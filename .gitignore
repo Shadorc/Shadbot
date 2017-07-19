@@ -1,0 +1,18 @@
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+
+# Eclipse project files
+.classpath
+.project
+.settings
+
+# Windows thumbnail db
+Thumbs.db
+
+# Project Files
+api_keys.json
+data.json

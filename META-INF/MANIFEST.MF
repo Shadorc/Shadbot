@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Created-By: Shadorc
+Main-Class: me.shadorc.discordbot.Main
+Class-Path: ./lib/Discord4j-2.8.4-shaded.jar ./lib/twitter4j-core-3.0.5.jar ./lib/infonet-1.4.4.jar ./lib/json.jar
