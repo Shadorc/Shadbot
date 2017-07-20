@@ -64,6 +64,7 @@ public class Command {
 				+ "\n\t/trivia"
 				+ "\n\t/roulette_russe"
 				+ "\n\t/coins"
+				+ "\n\t/chat <message>"
 				, channel);
 	}
 
@@ -214,6 +215,16 @@ public class Command {
 			Bot.sendMessage("```" + quote + "```", channel);
 		} catch (IOException e) {
 			Utils.error(e, "Une erreur est survenue lors de la récupération d'une quote sur danstonchat.com", channel);
+		}
+	}
+
+	public void chat() {
+		CleverbotChat.answer(arg, channel);
+	}
+
+	public void enable_translation() {
+		if(arg != null) {
+			CleverbotChat.setTranslationEnabled(Boolean.getBoolean(arg));
 		}
 	}
 }
