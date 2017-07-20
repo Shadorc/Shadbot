@@ -52,7 +52,7 @@ public class Command {
 		} catch (NoSuchMethodException e1) {
 			Bot.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", channel);
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e2) {
-			Log.error("Error while executing method." ,e2);
+			Log.error("Error while executing method.", e2);
 		}
 	}
 
@@ -63,14 +63,14 @@ public class Command {
 				+ "\n\t/vacances <zone>"
 				+ "\n\t/calc <calcul>"
 				+ "\n\t/meteo <ville>"
-				+ "\n\t/gif"
+				+ "\n\t/chat <message>"
 				+ "\n\t/gif <tag>"
+				+ "\n\t/gif"
 				+ "\n\t/dtc"
 				+ "\n\t/blague"
 				+ "\n\t/trivia"
 				+ "\n\t/roulette_russe"
 				+ "\n\t/coins"
-				+ "\n\t/chat <message>"
 				, channel);
 	}
 
@@ -82,11 +82,13 @@ public class Command {
 			} catch (IOException e) {
 				Log.error("Une erreur est survenue lors de la récupération du gif.", e, channel);
 			}
-		} 
+		}
 
 		else {
 			try {
-				String json = Infonet.getHTML(new URL("https://api.giphy.com/v1/gifs/random?tag=" + URLEncoder.encode(arg, "UTF-8") + "&api_key=" + Storage.get(API_KEYS.GIPHY_API_KEY)));
+				String json = Infonet.getHTML(new URL("https://api.giphy.com/v1/gifs/random?"
+						+ "api_key=" + Storage.get(API_KEYS.GIPHY_API_KEY)
+						+ "&tag=" + URLEncoder.encode(arg, "UTF-8")));
 				JSONObject obj = new JSONObject(json);
 				if(obj.get("data") instanceof JSONArray) {
 					Bot.sendMessage("Aucun résultat pour " + arg, channel);
@@ -119,12 +121,14 @@ public class Command {
 
 			JSONObject pagesObj = new JSONObject(json).getJSONObject("query").getJSONObject("pages");
 			String pageId = pagesObj.names().getString(0);
+			if(pageId.equals("-1")) {
+				Bot.sendMessage("Aucun résultat pour : " + arg, channel);
+				return;
+			}
 			String description = pagesObj.getJSONObject(pageId).getString("extract");
 			Bot.sendMessage(description, channel);
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération des informations sur Wikipédia.", e, channel);
-		} catch (StringIndexOutOfBoundsException e1) {
-			Bot.sendMessage("Aucun résultat pour : " + arg, channel);
 		}
 	}
 
@@ -148,6 +152,11 @@ public class Command {
 	}
 
 	public void calc() {
+		if(arg == null) {
+			Bot.sendMessage("Merci d'entrer un calcul.", channel);
+			return;
+		}
+
 		try {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			Bot.sendMessage(arg + " = " + engine.eval(arg), channel);
@@ -174,7 +183,7 @@ public class Command {
 		} catch (Exception e) {
 			Log.error("Une erreur est survenue lors de la traduction.", e, channel);
 		}
-	} 
+	}
 
 	public void trivia() {
 		try {
@@ -200,11 +209,16 @@ public class Command {
 	}
 
 	public void meteo() {
+		if(arg == null) {
+			Bot.sendMessage("Merci d'indiquer le nom d'une ville.", channel);
+			return;
+		}
+
 		IWeatherDataService dataService = WeatherDataServiceFactory.getWeatherDataService(service.OPEN_WEATHER_MAP);
 		try {
 			WeatherData data = dataService.getWeatherData(new Location(arg, "FR"));
 			Bot.sendMessage("__Météo pour la ville de " + data.getCity().getName() + "__ (dernière mise à jour le " + data.getLastUpdate().getValue() + ") :"
-					+ "\n\tNuages : " + Utils.translate("en", "fr", data.getClouds().getValue()) 
+					+ "\n\tNuages : " + Utils.translate("en", "fr", data.getClouds().getValue())
 					+ "\n\tVent : " + data.getWind().getSpeed().getValue() + "m/s, " + Utils.translate("en", "fr", data.getWind().getSpeed().getName()).toLowerCase()
 					+ "\n\tPrécipitations : " + (data.getPrecipitation().getMode().equals("no") ? "Aucune" : data.getPrecipitation().getValue())
 					+ "\n\tHumidité : " + data.getHumidity().getValue() + "%"
@@ -217,7 +231,7 @@ public class Command {
 	public void dtc() {
 		try {
 			String json = Infonet.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
-					+ "key=" + Storage.get(API_KEYS.DTC_API_KEY) 
+					+ "key=" + Storage.get(API_KEYS.DTC_API_KEY)
 					+ "&format=json"));
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");
 			Bot.sendMessage("```" + quote + "```", channel);
@@ -241,7 +255,7 @@ public class Command {
 			Log.error("Une erreur est survenue lors de la récupération de la blague.", e, channel);
 		}
 	}
-	
+
 	public void set_chatbot() {
 		if(message.getAuthor().getName().equals("Shadorc")) {
 			if(arg != null) {

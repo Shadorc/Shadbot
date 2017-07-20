@@ -41,12 +41,12 @@ public class Chat {
 				String response = result.getString("that");
 				aliceState = result.getString("custid");
 				Bot.sendMessage(response, channel);
-			} 
+			}
 
 			else if(chatBot.equals(ChatBot.CLEVERBOT)) {
 				String jsonString = Infonet.getHTML(new URL("http://www.cleverbot.com/getreply?"
-						+ "key=" + Storage.get(API_KEYS.CLEVERBOT_API_KEY) 
-						+ "&input=" + URLEncoder.encode(arg, "UTF-8") 
+						+ "key=" + Storage.get(API_KEYS.CLEVERBOT_API_KEY)
+						+ "&input=" + URLEncoder.encode(arg, "UTF-8")
 						+ (cleverbotState != null ? "&cs=" + cleverbotState : "")));
 				JSONObject obj = new JSONObject(jsonString);
 				String response = obj.getString("output");

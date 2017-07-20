@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,18 +19,15 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class Trivia {
 
-	private static ArrayList <IUser> alreadyAnswered = new ArrayList <IUser> ();
+	private static ArrayList <IUser> alreadyAnswered = new ArrayList <> ();
 	public static boolean QUIZZ_STARTED = false;
 
 	private static String CORRECT_ANSWER;
 	private static IChannel CHANNEL;
 
-	private static final Timer timer = new Timer(30*1000, new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Bot.sendMessage("Temps écoulé, la bonne réponse était " + CORRECT_ANSWER, CHANNEL);
-			Trivia.stop();
-		}
+	private static final Timer timer = new Timer(30*1000, e -> {
+		Bot.sendMessage("Temps écoulé, la bonne réponse était " + CORRECT_ANSWER, CHANNEL);
+		Trivia.stop();
 	});
 
 	public static void start(IChannel channel) throws MalformedURLException, IOException {
@@ -77,12 +72,12 @@ public class Trivia {
 	public static void checkAnswer(IMessage message) {
 		if(alreadyAnswered.contains(message.getAuthor())) {
 			Bot.sendMessage("Désolé " + message.getAuthor().getName() + ", tu ne peux plus répondre après avoir donné une mauvaise réponse.", message.getChannel());
-		} 
+		}
 		else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), Trivia.CORRECT_ANSWER.toLowerCase()) < 2) {
 			Bot.sendMessage("Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 10 coins.", CHANNEL);
 			Utils.gain(message.getAuthor().getName(), 10);
 			Trivia.stop();
-		} 
+		}
 		else {
 			Bot.sendMessage("Mauvaise réponse.", CHANNEL);
 			alreadyAnswered.add(message.getAuthor());

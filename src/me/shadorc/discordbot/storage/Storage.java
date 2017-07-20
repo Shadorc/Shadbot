@@ -18,12 +18,12 @@ public class Storage {
 	private static final File DATA_FILE = new File("data.json");
 
 	public enum API_KEYS {
-		GIPHY_API_KEY, 
-		DTC_API_KEY, 
-		DISCORD_TOKEN, 
-		TWITTER_API_KEY, 
-		TWITTER_API_SECRET, 
-		TWITTER_TOKEN, 
+		GIPHY_API_KEY,
+		DTC_API_KEY,
+		DISCORD_TOKEN,
+		TWITTER_API_KEY,
+		TWITTER_API_SECRET,
+		TWITTER_TOKEN,
 		TWITTER_TOKEN_SECRET,
 		CLEVERBOT_API_KEY
 	}
@@ -41,7 +41,9 @@ public class Storage {
 					Log.error("Error while saving in storage file.", e);
 				} finally {
 					try {
-						if(writer != null) writer.close();
+						if(writer != null) {
+							writer.close();
+						}
 					} catch (IOException e) {
 						Log.error("Error while closing writer.", e);
 					}
@@ -53,7 +55,9 @@ public class Storage {
 	}
 
 	public static void store(Object key, Object value) {
-		if(!DATA_FILE.exists()) Storage.init();
+		if(!DATA_FILE.exists()) {
+			Storage.init();
+		}
 
 		FileWriter writer = null;
 		try {
@@ -67,7 +71,9 @@ public class Storage {
 			Log.error("Error while saving in storage file.", e);
 		} finally {
 			try {
-				if(writer != null) writer.close();
+				if(writer != null) {
+					writer.close();
+				}
 			} catch (IOException e) {
 				Log.error("Error while closing writer.", e);
 			}
@@ -75,7 +81,9 @@ public class Storage {
 	}
 
 	public static int get(String key) {
-		if(!DATA_FILE.exists()) Storage.init();
+		if(!DATA_FILE.exists()) {
+			Storage.init();
+		}
 
 		try {
 			JSONObject obj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
