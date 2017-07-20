@@ -27,9 +27,7 @@ public class AnnotationListener {
 		IChannel channel = event.getChannel();
 		IMessage message = event.getMessage();
 
-		if(Main.BETA && guild.getName().equals("Shadserv") && channel.getName().equals("test")
-				|| !Main.BETA && guild.getName().equals("Chambre de Jack") && channel.getName().equals("bot_room")) {
-
+		if(Main.DEBUG && guild.getStringID().equals("331152695006330880") || !Main.DEBUG && channel.getStringID().equals("275615361997471745")) {
 			if(Trivia.QUIZZ_STARTED) {
 				Trivia.checkAnswer(message);
 			}
