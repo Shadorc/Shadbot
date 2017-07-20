@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javax.swing.Timer;
 
@@ -14,9 +15,11 @@ import org.json.JSONObject;
 import me.shadorc.infonet.Infonet;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
 
 public class Trivia {
 
+	private static ArrayList <IUser> alreadyAnswered = new ArrayList <IUser> ();
 	public static boolean QUIZZ_STARTED = false;
 
 	private static String CORRECT_ANSWER;
@@ -26,8 +29,7 @@ public class Trivia {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Bot.sendMessage("Temps écoulé, la bonne réponse était " + CORRECT_ANSWER, CHANNEL);
-			Trivia.QUIZZ_STARTED = false;
-			timer.stop();
+			Trivia.stop();
 		}
 	});
 
@@ -66,20 +68,33 @@ public class Trivia {
 		Bot.sendMessage(quizzMessage.toString(), channel);
 
 		Trivia.CORRECT_ANSWER = Utils.convertToPlainText(correct_answer);
-		Trivia.QUIZZ_STARTED = true;
 		Trivia.CHANNEL = channel;
-
-		timer.start();
+		Trivia.start();
 	}
 
 	public static void checkAnswer(IMessage message) {
-		if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), Trivia.CORRECT_ANSWER.toLowerCase()) < 2) {
+		if(alreadyAnswered.contains(message.getAuthor())) {
+			Bot.sendMessage("Désolé " + message.getAuthor().getName() + ", tu ne peux plus répondre après avoir donné une mauvaise réponse.", message.getChannel());
+		} 
+		else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), Trivia.CORRECT_ANSWER.toLowerCase()) < 2) {
 			Bot.sendMessage("Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 10 coins.", CHANNEL);
 			Utils.gain(message.getAuthor().getName(), 10);
-			Trivia.QUIZZ_STARTED = false;
-			timer.stop();
-		} else {
+			Trivia.stop();
+		} 
+		else {
 			Bot.sendMessage("Mauvaise réponse.", CHANNEL);
+			alreadyAnswered.add(message.getAuthor());
 		}
+	}
+
+	public static void start() {
+		Trivia.QUIZZ_STARTED = true;
+		timer.start();
+	}
+
+	public static void stop() {
+		Trivia.QUIZZ_STARTED = false;
+		alreadyAnswered.clear();
+		timer.stop();
 	}
 }
