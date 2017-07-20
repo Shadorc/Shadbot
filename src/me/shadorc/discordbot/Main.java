@@ -1,6 +1,8 @@
 package me.shadorc.discordbot;
 
-import me.shadorc.discordbot.Storage.API_KEYS;
+import me.shadorc.discordbot.listener.AnnotationListener;
+import me.shadorc.discordbot.storage.Storage;
+import me.shadorc.discordbot.storage.Storage.API_KEYS;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventDispatcher;

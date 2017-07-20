@@ -1,4 +1,4 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.command;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +12,8 @@ import javax.swing.Timer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Bot;
+import me.shadorc.discordbot.utility.Utils;
 import me.shadorc.infonet.Infonet;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -50,7 +52,7 @@ public class Trivia {
 		quizzMessage.append("Catégorie : " + category
 				+ ", type : " + type
 				+ ", difficulté : " + difficulty
-				+ "\nQuestion : **" + Utils.convertToPlainText(question) + "**\n");
+				+ "\nQuestion : **" + Utils.convertToUTF8(question) + "**\n");
 
 		if(type.equals("multiple")) {
 			JSONArray incorrect_answers = result.getJSONArray("incorrect_answers");
@@ -59,15 +61,15 @@ public class Trivia {
 			int index = Utils.rand(incorrect_answers.length());
 			for(int i = 0; i < incorrect_answers.length(); i++) {
 				if(i == index) {
-					quizzMessage.append("\t- " + Utils.convertToPlainText(correct_answer) + "\n");
+					quizzMessage.append("\t- " + Utils.convertToUTF8(correct_answer) + "\n");
 				}
-				quizzMessage.append("\t- " + Utils.convertToPlainText((String) incorrect_answers.get(i)) + "\n");
+				quizzMessage.append("\t- " + Utils.convertToUTF8((String) incorrect_answers.get(i)) + "\n");
 			}
 		}
 
 		Bot.sendMessage(quizzMessage.toString(), channel);
 
-		Trivia.CORRECT_ANSWER = Utils.convertToPlainText(correct_answer);
+		Trivia.CORRECT_ANSWER = Utils.convertToUTF8(correct_answer);
 		Trivia.CHANNEL = channel;
 		Trivia.start();
 	}

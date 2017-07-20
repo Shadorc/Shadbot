@@ -1,4 +1,4 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.storage;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import me.shadorc.discordbot.utility.Log;
 
 public class Storage {
 
@@ -36,18 +38,16 @@ public class Storage {
 					writer.write("{}");
 					writer.flush();
 				} catch (IOException e) {
-					System.err.println("Error while saving in storage file.");
-					e.printStackTrace();
+					Log.error("Error while saving in storage file.", e);
 				} finally {
 					try {
 						if(writer != null) writer.close();
 					} catch (IOException e) {
-						e.printStackTrace();
+						Log.error("Error while closing writer.", e);
 					}
 				}
 			} catch (IOException e) {
-				System.err.println("Error while creating storage file.");
-				e.printStackTrace();
+				Log.error("Error while creating storage file.", e);
 			}
 		}
 	}
@@ -61,16 +61,15 @@ public class Storage {
 			obj.put(key.toString(), value.toString());
 
 			writer = new FileWriter(DATA_FILE);
-			writer.write(obj.toString());
+			writer.write(obj.toString(2));
 			writer.flush();
 		} catch (IOException e) {
-			System.err.println("Error while saving in storage file.");
-			e.printStackTrace();
+			Log.error("Error while saving in storage file.", e);
 		} finally {
 			try {
 				if(writer != null) writer.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				Log.error("Error while closing writer.", e);
 			}
 		}
 	}
@@ -84,8 +83,7 @@ public class Storage {
 				return obj.getInt(key);
 			}
 		} catch (JSONException | IOException e) {
-			System.err.println("Error while reading storage file.");
-			e.printStackTrace();
+			Log.error("Error while reading storage file.", e);
 		}
 		return 0;
 	}
@@ -95,8 +93,7 @@ public class Storage {
 			JSONObject obj = new JSONObject(new String(Files.readAllBytes(Paths.get(API_KEYS_FILE.getPath())), StandardCharsets.UTF_8));
 			return obj.getString(key.toString());
 		} catch (JSONException | IOException e) {
-			System.err.println("Error while accessing to API keys storage.");
-			e.printStackTrace();
+			Log.error("Error while accessing to API keys storage.", e);
 		}
 		return null;
 	}

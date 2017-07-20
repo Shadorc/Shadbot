@@ -1,4 +1,4 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.command;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +19,13 @@ import il.ac.hit.finalproject.classes.Location;
 import il.ac.hit.finalproject.classes.WeatherData;
 import il.ac.hit.finalproject.classes.WeatherDataServiceFactory;
 import il.ac.hit.finalproject.classes.WeatherDataServiceFactory.service;
-import me.shadorc.discordbot.Storage.API_KEYS;
+import me.shadorc.discordbot.Bot;
+import me.shadorc.discordbot.Main;
+import me.shadorc.discordbot.command.Chat.ChatBot;
+import me.shadorc.discordbot.storage.Storage;
+import me.shadorc.discordbot.storage.Storage.API_KEYS;
+import me.shadorc.discordbot.utility.Log;
+import me.shadorc.discordbot.utility.Utils;
 import me.shadorc.infonet.Infonet;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -46,8 +52,7 @@ public class Command {
 		} catch (NoSuchMethodException e1) {
 			Bot.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", channel);
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e2) {
-			System.err.println("Error while executing method.");
-			e2.printStackTrace();
+			Log.error("Error while executing method." ,e2);
 		}
 	}
 
@@ -75,7 +80,7 @@ public class Command {
 				String gifUrl = Infonet.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
 				Bot.sendMessage(gifUrl, channel);
 			} catch (IOException e) {
-				Utils.error(e, "Une erreur est survenue lors de la récupération du gif.", channel);
+				Log.error("Une erreur est survenue lors de la récupération du gif.", e, channel);
 			}
 		} 
 
@@ -90,7 +95,7 @@ public class Command {
 				String url = obj.getJSONObject("data").getString("url");
 				Bot.sendMessage(url, channel);
 			} catch (IOException e) {
-				Utils.error(e, "Une erreur est survenue lors de la récupération d'un gif sur Giphy.", channel);
+				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Giphy.", e, channel);
 			}
 		}
 	}
@@ -117,7 +122,7 @@ public class Command {
 			String description = pagesObj.getJSONObject(pageId).getString("extract");
 			Bot.sendMessage(description, channel);
 		} catch (IOException e) {
-			Utils.error(e, "Une erreur est survenue lors de la récupération des informations sur Wikipédia.", channel);
+			Log.error("Une erreur est survenue lors de la récupération des informations sur Wikipédia.", e, channel);
 		} catch (StringIndexOutOfBoundsException e1) {
 			Bot.sendMessage("Aucun résultat pour : " + arg, channel);
 		}
@@ -137,7 +142,7 @@ public class Command {
 			if(e.getErrorCode() == 34) {
 				Bot.sendMessage("La zone indiquée n'existe pas, merci d'entrer A, B ou C.", channel);
 			} else {
-				Utils.error(e, "Une erreur est survenue lors de la récupération des informations concernant les vacances.", channel);
+				Log.error("Une erreur est survenue lors de la récupération des informations concernant les vacances.", e, channel);
 			}
 		}
 	}
@@ -167,7 +172,7 @@ public class Command {
 			String word = Utils.translate(args[0], args[1], args[2]);
 			Bot.sendMessage("Traduction : " + word, channel);
 		} catch (Exception e) {
-			Utils.error(e, "Une erreur est survenue lors de la traduction.", channel);
+			Log.error("Une erreur est survenue lors de la traduction.", e, channel);
 		}
 	} 
 
@@ -175,7 +180,7 @@ public class Command {
 		try {
 			Trivia.start(channel);
 		} catch (IOException e) {
-			Utils.error(e, "Une erreur est survenue lors de la récupération de la question.", channel);
+			Log.error("Une erreur est survenue lors de la récupération de la question.", e, channel);
 		}
 	}
 
@@ -205,7 +210,7 @@ public class Command {
 					+ "\n\tHumidité : " + data.getHumidity().getValue() + "%"
 					+ "\n\tTempérature : " + data.getTemperature().getValue() + "°C", channel);
 		} catch (Exception e) {
-			Utils.error(e, "Une erreur est survenue lors de la récupération des données météorologiques.", channel);
+			Log.error("Une erreur est survenue lors de la récupération des données météorologiques.", e, channel);
 		}
 	}
 
@@ -217,18 +222,12 @@ public class Command {
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");
 			Bot.sendMessage("```" + quote + "```", channel);
 		} catch (IOException e) {
-			Utils.error(e, "Une erreur est survenue lors de la récupération d'une quote sur danstonchat.com", channel);
+			Log.error("Une erreur est survenue lors de la récupération d'une quote sur danstonchat.com", e, channel);
 		}
 	}
 
 	public void chat() {
-		CleverbotChat.answer(arg, channel);
-	}
-
-	public void enable_translation() {
-		if(arg != null) {
-			CleverbotChat.setTranslationEnabled(Boolean.getBoolean(arg));
-		}
+		Chat.answer(arg, channel);
 	}
 
 	public void blague() {
@@ -237,9 +236,22 @@ public class Command {
 			ArrayList <String> jokesList = Infonet.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
 			String joke = jokesList.get(Utils.rand(jokesList.size()));
 			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
-			Bot.sendMessage("```" + Utils.convertToPlainText(joke) + "```", channel);
+			Bot.sendMessage("```" + Utils.convertToUTF8(joke) + "```", channel);
 		} catch (IOException e) {
-			Utils.error(e, "Une erreur est survenue lors de la récupération de la blague.", channel);
+			Log.error("Une erreur est survenue lors de la récupération de la blague.", e, channel);
+		}
+	}
+	
+	public void set_chatbot() {
+		if(message.getAuthor().getName().equals("Shadorc")) {
+			if(arg != null) {
+				if(arg.equalsIgnoreCase(ChatBot.ALICE.toString())) {
+					Chat.setChatbot(ChatBot.ALICE);
+				} else if(arg.equalsIgnoreCase(ChatBot.CLEVERBOT.toString())) {
+					Chat.setChatbot(ChatBot.CLEVERBOT);
+				}
+				Bot.sendMessage("ChatBot has been set to " + arg.toUpperCase(), channel);
+			}
 		}
 	}
 }

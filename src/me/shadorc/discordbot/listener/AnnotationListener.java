@@ -1,7 +1,11 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.listener;
 
 import java.util.List;
 
+import me.shadorc.discordbot.Bot;
+import me.shadorc.discordbot.Main;
+import me.shadorc.discordbot.command.Trivia;
+import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -13,16 +17,15 @@ public class AnnotationListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		System.out.println("\n---------------- Shadbot is connected ----------------");
-		System.out.println("ShadBot is connected to :");
+		Log.print("\n---------------- Shadbot is connected [DEBUG MODE : " + Main.DEBUG + "] ----------------");
+		Log.print("ShadBot is connected to :");
 		List <IGuild> guilds = event.getClient().getGuilds();
 		for(IGuild guild : guilds) {
-			System.out.println("\t*Guild : " + guild.getName() + " | ID : " + guild.getLongID());
+			Log.print("\t*Guild: " + guild.getName() + " (ID: " + guild.getLongID() +")");
 			for(IChannel chan : guild.getChannels()) {
-				System.out.println("\t\tChannel : " + chan.getName() + " | ID : " + chan.getLongID());
+				Log.print("\t\tChannel: " + chan.getName() + " (ID: " + chan.getLongID() + ")");
 			}
 		}
-		System.out.println();
 	}
 
 	@EventSubscriber

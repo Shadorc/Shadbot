@@ -1,4 +1,4 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.utility;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,16 +11,11 @@ import java.util.Random;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 
-import sx.blah.discord.handle.obj.IChannel;
+import me.shadorc.discordbot.storage.Storage;
 
 public class Utils {
 
 	private static final Random RAND = new Random();
-
-	public static void error(Exception e, String message, IChannel channel) {
-		Bot.sendMessage(message, channel);
-		e.printStackTrace();
-	}
 
 	public static String translate(String langFrom, String langTo, String word) throws IOException {
 		String url = "https://translate.googleapis.com/translate_a/single?"+
@@ -49,7 +44,7 @@ public class Utils {
 		return jsonArray3.get(0).toString();
 	}
 
-	public static String convertToPlainText(String text) {
+	public static String convertToUTF8(String text) {
 		return StringEscapeUtils.unescapeHtml3(text);
 	}
 

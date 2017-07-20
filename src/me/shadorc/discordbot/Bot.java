@@ -1,5 +1,7 @@
 package me.shadorc.discordbot;
 
+import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.DiscordException;
@@ -15,16 +17,16 @@ public class Bot {
 				new MessageBuilder(Main.getClient()).withChannel(channel).withContent(message).build();
 			}
 		} catch (RateLimitException e) {
-			System.err.println("Sending messages too quickly!");
+			Log.error("Sending messages too quickly!");
 		} catch (MissingPermissionsException e) {
-			System.err.println("Missing permissions for channel!");
+			Log.error("Missing permissions for channel!");
 		} catch (DiscordException e) {
-			System.err.println(e.getErrorMessage());
-			e.printStackTrace();
+			Log.error(e.getErrorMessage(), e);
 		}
 	}
 
 	public static void executeCommand(IMessage message, IChannel channel) {
+		Log.info("Executing command \"" + message.getContent() + "\" from " + message.getAuthor().getName() + ".");
 		new Command(message, channel).execute();
 	}
 }
