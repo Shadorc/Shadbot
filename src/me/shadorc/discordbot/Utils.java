@@ -1,12 +1,14 @@
 package me.shadorc.discordbot;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Random;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -20,7 +22,7 @@ public class Utils {
 		e.printStackTrace();
 	}
 
-	public static String translate(String langFrom, String langTo, String word) throws Exception {
+	public static String translate(String langFrom, String langTo, String word) throws IOException {
 		String url = "https://translate.googleapis.com/translate_a/single?"+
 				"client=gtx&"+
 				"sl=" + langFrom + 
@@ -48,7 +50,7 @@ public class Utils {
 	}
 
 	public static String convertToPlainText(String text) {
-		return text.replace("&amp;", "&").replace("&quot;", "\"").replaceAll("&#039;", "'");
+		return StringEscapeUtils.unescapeHtml3(text);
 	}
 
 	public static int rand(int bound) {
@@ -58,7 +60,7 @@ public class Utils {
 	public static void gain(String author, int gain) {
 		Storage.store(author, Storage.get(author)+gain);
 	}
-	
+
 	public static int getLevenshteinDistance(String word1, String word2) {
 		int[][] distance = new int[word1.length() + 1][word2.length() + 1];        
 

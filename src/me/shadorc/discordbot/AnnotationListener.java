@@ -13,10 +13,14 @@ public class AnnotationListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		System.out.println("\nShadBot is connected to :");
+		System.out.println("\n---------------- Shadbot is connected ----------------");
+		System.out.println("ShadBot is connected to :");
 		List <IGuild> guilds = event.getClient().getGuilds();
 		for(IGuild guild : guilds) {
-			System.out.println("\tName : " + guild.getName() + " | ID : " + guild.getLongID());
+			System.out.println("\t*Guild : " + guild.getName() + " | ID : " + guild.getLongID());
+			for(IChannel chan : guild.getChannels()) {
+				System.out.println("\t\tChannel : " + chan.getName() + " | ID : " + chan.getLongID());
+			}
 		}
 		System.out.println();
 	}

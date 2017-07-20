@@ -50,7 +50,7 @@ public class Trivia {
 		quizzMessage.append("Catégorie : " + category
 				+ ", type : " + type
 				+ ", difficulté : " + difficulty
-				+ "\nQuestion : *" + Utils.convertToPlainText(question) + "*\n");
+				+ "\nQuestion : **" + Utils.convertToPlainText(question) + "**\n");
 
 		if(type.equals("multiple")) {
 			JSONArray incorrect_answers = result.getJSONArray("incorrect_answers");

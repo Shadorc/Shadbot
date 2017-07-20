@@ -10,7 +10,7 @@ import twitter4j.auth.AccessToken;
 
 public class Main {
 
-	public static boolean BETA = false;
+	public static boolean DEBUG = false;
 
 	private static IDiscordClient client;
 	private static Twitter twitter;

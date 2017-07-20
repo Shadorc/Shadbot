@@ -59,7 +59,6 @@ public class Command {
 				+ "\n\t/meteo <ville>"
 				+ "\n\t/gif"
 				+ "\n\t/gif <tag>"
-				+ "\n\t/giphy <tag>"
 				+ "\n\t/dtc"
 				+ "\n\t/trivia"
 				+ "\n\t/roulette_russe"
@@ -210,7 +209,9 @@ public class Command {
 
 	public void dtc() {
 		try {
-			String json = Infonet.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?key=" + Storage.get(API_KEYS.DTC_API_KEY) + "&format=json"));
+			String json = Infonet.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
+					+ "key=" + Storage.get(API_KEYS.DTC_API_KEY) 
+					+ "&format=json"));
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");
 			Bot.sendMessage("```" + quote + "```", channel);
 		} catch (IOException e) {
