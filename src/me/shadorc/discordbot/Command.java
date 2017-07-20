@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -60,6 +61,7 @@ public class Command {
 				+ "\n\t/gif"
 				+ "\n\t/gif <tag>"
 				+ "\n\t/dtc"
+				+ "\n\t/blague"
 				+ "\n\t/trivia"
 				+ "\n\t/roulette_russe"
 				+ "\n\t/coins"
@@ -226,6 +228,18 @@ public class Command {
 	public void enable_translation() {
 		if(arg != null) {
 			CleverbotChat.setTranslationEnabled(Boolean.getBoolean(arg));
+		}
+	}
+
+	public void blague() {
+		try {
+			String htmlPage = Infonet.getHTML(new URL("https://www.blague-drole.net/blagues-" + Utils.rand(10)+1 + ".html?tri=top"));
+			ArrayList <String> jokesList = Infonet.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
+			String joke = jokesList.get(Utils.rand(jokesList.size()));
+			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
+			Bot.sendMessage("```" + Utils.convertToPlainText(joke) + "```", channel);
+		} catch (IOException e) {
+			Utils.error(e, "Une erreur est survenue lors de la récupération de la blague.", channel);
 		}
 	}
 }
