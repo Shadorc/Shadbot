@@ -2,9 +2,9 @@ package me.shadorc.discordbot.listener;
 
 import java.util.List;
 
-import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.Main;
 import me.shadorc.discordbot.command.Trivia;
+import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
@@ -26,6 +26,7 @@ public class AnnotationListener {
 				Log.print("\t\tChannel: " + chan.getName() + " (ID: " + chan.getLongID() + ")");
 			}
 		}
+		Log.print("");
 	}
 
 	@EventSubscriber
@@ -34,6 +35,11 @@ public class AnnotationListener {
 		IChannel channel = event.getChannel();
 		IMessage message = event.getMessage();
 
+		//Check if the bot doesn't answer to itself or to another bot
+		if(event.getAuthor().isBot() || event.getAuthor().getStringID().equals(event.getClient().getOurUser().getStringID())) {
+			return;
+		}
+		
 		if(Main.DEBUG && guild.getStringID().equals("331152695006330880") || !Main.DEBUG && channel.getStringID().equals("275615361997471745")) {
 			if(Trivia.QUIZZ_STARTED) {
 				Trivia.checkAnswer(message);
