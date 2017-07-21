@@ -2,7 +2,7 @@ package me.shadorc.discordbot.command;
 
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
-import me.shadorc.discordbot.storage.Storage;
+import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.utility.BotUtils;
 
 public class CoinsCommand extends Command {

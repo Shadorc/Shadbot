@@ -1,8 +1,7 @@
-package me.shadorc.discordbot.listener;
+package me.shadorc.discordbot;
 
 import java.util.List;
 
-import me.shadorc.discordbot.Main;
 import me.shadorc.discordbot.command.TriviaCommand;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;

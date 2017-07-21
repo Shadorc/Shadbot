@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.storage;
+package me.shadorc.discordbot;
 
 import java.io.File;
 import java.io.FileWriter;

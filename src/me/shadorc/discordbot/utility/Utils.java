@@ -11,7 +11,7 @@ import java.util.Random;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 
-import me.shadorc.discordbot.storage.Storage;
+import me.shadorc.discordbot.Storage;
 
 public class Utils {
 

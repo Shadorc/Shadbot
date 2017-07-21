@@ -1,7 +1,7 @@
 package me.shadorc.discordbot.utility;
 
+import me.shadorc.discordbot.CommandManager;
 import me.shadorc.discordbot.Main;
-import me.shadorc.discordbot.command.CommandManager;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;
