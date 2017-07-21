@@ -7,17 +7,17 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RateLimitException;
+import sx.blah.discord.util.RequestBuffer;
 
 public class Bot {
 
 	public static void sendMessage(String message, IChannel channel) {
 		try {
 			if(!message.isEmpty()) {
-				new MessageBuilder(Main.getClient()).withChannel(channel).withContent(message).build();
+				RequestBuffer.request(() -> {
+					new MessageBuilder(Main.getClient()).withChannel(channel).withContent(message).build();
+				});
 			}
-		} catch (RateLimitException e) {
-			Log.error("Sending messages too quickly!");
 		} catch (MissingPermissionsException e) {
 			Log.error("Missing permissions for channel!");
 		} catch (DiscordException e) {
