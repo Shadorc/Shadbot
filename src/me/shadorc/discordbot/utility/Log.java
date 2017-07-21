@@ -6,7 +6,6 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.shadorc.discordbot.Bot;
 import sx.blah.discord.handle.obj.IChannel;
 
 public class Log {
@@ -24,7 +23,7 @@ public class Log {
 
 	public static void error(String msg, Exception e, IChannel channel) {
 		LOGGER.error(Log.getTime() + msg, e);
-		Bot.sendMessage(msg, channel);
+		BotUtils.sendMessage(msg, channel);
 		e.printStackTrace();
 	}
 

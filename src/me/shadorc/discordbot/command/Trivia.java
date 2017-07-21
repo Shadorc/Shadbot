@@ -10,7 +10,7 @@ import javax.swing.Timer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import me.shadorc.discordbot.Bot;
+import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
 import me.shadorc.infonet.Infonet;
 import sx.blah.discord.handle.obj.IChannel;
@@ -26,7 +26,7 @@ public class Trivia {
 	private static IChannel CHANNEL;
 
 	private static final Timer timer = new Timer(30*1000, e -> {
-		Bot.sendMessage("Temps écoulé, la bonne réponse était " + CORRECT_ANSWER, CHANNEL);
+		BotUtils.sendMessage("Temps écoulé, la bonne réponse était " + CORRECT_ANSWER, CHANNEL);
 		Trivia.stop();
 	});
 
@@ -62,7 +62,7 @@ public class Trivia {
 			}
 		}
 
-		Bot.sendMessage(quizzMessage.toString(), channel);
+		BotUtils.sendMessage(quizzMessage.toString(), channel);
 
 		Trivia.CORRECT_ANSWER = Utils.convertToUTF8(correct_answer);
 		Trivia.CHANNEL = channel;
@@ -71,15 +71,15 @@ public class Trivia {
 
 	public static void checkAnswer(IMessage message) {
 		if(alreadyAnswered.contains(message.getAuthor())) {
-			Bot.sendMessage("Désolé " + message.getAuthor().getName() + ", tu ne peux plus répondre après avoir donné une mauvaise réponse.", message.getChannel());
+			BotUtils.sendMessage("Désolé " + message.getAuthor().getName() + ", tu ne peux plus répondre après avoir donné une mauvaise réponse.", message.getChannel());
 		}
 		else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), Trivia.CORRECT_ANSWER.toLowerCase()) < 2) {
-			Bot.sendMessage("Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 10 coins.", CHANNEL);
+			BotUtils.sendMessage("Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 10 coins.", CHANNEL);
 			Utils.gain(message.getAuthor().getName(), 10);
 			Trivia.stop();
 		}
 		else {
-			Bot.sendMessage("Mauvaise réponse.", CHANNEL);
+			BotUtils.sendMessage("Mauvaise réponse.", CHANNEL);
 			alreadyAnswered.add(message.getAuthor());
 		}
 	}

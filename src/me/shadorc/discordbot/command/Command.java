@@ -19,7 +19,7 @@ import il.ac.hit.finalproject.classes.Location;
 import il.ac.hit.finalproject.classes.WeatherData;
 import il.ac.hit.finalproject.classes.WeatherDataServiceFactory;
 import il.ac.hit.finalproject.classes.WeatherDataServiceFactory.service;
-import me.shadorc.discordbot.Bot;
+import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.Main;
 import me.shadorc.discordbot.command.Chat.ChatBot;
 import me.shadorc.discordbot.storage.Storage;
@@ -50,7 +50,7 @@ public class Command {
 			Method method = this.getClass().getMethod(command);
 			method.invoke(this);
 		} catch (NoSuchMethodException e1) {
-			Bot.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", channel);
+			BotUtils.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", channel);
 			Log.info("La commande " + command + " a été essayée sans résultat.");
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e2) {
 			Log.error("Error while executing method.", e2);
@@ -58,7 +58,7 @@ public class Command {
 	}
 
 	public void help() {
-		Bot.sendMessage("__**Commandes disponibles :**__"
+		BotUtils.sendMessage("__**Commandes disponibles :**__"
 				+ "\n\t/trad <lang1> <lang2> <texte>"
 				+ "\n\t/wiki <recherche>"
 				+ "\n\t/vacances <zone>"
@@ -79,18 +79,18 @@ public class Command {
 	public void trad() {
 		//Country doc https://www.pastebin.com/NHWLgJ43
 		if(arg == null) {
-			Bot.sendMessage("Merci d'indiquer les 2 langues et le texte à traduire. Exemple : /trad fr en Salut", channel);
+			BotUtils.sendMessage("Merci d'indiquer les 2 langues et le texte à traduire. Exemple : /trad fr en Salut", channel);
 			return;
 		}
 
 		try {
 			String[] args = arg.split(" ", 3);
 			if(args.length < 3) {
-				Bot.sendMessage("Merci d'indiquer les 2 langues et le texte à traduire. Exemple : /trad fr en Salut", channel);
+				BotUtils.sendMessage("Merci d'indiquer les 2 langues et le texte à traduire. Exemple : /trad fr en Salut", channel);
 				return;
 			}
 			String word = Utils.translate(args[0], args[1], args[2]);
-			Bot.sendMessage("Traduction : " + word, channel);
+			BotUtils.sendMessage("Traduction : " + word, channel);
 		} catch (Exception e) {
 			Log.error("Une erreur est survenue lors de la traduction.", e, channel);
 		}
@@ -98,7 +98,7 @@ public class Command {
 
 	public void wiki() {
 		if(arg == null) {
-			Bot.sendMessage("Merci d'indiquer une recherche.", channel);
+			BotUtils.sendMessage("Merci d'indiquer une recherche.", channel);
 			return;
 		}
 
@@ -116,11 +116,11 @@ public class Command {
 			JSONObject pagesObj = new JSONObject(json).getJSONObject("query").getJSONObject("pages");
 			String pageId = pagesObj.names().getString(0);
 			if(pageId.equals("-1")) {
-				Bot.sendMessage("Aucun résultat pour : " + arg, channel);
+				BotUtils.sendMessage("Aucun résultat pour : " + arg, channel);
 				return;
 			}
 			String description = pagesObj.getJSONObject(pageId).getString("extract");
-			Bot.sendMessage(description, channel);
+			BotUtils.sendMessage(description, channel);
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération des informations sur Wikipédia.", e, channel);
 		}
@@ -128,17 +128,17 @@ public class Command {
 
 	public void vacances() {
 		if(arg == null) {
-			Bot.sendMessage("Merci d'indiquer une zone : A, B ou C.", channel);
+			BotUtils.sendMessage("Merci d'indiquer une zone : A, B ou C.", channel);
 			return;
 		}
 
 		try {
 			Main.twitterConnection();
 			String holidays = Main.getTwitter().getUserTimeline("Vacances_Zone" + arg.toUpperCase()).get(0).getText().replaceAll("#", "");
-			Bot.sendMessage(holidays, channel);
+			BotUtils.sendMessage(holidays, channel);
 		} catch (TwitterException e) {
 			if(e.getErrorCode() == 34) {
-				Bot.sendMessage("La zone indiquée n'existe pas, merci d'entrer A, B ou C.", channel);
+				BotUtils.sendMessage("La zone indiquée n'existe pas, merci d'entrer A, B ou C.", channel);
 			} else {
 				Log.error("Une erreur est survenue lors de la récupération des informations concernant les vacances.", e, channel);
 			}
@@ -147,28 +147,28 @@ public class Command {
 
 	public void calc() {
 		if(arg == null) {
-			Bot.sendMessage("Merci d'entrer un calcul.", channel);
+			BotUtils.sendMessage("Merci d'entrer un calcul.", channel);
 			return;
 		}
 
 		try {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
-			Bot.sendMessage(arg + " = " + engine.eval(arg), channel);
+			BotUtils.sendMessage(arg + " = " + engine.eval(arg), channel);
 		} catch (ScriptException e) {
-			Bot.sendMessage("Calcul incorrect.", channel);
+			BotUtils.sendMessage("Calcul incorrect.", channel);
 		}
 	}
 
 	public void meteo() {
 		if(arg == null) {
-			Bot.sendMessage("Merci d'indiquer le nom d'une ville.", channel);
+			BotUtils.sendMessage("Merci d'indiquer le nom d'une ville.", channel);
 			return;
 		}
 
 		IWeatherDataService dataService = WeatherDataServiceFactory.getWeatherDataService(service.OPEN_WEATHER_MAP);
 		try {
 			WeatherData data = dataService.getWeatherData(new Location(arg, "FR"));
-			Bot.sendMessage("__Météo pour la ville de " + data.getCity().getName() + "__ (dernière mise à jour le " + data.getLastUpdate().getValue() + ") :"
+			BotUtils.sendMessage("__Météo pour la ville de " + data.getCity().getName() + "__ (dernière mise à jour le " + data.getLastUpdate().getValue() + ") :"
 					+ "\n\tNuages : " + Utils.translate("en", "fr", data.getClouds().getValue())
 					+ "\n\tVent : " + data.getWind().getSpeed().getValue() + "m/s, " + Utils.translate("en", "fr", data.getWind().getSpeed().getName()).toLowerCase()
 					+ "\n\tPrécipitations : " + (data.getPrecipitation().getMode().equals("no") ? "Aucune" : data.getPrecipitation().getValue())
@@ -187,7 +187,7 @@ public class Command {
 		if(arg == null) {
 			try {
 				String gifUrl = Infonet.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
-				Bot.sendMessage(gifUrl, channel);
+				BotUtils.sendMessage(gifUrl, channel);
 			} catch (IOException e) {
 				Log.error("Une erreur est survenue lors de la récupération du gif.", e, channel);
 			}
@@ -200,11 +200,11 @@ public class Command {
 						+ "&tag=" + URLEncoder.encode(arg, "UTF-8")));
 				JSONObject obj = new JSONObject(json);
 				if(obj.get("data") instanceof JSONArray) {
-					Bot.sendMessage("Aucun résultat pour " + arg, channel);
+					BotUtils.sendMessage("Aucun résultat pour " + arg, channel);
 					return;
 				}
 				String url = obj.getJSONObject("data").getString("url");
-				Bot.sendMessage(url, channel);
+				BotUtils.sendMessage(url, channel);
 			} catch (IOException e) {
 				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Giphy.", e, channel);
 			}
@@ -217,7 +217,7 @@ public class Command {
 					+ "key=" + Storage.get(API_KEYS.DTC_API_KEY)
 					+ "&format=json"));
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");
-			Bot.sendMessage("```" + quote + "```", channel);
+			BotUtils.sendMessage("```" + quote + "```", channel);
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération d'une quote sur danstonchat.com", e, channel);
 		}
@@ -229,7 +229,7 @@ public class Command {
 			ArrayList <String> jokesList = Infonet.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
 			String joke = jokesList.get(Utils.rand(jokesList.size()));
 			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
-			Bot.sendMessage("```" + Utils.convertToUTF8(joke) + "```", channel);
+			BotUtils.sendMessage("```" + Utils.convertToUTF8(joke) + "```", channel);
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération de la blague.", e, channel);
 		}
@@ -246,10 +246,10 @@ public class Command {
 	public void roulette_russe() {
 		String author = message.getAuthor().getName();
 		if(Utils.rand(6) == 0) {
-			Bot.sendMessage("Une goutte de sueur coule sur votre front, vous pressez la détente... **PAN** ... Désolé, vous êtes mort, vous perdez tous vos gains.", channel);
+			BotUtils.sendMessage("Une goutte de sueur coule sur votre front, vous pressez la détente... **PAN** ... Désolé, vous êtes mort, vous perdez tous vos gains.", channel);
 			Storage.store(author, 0);
 		} else {
-			Bot.sendMessage("Une goutte de sueur coule sur votre front, vous pressez la détente... **click** ... Pfiou, vous êtes toujours en vie, vous remportez 50 coins !", channel);
+			BotUtils.sendMessage("Une goutte de sueur coule sur votre front, vous pressez la détente... **click** ... Pfiou, vous êtes toujours en vie, vous remportez 50 coins !", channel);
 			Utils.gain(author, 50);
 		}
 	}
@@ -259,7 +259,7 @@ public class Command {
 	}
 
 	public void coins() {
-		Bot.sendMessage("Vous avez " + Storage.get(message.getAuthor().getName()) + " coins.", channel);
+		BotUtils.sendMessage("Vous avez " + Storage.get(message.getAuthor().getName()) + " coins.", channel);
 	}
 
 	public void set_chatbot() {
@@ -270,7 +270,7 @@ public class Command {
 				} else if(arg.equalsIgnoreCase(ChatBot.CLEVERBOT.toString())) {
 					Chat.setChatbot(ChatBot.CLEVERBOT);
 				}
-				Bot.sendMessage("ChatBot has been set to " + arg.toUpperCase(), channel);
+				BotUtils.sendMessage("ChatBot has been set to " + arg.toUpperCase(), channel);
 			}
 		}
 	}

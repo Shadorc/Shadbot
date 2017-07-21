@@ -2,7 +2,7 @@ package me.shadorc.discordbot.listener;
 
 import java.util.List;
 
-import me.shadorc.discordbot.Bot;
+import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.Main;
 import me.shadorc.discordbot.command.Trivia;
 import me.shadorc.discordbot.utility.Log;
@@ -39,7 +39,7 @@ public class AnnotationListener {
 				Trivia.checkAnswer(message);
 			}
 			else if(message.getContent().startsWith("/")) {
-				Bot.executeCommand(message, channel);
+				BotUtils.executeCommand(message, channel);
 			}
 		}
 	}

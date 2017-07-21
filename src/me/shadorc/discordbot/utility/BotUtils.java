@@ -1,7 +1,7 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.utility;
 
+import me.shadorc.discordbot.Main;
 import me.shadorc.discordbot.command.Command;
-import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.DiscordException;
@@ -9,7 +9,7 @@ import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
 
-public class Bot {
+public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
 		try {
