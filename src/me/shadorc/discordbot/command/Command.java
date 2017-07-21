@@ -51,6 +51,7 @@ public class Command {
 			method.invoke(this);
 		} catch (NoSuchMethodException e1) {
 			Bot.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", channel);
+			Log.info("La commande " + command + " a été essayée sans résultat.");
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e2) {
 			Log.error("Error while executing method.", e2);
 		}
@@ -70,35 +71,28 @@ public class Command {
 				+ "\n\t/blague"
 				+ "\n\t/trivia"
 				+ "\n\t/roulette_russe"
+				+ "\n\t/machine_sous"
 				+ "\n\t/coins"
 				, channel);
 	}
 
-	public void gif() {
+	public void trad() {
+		//Country doc https://www.pastebin.com/NHWLgJ43
 		if(arg == null) {
-			try {
-				String gifUrl = Infonet.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
-				Bot.sendMessage(gifUrl, channel);
-			} catch (IOException e) {
-				Log.error("Une erreur est survenue lors de la récupération du gif.", e, channel);
-			}
+			Bot.sendMessage("Merci d'indiquer les 2 langues et le texte à traduire. Exemple : /trad fr en Salut", channel);
+			return;
 		}
 
-		else {
-			try {
-				String json = Infonet.getHTML(new URL("https://api.giphy.com/v1/gifs/random?"
-						+ "api_key=" + Storage.get(API_KEYS.GIPHY_API_KEY)
-						+ "&tag=" + URLEncoder.encode(arg, "UTF-8")));
-				JSONObject obj = new JSONObject(json);
-				if(obj.get("data") instanceof JSONArray) {
-					Bot.sendMessage("Aucun résultat pour " + arg, channel);
-					return;
-				}
-				String url = obj.getJSONObject("data").getString("url");
-				Bot.sendMessage(url, channel);
-			} catch (IOException e) {
-				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Giphy.", e, channel);
+		try {
+			String[] args = arg.split(" ", 3);
+			if(args.length < 3) {
+				Bot.sendMessage("Merci d'indiquer les 2 langues et le texte à traduire. Exemple : /trad fr en Salut", channel);
+				return;
 			}
+			String word = Utils.translate(args[0], args[1], args[2]);
+			Bot.sendMessage("Traduction : " + word, channel);
+		} catch (Exception e) {
+			Log.error("Une erreur est survenue lors de la traduction.", e, channel);
 		}
 	}
 
@@ -165,23 +159,79 @@ public class Command {
 		}
 	}
 
-	public void trad() {
-		//Country doc https://www.pastebin.com/NHWLgJ43
+	public void meteo() {
 		if(arg == null) {
-			Bot.sendMessage("Merci d'indiquer les 2 langues et le texte à traduire. Exemple : /trad fr en Salut", channel);
+			Bot.sendMessage("Merci d'indiquer le nom d'une ville.", channel);
 			return;
 		}
 
+		IWeatherDataService dataService = WeatherDataServiceFactory.getWeatherDataService(service.OPEN_WEATHER_MAP);
 		try {
-			String[] args = arg.split(" ", 3);
-			if(args.length < 3) {
-				Bot.sendMessage("Merci d'indiquer les 2 langues et le texte à traduire. Exemple : /trad fr en Salut", channel);
-				return;
-			}
-			String word = Utils.translate(args[0], args[1], args[2]);
-			Bot.sendMessage("Traduction : " + word, channel);
+			WeatherData data = dataService.getWeatherData(new Location(arg, "FR"));
+			Bot.sendMessage("__Météo pour la ville de " + data.getCity().getName() + "__ (dernière mise à jour le " + data.getLastUpdate().getValue() + ") :"
+					+ "\n\tNuages : " + Utils.translate("en", "fr", data.getClouds().getValue())
+					+ "\n\tVent : " + data.getWind().getSpeed().getValue() + "m/s, " + Utils.translate("en", "fr", data.getWind().getSpeed().getName()).toLowerCase()
+					+ "\n\tPrécipitations : " + (data.getPrecipitation().getMode().equals("no") ? "Aucune" : data.getPrecipitation().getValue())
+					+ "\n\tHumidité : " + data.getHumidity().getValue() + "%"
+					+ "\n\tTempérature : " + data.getTemperature().getValue() + "°C", channel);
 		} catch (Exception e) {
-			Log.error("Une erreur est survenue lors de la traduction.", e, channel);
+			Log.error("Une erreur est survenue lors de la récupération des données météorologiques.", e, channel);
+		}
+	}
+
+	public void chat() {
+		Chat.answer(arg, channel);
+	}
+
+	public void gif() {
+		if(arg == null) {
+			try {
+				String gifUrl = Infonet.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
+				Bot.sendMessage(gifUrl, channel);
+			} catch (IOException e) {
+				Log.error("Une erreur est survenue lors de la récupération du gif.", e, channel);
+			}
+		}
+
+		else {
+			try {
+				String json = Infonet.getHTML(new URL("https://api.giphy.com/v1/gifs/random?"
+						+ "api_key=" + Storage.get(API_KEYS.GIPHY_API_KEY)
+						+ "&tag=" + URLEncoder.encode(arg, "UTF-8")));
+				JSONObject obj = new JSONObject(json);
+				if(obj.get("data") instanceof JSONArray) {
+					Bot.sendMessage("Aucun résultat pour " + arg, channel);
+					return;
+				}
+				String url = obj.getJSONObject("data").getString("url");
+				Bot.sendMessage(url, channel);
+			} catch (IOException e) {
+				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Giphy.", e, channel);
+			}
+		}
+	}
+
+	public void dtc() {
+		try {
+			String json = Infonet.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
+					+ "key=" + Storage.get(API_KEYS.DTC_API_KEY)
+					+ "&format=json"));
+			String quote = new JSONArray(json).getJSONObject(0).getString("content");
+			Bot.sendMessage("```" + quote + "```", channel);
+		} catch (IOException e) {
+			Log.error("Une erreur est survenue lors de la récupération d'une quote sur danstonchat.com", e, channel);
+		}
+	}
+
+	public void blague() {
+		try {
+			String htmlPage = Infonet.getHTML(new URL("https://www.blague-drole.net/blagues-" + Utils.rand(10)+1 + ".html?tri=top"));
+			ArrayList <String> jokesList = Infonet.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
+			String joke = jokesList.get(Utils.rand(jokesList.size()));
+			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
+			Bot.sendMessage("```" + Utils.convertToUTF8(joke) + "```", channel);
+		} catch (IOException e) {
+			Log.error("Une erreur est survenue lors de la récupération de la blague.", e, channel);
 		}
 	}
 
@@ -204,56 +254,12 @@ public class Command {
 		}
 	}
 
+	public void machine_sous() {
+		SlotMachine.play(message.getAuthor().getName(), channel);
+	}
+
 	public void coins() {
 		Bot.sendMessage("Vous avez " + Storage.get(message.getAuthor().getName()) + " coins.", channel);
-	}
-
-	public void meteo() {
-		if(arg == null) {
-			Bot.sendMessage("Merci d'indiquer le nom d'une ville.", channel);
-			return;
-		}
-
-		IWeatherDataService dataService = WeatherDataServiceFactory.getWeatherDataService(service.OPEN_WEATHER_MAP);
-		try {
-			WeatherData data = dataService.getWeatherData(new Location(arg, "FR"));
-			Bot.sendMessage("__Météo pour la ville de " + data.getCity().getName() + "__ (dernière mise à jour le " + data.getLastUpdate().getValue() + ") :"
-					+ "\n\tNuages : " + Utils.translate("en", "fr", data.getClouds().getValue())
-					+ "\n\tVent : " + data.getWind().getSpeed().getValue() + "m/s, " + Utils.translate("en", "fr", data.getWind().getSpeed().getName()).toLowerCase()
-					+ "\n\tPrécipitations : " + (data.getPrecipitation().getMode().equals("no") ? "Aucune" : data.getPrecipitation().getValue())
-					+ "\n\tHumidité : " + data.getHumidity().getValue() + "%"
-					+ "\n\tTempérature : " + data.getTemperature().getValue() + "°C", channel);
-		} catch (Exception e) {
-			Log.error("Une erreur est survenue lors de la récupération des données météorologiques.", e, channel);
-		}
-	}
-
-	public void dtc() {
-		try {
-			String json = Infonet.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
-					+ "key=" + Storage.get(API_KEYS.DTC_API_KEY)
-					+ "&format=json"));
-			String quote = new JSONArray(json).getJSONObject(0).getString("content");
-			Bot.sendMessage("```" + quote + "```", channel);
-		} catch (IOException e) {
-			Log.error("Une erreur est survenue lors de la récupération d'une quote sur danstonchat.com", e, channel);
-		}
-	}
-
-	public void chat() {
-		Chat.answer(arg, channel);
-	}
-
-	public void blague() {
-		try {
-			String htmlPage = Infonet.getHTML(new URL("https://www.blague-drole.net/blagues-" + Utils.rand(10)+1 + ".html?tri=top"));
-			ArrayList <String> jokesList = Infonet.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
-			String joke = jokesList.get(Utils.rand(jokesList.size()));
-			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
-			Bot.sendMessage("```" + Utils.convertToUTF8(joke) + "```", channel);
-		} catch (IOException e) {
-			Log.error("Une erreur est survenue lors de la récupération de la blague.", e, channel);
-		}
 	}
 
 	public void set_chatbot() {
