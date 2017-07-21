@@ -20,10 +20,9 @@ public class Chat {
 		CLEVERBOT, ALICE;
 	}
 
+	private static ChatBot chatBot = ChatBot.ALICE;
 	private static String cleverbotState = null;
 	private static String aliceState = null;
-
-	private static ChatBot chatBot = ChatBot.ALICE;
 
 	public static void answer(String arg, IChannel channel) {
 		if(arg == null) {
@@ -38,7 +37,7 @@ public class Chat {
 						+ "&input=" + URLEncoder.encode(arg, "UTF-8")
 						+ (aliceState != null ? "&custid=" + aliceState : "")));
 				JSONObject result = XML.toJSONObject(xmlString).getJSONObject("result");
-				String response = result.getString("that");
+				String response = result.getString("that").replace("<br>", "\n").trim();
 				aliceState = result.getString("custid");
 				Bot.sendMessage(response, channel);
 			}
