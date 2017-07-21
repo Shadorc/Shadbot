@@ -1,23 +1,34 @@
 package me.shadorc.discordbot.command;
 
+import me.shadorc.discordbot.Command;
+import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 
-public class SlotMachine {
-
+public class SlotMachineCommand extends Command {
+	
 	private enum SlotOptions {
 		CHERRIES,
 		BELL,
 		GIFT
 	}
-
-	private static final SlotOptions[] slotsArray = new SlotOptions[] {
+	
+	private final SlotOptions[] slotsArray = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES,
 			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL,
 			SlotOptions.GIFT};
 
-	public static void play(String author, IChannel channel) {
+	public SlotMachineCommand() {
+		super("machine_sous");
+	}
+
+	@Override
+	public void execute(Context context) {
+		this.play(context.getMessage().getAuthor().getName(), context.getChannel());		
+	}
+	
+	private void play(String author, IChannel channel) {
 		SlotOptions slot1 = slotsArray[Utils.rand(slotsArray.length)];
 		SlotOptions slot2 = slotsArray[Utils.rand(slotsArray.length)];
 		SlotOptions slot3 = slotsArray[Utils.rand(slotsArray.length)];
@@ -39,5 +50,5 @@ public class SlotMachine {
 		message.append(":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":");
 		message.append("\nVous avez "+ (gain > 0 ? "gagné" : "perdu") + " " + Math.abs(gain) + " coins !");
 		BotUtils.sendMessage(message.toString(), channel);
-	} 
+	}
 }

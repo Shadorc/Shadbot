@@ -1,6 +1,6 @@
 package me.shadorc.discordbot;
 
-import me.shadorc.discordbot.listener.AnnotationListener;
+import me.shadorc.discordbot.listener.Listener;
 import me.shadorc.discordbot.storage.Storage;
 import me.shadorc.discordbot.storage.Storage.API_KEYS;
 import sx.blah.discord.api.ClientBuilder;
@@ -23,7 +23,7 @@ public class Main {
 		client = clientBuilder.login();
 
 		EventDispatcher dispatcher = client.getDispatcher();
-		dispatcher.registerListener(new AnnotationListener());
+		dispatcher.registerListener(new Listener());
 	}
 
 	public static void twitterConnection() {

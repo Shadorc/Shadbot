@@ -7,6 +7,8 @@ import java.net.URLEncoder;
 import org.json.JSONObject;
 import org.json.XML;
 
+import me.shadorc.discordbot.Command;
+import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.storage.Storage;
 import me.shadorc.discordbot.storage.Storage.API_KEYS;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -14,17 +16,26 @@ import me.shadorc.discordbot.utility.Log;
 import me.shadorc.infonet.Infonet;
 import sx.blah.discord.handle.obj.IChannel;
 
-public class Chat {
-
+public class ChatCommand extends Command {
+	
 	public enum ChatBot {
 		CLEVERBOT, ALICE;
 	}
 
-	private static ChatBot chatBot = ChatBot.ALICE;
-	private static String cleverbotState = null;
-	private static String aliceState = null;
+	private ChatBot chatBot = ChatBot.ALICE;
+	private String cleverbotState = null;
+	private String aliceState = null;
 
-	public static void answer(String arg, IChannel channel) {
+	public ChatCommand() {
+		super("chat");
+	}
+
+	@Override
+	public void execute(Context context) {
+		this.answer(context.getArg(), context.getChannel());		
+	}
+	
+	private void answer(String arg, IChannel channel) {
 		if(arg == null) {
 			BotUtils.sendMessage("Une conversation fonctionne mieux quand on dit quelque chose :)", channel);
 			return;
@@ -56,8 +67,9 @@ public class Chat {
 			Log.error("Une erreur est survenue lors de la discussion avec le bot.", e, channel);
 		}
 	}
-
-	public static void setChatbot(ChatBot _chatBot) {
-		chatBot = _chatBot;
+	
+	private void setChatbot(ChatBot chatBot) {
+		this.chatBot = chatBot;
 	}
+
 }

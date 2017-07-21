@@ -1,15 +1,17 @@
 package me.shadorc.discordbot.utility;
 
 import me.shadorc.discordbot.Main;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.CommandManager;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
 
 public class BotUtils {
+	
+	private static CommandManager cmdManager = new CommandManager();
 
 	public static void sendMessage(String message, IChannel channel) {
 		try {
@@ -25,8 +27,8 @@ public class BotUtils {
 		}
 	}
 
-	public static void executeCommand(IMessage message, IChannel channel) {
-		Log.info("Executing command \"" + message.getContent() + "\" from " + message.getAuthor().getName() + ".");
-		new Command(message, channel).execute();
+	public static void executeCommand(MessageReceivedEvent event) {
+		Log.info("Executing command \"" + event.getMessage().getContent() + "\" from " + event.getMessage().getAuthor().getName() + ".");
+		cmdManager.manage(event);
 	}
 }
