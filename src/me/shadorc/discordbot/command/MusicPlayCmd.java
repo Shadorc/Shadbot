@@ -1,13 +1,13 @@
 package me.shadorc.discordbot.command;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.sound.sampled.UnsupportedAudioFileException;
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
-import me.shadorc.discordbot.music.GuildsMusicManager;
+import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.handle.obj.IVoiceChannel;
@@ -35,20 +35,39 @@ public class MusicPlayCmd extends Command {
 			userVoiceChannel.join();
 		}
 
-		File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
+		//		File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
+		//
+		//		if(songDir == null || songDir.length == 0) {
+		//			BotUtils.sendMessage("Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
+		//			return;
+		//		}
 
-		if(songDir == null || songDir.length == 0) {
-			BotUtils.sendMessage("Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
-			return;
-		}
 
-		try {
-			GuildsMusicManager.getMusicManager(context.getGuild()).queue(songDir[0]);
-		} catch (IOException | UnsupportedAudioFileException e) {
-			Log.error("Une erreur est survenue lors de la lecture de la musique.", e, context.getChannel());
-		}
+		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
+		GuildMusicManager.getAudioPlayerManager().loadItemOrdered(musicManager, context.getArg(), new AudioLoadResultHandler() {
+			@Override
+			public void trackLoaded(AudioTrack track) {
+				BotUtils.sendMessage("Adding to queue " + track.getInfo().title, context.getChannel());
+				musicManager.getScheduler().queue(track);
+			}
 
-		BotUtils.sendMessage("Lecture en cours : " + songDir[0].getName(), context.getChannel());
+			@Override
+			public void playlistLoaded(AudioPlaylist playlist) {
+				for(AudioTrack track : playlist.getTracks()) {
+					BotUtils.sendMessage("Ajout de " + track.getInfo().title + " à la playlist.", context.getChannel());
+					musicManager.getScheduler().queue(track);
+				}
+			}
+
+			@Override
+			public void noMatches() {
+				BotUtils.sendMessage("Aucun résultat n'a été trouvé pour " + context.getArg(), context.getChannel());
+			}
+
+			@Override
+			public void loadFailed(FriendlyException e) {
+				Log.error("Le chargement de la musique a échoué.", e, context.getChannel());
+			}
+		});
 	}
-
 }

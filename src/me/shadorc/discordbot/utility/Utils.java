@@ -1,20 +1,20 @@
 package me.shadorc.discordbot.utility;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+
 import me.shadorc.discordbot.Storage;
-import sx.blah.discord.util.audio.AudioPlayer.Track;
 
 public class Utils {
 
@@ -51,10 +51,10 @@ public class Utils {
 		return StringEscapeUtils.unescapeHtml3(text);
 	}
 
-	public static String formatPlaylist(List <Track> trackList) {
+	public static String formatPlaylist(BlockingQueue <AudioTrack> blockingQueue) {
 		StringBuilder playlist = new StringBuilder("Playlist :");
-		for(Track track : trackList) {
-			playlist.append("\n\t- " + ((File) track.getMetadata().get("file")).getName());
+		for(AudioTrack track : blockingQueue) {
+			playlist.append("\n\t- " + track.getInfo().author + " - " + track.getInfo().title);
 		}
 		return playlist.toString();
 	}

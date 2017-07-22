@@ -1,9 +1,10 @@
 package me.shadorc.discordbot.command;
 
+
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
-import me.shadorc.discordbot.music.GuildsMusicManager;
-import me.shadorc.discordbot.music.MusicManager;
+import me.shadorc.discordbot.music.GuildMusicManager;
+import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.Utils;
@@ -16,9 +17,10 @@ public class MusicCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		MusicManager musicManager = GuildsMusicManager.getMusicManager(context.getGuild());
+		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
+		TrackScheduler scheduler = musicManager.getScheduler();
 
-		if(!musicManager.isPlaying()) {
+		if(!scheduler.isPlaying()) {
 			BotUtils.sendMessage("Aucune musique en cours de lecture.", context.getChannel());
 			return;
 		}
@@ -41,31 +43,31 @@ public class MusicCmd extends Command {
 				return;
 			}
 			try {
-				musicManager.setVolume(Integer.parseInt(subArg));
-				BotUtils.sendMessage("Volume de la musique réglé sur " + musicManager.getVolume() + "%", context.getChannel());
+				scheduler.setVolume(Integer.parseInt(subArg));
+				BotUtils.sendMessage("Volume de la musique réglé sur " + scheduler.getVolume() + "%", context.getChannel());
 			} catch (NumberFormatException e) {
 				BotUtils.sendMessage("Merci d'indiquer un volume compris entre 1 et 100.", context.getChannel());
 			}
 		}
 
 		else if(subCmd.equals("pause")) {
-			musicManager.setPaused(!musicManager.isPaused());
+			scheduler.setPaused(!scheduler.isPaused());
 		}
 
 		else if(subCmd.equals("stop")) {
-			musicManager.stop();
+			scheduler.stop();
 		}
 
 		else if(subCmd.equals("next")) {
-			musicManager.next();
+			scheduler.nextTrack();
 		}
 
 		else if(subCmd.equals("name")) {
-			BotUtils.sendMessage("Musique en cours : " + musicManager.getCurrentTrackName(), context.getChannel());
+			BotUtils.sendMessage("Musique en cours : " + scheduler.getCurrentTrackName(), context.getChannel());
 		}
 
 		else if(subCmd.equals("playlist")) {
-			BotUtils.sendMessage(Utils.formatPlaylist(musicManager.getPlaylist()), context.getChannel());
+			BotUtils.sendMessage(Utils.formatPlaylist(scheduler.getPlaylist()), context.getChannel());
 		}
 
 		else {

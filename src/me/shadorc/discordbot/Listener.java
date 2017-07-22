@@ -1,12 +1,10 @@
 package me.shadorc.discordbot;
 
 import me.shadorc.discordbot.command.TriviaCmd;
-import me.shadorc.discordbot.music.GuildsMusicManager;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
-import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -46,10 +44,5 @@ public class Listener {
 				BotUtils.executeCommand(event);
 			}
 		}
-	}
-
-	@EventSubscriber
-	public void onGuildCreateEvent(GuildCreateEvent event) {
-		GuildsMusicManager.addMusicManager(event.getGuild());
 	}
 }
