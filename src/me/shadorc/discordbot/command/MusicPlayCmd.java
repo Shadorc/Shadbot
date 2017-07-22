@@ -1,5 +1,7 @@
 package me.shadorc.discordbot.command;
 
+import java.io.File;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -10,6 +12,7 @@ import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
+import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class MusicPlayCmd extends Command {
@@ -35,26 +38,28 @@ public class MusicPlayCmd extends Command {
 			userVoiceChannel.join();
 		}
 
-		//		File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
-		//
-		//		if(songDir == null || songDir.length == 0) {
-		//			BotUtils.sendMessage("Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
-		//			return;
-		//		}
-
+		String identifier = context.getArg();
+		if(!Utils.isValidURL(identifier)) {
+			File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
+			if(songDir == null || songDir.length == 0) {
+				BotUtils.sendMessage("Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
+				return;
+			}
+			identifier = songDir[0].getPath();
+		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		GuildMusicManager.getAudioPlayerManager().loadItemOrdered(musicManager, context.getArg(), new AudioLoadResultHandler() {
+		GuildMusicManager.getAudioPlayerManager().loadItemOrdered(musicManager, identifier, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				BotUtils.sendMessage("Ajout de " + track.getInfo().title + " à la playlist.", context.getChannel());
+				BotUtils.sendMessage("Ajout de *" + track.getInfo().author + " - " + track.getInfo().title + "* à la playlist.", context.getChannel());
 				musicManager.getScheduler().queue(track);
 			}
 
 			@Override
 			public void playlistLoaded(AudioPlaylist playlist) {
 				for(AudioTrack track : playlist.getTracks()) {
-					BotUtils.sendMessage("Ajout de " + track.getInfo().title + " à la playlist.", context.getChannel());
+					BotUtils.sendMessage("Ajout de *" + track.getInfo().author + " - " + track.getInfo().title + "* à la playlist.", context.getChannel());
 					musicManager.getScheduler().queue(track);
 				}
 			}

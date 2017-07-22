@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
@@ -88,5 +90,18 @@ public class Utils {
 		}
 
 		return distance[word1.length()][word2.length()];
+	}
+
+	public static boolean isValidURL(String stringUrl) {
+		try {
+			URL url = new URL(stringUrl);
+			URLConnection conn = url.openConnection();
+			conn.connect();
+		} catch (MalformedURLException e) {
+			return false;
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
 	}
 }

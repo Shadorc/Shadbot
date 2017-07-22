@@ -33,7 +33,6 @@ public class HelpCmd extends Command {
 				+ "\n**Music**"
 				+ "\n\t/play <music>"
 				+ "\n\t/music <volume <0-150> | pause | stop | next | name | playlist>"
-				+ "\n\t/join"
 				+ "\n\t/leave"
 				, context.getChannel());
 	}
