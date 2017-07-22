@@ -50,6 +50,6 @@ public class Listener {
 
 	@EventSubscriber
 	public void onGuildCreateEvent(GuildCreateEvent event) {
-		GuildsMusicManager.addMusicPlayer(event.getGuild());
+		GuildsMusicManager.addMusicManager(event.getGuild());
 	}
 }

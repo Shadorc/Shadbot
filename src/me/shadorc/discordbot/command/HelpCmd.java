@@ -31,10 +31,10 @@ public class HelpCmd extends Command {
 				+ "\n\t/trivia"
 				+ "\n\t/coins"
 				+ "\n**Music**"
+				+ "\n\t/play <music>"
+				+ "\n\t/music <volume <1-100> | pause | stop | next | name | playlist>"
 				+ "\n\t/join"
 				+ "\n\t/leave"
-				+ "\n\t/play <music>"
-				+ "\n\t/volume <1-100>"
 				, context.getChannel());
 	}
 

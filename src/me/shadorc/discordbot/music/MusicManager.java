@@ -2,11 +2,13 @@ package me.shadorc.discordbot.music;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.audio.AudioPlayer;
+import sx.blah.discord.util.audio.AudioPlayer.Track;
 
 public class MusicManager {
 
@@ -26,7 +28,7 @@ public class MusicManager {
 		return this.volume;
 	}
 
-	public void start(File file) throws IOException, UnsupportedAudioFileException {
+	public void queue(File file) throws IOException, UnsupportedAudioFileException {
 		this.audioPlayer.queue(file);
 	}
 
@@ -34,4 +36,27 @@ public class MusicManager {
 		this.audioPlayer.clear();
 	}
 
+	public void setPaused(boolean isPaused) {
+		this.audioPlayer.setPaused(isPaused);
+	}
+
+	public void next() {
+		this.audioPlayer.skip();
+	}
+
+	public String getCurrentTrackName() {
+		return ((File) this.audioPlayer.getCurrentTrack().getMetadata().get("file")).getName();
+	}
+
+	public List <Track> getPlaylist() {
+		return this.audioPlayer.getPlaylist();
+	}
+
+	public boolean isPaused() {
+		return this.audioPlayer.isPaused();
+	}
+
+	public boolean isPlaying() {
+		return this.audioPlayer.getCurrentTrack() != null;
+	}
 }

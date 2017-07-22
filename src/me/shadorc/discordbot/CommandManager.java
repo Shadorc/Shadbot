@@ -31,7 +31,7 @@ public class CommandManager {
 				new MusicJoinCmd(),
 				new MusicLeaveCmd(),
 				new MusicPlayCmd(),
-				new MusicVolumeCmd()
+				new MusicCmd()
 				);
 	}
 

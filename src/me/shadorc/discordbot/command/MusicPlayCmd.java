@@ -35,7 +35,6 @@ public class MusicPlayCmd extends Command {
 			userVoiceChannel.join();
 		}
 
-		// Find a song given the search term
 		File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
 
 		if(songDir == null || songDir.length == 0) {
@@ -43,11 +42,8 @@ public class MusicPlayCmd extends Command {
 			return;
 		}
 
-		GuildsMusicManager.getMusicPlayer(context.getGuild()).stop();
-
-		// Play the found song
 		try {
-			GuildsMusicManager.getMusicPlayer(context.getGuild()).start(songDir[0]);
+			GuildsMusicManager.getMusicManager(context.getGuild()).queue(songDir[0]);
 		} catch (IOException | UnsupportedAudioFileException e) {
 			Log.error("Une erreur est survenue lors de la lecture de la musique.", e, context.getChannel());
 		}

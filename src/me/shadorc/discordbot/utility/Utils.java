@@ -1,17 +1,20 @@
 package me.shadorc.discordbot.utility;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Storage;
+import sx.blah.discord.util.audio.AudioPlayer.Track;
 
 public class Utils {
 
@@ -46,6 +49,14 @@ public class Utils {
 
 	public static String convertToUTF8(String text) {
 		return StringEscapeUtils.unescapeHtml3(text);
+	}
+
+	public static String formatPlaylist(List <Track> trackList) {
+		StringBuilder playlist = new StringBuilder("Playlist :");
+		for(Track track : trackList) {
+			playlist.append("\n\t- " + ((File) track.getMetadata().get("file")).getName());
+		}
+		return playlist.toString();
 	}
 
 	public static int rand(int bound) {
