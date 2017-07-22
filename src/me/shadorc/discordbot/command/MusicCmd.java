@@ -37,44 +37,38 @@ public class MusicCmd extends Command {
 			subArg = splitCmd[1].toLowerCase().trim();
 		}
 
-		if(subCmd.equals("volume")) {
-			if(subArg == null) {
-				BotUtils.sendMessage("Merci d'indiquer un volume compris entre 1 et 100.", context.getChannel());
-				return;
-			}
-			try {
-				scheduler.setVolume(Integer.parseInt(subArg));
-				BotUtils.sendMessage("Volume de la musique réglé sur " + scheduler.getVolume() + "%", context.getChannel());
-			} catch (NumberFormatException e) {
-				BotUtils.sendMessage("Merci d'indiquer un volume compris entre 1 et 100.", context.getChannel());
-			}
+		switch(subCmd) {
+			case "volume":
+				if(subArg == null) {
+					BotUtils.sendMessage("Merci d'indiquer un volume compris entre 0 et 150.", context.getChannel());
+					return;
+				}
+				try {
+					scheduler.setVolume(Integer.parseInt(subArg));
+					BotUtils.sendMessage("Volume de la musique réglé sur " + scheduler.getVolume() + ".", context.getChannel());
+				} catch (NumberFormatException e) {
+					BotUtils.sendMessage("Merci d'indiquer un volume compris entre 0 et 150.", context.getChannel());
+				}
+				break;
+			case "pause":
+				scheduler.setPaused(!scheduler.isPaused());
+				break;
+			case "stop":
+				scheduler.stop();
+				break;
+			case "next":
+				scheduler.nextTrack();
+				break;
+			case "name":
+				BotUtils.sendMessage("Musique en cours : " + scheduler.getCurrentTrackName(), context.getChannel());
+				break;
+			case "playlist":
+				BotUtils.sendMessage(Utils.formatPlaylist(scheduler.getPlaylist()), context.getChannel());
+				break;
+			default:
+				BotUtils.sendMessage("Cette commande est inconnue, tapez /help pour plus d'informations.", context.getChannel());
+				Log.error("La commande musicale \"" + subCmd + "\" a été utilisée sans résultat.");
+				break;
 		}
-
-		else if(subCmd.equals("pause")) {
-			scheduler.setPaused(!scheduler.isPaused());
-		}
-
-		else if(subCmd.equals("stop")) {
-			scheduler.stop();
-		}
-
-		else if(subCmd.equals("next")) {
-			scheduler.nextTrack();
-		}
-
-		else if(subCmd.equals("name")) {
-			BotUtils.sendMessage("Musique en cours : " + scheduler.getCurrentTrackName(), context.getChannel());
-		}
-
-		else if(subCmd.equals("playlist")) {
-			BotUtils.sendMessage(Utils.formatPlaylist(scheduler.getPlaylist()), context.getChannel());
-		}
-
-		else {
-			BotUtils.sendMessage("Cette commande est inconnue pour la musique, tapez /help pour plus d'informations.", context.getChannel());
-			Log.error("La commande musicale " + subCmd + " a été utilisée sans résultat.");
-		}
-
 	}
-
 }

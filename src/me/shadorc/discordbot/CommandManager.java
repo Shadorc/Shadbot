@@ -28,7 +28,6 @@ public class CommandManager {
 				new TriviaCmd(),
 				new WeatherCmd(),
 				new WikiCmd(),
-				new MusicJoinCmd(),
 				new MusicLeaveCmd(),
 				new MusicPlayCmd(),
 				new MusicCmd()

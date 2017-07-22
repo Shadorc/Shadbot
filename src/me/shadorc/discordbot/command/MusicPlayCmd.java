@@ -21,7 +21,7 @@ public class MusicPlayCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage("Merci d'entrer le nom ou une partie du nom de la chanson.", context.getChannel());
+			BotUtils.sendMessage("Merci d'entrer l'URL d'une musique à écouter.", context.getChannel());
 			return;
 		}
 
@@ -47,7 +47,7 @@ public class MusicPlayCmd extends Command {
 		GuildMusicManager.getAudioPlayerManager().loadItemOrdered(musicManager, context.getArg(), new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				BotUtils.sendMessage("Adding to queue " + track.getInfo().title, context.getChannel());
+				BotUtils.sendMessage("Ajout de " + track.getInfo().title + " à la playlist.", context.getChannel());
 				musicManager.getScheduler().queue(track);
 			}
 

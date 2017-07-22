@@ -15,9 +15,6 @@ public class GuildMusicManager {
 	private static AudioPlayerManager playerManager;
 	private static Map<Long, GuildMusicManager> musicManagers;
 
-	private AudioPlayer player;
-	private TrackScheduler scheduler;
-
 	public static void init() {
 		musicManagers = new HashMap<>();
 		playerManager = new DefaultAudioPlayerManager();
@@ -41,6 +38,9 @@ public class GuildMusicManager {
 	public static AudioPlayerManager getAudioPlayerManager() {
 		return playerManager;
 	}
+
+	private AudioPlayer player;
+	private TrackScheduler scheduler;
 
 	public GuildMusicManager(AudioPlayerManager manager) {
 		this.player = manager.createPlayer();
