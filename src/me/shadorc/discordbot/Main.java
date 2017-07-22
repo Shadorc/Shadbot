@@ -9,8 +9,6 @@ import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class Main {
 
-	public static boolean DEBUG = false;
-
 	public static void main(String[] args) {
 		IDiscordClient client = new ClientBuilder()
 				.withToken(Storage.get(API_KEYS.DISCORD_TOKEN))

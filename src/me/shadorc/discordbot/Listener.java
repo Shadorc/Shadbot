@@ -14,13 +14,10 @@ public class Listener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		Log.print("\n---------------- Shadbot is connected [DEBUG MODE : " + Main.DEBUG + "] ----------------");
+		Log.print("\n---------------- Shadbot is connected ----------------");
 		Log.print("ShadBot is connected to :");
 		for(IGuild guild : event.getClient().getGuilds()) {
 			Log.print("\t*Guild: " + guild.getName() + " (ID: " + guild.getLongID() +")");
-			for(IChannel chan : guild.getChannels()) {
-				Log.print("\t\tChannel: " + chan.getName() + " (ID: " + chan.getLongID() + ")");
-			}
 		}
 		Log.print("");
 	}
@@ -36,7 +33,7 @@ public class Listener {
 			return;
 		}
 
-		if(Main.DEBUG && guild.getStringID().equals("331152695006330880") || !Main.DEBUG && channel.getStringID().equals("275615361997471745")) {
+		if(guild.getStringID().equals("331152695006330880") || channel.getStringID().equals("275615361997471745")) {
 			if(TriviaCmd.QUIZZ_STARTED) {
 				TriviaCmd.checkAnswer(message);
 			}
