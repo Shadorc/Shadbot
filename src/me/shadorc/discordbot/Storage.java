@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.utility.Log;
+import sx.blah.discord.handle.obj.IGuild;
 
 public class Storage {
 
@@ -35,7 +36,7 @@ public class Storage {
 				FileWriter writer = null;
 				try {
 					writer = new FileWriter(DATA_FILE);
-					writer.write("{}");
+					writer.write(new JSONObject().toString());
 					writer.flush();
 				} catch (IOException e) {
 					Log.error("Error while saving in storage file.", e);
@@ -54,18 +55,22 @@ public class Storage {
 		}
 	}
 
-	public static void store(Object key, Object value) {
+	public static void store(IGuild guild, Long key, Object value) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
 
 		FileWriter writer = null;
 		try {
-			JSONObject obj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
-			obj.put(key.toString(), value.toString());
+			JSONObject mainObj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
+
+			if(!mainObj.has(guild.getStringID())) {
+				mainObj.put(guild.getStringID(), new JSONObject());
+			}
+			mainObj.getJSONObject(guild.getStringID()).put(key.toString(), value.toString());
 
 			writer = new FileWriter(DATA_FILE);
-			writer.write(obj.toString(2));
+			writer.write(mainObj.toString(2));
 			writer.flush();
 		} catch (IOException e) {
 			Log.error("Error while saving in storage file.", e);
@@ -80,20 +85,20 @@ public class Storage {
 		}
 	}
 
-	public static int get(String key) {
+	public static String get(IGuild guild, Long key) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
 
 		try {
-			JSONObject obj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
-			if(obj.has(key)) {
-				return obj.getInt(key);
+			JSONObject mainObj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
+			if(mainObj.has(guild.getStringID())) {
+				return mainObj.getJSONObject(guild.getStringID()).getString(key.toString());
 			}
 		} catch (JSONException | IOException e) {
 			Log.error("Error while reading storage file.", e);
 		}
-		return 0;
+		return null;
 	}
 
 	public static String get(API_KEYS key) {

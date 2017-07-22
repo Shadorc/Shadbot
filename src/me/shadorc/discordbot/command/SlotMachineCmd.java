@@ -27,7 +27,7 @@ public class SlotMachineCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		if(Storage.get(context.getAuthor().getName()) < PAID_COST) {
+		if(Integer.parseInt(Storage.get(context.getGuild(), context.getAuthor().getLongID())) < PAID_COST) {
 			BotUtils.sendMessage("Vous n'avez plus assez de coins pour jouer aux machines à sous, il vous en faut minimum " + PAID_COST + " !", context.getChannel());
 			return;
 		}
@@ -47,7 +47,7 @@ public class SlotMachineCmd extends Command {
 		else if(slot1 == SlotOptions.GIFT && slot2 == SlotOptions.GIFT && slot3 == SlotOptions.GIFT) {
 			gain = 5000;
 		}
-		Utils.gain(context.getAuthor().getName(), gain);
+		Utils.gain(context.getGuild(), context.getAuthor().getLongID(), gain);
 
 		StringBuilder message = new StringBuilder();
 		message.append(":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":");

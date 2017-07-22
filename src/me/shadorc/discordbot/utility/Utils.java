@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.discordbot.Storage;
+import sx.blah.discord.handle.obj.IGuild;
 
 public class Utils {
 
@@ -65,8 +66,13 @@ public class Utils {
 		return RAND.nextInt(bound);
 	}
 
-	public static void gain(String author, int gain) {
-		Storage.store(author, Storage.get(author)+gain);
+	public static void gain(IGuild guild, Long authorId, int gain) {
+		String coinsStr = Storage.get(guild, authorId);
+		int coins = 0;
+		if(coinsStr != null) {
+			coins = Integer.parseInt(coinsStr);
+		}
+		Storage.store(guild, authorId, coins+gain);
 	}
 
 	public static int getLevenshteinDistance(String word1, String word2) {

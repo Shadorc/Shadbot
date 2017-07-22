@@ -4,42 +4,40 @@ import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 public class Context {
 
-	private IMessage message;
-	private IChannel channel;
-	private IGuild guild;
-	private IDiscordClient client;
-	private IUser author;
-
+	private MessageReceivedEvent event;
 	private String command;
 	private String arg;
 
 	public Context(MessageReceivedEvent event) {
-		this.message = event.getMessage();
-		this.channel = event.getChannel();
-		this.guild = event.getGuild();
-		this.client = event.getClient();
-		this.author = event.getAuthor();
+		this.event = event;
 
-		String[] splitMessage = message.getContent().split(" ", 2);
+		String[] splitMessage = event.getMessage().getContent().split(" ", 2);
 		this.command = splitMessage[0].substring(1).toLowerCase().trim();
 		this.arg = (splitMessage.length > 1) ? splitMessage[1].trim() : null;
 	}
 
 	public IUser getAuthor() {
-		return author;
+		return event.getAuthor();
+	}
+
+	public String getAuthorName() {
+		return event.getAuthor().getName();
 	}
 
 	public IChannel getChannel() {
-		return channel;
+		return event.getChannel();
 	}
 
 	public IGuild getGuild() {
-		return guild;
+		return event.getGuild();
+	}
+
+	public IDiscordClient getClient() {
+		return event.getClient();
 	}
 
 	public String getCommand() {
@@ -48,9 +46,5 @@ public class Context {
 
 	public String getArg() {
 		return arg;
-	}
-
-	public IDiscordClient getClient() {
-		return client;
 	}
 }
