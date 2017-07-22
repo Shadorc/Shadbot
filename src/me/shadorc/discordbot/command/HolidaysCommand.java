@@ -2,9 +2,9 @@ package me.shadorc.discordbot.command;
 
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
-import me.shadorc.discordbot.Main;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
+import me.shadorc.discordbot.utility.TwitterUtils;
 import twitter4j.TwitterException;
 
 public class HolidaysCommand extends Command {
@@ -21,8 +21,8 @@ public class HolidaysCommand extends Command {
 		}
 
 		try {
-			Main.twitterConnection();
-			String holidays = Main.getTwitter().getUserTimeline("Vacances_Zone" + context.getArg().toUpperCase()).get(0).getText().replaceAll("#", "");
+			TwitterUtils.connection();
+			String holidays = TwitterUtils.getInstance().getUserTimeline("Vacances_Zone" + context.getArg().toUpperCase()).get(0).getText().replaceAll("#", "");
 			BotUtils.sendMessage(holidays, context.getChannel());
 		} catch (TwitterException e) {
 			if(e.getErrorCode() == 34) {
