@@ -16,7 +16,7 @@ import me.shadorc.discordbot.utility.Log;
 import me.shadorc.infonet.Infonet;
 import sx.blah.discord.handle.obj.IChannel;
 
-public class ChatCommand extends Command {
+public class ChatCmd extends Command {
 
 	public enum ChatBot {
 		CLEVERBOT, ALICE;
@@ -26,7 +26,7 @@ public class ChatCommand extends Command {
 	private String cleverbotState = null;
 	private String aliceState = null;
 
-	public ChatCommand() {
+	public ChatCmd() {
 		super("chat");
 	}
 
@@ -67,7 +67,7 @@ public class ChatCommand extends Command {
 			Log.error("Une erreur est survenue lors de la discussion avec le bot.", e, channel);
 		}
 	}
-	
+
 	public void setChatbot(ChatBot chatBot) {
 		this.chatBot = chatBot;
 	}

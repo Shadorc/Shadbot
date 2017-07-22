@@ -5,9 +5,9 @@ import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
-public class MusicLeaveCommand extends Command {
+public class MusicLeaveCmd extends Command {
 
-	public MusicLeaveCommand() {
+	public MusicLeaveCmd() {
 		super("leave", "quit");
 	}
 

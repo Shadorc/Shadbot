@@ -12,9 +12,9 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.infonet.Infonet;
 
-public class WikiCommand extends Command {
+public class WikiCmd extends Command {
 
-	public WikiCommand() {
+	public WikiCmd() {
 		super("wiki", "wikipedia");
 	}
 

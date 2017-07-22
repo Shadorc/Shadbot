@@ -14,24 +14,24 @@ public class CommandManager {
 
 	public CommandManager() {
 		this.register(
-				new BashCommand(),
-				new CalcCommand(),
-				new ChatCommand(),
-				new CoinsCommand(),
-				new GifCommand(),
-				new HelpCommand(),
-				new HolidaysCommand(),
-				new JokeCommand(),
-				new RussianRouletteCommand(),
-				new SlotMachineCommand(),
-				new TranslateCommand(),
-				new TriviaCommand(),
-				new WeatherCommand(),
-				new WikiCommand(),
-				new MusicJoinCommand(),
-				new MusicLeaveCommand(),
-				new MusicPlayCommand(),
-				new MusicVolumeCommand()
+				new BashCmd(),
+				new CalcCmd(),
+				new ChatCmd(),
+				new CoinsCmd(),
+				new GifCmd(),
+				new HelpCmd(),
+				new HolidaysCmd(),
+				new JokeCmd(),
+				new RussianRouletteCmd(),
+				new SlotMachineCmd(),
+				new TranslateCmd(),
+				new TriviaCmd(),
+				new WeatherCmd(),
+				new WikiCmd(),
+				new MusicJoinCmd(),
+				new MusicLeaveCmd(),
+				new MusicPlayCmd(),
+				new MusicVolumeCmd()
 				);
 	}
 

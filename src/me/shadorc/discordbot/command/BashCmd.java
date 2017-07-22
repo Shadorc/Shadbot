@@ -13,9 +13,9 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.infonet.Infonet;
 
-public class BashCommand extends Command {
+public class BashCmd extends Command {
 
-	public BashCommand() {
+	public BashCmd() {
 		super("dtc", "bash");
 	}
 

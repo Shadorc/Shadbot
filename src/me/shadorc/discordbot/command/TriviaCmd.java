@@ -20,7 +20,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
-public class TriviaCommand extends Command {
+public class TriviaCmd extends Command {
 
 	private static ArrayList <IUser> alreadyAnswered = new ArrayList <> ();
 	public static boolean QUIZZ_STARTED = false;
@@ -30,10 +30,10 @@ public class TriviaCommand extends Command {
 
 	private final static Timer timer = new Timer(30*1000, e -> {
 		BotUtils.sendMessage("Temps écoulé, la bonne réponse était " + CORRECT_ANSWER, CHANNEL);
-		TriviaCommand.stop();
+		TriviaCmd.stop();
 	});
 
-	public TriviaCommand() {
+	public TriviaCmd() {
 		super("trivia", "quizz", "question");
 	}
 
@@ -89,10 +89,10 @@ public class TriviaCommand extends Command {
 		if(alreadyAnswered.contains(message.getAuthor())) {
 			BotUtils.sendMessage("Désolé " + message.getAuthor().getName() + ", tu ne peux plus répondre après avoir donné une mauvaise réponse.", message.getChannel());
 		}
-		else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), TriviaCommand.CORRECT_ANSWER.toLowerCase()) < 2) {
+		else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), TriviaCmd.CORRECT_ANSWER.toLowerCase()) < 2) {
 			BotUtils.sendMessage("Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 10 coins.", CHANNEL);
 			Utils.gain(message.getAuthor().getName(), 10);
-			TriviaCommand.stop();
+			TriviaCmd.stop();
 		}
 		else {
 			BotUtils.sendMessage("Mauvaise réponse.", CHANNEL);

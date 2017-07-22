@@ -12,9 +12,9 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
-public class MusicPlayCommand extends Command {
+public class MusicPlayCmd extends Command {
 
-	public MusicPlayCommand() {
+	public MusicPlayCmd() {
 		super("play", "joue");
 	}
 

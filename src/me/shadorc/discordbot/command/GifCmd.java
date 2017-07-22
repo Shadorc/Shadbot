@@ -15,9 +15,9 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.infonet.Infonet;
 
-public class GifCommand extends Command {
+public class GifCmd extends Command {
 
-	public GifCommand() {
+	public GifCmd() {
 		super("gif");
 	}
 

@@ -1,6 +1,6 @@
 package me.shadorc.discordbot;
 
-import me.shadorc.discordbot.command.TriviaCommand;
+import me.shadorc.discordbot.command.TriviaCmd;
 import me.shadorc.discordbot.music.GuildsMusicManager;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
@@ -39,8 +39,8 @@ public class Listener {
 		}
 
 		if(Main.DEBUG && guild.getStringID().equals("331152695006330880") || !Main.DEBUG && channel.getStringID().equals("275615361997471745")) {
-			if(TriviaCommand.QUIZZ_STARTED) {
-				TriviaCommand.checkAnswer(message);
+			if(TriviaCmd.QUIZZ_STARTED) {
+				TriviaCmd.checkAnswer(message);
 			}
 			else if(message.getContent().startsWith("/")) {
 				BotUtils.executeCommand(event);
@@ -49,7 +49,7 @@ public class Listener {
 	}
 
 	@EventSubscriber
-	public void onGuildCreateEvent(GuildCreateEvent event) { 
+	public void onGuildCreateEvent(GuildCreateEvent event) {
 		GuildsMusicManager.addMusicPlayer(event.getGuild());
 	}
 }

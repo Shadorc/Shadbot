@@ -18,7 +18,7 @@ public class MusicManager {
 	}
 
 	public void setVolume(int volume) {
-		this.volume = (int) Math.max(0, Math.min(100, volume));
+		this.volume = Math.max(0, Math.min(100, volume));
 		this.audioPlayer.setVolume(volume/100f);
 	}
 

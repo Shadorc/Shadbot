@@ -6,9 +6,9 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
 
-public class RussianRouletteCommand extends Command {
+public class RussianRouletteCmd extends Command {
 
-	public RussianRouletteCommand() {
+	public RussianRouletteCmd() {
 		super("roulette_russe");
 	}
 

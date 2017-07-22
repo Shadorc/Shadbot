@@ -4,9 +4,9 @@ import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 
-public class HelpCommand extends Command {
+public class HelpCmd extends Command {
 
-	public HelpCommand() {
+	public HelpCmd() {
 		super("help", "aide");
 	}
 

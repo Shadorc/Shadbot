@@ -7,9 +7,9 @@ import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.TwitterUtils;
 import twitter4j.TwitterException;
 
-public class HolidaysCommand extends Command {
+public class HolidaysCmd extends Command {
 
-	public HolidaysCommand() {
+	public HolidaysCmd() {
 		super("vacances", "vacs");
 	}
 

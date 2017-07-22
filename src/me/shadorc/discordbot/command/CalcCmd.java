@@ -8,9 +8,9 @@ import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 
-public class CalcCommand extends Command {
+public class CalcCmd extends Command {
 
-	public CalcCommand() {
+	public CalcCmd() {
 		super("calc");
 	}
 

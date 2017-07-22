@@ -6,9 +6,9 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.Utils;
 
-public class TranslateCommand extends Command {
+public class TranslateCmd extends Command {
 
-	public TranslateCommand() {
+	public TranslateCmd() {
 		super("trad");
 	}
 

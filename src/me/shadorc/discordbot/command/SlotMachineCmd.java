@@ -6,20 +6,30 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
 
-public class SlotMachineCommand extends Command {
+public class SlotMachineCmd extends Command {
 
 	private enum SlotOptions {
 		CHERRIES,
 		BELL,
 		GIFT
 	}
-	
+
+	/*
+	 * CHERRIES : 4/8
+	 * BELL : 3/8
+	 * GIFT 1/8
+	 *
+	 * 50€ : 12.5%
+	 * 100€ : 5.3%
+	 * 5000€ : 0.2%
+	 */
+
 	private final SlotOptions[] slotsArray = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES,
 			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL,
 			SlotOptions.GIFT};
 
-	public SlotMachineCommand() {
+	public SlotMachineCmd() {
 		super("machine_sous");
 	}
 

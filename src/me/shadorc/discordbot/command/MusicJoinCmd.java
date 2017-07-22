@@ -5,9 +5,9 @@ import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
-public class MusicJoinCommand extends Command {
+public class MusicJoinCmd extends Command {
 
-	public MusicJoinCommand() {
+	public MusicJoinCmd() {
 		super("join", "rejoindre", "joindre");
 	}
 

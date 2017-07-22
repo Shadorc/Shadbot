@@ -11,9 +11,9 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.Utils;
 
-public class WeatherCommand extends Command{
+public class WeatherCmd extends Command{
 
-	public WeatherCommand() {
+	public WeatherCmd() {
 		super("meteo", "météo", "weather");
 	}
 

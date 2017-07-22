@@ -6,9 +6,9 @@ import me.shadorc.discordbot.music.GuildsMusicManager;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 
-public class MusicVolumeCommand extends Command {
+public class MusicVolumeCmd extends Command {
 
-	public MusicVolumeCommand() {
+	public MusicVolumeCmd() {
 		super("volume");
 	}
 

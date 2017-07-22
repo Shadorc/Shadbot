@@ -11,9 +11,9 @@ import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.Utils;
 import me.shadorc.infonet.Infonet;
 
-public class JokeCommand extends Command {
+public class JokeCmd extends Command {
 
-	public JokeCommand() {
+	public JokeCmd() {
 		super("blague", "joke");
 	}
 
