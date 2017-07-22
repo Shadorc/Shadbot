@@ -21,15 +21,18 @@ public class MusicPlayCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage("Merci d'entrer le nom de la chanson ou un mot.", context.getChannel());
+			BotUtils.sendMessage("Merci d'entrer le nom ou une partie du nom de la chanson.", context.getChannel());
 			return;
 		}
 
 		IVoiceChannel botVoiceChannel = context.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel();
-
 		if(botVoiceChannel == null) {
-			BotUtils.sendMessage("Je ne suis dans aucun salon vocal, rejoignez-en un puis utilisez la command /join", context.getChannel());
-			return;
+			IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
+			if(userVoiceChannel == null) {
+				BotUtils.sendMessage("Rejoignez un salon vocal avant d'utiliser cette commande pour que je puisse vous rejoindre.", context.getChannel());
+				return;
+			}
+			userVoiceChannel.join();
 		}
 
 		// Find a song given the search term
