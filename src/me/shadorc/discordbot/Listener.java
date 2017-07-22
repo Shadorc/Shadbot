@@ -1,12 +1,12 @@
 package me.shadorc.discordbot;
 
-import java.util.List;
-
 import me.shadorc.discordbot.command.TriviaCommand;
+import me.shadorc.discordbot.music.MusicManager;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
+import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -18,8 +18,7 @@ public class Listener {
 	public void onReadyEvent(ReadyEvent event) {
 		Log.print("\n---------------- Shadbot is connected [DEBUG MODE : " + Main.DEBUG + "] ----------------");
 		Log.print("ShadBot is connected to :");
-		List <IGuild> guilds = event.getClient().getGuilds();
-		for(IGuild guild : guilds) {
+		for(IGuild guild : event.getClient().getGuilds()) {
 			Log.print("\t*Guild: " + guild.getName() + " (ID: " + guild.getLongID() +")");
 			for(IChannel chan : guild.getChannels()) {
 				Log.print("\t\tChannel: " + chan.getName() + " (ID: " + chan.getLongID() + ")");
@@ -30,9 +29,9 @@ public class Listener {
 
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
-		IGuild guild = event.getGuild();
 		IChannel channel = event.getChannel();
 		IMessage message = event.getMessage();
+		IGuild guild = event.getGuild();
 
 		//Check if the bot doesn't answer to itself or to another bot
 		if(event.getAuthor().isBot() || event.getAuthor().getStringID().equals(event.getClient().getOurUser().getStringID())) {
@@ -47,5 +46,10 @@ public class Listener {
 				BotUtils.executeCommand(event);
 			}
 		}
+	}
+
+	@EventSubscriber
+	public void onGuildCreateEvent(GuildCreateEvent event) { 
+		MusicManager.addMusicPlayer(event.getGuild());
 	}
 }

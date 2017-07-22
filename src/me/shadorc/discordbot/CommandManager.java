@@ -30,11 +30,12 @@ public class CommandManager {
 				new WikiCommand(),
 				new MusicJoinCommand(),
 				new MusicLeaveCommand(),
-				new MusicPlayCommand()
+				new MusicPlayCommand(),
+				new MusicVolumeCommand()
 				);
 	}
 
-	public void register(Command... cmds) {
+	private void register(Command... cmds) {
 		for(Command command : cmds) {
 			for(String name : command.getNames()) {
 				if(commands.containsKey(name)) {
@@ -47,12 +48,12 @@ public class CommandManager {
 	}
 
 	public void manage(MessageReceivedEvent event) {
-		String command = event.getMessage().getContent().split(" ", 2)[0].substring(1).toLowerCase().trim();
-		if(commands.containsKey(command)) {
-			commands.get(command).execute(new Context(event));
+		Context context = new Context(event);
+		if(commands.containsKey(context.getCommand())) {
+			commands.get(context.getCommand()).execute(context);
 		} else {
 			BotUtils.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());
-			Log.info("La commande " + command + " a été essayée sans résultat.");
+			Log.info("La commande " + context.getCommand() + " a été essayée sans résultat.");
 		}
 	}
 }

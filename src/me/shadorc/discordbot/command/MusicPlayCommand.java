@@ -7,10 +7,10 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
+import me.shadorc.discordbot.music.MusicManager;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.handle.obj.IVoiceChannel;
-import sx.blah.discord.util.audio.AudioPlayer;
 
 public class MusicPlayCommand extends Command {
 
@@ -32,9 +32,6 @@ public class MusicPlayCommand extends Command {
 			return;
 		}
 
-		// Get the AudioPlayer object for the guild
-		AudioPlayer audioP = AudioPlayer.getAudioPlayerForGuild(context.getGuild());
-
 		// Find a song given the search term
 		File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
 
@@ -43,12 +40,11 @@ public class MusicPlayCommand extends Command {
 			return;
 		}
 
-		// Stop the playing track
-		audioP.clear();
+		MusicManager.getMusicPlayer(context.getGuild()).stop();
 
 		// Play the found song
 		try {
-			audioP.queue(songDir[0]);
+			MusicManager.getMusicPlayer(context.getGuild()).start(songDir[0]);
 		} catch (IOException | UnsupportedAudioFileException e) {
 			Log.error("Une erreur est survenue lors de la lecture de la musique.", e, context.getChannel());
 		}

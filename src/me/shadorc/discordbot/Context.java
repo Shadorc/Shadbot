@@ -14,6 +14,7 @@ public class Context {
 	private IGuild guild;
 	private IDiscordClient client;
 	private IUser author;
+
 	private String command;
 	private String arg;
 
