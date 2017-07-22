@@ -10,12 +10,15 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 public class TrackScheduler extends AudioEventAdapter {
 
+	private static final int DEFAULT_VOLUME = 15;
+
 	private final AudioPlayer audioPlayer;
 	private final BlockingQueue<AudioTrack> queue;
 
 	public TrackScheduler(AudioPlayer player) {
 		this.audioPlayer = player;
 		this.queue = new LinkedBlockingQueue<>();
+		this.setVolume(DEFAULT_VOLUME);
 	}
 
 	public void queue(AudioTrack track) {
