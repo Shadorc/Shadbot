@@ -27,7 +27,10 @@ public class CommandManager {
 				new TranslateCommand(),
 				new TriviaCommand(),
 				new WeatherCommand(),
-				new WikiCommand()
+				new WikiCommand(),
+				new MusicJoinCommand(),
+				new MusicLeaveCommand(),
+				new MusicPlayCommand()
 				);
 	}
 

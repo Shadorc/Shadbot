@@ -27,6 +27,9 @@ public class HelpCommand extends Command {
 				+ "\n\t/roulette_russe"
 				+ "\n\t/machine_sous"
 				+ "\n\t/coins"
+				+ "\n\t/join"
+				+ "\n\t/leave"
+				+ "\n\t/play <music>"
 				, context.getChannel());
 	}
 
