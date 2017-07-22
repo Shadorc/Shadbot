@@ -67,7 +67,7 @@ public class MusicCmd extends Command {
 				break;
 			default:
 				BotUtils.sendMessage("Cette commande est inconnue, tapez /help pour plus d'informations.", context.getChannel());
-				Log.error("La commande musicale \"" + subCmd + "\" a été utilisée sans résultat.");
+				Log.warn("Musical command \"" + subCmd + "\" has been tried without success");
 				break;
 		}
 	}

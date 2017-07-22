@@ -14,12 +14,10 @@ public class Listener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		Log.print("\n---------------- Shadbot is connected ----------------");
-		Log.print("ShadBot is connected to :");
+		Log.info("---------------- Shadbot is connected ----------------");
 		for(IGuild guild : event.getClient().getGuilds()) {
-			Log.print("\t*Guild: " + guild.getName() + " (ID: " + guild.getLongID() +")");
+			Log.info("Shadbot is connected to guild: " + guild.getName() + " (ID: " + guild.getLongID() +")");
 		}
-		Log.print("");
 	}
 
 	@EventSubscriber

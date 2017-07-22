@@ -20,14 +20,13 @@ public class BotUtils {
 				});
 			}
 		} catch (MissingPermissionsException e) {
-			Log.error("Missing permissions for channel!");
+			Log.warn("Missing permissions for channel \"" + channel.getName() + "\" (ID: " + channel.getStringID() + ")");
 		} catch (DiscordException e) {
 			Log.error(e.getErrorMessage(), e);
 		}
 	}
 
 	public static void executeCommand(MessageReceivedEvent event) {
-		Log.info("Executing command \"" + event.getMessage().getContent() + "\" from " + event.getMessage().getAuthor().getName() + ".");
 		cmdManager.manage(event);
 	}
 }

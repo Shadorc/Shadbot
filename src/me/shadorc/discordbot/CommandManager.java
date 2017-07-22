@@ -38,7 +38,7 @@ public class CommandManager {
 		for(Command command : cmds) {
 			for(String name : command.getNames()) {
 				if(commands.containsKey(name)) {
-					Log.error("Command name collision " + name + " in " + command.getClass().getName() + " !");
+					Log.warn("Command name collision " + name + " in " + command.getClass().getName());
 					continue;
 				}
 				commands.put(name, command);
@@ -52,7 +52,7 @@ public class CommandManager {
 			commands.get(context.getCommand()).execute(context);
 		} else {
 			BotUtils.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());
-			Log.info("La commande " + context.getCommand() + " a été essayée sans résultat.");
+			Log.warn("La commande " + context.getCommand() + " a été essayée sans résultat.");
 		}
 	}
 }

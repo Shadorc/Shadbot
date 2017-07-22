@@ -96,7 +96,7 @@ public class Storage {
 				return mainObj.getJSONObject(guild.getStringID()).getString(key.toString());
 			}
 		} catch (JSONException | IOException e) {
-			Log.error("Error while reading storage file.", e);
+			Log.error("Error while reading data file.", e);
 		}
 		return null;
 	}
@@ -106,7 +106,7 @@ public class Storage {
 			JSONObject obj = new JSONObject(new String(Files.readAllBytes(Paths.get(API_KEYS_FILE.getPath())), StandardCharsets.UTF_8));
 			return obj.getString(key.toString());
 		} catch (JSONException | IOException e) {
-			Log.error("Error while accessing to API keys storage.", e);
+			Log.error("Error while accessing to API keys file.", e);
 		}
 		return null;
 	}
