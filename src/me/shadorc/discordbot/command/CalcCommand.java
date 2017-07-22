@@ -26,7 +26,7 @@ public class CalcCommand extends Command {
 			BotUtils.sendMessage(context.getArg() + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException e) {
 			BotUtils.sendMessage("Calcul incorrect.", context.getChannel());
-		}		
+		}
 	}
 
 }

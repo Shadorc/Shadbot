@@ -27,7 +27,7 @@ public class JokeCommand extends Command {
 			BotUtils.sendMessage("```" + Utils.convertToUTF8(joke) + "```", context.getChannel());
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération de la blague.", e, context.getChannel());
-		}		
+		}
 	}
 
 }

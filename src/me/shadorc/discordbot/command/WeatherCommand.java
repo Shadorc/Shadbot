@@ -35,7 +35,7 @@ public class WeatherCommand extends Command{
 					+ "\n\tTempérature : " + data.getTemperature().getValue() + "°C", context.getChannel());
 		} catch (Exception e) {
 			Log.error("Une erreur est survenue lors de la récupération des données météorologiques.", e, context.getChannel());
-		}		
+		}
 	}
 
 }

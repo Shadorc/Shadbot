@@ -29,7 +29,7 @@ public class BashCommand extends Command {
 			BotUtils.sendMessage("```" + quote + "```", context.getChannel());
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération d'une quote sur danstonchat.com", e, context.getChannel());
-		}		
+		}
 	}
 
 }

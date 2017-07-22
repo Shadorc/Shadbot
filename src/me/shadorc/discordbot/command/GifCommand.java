@@ -47,7 +47,7 @@ public class GifCommand extends Command {
 			} catch (IOException e) {
 				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Giphy.", e, context.getChannel());
 			}
-		}		
+		}
 	}
 
 }

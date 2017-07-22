@@ -17,7 +17,7 @@ import me.shadorc.infonet.Infonet;
 import sx.blah.discord.handle.obj.IChannel;
 
 public class ChatCommand extends Command {
-	
+
 	public enum ChatBot {
 		CLEVERBOT, ALICE;
 	}
@@ -32,9 +32,9 @@ public class ChatCommand extends Command {
 
 	@Override
 	public void execute(Context context) {
-		this.answer(context.getArg(), context.getChannel());		
+		this.answer(context.getArg(), context.getChannel());
 	}
-	
+
 	private void answer(String arg, IChannel channel) {
 		if(arg == null) {
 			BotUtils.sendMessage("Une conversation fonctionne mieux quand on dit quelque chose :)", channel);
@@ -68,8 +68,7 @@ public class ChatCommand extends Command {
 		}
 	}
 	
-	private void setChatbot(ChatBot chatBot) {
+	public void setChatbot(ChatBot chatBot) {
 		this.chatBot = chatBot;
 	}
-
 }

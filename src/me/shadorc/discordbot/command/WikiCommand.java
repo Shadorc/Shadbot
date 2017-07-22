@@ -46,7 +46,7 @@ public class WikiCommand extends Command {
 			BotUtils.sendMessage(description, context.getChannel());
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération des informations sur Wikipédia.", e, context.getChannel());
-		}		
+		}
 	}
 
 }

@@ -1,8 +1,6 @@
 package me.shadorc.discordbot;
 
-import me.shadorc.discordbot.listener.Listener;
-import me.shadorc.discordbot.storage.Storage;
-import me.shadorc.discordbot.storage.Storage.API_KEYS;
+import me.shadorc.discordbot.Storage.API_KEYS;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventDispatcher;
@@ -14,13 +12,12 @@ public class Main {
 
 	public static boolean DEBUG = false;
 
-	private static IDiscordClient client;
 	private static Twitter twitter;
 
 	public static void main(String[] args) {
 		ClientBuilder clientBuilder = new ClientBuilder();
 		clientBuilder.withToken(Storage.get(API_KEYS.DISCORD_TOKEN));
-		client = clientBuilder.login();
+		IDiscordClient client = clientBuilder.login();
 
 		EventDispatcher dispatcher = client.getDispatcher();
 		dispatcher.registerListener(new Listener());
@@ -32,10 +29,6 @@ public class Main {
 			twitter.setOAuthConsumer(Storage.get(API_KEYS.TWITTER_API_KEY), Storage.get(API_KEYS.TWITTER_API_SECRET));
 			twitter.setOAuthAccessToken(new AccessToken(Storage.get(API_KEYS.TWITTER_TOKEN), Storage.get(API_KEYS.TWITTER_TOKEN_SECRET)));
 		}
-	}
-
-	public static IDiscordClient getClient() {
-		return client;
 	}
 
 	public static Twitter getTwitter() {

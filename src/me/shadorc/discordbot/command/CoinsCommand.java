@@ -13,6 +13,6 @@ public class CoinsCommand extends Command {
 
 	@Override
 	public void execute(Context context) {
-		BotUtils.sendMessage("Vous avez " + Storage.get(context.getMessage().getAuthor().getName()) + " coins.", context.getChannel());		
+		BotUtils.sendMessage("Vous avez " + Storage.get(context.getAuthor().getName()) + " coins.", context.getChannel());
 	}
 }

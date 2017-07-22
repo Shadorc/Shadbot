@@ -21,13 +21,13 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 public class TriviaCommand extends Command {
-	
+
 	private static ArrayList <IUser> alreadyAnswered = new ArrayList <> ();
 	public static boolean QUIZZ_STARTED = false;
 
 	private static String CORRECT_ANSWER;
 	private static IChannel CHANNEL;
-	
+
 	private final static Timer timer = new Timer(30*1000, e -> {
 		BotUtils.sendMessage("Temps écoulé, la bonne réponse était " + CORRECT_ANSWER, CHANNEL);
 		TriviaCommand.stop();
@@ -43,7 +43,7 @@ public class TriviaCommand extends Command {
 			this.start(context.getChannel());
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération de la question.", e, context.getChannel());
-		}		
+		}
 	}
 
 	private void start(IChannel channel) throws MalformedURLException, IOException {
@@ -110,5 +110,5 @@ public class TriviaCommand extends Command {
 		alreadyAnswered.clear();
 		timer.stop();
 	}
-	
+
 }

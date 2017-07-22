@@ -30,7 +30,7 @@ public class HolidaysCommand extends Command {
 			} else {
 				Log.error("Une erreur est survenue lors de la récupération des informations concernant les vacances.", e, context.getChannel());
 			}
-		}		
+		}
 	}
 
 }

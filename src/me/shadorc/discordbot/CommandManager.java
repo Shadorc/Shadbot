@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.command.*;
+import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
