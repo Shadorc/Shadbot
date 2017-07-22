@@ -44,11 +44,12 @@ public class CommandManager {
 	}
 
 	public void manage(MessageReceivedEvent event) {
-		String command = event.getMessage().getContent().split(" ", 2)[0].replace("/", "").toLowerCase().trim();
-		this.getCommand(command).execute(new Context(event));
-	}
-
-	public Command getCommand(String name) {
-		return commands.get(name);
+		String command = event.getMessage().getContent().split(" ", 2)[0].substring(1).toLowerCase().trim();
+		if(commands.containsKey(command)) {
+			commands.get(command).execute(new Context(event));
+		} else {
+			BotUtils.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());
+			Log.info("La commande " + command + " a été essayée sans résultat.");
+		}
 	}
 }
