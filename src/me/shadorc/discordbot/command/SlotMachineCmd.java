@@ -14,15 +14,7 @@ public class SlotMachineCmd extends Command {
 		GIFT
 	}
 
-	/*
-	 * CHERRIES : 4/8
-	 * BELL : 3/8
-	 * GIFT 1/8
-	 *
-	 * 50€ : 12.5%
-	 * 100€ : 5.3%
-	 * 5000€ : 0.2%
-	 */
+	private static final int PAID_COST = 5;
 
 	private final SlotOptions[] slotsArray = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES,
@@ -35,8 +27,8 @@ public class SlotMachineCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		if(Storage.get(context.getAuthor().getName()) < 5) {
-			BotUtils.sendMessage("Vous ne pouvez pas jouer aux machines à sous, vous n'avez plus assez de coins !", context.getChannel());
+		if(Storage.get(context.getAuthor().getName()) < PAID_COST) {
+			BotUtils.sendMessage("Vous n'avez plus assez de coins pour jouer aux machines à sous, il vous en faut minimum " + PAID_COST + " !", context.getChannel());
 			return;
 		}
 
@@ -44,13 +36,13 @@ public class SlotMachineCmd extends Command {
 		SlotOptions slot2 = slotsArray[Utils.rand(slotsArray.length)];
 		SlotOptions slot3 = slotsArray[Utils.rand(slotsArray.length)];
 
-		int gain = -5;
+		int gain = -PAID_COST;
 
 		if(slot1 == SlotOptions.CHERRIES && slot2 == SlotOptions.CHERRIES && slot3 == SlotOptions.CHERRIES) {
-			gain = 50;
+			gain = 30;
 		}
 		else if(slot1 == SlotOptions.BELL && slot2 == SlotOptions.BELL && slot3 == SlotOptions.BELL) {
-			gain = 100;
+			gain = 150;
 		}
 		else if(slot1 == SlotOptions.GIFT && slot2 == SlotOptions.GIFT && slot3 == SlotOptions.GIFT) {
 			gain = 5000;
