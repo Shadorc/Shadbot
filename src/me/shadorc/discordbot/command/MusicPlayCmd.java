@@ -29,8 +29,9 @@ public class MusicPlayCmd extends Command {
 		}
 
 		IVoiceChannel botVoiceChannel = context.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel();
+		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
+
 		if(botVoiceChannel == null) {
-			IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
 			if(userVoiceChannel == null) {
 				BotUtils.sendMessage("Rejoignez un salon vocal avant d'utiliser cette commande pour que je puisse vous rejoindre.", context.getChannel());
 				return;

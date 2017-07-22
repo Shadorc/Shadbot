@@ -10,7 +10,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 public class TrackScheduler extends AudioEventAdapter {
 
-	private static final int DEFAULT_VOLUME = 15;
+	private static final int DEFAULT_VOLUME = 20;
 
 	private final AudioPlayer audioPlayer;
 	private final BlockingQueue<AudioTrack> queue;
@@ -63,7 +63,7 @@ public class TrackScheduler extends AudioEventAdapter {
 	}
 
 	public void setVolume(int volume) {
-		audioPlayer.setVolume(Math.max(0, Math.min(150, volume)));
+		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
 	}
 
 	public int getVolume() {

@@ -40,14 +40,14 @@ public class MusicCmd extends Command {
 		switch(subCmd) {
 			case "volume":
 				if(subArg == null) {
-					BotUtils.sendMessage("Merci d'indiquer un volume compris entre 0 et 150.", context.getChannel());
+					BotUtils.sendMessage("Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
 					return;
 				}
 				try {
 					scheduler.setVolume(Integer.parseInt(subArg));
-					BotUtils.sendMessage("Volume de la musique réglé sur " + scheduler.getVolume() + ".", context.getChannel());
+					BotUtils.sendMessage("Volume de la musique réglé sur " + scheduler.getVolume() + "%", context.getChannel());
 				} catch (NumberFormatException e) {
-					BotUtils.sendMessage("Merci d'indiquer un volume compris entre 0 et 150.", context.getChannel());
+					BotUtils.sendMessage("Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
 				}
 				break;
 			case "pause":
