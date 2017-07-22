@@ -1,27 +1,37 @@
 package me.shadorc.discordbot.music;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.util.audio.AudioPlayer;
 
 public class MusicManager {
 
-	public static final Map<IGuild, Music> GUILDS = new HashMap <> ();
+	private int volume;
+	private AudioPlayer audioPlayer;
 
-	public static void addMusicPlayer(IGuild guild) {
-		if(!GUILDS.containsKey(guild)) {
-			GUILDS.put(guild, new Music(guild));
-		}
+	public MusicManager(IGuild guild) {
+		this.audioPlayer = AudioPlayer.getAudioPlayerForGuild(guild);
 	}
 
-	public static void delMusicPlayer(IGuild guild) {
-		if(GUILDS.containsKey(guild)) {
-			GUILDS.remove(guild);
-		}
+	public void setVolume(int volume) {
+		this.volume = (int) Math.max(0, Math.min(100, volume));
+		this.audioPlayer.setVolume(volume/100f);
 	}
 
-	public static Music getMusicPlayer(IGuild guild) {
-		return GUILDS.get(guild);
+	public int getVolume() {
+		return this.volume;
 	}
+
+	public void start(File file) throws IOException, UnsupportedAudioFileException {
+		this.audioPlayer.queue(file);
+	}
+
+	public void stop() {
+		this.audioPlayer.clear();
+	}
+
 }

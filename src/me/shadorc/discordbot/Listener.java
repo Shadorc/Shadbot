@@ -1,7 +1,7 @@
 package me.shadorc.discordbot;
 
 import me.shadorc.discordbot.command.TriviaCommand;
-import me.shadorc.discordbot.music.MusicManager;
+import me.shadorc.discordbot.music.GuildsMusicManager;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -50,6 +50,6 @@ public class Listener {
 
 	@EventSubscriber
 	public void onGuildCreateEvent(GuildCreateEvent event) { 
-		MusicManager.addMusicPlayer(event.getGuild());
+		GuildsMusicManager.addMusicPlayer(event.getGuild());
 	}
 }
