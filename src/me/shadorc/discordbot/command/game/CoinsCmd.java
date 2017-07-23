@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command;
+package me.shadorc.discordbot.command.game;
 
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;

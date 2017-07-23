@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command;
+package me.shadorc.discordbot.command.fun;
 
 import java.io.IOException;
 import java.net.URL;

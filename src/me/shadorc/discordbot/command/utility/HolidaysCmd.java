@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command;
+package me.shadorc.discordbot.command.utility;
 
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
@@ -10,7 +10,7 @@ import twitter4j.TwitterException;
 public class HolidaysCmd extends Command {
 
 	public HolidaysCmd() {
-		super("vacances", "vacs");
+		super("vacances", "vacs", "holidays");
 	}
 
 	@Override

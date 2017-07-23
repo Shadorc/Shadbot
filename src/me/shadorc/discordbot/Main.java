@@ -34,4 +34,19 @@ public class Main {
 		});
 	}
 
+	/*
+	 * //	public void set_chatbot() {
+//		if(message.getAuthor().getName().equals("Shadorc")) {
+//			if(arg != null) {
+//				if(arg.equalsIgnoreCase(ChatBot.ALICE.toString())) {
+//					Chat.setChatbot(ChatBot.ALICE);
+//				} else if(arg.equalsIgnoreCase(ChatBot.CLEVERBOT.toString())) {
+//					Chat.setChatbot(ChatBot.CLEVERBOT);
+//				}
+//				BotUtils.sendMessage("ChatBot has been set to " + arg.toUpperCase(), channel);
+//			}
+//		}
+//	}
+	 * */
+
 }

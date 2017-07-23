@@ -3,7 +3,28 @@ package me.shadorc.discordbot;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.shadorc.discordbot.command.*;
+import me.shadorc.discordbot.command.HelpCmd;
+import me.shadorc.discordbot.command.fun.BashCmd;
+import me.shadorc.discordbot.command.fun.ChatCmd;
+import me.shadorc.discordbot.command.fun.GifCmd;
+import me.shadorc.discordbot.command.fun.JokeCmd;
+import me.shadorc.discordbot.command.game.CoinsCmd;
+import me.shadorc.discordbot.command.game.RussianRouletteCmd;
+import me.shadorc.discordbot.command.game.SlotMachineCmd;
+import me.shadorc.discordbot.command.game.TriviaCmd;
+import me.shadorc.discordbot.command.music.MusicLeaveCmd;
+import me.shadorc.discordbot.command.music.MusicPlayCmd;
+import me.shadorc.discordbot.command.music.NameCmd;
+import me.shadorc.discordbot.command.music.NextCmd;
+import me.shadorc.discordbot.command.music.PauseCmd;
+import me.shadorc.discordbot.command.music.PlaylistCmd;
+import me.shadorc.discordbot.command.music.StopCmd;
+import me.shadorc.discordbot.command.music.VolumeCmd;
+import me.shadorc.discordbot.command.utility.CalcCmd;
+import me.shadorc.discordbot.command.utility.HolidaysCmd;
+import me.shadorc.discordbot.command.utility.TranslateCmd;
+import me.shadorc.discordbot.command.utility.WeatherCmd;
+import me.shadorc.discordbot.command.utility.WikiCmd;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -30,7 +51,12 @@ public class CommandManager {
 				new WikiCmd(),
 				new MusicLeaveCmd(),
 				new MusicPlayCmd(),
-				new MusicCmd()
+				new NameCmd(),
+				new NextCmd(),
+				new PauseCmd(),
+				new PlaylistCmd(),
+				new StopCmd(),
+				new VolumeCmd()
 				);
 	}
 

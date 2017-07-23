@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command;
+package me.shadorc.discordbot.command.utility;
 
 import il.ac.hit.finalproject.classes.IWeatherDataService;
 import il.ac.hit.finalproject.classes.Location;

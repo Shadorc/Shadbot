@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command;
+package me.shadorc.discordbot.command.utility;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;

@@ -1,6 +1,6 @@
 package me.shadorc.discordbot;
 
-import me.shadorc.discordbot.command.TriviaCmd;
+import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.api.events.EventSubscriber;

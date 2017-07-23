@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command;
+package me.shadorc.discordbot.command.utility;
 
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
@@ -9,7 +9,7 @@ import me.shadorc.discordbot.utility.Utils;
 public class TranslateCmd extends Command {
 
 	public TranslateCmd() {
-		super("trad");
+		super("trad", "translate", "traduire");
 	}
 
 	@Override

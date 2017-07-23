@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command;
+package me.shadorc.discordbot.command.game;
 
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
@@ -9,7 +9,7 @@ import me.shadorc.discordbot.utility.Utils;
 public class RussianRouletteCmd extends Command {
 
 	public RussianRouletteCmd() {
-		super("roulette_russe");
+		super("roulette_russe", "russian_roulette");
 	}
 
 	@Override

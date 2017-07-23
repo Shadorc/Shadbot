@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command;
+package me.shadorc.discordbot.command.game;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
