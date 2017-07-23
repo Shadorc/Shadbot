@@ -54,9 +54,12 @@ public class Utils {
 		return StringEscapeUtils.unescapeHtml3(text);
 	}
 
-	public static String formatPlaylist(BlockingQueue <AudioTrack> blockingQueue) {
-		StringBuilder playlist = new StringBuilder("Playlist :");
-		for(AudioTrack track : blockingQueue) {
+	public static String formatPlaylist(BlockingQueue <AudioTrack> queue) {
+		StringBuilder playlist = new StringBuilder("Musique(s) en attente : ");
+		if(queue.isEmpty()) {
+			playlist.append("Aucune");
+		}
+		for(AudioTrack track : queue) {
 			playlist.append("\n\t- " + track.getInfo().author + " - " + track.getInfo().title);
 		}
 		return playlist.toString();
