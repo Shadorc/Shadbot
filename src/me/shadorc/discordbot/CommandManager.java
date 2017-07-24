@@ -16,7 +16,7 @@ import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TransferCoinsCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd;
-import me.shadorc.discordbot.command.music.MusicPlayCmd;
+import me.shadorc.discordbot.command.music.PlayCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
 import me.shadorc.discordbot.command.music.NextCmd;
 import me.shadorc.discordbot.command.music.PauseCmd;
@@ -55,7 +55,7 @@ public class CommandManager {
 				new SlotMachineCmd(),
 				new TriviaCmd(),
 				new CoinsCmd(),
-				new MusicPlayCmd(),
+				new PlayCmd(),
 				new VolumeCmd(),
 				new PauseCmd(),
 				new StopCmd(),
