@@ -93,7 +93,11 @@ public class Storage {
 		try {
 			JSONObject mainObj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
 			if(mainObj.has(guild.getStringID())) {
-				return mainObj.getJSONObject(guild.getStringID()).getString(key.toString());
+				JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
+				if(!guildObj.has(key.toString())) {
+					return null;
+				}
+				return guildObj.getString(key.toString());
 			}
 		} catch (JSONException | IOException e) {
 			Log.error("Error while reading data file.", e);
