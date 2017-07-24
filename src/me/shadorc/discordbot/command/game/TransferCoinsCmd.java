@@ -16,19 +16,29 @@ public class TransferCoinsCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage("Indiquez la personne et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
+			BotUtils.sendMessage("Indiquez l'utilisateur et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
 			return;
 		}
 
 		String[] splitCmd = context.getArg().split(" ", 2);
-		if(splitCmd.length < 2) {
-			BotUtils.sendMessage("Indiquez la personne et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
+		if(splitCmd.length != 2) {
+			BotUtils.sendMessage("Indiquez l'utilisateur et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
+			return;
+		}
+
+		if(context.getMessage().getMentions().size() != 1) {
+			BotUtils.sendMessage("Vous devez mentionner un utilisateur : /transfert <montant> <utilisateur>", context.getChannel());
 			return;
 		}
 
 		try {
 			int coins = Integer.parseInt(splitCmd[0]);
-			IUser user = context.getGuild().getUsersByName(splitCmd[1]).get(0);
+			IUser user = context.getMessage().getMentions().get(0);
+
+			if(coins <= 0) {
+				BotUtils.sendMessage("Vous devez transférer un montant supérieur à 0.", context.getChannel());
+				return;
+			}
 
 			if(user.equals(context.getAuthor())) {
 				BotUtils.sendMessage("Vous ne pouvez pas vous transférer de l'argent à vous même.", context.getChannel());
@@ -43,11 +53,9 @@ public class TransferCoinsCmd extends Command {
 			Utils.gain(context.getGuild(), context.getAuthor().getLongID(), -coins);
 			Utils.gain(context.getGuild(), user.getLongID(), coins);
 
-			BotUtils.sendMessage(coins + " coins ont été transférés à " + user.getName(), context.getChannel());
+			BotUtils.sendMessage(context.getAuthor().mention() + " a transféré " + coins + " coins à " + user.mention(), context.getChannel());
 		} catch(NumberFormatException e1) {
 			BotUtils.sendMessage("Montant invalide.", context.getChannel());
-		} catch(IndexOutOfBoundsException e2) {
-			BotUtils.sendMessage("Utilisateur inconnu.", context.getChannel());
 		}
 	}
 }

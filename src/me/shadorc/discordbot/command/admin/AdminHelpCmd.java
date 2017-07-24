@@ -26,7 +26,7 @@ public class AdminHelpCmd extends Command {
 				"`/allows_channel <#channel | all>`"
 						+ "\n`/quit`", false);
 
-		BotUtils.sendEmbed(builder.build(), context.getChannel());		
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
 }

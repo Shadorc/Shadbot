@@ -41,6 +41,6 @@ public class AllowsChannelCmd extends Command {
 				Storage.store(context.getGuild(), "allowedChannels", channel.getStringID());
 			}
 		}
-		BotUtils.sendMessage("Le(s) channel(s) *" + channels.stream().map(channel -> channel.getName()).collect(Collectors.joining(", ")).trim() + "* a/ont été ajouté(s) à la liste des channels autorisés.", context.getChannel());
+		BotUtils.sendMessage("Le(s) channel(s) " + channels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " a/ont été ajouté(s) à la liste des channels autorisés.", context.getChannel());
 	}
 }
