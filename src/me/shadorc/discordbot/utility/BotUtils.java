@@ -26,6 +26,7 @@ public class BotUtils {
 		}
 	}
 
+	//EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
 		try {
 			RequestBuffer.request(() -> {
