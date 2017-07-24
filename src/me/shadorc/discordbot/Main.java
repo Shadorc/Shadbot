@@ -2,7 +2,7 @@ package me.shadorc.discordbot;
 
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
-import me.shadorc.discordbot.Storage.API_KEYS;
+import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.listener.ChannelListener;
 import me.shadorc.discordbot.listener.EventListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -15,7 +15,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		client = new ClientBuilder()
-				.withToken(Storage.get(API_KEYS.DISCORD_TOKEN))
+				.withToken(Storage.get(ApiKeys.DISCORD_TOKEN))
 				.login();
 
 		client.getDispatcher().registerListener(new EventListener());

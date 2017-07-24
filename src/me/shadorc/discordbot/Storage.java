@@ -18,7 +18,7 @@ public class Storage {
 	private static final File API_KEYS_FILE = new File("api_keys.json");
 	private static final File DATA_FILE = new File("data.json");
 
-	public enum API_KEYS {
+	public enum ApiKeys {
 		GIPHY_API_KEY,
 		DTC_API_KEY,
 		DISCORD_TOKEN,
@@ -120,7 +120,7 @@ public class Storage {
 		return null;
 	}
 
-	public static String get(API_KEYS key) {
+	public static String get(ApiKeys key) {
 		try {
 			JSONObject obj = new JSONObject(new String(Files.readAllBytes(Paths.get(API_KEYS_FILE.getPath())), StandardCharsets.UTF_8));
 			return obj.getString(key.toString());

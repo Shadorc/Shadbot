@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.command.HelpCmd;
+import me.shadorc.discordbot.command.admin.AdminHelpCmd;
+import me.shadorc.discordbot.command.admin.AllowChannelCmd;
 import me.shadorc.discordbot.command.admin.QuitCmd;
 import me.shadorc.discordbot.command.fun.BashCmd;
 import me.shadorc.discordbot.command.fun.ChatCmd;
@@ -37,29 +39,31 @@ public class CommandManager {
 
 	public CommandManager() {
 		this.register(
-				new BashCmd(),
-				new CalcCmd(),
-				new ChatCmd(),
-				new CoinsCmd(),
-				new GifCmd(),
 				new HelpCmd(),
+				new AdminHelpCmd(),
+				new TranslateCmd(),
+				new WikiCmd(),
 				new HolidaysCmd(),
+				new CalcCmd(),
+				new WeatherCmd(),
+				new ChatCmd(),
+				new GifCmd(),
+				new BashCmd(),
 				new JokeCmd(),
+				new TransferCoinsCmd(),
 				new RussianRouletteCmd(),
 				new SlotMachineCmd(),
-				new TranslateCmd(),
 				new TriviaCmd(),
-				new WeatherCmd(),
-				new WikiCmd(),
+				new CoinsCmd(),
 				new MusicPlayCmd(),
-				new NameCmd(),
-				new NextCmd(),
-				new PauseCmd(),
-				new PlaylistCmd(),
-				new StopCmd(),
 				new VolumeCmd(),
+				new PauseCmd(),
+				new StopCmd(),
+				new NextCmd(),
+				new NameCmd(),
+				new PlaylistCmd(),
 				new QuitCmd(),
-				new TransferCoinsCmd()
+				new AllowChannelCmd()
 				);
 	}
 
@@ -77,6 +81,11 @@ public class CommandManager {
 
 	public void manage(MessageReceivedEvent event) {
 		Context context = new Context(event);
+
+		if(!Utils.isChannelAllowed(context.getGuild(), context.getChannel())) {
+			return;
+		}
+
 		if(commands.containsKey(context.getCommand())) {
 			Command command = commands.get(context.getCommand());
 			if(command.isAdminCmd() && !Utils.isAdmin(context.getGuild(), context.getAuthor())) {

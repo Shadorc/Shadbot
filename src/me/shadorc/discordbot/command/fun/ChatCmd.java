@@ -10,7 +10,7 @@ import org.json.XML;
 import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.API_KEYS;
+import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.infonet.Infonet;
@@ -55,7 +55,7 @@ public class ChatCmd extends Command {
 
 			else if(chatBot.equals(ChatBot.CLEVERBOT)) {
 				String jsonString = Infonet.getHTML(new URL("http://www.cleverbot.com/getreply?"
-						+ "key=" + Storage.get(API_KEYS.CLEVERBOT_API_KEY)
+						+ "key=" + Storage.get(ApiKeys.CLEVERBOT_API_KEY)
 						+ "&input=" + URLEncoder.encode(arg, "UTF-8")
 						+ (cleverbotState != null ? "&cs=" + cleverbotState : "")));
 				JSONObject obj = new JSONObject(jsonString);
