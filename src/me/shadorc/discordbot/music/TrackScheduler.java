@@ -35,14 +35,6 @@ public class TrackScheduler extends AudioEventAdapter {
 		audioPlayer.startTrack(queue.poll(), false);
 	}
 
-	public boolean isPlaying() {
-		return (audioPlayer.getPlayingTrack() != null);
-	}
-
-	public void setPaused(boolean isPaused) {
-		this.audioPlayer.setPaused(isPaused);
-	}
-
 	public String getCurrentTrackName() {
 		return this.audioPlayer.getPlayingTrack().getInfo().title;
 	}
@@ -51,8 +43,24 @@ public class TrackScheduler extends AudioEventAdapter {
 		return queue;
 	}
 
+	public int getVolume() {
+		return audioPlayer.getVolume();
+	}
+
+	public void setVolume(int volume) {
+		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
+	}
+
+	public void setPaused(boolean isPaused) {
+		this.audioPlayer.setPaused(isPaused);
+	}
+
 	public boolean isPaused() {
 		return this.audioPlayer.isPaused();
+	}
+
+	public boolean isPlaying() {
+		return (audioPlayer.getPlayingTrack() != null);
 	}
 
 	@Override
@@ -60,13 +68,5 @@ public class TrackScheduler extends AudioEventAdapter {
 		if(endReason.mayStartNext) {
 			this.nextTrack();
 		}
-	}
-
-	public void setVolume(int volume) {
-		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
-	}
-
-	public int getVolume() {
-		return audioPlayer.getVolume();
 	}
 }

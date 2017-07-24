@@ -3,49 +3,43 @@ package me.shadorc.discordbot.music;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.Timer;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
+import me.shadorc.discordbot.Main;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 
 public class GuildMusicManager {
 
-	private static AudioPlayerManager playerManager;
-	private static Map<Long, GuildMusicManager> musicManagers;
+	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
+	private final static Map<Long, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
 
-	public static void init() {
-		musicManagers = new HashMap<>();
-		playerManager = new DefaultAudioPlayerManager();
-		AudioSourceManagers.registerRemoteSources(playerManager);
-		AudioSourceManagers.registerLocalSource(playerManager);
-	}
-
-	public static synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {
-		GuildMusicManager musicManager = musicManagers.get(guild.getLongID());
-
-		if(musicManager == null) {
-			musicManager = new GuildMusicManager(playerManager);
-			musicManagers.put(guild.getLongID(), musicManager);
-		}
-
-		guild.getAudioManager().setAudioProvider(musicManager.getAudioProvider());
-
-		return musicManager;
-	}
-
-	public static AudioPlayerManager getAudioPlayerManager() {
-		return playerManager;
-	}
-
+	private IChannel channel;
 	private AudioPlayer player;
 	private TrackScheduler scheduler;
+	private Timer leaveTimer;
 
-	public GuildMusicManager(AudioPlayerManager manager) {
+	public GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
 		this.player = manager.createPlayer();
 		this.scheduler = new TrackScheduler(player);
 		this.player.addListener(scheduler);
+		this.leaveTimer = new Timer(2*60*1000, e -> {
+			Main.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel().leave();
+			scheduler.stop();
+			leaveTimer.stop();
+		});
+	}
+
+	public void scheduleLeave() {
+		leaveTimer.start();
+	}
+
+	public void cancelLeave() {
+		leaveTimer.stop();
 	}
 
 	public AudioProvider getAudioProvider() {
@@ -58,5 +52,30 @@ public class GuildMusicManager {
 
 	public TrackScheduler getScheduler() {
 		return scheduler;
+	}
+
+	public IChannel getRequestedChannel() {
+		return channel;
+	}
+
+	public void setRequestedChannel(IChannel channel) {
+		this.channel = channel;
+	}
+
+	public boolean isCancelling() {
+		return leaveTimer.isRunning();
+	}
+
+	public static synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {
+		GuildMusicManager musicManager = MUSIC_MANAGERS.get(guild.getLongID());
+
+		if(musicManager == null) {
+			musicManager = new GuildMusicManager(guild, PLAYER_MANAGER);
+			MUSIC_MANAGERS.put(guild.getLongID(), musicManager);
+		}
+
+		guild.getAudioManager().setAudioProvider(musicManager.getAudioProvider());
+
+		return musicManager;
 	}
 }

@@ -50,7 +50,8 @@ public class MusicPlayCmd extends Command {
 		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		GuildMusicManager.getAudioPlayerManager().loadItemOrdered(musicManager, identifier, new AudioLoadResultHandler() {
+		musicManager.setRequestedChannel(context.getChannel());
+		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
 				BotUtils.sendMessage("Ajout de *" + track.getInfo().author + " - " + track.getInfo().title + "* à la playlist.", context.getChannel());

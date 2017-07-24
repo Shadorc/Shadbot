@@ -1,37 +1,32 @@
 package me.shadorc.discordbot;
 
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+
 import me.shadorc.discordbot.Storage.API_KEYS;
+import me.shadorc.discordbot.listener.ChannelListener;
+import me.shadorc.discordbot.listener.EventListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class Main {
 
+	private static IDiscordClient client;
+
 	public static void main(String[] args) {
-		IDiscordClient client = new ClientBuilder()
+		client = new ClientBuilder()
 				.withToken(Storage.get(API_KEYS.DISCORD_TOKEN))
 				.login();
 
-		client.getDispatcher().registerListener(new Listener());
-		GuildMusicManager.init();
+		client.getDispatcher().registerListener(new EventListener());
+		client.getDispatcher().registerListener(new ChannelListener());
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				for(IGuild guild : client.getGuilds()) {
-					GuildMusicManager guildMusicManager = GuildMusicManager.getGuildAudioPlayer(guild);
-					if(guildMusicManager != null) {
-						guildMusicManager.getScheduler().stop();
-						IVoiceChannel botVoiceChannel = client.getOurUser().getVoiceStateForGuild(guild).getChannel();
-						if(botVoiceChannel != null) {
-							botVoiceChannel.leave();
-						}
-					}
-				}
-			}
-		});
+		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
+		AudioSourceManagers.registerLocalSource(GuildMusicManager.PLAYER_MANAGER);
+	}
+
+	public static IDiscordClient getClient() {
+		return client;
 	}
 
 	/*

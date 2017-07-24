@@ -1,4 +1,4 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.listener;
 
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -10,7 +10,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 
-public class Listener {
+public class EventListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
