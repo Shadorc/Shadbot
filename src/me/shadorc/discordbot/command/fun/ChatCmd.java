@@ -27,7 +27,7 @@ public class ChatCmd extends Command {
 	private String aliceState = null;
 
 	public ChatCmd() {
-		super("chat");
+		super(false, "chat");
 	}
 
 	@Override

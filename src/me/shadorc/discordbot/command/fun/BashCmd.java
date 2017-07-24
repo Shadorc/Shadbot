@@ -16,7 +16,7 @@ import me.shadorc.infonet.Infonet;
 public class BashCmd extends Command {
 
 	public BashCmd() {
-		super("dtc", "bash");
+		super(false, "dtc", "bash");
 	}
 
 	@Override

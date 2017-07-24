@@ -9,7 +9,7 @@ import me.shadorc.discordbot.utility.BotUtils;
 public class NameCmd extends Command {
 
 	public NameCmd() {
-		super("name", "nom");
+		super(false, "name", "nom");
 	}
 
 	@Override

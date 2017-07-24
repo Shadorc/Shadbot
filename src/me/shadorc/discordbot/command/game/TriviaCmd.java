@@ -34,7 +34,7 @@ public class TriviaCmd extends Command {
 	});
 
 	public TriviaCmd() {
-		super("trivia", "quizz", "question");
+		super(false, "trivia", "quizz", "question");
 	}
 
 	@Override

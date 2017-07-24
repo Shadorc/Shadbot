@@ -14,7 +14,7 @@ import me.shadorc.infonet.Infonet;
 public class JokeCmd extends Command {
 
 	public JokeCmd() {
-		super("blague", "joke");
+		super(false, "blague", "joke");
 	}
 
 	@Override

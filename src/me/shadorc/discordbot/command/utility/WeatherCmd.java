@@ -14,7 +14,7 @@ import me.shadorc.discordbot.utility.Utils;
 public class WeatherCmd extends Command{
 
 	public WeatherCmd() {
-		super("meteo", "météo", "weather");
+		super(false, "meteo", "météo", "weather");
 	}
 
 	@Override

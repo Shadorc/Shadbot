@@ -18,7 +18,7 @@ import sx.blah.discord.handle.obj.IVoiceChannel;
 public class MusicPlayCmd extends Command {
 
 	public MusicPlayCmd() {
-		super("play", "joue");
+		super(false, "play", "joue");
 	}
 
 	@Override

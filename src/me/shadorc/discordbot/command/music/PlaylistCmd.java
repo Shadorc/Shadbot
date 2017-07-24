@@ -10,7 +10,7 @@ import me.shadorc.discordbot.utility.Utils;
 public class PlaylistCmd extends Command {
 
 	public PlaylistCmd() {
-		super("playlist");
+		super(false, "playlist");
 	}
 
 	@Override

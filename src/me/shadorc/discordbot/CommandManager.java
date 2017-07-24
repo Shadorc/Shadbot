@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.command.HelpCmd;
+import me.shadorc.discordbot.command.admin.QuitCmd;
 import me.shadorc.discordbot.command.fun.BashCmd;
 import me.shadorc.discordbot.command.fun.ChatCmd;
 import me.shadorc.discordbot.command.fun.GifCmd;
@@ -12,7 +13,6 @@ import me.shadorc.discordbot.command.game.CoinsCmd;
 import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd;
-import me.shadorc.discordbot.command.music.MusicLeaveCmd;
 import me.shadorc.discordbot.command.music.MusicPlayCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
 import me.shadorc.discordbot.command.music.NextCmd;
@@ -27,6 +27,7 @@ import me.shadorc.discordbot.command.utility.WeatherCmd;
 import me.shadorc.discordbot.command.utility.WikiCmd;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
+import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 public class CommandManager {
@@ -49,14 +50,14 @@ public class CommandManager {
 				new TriviaCmd(),
 				new WeatherCmd(),
 				new WikiCmd(),
-				new MusicLeaveCmd(),
 				new MusicPlayCmd(),
 				new NameCmd(),
 				new NextCmd(),
 				new PauseCmd(),
 				new PlaylistCmd(),
 				new StopCmd(),
-				new VolumeCmd()
+				new VolumeCmd(),
+				new QuitCmd()
 				);
 	}
 
@@ -75,7 +76,12 @@ public class CommandManager {
 	public void manage(MessageReceivedEvent event) {
 		Context context = new Context(event);
 		if(commands.containsKey(context.getCommand())) {
-			commands.get(context.getCommand()).execute(context);
+			Command command = commands.get(context.getCommand());
+			if(command.isAdminCmd() && !Utils.isAdmin(context.getGuild(), context.getAuthor())) {
+				BotUtils.sendMessage("Vous devez être administrateur pour exécuter cette commande.", event.getChannel());
+			} else {
+				command.execute(context);
+			}
 		} else {
 			BotUtils.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());
 			Log.warn("La commande " + context.getCommand() + " a été essayée sans résultat.");

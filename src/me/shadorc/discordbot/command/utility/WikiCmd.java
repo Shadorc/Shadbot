@@ -15,7 +15,7 @@ import me.shadorc.infonet.Infonet;
 public class WikiCmd extends Command {
 
 	public WikiCmd() {
-		super("wiki", "wikipedia");
+		super(false, "wiki", "wikipedia");
 	}
 
 	@Override

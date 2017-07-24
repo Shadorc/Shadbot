@@ -18,7 +18,7 @@ import me.shadorc.infonet.Infonet;
 public class GifCmd extends Command {
 
 	public GifCmd() {
-		super("gif");
+		super(false, "gif");
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import me.shadorc.discordbot.utility.BotUtils;
 public class CalcCmd extends Command {
 
 	public CalcCmd() {
-		super("calc");
+		super(false, "calc");
 	}
 
 	@Override

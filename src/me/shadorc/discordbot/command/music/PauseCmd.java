@@ -9,7 +9,7 @@ import me.shadorc.discordbot.utility.BotUtils;
 public class PauseCmd extends Command {
 
 	public PauseCmd() {
-		super("pause");
+		super(false, "pause");
 	}
 
 	@Override

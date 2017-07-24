@@ -8,7 +8,7 @@ import me.shadorc.discordbot.utility.BotUtils;
 public class CoinsCmd extends Command {
 
 	public CoinsCmd() {
-		super("coins", "coin");
+		super(false, "coins", "coin");
 	}
 
 	@Override

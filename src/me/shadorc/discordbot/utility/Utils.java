@@ -18,6 +18,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.discordbot.Storage;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 
 public class Utils {
 
@@ -112,5 +114,9 @@ public class Utils {
 			return false;
 		}
 		return true;
+	}
+
+	public static boolean isAdmin(IGuild guild, IUser user) {
+		return user.getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR);
 	}
 }

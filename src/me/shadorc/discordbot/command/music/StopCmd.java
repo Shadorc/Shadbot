@@ -9,7 +9,7 @@ import me.shadorc.discordbot.utility.BotUtils;
 public class StopCmd extends Command {
 
 	public StopCmd() {
-		super("stop");
+		super(false, "stop");
 	}
 
 	@Override

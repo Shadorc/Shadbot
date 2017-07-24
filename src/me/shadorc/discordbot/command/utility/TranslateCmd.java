@@ -9,7 +9,7 @@ import me.shadorc.discordbot.utility.Utils;
 public class TranslateCmd extends Command {
 
 	public TranslateCmd() {
-		super("trad", "translate", "traduire");
+		super(false, "trad", "translate", "traduire");
 	}
 
 	@Override

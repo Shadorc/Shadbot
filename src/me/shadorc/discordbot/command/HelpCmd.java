@@ -10,7 +10,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class HelpCmd extends Command {
 
 	public HelpCmd() {
-		super("help", "aide");
+		super(false, "help", "aide");
 	}
 
 	@Override

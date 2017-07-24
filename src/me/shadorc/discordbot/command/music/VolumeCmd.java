@@ -9,7 +9,7 @@ import me.shadorc.discordbot.utility.BotUtils;
 public class VolumeCmd extends Command {
 
 	public VolumeCmd() {
-		super("volume");
+		super(false, "volume");
 	}
 
 	@Override

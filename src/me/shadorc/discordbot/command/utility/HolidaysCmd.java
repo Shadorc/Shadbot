@@ -10,7 +10,7 @@ import twitter4j.TwitterException;
 public class HolidaysCmd extends Command {
 
 	public HolidaysCmd() {
-		super("vacances", "vacs", "holidays");
+		super(false, "vacances", "vacs", "holidays");
 	}
 
 	@Override

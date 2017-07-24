@@ -22,7 +22,7 @@ public class SlotMachineCmd extends Command {
 			SlotOptions.GIFT};
 
 	public SlotMachineCmd() {
-		super("machine_sous", "slot_machine");
+		super(false, "machine_sous", "slot_machine");
 	}
 
 	@Override

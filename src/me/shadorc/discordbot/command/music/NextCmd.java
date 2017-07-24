@@ -9,7 +9,7 @@ import me.shadorc.discordbot.utility.BotUtils;
 public class NextCmd extends Command {
 
 	public NextCmd() {
-		super("next", "suivante");
+		super(false, "next", "suivante");
 	}
 
 	@Override
