@@ -14,6 +14,7 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
+		event.getClient().changePlayingText("/help");
 		Log.info("---------------- Shadbot is connected ----------------");
 		for(IGuild guild : event.getClient().getGuilds()) {
 			Log.info("Shadbot is connected to guild: " + guild.getName() + " (ID: " + guild.getLongID() +")");
