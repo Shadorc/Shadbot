@@ -35,7 +35,8 @@ public class HelpCmd extends Command {
 						+ "\n`/dtc`"
 						+ "\n`/blague`", false);
 		builder.appendField("Commandes Jeux :",
-				"`/roulette_russe`"
+				"`/transfert <montant> <utilisateur>`"
+						+ "\n`/roulette_russe`"
 						+ "\n`/machine_sous`"
 						+ "\n`/trivia`"
 						+ "\n`/coins`", false);
