@@ -4,6 +4,7 @@ import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 
@@ -35,6 +36,10 @@ public class Context {
 
 	public IGuild getGuild() {
 		return event.getGuild();
+	}
+
+	public IMessage getMessage() {
+		return event.getMessage();
 	}
 
 	public IDiscordClient getClient() {

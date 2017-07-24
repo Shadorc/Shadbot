@@ -23,7 +23,7 @@ public class AdminHelpCmd extends Command {
 		builder.withColor(new Color(170, 196, 222));
 		builder.withDesc("Aide pour les commandes administrateurs. Pour plus d'informations, utilisez /help <commande>.");
 		builder.appendField("Commandes :",
-				"`/allows_channel <channel | all>`"
+				"`/allows_channel <#channel | all>`"
 						+ "\n`/quit`", false);
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());		
