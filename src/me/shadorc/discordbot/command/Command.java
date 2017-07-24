@@ -1,4 +1,4 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.command;
 
 public abstract class Command {
 

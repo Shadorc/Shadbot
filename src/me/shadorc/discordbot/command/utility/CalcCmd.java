@@ -4,8 +4,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import me.shadorc.discordbot.Command;
-import me.shadorc.discordbot.Context;
+import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 
 public class CalcCmd extends Command {

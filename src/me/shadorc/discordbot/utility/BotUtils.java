@@ -1,6 +1,6 @@
 package me.shadorc.discordbot.utility;
 
-import me.shadorc.discordbot.CommandManager;
+import me.shadorc.discordbot.command.CommandManager;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;

@@ -2,9 +2,9 @@ package me.shadorc.discordbot.command.admin;
 
 import java.util.List;
 
-import me.shadorc.discordbot.Command;
-import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.obj.IChannel;

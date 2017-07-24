@@ -1,8 +1,8 @@
 package me.shadorc.discordbot.command.game;
 
-import me.shadorc.discordbot.Command;
-import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.obj.IUser;

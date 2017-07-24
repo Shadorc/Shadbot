@@ -1,9 +1,8 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.command;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import me.shadorc.discordbot.command.HelpCmd;
 import me.shadorc.discordbot.command.admin.AdminHelpCmd;
 import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
 import me.shadorc.discordbot.command.admin.QuitCmd;

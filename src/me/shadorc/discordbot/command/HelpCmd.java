@@ -2,8 +2,6 @@ package me.shadorc.discordbot.command;
 
 import java.awt.Color;
 
-import me.shadorc.discordbot.Command;
-import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
