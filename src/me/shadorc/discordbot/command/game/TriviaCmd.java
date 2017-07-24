@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.game;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,6 +23,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class TriviaCmd extends Command {
 
@@ -75,12 +77,7 @@ public class TriviaCmd extends Command {
 			String question = result.getString("question");
 			String correct_answer = result.getString("correct_answer");
 
-			StringBuilder quizzMessage = new StringBuilder();
-
-			quizzMessage.append("Catégorie : " + category
-					+ ", type : " + type
-					+ ", difficulté : " + difficulty
-					+ "\nQuestion : **" + Utils.convertToUTF8(question) + "**\n");
+			StringBuilder quizzMessage = new StringBuilder("**" + Utils.convertToUTF8(question) + "**");
 
 			if(type.equals("multiple")) {
 				JSONArray incorrect_answers = result.getJSONArray("incorrect_answers");
@@ -89,13 +86,22 @@ public class TriviaCmd extends Command {
 				int index = Utils.rand(incorrect_answers.length());
 				for(int i = 0; i < incorrect_answers.length(); i++) {
 					if(i == index) {
-						quizzMessage.append("\t- " + Utils.convertToUTF8(correct_answer) + "\n");
+						quizzMessage.append("\n\t- " + Utils.convertToUTF8(correct_answer));
 					}
-					quizzMessage.append("\t- " + Utils.convertToUTF8((String) incorrect_answers.get(i)) + "\n");
+					quizzMessage.append("\n\t- " + Utils.convertToUTF8((String) incorrect_answers.get(i)));
 				}
 			}
 
-			BotUtils.sendMessage(quizzMessage.toString(), channel);
+			EmbedBuilder builder = new EmbedBuilder()
+					.withAuthorName("Trivia")
+					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
+					.withColor(new Color(170, 196, 222))
+					.appendField("Question", quizzMessage.toString(), false)
+					.appendField("Catégorie",  "`" + category + "`", true)
+					.appendField("Type", "`" + type + "`", true)
+					.appendField("Difficulté", "`" + difficulty + "`", true);
+
+			BotUtils.sendEmbed(builder.build(), channel);
 
 			this.correctAnswer = Utils.convertToUTF8(correct_answer);
 			this.isStarted = true;
