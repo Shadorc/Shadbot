@@ -3,7 +3,7 @@
     <header>
         <img align="right" src="https://i.imgur.com/bP970dP.png" height="220" width="220">
         <h1>Shadbot</h1>
-        <p><b>Shadbot is a Discord Bot that executes Fun, Utils, Games and Admin commands and play Musics !</b></p>
+        <p><b>Shadbot is a Discord Bot that executes Fun, Utils, Games and Admin commands and plays Musics !</b></p>
     </header>
     <body>
         <hr>
@@ -29,6 +29,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/
             </code>
         </pre>
         <a href="https://github.com/Shadorc/Shadbot/blob/master/LICENSE">The full licence can be found here.</a>
-		<p><i>Bot inspired by <a href="https://github.com/Mantaro/MantaroBot">MantaroBot</i></a>
+	<hr>
+	<p><i>Bot inspired by <a href="https://github.com/Mantaro/MantaroBot">MantaroBot</i></a>
     </body>
 </html>
