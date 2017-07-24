@@ -5,6 +5,7 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedE
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 
 public class Context {
 
@@ -46,5 +47,9 @@ public class Context {
 
 	public String getArg() {
 		return arg;
+	}
+
+	public boolean isAuthorAdmin() {
+		return event.getAuthor().getPermissionsForGuild(event.getGuild()).contains(Permissions.ADMINISTRATOR);
 	}
 }

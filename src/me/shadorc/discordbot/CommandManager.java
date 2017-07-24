@@ -88,7 +88,7 @@ public class CommandManager {
 
 		if(commands.containsKey(context.getCommand())) {
 			Command command = commands.get(context.getCommand());
-			if(command.isAdminCmd() && !Utils.isAdmin(context.getGuild(), context.getAuthor())) {
+			if(command.isAdminCmd() && !context.isAuthorAdmin()) {
 				BotUtils.sendMessage("Vous devez être administrateur pour exécuter cette commande.", event.getChannel());
 			} else {
 				command.execute(context);

@@ -115,8 +115,6 @@ public class Utils {
 		return true;
 	}
 
-	public static boolean isAdmin(IGuild guild, IUser user) {
-		return user.getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR);
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
 		JSONArray channelsArray = (JSONArray) Storage.get(guild, "allowedChannels");
 		if(channelsArray == null) {
