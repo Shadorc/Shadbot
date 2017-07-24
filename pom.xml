@@ -2,9 +2,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.shadorc.discordbot</groupId>
   <artifactId>discordbot</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>DiscordBot</name>
-  <description>A Discord Bot</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -59,4 +58,6 @@
       <version>1.2.42</version>
     </dependency>
   </dependencies>
+  <description>Shadbot is a Discord Bot that executes Fun, Utils, Games and Admin commands and plays Musics</description>
+  <url>https://github.com/Shadorc/Shadbot</url>
 </project>
