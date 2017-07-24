@@ -17,9 +17,8 @@ import org.json.JSONArray;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.discordbot.Storage;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
 
 public class Utils {
 
@@ -72,7 +71,7 @@ public class Utils {
 	}
 
 	public static void gain(IGuild guild, Long authorId, int gain) {
-		String coinsStr = Storage.get(guild, authorId);
+		String coinsStr = Storage.get(guild, authorId).toString();
 		int coins = 0;
 		if(coinsStr != null) {
 			coins = Integer.parseInt(coinsStr);
@@ -118,5 +117,16 @@ public class Utils {
 
 	public static boolean isAdmin(IGuild guild, IUser user) {
 		return user.getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR);
+	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
+		JSONArray channelsArray = (JSONArray) Storage.get(guild, "allowedChannels");
+		if(channelsArray == null) {
+			return false;
+		}
+		for(int i = 0; i < channelsArray.length(); i++) {
+			if(channelsArray.get(i).equals(channel.getStringID())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

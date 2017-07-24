@@ -35,7 +35,7 @@ public class TransferCoinsCmd extends Command {
 				return;
 			}
 
-			if(Integer.parseInt(Storage.get(context.getGuild(), context.getAuthor().getLongID())) < coins) {
+			if(Integer.parseInt(Storage.get(context.getGuild(), context.getAuthor().getLongID()).toString()) < coins) {
 				BotUtils.sendMessage("Vous n'avez pas assez de coins pour effectuer ce transfert.", context.getChannel());
 				return;
 			}

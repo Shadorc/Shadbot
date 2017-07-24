@@ -27,7 +27,7 @@ public class SlotMachineCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		if(Integer.parseInt(Storage.get(context.getGuild(), context.getAuthor().getLongID())) < PAID_COST) {
+		if(Integer.parseInt(Storage.get(context.getGuild(), context.getAuthor().getLongID()).toString()) < PAID_COST) {
 			BotUtils.sendMessage("Vous n'avez plus assez de coins pour jouer aux machines à sous, il vous en faut minimum " + PAID_COST + " !", context.getChannel());
 			return;
 		}

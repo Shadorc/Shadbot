@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.json.JSONException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.utility.Log;
@@ -55,7 +55,7 @@ public class Storage {
 		}
 	}
 
-	public static void store(IGuild guild, Long key, Object value) {
+	public static void store(IGuild guild, Object key, Object value) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -64,10 +64,20 @@ public class Storage {
 		try {
 			JSONObject mainObj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
 
+			//If guild has never been saved before, create new guild JSONObject
 			if(!mainObj.has(guild.getStringID())) {
 				mainObj.put(guild.getStringID(), new JSONObject());
 			}
-			mainObj.getJSONObject(guild.getStringID()).put(key.toString(), value.toString());
+			JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
+			if(key instanceof Long) {
+				guildObj.put(key.toString(), value.toString());
+			} else if(key instanceof String) {
+				if(guildObj.has(key.toString())) {
+					guildObj.put("allowedChannels", ((JSONArray) Storage.get(guild, "allowedChannels")).put(value.toString()));
+				} else {
+					guildObj.put("allowedChannels", new JSONArray().put(value.toString()));
+				}
+			}
 
 			writer = new FileWriter(DATA_FILE);
 			writer.write(mainObj.toString(2));
@@ -85,7 +95,7 @@ public class Storage {
 		}
 	}
 
-	public static String get(IGuild guild, Long key) {
+	public static Object get(IGuild guild, Object key) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -94,12 +104,17 @@ public class Storage {
 			JSONObject mainObj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
 			if(mainObj.has(guild.getStringID())) {
 				JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
-				if(!guildObj.has(key.toString())) {
-					return null;
+				if(key instanceof Long) {
+					if(guildObj.has(key.toString())) {
+						return guildObj.getString(key.toString());
+					}
+				} else if(key instanceof String) {
+					if(guildObj.has(key.toString())) {
+						return guildObj.getJSONArray(key.toString());
+					}
 				}
-				return guildObj.getString(key.toString());
 			}
-		} catch (JSONException | IOException e) {
+		} catch (IOException e) {
 			Log.error("Error while reading data file.", e);
 		}
 		return null;
@@ -109,7 +124,7 @@ public class Storage {
 		try {
 			JSONObject obj = new JSONObject(new String(Files.readAllBytes(Paths.get(API_KEYS_FILE.getPath())), StandardCharsets.UTF_8));
 			return obj.getString(key.toString());
-		} catch (JSONException | IOException e) {
+		} catch (IOException e) {
 			Log.error("Error while accessing to API keys file.", e);
 		}
 		return null;
