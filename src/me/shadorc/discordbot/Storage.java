@@ -106,6 +106,8 @@ public class Storage {
 				if(key instanceof Long) {
 					if(guildObj.has(key.toString())) {
 						return guildObj.getString(key.toString());
+					} else {
+						return "0";
 					}
 				} else if(key instanceof String) {
 					if(guildObj.has(key.toString())) {
