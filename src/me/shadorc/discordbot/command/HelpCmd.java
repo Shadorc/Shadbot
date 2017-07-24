@@ -13,39 +13,39 @@ public class HelpCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		//EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
-		EmbedBuilder builder = new EmbedBuilder();
-
-		builder.withAuthorName("Shadbot Aide");
-		builder.withAuthorIcon(context.getClient().getOurUser().getAvatarURL());
-		builder.withColor(new Color(170, 196, 222));
-		builder.withDesc("Aide pour les commandes. Pour plus d'informations, utilisez /help <commande>.");
-		builder.appendField("Commandes Utiles :",
-				"`/trad <lang1> <lang2> <texte>`"
-						+ "\n`/wiki <recherche>`"
-						+ "\n`/vacs <zone>`"
-						+ "\n`/calc <calcul>`"
-						+ "\n`/meteo <ville>`", false);
-		builder.appendField("Commandes Fun :",
-				"`/chat <message>`"
-						+ "\n`/gif <tag>`"
-						+ "\n`/gif`"
-						+ "\n`/dtc`"
-						+ "\n`/blague`", false);
-		builder.appendField("Commandes Jeux :",
-				"`/transfert <montant> <utilisateur>`"
-						+ "\n`/roulette_russe`"
-						+ "\n`/machine_sous`"
-						+ "\n`/trivia`"
-						+ "\n`/coins`", false);
-		builder.appendField("Commandes Musique:",
-				"`/play <music>`"
-						+ "\n`/volume <0-100>`"
-						+ "\n`/pause`"
-						+ "\n`/stop`"
-						+ "\n`/next`"
-						+ "\n`/nom`"
-						+ "\n`/playlist`", false);
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Shadbot Aide")
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.withDesc("Aide pour les commandes. Pour plus d'informations, utilisez /help <commande>.")
+				.appendField("Commandes Utiles :",
+						"`/trad <lang1> <lang2> <texte>`"
+								+ "\n`/wiki <recherche>`"
+								+ "\n`/vacs <zone>`"
+								+ "\n`/calc <calcul>`"
+								+ "\n`/meteo <ville>`", false)
+				.appendField("Commandes Fun :",
+						"`/chat <message>`"
+								+ "\n`/gif <tag>`"
+								+ "\n`/gif`"
+								+ "\n`/dtc`"
+								+ "\n`/blague`", false)
+				.appendField("Commandes Jeux :",
+						"`/transfert <montant> <utilisateur>`"
+								+ "\n`/roulette_russe`"
+								+ "\n`/machine_sous`"
+								+ "\n`/trivia`"
+								+ "\n`/coins`", false)
+				.appendField("Commandes Musique:",
+						"`/play <music>`"
+								+ "\n`/volume <0-100>`"
+								+ "\n`/pause`"
+								+ "\n`/stop`"
+								+ "\n`/next`"
+								+ "\n`/nom`"
+								+ "\n`/playlist`", false)
+				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
+				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
