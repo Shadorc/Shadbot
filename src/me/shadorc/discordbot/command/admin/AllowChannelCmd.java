@@ -6,6 +6,7 @@ import me.shadorc.discordbot.Command;
 import me.shadorc.discordbot.Context;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.utility.BotUtils;
+import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 
 public class AllowChannelCmd extends Command {
@@ -23,8 +24,10 @@ public class AllowChannelCmd extends Command {
 
 		if(context.getArg().equalsIgnoreCase("all")) {
 			for(IChannel channel : context.getGuild().getChannels()) {
-				Storage.store(context.getGuild(), "allowedChannels", channel.getStringID());
-				BotUtils.sendMessage(channel.getName() + " a été ajouté à la liste des channels autorisés.", context.getChannel());
+				if(!Utils.isChannelAllowed(context.getGuild(), channel)) {
+					Storage.store(context.getGuild(), "allowedChannels", channel.getStringID());
+					BotUtils.sendMessage("Le channel *" + channel.getName() + "* a été ajouté à la liste des channels autorisés.", context.getChannel());
+				}
 			}
 		} else {
 			List <IChannel> channelsByName = context.getGuild().getChannelsByName(context.getArg());
@@ -32,8 +35,13 @@ public class AllowChannelCmd extends Command {
 				BotUtils.sendMessage("Aucun channel correspondant au nom " + context.getArg(), context.getChannel());
 				return;
 			}
-			Storage.store(context.getGuild(), "allowedChannels", channelsByName.get(0).getStringID());
-			BotUtils.sendMessage(channelsByName.get(0).getName() + " a été ajouté à la liste des channels autorisés.", context.getChannel());
+			IChannel channel = channelsByName.get(0);
+			if(Utils.isChannelAllowed(context.getGuild(), channel)) {
+				BotUtils.sendMessage("Le channel *" + channel.getName() + "* est déjà dans la liste des channels autorisés.", context.getChannel());
+				return;
+			}
+			Storage.store(context.getGuild(), "allowedChannels", channel.getStringID());
+			BotUtils.sendMessage("Le channel *" + channel.getName() + "* a été ajouté à la liste des channels autorisés.", context.getChannel());
 		}
 	}
 }
