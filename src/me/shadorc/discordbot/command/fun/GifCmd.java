@@ -39,7 +39,7 @@ public class GifCmd extends Command {
 						+ "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8")));
 				JSONObject obj = new JSONObject(json);
 				if(obj.get("data") instanceof JSONArray) {
-					BotUtils.sendMessage("Aucun résultat pour " + context.getArg(), context.getChannel());
+					BotUtils.sendMessage(":information_source: Aucun résultat pour " + context.getArg(), context.getChannel());
 					return;
 				}
 				String url = obj.getJSONObject("data").getString("url");

@@ -18,7 +18,7 @@ public class StopCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage("Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Aucune musique en cours de lecture.", context.getChannel());
 			return;
 		}
 

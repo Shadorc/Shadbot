@@ -24,7 +24,7 @@ public class PlayCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage("Merci d'entrer l'URL d'une musique à écouter.", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Merci d'entrer l'URL d'une musique à écouter.", context.getChannel());
 			return;
 		}
 
@@ -33,7 +33,7 @@ public class PlayCmd extends Command {
 
 		if(botVoiceChannel == null) {
 			if(userVoiceChannel == null) {
-				BotUtils.sendMessage("Rejoignez un salon vocal avant d'utiliser cette commande pour que je puisse vous rejoindre.", context.getChannel());
+				BotUtils.sendMessage(":grey_exclamation: Rejoignez un salon vocal avant d'utiliser cette commande pour que je puisse vous rejoindre.", context.getChannel());
 				return;
 			}
 			userVoiceChannel.join();
@@ -43,7 +43,7 @@ public class PlayCmd extends Command {
 		if(!Utils.isValidURL(identifier)) {
 			File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
 			if(songDir == null || songDir.length == 0) {
-				BotUtils.sendMessage("Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
+				BotUtils.sendMessage(":grey_exclamation: Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
 				return;
 			}
 			identifier = songDir[0].getPath();
@@ -54,21 +54,21 @@ public class PlayCmd extends Command {
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				BotUtils.sendMessage("Ajout de *" + track.getInfo().author + " - " + track.getInfo().title + "* à la playlist.", context.getChannel());
+				BotUtils.sendMessage(":musical_note: Ajout de *" + track.getInfo().author + " - " + track.getInfo().title + "* à la playlist.", context.getChannel());
 				musicManager.getScheduler().queue(track);
 			}
 
 			@Override
 			public void playlistLoaded(AudioPlaylist playlist) {
 				for(AudioTrack track : playlist.getTracks()) {
-					BotUtils.sendMessage("Ajout de *" + track.getInfo().author + " - " + track.getInfo().title + "* à la playlist.", context.getChannel());
+					BotUtils.sendMessage(":musical_note: Ajout de *" + track.getInfo().author + " - " + track.getInfo().title + "* à la playlist.", context.getChannel());
 					musicManager.getScheduler().queue(track);
 				}
 			}
 
 			@Override
 			public void noMatches() {
-				BotUtils.sendMessage("Aucun résultat n'a été trouvé pour " + context.getArg(), context.getChannel());
+				BotUtils.sendMessage(":heavy_multiplication_x: Aucun résultat n'a été trouvé pour " + context.getArg(), context.getChannel());
 			}
 
 			@Override

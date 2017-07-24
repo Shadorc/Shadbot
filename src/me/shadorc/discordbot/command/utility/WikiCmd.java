@@ -21,7 +21,7 @@ public class WikiCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage("Merci d'indiquer une recherche.", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Merci d'indiquer une recherche.", context.getChannel());
 			return;
 		}
 
@@ -39,7 +39,7 @@ public class WikiCmd extends Command {
 			JSONObject pagesObj = new JSONObject(json).getJSONObject("query").getJSONObject("pages");
 			String pageId = pagesObj.names().getString(0);
 			if(pageId.equals("-1")) {
-				BotUtils.sendMessage("Aucun résultat pour : " + context.getArg(), context.getChannel());
+				BotUtils.sendMessage(":heavy_multiplication_x: Aucun résultat pour : " + context.getArg(), context.getChannel());
 				return;
 			}
 			String description = pagesObj.getJSONObject(pageId).getString("extract");

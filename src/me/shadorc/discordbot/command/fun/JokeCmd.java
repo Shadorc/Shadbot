@@ -24,7 +24,7 @@ public class JokeCmd extends Command {
 			ArrayList <String> jokesList = Infonet.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
 			String joke = jokesList.get(Utils.rand(jokesList.size()));
 			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
-			BotUtils.sendMessage("```" + Utils.convertToUTF8(joke) + "```", context.getChannel());
+			BotUtils.sendMessage("```" + Utils.convertToUTF8(joke).replace("\n\n", "\n") + "```", context.getChannel());
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération de la blague.", e, context.getChannel());
 		}

@@ -58,7 +58,7 @@ public class TriviaCmd extends Command {
 			this.alreadyAnswered = new ArrayList<>();
 			this.isStarted = false;
 			this.timer = new Timer(30*1000, e -> {
-				BotUtils.sendMessage("Temps écoulé, la bonne réponse était " + correctAnswer, channel);
+				BotUtils.sendMessage(":hourglass: Temps écoulé, la bonne réponse était " + correctAnswer, channel);
 				this.stop();
 			});
 		}
@@ -104,15 +104,15 @@ public class TriviaCmd extends Command {
 
 		public void checkAnswer(IMessage message) {
 			if(alreadyAnswered.contains(message.getAuthor())) {
-				BotUtils.sendMessage("Désolé " + message.getAuthor().getName() + ", tu ne peux plus répondre après avoir donné une mauvaise réponse.", message.getChannel());
+				BotUtils.sendMessage(":heavy_multiplication_x: Désolé " + message.getAuthor().getName() + ", tu ne peux plus répondre après avoir donné une mauvaise réponse.", message.getChannel());
 			}
 			else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), this.correctAnswer.toLowerCase()) < 2) {
-				BotUtils.sendMessage("Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 50 coins.", channel);
+				BotUtils.sendMessage(":clap: Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 50 coins.", channel);
 				Utils.gain(message.getGuild(), message.getAuthor().getLongID(), 10);
 				this.stop();
 			}
 			else {
-				BotUtils.sendMessage("Mauvaise réponse.", channel);
+				BotUtils.sendMessage(":thumbsdown: Mauvaise réponse.", channel);
 				alreadyAnswered.add(message.getAuthor());
 			}
 		}

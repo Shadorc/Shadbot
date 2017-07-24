@@ -16,18 +16,18 @@ public class TransferCoinsCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage("Indiquez l'utilisateur et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Indiquez l'utilisateur et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
 			return;
 		}
 
 		String[] splitCmd = context.getArg().split(" ", 2);
 		if(splitCmd.length != 2) {
-			BotUtils.sendMessage("Indiquez l'utilisateur et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Indiquez l'utilisateur et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
 			return;
 		}
 
 		if(context.getMessage().getMentions().size() != 1) {
-			BotUtils.sendMessage("Vous devez mentionner un utilisateur : /transfert <montant> <utilisateur>", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Vous devez mentionner un utilisateur : /transfert <montant> <utilisateur>", context.getChannel());
 			return;
 		}
 
@@ -36,26 +36,26 @@ public class TransferCoinsCmd extends Command {
 			IUser user = context.getMessage().getMentions().get(0);
 
 			if(coins <= 0) {
-				BotUtils.sendMessage("Vous devez transférer un montant supérieur à 0.", context.getChannel());
+				BotUtils.sendMessage(":heavy_multiplication_x: Vous devez transférer un montant supérieur à 0.", context.getChannel());
 				return;
 			}
 
 			if(user.equals(context.getAuthor())) {
-				BotUtils.sendMessage("Vous ne pouvez pas vous transférer de l'argent à vous même.", context.getChannel());
+				BotUtils.sendMessage(":heavy_multiplication_x: Vous ne pouvez pas vous transférer de l'argent à vous même.", context.getChannel());
 				return;
 			}
 
 			if(Integer.parseInt(Storage.get(context.getGuild(), context.getAuthor().getLongID()).toString()) < coins) {
-				BotUtils.sendMessage("Vous n'avez pas assez de coins pour effectuer ce transfert.", context.getChannel());
+				BotUtils.sendMessage(":bank: Vous n'avez pas assez de coins pour effectuer ce transfert.", context.getChannel());
 				return;
 			}
 
 			Utils.gain(context.getGuild(), context.getAuthor().getLongID(), -coins);
 			Utils.gain(context.getGuild(), user.getLongID(), coins);
 
-			BotUtils.sendMessage(context.getAuthor().mention() + " a transféré " + coins + " coins à " + user.mention(), context.getChannel());
+			BotUtils.sendMessage(":bank: " + context.getAuthor().mention() + " a transféré " + coins + " coins à " + user.mention(), context.getChannel());
 		} catch(NumberFormatException e1) {
-			BotUtils.sendMessage("Montant invalide.", context.getChannel());
+			BotUtils.sendMessage(":heavy_multiplication_x: Montant invalide.", context.getChannel());
 		}
 	}
 }

@@ -88,12 +88,12 @@ public class CommandManager {
 		if(commands.containsKey(context.getCommand())) {
 			Command command = commands.get(context.getCommand());
 			if(command.isAdminCmd() && !context.isAuthorAdmin()) {
-				BotUtils.sendMessage("Vous devez être administrateur pour exécuter cette commande.", event.getChannel());
+				BotUtils.sendMessage(":no_entry_sign: Vous devez être administrateur pour exécuter cette commande.", event.getChannel());
 			} else {
 				command.execute(context);
 			}
 		} else {
-			BotUtils.sendMessage("Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());
+			BotUtils.sendMessage(":heavy_multiplication_x: Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());
 			Log.warn("La commande " + context.getCommand() + " a été essayée sans résultat.");
 		}
 	}

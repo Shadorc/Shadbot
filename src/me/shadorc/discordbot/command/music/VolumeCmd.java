@@ -18,20 +18,20 @@ public class VolumeCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage("Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Aucune musique en cours de lecture.", context.getChannel());
 			return;
 		}
 
 		if(context.getArg() == null) {
-			BotUtils.sendMessage("Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
 			return;
 		}
 
 		try {
 			scheduler.setVolume(Integer.parseInt(context.getArg()));
-			BotUtils.sendMessage("Volume de la musique réglé sur " + scheduler.getVolume() + "%", context.getChannel());
+			BotUtils.sendMessage(":musical_note: Volume de la musique réglé sur " + scheduler.getVolume() + "%", context.getChannel());
 		} catch (NumberFormatException e) {
-			BotUtils.sendMessage("Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
 		}
 	}
 

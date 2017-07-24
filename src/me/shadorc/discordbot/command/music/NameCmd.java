@@ -18,10 +18,10 @@ public class NameCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage("Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Aucune musique en cours de lecture.", context.getChannel());
 			return;
 		}
 
-		BotUtils.sendMessage("Musique en cours : " + scheduler.getCurrentTrackName(), context.getChannel());
+		BotUtils.sendMessage(":musical_note: Musique en cours : " + scheduler.getCurrentTrackName(), context.getChannel());
 	}
 }

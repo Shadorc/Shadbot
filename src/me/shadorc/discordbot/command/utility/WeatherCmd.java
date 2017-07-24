@@ -20,7 +20,7 @@ public class WeatherCmd extends Command{
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage("Merci d'indiquer le nom d'une ville.", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Merci d'indiquer le nom d'une ville.", context.getChannel());
 			return;
 		}
 

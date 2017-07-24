@@ -17,7 +17,7 @@ public class CalcCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage("Merci d'entrer un calcul.", context.getChannel());
+			BotUtils.sendMessage(":grey_exclamation: Merci d'entrer un calcul.", context.getChannel());
 			return;
 		}
 
@@ -25,7 +25,7 @@ public class CalcCmd extends Command {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			BotUtils.sendMessage(context.getArg() + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException e) {
-			BotUtils.sendMessage("Calcul incorrect.", context.getChannel());
+			BotUtils.sendMessage(":heavy_multiplication_x: Calcul incorrect.", context.getChannel());
 		}
 	}
 

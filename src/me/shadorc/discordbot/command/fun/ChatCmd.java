@@ -37,7 +37,7 @@ public class ChatCmd extends Command {
 
 	private void answer(String arg, IChannel channel) {
 		if(arg == null) {
-			BotUtils.sendMessage("Une conversation fonctionne mieux quand on dit quelque chose :)", channel);
+			BotUtils.sendMessage(":grey_exclamation: Une conversation fonctionne mieux quand on dit quelque chose :)", channel);
 			return;
 		}
 
@@ -50,7 +50,7 @@ public class ChatCmd extends Command {
 				JSONObject result = XML.toJSONObject(xmlString).getJSONObject("result");
 				String response = result.getString("that").replace("<br>", "\n").trim();
 				aliceState = result.getString("custid");
-				BotUtils.sendMessage(response, channel);
+				BotUtils.sendMessage(":speech_balloon: " + response, channel);
 			}
 
 			else if(chatBot.equals(ChatBot.CLEVERBOT)) {
@@ -61,7 +61,7 @@ public class ChatCmd extends Command {
 				JSONObject obj = new JSONObject(jsonString);
 				String response = obj.getString("output");
 				cleverbotState = obj.getString("cs");
-				BotUtils.sendMessage(response, channel);
+				BotUtils.sendMessage(":speech_balloon: " + response, channel);
 			}
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la discussion avec le bot.", e, channel);
