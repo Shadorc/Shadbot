@@ -5,7 +5,7 @@ import java.util.Map;
 
 import me.shadorc.discordbot.command.HelpCmd;
 import me.shadorc.discordbot.command.admin.AdminHelpCmd;
-import me.shadorc.discordbot.command.admin.AllowChannelCmd;
+import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
 import me.shadorc.discordbot.command.admin.QuitCmd;
 import me.shadorc.discordbot.command.fun.BashCmd;
 import me.shadorc.discordbot.command.fun.ChatCmd;
@@ -63,7 +63,7 @@ public class CommandManager {
 				new NameCmd(),
 				new PlaylistCmd(),
 				new QuitCmd(),
-				new AllowChannelCmd()
+				new AllowsChannelCmd()
 				);
 	}
 

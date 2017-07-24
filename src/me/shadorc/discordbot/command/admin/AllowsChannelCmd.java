@@ -9,10 +9,10 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 
-public class AllowChannelCmd extends Command {
+public class AllowsChannelCmd extends Command {
 
-	public AllowChannelCmd() {
-		super(true, "allow_channel");
+	public AllowsChannelCmd() {
+		super(true, "allows_channel");
 	}
 
 	@Override
