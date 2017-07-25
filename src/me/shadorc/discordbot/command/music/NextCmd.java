@@ -22,6 +22,9 @@ public class NextCmd extends Command {
 			return;
 		}
 
-		scheduler.nextTrack();
+		if(!scheduler.nextTrack()) {
+			BotUtils.sendMessage(":grey_exclamation: Fin de la playlist.", context.getChannel());
+			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
+		}
 	}
 }

@@ -18,19 +18,19 @@ public class GuildMusicManager {
 	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
 	private final static Map<Long, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
 
+	private IGuild guild;
 	private IChannel channel;
 	private AudioPlayer player;
 	private TrackScheduler scheduler;
 	private Timer leaveTimer;
 
 	public GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
+		this.guild = guild;
 		this.player = manager.createPlayer();
 		this.scheduler = new TrackScheduler(player);
 		this.player.addListener(scheduler);
 		this.leaveTimer = new Timer(2*60*1000, e -> {
-			Main.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel().leave();
-			scheduler.stop();
-			leaveTimer.stop();
+			this.leave();
 		});
 	}
 
@@ -39,6 +39,12 @@ public class GuildMusicManager {
 	}
 
 	public void cancelLeave() {
+		leaveTimer.stop();
+	}
+
+	public void leave() {
+		Main.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel().leave();
+		scheduler.stop();
 		leaveTimer.stop();
 	}
 
