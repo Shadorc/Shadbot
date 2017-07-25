@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import me.shadorc.discordbot.Storage;
 import sx.blah.discord.handle.obj.IChannel;
@@ -68,6 +69,10 @@ public class Utils {
 			playlist.append("\n\t- " + track.getInfo().author + " - " + track.getInfo().title);
 		}
 		return playlist.toString();
+	}
+	
+	public static String formatTrackName(AudioTrackInfo info) {
+		return (info.author.equals("Unknown artist") ? "" : (info.author + " - ")) + info.title;
 	}
 
 	public static int rand(int bound) {

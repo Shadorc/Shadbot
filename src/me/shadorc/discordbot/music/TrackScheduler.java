@@ -8,6 +8,8 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
+import me.shadorc.discordbot.utility.Utils;
+
 public class TrackScheduler extends AudioEventAdapter {
 
 	private static final int DEFAULT_VOLUME = 20;
@@ -31,12 +33,12 @@ public class TrackScheduler extends AudioEventAdapter {
 		audioPlayer.stopTrack();
 	}
 
-	public void nextTrack() {
-		audioPlayer.startTrack(queue.poll(), false);
+	public boolean nextTrack() {
+		return audioPlayer.startTrack(queue.poll(), false);
 	}
 
 	public String getCurrentTrackName() {
-		return this.audioPlayer.getPlayingTrack().getInfo().title;
+		return Utils.formatTrackName(this.audioPlayer.getPlayingTrack().getInfo());
 	}
 
 	public BlockingQueue <AudioTrack> getPlaylist() {

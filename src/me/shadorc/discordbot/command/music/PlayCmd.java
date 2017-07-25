@@ -54,14 +54,14 @@ public class PlayCmd extends Command {
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				BotUtils.sendMessage(":musical_note: Ajout de *" + track.getInfo().author + " - " + track.getInfo().title + "* à la playlist.", context.getChannel());
+				BotUtils.sendMessage(":musical_note: Ajout de *" + Utils.formatTrackName(track.getInfo()) + "* à la playlist.", context.getChannel());
 				musicManager.getScheduler().queue(track);
 			}
 
 			@Override
 			public void playlistLoaded(AudioPlaylist playlist) {
 				for(AudioTrack track : playlist.getTracks()) {
-					BotUtils.sendMessage(":musical_note: Ajout de *" + track.getInfo().author + " - " + track.getInfo().title + "* à la playlist.", context.getChannel());
+					BotUtils.sendMessage(":musical_note: Ajout de *" + Utils.formatTrackName(track.getInfo()) + "* à la playlist.", context.getChannel());
 					musicManager.getScheduler().queue(track);
 				}
 			}
