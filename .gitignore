@@ -11,6 +11,7 @@ gen/
 .settings
 
 # Maven build files
+target/
 dependency-reduced-pom.xml
 
 # Windows thumbnail db

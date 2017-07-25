@@ -21,9 +21,11 @@ public class AdminHelpCmd extends Command {
 		builder.withAuthorName("Shadbot Admin Aide");
 		builder.withAuthorIcon(context.getClient().getOurUser().getAvatarURL());
 		builder.withColor(new Color(170, 196, 222));
-		builder.withDesc("Aide pour les commandes administrateurs. Pour plus d'informations, utilisez /help <commande>.");
+		builder.withDesc("Aide pour les commandes administrateurs.");
 		builder.appendField("Commandes :",
-				"`/allows_channel <#channel | all>`", false);
+				"`/allows_channel <#channel | all>`", false)
+		.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
+		.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

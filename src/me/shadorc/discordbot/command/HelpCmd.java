@@ -17,7 +17,7 @@ public class HelpCmd extends Command {
 				.withAuthorName("Shadbot Aide")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.withDesc("Aide pour les commandes. Pour plus d'informations, utilisez /help <commande>.")
+				.withDesc("Aide pour les commandes.")
 				.appendField("Commandes Utiles :",
 						"`/trad <lang1> <lang2> <texte>`"
 								+ "\n`/wiki <recherche>`"
@@ -31,7 +31,7 @@ public class HelpCmd extends Command {
 								+ "\n`/dtc`"
 								+ "\n`/blague`", false)
 				.appendField("Commandes Jeux :",
-						"`/transfert <montant> <utilisateur>`"
+						"`/transfert <montant> <@utilisateur>`"
 								+ "\n`/roulette_russe`"
 								+ "\n`/machine_sous`"
 								+ "\n`/trivia`"
