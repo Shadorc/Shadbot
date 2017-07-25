@@ -6,8 +6,8 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
+import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 
 public class EventListener {
@@ -15,10 +15,7 @@ public class EventListener {
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
 		event.getClient().changePlayingText("/help");
-		Log.info("---------------- Shadbot is connected ----------------");
-		for(IGuild guild : event.getClient().getGuilds()) {
-			Log.info("Shadbot is connected to guild: " + guild.getName() + " (ID: " + guild.getLongID() +")");
-		}
+		Log.info("------------------- Shadbot is connected -------------------");
 	}
 
 	@EventSubscriber
@@ -37,5 +34,10 @@ public class EventListener {
 		else if(message.getContent().startsWith("/")) {
 			BotUtils.executeCommand(event);
 		}
+	}
+
+	@EventSubscriber
+	public void onGuildCreateEvent(GuildCreateEvent event) {
+		Log.info("Shadbot is now connected to guild: " + event.getGuild().getName() + " (ID: " + event.getGuild().getStringID() + ")");
 	}
 }

@@ -7,7 +7,7 @@ import sx.blah.discord.handle.obj.IChannel;
 
 public class Log {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Log.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger("Logger");
 
 	public static void info(String msg) {
 		LOGGER.info(msg);
