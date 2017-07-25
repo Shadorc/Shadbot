@@ -9,7 +9,8 @@
         <hr>
         <h2>Usage</h2>
         <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=3296256">link</a> !</b></p>
-		<p>During the first launch, you have to indicate the channels in whom Shadbot can post by typing /allows_channel &lt;#channel | all&gt;</p>
+		<p>During the first launch, you have to indicate the channels in whom Shadbot can post by typing
+		<br>/allows_channel &lt;#channel | all&gt;</p>
         <hr>
         <h2>Licence</h2>
         <p>Copyright (C) 2017 <b>Shadorc</b>
