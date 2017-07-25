@@ -54,7 +54,7 @@ public class Storage {
 		}
 	}
 
-	public static void store(IGuild guild, Object key, Object value) {
+	public static synchronized void store(IGuild guild, Object key, Object value) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -94,7 +94,7 @@ public class Storage {
 		}
 	}
 
-	public static Object get(IGuild guild, Object key) {
+	public static synchronized Object get(IGuild guild, Object key) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -121,7 +121,7 @@ public class Storage {
 		return null;
 	}
 
-	public static String get(ApiKeys key) {
+	public static synchronized String get(ApiKeys key) {
 		try {
 			JSONObject obj = new JSONObject(new String(Files.readAllBytes(Paths.get(API_KEYS_FILE.getPath())), StandardCharsets.UTF_8));
 			return obj.getString(key.toString());
