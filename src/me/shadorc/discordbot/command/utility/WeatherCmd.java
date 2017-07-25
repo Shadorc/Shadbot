@@ -30,6 +30,11 @@ public class WeatherCmd extends Command{
 		IWeatherDataService dataService = WeatherDataServiceFactory.getWeatherDataService(service.OPEN_WEATHER_MAP);
 		try {
 			WeatherData data = dataService.getWeatherData(new Location(context.getArg(), "FR"));
+			String clouds = Utils.capitalize(Utils.translate("en", "fr", data.getClouds().getValue()));
+			String windName = Utils.translate("en", "fr", data.getWind().getSpeed().getName());
+			int windSpeed = (int) (Float.parseFloat(data.getWind().getSpeed().getValue())*3.6f);
+			String precipitation = data.getPrecipitation().getMode().equals("no") ? "Aucune" : data.getPrecipitation().getValue();
+			int temperature = (int) Float.parseFloat(data.getTemperature().getValue());
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Météo pour la ville de " + data.getCity().getName())
@@ -37,10 +42,10 @@ public class WeatherCmd extends Command{
 					.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
 					.withAuthorIcon(context.getAuthor().getAvatarURL())
 					.withColor(new Color(170, 196, 222))
-					.appendField(":cloud: Nuages", Utils.capitalize(Utils.translate("en", "fr", data.getClouds().getValue())), true)
-					.appendField(":wind_blowing_face: Vent", Utils.translate("en", "fr", data.getWind().getSpeed().getName()) + "\n" + Float.parseFloat(data.getWind().getSpeed().getValue())*3.6f + " km/h", true)
-					.appendField(":cloud_rain: Précipitations", (data.getPrecipitation().getMode().equals("no") ? "Aucune" : data.getPrecipitation().getValue()), true)
-					.appendField(":thermometer: Température", data.getTemperature().getValue() + "°C", true)
+					.appendField(":cloud: Nuages", clouds, true)
+					.appendField(":wind_blowing_face: Vent", windName + "\n" + windSpeed + " km/h", true)
+					.appendField(":cloud_rain: Précipitations", precipitation, true)
+					.appendField(":thermometer: Température", temperature + "°C", true)
 					.withFooterText("Informations provenant du site OpenWeatherMap");
 
 			BotUtils.sendEmbed(builder.build(), context.getChannel());

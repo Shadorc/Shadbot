@@ -61,16 +61,19 @@ public class Utils {
 	}
 
 	public static String formatPlaylist(BlockingQueue <AudioTrack> queue) {
-		StringBuilder playlist = new StringBuilder("Musique(s) en attente : ");
+		StringBuilder playlist = new StringBuilder(queue.size() + " musique(s) en attente");
 		if(queue.isEmpty()) {
 			playlist.append("Aucune");
 		}
 		for(AudioTrack track : queue) {
-			playlist.append("\n\t- " + track.getInfo().author + " - " + track.getInfo().title);
+			String name = "\n\t- " + track.getInfo().author + " - " + track.getInfo().title;
+			if(playlist.length() + name.length() < 2000) {
+				playlist.append(name);
+			}
 		}
 		return playlist.toString();
 	}
-	
+
 	public static String formatTrackName(AudioTrackInfo info) {
 		return (info.author.equals("Unknown artist") ? "" : (info.author + " - ")) + info.title;
 	}

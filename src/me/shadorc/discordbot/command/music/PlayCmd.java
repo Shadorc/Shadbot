@@ -61,9 +61,10 @@ public class PlayCmd extends Command {
 			@Override
 			public void playlistLoaded(AudioPlaylist playlist) {
 				for(AudioTrack track : playlist.getTracks()) {
-					BotUtils.sendMessage(":musical_note: Ajout de *" + Utils.formatTrackName(track.getInfo()) + "* à la playlist.", context.getChannel());
 					musicManager.getScheduler().queue(track);
 				}
+				BotUtils.sendMessage(":musical_note: Toutes les musiques ont été ajoutés à la playlist, elle contient maintenant " + musicManager.getScheduler().getPlaylist().size() + " éléments.", context.getChannel());
+				BotUtils.sendMessage(":musical_note: Lecture en cours : *" + musicManager.getScheduler().getCurrentTrackName() + "*", context.getChannel());
 			}
 
 			@Override

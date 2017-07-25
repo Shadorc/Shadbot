@@ -23,5 +23,10 @@ public class PauseCmd extends Command {
 		}
 
 		scheduler.setPaused(!scheduler.isPaused());
+		if(scheduler.isPaused()) {
+			BotUtils.sendMessage(":pause_button: Musique mise en pause par " + context.getAuthorName(), context.getChannel());
+		} else {
+			BotUtils.sendMessage(":arrow_forward: Reprise de la musique à la demande de " + context.getAuthorName(), context.getChannel());
+		}
 	}
 }

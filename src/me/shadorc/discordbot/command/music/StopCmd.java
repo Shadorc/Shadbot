@@ -22,6 +22,7 @@ public class StopCmd extends Command {
 			return;
 		}
 
-		scheduler.stop();
+		BotUtils.sendMessage(":grey_exclamation: L'écoute des musiques a été arrêté par " + context.getAuthorName() +".", context.getChannel());
+		GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 	}
 }

@@ -8,12 +8,16 @@ import javax.swing.Timer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import me.shadorc.discordbot.Main;
+import me.shadorc.discordbot.utility.BotUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 
-public class GuildMusicManager {
+public class GuildMusicManager extends AudioEventAdapter {
 
 	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
 	private final static Map<Long, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
@@ -28,7 +32,7 @@ public class GuildMusicManager {
 		this.guild = guild;
 		this.player = manager.createPlayer();
 		this.scheduler = new TrackScheduler(player);
-		this.player.addListener(scheduler);
+		this.player.addListener(this);
 		this.leaveTimer = new Timer(2*60*1000, e -> {
 			this.leave();
 		});
@@ -70,6 +74,16 @@ public class GuildMusicManager {
 
 	public boolean isCancelling() {
 		return leaveTimer.isRunning();
+	}
+
+	@Override
+	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+		if(endReason.mayStartNext) {
+			if(!scheduler.nextTrack()) {
+				BotUtils.sendMessage(":grey_exclamation: Fin de la playlist.", channel);
+				GuildMusicManager.getGuildAudioPlayer(guild).leave();
+			}
+		}
 	}
 
 	public static synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {

@@ -4,13 +4,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import me.shadorc.discordbot.utility.Utils;
 
-public class TrackScheduler extends AudioEventAdapter {
+public class TrackScheduler {
 
 	private static final int DEFAULT_VOLUME = 20;
 
@@ -63,12 +61,5 @@ public class TrackScheduler extends AudioEventAdapter {
 
 	public boolean isPlaying() {
 		return (audioPlayer.getPlayingTrack() != null);
-	}
-
-	@Override
-	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-		if(endReason.mayStartNext) {
-			this.nextTrack();
-		}
 	}
 }

@@ -25,6 +25,8 @@ public class NextCmd extends Command {
 		if(!scheduler.nextTrack()) {
 			BotUtils.sendMessage(":grey_exclamation: Fin de la playlist.", context.getChannel());
 			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
+		} else {
+			BotUtils.sendMessage(":musical_note: Musique suivante : *" + scheduler.getCurrentTrackName() + "*", context.getChannel());
 		}
 	}
 }
