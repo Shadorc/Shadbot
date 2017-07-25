@@ -10,6 +10,9 @@ gen/
 .project
 .settings
 
+# Maven build files
+dependency-reduced-pom.xml
+
 # Windows thumbnail db
 Thumbs.db
 
