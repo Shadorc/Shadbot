@@ -15,11 +15,10 @@ public class SlotMachineCmd extends Command {
 	}
 
 	private static final int PAID_COST = 5;
-
-	private final SlotOptions[] slotsArray = new SlotOptions[] {
-			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, //12.5%
-			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, //5.3%
-			SlotOptions.GIFT}; //0.2%
+	private static final SlotOptions[] slotsArray = new SlotOptions[] {
+			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, //Winning chance : 12.5%
+			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, 									//Winning chance : 5.3%
+			SlotOptions.GIFT}; 																		//Winning chance : 0.2%
 
 	public SlotMachineCmd() {
 		super(false, "machine_sous", "slot_machine");

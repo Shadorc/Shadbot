@@ -19,7 +19,7 @@ import sx.blah.discord.handle.obj.IGuild;
 
 public class ChatCmd extends Command {
 
-	private static Map<IGuild, String> GUILDS = new HashMap<>();
+	private static Map<IGuild, String> GUILDS_CUSTID = new HashMap<>();
 
 	public ChatCmd() {
 		super(false, "chat");
@@ -27,8 +27,8 @@ public class ChatCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		if(!GUILDS.containsKey(context.getGuild())) {
-			GUILDS.put(context.getGuild(), null);
+		if(!GUILDS_CUSTID.containsKey(context.getGuild())) {
+			GUILDS_CUSTID.put(context.getGuild(), null);
 		}
 		this.answer(context.getArg(), context.getChannel());
 	}
@@ -40,14 +40,14 @@ public class ChatCmd extends Command {
 		}
 
 		try {
-			String aliceState = GUILDS.get(channel.getGuild());
+			String aliceState = GUILDS_CUSTID.get(channel.getGuild());
 			String xmlString = Infonet.getHTML(new URL("http://sheepridge.pandorabots.com/pandora/talk-xml?"
 					+ "botid=b69b8d517e345aba"
 					+ "&input=" + URLEncoder.encode(arg, "UTF-8")
 					+ (aliceState != null ? "&custid=" + aliceState : "")));
 			JSONObject result = XML.toJSONObject(xmlString).getJSONObject("result");
 			String response = result.getString("that").replace("<br>", "\n").trim();
-			GUILDS.put(channel.getGuild(), result.getString("custid"));
+			GUILDS_CUSTID.put(channel.getGuild(), result.getString("custid"));
 			BotUtils.sendMessage(":speech_balloon: " + response, channel);
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la discussion avec le bot.", e, channel);
