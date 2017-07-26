@@ -81,7 +81,7 @@ public class CommandManager {
 	public void manage(MessageReceivedEvent event) {
 		Context context = new Context(event);
 
-		if(!Utils.isChannelAllowed(context.getGuild(), context.getChannel()) && !context.isAuthorAdmin()) {
+		if(!Utils.isChannelAllowed(context.getGuild(), context.getChannel())) {
 			return;
 		}
 
