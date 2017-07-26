@@ -35,7 +35,7 @@ public class GifCmd extends Command {
 		else {
 			try {
 				String json = Infonet.getHTML(new URL("https://api.giphy.com/v1/gifs/random?"
-						+ "api_key=" + Storage.get(ApiKeys.GIPHY_API_KEY)
+						+ "api_key=" + Storage.getApiKey(ApiKeys.GIPHY_API_KEY)
 						+ "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8")));
 				JSONObject obj = new JSONObject(json);
 				if(obj.get("data") instanceof JSONArray) {

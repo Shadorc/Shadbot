@@ -36,7 +36,7 @@ public class TransferCoinsCmd extends Command {
 			IUser user = context.getMessage().getMentions().get(0);
 
 			if(coins <= 0) {
-				BotUtils.sendMessage(":heavy_multiplication_x: Vous devez transférer un montant supérieur à 0.", context.getChannel());
+				BotUtils.sendMessage(":heavy_multiplication_x: Vous devez transférer un montant strictement supérieur à 0.", context.getChannel());
 				return;
 			}
 
@@ -45,13 +45,13 @@ public class TransferCoinsCmd extends Command {
 				return;
 			}
 
-			if(Integer.parseInt(Storage.get(context.getGuild(), context.getAuthor().getLongID()).toString()) < coins) {
+			if(Storage.getCoins(context.getGuild(), context.getAuthor()) < coins) {
 				BotUtils.sendMessage(":bank: Vous n'avez pas assez de coins pour effectuer ce transfert.", context.getChannel());
 				return;
 			}
 
-			Utils.gain(context.getGuild(), context.getAuthor().getLongID(), -coins);
-			Utils.gain(context.getGuild(), user.getLongID(), coins);
+			Utils.gain(context.getGuild(), context.getAuthor(), -coins);
+			Utils.gain(context.getGuild(), user, coins);
 
 			BotUtils.sendMessage(":bank: " + context.getAuthor().mention() + " a transféré " + coins + " coins à " + user.mention(), context.getChannel());
 		} catch(NumberFormatException e1) {

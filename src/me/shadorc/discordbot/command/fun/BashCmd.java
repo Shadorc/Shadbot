@@ -23,7 +23,7 @@ public class BashCmd extends Command {
 	public void execute(Context context) {
 		try {
 			String json = Infonet.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
-					+ "key=" + Storage.get(ApiKeys.DTC_API_KEY)
+					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)
 					+ "&format=json"));
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");
 			BotUtils.sendMessage("```" + quote + "```", context.getChannel());

@@ -17,9 +17,9 @@ public class SlotMachineCmd extends Command {
 	private static final int PAID_COST = 5;
 
 	private final SlotOptions[] slotsArray = new SlotOptions[] {
-			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES,
-			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL,
-			SlotOptions.GIFT};
+			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, //12.5%
+			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, //5.3%
+			SlotOptions.GIFT}; //0.2%
 
 	public SlotMachineCmd() {
 		super(false, "machine_sous", "slot_machine");
@@ -27,8 +27,8 @@ public class SlotMachineCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		if(Integer.parseInt(Storage.get(context.getGuild(), context.getAuthor().getLongID()).toString()) < PAID_COST) {
-			BotUtils.sendMessage(":slot_machine: Vous n'avez plus assez de coins pour jouer aux machines à sous, il vous en faut minimum " + PAID_COST + " !", context.getChannel());
+		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < PAID_COST) {
+			BotUtils.sendMessage(":slot_machine: Vous n'avez pas assez de coins pour jouer aux machines à sous, il vous en faut minimum " + PAID_COST + " !", context.getChannel());
 			return;
 		}
 
@@ -47,7 +47,7 @@ public class SlotMachineCmd extends Command {
 		else if(slot1 == SlotOptions.GIFT && slot2 == SlotOptions.GIFT && slot3 == SlotOptions.GIFT) {
 			gain = 5000;
 		}
-		Utils.gain(context.getGuild(), context.getAuthor().getLongID(), gain);
+		Utils.gain(context.getGuild(), context.getAuthor(), gain);
 
 		StringBuilder message = new StringBuilder();
 		message.append(":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":");

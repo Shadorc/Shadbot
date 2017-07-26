@@ -16,7 +16,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		client = new ClientBuilder()
-				.withToken(Storage.get(ApiKeys.DISCORD_TOKEN))
+				.withToken(Storage.getApiKey(ApiKeys.DISCORD_TOKEN))
 				.login();
 
 		client.getDispatcher().registerListener(new EventListener());

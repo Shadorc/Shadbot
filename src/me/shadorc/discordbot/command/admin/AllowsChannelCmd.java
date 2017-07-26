@@ -38,7 +38,7 @@ public class AllowsChannelCmd extends Command {
 	private void addChannels(Context context, List <IChannel> channels) {
 		for(IChannel channel : channels) {
 			if(!Utils.isChannelAllowed(context.getGuild(), channel)) {
-				Storage.store(context.getGuild(), "allowedChannels", channel.getStringID());
+				Storage.storePermission(context.getGuild(), channel);
 			}
 		}
 		BotUtils.sendMessage(":white_check_mark: Le(s) channel(s) " + channels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " a/ont été ajouté(s) à la liste des channels autorisés.", context.getChannel());

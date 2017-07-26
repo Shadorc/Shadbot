@@ -20,6 +20,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import me.shadorc.discordbot.Storage;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IUser;
 
 public class Utils {
 
@@ -82,13 +83,9 @@ public class Utils {
 		return RAND.nextInt(bound);
 	}
 
-	public static void gain(IGuild guild, Long authorId, int gain) {
-		String coinsStr = Storage.get(guild, authorId).toString();
-		int coins = 0;
-		if(coinsStr != null) {
-			coins = Integer.parseInt(coinsStr);
-		}
-		Storage.store(guild, authorId, coins+gain);
+	public static void gain(IGuild guild, IUser user, int gain) {
+		int coins = Storage.getCoins(guild, user);
+		Storage.storeCoins(guild, user, coins+gain);
 	}
 
 	public static int getLevenshteinDistance(String word1, String word2) {
@@ -128,7 +125,7 @@ public class Utils {
 	}
 
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
-		JSONArray channelsArray = (JSONArray) Storage.get(guild, "allowedChannels");
+		JSONArray channelsArray = Storage.getAllowedChannels(guild);
 		if(channelsArray == null) {
 			return false;
 		}
@@ -138,5 +135,29 @@ public class Utils {
 			}
 		}
 		return false;
+	}
+
+	public static boolean isInteger(String str) {
+		if(str == null) {
+			return false;
+		}
+		int length = str.length();
+		if(length == 0) {
+			return false;
+		}
+		int i = 0;
+		if(str.charAt(0) == '-') {
+			if(length == 1) {
+				return false;
+			}
+			i = 1;
+		}
+		for(; i < length; i++) {
+			char c = str.charAt(i);
+			if (c < '0' || c > '9') {
+				return false;
+			}
+		}
+		return true;
 	}
 }

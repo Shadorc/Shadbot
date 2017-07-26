@@ -27,7 +27,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class TriviaCmd extends Command {
 
-	public static final Map<IGuild, GuildTriviaManager> GUILDS = new HashMap<>();
+	private static final Map<IGuild, GuildTriviaManager> GUILDS = new HashMap<>();
 
 	public TriviaCmd() {
 		super(false, "trivia", "quizz", "question");
@@ -114,7 +114,7 @@ public class TriviaCmd extends Command {
 			}
 			else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), this.correctAnswer.toLowerCase()) < 2) {
 				BotUtils.sendMessage(":clap: Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 50 coins.", channel);
-				Utils.gain(message.getGuild(), message.getAuthor().getLongID(), 10);
+				Utils.gain(message.getGuild(), message.getAuthor(), 10);
 				this.stop();
 			}
 			else {
