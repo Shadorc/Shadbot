@@ -40,6 +40,7 @@ public class HelpCmd extends Command {
 						"`/play <music>`"
 								+ "\n`/volume <0-100>`"
 								+ "\n`/pause`"
+								+ "\n`/repeat`"
 								+ "\n`/stop`"
 								+ "\n`/next`"
 								+ "\n`/nom`"

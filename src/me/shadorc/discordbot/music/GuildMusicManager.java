@@ -34,6 +34,7 @@ public class GuildMusicManager extends AudioEventAdapter {
 		this.scheduler = new TrackScheduler(player);
 		this.player.addListener(this);
 		this.leaveTimer = new Timer(2*60*1000, e -> {
+			this.scheduler.stop();
 			this.leave();
 		});
 	}
@@ -48,7 +49,6 @@ public class GuildMusicManager extends AudioEventAdapter {
 
 	public void leave() {
 		Main.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel().leave();
-		scheduler.stop();
 		leaveTimer.stop();
 	}
 
@@ -78,12 +78,17 @@ public class GuildMusicManager extends AudioEventAdapter {
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-		if(endReason.mayStartNext) {
-			if(!scheduler.nextTrack()) {
-				BotUtils.sendMessage(":grey_exclamation: Fin de la playlist.", channel);
-				GuildMusicManager.getGuildAudioPlayer(guild).leave();
+		//Create a new Thread avoid java.net.SocketException by leaving the time to the sockets to close
+		new Thread(() -> {
+			if(endReason.mayStartNext) {
+				if(scheduler.isRepeating()) {
+					scheduler.queue(track.makeClone());
+				} else if(!scheduler.nextTrack()) {
+					BotUtils.sendMessage(":grey_exclamation: Fin de la playlist.", channel);
+					GuildMusicManager.getGuildAudioPlayer(guild).leave();
+				}
 			}
-		}
+		}).start();
 	}
 
 	public static synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {

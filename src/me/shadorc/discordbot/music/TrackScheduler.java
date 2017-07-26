@@ -15,9 +15,12 @@ public class TrackScheduler {
 	private final AudioPlayer audioPlayer;
 	private final BlockingQueue<AudioTrack> queue;
 
+	private boolean isRepeating;
+
 	public TrackScheduler(AudioPlayer player) {
 		this.audioPlayer = player;
 		this.queue = new LinkedBlockingQueue<>();
+		this.isRepeating = false;
 		this.setVolume(DEFAULT_VOLUME);
 	}
 
@@ -51,8 +54,16 @@ public class TrackScheduler {
 		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
 	}
 
+	public void setRepeatEnabled(boolean enabled) {
+		this.isRepeating = enabled;
+	}
+
 	public void setPaused(boolean isPaused) {
 		this.audioPlayer.setPaused(isPaused);
+	}
+
+	public boolean isRepeating() {
+		return isRepeating;
 	}
 
 	public boolean isPaused() {

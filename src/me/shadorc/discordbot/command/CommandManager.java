@@ -19,6 +19,7 @@ import me.shadorc.discordbot.command.music.NextCmd;
 import me.shadorc.discordbot.command.music.PauseCmd;
 import me.shadorc.discordbot.command.music.PlayCmd;
 import me.shadorc.discordbot.command.music.PlaylistCmd;
+import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.utility.CalcCmd;
@@ -60,6 +61,7 @@ public class CommandManager {
 				new NextCmd(),
 				new NameCmd(),
 				new PlaylistCmd(),
+				new RepeatCmd(),
 				new AllowsChannelCmd()
 				);
 	}
