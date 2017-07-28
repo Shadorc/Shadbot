@@ -6,6 +6,7 @@ import java.util.Map;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.admin.AdminHelpCmd;
 import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
+import me.shadorc.discordbot.command.currency.LeaderboardCmd;
 import me.shadorc.discordbot.command.fun.BashCmd;
 import me.shadorc.discordbot.command.fun.ChatCmd;
 import me.shadorc.discordbot.command.fun.GifCmd;
@@ -65,7 +66,8 @@ public class CommandManager {
 				new NameCmd(),
 				new PlaylistCmd(),
 				new RepeatCmd(),
-				new AllowsChannelCmd()
+				new AllowsChannelCmd(),
+				new LeaderboardCmd()
 				);
 	}
 
