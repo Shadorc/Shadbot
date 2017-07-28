@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.game;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -15,13 +16,13 @@ public class RussianRouletteCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(Utils.rand(6) == 0) {
-			BotUtils.sendMessage(":game_die: Une goutte de sueur coule sur votre front, vous pressez la détente... **PAN** ... "
+			BotUtils.sendMessage(Emoji.DICE + " Une goutte de sueur coule sur votre front, vous pressez la détente... **PAN** ... "
 					+ "Désolé, vous êtes mort, vous perdez tous vos gains.", context.getChannel());
 			Storage.storeCoins(context.getGuild(), context.getAuthor(), 0);
 		} else {
-			BotUtils.sendMessage(":game_die: Une goutte de sueur coule sur votre front, vous pressez la détente... **click** ... "
+			BotUtils.sendMessage(Emoji.DICE + " Une goutte de sueur coule sur votre front, vous pressez la détente... **click** ... "
 					+ "Pfiou, vous êtes toujours en vie, vous remportez 25 coins !", context.getChannel());
-			Utils.gain(context.getGuild(), context.getAuthor(), 25);
+			Utils.addCoins(context.getGuild(), context.getAuthor(), 25);
 		}
 	}
 

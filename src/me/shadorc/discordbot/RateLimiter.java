@@ -1,13 +1,13 @@
 package me.shadorc.discordbot;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
 public class RateLimiter {
 
-	private static final ConcurrentHashMap <IGuild, ConcurrentHashMap <IUser, Long>> GUILDS_RATELIMIT = new ConcurrentHashMap<>();
+	private static final HashMap <IGuild, HashMap <IUser, Long>> GUILDS_RATELIMITER = new HashMap<>();
 
 	private int timeout;
 
@@ -18,16 +18,16 @@ public class RateLimiter {
 	public boolean isRateLimited(IGuild guild, IUser user) {
 		long currentTime = System.currentTimeMillis();
 
-		if(!GUILDS_RATELIMIT.containsKey(guild)) {
-			GUILDS_RATELIMIT.put(guild, new ConcurrentHashMap <IUser, Long>());
-			GUILDS_RATELIMIT.get(guild).put(user, currentTime);
+		if(!GUILDS_RATELIMITER.containsKey(guild)) {
+			GUILDS_RATELIMITER.put(guild, new HashMap <IUser, Long>());
+			GUILDS_RATELIMITER.get(guild).put(user, currentTime);
 			return false;
 		}
 
-		long lastTime = GUILDS_RATELIMIT.get(guild).get(user);
+		long lastTime = GUILDS_RATELIMITER.get(guild).get(user);
 		long diff = currentTime - lastTime;
 		if(diff > timeout*1000) {
-			GUILDS_RATELIMIT.get(guild).put(user, currentTime);
+			GUILDS_RATELIMITER.get(guild).put(user, currentTime);
 			return false;
 		}
 
@@ -35,7 +35,7 @@ public class RateLimiter {
 	}
 
 	public long getRemainingTime(IGuild guild, IUser user) {
-		return timeout - (System.currentTimeMillis() - GUILDS_RATELIMIT.get(guild).get(user))/1000;
+		return timeout - (System.currentTimeMillis() - GUILDS_RATELIMITER.get(guild).get(user))/1000;
 	}
 
 	public int getTimeout() {

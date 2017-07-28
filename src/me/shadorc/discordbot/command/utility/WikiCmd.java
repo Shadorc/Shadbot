@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -23,7 +24,7 @@ public class WikiCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(":grey_exclamation: Merci d'indiquer une recherche.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Merci d'indiquer une recherche.", context.getChannel());
 			return;
 		}
 
@@ -44,7 +45,7 @@ public class WikiCmd extends Command {
 			JSONObject searchObj = pagesObj.getJSONObject(pageId);
 
 			if(pageId.equals("-1") || searchObj.getString("extract").isEmpty()) {
-				BotUtils.sendMessage(":heavy_multiplication_x: Aucun résultat pour : " + context.getArg(), context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " Aucun résultat pour : " + context.getArg(), context.getChannel());
 				return;
 			}
 

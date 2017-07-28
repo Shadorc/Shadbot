@@ -13,6 +13,7 @@ import javax.swing.Timer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -61,7 +62,7 @@ public class TriviaCmd extends Command {
 			this.alreadyAnswered = new ArrayList<>();
 			this.isStarted = false;
 			this.timer = new Timer(30*1000, e -> {
-				BotUtils.sendMessage(":hourglass: Temps écoulé, la bonne réponse était " + correctAnswer + ".", channel);
+				BotUtils.sendMessage(Emoji.HOURGLASS + " Temps écoulé, la bonne réponse était " + correctAnswer + ".", channel);
 				this.stop();
 			});
 		}
@@ -111,16 +112,16 @@ public class TriviaCmd extends Command {
 		public void checkAnswer(IMessage message) {
 			if(Utils.convertToList(incorrectAnswers).contains(message.getContent().toLowerCase())) {
 				if(alreadyAnswered.contains(message.getAuthor())) {
-					BotUtils.sendMessage(":heavy_multiplication_x: Désolé " + message.getAuthor().getName() + ", tu ne peux donner qu'une seule réponse.", message.getChannel());
+					BotUtils.sendMessage(Emoji.WARNING + " Désolé " + message.getAuthor().getName() + ", tu ne peux donner qu'une seule réponse.", message.getChannel());
 				}
 				else {
-					BotUtils.sendMessage(":thumbsdown: Mauvaise réponse.", channel);
+					BotUtils.sendMessage(Emoji.THUMBSDOWN + " Mauvaise réponse.", channel);
 					alreadyAnswered.add(message.getAuthor());
 				}
 			}
 			else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), this.correctAnswer.toLowerCase()) < 2) {
-				BotUtils.sendMessage(":clap: Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 50 coins.", channel);
-				Utils.gain(message.getGuild(), message.getAuthor(), 10);
+				BotUtils.sendMessage(Emoji.CLAP + " Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 50 coins.", channel);
+				Utils.addCoins(message.getGuild(), message.getAuthor(), 10);
 				this.stop();
 			}
 		}

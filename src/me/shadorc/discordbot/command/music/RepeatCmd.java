@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.music;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -18,15 +19,15 @@ public class RepeatCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(":grey_exclamation: Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Aucune musique en cours de lecture.", context.getChannel());
 			return;
 		}
 
 		scheduler.setRepeatEnabled(!scheduler.isRepeating());
 		if(scheduler.isRepeating()) {
-			BotUtils.sendMessage(":repeat: Répétition de la musique activée.", context.getChannel());
+			BotUtils.sendMessage(Emoji.REPEAT + " Répétition de la musique activée.", context.getChannel());
 		} else {
-			BotUtils.sendMessage(":arrow_forward: Répétition de la musique activée.", context.getChannel());
+			BotUtils.sendMessage(Emoji.PLAY + " Répétition de la musique désactivée.", context.getChannel());
 		}
 	}
 

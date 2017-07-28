@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.game;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -14,6 +15,6 @@ public class CoinsCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		int coins = Storage.getCoins(context.getGuild(), context.getAuthor());
-		BotUtils.sendMessage(":purse: Vous avez " + coins + " coins.", context.getChannel());
+		BotUtils.sendMessage(Emoji.PURSE + " Vous avez " + coins + " coins.", context.getChannel());
 	}
 }

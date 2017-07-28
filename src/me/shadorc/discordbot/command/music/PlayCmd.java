@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -24,7 +25,7 @@ public class PlayCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(":grey_exclamation: Merci d'entrer l'URL d'une musique à écouter.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Merci d'entrer l'URL d'une musique à écouter.", context.getChannel());
 			return;
 		}
 
@@ -33,7 +34,7 @@ public class PlayCmd extends Command {
 
 		if(botVoiceChannel == null) {
 			if(userVoiceChannel == null) {
-				BotUtils.sendMessage(":grey_exclamation: Rejoignez un salon vocal avant d'utiliser cette commande pour que je puisse vous rejoindre.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " Rejoignez un salon vocal avant d'utiliser cette commande pour que je puisse vous rejoindre.", context.getChannel());
 				return;
 			}
 			userVoiceChannel.join();
@@ -43,7 +44,7 @@ public class PlayCmd extends Command {
 		if(!Utils.isValidURL(identifier)) {
 			File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
 			if(songDir == null || songDir.length == 0) {
-				BotUtils.sendMessage(":grey_exclamation: Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
 				return;
 			}
 			identifier = songDir[0].getPath();
@@ -54,7 +55,7 @@ public class PlayCmd extends Command {
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				BotUtils.sendMessage(":musical_note: Ajout de *" + Utils.formatTrackName(track.getInfo()) + "* à la playlist.", context.getChannel());
+				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Ajout de *" + Utils.formatTrackName(track.getInfo()) + "* à la playlist.", context.getChannel());
 				musicManager.getScheduler().queue(track);
 			}
 
@@ -63,13 +64,13 @@ public class PlayCmd extends Command {
 				for(AudioTrack track : playlist.getTracks()) {
 					musicManager.getScheduler().queue(track);
 				}
-				BotUtils.sendMessage(":musical_note: Toutes les musiques ont été ajoutés à la playlist, elle contient maintenant " + musicManager.getScheduler().getPlaylist().size() + " éléments.", context.getChannel());
-				BotUtils.sendMessage(":musical_note: Lecture en cours : *" + musicManager.getScheduler().getCurrentTrackName() + "*", context.getChannel());
+				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Toutes les musiques ont été ajoutés à la playlist, elle contient maintenant " + musicManager.getScheduler().getPlaylist().size() + " éléments.", context.getChannel());
+				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Lecture en cours : *" + musicManager.getScheduler().getCurrentTrackName() + "*", context.getChannel());
 			}
 
 			@Override
 			public void noMatches() {
-				BotUtils.sendMessage(":heavy_multiplication_x: Aucun résultat n'a été trouvé pour " + context.getArg(), context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " Aucun résultat n'a été trouvé pour " + context.getArg(), context.getChannel());
 			}
 
 			@Override

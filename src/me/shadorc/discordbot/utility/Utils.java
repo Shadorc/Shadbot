@@ -89,11 +89,15 @@ public class Utils {
 		return (info.author.equals("Unknown artist") ? "" : (info.author + " - ")) + info.title;
 	}
 
+	/**
+	 * @param bound - the upper bound (exclusive). Must be positive.
+	 * @return the next pseudorandom, uniformly distributed int value between zero (inclusive) and bound (exclusive)
+	 */
 	public static int rand(int bound) {
 		return RAND.nextInt(bound);
 	}
 
-	public static void gain(IGuild guild, IUser user, int gain) {
+	public static void addCoins(IGuild guild, IUser user, int gain) {
 		int coins = Storage.getCoins(guild, user);
 		Storage.storeCoins(guild, user, coins+gain);
 	}

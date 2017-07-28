@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command;
 import java.util.HashMap;
 import java.util.Map;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.admin.AdminHelpCmd;
 import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
 import me.shadorc.discordbot.command.fun.BashCmd;
@@ -10,6 +11,7 @@ import me.shadorc.discordbot.command.fun.ChatCmd;
 import me.shadorc.discordbot.command.fun.GifCmd;
 import me.shadorc.discordbot.command.fun.JokeCmd;
 import me.shadorc.discordbot.command.game.CoinsCmd;
+import me.shadorc.discordbot.command.game.DiceCmd;
 import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TransferCoinsCmd;
@@ -88,12 +90,12 @@ public class CommandManager {
 		if(commands.containsKey(context.getCommand())) {
 			Command command = commands.get(context.getCommand());
 			if(command.isAdminCmd() && !context.isAuthorAdmin()) {
-				BotUtils.sendMessage(":no_entry_sign: Vous devez être administrateur pour exécuter cette commande.", event.getChannel());
+				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " Vous devez être administrateur pour exécuter cette commande.", event.getChannel());
 			} else {
 				command.execute(context);
 			}
 		} else {
-			BotUtils.sendMessage(":heavy_multiplication_x: Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());
+			BotUtils.sendMessage(Emoji.CROSS + " Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());
 			Log.warn("La commande " + context.getCommand() + " a été essayée sans résultat.");
 		}
 	}

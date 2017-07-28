@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.music;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -18,20 +19,20 @@ public class VolumeCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(":grey_exclamation: Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Aucune musique en cours de lecture.", context.getChannel());
 			return;
 		}
 
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(":grey_exclamation: Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
 			return;
 		}
 
 		try {
 			scheduler.setVolume(Integer.parseInt(context.getArg()));
-			BotUtils.sendMessage(":musical_note: Volume de la musique réglé sur " + scheduler.getVolume() + "%", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Volume de la musique réglé sur " + scheduler.getVolume() + "%", context.getChannel());
 		} catch (NumberFormatException e) {
-			BotUtils.sendMessage(":grey_exclamation: Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
 		}
 	}
 

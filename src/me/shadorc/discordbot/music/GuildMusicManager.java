@@ -12,6 +12,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.utility.BotUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -83,7 +84,7 @@ public class GuildMusicManager extends AudioEventAdapter {
 				if(scheduler.isRepeating()) {
 					scheduler.queue(track.makeClone());
 				} else if(!scheduler.nextTrack()) {
-					BotUtils.sendMessage(":grey_exclamation: Fin de la playlist.", channel);
+					BotUtils.sendMessage(Emoji.WARNING + " Fin de la playlist.", channel);
 					GuildMusicManager.getGuildAudioPlayer(guild).leave();
 				}
 			}

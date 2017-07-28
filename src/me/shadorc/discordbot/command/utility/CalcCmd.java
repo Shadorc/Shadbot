@@ -4,6 +4,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -17,7 +18,7 @@ public class CalcCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(":grey_exclamation: Merci d'entrer un calcul.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Merci d'entrer un calcul.", context.getChannel());
 			return;
 		}
 
@@ -25,7 +26,7 @@ public class CalcCmd extends Command {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			BotUtils.sendMessage(context.getArg() + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException e) {
-			BotUtils.sendMessage(":heavy_multiplication_x: Calcul incorrect.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Calcul incorrect.", context.getChannel());
 		}
 	}
 

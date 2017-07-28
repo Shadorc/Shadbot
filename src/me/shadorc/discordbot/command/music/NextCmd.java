@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.music;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -18,15 +19,15 @@ public class NextCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(":grey_exclamation: Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Aucune musique en cours de lecture.", context.getChannel());
 			return;
 		}
 
 		if(!scheduler.nextTrack()) {
-			BotUtils.sendMessage(":grey_exclamation: Fin de la playlist.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Fin de la playlist.", context.getChannel());
 			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 		} else {
-			BotUtils.sendMessage(":musical_note: Musique suivante : *" + scheduler.getCurrentTrackName() + "*", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Musique suivante : *" + scheduler.getCurrentTrackName() + "*", context.getChannel());
 		}
 	}
 }

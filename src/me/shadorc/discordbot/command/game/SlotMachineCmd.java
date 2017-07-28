@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.game;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -27,7 +28,7 @@ public class SlotMachineCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < PAID_COST) {
-			BotUtils.sendMessage(":slot_machine: Vous n'avez pas assez de coins pour jouer aux machines à sous, il vous en faut minimum " + PAID_COST + " !", context.getChannel());
+			BotUtils.sendMessage(Emoji.SLOT_MACHINE + " Vous n'avez pas assez de coins pour jouer aux machines à sous, il vous en faut minimum " + PAID_COST + " !", context.getChannel());
 			return;
 		}
 
@@ -46,7 +47,7 @@ public class SlotMachineCmd extends Command {
 		else if(slot1 == SlotOptions.GIFT && slot2 == SlotOptions.GIFT && slot3 == SlotOptions.GIFT) {
 			gain = 5000;
 		}
-		Utils.gain(context.getGuild(), context.getAuthor(), gain);
+		Utils.addCoins(context.getGuild(), context.getAuthor(), gain);
 
 		StringBuilder message = new StringBuilder();
 		message.append(":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":");

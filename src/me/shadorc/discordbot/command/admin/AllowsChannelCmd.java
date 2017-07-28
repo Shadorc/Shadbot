@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command.admin;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -19,7 +20,7 @@ public class AllowsChannelCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(":grey_exclamation: Mentionnez un ou plusieurs channels à autoriser.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Mentionnez un ou plusieurs channels à autoriser.", context.getChannel());
 			return;
 		}
 
@@ -28,7 +29,7 @@ public class AllowsChannelCmd extends Command {
 		} else {
 			List <IChannel> channels = context.getMessage().getChannelMentions();
 			if(channels.size() == 0) {
-				BotUtils.sendMessage(":grey_exclamation: Vous devez mentionner au moins un channel.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " Vous devez mentionner au moins un channel.", context.getChannel());
 				return;
 			}
 			this.addChannels(context, channels);
@@ -41,6 +42,6 @@ public class AllowsChannelCmd extends Command {
 				Storage.storePermission(context.getGuild(), channel);
 			}
 		}
-		BotUtils.sendMessage(":white_check_mark: Le(s) channel(s) " + channels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " a/ont été ajouté(s) à la liste des channels autorisés.", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " Le(s) channel(s) " + channels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " a/ont été ajouté(s) à la liste des channels autorisés.", context.getChannel());
 	}
 }

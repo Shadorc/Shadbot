@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.listener;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utility.BotUtils;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -14,11 +15,11 @@ public class ChannelListener {
 		if(botVoiceChannel != null) {
 			GuildMusicManager gmm = GuildMusicManager.getGuildAudioPlayer(botVoiceChannel.getGuild());
 			if(this.isAlone(botVoiceChannel) && !gmm.isCancelling()) {
-				BotUtils.sendMessage(":information_source: Il n'y a plus personne qui écoute de la musique, musique mis en pause, je quitterai le salon dans 1 minute.", gmm.getRequestedChannel());
+				BotUtils.sendMessage(Emoji.INFO + " Il n'y a plus personne qui écoute de la musique, musique mis en pause, je quitterai le salon dans 1 minute.", gmm.getRequestedChannel());
 				gmm.getScheduler().setPaused(true);
 				gmm.scheduleLeave();
 			} else if(!this.isAlone(botVoiceChannel) && gmm.isCancelling()){
-				BotUtils.sendMessage(":information_source: Quelqu'un m'a rejoint, reprise de la musique.", gmm.getRequestedChannel());
+				BotUtils.sendMessage(Emoji.INFO + " Quelqu'un m'a rejoint, reprise de la musique.", gmm.getRequestedChannel());
 				gmm.getScheduler().setPaused(false);
 				gmm.cancelLeave();
 			}

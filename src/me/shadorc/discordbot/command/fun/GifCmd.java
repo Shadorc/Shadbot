@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
@@ -39,7 +40,7 @@ public class GifCmd extends Command {
 						+ "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8")));
 				JSONObject obj = new JSONObject(json);
 				if(obj.get("data") instanceof JSONArray) {
-					BotUtils.sendMessage(":information_source: Aucun résultat pour " + context.getArg(), context.getChannel());
+					BotUtils.sendMessage(Emoji.WARNING + " Aucun résultat pour " + context.getArg(), context.getChannel());
 					return;
 				}
 				String url = obj.getJSONObject("data").getString("url");

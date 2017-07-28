@@ -9,6 +9,7 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.json.XML;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -35,7 +36,7 @@ public class ChatCmd extends Command {
 
 	private void answer(String arg, IChannel channel) {
 		if(arg == null) {
-			BotUtils.sendMessage(":grey_exclamation: Une conversation fonctionne mieux quand on dit quelque chose :)", channel);
+			BotUtils.sendMessage(Emoji.WARNING + " Une conversation fonctionne mieux quand on dit quelque chose :)", channel);
 			return;
 		}
 
@@ -48,7 +49,7 @@ public class ChatCmd extends Command {
 			JSONObject result = XML.toJSONObject(xmlString).getJSONObject("result");
 			String response = result.getString("that").replace("<br>", "\n").trim();
 			GUILDS_CUSTID.put(channel.getGuild(), result.getString("custid"));
-			BotUtils.sendMessage(":speech_balloon: " + response, channel);
+			BotUtils.sendMessage(Emoji.SPEECH + " " + response, channel);
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la discussion avec le bot.", e, channel);
 		}

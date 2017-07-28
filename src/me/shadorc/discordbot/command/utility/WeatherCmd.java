@@ -7,6 +7,7 @@ import il.ac.hit.finalproject.classes.Location;
 import il.ac.hit.finalproject.classes.WeatherData;
 import il.ac.hit.finalproject.classes.WeatherDataServiceFactory;
 import il.ac.hit.finalproject.classes.WeatherDataServiceFactory.service;
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -23,7 +24,7 @@ public class WeatherCmd extends Command{
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(":grey_exclamation: Merci d'indiquer le nom d'une ville.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Merci d'indiquer le nom d'une ville.", context.getChannel());
 			return;
 		}
 
@@ -42,10 +43,10 @@ public class WeatherCmd extends Command{
 					.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
 					.withAuthorIcon(context.getAuthor().getAvatarURL())
 					.withColor(new Color(170, 196, 222))
-					.appendField(":cloud: Nuages", clouds, true)
-					.appendField(":wind_blowing_face: Vent", windName + "\n" + windSpeed + " km/h", true)
-					.appendField(":cloud_rain: Précipitations", precipitation, true)
-					.appendField(":thermometer: Température", temperature + "°C", true)
+					.appendField(Emoji.CLOUD + " Nuages", clouds, true)
+					.appendField(Emoji.WIND + " Vent", windName + "\n" + windSpeed + " km/h", true)
+					.appendField(Emoji.RAIN + " Précipitations", precipitation, true)
+					.appendField(Emoji.THERMOMETER + " Température", temperature + "°C", true)
 					.withFooterText("Informations provenant du site OpenWeatherMap");
 
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
