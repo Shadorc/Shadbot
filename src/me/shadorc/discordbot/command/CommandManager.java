@@ -52,6 +52,7 @@ public class CommandManager {
 				new BashCmd(),
 				new JokeCmd(),
 				new TransferCoinsCmd(),
+				new DiceCmd(),
 				new RussianRouletteCmd(),
 				new SlotMachineCmd(),
 				new TriviaCmd(),

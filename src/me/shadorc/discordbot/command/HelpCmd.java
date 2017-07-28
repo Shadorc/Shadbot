@@ -32,6 +32,7 @@ public class HelpCmd extends Command {
 								+ "\n`/blague`", false)
 				.appendField("Commandes Jeux :",
 						"`/transfert <montant> <@utilisateur>`"
+								+ "\n`/dice <mise> <chiffre>`"
 								+ "\n`/roulette_russe`"
 								+ "\n`/machine_sous`"
 								+ "\n`/trivia`"
