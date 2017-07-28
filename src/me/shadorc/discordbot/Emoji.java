@@ -29,4 +29,5 @@ public interface Emoji {
 	String THUMBSDOWN = ":thumbsdown:";
 	String SPEECH = ":speech_balloon:";
 	String CLAP = ":clap:";
+	String GEAR = ":gear:";
 }
