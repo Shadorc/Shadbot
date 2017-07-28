@@ -12,10 +12,8 @@ import sx.blah.discord.api.IDiscordClient;
 
 public class Main {
 
-	private static IDiscordClient client;
-
 	public static void main(String[] args) {
-		client = new ClientBuilder()
+		IDiscordClient client = new ClientBuilder()
 				.withToken(Storage.getApiKey(ApiKeys.DISCORD_TOKEN))
 				.login();
 
@@ -30,12 +28,7 @@ public class Main {
 			public void run() {
 				client.logout();
 				Log.info("Shadbot has been disconnected from all guilds.");
-				System.exit(0);
 			}
 		});
-	}
-
-	public static IDiscordClient getClient() {
-		return client;
 	}
 }

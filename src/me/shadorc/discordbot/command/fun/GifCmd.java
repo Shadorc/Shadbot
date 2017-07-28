@@ -28,7 +28,7 @@ public class GifCmd extends Command {
 				String gifUrl = Infonet.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
 				BotUtils.sendMessage(gifUrl, context.getChannel());
 			} catch (IOException e) {
-				Log.error("Une erreur est survenue lors de la récupération du gif.", e, context.getChannel());
+				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Gifland.", e, context.getChannel());
 			}
 		}
 

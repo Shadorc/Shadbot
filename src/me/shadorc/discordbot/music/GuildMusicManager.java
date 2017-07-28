@@ -12,7 +12,6 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
-import me.shadorc.discordbot.Main;
 import me.shadorc.discordbot.utility.BotUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -48,7 +47,7 @@ public class GuildMusicManager extends AudioEventAdapter {
 	}
 
 	public void leave() {
-		Main.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel().leave();
+		guild.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel().leave();
 		leaveTimer.stop();
 	}
 

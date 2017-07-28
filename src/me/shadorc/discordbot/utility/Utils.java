@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
@@ -61,6 +63,14 @@ public class Utils {
 		return StringEscapeUtils.unescapeHtml3(text);
 	}
 
+	public static List<String> convertToList(JSONArray jArray) {
+		List<String> list = new ArrayList<>();
+		for(int i = 0; i < jArray.length(); i++) {
+			list.add(jArray.getString(i).toLowerCase());
+		}
+		return list;
+	}
+
 	public static String formatPlaylist(BlockingQueue <AudioTrack> queue) {
 		StringBuilder playlist = new StringBuilder(queue.size() + " musique(s) en attente");
 		if(queue.isEmpty()) {
@@ -111,6 +121,10 @@ public class Utils {
 		return distance[word1.length()][word2.length()];
 	}
 
+	/**
+	 * @param stringUrl
+	 * @return true if stringUrl is a valid URL
+	 */
 	public static boolean isValidURL(String stringUrl) {
 		try {
 			URL url = new URL(stringUrl);
@@ -124,6 +138,9 @@ public class Utils {
 		return true;
 	}
 
+	/**
+	 * @return true if Shadbot is allowed to post to the channel in this guild
+	 */
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
 		JSONArray channelsArray = Storage.getAllowedChannels(guild);
 		//If no permissions were defined, authorize by default all the channels
@@ -138,6 +155,10 @@ public class Utils {
 		return false;
 	}
 
+	/**
+	 * @param str - String to check
+	 * @return true if str can be cast to an Integer, false otherwise
+	 */
 	public static boolean isInteger(String str) {
 		if(str == null) {
 			return false;

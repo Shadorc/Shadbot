@@ -19,7 +19,7 @@ import sx.blah.discord.handle.obj.IGuild;
 
 public class ChatCmd extends Command {
 
-	private static Map<IGuild, String> GUILDS_CUSTID = new HashMap<>();
+	private static final Map<IGuild, String> GUILDS_CUSTID = new HashMap<>();
 
 	public ChatCmd() {
 		super(false, "chat");

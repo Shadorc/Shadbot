@@ -30,10 +30,10 @@ public class WeatherCmd extends Command{
 		IWeatherDataService dataService = WeatherDataServiceFactory.getWeatherDataService(service.OPEN_WEATHER_MAP);
 		try {
 			WeatherData data = dataService.getWeatherData(new Location(context.getArg(), "FR"));
+			String precipitation = data.getPrecipitation().getMode().equals("no") ? "Aucune" : data.getPrecipitation().getValue();
 			String clouds = Utils.capitalize(Utils.translate("en", "fr", data.getClouds().getValue()));
 			String windName = Utils.translate("en", "fr", data.getWind().getSpeed().getName());
 			int windSpeed = (int) (Float.parseFloat(data.getWind().getSpeed().getValue())*3.6f);
-			String precipitation = data.getPrecipitation().getMode().equals("no") ? "Aucune" : data.getPrecipitation().getValue();
 			int temperature = (int) Float.parseFloat(data.getTemperature().getValue());
 
 			EmbedBuilder builder = new EmbedBuilder()

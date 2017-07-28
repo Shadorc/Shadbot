@@ -15,17 +15,15 @@ public class AdminHelpCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		//EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
-		EmbedBuilder builder = new EmbedBuilder();
-
-		builder.withAuthorName("Shadbot Admin Aide");
-		builder.withAuthorIcon(context.getClient().getOurUser().getAvatarURL());
-		builder.withColor(new Color(170, 196, 222));
-		builder.withDesc("Aide pour les commandes administrateurs.");
-		builder.appendField("Commandes :",
-				"`/allows_channel <#channel | all>`", false)
-		.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
-		.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Shadbot Admin Aide")
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.withDesc("Aide pour les commandes administrateurs.")
+				.appendField("Commandes :",
+						"`/allows_channel <#channel | all>`", false)
+				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
+				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
