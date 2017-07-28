@@ -17,6 +17,7 @@ import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.info.AdminHelpCmd;
+import me.shadorc.discordbot.command.info.CounterStrikeCmd;
 import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.OverwatchCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
@@ -73,6 +74,7 @@ public class CommandManager {
 				new LeaderboardCmd(),
 				new PingCmd(),
 				new OverwatchCmd(),
+				new CounterStrikeCmd()
 				);
 	}
 
