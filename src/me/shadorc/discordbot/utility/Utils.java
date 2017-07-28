@@ -94,9 +94,15 @@ public class Utils {
 	}
 
 	/**
-	 * @param bound - the upper bound (exclusive). Must be positive.
-	 * @return the next pseudorandom, uniformly distributed int value between zero (inclusive) and bound (exclusive)
+	 * 
+	 * @param min - min value
+	 * @param max - max value
+	 * @return rand number between min (inclusive) and max (inclusive)
 	 */
+	public static int rand(int min, int max) {
+		return min + Utils.rand(max-min+1);
+	}
+
 	public static int rand(int bound) {
 		return RAND.nextInt(bound);
 	}

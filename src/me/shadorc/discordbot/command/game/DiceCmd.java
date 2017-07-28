@@ -145,12 +145,12 @@ public class DiceCmd extends Command {
 		private void stop() {
 			this.timer.stop();
 
-			int rand = Utils.rand(6)+1;
+			int rand = Utils.rand(1, 6);
 			BotUtils.sendMessage(Emoji.DICE + " Le dés est lancé... **" + rand + "** !", channel);
 
 			if(numsPlayers.containsKey(rand)) {
 				IUser winner = numsPlayers.get(rand);
-				int gains = bet*numsPlayers.size()*3;
+				int gains = bet*numsPlayers.size()*6;
 				BotUtils.sendMessage(Emoji.DICE + " Bravo " + winner.mention() + ", tu remportes " + gains + " coins !", channel);
 				Utils.addCoins(channel.getGuild(), winner, gains);
 				numsPlayers.remove(rand);
