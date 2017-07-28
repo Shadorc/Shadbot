@@ -66,7 +66,7 @@ public class DiceCmd extends Command {
 			}
 
 			if(GUILDS_DICE.get(context.getGuild()).isAlreadyPlaye(context.getAuthor())) {
-				BotUtils.sendMessage(Emoji.WARNING + " Vous participez déjà.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " " + context.getAuthor().mention() + ", tu participez déjà.", context.getChannel());
 				return;
 			}
 
@@ -88,6 +88,7 @@ public class DiceCmd extends Command {
 			}
 
 			GUILDS_DICE.get(context.getGuild()).addPlayer(context.getAuthor(), num);
+			BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " a misé sur le " + num + ".", context.getChannel());
 		}
 	}
 
@@ -131,10 +132,10 @@ public class DiceCmd extends Command {
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Jeu de dés")
 					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
-					.withThumbnail("http://findicons.com/files/icons/2711/free_icons_for_windows8_metro/128/dice.png")
+					.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 					.withColor(new Color(170, 196, 222))
 					.appendField(croupier.getName() + " a démarré un jeu de dés.", 
-							"Utilisez la commande `/dice <num>` pour rejoindre la partie avec une mise de " + bet + " coins.", false)
+							"Utilisez la commande `/dice <num>` pour rejoindre la partie avec une mise de **" + bet + " coins**.", false)
 					.withFooterText("Vous avez " + (timer.getDelay()/1000) + " secondes pour faire vos paris");
 			BotUtils.sendEmbed(builder.build(), channel);
 
@@ -145,23 +146,27 @@ public class DiceCmd extends Command {
 			this.timer.stop();
 
 			int rand = Utils.rand(6)+1;
-			BotUtils.sendMessage(Emoji.DICE + " Shadbot lance le dés... **" + rand + "** !", channel);
+			BotUtils.sendMessage(Emoji.DICE + " Le dés est lancé... **" + rand + "** !", channel);
 
 			if(numsPlayers.containsKey(rand)) {
 				IUser winner = numsPlayers.get(rand);
-				int gains = bet*numsPlayers.size();
-				BotUtils.sendMessage(Emoji.DICE + " Bravo " + winner.getName() + ", tu remportes " + gains + " coins !", channel);
+				int gains = bet*numsPlayers.size()*3;
+				BotUtils.sendMessage(Emoji.DICE + " Bravo " + winner.mention() + ", tu remportes " + gains + " coins !", channel);
 				Utils.addCoins(channel.getGuild(), winner, gains);
+				numsPlayers.remove(rand);
 			}
 
-			StringBuilder strBuilder = new StringBuilder(Emoji.LOST_MONEY + " Désolé, ");
-			for(int num : numsPlayers.keySet()) {
-				if(rand != num) {
-					strBuilder.append(numsPlayers.get(num).mention() + ", ");
+			if(numsPlayers.size() > 0) {
+				StringBuilder strBuilder = new StringBuilder(Emoji.LOST_MONEY + " Désolé, ");
+				for(int num : numsPlayers.keySet()) {
+					if(rand != num) {
+						Utils.addCoins(channel.getGuild(), numsPlayers.get(num), -bet);
+						strBuilder.append(numsPlayers.get(num).mention() + ", ");
+					}
 				}
+				strBuilder.append("vous avez perdu " + bet + " coin(s).");
+				BotUtils.sendMessage(strBuilder.toString(), channel);
 			}
-			strBuilder.append("vous avez perdu " + bet + " coin(s).");
-			BotUtils.sendMessage(strBuilder.toString(), channel);
 
 			GUILDS_DICE.remove(channel.getGuild());
 		}
