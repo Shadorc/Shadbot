@@ -98,4 +98,25 @@ public class NetUtils {
 
 		return null;
 	}
+
+	/**
+	 * @param  html - webpage's html
+	 * @param  toMatch - String to match in HTML code
+	 * @param  start - parsing begin
+	 * @param  end - parsing ending
+	 * @return Parsed HTML from "start" to "end"
+	 */
+	public static String parseTextHTML(String html, String toMatch, String start, String end) {
+		for(String line : html.split("\n")) {
+			if(line.contains(toMatch)) {
+				Pattern p = Pattern.compile(Pattern.quote(start) + "(.*?)" + Pattern.quote(end));
+				Matcher m = p.matcher(line);
+				if(m.find()) {
+					return m.group(1).trim();
+				}
+			}
+		}
+
+		return null;
+	}
 }

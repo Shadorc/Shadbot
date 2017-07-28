@@ -18,6 +18,7 @@ import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.info.AdminHelpCmd;
 import me.shadorc.discordbot.command.info.HelpCmd;
+import me.shadorc.discordbot.command.info.OverwatchCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
 import me.shadorc.discordbot.command.music.NextCmd;
@@ -69,8 +70,9 @@ public class CommandManager {
 				new PlaylistCmd(),
 				new RepeatCmd(),
 				new AllowsChannelCmd(),
-				new LeaderboardCmd()
+				new LeaderboardCmd(),
 				new PingCmd(),
+				new OverwatchCmd(),
 				);
 	}
 
