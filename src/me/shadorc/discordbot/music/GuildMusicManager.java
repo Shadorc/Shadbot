@@ -32,7 +32,7 @@ public class GuildMusicManager extends AudioEventAdapter {
 		this.player = manager.createPlayer();
 		this.scheduler = new TrackScheduler(player);
 		this.player.addListener(this);
-		this.leaveTimer = new Timer(2*60*1000, e -> {
+		this.leaveTimer = new Timer(60*1000, e -> {
 			this.scheduler.stop();
 			this.leave();
 		});
