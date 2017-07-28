@@ -66,7 +66,7 @@ public class DiceCmd extends Command {
 			}
 
 			if(GUILDS_DICE.get(context.getGuild()).isAlreadyPlaye(context.getAuthor())) {
-				BotUtils.sendMessage(Emoji.WARNING + " " + context.getAuthor().mention() + ", tu participez déjà.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " " + context.getAuthor().mention() + ", tu participes déjà.", context.getChannel());
 				return;
 			}
 

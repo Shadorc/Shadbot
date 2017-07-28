@@ -121,7 +121,7 @@ public class TriviaCmd extends Command {
 			}
 			else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), this.correctAnswer.toLowerCase()) < 2) {
 				BotUtils.sendMessage(Emoji.CLAP + " Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes 50 coins.", channel);
-				Utils.addCoins(message.getGuild(), message.getAuthor(), 10);
+				Utils.addCoins(message.getGuild(), message.getAuthor(), 50);
 				this.stop();
 			}
 		}

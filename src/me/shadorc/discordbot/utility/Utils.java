@@ -94,7 +94,7 @@ public class Utils {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param min - min value
 	 * @param max - max value
 	 * @return rand number between min (inclusive) and max (inclusive)
