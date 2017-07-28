@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.game;
+package me.shadorc.discordbot.command.currency;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;

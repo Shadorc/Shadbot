@@ -31,11 +31,13 @@ public class HelpCmd extends Command {
 								+ "\n`/dtc`"
 								+ "\n`/blague`", false)
 				.appendField("Commandes Jeux :",
-						"`/transfert <montant> <@utilisateur>`"
-								+ "\n`/dice <mise> <chiffre>`"
+						"`/dice <mise> <chiffre>`"
 								+ "\n`/roulette_russe`"
 								+ "\n`/machine_sous`"
-								+ "\n`/trivia`"
+								+ "\n`/trivia`", false)
+				.appendField("Commandes Argent :",
+						"`/transfert <montant> <@utilisateur>`"
+								+ "\n`/leaderboard`"
 								+ "\n`/coins`", false)
 				.appendField("Commandes Musique:",
 						"`/play <music>`"
