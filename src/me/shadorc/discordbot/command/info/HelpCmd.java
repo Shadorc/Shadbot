@@ -1,7 +1,9 @@
-package me.shadorc.discordbot.command;
+package me.shadorc.discordbot.command.info;
 
 import java.awt.Color;
 
+import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -48,6 +50,10 @@ public class HelpCmd extends Command {
 								+ "\n`/next`"
 								+ "\n`/nom`"
 								+ "\n`/playlist`", false)
+				.appendField("Commandes Infos:",
+						"`/overwatch <pc|psn|xbl> <eu|us|cn|kr> <battletag#0000>`"
+								+ "\n`/cs <steamID>`"
+								+ "\n`/ping`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
 				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
 

@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.admin;
+package me.shadorc.discordbot.command.info;
 
 import java.awt.Color;
 
