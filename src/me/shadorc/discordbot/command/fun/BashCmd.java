@@ -11,7 +11,7 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
-import me.shadorc.infonet.Infonet;
+import me.shadorc.discordbot.utility.NetUtils;
 
 public class BashCmd extends Command {
 
@@ -22,7 +22,7 @@ public class BashCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		try {
-			String json = Infonet.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
+			String json = NetUtils.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
 					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)
 					+ "&format=json"));
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");

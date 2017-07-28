@@ -8,8 +8,8 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
+import me.shadorc.discordbot.utility.NetUtils;
 import me.shadorc.discordbot.utility.Utils;
-import me.shadorc.infonet.Infonet;
 
 public class JokeCmd extends Command {
 
@@ -20,8 +20,8 @@ public class JokeCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		try {
-			String htmlPage = Infonet.getHTML(new URL("https://www.blague-drole.net/blagues-" + (Utils.rand(10)+1) + ".html?tri=top"));
-			ArrayList <String> jokesList = Infonet.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
+			String htmlPage = NetUtils.getHTML(new URL("https://www.blague-drole.net/blagues-" + (Utils.rand(10)+1) + ".html?tri=top"));
+			ArrayList <String> jokesList = NetUtils.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
 			String joke = jokesList.get(Utils.rand(jokesList.size()));
 			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
 			BotUtils.sendMessage("```" + Utils.convertToUTF8(joke).replace("\n\n", "\n") + "```", context.getChannel());

@@ -18,7 +18,7 @@ public class CoinsCmd extends Command {
 		if(context.getMessage().getMentions().isEmpty()) {
 			int coins = Storage.getCoins(context.getGuild(), context.getAuthor());
 			BotUtils.sendMessage(Emoji.PURSE + " Vous avez **" + coins + " coin(s)**.", context.getChannel());
-		} 
+		}
 
 		else {
 			IUser user = context.getMessage().getMentions().get(0);

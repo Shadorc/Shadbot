@@ -57,7 +57,7 @@ public class DiceCmd extends Command {
 			}
 
 			GUILDS_DICE.put(context.getGuild(), new DiceManager(context.getChannel(), context.getAuthor(), num, bet));
-		} 
+		}
 
 		else {
 			if(Storage.getCoins(context.getGuild(), context.getAuthor()) < GUILDS_DICE.get(context.getGuild()).getBet()) {
@@ -134,7 +134,7 @@ public class DiceCmd extends Command {
 					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 					.withColor(new Color(170, 196, 222))
-					.appendField(croupier.getName() + " a démarré un jeu de dés.", 
+					.appendField(croupier.getName() + " a démarré un jeu de dés.",
 							"Utilisez la commande `/dice <num>` pour rejoindre la partie avec une mise de **" + bet + " coins**.", false)
 					.withFooterText("Vous avez " + (timer.getDelay()/1000) + " secondes pour faire vos paris");
 			BotUtils.sendEmbed(builder.build(), channel);

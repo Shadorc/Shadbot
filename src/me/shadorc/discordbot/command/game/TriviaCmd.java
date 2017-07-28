@@ -18,8 +18,8 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
+import me.shadorc.discordbot.utility.NetUtils;
 import me.shadorc.discordbot.utility.Utils;
-import me.shadorc.infonet.Infonet;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -69,7 +69,7 @@ public class TriviaCmd extends Command {
 
 		//Trivia API doc : https://opentdb.com/api_config.php
 		private void start() throws MalformedURLException, IOException {
-			String json = Infonet.getHTML(new URL("https://opentdb.com/api.php?amount=1"));
+			String json = NetUtils.getHTML(new URL("https://opentdb.com/api.php?amount=1"));
 			JSONObject result = new JSONObject(json).getJSONArray("results").getJSONObject(0);
 
 			String category = result.getString("category");

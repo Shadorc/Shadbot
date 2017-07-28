@@ -196,9 +196,9 @@ public class Utils {
 				.stream()
 				.sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
 				.collect(Collectors.toMap(
-						Map.Entry::getKey, 
-						Map.Entry::getValue, 
-						(e1, e2) -> e1, 
+						Map.Entry::getKey,
+						Map.Entry::getValue,
+						(e1, e2) -> e1,
 						LinkedHashMap::new
 						));
 	}

@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Created-By: Shadorc
 Main-Class: me.shadorc.discordbot.Main
-Class-Path: ./lib/infonet-1.6.0.jar ./lib/openweathermap-api.jar
+Class-Path: ./lib/openweathermap-api.jar

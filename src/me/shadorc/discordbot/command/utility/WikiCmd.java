@@ -12,7 +12,7 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
-import me.shadorc.infonet.Infonet;
+import me.shadorc.discordbot.utility.NetUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class WikiCmd extends Command {
@@ -31,7 +31,7 @@ public class WikiCmd extends Command {
 		try {
 			String searchEncoded = URLEncoder.encode(context.getArg(), "UTF-8");
 			//Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-			String json = Infonet.getHTML(new URL("https://fr.wikipedia.org/w/api.php?"
+			String json = NetUtils.getHTML(new URL("https://fr.wikipedia.org/w/api.php?"
 					+ "action=query"
 					+ "&titles=" + searchEncoded
 					+ "&prop=extracts"
