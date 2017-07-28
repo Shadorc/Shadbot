@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.fun;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
-import me.shadorc.infonet.Infonet;
+import me.shadorc.discordbot.utility.NetUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -42,7 +43,7 @@ public class ChatCmd extends Command {
 
 		try {
 			String aliceState = GUILDS_CUSTID.get(channel.getGuild());
-			String xmlString = Infonet.getHTML(new URL("http://sheepridge.pandorabots.com/pandora/talk-xml?"
+			String xmlString = NetUtils.getHTML(new URL("http://sheepridge.pandorabots.com/pandora/talk-xml?"
 					+ "botid=b69b8d517e345aba"
 					+ "&input=" + URLEncoder.encode(arg, "UTF-8")
 					+ (aliceState != null ? "&custid=" + aliceState : "")));
@@ -50,6 +51,9 @@ public class ChatCmd extends Command {
 			String response = result.getString("that").replace("<br>", "\n").trim();
 			GUILDS_CUSTID.put(channel.getGuild(), result.getString("custid"));
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, channel);
+		} catch (SocketTimeoutException e) {
+			BotUtils.sendMessage(Emoji.WARNING + " La discussion n'est pas disponible actuellement.", channel);
+			Log.warn("A.L.I.C.E. ne répond pas.");
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la discussion avec le bot.", e, channel);
 		}
