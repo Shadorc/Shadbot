@@ -24,8 +24,7 @@ public class WikiCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(Emoji.WARNING + " Merci d'indiquer une recherche.", context.getChannel());
-			return;
+			throw new IllegalArgumentException();
 		}
 
 		try {
@@ -61,6 +60,17 @@ public class WikiCmd extends Command {
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération des informations sur Wikipédia.", e, context.getChannel());
 		}
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.withDescription("**Affiche la description Wikipedia d'une recherche.**")
+				.appendField("Utlisation", "/wiki <recherche>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
 }

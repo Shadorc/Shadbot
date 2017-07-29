@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.music;
 
+import java.awt.Color;
 import java.io.File;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -15,6 +16,7 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.obj.IVoiceChannel;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class PlayCmd extends Command {
 
@@ -78,5 +80,16 @@ public class PlayCmd extends Command {
 				Log.error("Le chargement de la musique a échoué.", e, context.getChannel());
 			}
 		});
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Joue la musique passée en URL.**")
+				.appendField("Utilisation", "/play <url>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

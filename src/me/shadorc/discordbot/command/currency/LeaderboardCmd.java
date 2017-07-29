@@ -48,4 +48,13 @@ public class LeaderboardCmd extends Command {
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Affiche le classement des coins du serveur.**");
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
+	}
 }

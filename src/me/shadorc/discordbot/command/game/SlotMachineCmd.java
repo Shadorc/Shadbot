@@ -1,11 +1,14 @@
 package me.shadorc.discordbot.command.game;
 
+import java.awt.Color;
+
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class SlotMachineCmd extends Command {
 
@@ -28,7 +31,7 @@ public class SlotMachineCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < PAID_COST) {
-			BotUtils.sendMessage(Emoji.SLOT_MACHINE + " Vous n'avez pas assez de coins pour jouer aux machines à sous, il vous en faut minimum " + PAID_COST + " !", context.getChannel());
+			BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour jouer à la machine à sous, une partie coûte " + PAID_COST + ".", context.getChannel());
 			return;
 		}
 
@@ -53,5 +56,16 @@ public class SlotMachineCmd extends Command {
 		message.append(":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":");
 		message.append("\nVous avez "+ (gain > 0 ? "gagné" : "perdu") + " " + Math.abs(gain) + " coins !");
 		BotUtils.sendMessage(message.toString(), context.getChannel());
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Joue à la machine à sous pour " + PAID_COST + " coins.**")
+				.appendField("Gains", "Vous avez 12.5% de chance de gagner 30 coins, 5.3% de gagner 150 coins et 0.2% de gagner 5000 coins.", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

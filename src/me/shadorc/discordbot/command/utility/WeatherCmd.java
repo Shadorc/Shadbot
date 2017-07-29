@@ -24,8 +24,7 @@ public class WeatherCmd extends Command{
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(Emoji.WARNING + " Merci d'indiquer le nom d'une ville.", context.getChannel());
-			return;
+			throw new IllegalArgumentException();
 		}
 
 		IWeatherDataService dataService = WeatherDataServiceFactory.getWeatherDataService(service.OPEN_WEATHER_MAP);
@@ -56,4 +55,14 @@ public class WeatherCmd extends Command{
 		}
 	}
 
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Affiche la météo d'une ville.**")
+				.appendField("Utilisation", "/meteo <ville>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
+	}
 }

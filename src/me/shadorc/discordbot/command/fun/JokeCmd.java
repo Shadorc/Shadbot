@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.fun;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.NetUtils;
 import me.shadorc.discordbot.utility.Utils;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class JokeCmd extends Command {
 
@@ -30,4 +32,13 @@ public class JokeCmd extends Command {
 		}
 	}
 
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Affiche une blague aléatoire provenant du site blague-drole.net.**");
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
+	}
 }

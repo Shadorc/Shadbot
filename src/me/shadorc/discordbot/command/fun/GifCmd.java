@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.fun;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -15,6 +16,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.NetUtils;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class GifCmd extends Command {
 
@@ -49,6 +51,17 @@ public class GifCmd extends Command {
 				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Giphy.", e, context.getChannel());
 			}
 		}
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Affiche un gif aléatoire ou correspondant à un mot clé provenant du site gifland.us.**")
+				.appendField("Utilisation", "/gif ou /gif <tag>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
 }

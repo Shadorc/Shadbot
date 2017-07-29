@@ -1,5 +1,7 @@
 package me.shadorc.discordbot.command.currency;
 
+import java.awt.Color;
+
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
@@ -7,6 +9,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class TransferCoinsCmd extends Command {
 
@@ -17,33 +20,20 @@ public class TransferCoinsCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(Emoji.WARNING + " Indiquez l'utilisateur et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
-			return;
+			throw new IllegalArgumentException();
 		}
 
 		String[] splitCmd = context.getArg().split(" ", 2);
-		if(splitCmd.length != 2) {
-			BotUtils.sendMessage(Emoji.WARNING + " Indiquez l'utilisateur et le montant à transférer : /transfert <montant> <utilisateur>", context.getChannel());
-			return;
-		}
-
-		if(context.getMessage().getMentions().size() != 1) {
-			BotUtils.sendMessage(Emoji.WARNING + " Vous devez mentionner un utilisateur : /transfert <montant> <utilisateur>", context.getChannel());
-			return;
+		if(splitCmd.length != 2 || context.getMessage().getMentions().size() != 1) {
+			throw new IllegalArgumentException();
 		}
 
 		try {
 			int coins = Integer.parseInt(splitCmd[0]);
 			IUser user = context.getMessage().getMentions().get(0);
 
-			if(coins <= 0) {
-				BotUtils.sendMessage(Emoji.WARNING + " Vous devez transférer un montant strictement supérieur à 0.", context.getChannel());
-				return;
-			}
-
-			if(user.equals(context.getAuthor())) {
-				BotUtils.sendMessage(Emoji.WARNING + " Vous ne pouvez pas vous transférer de l'argent à vous même.", context.getChannel());
-				return;
+			if(coins <= 0 || user.equals(context.getAuthor())) {
+				throw new IllegalArgumentException();
 			}
 
 			if(Storage.getCoins(context.getGuild(), context.getAuthor()) < coins) {
@@ -56,7 +46,19 @@ public class TransferCoinsCmd extends Command {
 
 			BotUtils.sendMessage(Emoji.BANK + " " + context.getAuthor().mention() + " a transféré " + coins + " coins à " + user.mention(), context.getChannel());
 		} catch(NumberFormatException e1) {
-			BotUtils.sendMessage(Emoji.WARNING + " Montant invalide.", context.getChannel());
+			throw new IllegalArgumentException();
 		}
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Transfert des coins à l'utilisateur mentionné.**")
+				.appendField("Utilisation", "/transfert <coins> <@utilisateur>", false)
+				.appendField("Restrictions", "Le montant transféré doit être strictement supérieur à 0.\nVous ne pouvez pas vous transférer de coins à vous-même.", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

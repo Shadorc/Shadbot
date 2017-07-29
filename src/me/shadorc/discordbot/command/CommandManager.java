@@ -97,12 +97,21 @@ public class CommandManager {
 			return;
 		}
 
+		if(context.getCommand().equals("help") && context.getArg() != null && commands.containsKey(context.getArg().replace("/", ""))) {
+			commands.get(context.getArg()).showHelp(context);
+			return;
+		}
+
 		if(commands.containsKey(context.getCommand())) {
 			Command command = commands.get(context.getCommand());
 			if(command.isAdminCmd() && !context.isAuthorAdmin()) {
 				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " Vous devez être administrateur pour exécuter cette commande.", event.getChannel());
 			} else {
-				command.execute(context);
+				try {
+					command.execute(context);
+				} catch (IllegalArgumentException e) {
+					command.showHelp(context);
+				}
 			}
 		} else {
 			BotUtils.sendMessage(Emoji.CROSS + " Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());

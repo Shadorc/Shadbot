@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.fun;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
 
@@ -12,6 +13,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.NetUtils;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class BashCmd extends Command {
 
@@ -32,4 +34,13 @@ public class BashCmd extends Command {
 		}
 	}
 
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Affiche une quote aléatoire issue du site danstonchat.com.**");
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
+	}
 }

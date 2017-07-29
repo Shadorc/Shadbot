@@ -19,6 +19,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class DiceCmd extends Command {
 
 	private static final HashMap <IGuild, DiceManager> GUILDS_DICE = new HashMap<>();
+	private static final int MULTIPLIER = 6;
 
 	public DiceCmd() {
 		super(false, "des", "dice");
@@ -28,27 +29,19 @@ public class DiceCmd extends Command {
 	public void execute(Context context) {
 		if(!GUILDS_DICE.containsKey(context.getGuild())) {
 			if(context.getArg() == null) {
-				BotUtils.sendMessage(Emoji.WARNING + " Vous devez indiquer une mise et un chiffre.", context.getChannel());
-				return;
+				throw new IllegalArgumentException();
 			}
 
 			String[] splitArgs = context.getArg().split(" ");
-			if(splitArgs.length != 2) {
-				BotUtils.sendMessage(Emoji.WARNING + " Vous devez indiquer une mise et un chiffre.", context.getChannel());
-				return;
-			}
-
-			if(!Utils.isInteger(splitArgs[0]) || !Utils.isInteger(splitArgs[1])) {
-				BotUtils.sendMessage(Emoji.WARNING + " La mise ou le chiffre que vous avez indiquez ne sont pas des nombres.", context.getChannel());
-				return;
+			if(splitArgs.length != 2 || !Utils.isInteger(splitArgs[0]) || !Utils.isInteger(splitArgs[1])) {
+				throw new IllegalArgumentException();
 			}
 
 			int bet = Integer.parseInt(splitArgs[0]);
 			int num = Integer.parseInt(splitArgs[1]);
 
 			if(num < 1 || num > 6) {
-				BotUtils.sendMessage(Emoji.WARNING + " Vous devez indiquer un chiffre compris entre 1 et 6.", context.getChannel());
-				return;
+				throw new IllegalArgumentException();
 			}
 
 			if(Storage.getCoins(context.getGuild(), context.getAuthor()) < bet) {
@@ -60,45 +53,45 @@ public class DiceCmd extends Command {
 		}
 
 		else {
-			if(Storage.getCoins(context.getGuild(), context.getAuthor()) < GUILDS_DICE.get(context.getGuild()).getBet()) {
+			DiceManager diceManager = GUILDS_DICE.get(context.getGuild());
+
+			if(Storage.getCoins(context.getGuild(), context.getAuthor()) < diceManager.getBet()) {
 				BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour rejoindre cette partie.", context.getChannel());
 				return;
 			}
 
-			if(GUILDS_DICE.get(context.getGuild()).isAlreadyPlaye(context.getAuthor())) {
+			if(diceManager.isAlreadyPlaye(context.getAuthor())) {
 				BotUtils.sendMessage(Emoji.WARNING + " " + context.getAuthor().mention() + ", tu participes déjà.", context.getChannel());
 				return;
 			}
 
 			if(context.getArg() == null || !Utils.isInteger(context.getArg())) {
-				BotUtils.sendMessage(Emoji.WARNING + " Vous devez indiquer un chiffre.", context.getChannel());
-				return;
+				throw new IllegalArgumentException();
 			}
 
 			int num = Integer.parseInt(context.getArg());
 
 			if(num < 1 || num > 6) {
-				BotUtils.sendMessage(Emoji.WARNING + " Vous devez indiquer un chiffre compris entre 1 et 6.", context.getChannel());
+				throw new IllegalArgumentException();
+			}
+
+			if(diceManager.isAlreadyBet(num)) {
+				BotUtils.sendMessage(Emoji.WARNING + " Ce numéro a déjà été misé, merci d'en indiquer un autre.", context.getChannel());
 				return;
 			}
 
-			if(GUILDS_DICE.get(context.getGuild()).isAlreadyBet(num)) {
-				BotUtils.sendMessage(Emoji.WARNING + " Ce numéro a déjà été parié, merci d'en indiquer un autre.", context.getChannel());
-				return;
-			}
-
-			GUILDS_DICE.get(context.getGuild()).addPlayer(context.getAuthor(), num);
+			diceManager.addPlayer(context.getAuthor(), num);
 			BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " a misé sur le " + num + ".", context.getChannel());
 		}
 	}
 
 	public class DiceManager {
 
+		private HashMap<Integer, IUser> numsPlayers;
 		private IChannel channel;
 		private IUser croupier;
-		private int bet;
-		private HashMap<Integer, IUser> numsPlayers;
 		private Timer timer;
+		private int bet;
 
 		private DiceManager(IChannel channel, IUser user, int num, int bet) {
 			this.channel = channel;
@@ -150,7 +143,7 @@ public class DiceCmd extends Command {
 
 			if(numsPlayers.containsKey(rand)) {
 				IUser winner = numsPlayers.get(rand);
-				int gains = bet*numsPlayers.size()*6;
+				int gains = bet*numsPlayers.size()*MULTIPLIER;
 				BotUtils.sendMessage(Emoji.DICE + " Bravo " + winner.mention() + ", tu remportes " + gains + " coins !", channel);
 				Utils.addCoins(channel.getGuild(), winner, gains);
 				numsPlayers.remove(rand);
@@ -170,5 +163,18 @@ public class DiceCmd extends Command {
 
 			GUILDS_DICE.remove(channel.getGuild());
 		}
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Lance une partie de dés avec une mise commune ou rejoint une partie déjà existante.**")
+				.appendField("Utilisation", "Créer une partie : **/dice <mise> <num>**.\nRejoindre une partie **/dice <num>**", false)
+				.appendField("Restrictions", "Le numéro doit être compris entre 1 et 6.\nVous ne pouvez pas miser un numéro qui a déjà été choisi par un autre utilisateur.", false)
+				.appendField("Gains", "Le gagnant remporte " + MULTIPLIER + " fois la mise commune multipliée par le nombre de participants.", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

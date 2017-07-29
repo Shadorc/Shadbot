@@ -19,7 +19,7 @@ public class HelpCmd extends Command {
 				.withAuthorName("Shadbot Aide")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.withDesc("Aide pour les commandes.")
+				.withDesc("Obtenez plus d'informations en utilisant /help <commande>.")
 				.appendField("Commandes Utiles :",
 						"`/trad <lang1> <lang2> <texte>`"
 								+ "\n`/wiki <recherche>`"
@@ -33,7 +33,7 @@ public class HelpCmd extends Command {
 								+ "\n`/dtc`"
 								+ "\n`/blague`", false)
 				.appendField("Commandes Jeux :",
-						"`/dice <mise> <chiffre>`"
+						"`/dice <mise> <num>`"
 								+ "\n`/roulette_russe`"
 								+ "\n`/machine_sous`"
 								+ "\n`/trivia`", false)
@@ -60,4 +60,13 @@ public class HelpCmd extends Command {
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Affiche l'aide pour les commandes.**");
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
+	}
 }

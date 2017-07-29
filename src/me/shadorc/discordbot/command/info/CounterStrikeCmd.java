@@ -26,8 +26,7 @@ public class CounterStrikeCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(Emoji.WARNING + " Veuillez indiquer le Steam ID de l'utilisateur.", context.getChannel());
-			return;
+			throw new IllegalArgumentException();
 		}
 
 		try {
@@ -37,7 +36,7 @@ public class CounterStrikeCmd extends Command {
 			} else {
 				steamids = context.getArg();
 			}
-			
+
 			URL statsUrl = new URL("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
 					+ "appid=730"
 					+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
@@ -49,7 +48,7 @@ public class CounterStrikeCmd extends Command {
 
 			JSONArray statsArray = new JSONObject(NetUtils.getHTML(statsUrl)).getJSONObject("playerstats").getJSONArray("stats");
 			JSONObject userObj = new JSONObject(NetUtils.getHTML(userUrl)).getJSONObject("response").getJSONArray("players").getJSONObject(0);
-			
+
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Statistiques Counter-Strike: Global Offensive")
 					.withAuthorIcon("http://www.icon100.com/up/2841/256/csgo.png")
@@ -77,6 +76,17 @@ public class CounterStrikeCmd extends Command {
 			}
 		}
 		return -1;
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Affiche les statistiques d'un utilisateur pour le jeu Counter-Strike: Global Offensive.**")
+				.appendField("Utilisation", "/cs <steamID>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
 }

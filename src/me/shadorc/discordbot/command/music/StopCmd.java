@@ -1,11 +1,14 @@
 package me.shadorc.discordbot.command.music;
 
+import java.awt.Color;
+
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utility.BotUtils;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class StopCmd extends Command {
 
@@ -25,5 +28,15 @@ public class StopCmd extends Command {
 
 		BotUtils.sendMessage(Emoji.WARNING + " L'écoute des musiques a été arrêté par " + context.getAuthorName() +".", context.getChannel());
 		GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Arrête la lecture de toutes les musiques.**");
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

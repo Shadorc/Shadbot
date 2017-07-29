@@ -28,4 +28,14 @@ public class AdminHelpCmd extends Command {
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Affiche l'aide pour les commandes réservées aux administrateurs.**");
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
+	}
+
 }

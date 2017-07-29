@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.admin;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +11,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class AllowsChannelCmd extends Command {
 
@@ -19,29 +21,27 @@ public class AllowsChannelCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		if(context.getArg() == null) {
-			BotUtils.sendMessage(Emoji.WARNING + " Mentionnez un ou plusieurs channels à autoriser.", context.getChannel());
-			return;
+		List <IChannel> channels = context.getMessage().getChannelMentions();
+		if(channels.size() == 0) {
+			throw new IllegalArgumentException();
 		}
 
-		if(context.getArg().equalsIgnoreCase("all")) {
-			this.addChannels(context, context.getGuild().getChannels());
-		} else {
-			List <IChannel> channels = context.getMessage().getChannelMentions();
-			if(channels.size() == 0) {
-				BotUtils.sendMessage(Emoji.WARNING + " Vous devez mentionner au moins un channel.", context.getChannel());
-				return;
-			}
-			this.addChannels(context, channels);
-		}
-	}
-
-	private void addChannels(Context context, List <IChannel> channels) {
 		for(IChannel channel : channels) {
 			if(!Utils.isChannelAllowed(context.getGuild(), channel)) {
 				Storage.storePermission(context.getGuild(), channel);
 			}
 		}
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " Le(s) channel(s) " + channels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " a/ont été ajouté(s) à la liste des channels autorisés.", context.getChannel());
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Autorise Shadbot à poster des messages uniquement dans les channels mentionnés.\nPar défaut, tous les channels sont autorisés.**")
+				.appendField("Utilisation", "/allows_channel <#channel>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

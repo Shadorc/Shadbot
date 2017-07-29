@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.fun;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -18,6 +19,7 @@ import me.shadorc.discordbot.utility.Log;
 import me.shadorc.discordbot.utility.NetUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class ChatCmd extends Command {
 
@@ -37,8 +39,7 @@ public class ChatCmd extends Command {
 
 	private void answer(String arg, IChannel channel) {
 		if(arg == null) {
-			BotUtils.sendMessage(Emoji.WARNING + " Une conversation fonctionne mieux quand on dit quelque chose :)", channel);
-			return;
+			throw new IllegalArgumentException();
 		}
 
 		try {
@@ -57,5 +58,16 @@ public class ChatCmd extends Command {
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la discussion avec le bot.", e, channel);
 		}
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Discute avec l'intelligence artificielle anglaise A.L.I.C.E.**")
+				.appendField("Utilisation", "/chat <message>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

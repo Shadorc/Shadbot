@@ -22,14 +22,12 @@ public class OverwatchCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(Emoji.WARNING + " Veuillez indiquer la plateforme, la région et le Battletag d'un utilisateur.", context.getChannel());
-			return;
+			throw new IllegalArgumentException();
 		}
 
 		String[] splitArgs = context.getArg().split(" ", 3);
 		if(splitArgs.length != 3) {
-			BotUtils.sendMessage(Emoji.WARNING + " Veuillez indiquer la région, la plateforme et le Battletag d'un utilisateur.", context.getChannel());
-			return;
+			throw new IllegalArgumentException();
 		}
 
 		String plateform = splitArgs[0].toLowerCase();
@@ -66,6 +64,17 @@ public class OverwatchCmd extends Command {
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la récupération des informations sur le profil Overwatch, réessayez plus tard.", e, context.getChannel());
 		}
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(new Color(170, 196, 222))
+				.appendDescription("**Affiche les statistiques d'un utilisateur pour le jeu Overwatch.**")
+				.appendField("Utilisation", "/overwatch <pc|psn|xbl> <eu|us|cn|kr> <battletag#0000>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
 }
