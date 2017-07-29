@@ -14,6 +14,7 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
 import me.shadorc.discordbot.utility.NetUtils;
+import me.shadorc.discordbot.utility.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class CounterStrikeCmd extends Command {
@@ -30,30 +31,36 @@ public class CounterStrikeCmd extends Command {
 		}
 
 		try {
+			String steamids;
+			if(!Utils.isInteger(context.getArg())) {
+				steamids = NetUtils.parseHTML(new URL("https://steamcommunity.com/id/" + context.getArg() + "/"), "\"steamid\":\"", "\"steamid\":\"", "\",\"");
+			} else {
+				steamids = context.getArg();
+			}
+			
 			URL statsUrl = new URL("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
 					+ "appid=730"
 					+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
-					+ "&steamid=" + context.getArg());
+					+ "&steamid=" + steamids);
 
 			URL userUrl = new URL("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
 					+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
-					+ "&steamids=" + context.getArg());
+					+ "&steamids=" + steamids);
 
 			JSONArray statsArray = new JSONObject(NetUtils.getHTML(statsUrl)).getJSONObject("playerstats").getJSONArray("stats");
 			JSONObject userObj = new JSONObject(NetUtils.getHTML(userUrl)).getJSONObject("response").getJSONArray("players").getJSONObject(0);
-
+			
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Statistiques Counter-Strike: Global Offensive")
-					.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+					.withAuthorIcon("http://www.icon100.com/up/2841/256/csgo.png")
 					.withThumbnail(userObj.getString("avatarfull"))
 					.withColor(new Color(170, 196, 222))
 					.withDesc("Statistiques pour **" + userObj.getString("personaname") + "**")
 					.appendField("Tués", Integer.toString(this.getValue(statsArray, "total_kills")), true)
 					.appendField("Morts",  Integer.toString(this.getValue(statsArray, "total_deaths")), true)
-					.appendField("Ratio", String.format("%.1f", (float) this.getValue(statsArray, "total_kills")/this.getValue(statsArray, "total_deaths")), true)
+					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills")/this.getValue(statsArray, "total_deaths")), true)
 					.appendField("Nombre de victoires",  Integer.toString(this.getValue(statsArray, "total_wins")), true)
 					.appendField("Nombre de fois meilleur joueur",  Integer.toString(this.getValue(statsArray, "total_mvps")), true)
-					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/1024px-Steam_icon_logo.svg.png")
 					.withFooterText("Profile Steam : http://steamcommunity.com/profiles/" + context.getArg() + "/");
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 

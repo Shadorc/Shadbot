@@ -46,18 +46,19 @@ public class OverwatchCmd extends Command {
 			String topHero = NetUtils.parseTextHTML(html, "<div class=\"title\">", "<div class=\"title\">", "</div>");
 			String topHeroTime = NetUtils.parseTextHTML(html, "<div class=\"description\">", "<div class=\"description\">", "</div>");
 			String timePlayed = NetUtils.parseTextHTML(html, "<td>Temps de jeu</td>", "<td>Temps de jeu</td><td>", "</td>");
+			String rank = NetUtils.parseTextHTML(html, "<div class=\"u-align-center h6\">", "<div class=\"u-align-center h6\">", "</div>");
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Statistiques Overwatch")
-					.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
 					.withThumbnail(icon)
 					.withColor(new Color(170, 196, 222))
-					.withDesc("Statistiques en Partie Rapide pour **" + battletag + "**.")
+					.withDesc("Statistiques pour **" + battletag + "**.")
 					.appendField("Niveau", level, true)
+					.appendField("Rang compétitif", rank, true)
 					.appendField("Parties remportées", wins, true)
 					.appendField("Temps de jeu", timePlayed, true)
-					.appendField("Top héro", topHero + " (" + topHeroTime + ")", true)
-					.withFooterIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
+					.appendField("Top héro (Partie Rapide)", topHero + " (" + topHeroTime + ")", true)
 					.withFooterText("Lien vers la carrière : " + url.toString());
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 		} catch (FileNotFoundException fnf) {
