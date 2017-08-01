@@ -11,6 +11,9 @@ import sx.blah.discord.api.IDiscordClient;
 
 public class Main {
 
+	public static final boolean IS_BETA = false;
+	public static final String DEBUG_CHANNEL_ID = "342074301840752640";
+
 	public static void main(String[] args) {
 		IDiscordClient client = new ClientBuilder()
 				.withToken(Storage.getApiKey(ApiKeys.DISCORD_TOKEN))

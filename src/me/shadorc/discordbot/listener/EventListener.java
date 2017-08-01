@@ -18,12 +18,15 @@ public class EventListener {
 		Log.info("------------------- Shadbot is connected -------------------");
 	}
 
+	@SuppressWarnings("unused")
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
 		IMessage message = event.getMessage();
 
 		//Check if the bot doesn't answer to itself or to another bot
 		if(event.getAuthor().isBot() || event.getAuthor().getStringID().equals(event.getClient().getOurUser().getStringID())) {
+		if((Main.IS_BETA && !event.getChannel().getStringID().equals(Main.DEBUG_CHANNEL_ID)) 
+				|| (!Main.IS_BETA && event.getChannel().getStringID().equals(Main.DEBUG_CHANNEL_ID))) {
 			return;
 		}
 
