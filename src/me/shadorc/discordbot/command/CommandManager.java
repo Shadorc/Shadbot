@@ -5,6 +5,7 @@ import java.util.Map;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
+import me.shadorc.discordbot.command.admin.DebugCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
 import me.shadorc.discordbot.command.currency.LeaderboardCmd;
 import me.shadorc.discordbot.command.currency.TransferCoinsCmd;
@@ -74,7 +75,8 @@ public class CommandManager {
 				new LeaderboardCmd(),
 				new PingCmd(),
 				new OverwatchCmd(),
-				new CounterStrikeCmd()
+				new CounterStrikeCmd(),
+				new DebugCmd()
 				);
 	}
 

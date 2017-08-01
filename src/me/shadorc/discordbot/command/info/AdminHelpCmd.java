@@ -19,9 +19,10 @@ public class AdminHelpCmd extends Command {
 				.withAuthorName("Shadbot Admin Aide")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.withDesc("Aide pour les commandes administrateurs.")
-				.appendField("Commandes :",
-						"`/allows_channel <#channel | all>`", false)
+				.withDesc("Obtenez plus d'informations en utilisant /help <commande>.")
+				.appendField("Commandes :",			
+						"`/allows_channel <#channel>`"
+								+ "\n`/debug`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
 				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
 
