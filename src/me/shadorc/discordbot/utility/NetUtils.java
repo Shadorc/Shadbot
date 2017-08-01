@@ -119,4 +119,48 @@ public class NetUtils {
 
 		return null;
 	}
+
+	/**
+	 * @return Average time to send 1 packet of 32 bytes
+	 * @throws IOException
+	 */
+	public static int getPing() {
+		BufferedReader in = null;
+
+		try {
+			String command = "ping -n 1 www.discordapp.com";
+
+			Process p = Runtime.getRuntime().exec(command);
+			in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+			StringBuilder builder = new StringBuilder();
+
+			String line;
+			while((line = in.readLine()) != null) {
+				builder.append(line + "\n");
+			}
+
+			int average = 0;
+			String[] array = builder.toString().split(" = ");
+			average = Integer.parseInt(array[array.length-1].replaceAll("[^\\d]", ""));
+
+			return average;
+
+		} catch (IOException e) {
+			Log.error("Error while parsing ping.", e);
+			e.printStackTrace();
+
+		} finally {
+			if(in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					Log.error("Error while parsing ping.", e);
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return -1;
+	}
 }

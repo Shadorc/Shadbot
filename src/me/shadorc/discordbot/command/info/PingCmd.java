@@ -1,12 +1,12 @@
 package me.shadorc.discordbot.command.info;
 
 import java.awt.Color;
-import java.time.ZoneId;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
+import me.shadorc.discordbot.utility.NetUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class PingCmd extends Command {
@@ -17,9 +17,7 @@ public class PingCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		long messageMillisTime = context.getMessage().getCreationDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-		long currentMillisTime = System.currentTimeMillis();
-		long ping = currentMillisTime - messageMillisTime;
+		long ping = NetUtils.getPing();
 		BotUtils.sendMessage(Emoji.GEAR + " Ping : " + ping + "ms", context.getChannel());
 	}
 
