@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.listener;
 
+import me.shadorc.discordbot.Main;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -14,8 +15,8 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		event.getClient().changePlayingText("/help");
 		Log.info("------------------- Shadbot is connected -------------------");
+		event.getClient().changePlayingText("/help");
 	}
 
 	@SuppressWarnings("unused")
@@ -23,8 +24,10 @@ public class EventListener {
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
 		IMessage message = event.getMessage();
 
-		//Check if the bot doesn't answer to itself or to another bot
-		if(event.getAuthor().isBot() || event.getAuthor().getStringID().equals(event.getClient().getOurUser().getStringID())) {
+		if(event.getAuthor().isBot()) {
+			return;
+		}
+
 		if((Main.IS_BETA && !event.getChannel().getStringID().equals(Main.DEBUG_CHANNEL_ID)) 
 				|| (!Main.IS_BETA && event.getChannel().getStringID().equals(Main.DEBUG_CHANNEL_ID))) {
 			return;
