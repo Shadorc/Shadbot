@@ -25,7 +25,7 @@ public class NetUtils {
 			connection.setReadTimeout(5000);
 			connection.connect();
 
-			reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
 
 			StringBuilder html = new StringBuilder();
 
@@ -77,7 +77,7 @@ public class NetUtils {
 			connection.setReadTimeout(5000);
 			connection.connect();
 
-			reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
 
 			String line;
 			while((line = reader.readLine()) != null) {
