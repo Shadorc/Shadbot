@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.command.admin.AdminHelpCmd;
 import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
 import me.shadorc.discordbot.command.admin.DebugCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
@@ -17,7 +18,6 @@ import me.shadorc.discordbot.command.game.DiceCmd;
 import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd;
-import me.shadorc.discordbot.command.info.AdminHelpCmd;
 import me.shadorc.discordbot.command.info.CounterStrikeCmd;
 import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.OverwatchCmd;

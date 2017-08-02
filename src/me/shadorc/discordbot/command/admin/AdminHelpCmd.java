@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.info;
+package me.shadorc.discordbot.command.admin;
 
 import java.awt.Color;
 
@@ -21,8 +21,8 @@ public class AdminHelpCmd extends Command {
 				.withColor(new Color(170, 196, 222))
 				.withDesc("Obtenez plus d'informations en utilisant /help <commande>.")
 				.appendField("Commandes :",			
-						"`/allows_channel <#channel>`"
-								+ "\n`/debug`", false)
+						"`/allows_channel`"
+								+ " `/debug`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
 				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
 
