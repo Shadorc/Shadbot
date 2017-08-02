@@ -30,6 +30,7 @@ import me.shadorc.discordbot.command.music.PlaylistCmd;
 import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
+import me.shadorc.discordbot.command.rpg.InfoCmd;
 import me.shadorc.discordbot.command.utility.CalcCmd;
 import me.shadorc.discordbot.command.utility.HolidaysCmd;
 import me.shadorc.discordbot.command.utility.TranslateCmd;
@@ -76,7 +77,8 @@ public class CommandManager {
 				new PingCmd(),
 				new OverwatchCmd(),
 				new CounterStrikeCmd(),
-				new DebugCmd()
+				new DebugCmd(),
+				new InfoCmd()
 				);
 	}
 
