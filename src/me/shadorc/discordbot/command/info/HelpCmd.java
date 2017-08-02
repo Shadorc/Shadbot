@@ -21,39 +21,38 @@ public class HelpCmd extends Command {
 				.withColor(new Color(170, 196, 222))
 				.withDesc("Obtenez plus d'informations en utilisant /help <commande>.")
 				.appendField("Commandes Utiles :",
-						"`/trad <lang1> <lang2> <texte>`"
-								+ "\n`/wiki <recherche>`"
-								+ "\n`/vacs <zone>`"
-								+ "\n`/calc <calcul>`"
-								+ "\n`/meteo <ville>`", false)
+						"`/trad`"
+								+ " `/wiki`"
+								+ " `/vacs`"
+								+ " `/calc`"
+								+ " `/meteo`", false)
 				.appendField("Commandes Fun :",
-						"`/chat <message>`"
-								+ "\n`/gif <tag>`"
-								+ "\n`/gif`"
-								+ "\n`/dtc`"
-								+ "\n`/blague`", false)
+						"`/chat`"
+								+ " `/gif`"
+								+ " `/dtc`"
+								+ " `/blague`", false)
 				.appendField("Commandes Jeux :",
-						"`/dice <mise> <num>`"
-								+ "\n`/roulette_russe`"
-								+ "\n`/machine_sous`"
-								+ "\n`/trivia`", false)
+						"`/dice`"
+								+ " `/roulette_russe`"
+								+ " `/machine_sous`"
+								+ " `/trivia`", false)
 				.appendField("Commandes Argent :",
-						"`/transfert <montant> <@utilisateur>`"
-								+ "\n`/leaderboard`"
-								+ "\n`/coins`", false)
+						"`/transfert`"
+								+ " `/leaderboard`"
+								+ " `/coins`", false)
 				.appendField("Commandes Musique:",
-						"`/play <music>`"
-								+ "\n`/volume <0-100>`"
-								+ "\n`/pause`"
-								+ "\n`/repeat`"
-								+ "\n`/stop`"
-								+ "\n`/next`"
-								+ "\n`/nom`"
-								+ "\n`/playlist`", false)
+						"`/play`"
+								+ " `/volume`"
+								+ " `/pause`"
+								+ " `/repeat`"
+								+ " `/stop`"
+								+ " `/next`"
+								+ " `/nom`"
+								+ " `/playlist`", false)
 				.appendField("Commandes Infos:",
-						"`/overwatch <pc|psn|xbl> <eu|us|cn|kr> <battletag#0000>`"
-								+ "\n`/cs <steamID>`"
-								+ "\n`/ping`", false)
+						"`/overwatch`"
+								+ " `/cs`"
+								+ " `/ping`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
 				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
 
