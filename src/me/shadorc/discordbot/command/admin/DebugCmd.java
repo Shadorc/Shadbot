@@ -28,7 +28,7 @@ public class DebugCmd extends Command {
 				.appendField("Channel(s)", context.getGuild().getChannels().stream().map(
 						channel -> channel.mention() 
 						+ " | ID: " + channel.getStringID()
-						+ " | Autorisé : " + Storage.getAllowedChannels(context.getGuild()).toString().contains(channel.getStringID()))
+						+ " | Autorisé : " + (Storage.getAllowedChannels(context.getGuild()) == null ? "true" : Storage.getAllowedChannels(context.getGuild()).toString().contains(channel.getStringID())))
 						.collect(Collectors.joining("\n")), true);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
