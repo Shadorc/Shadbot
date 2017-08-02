@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -28,7 +29,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class TriviaCmd extends Command {
 
-	private static final int GAIN = 25;
+	private static final int GAINS = 25;
 	private static final Map<IGuild, GuildTriviaManager> GUILDS_TRIVIA = new HashMap<>();
 
 	public TriviaCmd() {
@@ -51,12 +52,12 @@ public class TriviaCmd extends Command {
 
 	public class GuildTriviaManager {
 
-		private IChannel channel;
-		private ArrayList <IUser> alreadyAnswered;
+		private final IChannel channel;
+		private final ArrayList <IUser> alreadyAnswered;
+		private final Timer timer;
 		private boolean isStarted;
 		private String correctAnswer;
 		private JSONArray incorrectAnswers;
-		private Timer timer;
 
 		private GuildTriviaManager(IChannel channel) {
 			this.channel = channel;
@@ -121,8 +122,8 @@ public class TriviaCmd extends Command {
 				}
 			}
 			else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), this.correctAnswer.toLowerCase()) < 2) {
-				BotUtils.sendMessage(Emoji.CLAP + " Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes " + GAIN + " coins.", channel);
-				Utils.addCoins(message.getGuild(), message.getAuthor(), GAIN);
+				BotUtils.sendMessage(Emoji.CLAP + " Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes " + GAINS + " coins.", channel);
+				Storage.getUser(message.getGuild(), message.getAuthor()).addCoins(GAINS);
 				this.stop();
 			}
 		}
@@ -145,7 +146,7 @@ public class TriviaCmd extends Command {
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
 				.appendDescription("**Lance une partie de Trivia. Une fois la partie lancée, tout le monde peut participer.**")
-				.appendField("Gains", "Le gagnant remporte " + GAIN + " coins.", false);
+				.appendField("Gains", "Le gagnant remporte " + GAINS + " coins.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

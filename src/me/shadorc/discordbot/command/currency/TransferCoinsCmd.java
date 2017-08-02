@@ -4,11 +4,10 @@ import java.awt.Color;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.User;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
-import me.shadorc.discordbot.utility.Utils;
-import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class TransferCoinsCmd extends Command {
@@ -30,21 +29,22 @@ public class TransferCoinsCmd extends Command {
 
 		try {
 			int coins = Integer.parseInt(splitCmd[0]);
-			IUser user = context.getMessage().getMentions().get(0);
+			User receiverUser = Storage.getUser(context.getGuild(), context.getMessage().getMentions().get(0));
+			User senderUser = context.getUser();
 
-			if(coins <= 0 || user.equals(context.getAuthor())) {
+			if(coins <= 0 || senderUser.equals(receiverUser)) {
 				throw new IllegalArgumentException();
 			}
 
-			if(Storage.getCoins(context.getGuild(), context.getAuthor()) < coins) {
+			if(senderUser.getCoins() < coins) {
 				BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour effectuer ce transfert.", context.getChannel());
 				return;
 			}
 
-			Utils.addCoins(context.getGuild(), context.getAuthor(), -coins);
-			Utils.addCoins(context.getGuild(), user, coins);
+			senderUser.addCoins(-coins);
+			receiverUser.addCoins(coins);
 
-			BotUtils.sendMessage(Emoji.BANK + " " + context.getAuthor().mention() + " a transféré " + coins + " coins à " + user.mention(), context.getChannel());
+			BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " a transféré " + coins + " coins à " + receiverUser.mention(), context.getChannel());
 		} catch(NumberFormatException e1) {
 			throw new IllegalArgumentException();
 		}

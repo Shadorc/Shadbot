@@ -3,7 +3,6 @@ package me.shadorc.discordbot.command.game;
 import java.awt.Color;
 
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -30,7 +29,7 @@ public class SlotMachineCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < PAID_COST) {
+		if(context.getUser().getCoins() < PAID_COST) {
 			BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour jouer à la machine à sous, une partie coûte " + PAID_COST + ".", context.getChannel());
 			return;
 		}
@@ -39,22 +38,22 @@ public class SlotMachineCmd extends Command {
 		SlotOptions slot2 = slotsArray[Utils.rand(slotsArray.length)];
 		SlotOptions slot3 = slotsArray[Utils.rand(slotsArray.length)];
 
-		int gain = -PAID_COST;
+		int gains = -PAID_COST;
 
 		if(slot1 == SlotOptions.CHERRIES && slot2 == SlotOptions.CHERRIES && slot3 == SlotOptions.CHERRIES) {
-			gain = 30;
+			gains = 30;
 		}
 		else if(slot1 == SlotOptions.BELL && slot2 == SlotOptions.BELL && slot3 == SlotOptions.BELL) {
-			gain = 150;
+			gains = 150;
 		}
 		else if(slot1 == SlotOptions.GIFT && slot2 == SlotOptions.GIFT && slot3 == SlotOptions.GIFT) {
-			gain = 5000;
+			gains = 5000;
 		}
-		Utils.addCoins(context.getGuild(), context.getAuthor(), gain);
+		context.getUser().addCoins(gains);
 
 		StringBuilder message = new StringBuilder();
 		message.append(":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":");
-		message.append("\nVous avez "+ (gain > 0 ? "gagné" : "perdu") + " " + Math.abs(gain) + " coins !");
+		message.append("\nVous avez "+ (gains > 0 ? "gagné" : "perdu") + " " + Math.abs(gains) + " coins !");
 		BotUtils.sendMessage(message.toString(), context.getChannel());
 	}
 

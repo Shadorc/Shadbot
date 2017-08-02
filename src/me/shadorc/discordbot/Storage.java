@@ -3,12 +3,10 @@ package me.shadorc.discordbot;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import me.shadorc.discordbot.utility.Log;
 import sx.blah.discord.handle.obj.IChannel;
@@ -44,8 +42,10 @@ public class Storage {
 					writer = new FileWriter(DATA_FILE);
 					writer.write(new JSONObject().toString());
 					writer.flush();
+
 				} catch (IOException e) {
 					Log.error("Error while saving in storage file.", e);
+
 				} finally {
 					try {
 						if(writer != null) {
@@ -68,7 +68,7 @@ public class Storage {
 
 		FileWriter writer = null;
 		try {
-			JSONObject mainObj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
+			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 
 			if(!mainObj.has(guild.getStringID())) {
 				mainObj.put(guild.getStringID(), new JSONObject());
@@ -83,8 +83,10 @@ public class Storage {
 			writer = new FileWriter(DATA_FILE);
 			writer.write(mainObj.toString(2));
 			writer.flush();
+
 		} catch (IOException e) {
 			Log.error("Error while saving in storage file.", e);
+
 		} finally {
 			try {
 				if(writer != null) {
@@ -96,26 +98,29 @@ public class Storage {
 		}
 	}
 
-	public static synchronized void storeCoins(IGuild guild, IUser user, int coins) {
+	public static synchronized void storeUser(User user) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
 
 		FileWriter writer = null;
 		try {
-			JSONObject mainObj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
+			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 
-			if(!mainObj.has(guild.getStringID())) {
-				mainObj.put(guild.getStringID(), new JSONObject());
+			if(!mainObj.has(user.getGuild().getStringID())) {
+				mainObj.put(user.getGuild().getStringID(), new JSONObject());
 			}
-			JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
-			guildObj.put(user.getStringID(), Integer.toString(coins));
+			JSONObject guildObj = mainObj.getJSONObject(user.getGuild().getStringID());
+
+			guildObj.put(user.getStringID(), user.toJSON());
 
 			writer = new FileWriter(DATA_FILE);
 			writer.write(mainObj.toString(2));
 			writer.flush();
+
 		} catch (IOException e) {
 			Log.error("Error while saving in storage file.", e);
+
 		} finally {
 			try {
 				if(writer != null) {
@@ -133,42 +138,46 @@ public class Storage {
 		}
 
 		try {
-			JSONObject mainObj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
+			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 			if(mainObj.has(guild.getStringID())) {
 				JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
 				if(guildObj.has(Permissions.AUTHORIZED_CHANNELS)) {
 					return guildObj.getJSONArray(Permissions.AUTHORIZED_CHANNELS);
 				}
 			}
+
 		} catch (IOException e) {
 			Log.error("Error while reading data file.", e);
 		}
 		return null;
 	}
 
-	public static synchronized int getCoins(IGuild guild, IUser user) {
+	public static synchronized User getUser(IGuild guild, IUser user) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
 
 		try {
-			JSONObject mainObj = new JSONObject(new String(Files.readAllBytes(Paths.get(DATA_FILE.getPath())), StandardCharsets.UTF_8));
+			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
+
 			if(mainObj.has(guild.getStringID())) {
 				JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
 				if(guildObj.has(user.getStringID())) {
-					return Integer.parseInt(guildObj.getString(user.getStringID()));
+					return new User(guild, user.getLongID(), guildObj.getJSONObject(user.getStringID()));
 				}
 			}
+
 		} catch (IOException e) {
 			Log.error("Error while reading data file.", e);
 		}
-		return 0;
+
+		return new User(guild, user);
 	}
 
 	public static synchronized String getApiKey(ApiKeys key) {
 		try {
-			JSONObject obj = new JSONObject(new String(Files.readAllBytes(Paths.get(API_KEYS_FILE.getPath())), StandardCharsets.UTF_8));
-			return obj.getString(key.toString());
+			JSONObject mainObj = new JSONObject(new JSONTokener(API_KEYS_FILE.toURI().toURL().openStream()));
+			return mainObj.getString(key.toString());
 		} catch (IOException e) {
 			Log.error("Error while accessing to API keys file.", e);
 		}

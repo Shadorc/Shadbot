@@ -22,13 +22,13 @@ public class GuildMusicManager extends AudioEventAdapter {
 	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
 	private final static Map<Long, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
 
-	private IGuild guild;
+	private final IGuild guild;
+	private final AudioPlayer player;
+	private final TrackScheduler scheduler;
+	private final Timer leaveTimer;
 	private IChannel channel;
-	private AudioPlayer player;
-	private TrackScheduler scheduler;
-	private Timer leaveTimer;
 
-	public GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
+	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
 		this.guild = guild;
 		this.player = manager.createPlayer();
 		this.scheduler = new TrackScheduler(player);

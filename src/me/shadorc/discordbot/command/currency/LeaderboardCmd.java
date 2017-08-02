@@ -22,7 +22,7 @@ public class LeaderboardCmd extends Command {
 	public void execute(Context context) {
 		Map <IUser, Integer> usersCoin = new HashMap<>();
 		for(IUser user : context.getGuild().getUsers()) {
-			int userCoin = Storage.getCoins(context.getGuild(), user);
+			int userCoin = Storage.getUser(context.getGuild(), user).getCoins();
 			if(userCoin > 0) {
 				usersCoin.put(user, userCoin);
 			}

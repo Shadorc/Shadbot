@@ -1,5 +1,7 @@
 package me.shadorc.discordbot.command;
 
+import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.User;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
@@ -10,9 +12,9 @@ import sx.blah.discord.handle.obj.Permissions;
 
 public class Context {
 
-	private MessageReceivedEvent event;
-	private String command;
-	private String arg;
+	private final MessageReceivedEvent event;
+	private final String command;
+	private final String arg;
 
 	public Context(MessageReceivedEvent event) {
 		this.event = event;
@@ -20,6 +22,10 @@ public class Context {
 		String[] splitMessage = event.getMessage().getContent().split(" ", 2);
 		this.command = splitMessage[0].substring(1).toLowerCase().trim();
 		this.arg = (splitMessage.length > 1) ? splitMessage[1].trim() : null;
+	}
+
+	public User getUser() {
+		return Storage.getUser(this.getGuild(), this.getAuthor());
 	}
 
 	public IUser getAuthor() {

@@ -44,7 +44,7 @@ public class DiceCmd extends Command {
 				throw new IllegalArgumentException();
 			}
 
-			if(Storage.getCoins(context.getGuild(), context.getAuthor()) < bet) {
+			if(context.getUser().getCoins() < bet) {
 				BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour effectuer cette mise.", context.getChannel());
 				return;
 			}
@@ -55,7 +55,7 @@ public class DiceCmd extends Command {
 		else {
 			DiceManager diceManager = GUILDS_DICE.get(context.getGuild());
 
-			if(Storage.getCoins(context.getGuild(), context.getAuthor()) < diceManager.getBet()) {
+			if(context.getUser().getCoins() < diceManager.getBet()) {
 				BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour rejoindre cette partie.", context.getChannel());
 				return;
 			}
@@ -85,7 +85,7 @@ public class DiceCmd extends Command {
 		}
 	}
 
-	public class DiceManager {
+	private class DiceManager {
 
 		private HashMap<Integer, IUser> numsPlayers;
 		private IChannel channel;
@@ -105,7 +105,7 @@ public class DiceCmd extends Command {
 			this.start();
 		}
 
-		public void addPlayer(IUser user, int num) {
+		private void addPlayer(IUser user, int num) {
 			this.numsPlayers.put(num, user);
 		}
 
@@ -113,11 +113,11 @@ public class DiceCmd extends Command {
 			return bet;
 		}
 
-		public boolean isAlreadyPlaye(IUser user) {
+		private boolean isAlreadyPlaye(IUser user) {
 			return numsPlayers.containsValue(user);
 		}
 
-		public boolean isAlreadyBet(int num) {
+		private boolean isAlreadyBet(int num) {
 			return numsPlayers.containsKey(num);
 		}
 
@@ -145,7 +145,7 @@ public class DiceCmd extends Command {
 				IUser winner = numsPlayers.get(rand);
 				int gains = bet*numsPlayers.size()*MULTIPLIER;
 				BotUtils.sendMessage(Emoji.DICE + " Bravo " + winner.mention() + ", tu remportes " + gains + " coins !", channel);
-				Utils.addCoins(channel.getGuild(), winner, gains);
+				Storage.getUser(channel.getGuild(), winner).addCoins(gains);
 				numsPlayers.remove(rand);
 			}
 
@@ -153,7 +153,7 @@ public class DiceCmd extends Command {
 				StringBuilder strBuilder = new StringBuilder(Emoji.LOST_MONEY + " Désolé, ");
 				for(int num : numsPlayers.keySet()) {
 					if(rand != num) {
-						Utils.addCoins(channel.getGuild(), numsPlayers.get(num), -bet);
+						Storage.getUser(channel.getGuild(), numsPlayers.get(num)).addCoins(-bet);
 						strBuilder.append(numsPlayers.get(num).mention() + ", ");
 					}
 				}

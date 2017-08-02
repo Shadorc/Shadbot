@@ -3,7 +3,6 @@ package me.shadorc.discordbot.command.game;
 import java.awt.Color;
 
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utility.BotUtils;
@@ -23,11 +22,11 @@ public class RussianRouletteCmd extends Command {
 		if(Utils.rand(6) == 0) {
 			BotUtils.sendMessage(Emoji.DICE + " Une goutte de sueur coule sur votre front, vous pressez la détente... **PAN** ... "
 					+ "Désolé, vous êtes mort, vous perdez tous vos gains.", context.getChannel());
-			Storage.storeCoins(context.getGuild(), context.getAuthor(), 0);
+			context.getUser().setCoins(0);
 		} else {
 			BotUtils.sendMessage(Emoji.DICE + " Une goutte de sueur coule sur votre front, vous pressez la détente... **click** ... "
 					+ "Pfiou, vous êtes toujours en vie, vous remportez " + GAIN + " coins !", context.getChannel());
-			Utils.addCoins(context.getGuild(), context.getAuthor(), GAIN);
+			context.getUser().addCoins(GAIN);
 		}
 	}
 

@@ -9,7 +9,7 @@ public class RateLimiter {
 
 	private static final HashMap <IGuild, HashMap <IUser, Long>> GUILDS_RATELIMITER = new HashMap<>();
 
-	private int timeout;
+	private final int timeout;
 
 	public RateLimiter(int timeout) {
 		this.timeout = timeout;

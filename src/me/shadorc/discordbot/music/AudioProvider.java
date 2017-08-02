@@ -8,7 +8,7 @@ import sx.blah.discord.handle.audio.IAudioProvider;
 
 public class AudioProvider implements IAudioProvider {
 
-	private AudioPlayer audioPlayer;
+	private final AudioPlayer audioPlayer;
 	private AudioFrame lastFrame;
 
 	public AudioProvider(AudioPlayer audioPlayer) {

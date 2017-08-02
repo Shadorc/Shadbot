@@ -10,7 +10,7 @@ import sx.blah.discord.util.RequestBuffer;
 
 public class BotUtils {
 
-	private static CommandManager cmdManager = new CommandManager();
+	private final static CommandManager CMD_MANAGER = new CommandManager();
 
 	public static void sendMessage(String message, IChannel channel) {
 		try {
@@ -40,6 +40,6 @@ public class BotUtils {
 	}
 
 	public static void executeCommand(MessageReceivedEvent event) {
-		cmdManager.manage(event);
+		CMD_MANAGER.manage(event);
 	}
 }

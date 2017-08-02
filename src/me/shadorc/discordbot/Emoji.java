@@ -7,7 +7,6 @@ public interface Emoji {
 	String CROSS = ":heavy_multiplication_x:";
 	String INFO = ":information_source:";
 
-	String SLOT_MACHINE = ":slot_machine:";
 	String LOST_MONEY = ":money_with_wings:";
 	String HOURGLASS = ":hourglass:";
 	String PURSE = ":purse:";

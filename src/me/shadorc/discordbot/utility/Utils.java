@@ -26,7 +26,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import me.shadorc.discordbot.Storage;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IUser;
 
 public class Utils {
 
@@ -105,11 +104,6 @@ public class Utils {
 
 	public static int rand(int bound) {
 		return RAND.nextInt(bound);
-	}
-
-	public static void addCoins(IGuild guild, IUser user, int gain) {
-		int coins = Storage.getCoins(guild, user);
-		Storage.storeCoins(guild, user, coins+gain);
 	}
 
 	public static int getLevenshteinDistance(String word1, String word2) {
