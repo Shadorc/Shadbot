@@ -118,8 +118,7 @@ public class CommandManager {
 				}
 			}
 		} else {
-			BotUtils.sendMessage(Emoji.CROSS + " Cette commande n'existe pas, pour la liste des commandes disponibles, entrez /help.", event.getChannel());
-			Log.warn("La commande " + context.getCommand() + " a été essayée sans résultat.");
+			Log.warn("The command \"" + context.getCommand() + "\" has been tried without result.");
 		}
 	}
 }
