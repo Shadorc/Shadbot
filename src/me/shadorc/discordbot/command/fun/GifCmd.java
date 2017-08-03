@@ -26,6 +26,11 @@ public class GifCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
+		if(!context.getChannel().isNSFW()) {
+			BotUtils.sendMessage(Emoji.WARNING + " Vous devez être dans un salon NSFW pour utiliser les gifs.", context.getChannel());
+			return;
+		}
+
 		if(context.getArg() == null) {
 			try {
 				String gifUrl = NetUtils.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
