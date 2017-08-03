@@ -7,10 +7,10 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class InfoCmd extends Command {
+public class CharacterCmd extends Command {
 
-	public InfoCmd() {
-		super(false, "info", "infos");
+	public CharacterCmd() {
+		super(false, "character", "personnage");
 	}
 
 	@Override

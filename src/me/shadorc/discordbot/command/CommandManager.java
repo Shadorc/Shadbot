@@ -30,7 +30,7 @@ import me.shadorc.discordbot.command.music.PlaylistCmd;
 import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
-import me.shadorc.discordbot.command.rpg.InfoCmd;
+import me.shadorc.discordbot.command.rpg.CharacterCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
 import me.shadorc.discordbot.command.utils.HolidaysCmd;
 import me.shadorc.discordbot.command.utils.TranslateCmd;
@@ -78,6 +78,7 @@ public class CommandManager {
 				new OverwatchCmd(),
 				new CounterStrikeCmd(),
 				new DebugCmd(),
+				new CharacterCmd(),
 				new InfoCmd()
 				);
 	}
@@ -97,7 +98,7 @@ public class CommandManager {
 	public void manage(MessageReceivedEvent event) {
 		Context context = new Context(event);
 
-		if(!Utils.isChannelAllowed(context.getGuild(), context.getChannel())) {
+		if(!BotUtils.isChannelAllowed(context.getGuild(), context.getChannel())) {
 			return;
 		}
 
