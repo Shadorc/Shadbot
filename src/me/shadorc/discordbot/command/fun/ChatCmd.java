@@ -54,7 +54,7 @@ public class ChatCmd extends Command {
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, channel);
 		} catch (SocketTimeoutException e) {
 			BotUtils.sendMessage(Emoji.WARNING + " La discussion n'est pas disponible actuellement.", channel);
-			Log.warn("A.L.I.C.E. ne répond pas.");
+			Log.warn("A.L.I.C.E. doesn't respond.");
 		} catch (IOException e) {
 			Log.error("Une erreur est survenue lors de la discussion avec le bot.", e, channel);
 		}

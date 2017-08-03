@@ -148,15 +148,13 @@ public class NetUtils {
 
 		} catch (IOException e) {
 			Log.error("Error while parsing ping.", e);
-			e.printStackTrace();
 
 		} finally {
 			if(in != null) {
 				try {
 					in.close();
 				} catch (IOException e) {
-					Log.error("Error while parsing ping.", e);
-					e.printStackTrace();
+					Log.error("Error while closing reader during ping parsing.", e);
 				}
 			}
 		}

@@ -22,7 +22,7 @@ public class BotUtils {
 		} catch (MissingPermissionsException e) {
 			Log.warn("Missing permissions for channel \"" + channel.getName() + "\" (ID: " + channel.getStringID() + ")");
 		} catch (DiscordException e) {
-			Log.error(e.getErrorMessage(), e);
+			Log.error("Discord exception while sending message : " + e.getErrorMessage(), e);
 		}
 	}
 
@@ -35,7 +35,7 @@ public class BotUtils {
 		} catch (MissingPermissionsException e) {
 			Log.warn("Missing permissions for channel \"" + channel.getName() + "\" (ID: " + channel.getStringID() + ")");
 		} catch (DiscordException e) {
-			Log.error(e.getErrorMessage(), e);
+			Log.error("Discord exception while sending embed : " + e.getErrorMessage(), e);
 		}
 	}
 

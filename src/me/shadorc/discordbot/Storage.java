@@ -36,28 +36,24 @@ public class Storage {
 
 	private static void init() {
 		if(!DATA_FILE.exists()) {
+			FileWriter writer = null;
 			try {
 				DATA_FILE.createNewFile();
-				FileWriter writer = null;
-				try {
-					writer = new FileWriter(DATA_FILE);
-					writer.write(new JSONObject().toString());
-					writer.flush();
+				writer = new FileWriter(DATA_FILE);
+				writer.write(new JSONObject().toString());
+				writer.flush();
 
-				} catch (IOException e) {
-					Log.error("Error while saving in storage file.", e);
-
-				} finally {
-					try {
-						if(writer != null) {
-							writer.close();
-						}
-					} catch (IOException e) {
-						Log.error("Error while closing writer.", e);
-					}
-				}
 			} catch (IOException e) {
-				Log.error("Error while creating storage file.", e);
+				Log.error("Error while saving data file during initialization.", e);
+
+			} finally {
+				try {
+					if(writer != null) {
+						writer.close();
+					}
+				} catch (IOException e) {
+					Log.error("Error while closing writer during initialization.", e);
+				}
 			}
 		}
 	}
@@ -86,7 +82,7 @@ public class Storage {
 			writer.flush();
 
 		} catch (IOException e) {
-			Log.error("Error while saving in storage file.", e);
+			Log.error("Error while saving permissions.", e);
 
 		} finally {
 			try {
@@ -94,7 +90,7 @@ public class Storage {
 					writer.close();
 				}
 			} catch (IOException e) {
-				Log.error("Error while closing writer.", e);
+				Log.error("Error while closing writer during saving of the permissions.", e);
 			}
 		}
 	}
@@ -120,7 +116,7 @@ public class Storage {
 			writer.flush();
 
 		} catch (IOException e) {
-			Log.error("Error while saving in storage file.", e);
+			Log.error("Error while saving user.", e);
 
 		} finally {
 			try {
@@ -128,7 +124,7 @@ public class Storage {
 					writer.close();
 				}
 			} catch (IOException e) {
-				Log.error("Error while closing writer.", e);
+				Log.error("Error while closing writer during saving of the user.", e);
 			}
 		}
 	}
@@ -180,7 +176,7 @@ public class Storage {
 			JSONObject mainObj = new JSONObject(new JSONTokener(API_KEYS_FILE.toURI().toURL().openStream()));
 			return mainObj.getString(key.toString());
 		} catch (IOException e) {
-			Log.error("Error while accessing to API keys file.", e);
+			Log.error("Error while reading API keys file.", e);
 		}
 		return null;
 	}
