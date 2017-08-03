@@ -20,6 +20,7 @@ import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.info.CounterStrikeCmd;
 import me.shadorc.discordbot.command.info.HelpCmd;
+import me.shadorc.discordbot.command.info.InfoCmd;
 import me.shadorc.discordbot.command.info.OverwatchCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
@@ -38,7 +39,6 @@ import me.shadorc.discordbot.command.utils.WeatherCmd;
 import me.shadorc.discordbot.command.utils.WikiCmd;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Log;
-import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 public class CommandManager {
