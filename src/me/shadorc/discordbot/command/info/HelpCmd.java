@@ -49,9 +49,11 @@ public class HelpCmd extends Command {
 								+ " `/next`"
 								+ " `/nom`"
 								+ " `/playlist`", false)
-				.appendField("Commandes Infos:",
+				.appendField("Commandes Statistiques Jeux:",
 						"`/overwatch`"
-								+ " `/cs`"
+								+ " `/cs`", false)
+				.appendField("Commandes Info:",
+						" `/info`"
 								+ " `/ping`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
 				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
