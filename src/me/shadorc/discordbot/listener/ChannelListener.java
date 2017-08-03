@@ -2,7 +2,7 @@ package me.shadorc.discordbot.listener;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.music.GuildMusicManager;
-import me.shadorc.discordbot.utility.BotUtils;
+import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelEvent;
 import sx.blah.discord.handle.obj.IVoiceChannel;

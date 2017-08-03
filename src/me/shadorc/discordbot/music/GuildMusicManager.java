@@ -13,7 +13,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.utility.BotUtils;
+import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 

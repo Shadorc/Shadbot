@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.discordbot.utility.Utils;
+import me.shadorc.discordbot.utils.Utils;
 
 public class TrackScheduler {
 

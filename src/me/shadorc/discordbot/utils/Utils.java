@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.utility;
+package me.shadorc.discordbot.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.utility;
+package me.shadorc.discordbot.utils;
 
 import me.shadorc.discordbot.command.CommandManager;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;

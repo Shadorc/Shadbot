@@ -7,7 +7,7 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.rpg.User;
-import me.shadorc.discordbot.utility.BotUtils;
+import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class TransferCoinsCmd extends Command {

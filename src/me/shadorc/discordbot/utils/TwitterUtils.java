@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.utility;
+package me.shadorc.discordbot.utils;
 
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;

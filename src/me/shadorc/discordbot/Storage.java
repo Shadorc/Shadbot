@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import me.shadorc.discordbot.rpg.User;
-import me.shadorc.discordbot.utility.Log;
+import me.shadorc.discordbot.utils.Log;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;

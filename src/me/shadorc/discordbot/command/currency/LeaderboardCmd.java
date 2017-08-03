@@ -7,8 +7,8 @@ import java.util.Map;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.utility.BotUtils;
-import me.shadorc.discordbot.utility.Utils;
+import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 

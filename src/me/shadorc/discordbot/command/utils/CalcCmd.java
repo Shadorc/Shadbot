@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.utility;
+package me.shadorc.discordbot.command.utils;
 
 import java.awt.Color;
 
@@ -9,7 +9,7 @@ import javax.script.ScriptException;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.utility.BotUtils;
+import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class CalcCmd extends Command {

@@ -10,9 +10,9 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.utility.BotUtils;
-import me.shadorc.discordbot.utility.Log;
-import me.shadorc.discordbot.utility.NetUtils;
+import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.Log;
+import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class BashCmd extends Command {

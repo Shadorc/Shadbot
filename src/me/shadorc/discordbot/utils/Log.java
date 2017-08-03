@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.utility;
+package me.shadorc.discordbot.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

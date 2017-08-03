@@ -31,14 +31,14 @@ import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.rpg.InfoCmd;
-import me.shadorc.discordbot.command.utility.CalcCmd;
-import me.shadorc.discordbot.command.utility.HolidaysCmd;
-import me.shadorc.discordbot.command.utility.TranslateCmd;
-import me.shadorc.discordbot.command.utility.WeatherCmd;
-import me.shadorc.discordbot.command.utility.WikiCmd;
-import me.shadorc.discordbot.utility.BotUtils;
-import me.shadorc.discordbot.utility.Log;
-import me.shadorc.discordbot.utility.Utils;
+import me.shadorc.discordbot.command.utils.CalcCmd;
+import me.shadorc.discordbot.command.utils.HolidaysCmd;
+import me.shadorc.discordbot.command.utils.TranslateCmd;
+import me.shadorc.discordbot.command.utils.WeatherCmd;
+import me.shadorc.discordbot.command.utils.WikiCmd;
+import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.Log;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 public class CommandManager {

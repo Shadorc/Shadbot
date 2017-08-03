@@ -12,9 +12,9 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
-import me.shadorc.discordbot.utility.BotUtils;
-import me.shadorc.discordbot.utility.Log;
-import me.shadorc.discordbot.utility.Utils;
+import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.Log;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
