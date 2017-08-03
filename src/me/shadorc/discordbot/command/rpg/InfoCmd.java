@@ -15,7 +15,6 @@ public class InfoCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("RPG Stats")
 				.withAuthorIcon(context.getAuthor().getAvatarURL())
