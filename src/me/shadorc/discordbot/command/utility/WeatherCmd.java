@@ -18,7 +18,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class WeatherCmd extends Command{
 
 	public WeatherCmd() {
-		super(false, "meteo", "météo", "weather");
+		super(false, "meteo", "weather");
 	}
 
 	@Override

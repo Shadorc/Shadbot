@@ -13,7 +13,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class TransferCoinsCmd extends Command {
 
 	public TransferCoinsCmd() {
-		super(false, "transfert", "transferer", "donner", "transfer");
+		super(false, "transfert", "transfer");
 	}
 
 	@Override
