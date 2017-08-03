@@ -8,6 +8,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.NumberFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -18,18 +22,68 @@ import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.json.JSONArray;
 
+import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import me.shadorc.discordbot.Storage;
+import sx.blah.discord.Discord4J;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 
 public class Utils {
 
 	private static final Random RAND = new Random();
+
+	public static String getGlobalInfo() {
+		Runtime runtime = Runtime.getRuntime();
+		StringBuilder sb = new StringBuilder();
+		NumberFormat format = NumberFormat.getInstance();
+
+		long allocatedMemory = runtime.totalMemory();
+		long freeMemory = runtime.freeMemory();
+		long uptime = Duration.between(Discord4J.getLaunchTime().atZone(ZoneId.systemDefault()).toInstant(), Instant.now()).toMillis();
+
+		sb.append("```css");
+		sb.append("\n-= Memory Usage =-");
+		sb.append("\nUsed memory: " + format.format((allocatedMemory-freeMemory)/Math.pow(1024, 2)) + "Mb");
+		sb.append("\nAllocated memory: " + format.format(allocatedMemory / Math.pow(1024, 2)) + "Mb");
+		sb.append("\\n-= APIs Info =-");
+		sb.append("\n" + Discord4J.NAME + " Version: " + Discord4J.VERSION);
+		sb.append("\nLavaPlayer Version: " + PlayerLibrary.VERSION);
+		sb.append("\\n-= Shadbot Info =-");
+		sb.append("\nUptime: " + DurationFormatUtils.formatDuration(uptime, "HH:mm:ss", true));
+		sb.append("```");
+
+
+		return sb.toString();
+	}
+
+	public static int getLevenshteinDistance(String word1, String word2) {
+		int[][] distance = new int[word1.length() + 1][word2.length() + 1];
+
+		for (int i = 0; i <= word1.length(); i++) {
+			distance[i][0] = i;
+		}
+		for (int j = 1; j <= word2.length(); j++) {
+			distance[0][j] = j;
+		}
+
+		for (int i = 1; i <= word1.length(); i++) {
+			for (int j = 1; j <= word2.length(); j++) {
+				distance[i][j] = Math.min(
+						Math.min(
+								distance[i - 1][j] + 1,
+								distance[i][j - 1] + 1),
+						distance[i - 1][j - 1] + ((word1.charAt(i - 1) == word2.charAt(j - 1)) ? 0 : 1));
+			}
+		}
+
+		return distance[word1.length()][word2.length()];
+	}
 
 	public static String translate(String langFrom, String langTo, String word) throws IOException {
 		String url = "https://translate.googleapis.com/translate_a/single?"+
@@ -104,29 +158,6 @@ public class Utils {
 
 	public static int rand(int bound) {
 		return RAND.nextInt(bound);
-	}
-
-	public static int getLevenshteinDistance(String word1, String word2) {
-		int[][] distance = new int[word1.length() + 1][word2.length() + 1];
-
-		for (int i = 0; i <= word1.length(); i++) {
-			distance[i][0] = i;
-		}
-		for (int j = 1; j <= word2.length(); j++) {
-			distance[0][j] = j;
-		}
-
-		for (int i = 1; i <= word1.length(); i++) {
-			for (int j = 1; j <= word2.length(); j++) {
-				distance[i][j] = Math.min(
-						Math.min(
-								distance[i - 1][j] + 1,
-								distance[i][j - 1] + 1),
-						distance[i - 1][j - 1] + ((word1.charAt(i - 1) == word2.charAt(j - 1)) ? 0 : 1));
-			}
-		}
-
-		return distance[word1.length()][word2.length()];
 	}
 
 	/**
