@@ -14,8 +14,8 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.HtmlUtils;
 import me.shadorc.discordbot.utils.Log;
-import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class GifCmd extends Command {
@@ -33,7 +33,7 @@ public class GifCmd extends Command {
 
 		if(context.getArg() == null) {
 			try {
-				String gifUrl = NetUtils.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
+				String gifUrl = HtmlUtils.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
 				BotUtils.sendMessage(gifUrl, context.getChannel());
 			} catch (IOException e) {
 				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Gifland.", e, context.getChannel());
@@ -42,7 +42,7 @@ public class GifCmd extends Command {
 
 		else {
 			try {
-				String json = NetUtils.getHTML(new URL("https://api.giphy.com/v1/gifs/random?"
+				String json = HtmlUtils.getHTML(new URL("https://api.giphy.com/v1/gifs/random?"
 						+ "api_key=" + Storage.getApiKey(ApiKeys.GIPHY_API_KEY)
 						+ "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8")));
 				JSONObject obj = new JSONObject(json);

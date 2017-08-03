@@ -6,7 +6,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.discordbot.utils.MathUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class SlotMachineCmd extends Command {
@@ -34,9 +34,9 @@ public class SlotMachineCmd extends Command {
 			return;
 		}
 
-		SlotOptions slot1 = slotsArray[Utils.rand(slotsArray.length)];
-		SlotOptions slot2 = slotsArray[Utils.rand(slotsArray.length)];
-		SlotOptions slot3 = slotsArray[Utils.rand(slotsArray.length)];
+		SlotOptions slot1 = slotsArray[MathUtils.rand(slotsArray.length)];
+		SlotOptions slot2 = slotsArray[MathUtils.rand(slotsArray.length)];
+		SlotOptions slot3 = slotsArray[MathUtils.rand(slotsArray.length)];
 
 		int gains = -PAID_COST;
 

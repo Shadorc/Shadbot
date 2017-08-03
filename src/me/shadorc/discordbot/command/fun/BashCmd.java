@@ -11,8 +11,8 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.HtmlUtils;
 import me.shadorc.discordbot.utils.Log;
-import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class BashCmd extends Command {
@@ -24,7 +24,7 @@ public class BashCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		try {
-			String json = NetUtils.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
+			String json = HtmlUtils.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
 					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)
 					+ "&format=json"));
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");

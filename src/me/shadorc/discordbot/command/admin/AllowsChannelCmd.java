@@ -9,7 +9,6 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -27,7 +26,7 @@ public class AllowsChannelCmd extends Command {
 		}
 
 		for(IChannel channel : channels) {
-			if(!Utils.isChannelAllowed(context.getGuild(), channel)) {
+			if(!BotUtils.isChannelAllowed(context.getGuild(), channel)) {
 				Storage.storePermission(context.getGuild(), channel);
 			}
 		}

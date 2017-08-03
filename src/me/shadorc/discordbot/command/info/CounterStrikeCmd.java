@@ -13,8 +13,8 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.NetUtils;
-import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class CounterStrikeCmd extends Command {
@@ -31,8 +31,8 @@ public class CounterStrikeCmd extends Command {
 
 		try {
 			String steamids;
-			if(!Utils.isInteger(context.getArg())) {
-				steamids = NetUtils.parseHTML(new URL("https://steamcommunity.com/id/" + context.getArg() + "/"), "\"steamid\":\"", "\"steamid\":\"", "\",\"");
+			if(!StringUtils.isInteger(context.getArg())) {
+				steamids = HtmlUtils.parseHTML(new URL("https://steamcommunity.com/id/" + context.getArg() + "/"), "\"steamid\":\"", "\"steamid\":\"", "\",\"");
 			} else {
 				steamids = context.getArg();
 			}
@@ -46,8 +46,8 @@ public class CounterStrikeCmd extends Command {
 					+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
 					+ "&steamids=" + steamids);
 
-			JSONArray statsArray = new JSONObject(NetUtils.getHTML(statsUrl)).getJSONObject("playerstats").getJSONArray("stats");
-			JSONObject userObj = new JSONObject(NetUtils.getHTML(userUrl)).getJSONObject("response").getJSONArray("players").getJSONObject(0);
+			JSONArray statsArray = new JSONObject(HtmlUtils.getHTML(statsUrl)).getJSONObject("playerstats").getJSONArray("stats");
+			JSONObject userObj = new JSONObject(HtmlUtils.getHTML(userUrl)).getJSONObject("response").getJSONArray("players").getJSONObject(0);
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Statistiques Counter-Strike: Global Offensive")

@@ -1,9 +1,13 @@
 package me.shadorc.discordbot.utils;
 
+import org.json.JSONArray;
+
+import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.CommandManager;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
@@ -41,5 +45,22 @@ public class BotUtils {
 
 	public static void executeCommand(MessageReceivedEvent event) {
 		CMD_MANAGER.manage(event);
+	}
+	
+	/**
+	 * @return true if Shadbot is allowed to post in channel
+	 */
+	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
+		JSONArray channelsArray = Storage.getAllowedChannels(guild);
+		//If no permissions were defined, authorize by default all the channels
+		if(channelsArray == null) {
+			return true;
+		}
+		for(int i = 0; i < channelsArray.length(); i++) {
+			if(channelsArray.get(i).equals(channel.getStringID())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -12,6 +12,7 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Log;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -31,7 +32,7 @@ public class WeatherCmd extends Command{
 		try {
 			WeatherData data = dataService.getWeatherData(new Location(context.getArg(), "FR"));
 			String precipitation = data.getPrecipitation().getMode().equals("no") ? "Aucune" : data.getPrecipitation().getValue();
-			String clouds = Utils.capitalize(Utils.translate("en", "fr", data.getClouds().getValue()));
+			String clouds = StringUtils.capitalize(Utils.translate("en", "fr", data.getClouds().getValue()));
 			String windName = Utils.translate("en", "fr", data.getWind().getSpeed().getName());
 			int windSpeed = (int) (Float.parseFloat(data.getWind().getSpeed().getValue())*3.6f);
 			int temperature = (int) Float.parseFloat(data.getTemperature().getValue());

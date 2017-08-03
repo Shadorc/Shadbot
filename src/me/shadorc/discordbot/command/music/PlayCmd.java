@@ -14,7 +14,8 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Log;
-import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -43,7 +44,7 @@ public class PlayCmd extends Command {
 		}
 
 		String identifier = context.getArg();
-		if(!Utils.isValidURL(identifier)) {
+		if(!NetUtils.isValidURL(identifier)) {
 			File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
 			if(songDir == null || songDir.length == 0) {
 				BotUtils.sendMessage(Emoji.WARNING + " Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
@@ -57,7 +58,7 @@ public class PlayCmd extends Command {
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Ajout de *" + Utils.formatTrackName(track.getInfo()) + "* à la playlist.", context.getChannel());
+				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Ajout de *" + StringUtils.formatTrackName(track.getInfo()) + "* à la playlist.", context.getChannel());
 				musicManager.getScheduler().queue(track);
 			}
 

@@ -6,7 +6,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.discordbot.utils.MathUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends Command {
@@ -19,7 +19,7 @@ public class RussianRouletteCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		if(Utils.rand(6) == 0) {
+		if(MathUtils.rand(6) == 0) {
 			BotUtils.sendMessage(Emoji.DICE + " Une goutte de sueur coule sur votre front, vous pressez la détente... **PAN** ... "
 					+ "Désolé, vous êtes mort, vous perdez tous vos gains.", context.getChannel());
 			context.getUser().setCoins(0);

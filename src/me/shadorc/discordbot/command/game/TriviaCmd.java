@@ -18,9 +18,10 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.HtmlUtils;
 import me.shadorc.discordbot.utils.Log;
-import me.shadorc.discordbot.utils.NetUtils;
-import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -71,7 +72,7 @@ public class TriviaCmd extends Command {
 
 		//Trivia API doc : https://opentdb.com/api_config.php
 		private void start() throws MalformedURLException, IOException {
-			String json = NetUtils.getHTML(new URL("https://opentdb.com/api.php?amount=1"));
+			String json = HtmlUtils.getHTML(new URL("https://opentdb.com/api.php?amount=1"));
 			JSONObject result = new JSONObject(json).getJSONArray("results").getJSONObject(0);
 
 			String category = result.getString("category");
@@ -82,15 +83,15 @@ public class TriviaCmd extends Command {
 
 			this.incorrectAnswers = result.getJSONArray("incorrect_answers");
 
-			StringBuilder strBuilder = new StringBuilder("**" + Utils.convertToUTF8(question) + "**");
+			StringBuilder strBuilder = new StringBuilder("**" + StringUtils.convertHtmlToUTF8(question) + "**");
 			if(type.equals("multiple")) {
 				//Place the correct answer randomly in the list
-				int index = Utils.rand(incorrectAnswers.length());
+				int index = MathUtils.rand(incorrectAnswers.length());
 				for(int i = 0; i < incorrectAnswers.length(); i++) {
 					if(i == index) {
-						strBuilder.append("\n\t- " + Utils.convertToUTF8(correct_answer));
+						strBuilder.append("\n\t- " + StringUtils.convertHtmlToUTF8(correct_answer));
 					}
-					strBuilder.append("\n\t- " + Utils.convertToUTF8((String) incorrectAnswers.get(i)));
+					strBuilder.append("\n\t- " + StringUtils.convertHtmlToUTF8((String) incorrectAnswers.get(i)));
 				}
 			}
 
@@ -106,13 +107,13 @@ public class TriviaCmd extends Command {
 
 			BotUtils.sendEmbed(builder.build(), channel);
 
-			this.correctAnswer = Utils.convertToUTF8(correct_answer);
+			this.correctAnswer = StringUtils.convertHtmlToUTF8(correct_answer);
 			this.isStarted = true;
 			this.timer.start();
 		}
 
 		public void checkAnswer(IMessage message) {
-			if(Utils.convertToList(incorrectAnswers).contains(message.getContent().toLowerCase())) {
+			if(incorrectAnswers.toString().toLowerCase().contains(message.getContent().toLowerCase())) {
 				if(alreadyAnswered.contains(message.getAuthor())) {
 					BotUtils.sendMessage(Emoji.WARNING + " Désolé " + message.getAuthor().getName() + ", tu ne peux donner qu'une seule réponse.", message.getChannel());
 				}
@@ -121,7 +122,7 @@ public class TriviaCmd extends Command {
 					alreadyAnswered.add(message.getAuthor());
 				}
 			}
-			else if(Utils.getLevenshteinDistance(message.getContent().toLowerCase(), this.correctAnswer.toLowerCase()) < 2) {
+			else if(StringUtils.getLevenshteinDistance(message.getContent().toLowerCase(), this.correctAnswer.toLowerCase()) < 2) {
 				BotUtils.sendMessage(Emoji.CLAP + " Bonne réponse " + message.getAuthor().getName() + " ! Tu gagnes " + GAINS + " coins.", channel);
 				Storage.getUser(message.getGuild(), message.getAuthor()).addCoins(GAINS);
 				this.stop();

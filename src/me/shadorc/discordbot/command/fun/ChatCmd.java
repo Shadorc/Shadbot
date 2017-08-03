@@ -15,8 +15,8 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.HtmlUtils;
 import me.shadorc.discordbot.utils.Log;
-import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.EmbedBuilder;
@@ -44,7 +44,7 @@ public class ChatCmd extends Command {
 
 		try {
 			String aliceState = GUILDS_CUSTID.get(channel.getGuild());
-			String xmlString = NetUtils.getHTML(new URL("http://sheepridge.pandorabots.com/pandora/talk-xml?"
+			String xmlString = HtmlUtils.getHTML(new URL("http://sheepridge.pandorabots.com/pandora/talk-xml?"
 					+ "botid=b69b8d517e345aba"
 					+ "&input=" + URLEncoder.encode(arg, "UTF-8")
 					+ (aliceState != null ? "&custid=" + aliceState : "")));

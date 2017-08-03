@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.discordbot.utils.StringUtils;
 
 public class TrackScheduler {
 
@@ -39,7 +39,7 @@ public class TrackScheduler {
 	}
 
 	public String getCurrentTrackName() {
-		return Utils.formatTrackName(this.audioPlayer.getPlayingTrack().getInfo());
+		return StringUtils.formatTrackName(this.audioPlayer.getPlayingTrack().getInfo());
 	}
 
 	public BlockingQueue <AudioTrack> getPlaylist() {

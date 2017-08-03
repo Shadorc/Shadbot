@@ -10,7 +10,8 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
@@ -33,7 +34,7 @@ public class DiceCmd extends Command {
 			}
 
 			String[] splitArgs = context.getArg().split(" ");
-			if(splitArgs.length != 2 || !Utils.isInteger(splitArgs[0]) || !Utils.isInteger(splitArgs[1])) {
+			if(splitArgs.length != 2 || !StringUtils.isInteger(splitArgs[0]) || !StringUtils.isInteger(splitArgs[1])) {
 				throw new IllegalArgumentException();
 			}
 
@@ -65,7 +66,7 @@ public class DiceCmd extends Command {
 				return;
 			}
 
-			if(context.getArg() == null || !Utils.isInteger(context.getArg())) {
+			if(context.getArg() == null || !StringUtils.isInteger(context.getArg())) {
 				throw new IllegalArgumentException();
 			}
 
@@ -138,7 +139,7 @@ public class DiceCmd extends Command {
 		private void stop() {
 			this.timer.stop();
 
-			int rand = Utils.rand(1, 6);
+			int rand = MathUtils.rand(1, 6);
 			BotUtils.sendMessage(Emoji.DICE + " Le dés est lancé... **" + rand + "** !", channel);
 
 			if(numsPlayers.containsKey(rand)) {

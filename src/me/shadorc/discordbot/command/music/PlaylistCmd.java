@@ -8,7 +8,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class PlaylistCmd extends Command {
@@ -27,7 +27,7 @@ public class PlaylistCmd extends Command {
 			return;
 		}
 
-		BotUtils.sendMessage(Utils.formatPlaylist(scheduler.getPlaylist()), context.getChannel());
+		BotUtils.sendMessage(StringUtils.formatPlaylist(scheduler.getPlaylist()), context.getChannel());
 	}
 
 	@Override

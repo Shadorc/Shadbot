@@ -9,8 +9,8 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.HtmlUtils;
 import me.shadorc.discordbot.utils.Log;
-import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class OverwatchCmd extends Command {
@@ -36,15 +36,15 @@ public class OverwatchCmd extends Command {
 
 		try {
 			URL url = new URL("https://playoverwatch.com/fr-fr/career/" + plateform + "/" + region + "/" + battletag.replace("#", "-"));
-			String html = NetUtils.getHTML(url);
+			String html = HtmlUtils.getHTML(url);
 
-			String icon = NetUtils.parseTextHTML(html, "<div class=\"masthead-player\"><img src=\"", "<div class=\"masthead-player\"><img src=\"", "\" class=\"player-portrait\">");
-			String level = NetUtils.parseTextHTML(html, "class=\"player-level\">", "<div class=\"u-vertical-center\">", "</div>");
-			String wins = NetUtils.parseTextHTML(html, "<p class=\"masthead-detail h4\"><span>", "<p class=\"masthead-detail h4\"><span>", " parties remportées</span>");
-			String topHero = NetUtils.parseTextHTML(html, "<div class=\"title\">", "<div class=\"title\">", "</div>");
-			String topHeroTime = NetUtils.parseTextHTML(html, "<div class=\"description\">", "<div class=\"description\">", "</div>");
-			String timePlayed = NetUtils.parseTextHTML(html, "<td>Temps de jeu</td>", "<td>Temps de jeu</td><td>", "</td>");
-			String rank = NetUtils.parseTextHTML(html, "<div class=\"u-align-center h6\">", "<div class=\"u-align-center h6\">", "</div>");
+			String icon = HtmlUtils.parseTextHTML(html, "<div class=\"masthead-player\"><img src=\"", "<div class=\"masthead-player\"><img src=\"", "\" class=\"player-portrait\">");
+			String level = HtmlUtils.parseTextHTML(html, "class=\"player-level\">", "<div class=\"u-vertical-center\">", "</div>");
+			String wins = HtmlUtils.parseTextHTML(html, "<p class=\"masthead-detail h4\"><span>", "<p class=\"masthead-detail h4\"><span>", " parties remportées</span>");
+			String topHero = HtmlUtils.parseTextHTML(html, "<div class=\"title\">", "<div class=\"title\">", "</div>");
+			String topHeroTime = HtmlUtils.parseTextHTML(html, "<div class=\"description\">", "<div class=\"description\">", "</div>");
+			String timePlayed = HtmlUtils.parseTextHTML(html, "<td>Temps de jeu</td>", "<td>Temps de jeu</td><td>", "</td>");
+			String rank = HtmlUtils.parseTextHTML(html, "<div class=\"u-align-center h6\">", "<div class=\"u-align-center h6\">", "</div>");
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Statistiques Overwatch")
