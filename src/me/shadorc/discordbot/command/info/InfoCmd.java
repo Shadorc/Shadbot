@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.info;
 
-import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -24,24 +23,25 @@ public class InfoCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		Runtime runtime = Runtime.getRuntime();
-		NumberFormat format = NumberFormat.getInstance();
 
 		long allocatedMemory = runtime.totalMemory();
 		long freeMemory = runtime.freeMemory();
 		long uptime = Duration.between(Discord4J.getLaunchTime().atZone(ZoneId.systemDefault()).toInstant(), Instant.now()).toMillis();
+		int mb = 1024*1024;
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("```css");
-		sb.append("\n-= Memory Usage =-");
-		sb.append("\nUsed memory: " + format.format((allocatedMemory-freeMemory)/Math.pow(1024, 2)) + "Mb");
-		sb.append("\nAllocated memory: " + format.format(allocatedMemory / Math.pow(1024, 2)) + "Mb");
-		sb.append("\\n-= APIs Info =-");
+		sb.append("```prolog");
+		sb.append("\n-= Performance Info =-");
+		sb.append("\nMemory : " + String.format("%.1f MB / %.1f MB", (float) (allocatedMemory-freeMemory)/mb, (float) allocatedMemory/mb));
+		sb.append("\nThreads Count : " + Thread.activeCount());
+		sb.append("\n\n-= APIs Info =-");
 		sb.append("\n" + Discord4J.NAME + " Version: " + Discord4J.VERSION);
 		sb.append("\nLavaPlayer Version: " + PlayerLibrary.VERSION);
-		sb.append("\\n-= Shadbot Info =-");
+		sb.append("\n\n-= Shadbot Info =-");
 		sb.append("\nUptime: " + DurationFormatUtils.formatDuration(uptime, "HH:mm:ss", true));
-		sb.append("\nPing: " + NetUtils.getPing());
+		sb.append("\nPing: " + NetUtils.getPing() + "ms");
 		sb.append("```");
+
 
 		BotUtils.sendMessage(sb.toString(), context.getChannel());
 	}
