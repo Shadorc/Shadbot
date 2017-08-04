@@ -27,7 +27,7 @@ public class VolumeCmd extends Command {
 		}
 
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(Emoji.WARNING + " Merci d'indiquer un volume compris entre 0 et 100.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Volume de la musique actuel : " + scheduler.getVolume() + "%", context.getChannel());
 			return;
 		}
 
@@ -45,8 +45,8 @@ public class VolumeCmd extends Command {
 				.withAuthorName("Aide pour la commande /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Change le volume des musiques.**")
-				.appendField("Utilisation", "/volume <0-100>", false);
+				.appendDescription("**Affiche ou change le volume des musiques**")
+				.appendField("Utilisation", "/volume ou /volume <0-100>", false);
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
