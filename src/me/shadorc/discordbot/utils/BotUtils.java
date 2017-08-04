@@ -46,9 +46,11 @@ public class BotUtils {
 	public static void executeCommand(MessageReceivedEvent event) {
 		CMD_MANAGER.manage(event);
 	}
-	
+
 	/**
-	 * @return true if Shadbot is allowed to post in channel
+	 * @param guild - the guild of the channel
+	 * @param channel - the channel to check
+	 * @return true if Shadbot is allowed to send a message in the channel, false otherwise
 	 */
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
 		JSONArray channelsArray = Storage.getAllowedChannels(guild);

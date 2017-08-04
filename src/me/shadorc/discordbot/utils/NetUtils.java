@@ -9,8 +9,8 @@ import java.net.URLConnection;
 public class NetUtils {
 
 	/**
-	 * @param stringUrl
-	 * @return true if stringUrl is a valid URL
+	 * @param stringUrl - String to check
+	 * @return true if stringUrl is a valid URL, false otherwise
 	 */
 	public static boolean isValidURL(String stringUrl) {
 		try {
@@ -24,8 +24,7 @@ public class NetUtils {
 	}
 
 	/**
-	 * @return time to send 1 packet of 32 bytes
-	 * @throws IOException
+	 * @return time to send a packet of 32 bytes, -1 if an exception occured
 	 */
 	public static int getPing() {
 		BufferedReader in = null;

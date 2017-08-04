@@ -9,10 +9,18 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 public class StringUtils {
 
+	/**
+	 * @param str - String to capitalize
+	 * @return str with the first letter capitalized
+	 */
 	public static String capitalize(String str) {
 		return str.substring(0, 1).toUpperCase() + str.substring(1);
 	}
 
+	/**
+	 * @param text - the String to convert, may be null
+	 * @return a new converted String, null if null string input
+	 */
 	public static String convertHtmlToUTF8(String text) {
 		return StringEscapeUtils.unescapeHtml3(text);
 	}
@@ -35,6 +43,10 @@ public class StringUtils {
 		return (info.author.equals("Unknown artist") ? "" : (info.author + " - ")) + info.title;
 	}
 
+	/**
+	 * @param str - String to check
+	 * @return true if it can be cast to an Integer, false otherwise
+	 */
 	public static boolean isInteger(String str) {
 		if(str == null) {
 			return false;
