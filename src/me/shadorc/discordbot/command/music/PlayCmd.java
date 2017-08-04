@@ -36,7 +36,7 @@ public class PlayCmd extends Command {
 		if(!NetUtils.isValidURL(identifier)) {
 			File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
 			if(songDir == null || songDir.length == 0) {
-				BotUtils.sendMessage(Emoji.WARNING + " Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " Aucune musique contenant \"" + context.getArg() + "\" n'a été trouvée.", context.getChannel());
 				return;
 			}
 			identifier = songDir[0].getPath();

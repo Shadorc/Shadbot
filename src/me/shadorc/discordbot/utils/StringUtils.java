@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.utils;
 
+import java.io.File;
 import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -40,7 +41,17 @@ public class StringUtils {
 	}
 
 	public static String formatTrackName(AudioTrackInfo info) {
-		return (info.author.equals("Unknown artist") ? "" : (info.author + " - ")) + info.title;
+		StringBuilder strBuilder = new StringBuilder();
+		if(info.author.equals("Unknown artist") && info.title.equals("Unknown title")) {
+			String fileName = new File(info.uri).getName();
+			strBuilder.append(fileName.substring(0, fileName.indexOf(".")));
+		} else if(info.author.equals("Unknown artist")) {
+			strBuilder.append(info.title);
+		} else {
+			strBuilder.append(info.author + " - " + info.title);
+		}
+
+		return strBuilder.toString();
 	}
 
 	/**
