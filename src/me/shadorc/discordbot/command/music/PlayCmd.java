@@ -32,6 +32,16 @@ public class PlayCmd extends Command {
 			return;
 		}
 
+		String identifier = context.getArg();
+		if(!NetUtils.isValidURL(identifier)) {
+			File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
+			if(songDir == null || songDir.length == 0) {
+				BotUtils.sendMessage(Emoji.WARNING + " Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
+				return;
+			}
+			identifier = songDir[0].getPath();
+		}
+
 		IVoiceChannel botVoiceChannel = context.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel();
 		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
 
@@ -41,16 +51,6 @@ public class PlayCmd extends Command {
 				return;
 			}
 			userVoiceChannel.join();
-		}
-
-		String identifier = context.getArg();
-		if(!NetUtils.isValidURL(identifier)) {
-			File[] songDir = new File("S:/Bibliotheques/Music/Divers").listFiles(file -> file.getName().toLowerCase().contains(context.getArg().toLowerCase()));
-			if(songDir == null || songDir.length == 0) {
-				BotUtils.sendMessage(Emoji.WARNING + " Aucune musique contenant " + context.getArg() + " n'a été trouvée.", context.getChannel());
-				return;
-			}
-			identifier = songDir[0].getPath();
 		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
