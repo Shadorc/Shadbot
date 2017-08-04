@@ -28,9 +28,9 @@ public class PauseCmd extends Command {
 
 		scheduler.setPaused(!scheduler.isPaused());
 		if(scheduler.isPaused()) {
-			BotUtils.sendMessage(Emoji.PAUSE + " Musique mise en pause par " + context.getAuthorName(), context.getChannel());
+			BotUtils.sendMessage(Emoji.PAUSE + " Musique mise en pause par " + context.getAuthorName() + ".", context.getChannel());
 		} else {
-			BotUtils.sendMessage(Emoji.PLAY + " Reprise de la musique à la demande de " + context.getAuthorName(), context.getChannel());
+			BotUtils.sendMessage(Emoji.PLAY + " Reprise de la musique à la demande de " + context.getAuthorName() + ".", context.getChannel());
 		}
 	}
 

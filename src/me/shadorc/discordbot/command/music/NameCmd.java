@@ -26,7 +26,7 @@ public class NameCmd extends Command {
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Musique en cours : *" + scheduler.getCurrentTrackName() + "*", context.getChannel());
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Musique en cours : **" + scheduler.getCurrentTrackName() + "**", context.getChannel());
 	}
 
 	@Override

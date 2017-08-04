@@ -30,7 +30,7 @@ public class NextCmd extends Command {
 			BotUtils.sendMessage(Emoji.WARNING + " Fin de la playlist.", context.getChannel());
 			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 		} else {
-			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Musique suivante : *" + scheduler.getCurrentTrackName() + "*", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Musique suivante : **" + scheduler.getCurrentTrackName() + "**", context.getChannel());
 		}
 	}
 

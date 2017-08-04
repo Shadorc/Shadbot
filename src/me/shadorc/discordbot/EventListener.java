@@ -55,7 +55,7 @@ public class EventListener {
 		if(botVoiceChannel != null) {
 			GuildMusicManager gmm = GuildMusicManager.getGuildAudioPlayer(botVoiceChannel.getGuild());
 			if(this.isAlone(botVoiceChannel) && !gmm.isCancelling()) {
-				BotUtils.sendMessage(Emoji.INFO + " Il n'y a plus personne qui écoute de la musique, musique mis en pause, je quitterai le salon dans 1 minute.", gmm.getChannel());
+				BotUtils.sendMessage(Emoji.INFO + " Musique mise en pause car plus personne n'écoute de la musique. Je quitterai le chat vocal dans 1 minute.", gmm.getChannel());
 				gmm.getScheduler().setPaused(true);
 				gmm.scheduleLeave();
 			} else if(!this.isAlone(botVoiceChannel) && gmm.isCancelling()){

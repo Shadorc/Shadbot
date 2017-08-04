@@ -43,6 +43,6 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Lecture en cours : *" + StringUtils.formatTrackName(track.getInfo()) + "*", channel);
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Lecture en cours : **" + StringUtils.formatTrackName(track.getInfo()) + "**", channel);
 	}
 }

@@ -27,7 +27,7 @@ public class VolumeCmd extends Command {
 		}
 
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Volume de la musique actuel : " + scheduler.getVolume() + "%", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Volume de la musique actuelle : " + scheduler.getVolume() + "%", context.getChannel());
 			return;
 		}
 

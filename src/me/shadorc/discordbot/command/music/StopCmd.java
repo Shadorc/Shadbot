@@ -26,7 +26,7 @@ public class StopCmd extends Command {
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.WARNING + " L'écoute des musiques a été arrêté par " + context.getAuthorName() +".", context.getChannel());
+		BotUtils.sendMessage(Emoji.WARNING + " La lecture des musiques a été arrêtée par " + context.getAuthorName() + ".", context.getChannel());
 		GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 	}
 
