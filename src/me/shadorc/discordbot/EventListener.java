@@ -1,21 +1,23 @@
-package me.shadorc.discordbot.listener;
+package me.shadorc.discordbot;
 
-import me.shadorc.discordbot.Main;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
+import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Log;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelEvent;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class EventListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		Log.info("------------------- Shadbot is connected -------------------");
+		Log.info("------------------- Shadbot is connected [BETA:" + Main.IS_BETA + "] -------------------");
 		event.getClient().changePlayingText("/help");
 	}
 
@@ -45,5 +47,26 @@ public class EventListener {
 	@EventSubscriber
 	public void onGuildCreateEvent(GuildCreateEvent event) {
 		Log.info("Shadbot is now connected to guild: " + event.getGuild().getName() + " (ID: " + event.getGuild().getStringID() + ")");
+	}
+
+	@EventSubscriber
+	public void onUserVoiceChannelEvent(UserVoiceChannelEvent event) {
+		IVoiceChannel botVoiceChannel = event.getClient().getOurUser().getVoiceStateForGuild(event.getGuild()).getChannel();
+		if(botVoiceChannel != null) {
+			GuildMusicManager gmm = GuildMusicManager.getGuildAudioPlayer(botVoiceChannel.getGuild());
+			if(this.isAlone(botVoiceChannel) && !gmm.isCancelling()) {
+				BotUtils.sendMessage(Emoji.INFO + " Il n'y a plus personne qui écoute de la musique, musique mis en pause, je quitterai le salon dans 1 minute.", gmm.getChannel());
+				gmm.getScheduler().setPaused(true);
+				gmm.scheduleLeave();
+			} else if(!this.isAlone(botVoiceChannel) && gmm.isCancelling()){
+				BotUtils.sendMessage(Emoji.INFO + " Quelqu'un m'a rejoint, reprise de la musique.", gmm.getChannel());
+				gmm.getScheduler().setPaused(false);
+				gmm.cancelLeave();
+			}
+		}
+	}
+
+	private boolean isAlone(IVoiceChannel voiceChannel) {
+		return voiceChannel.getConnectedUsers().size() <= 1;
 	}
 }
