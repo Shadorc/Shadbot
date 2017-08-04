@@ -54,11 +54,13 @@ public class PlayCmd extends Command {
 		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		musicManager.setRequestedChannel(context.getChannel());
+		musicManager.setChannel(context.getChannel());
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Ajout de *" + StringUtils.formatTrackName(track.getInfo()) + "* à la playlist.", context.getChannel());
+				if(musicManager.getScheduler().isPlaying()) {
+					BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Ajout de *" + StringUtils.formatTrackName(track.getInfo()) + "* à la playlist.", context.getChannel());
+				}
 				musicManager.getScheduler().queue(track);
 			}
 
@@ -68,7 +70,6 @@ public class PlayCmd extends Command {
 					musicManager.getScheduler().queue(track);
 				}
 				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Toutes les musiques ont été ajoutés à la playlist, elle contient maintenant " + musicManager.getScheduler().getPlaylist().size() + " éléments.", context.getChannel());
-				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Lecture en cours : *" + musicManager.getScheduler().getCurrentTrackName() + "*", context.getChannel());
 			}
 
 			@Override

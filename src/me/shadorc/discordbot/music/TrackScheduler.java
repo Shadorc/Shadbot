@@ -39,7 +39,7 @@ public class TrackScheduler {
 	}
 
 	public String getCurrentTrackName() {
-		return StringUtils.formatTrackName(this.audioPlayer.getPlayingTrack().getInfo());
+		return StringUtils.formatTrackName(audioPlayer.getPlayingTrack().getInfo());
 	}
 
 	public BlockingQueue <AudioTrack> getPlaylist() {
@@ -59,7 +59,7 @@ public class TrackScheduler {
 	}
 
 	public void setPaused(boolean isPaused) {
-		this.audioPlayer.setPaused(isPaused);
+		audioPlayer.setPaused(isPaused);
 	}
 
 	public boolean isRepeating() {
@@ -67,7 +67,7 @@ public class TrackScheduler {
 	}
 
 	public boolean isPaused() {
-		return this.audioPlayer.isPaused();
+		return audioPlayer.isPaused();
 	}
 
 	public boolean isPlaying() {

@@ -8,16 +8,12 @@ import javax.swing.Timer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 
-public class GuildMusicManager extends AudioEventAdapter {
+public class GuildMusicManager {
 
 	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
 	private final static Map<Long, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
@@ -25,6 +21,7 @@ public class GuildMusicManager extends AudioEventAdapter {
 	private final IGuild guild;
 	private final AudioPlayer player;
 	private final TrackScheduler scheduler;
+	private final AudioEventListener audioEventListener;
 	private final Timer leaveTimer;
 	private IChannel channel;
 
@@ -32,7 +29,8 @@ public class GuildMusicManager extends AudioEventAdapter {
 		this.guild = guild;
 		this.player = manager.createPlayer();
 		this.scheduler = new TrackScheduler(player);
-		this.player.addListener(this);
+		this.audioEventListener = new AudioEventListener(guild, scheduler);
+		this.player.addListener(audioEventListener);
 		this.leaveTimer = new Timer(60*1000, e -> {
 			this.scheduler.stop();
 			this.leave();
@@ -52,6 +50,11 @@ public class GuildMusicManager extends AudioEventAdapter {
 		leaveTimer.stop();
 	}
 
+	public void setChannel(IChannel channel) {
+		this.channel = channel;
+		this.audioEventListener.setChannel(channel);
+	}
+
 	public AudioProvider getAudioProvider() {
 		return new AudioProvider(player);
 	}
@@ -64,31 +67,12 @@ public class GuildMusicManager extends AudioEventAdapter {
 		return scheduler;
 	}
 
-	public IChannel getRequestedChannel() {
+	public IChannel getChannel() {
 		return channel;
-	}
-
-	public void setRequestedChannel(IChannel channel) {
-		this.channel = channel;
 	}
 
 	public boolean isCancelling() {
 		return leaveTimer.isRunning();
-	}
-
-	@Override
-	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-		//Create a new Thread avoid java.net.SocketException by leaving the time to the sockets to close
-		new Thread(() -> {
-			if(endReason.mayStartNext) {
-				if(scheduler.isRepeating()) {
-					scheduler.queue(track.makeClone());
-				} else if(!scheduler.nextTrack()) {
-					BotUtils.sendMessage(Emoji.WARNING + " Fin de la playlist.", channel);
-					GuildMusicManager.getGuildAudioPlayer(guild).leave();
-				}
-			}
-		}).start();
 	}
 
 	public static synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {
