@@ -4,7 +4,6 @@ public interface Emoji {
 	String ACCESS_DENIED = ":no_entry_sign:";
 	String CHECK_MARK = ":white_check_mark:";
 	String WARNING = ":grey_exclamation:";
-	String CROSS = ":heavy_multiplication_x:";
 	String INFO = ":information_source:";
 
 	String LOST_MONEY = ":money_with_wings:";

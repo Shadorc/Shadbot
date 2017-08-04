@@ -42,7 +42,6 @@ public class InfoCmd extends Command {
 		sb.append("\nPing: " + NetUtils.getPing() + "ms");
 		sb.append("```");
 
-
 		BotUtils.sendMessage(sb.toString(), context.getChannel());
 	}
 
