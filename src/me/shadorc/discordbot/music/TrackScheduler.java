@@ -10,7 +10,7 @@ import me.shadorc.discordbot.utils.StringUtils;
 
 public class TrackScheduler {
 
-	private static final int DEFAULT_VOLUME = 20;
+	private static final int DEFAULT_VOLUME = 15;
 
 	private final AudioPlayer audioPlayer;
 	private final BlockingQueue<AudioTrack> queue;
