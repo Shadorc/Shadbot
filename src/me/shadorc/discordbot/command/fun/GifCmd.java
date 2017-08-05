@@ -26,18 +26,28 @@ public class GifCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		if(!context.getChannel().isNSFW()) {
-			BotUtils.sendMessage(Emoji.WARNING + " Vous devez être dans un salon NSFW pour utiliser les gifs.", context.getChannel());
-			return;
-		}
+		//		if(!context.getChannel().isNSFW()) {
+		//			BotUtils.sendMessage(Emoji.WARNING + " Vous devez être dans un salon NSFW pour utiliser les gifs.", context.getChannel());
+		//			return;
+		//		}
 
 		if(context.getArg() == null) {
 			try {
-				String gifUrl = HtmlUtils.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
-				BotUtils.sendMessage(gifUrl, context.getChannel());
+				String json = HtmlUtils.getHTML(new URL("https://api.giphy.com/v1/gifs/random?"
+						+ "api_key=" + Storage.getApiKey(ApiKeys.GIPHY_API_KEY)));
+				JSONObject obj = new JSONObject(json);
+				String url = obj.getJSONObject("data").getString("url");
+				BotUtils.sendMessage(url, context.getChannel());
 			} catch (IOException e) {
-				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Gifland.", e, context.getChannel());
+				Log.error("An arror occured while getting a gif from Giphy.", e, context.getChannel());
 			}
+
+			//			try {
+			//				String gifUrl = HtmlUtils.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
+			//				BotUtils.sendMessage(gifUrl, context.getChannel());
+			//			} catch (IOException e) {
+			//				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Gifland.", e, context.getChannel());
+			//			}
 		}
 
 		else {
@@ -53,7 +63,7 @@ public class GifCmd extends Command {
 				String url = obj.getJSONObject("data").getString("url");
 				BotUtils.sendMessage(url, context.getChannel());
 			} catch (IOException e) {
-				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Giphy.", e, context.getChannel());
+				Log.error("An arror occured while getting a gif from Giphy.", e, context.getChannel());
 			}
 		}
 	}
@@ -61,11 +71,11 @@ public class GifCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche un gif aléatoire ou correspondant à un mot clé provenant du site gifland.us.**")
-				.appendField("Utilisation", "/gif ou /gif <tag>", false);
+				.appendDescription("**Show a random gif or a gif corresponding to a tag.**")
+				.appendField("Usage", "/gif or /gif <tag>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
