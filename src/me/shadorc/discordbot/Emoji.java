@@ -17,6 +17,7 @@ public interface Emoji {
 	String CLOUD = ":cloud:";
 	String WIND = ":wind_blowing_face:";
 	String RAIN = ":cloud_rain:";
+	String WATER = ":droplet:";
 	String MAP = ":map:";
 
 	String MUSICAL_NOTE = ":musical_note:";

@@ -75,8 +75,8 @@
       </dependency>
       <dependency>
          <groupId>openweathermap</groupId>
-         <artifactId>openweathermap-api</artifactId>
-         <version>1.0.0</version>
+         <artifactId>owm-japis</artifactId>
+         <version>2.5.0.5</version>
       </dependency>
    </dependencies>
 </project>

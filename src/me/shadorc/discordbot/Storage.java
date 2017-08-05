@@ -31,7 +31,8 @@ public class Storage {
 		TWITTER_API_SECRET,
 		TWITTER_TOKEN,
 		TWITTER_TOKEN_SECRET,
-		STEAM_API_KEY
+		STEAM_API_KEY,
+		OPENWEATHERMAP_API_KEY
 	}
 
 	private static void init() {
