@@ -30,20 +30,20 @@ public class TranslateCmd extends Command {
 
 		try {
 			String word = Utils.translate(args[0], args[1], args[2]);
-			BotUtils.sendMessage(Emoji.MAP + " Traduction : " + word, context.getChannel());
+			BotUtils.sendMessage(Emoji.MAP + " Translation : " + word, context.getChannel());
 		} catch (Exception e) {
-			Log.error("Une erreur est survenue lors de la traduction.", e, context.getChannel());
+			Log.error("An error occured during the translation.", e, context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Traduit un texte de la langue 1 vers la langue 2.**")
-				.appendField("Utilisation", "/trad <lang1> <lang2> <texte>", false);
+				.appendDescription("**Translate a text from a language to another.**")
+				.appendField("Usage", "/translate <lang1> <lang2> <text>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

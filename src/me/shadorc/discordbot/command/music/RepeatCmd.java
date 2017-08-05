@@ -22,25 +22,25 @@ public class RepeatCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.WARNING + " Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		scheduler.setRepeatEnabled(!scheduler.isRepeating());
 		if(scheduler.isRepeating()) {
-			BotUtils.sendMessage(Emoji.REPEAT + " Répétition de la musique activée.", context.getChannel());
+			BotUtils.sendMessage(Emoji.REPEAT + " Repetition enabled.", context.getChannel());
 		} else {
-			BotUtils.sendMessage(Emoji.PLAY + " Répétition de la musique désactivée.", context.getChannel());
+			BotUtils.sendMessage(Emoji.PLAY + " Repetition disabled.", context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Active la répétition de la musique en cours. Réutilisez cette commande pour désactiver la répétition.**");
+				.appendDescription("**Enable/disable music repetition.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

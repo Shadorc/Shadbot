@@ -10,10 +10,11 @@ import me.shadorc.discordbot.command.admin.DebugCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
 import me.shadorc.discordbot.command.currency.LeaderboardCmd;
 import me.shadorc.discordbot.command.currency.TransferCoinsCmd;
-import me.shadorc.discordbot.command.fun.BashCmd;
+import me.shadorc.discordbot.command.french.BashCmd;
+import me.shadorc.discordbot.command.french.HolidaysCmd;
+import me.shadorc.discordbot.command.french.JokeCmd;
 import me.shadorc.discordbot.command.fun.ChatCmd;
 import me.shadorc.discordbot.command.fun.GifCmd;
-import me.shadorc.discordbot.command.fun.JokeCmd;
 import me.shadorc.discordbot.command.game.DiceCmd;
 import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
@@ -33,7 +34,7 @@ import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.rpg.CharacterCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
-import me.shadorc.discordbot.command.utils.HolidaysCmd;
+import me.shadorc.discordbot.command.rpg.FightCmd;
 import me.shadorc.discordbot.command.utils.TranslateCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
 import me.shadorc.discordbot.command.utils.WikiCmd;
@@ -110,7 +111,7 @@ public class CommandManager {
 		if(commands.containsKey(context.getCommand())) {
 			Command command = commands.get(context.getCommand());
 			if(command.isAdminCmd() && !context.isAuthorAdmin()) {
-				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " Vous devez être administrateur pour exécuter cette commande.", event.getChannel());
+				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You have to be an administrator to execute this command.", event.getChannel());
 			} else {
 				try {
 					command.execute(context);
@@ -119,7 +120,7 @@ public class CommandManager {
 				}
 			}
 		} else {
-			Log.warn("The command \"" + context.getCommand() + "\" has been tried without result.");
+			Log.warn("Command \"" + context.getCommand() + "\" has been tried without result.");
 		}
 	}
 }

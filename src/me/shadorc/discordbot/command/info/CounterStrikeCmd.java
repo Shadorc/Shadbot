@@ -54,17 +54,17 @@ public class CounterStrikeCmd extends Command {
 					.withAuthorIcon("http://www.icon100.com/up/2841/256/csgo.png")
 					.withThumbnail(userObj.getString("avatarfull"))
 					.withColor(new Color(170, 196, 222))
-					.withDesc("Statistiques pour **" + userObj.getString("personaname") + "**")
-					.appendField("Tués", Integer.toString(this.getValue(statsArray, "total_kills")), true)
-					.appendField("Morts",  Integer.toString(this.getValue(statsArray, "total_deaths")), true)
+					.withDesc("Stats for **" + userObj.getString("personaname") + "**")
+					.appendField("Kills", Integer.toString(this.getValue(statsArray, "total_kills")), true)
+					.appendField("Deaths",  Integer.toString(this.getValue(statsArray, "total_deaths")), true)
 					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills")/this.getValue(statsArray, "total_deaths")), true)
-					.appendField("Nombre de victoires",  Integer.toString(this.getValue(statsArray, "total_wins")), true)
-					.appendField("Nombre de fois meilleur joueur",  Integer.toString(this.getValue(statsArray, "total_mvps")), true)
-					.withFooterText("Profile Steam : http://steamcommunity.com/profiles/" + context.getArg() + "/");
+					.appendField("Total wins",  Integer.toString(this.getValue(statsArray, "total_wins")), true)
+					.appendField("Total MVP",  Integer.toString(this.getValue(statsArray, "total_mvps")), true)
+					.withFooterText("Steam Profile: http://steamcommunity.com/profiles/" + context.getArg() + "/");
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (IOException e) {
-			BotUtils.sendMessage(Emoji.WARNING + " Steam ID invalide.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Steam ID is invalid.", context.getChannel());
 		}
 	}
 
@@ -81,11 +81,11 @@ public class CounterStrikeCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche les statistiques d'un utilisateur pour le jeu Counter-Strike: Global Offensive.**")
-				.appendField("Utilisation", "/cs <steamID>", false);
+				.appendDescription("**Show stats of a player for Counter-Strike: Global Offensive.**")
+				.appendField("Usage", "/cs <steamID>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

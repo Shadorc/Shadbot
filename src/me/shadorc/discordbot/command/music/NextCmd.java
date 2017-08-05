@@ -22,25 +22,25 @@ public class NextCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.WARNING + " Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		if(!scheduler.nextTrack()) {
-			BotUtils.sendMessage(Emoji.WARNING + " Fin de la playlist.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " End of the playlist.", context.getChannel());
 			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 		} else {
-			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Musique suivante : **" + scheduler.getCurrentTrackName() + "**", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Next music: **" + scheduler.getCurrentTrackName() + "**", context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Passe à la musique suivante.**");
+				.appendDescription("**Skip to next music if it exists.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

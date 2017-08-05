@@ -22,25 +22,25 @@ public class PauseCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.WARNING + " Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		scheduler.setPaused(!scheduler.isPaused());
 		if(scheduler.isPaused()) {
-			BotUtils.sendMessage(Emoji.PAUSE + " Musique mise en pause par " + context.getAuthorName() + ".", context.getChannel());
+			BotUtils.sendMessage(Emoji.PAUSE + " Music paused by " + context.getAuthorName() + ".", context.getChannel());
 		} else {
-			BotUtils.sendMessage(Emoji.PLAY + " Reprise de la musique à la demande de " + context.getAuthorName() + ".", context.getChannel());
+			BotUtils.sendMessage(Emoji.PLAY + " Music resumed by " + context.getAuthorName() + ".", context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Met en pause la musique en cours. Réutilisez cette commande pour désactiver la pause.**");
+		.appendDescription("**Pause the current playing music. Use this command again to resume.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

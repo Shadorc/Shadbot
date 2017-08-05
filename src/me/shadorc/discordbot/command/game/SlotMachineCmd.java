@@ -30,7 +30,7 @@ public class SlotMachineCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getUser().getCoins() < PAID_COST) {
-			BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour jouer à la machine à sous, une partie coûte " + PAID_COST + ".", context.getChannel());
+			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to play the slot machine, one game costs " + PAID_COST + " coins.", context.getChannel());
 			return;
 		}
 
@@ -53,18 +53,18 @@ public class SlotMachineCmd extends Command {
 
 		StringBuilder message = new StringBuilder();
 		message.append(":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":");
-		message.append("\nVous avez "+ (gains > 0 ? "gagné" : "perdu") + " " + Math.abs(gains) + " coins !");
+		message.append("\nYou have "+ (gains > 0 ? "win" : "lost") + " " + Math.abs(gains) + " coins !");
 		BotUtils.sendMessage(message.toString(), context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Joue à la machine à sous pour " + PAID_COST + " coins.**")
-				.appendField("Gains", "Vous avez 12.5% de chance de gagner 30 coins, 5.3% de gagner 150 coins et 0.2% de gagner 5000 coins.", false);
+				.appendDescription("**Play a game of slot machine for " + PAID_COST + " coins.**")
+				.appendField("Gains", "You have a 12.5% chance of winning 30 coins, a 5.3% chance of winning 150 coins and a 0.2% chance of winning 5000 coins.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

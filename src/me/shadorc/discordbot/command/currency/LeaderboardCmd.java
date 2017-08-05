@@ -40,7 +40,7 @@ public class LeaderboardCmd extends Command {
 		}
 
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Classement")
+				.withAuthorName("Leaderboard")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
 				.withDescription(strBuilder.toString());
@@ -51,10 +51,10 @@ public class LeaderboardCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche le classement des coins du serveur.**");
+				.appendDescription("**Show coins leaderboard for this server.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

@@ -22,20 +22,20 @@ public class NameCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.WARNING + " Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " No currently playing music.", context.getChannel());
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Musique en cours : **" + scheduler.getCurrentTrackName() + "**", context.getChannel());
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Current music: **" + scheduler.getCurrentTrackName() + "**", context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche le nom de la musique en cours.**");
+				.appendDescription("**Show current music name.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

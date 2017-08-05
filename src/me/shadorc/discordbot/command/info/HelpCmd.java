@@ -16,45 +16,46 @@ public class HelpCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Shadbot Aide")
+				.withAuthorName("Shadbot Help")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.withDesc("Obtenez plus d'informations en utilisant /help <commande>.")
-				.appendField("Commandes Utiles :",
-						"`/trad`"
+				.withDesc("Get more information by using /help <command>.")
+				.appendField("Utils Commands:",
+						"`/translate`"
 								+ " `/wiki`"
-								+ " `/vacs`"
 								+ " `/calc`"
-								+ " `/meteo`", false)
-				.appendField("Commandes Fun :",
+								+ " `/weather`", false)
+				.appendField("Fun Commands:",
 						"`/chat`"
-								+ " `/gif`"
-								+ " `/dtc`"
-								+ " `/blague`", false)
-				.appendField("Commandes Jeux :",
+								+ " `/gif`", false)
+				.appendField("Games Commands:",
 						"`/dice`"
-								+ " `/roulette_russe`"
-								+ " `/machine_sous`"
+								+ " `/slot_machine`"
+								+ " `/russian_roulette`"
 								+ " `/trivia`", false)
-				.appendField("Commandes Argent :",
-						"`/transfert`"
+				.appendField("Currency Commands:",
+						"`/transfer`"
 								+ " `/leaderboard`"
 								+ " `/coins`", false)
-				.appendField("Commandes Musique:",
+				.appendField("Music Commands:",
 						"`/play`"
 								+ " `/volume`"
 								+ " `/pause`"
 								+ " `/repeat`"
 								+ " `/stop`"
 								+ " `/next`"
-								+ " `/nom`"
+								+ " `/name`"
 								+ " `/playlist`", false)
-				.appendField("Commandes Statistiques Jeux:",
+				.appendField("Games Stats Commands:",
 						"`/overwatch`"
 								+ " `/cs`", false)
-				.appendField("Commandes Info:",
+				.appendField("Info Commands:",
 						" `/info`"
 								+ " `/ping`", false)
+				.appendField("French Commands:",
+						"`/dtc`"
+								+ " `/blague`"
+								+ " `/vacs`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
 				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
 
@@ -64,10 +65,10 @@ public class HelpCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche l'aide pour les commandes.**");
+				.appendDescription("**Show help for all the commands.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

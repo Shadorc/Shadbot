@@ -16,11 +16,11 @@ public class AdminHelpCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Shadbot Admin Aide")
+				.withAuthorName("Shadbot Admin Help")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.withDesc("Obtenez plus d'informations en utilisant /help <commande>.")
-				.appendField("Commandes :",			
+				.withDesc("Get more information by using /help <command>.")
+				.appendField("Commands:",			
 						"`/allows_channel`"
 								+ " `/debug`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
@@ -32,10 +32,10 @@ public class AdminHelpCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche l'aide pour les commandes réservées aux administrateurs.**");
+				.appendDescription("**Show help for admin commands.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

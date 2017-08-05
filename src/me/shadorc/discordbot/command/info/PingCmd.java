@@ -24,10 +24,10 @@ public class PingCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche le ping de Shadbot.**");
+				.appendDescription("**Show Shadbot's ping.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

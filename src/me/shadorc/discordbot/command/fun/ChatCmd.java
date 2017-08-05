@@ -53,21 +53,21 @@ public class ChatCmd extends Command {
 			GUILDS_CUSTID.put(channel.getGuild(), result.getString("custid"));
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, channel);
 		} catch (SocketTimeoutException e) {
-			BotUtils.sendMessage(Emoji.WARNING + " La discussion n'est pas disponible actuellement.", channel);
+			BotUtils.sendMessage(Emoji.WARNING + " Chat isn't currently available.", channel);
 			Log.warn("A.L.I.C.E. doesn't respond.");
 		} catch (IOException e) {
-			Log.error("Une erreur est survenue lors de la discussion avec le bot.", e, channel);
+			Log.error("An error occured while discussing with A.L.I.C.E.", e, channel);
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Discute avec l'intelligence artificielle anglaise A.L.I.C.E.**")
-				.appendField("Utilisation", "/chat <message>", false);
+				.appendDescription("**Chat with the artificial intelligence A.L.I.C.E.**")
+				.appendField("Usage", "/chat <message>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

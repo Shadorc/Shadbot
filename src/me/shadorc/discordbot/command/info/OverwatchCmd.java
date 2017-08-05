@@ -47,33 +47,33 @@ public class OverwatchCmd extends Command {
 			String rank = HtmlUtils.parseTextHTML(html, "<div class=\"u-align-center h6\">", "<div class=\"u-align-center h6\">", "</div>");
 
 			EmbedBuilder builder = new EmbedBuilder()
-					.withAuthorName("Statistiques Overwatch")
+					.withAuthorName("Overwatch Stats")
 					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
 					.withThumbnail(icon)
 					.withColor(new Color(170, 196, 222))
-					.withDesc("Statistiques pour **" + battletag + "**.")
-					.appendField("Niveau", level, true)
-					.appendField("Rang compétitif", rank, true)
-					.appendField("Parties remportées", wins, true)
-					.appendField("Temps de jeu", timePlayed, true)
-					.appendField("Top héro (Partie Rapide)", topHero + " (" + topHeroTime + ")", true)
-					.withFooterText("Lien vers la carrière : " + url.toString());
+					.withDesc("Stats for user **" + battletag + "**.")
+					.appendField("Level", level, true)
+					.appendField("Competitive rank", rank, true)
+					.appendField("Wins", wins, true)
+					.appendField("Game time", timePlayed, true)
+					.appendField("Top hero (Casual matchmaking)", topHero + " (" + topHeroTime + ")", true)
+					.withFooterText("Career link: " + url.toString());
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 		} catch (FileNotFoundException fnf) {
-			BotUtils.sendMessage(Emoji.WARNING + "La plateforme, la région ou le Battletag sont incorrects.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Plateform, region or Battletag is invalid.", context.getChannel());
 		} catch (IOException e) {
-			Log.error("Une erreur est survenue lors de la récupération des informations sur le profil Overwatch, réessayez plus tard.", e, context.getChannel());
+			Log.error("An error occured while getting information from Overwatch profil, try again later.", e, context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche les statistiques d'un utilisateur pour le jeu Overwatch.**")
-				.appendField("Utilisation", "/overwatch <pc|psn|xbl> <eu|us|cn|kr> <battletag#0000>", false);
+				.appendDescription("**Show user stats for Overwatch.**")
+				.appendField("Usage", "/overwatch <pc|psn|xbl> <eu|us|cn|kr> <battletag#0000>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

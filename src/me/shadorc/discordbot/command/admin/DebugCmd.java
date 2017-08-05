@@ -18,16 +18,16 @@ public class DebugCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Infos de débogage")
+				.withAuthorName("Debug Info")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
 				.appendField("Ping", Integer.toString(NetUtils.getPing()), true)
 				.appendField("Guild ID", context.getGuild().getStringID(), true)
-				.appendField("Nombres de membres", Integer.toString(context.getGuild().getTotalMemberCount()), true)
+				.appendField("Members count", Integer.toString(context.getGuild().getTotalMemberCount()), true)
 				.appendField("Channel(s)", context.getGuild().getChannels().stream().map(
 						channel -> channel.mention() 
 						+ " | ID: " + channel.getStringID()
-						+ " | Autorisé : " + BotUtils.isChannelAllowed(context.getGuild(), channel))
+						+ " | Authorized : " + BotUtils.isChannelAllowed(context.getGuild(), channel))
 						.collect(Collectors.joining("\n")), true);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
@@ -35,10 +35,10 @@ public class DebugCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche les informations de débogage.**");
+				.appendDescription("**Show debug info.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

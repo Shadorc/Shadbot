@@ -28,18 +28,18 @@ public class CalcCmd extends Command {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			BotUtils.sendMessage(context.getArg() + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException e) {
-			BotUtils.sendMessage(Emoji.WARNING + " Calcul incorrect.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Invalid expression.", context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Calcule une expression.**")
-				.appendField("Utilisation", "/calc <expression>", false);
+				.appendDescription("**Calculate an expression.**")
+				.appendField("Usage", "/calc <expression>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

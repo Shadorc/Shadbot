@@ -46,7 +46,7 @@ public class DiceCmd extends Command {
 			}
 
 			if(context.getUser().getCoins() < bet) {
-				BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour effectuer cette mise.", context.getChannel());
+				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
 				return;
 			}
 
@@ -57,12 +57,12 @@ public class DiceCmd extends Command {
 			DiceManager diceManager = GUILDS_DICE.get(context.getGuild());
 
 			if(context.getUser().getCoins() < diceManager.getBet()) {
-				BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour rejoindre cette partie.", context.getChannel());
+				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to join this game.", context.getChannel());
 				return;
 			}
 
 			if(diceManager.isAlreadyPlaye(context.getAuthor())) {
-				BotUtils.sendMessage(Emoji.WARNING + " " + context.getAuthor().mention() + ", tu participes déjà.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " " + context.getAuthor().mention() + ", you're already participating.", context.getChannel());
 				return;
 			}
 
@@ -77,12 +77,12 @@ public class DiceCmd extends Command {
 			}
 
 			if(diceManager.isAlreadyBet(num)) {
-				BotUtils.sendMessage(Emoji.WARNING + " Ce numéro a déjà été misé, merci d'en indiquer un autre.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " This number has already been bet, please try with another one.", context.getChannel());
 				return;
 			}
 
 			diceManager.addPlayer(context.getAuthor(), num);
-			BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " a misé sur le " + num + ".", context.getChannel());
+			BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " bet on " + num + ".", context.getChannel());
 		}
 	}
 
@@ -124,13 +124,13 @@ public class DiceCmd extends Command {
 
 		private void start() {
 			EmbedBuilder builder = new EmbedBuilder()
-					.withAuthorName("Jeu de dés")
+					.withAuthorName("Dice Game")
 					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 					.withColor(new Color(170, 196, 222))
-					.appendField(croupier.getName() + " a démarré un jeu de dés.",
-							"Utilisez la commande `/dice <num>` pour rejoindre la partie avec une mise de **" + bet + " coins**.", false)
-					.withFooterText("Vous avez " + (timer.getDelay()/1000) + " secondes pour faire vos paris");
+					.appendField(croupier.getName() + " started a dice game.",
+							"Use `/dice <num>` to join the game with a **" + bet + " coins** putting.", false)
+					.withFooterText("You have " + (timer.getDelay()/1000) + " seconds to make your bets.");
 			BotUtils.sendEmbed(builder.build(), channel);
 
 			this.timer.start();
@@ -140,25 +140,25 @@ public class DiceCmd extends Command {
 			this.timer.stop();
 
 			int rand = MathUtils.rand(1, 6);
-			BotUtils.sendMessage(Emoji.DICE + " Le dés est lancé... **" + rand + "** !", channel);
+			BotUtils.sendMessage(Emoji.DICE + " The dice is rolling... **" + rand + "** !", channel);
 
 			if(numsPlayers.containsKey(rand)) {
 				IUser winner = numsPlayers.get(rand);
 				int gains = bet*numsPlayers.size()*MULTIPLIER;
-				BotUtils.sendMessage(Emoji.DICE + " Bravo " + winner.mention() + ", tu remportes " + gains + " coins !", channel);
+				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win " + gains + " coins !", channel);
 				Storage.getUser(channel.getGuild(), winner).addCoins(gains);
 				numsPlayers.remove(rand);
 			}
 
 			if(numsPlayers.size() > 0) {
-				StringBuilder strBuilder = new StringBuilder(Emoji.LOST_MONEY + " Désolé, ");
+				StringBuilder strBuilder = new StringBuilder(Emoji.LOST_MONEY + " Sorry, ");
 				for(int num : numsPlayers.keySet()) {
 					if(rand != num) {
 						Storage.getUser(channel.getGuild(), numsPlayers.get(num)).addCoins(-bet);
 						strBuilder.append(numsPlayers.get(num).mention() + ", ");
 					}
 				}
-				strBuilder.append("vous avez perdu " + bet + " coin(s).");
+				strBuilder.append("you have lost " + bet + " coin(s).");
 				BotUtils.sendMessage(strBuilder.toString(), channel);
 			}
 
@@ -169,13 +169,13 @@ public class DiceCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Lance une partie de dés avec une mise commune ou rejoint une partie déjà existante.**")
-				.appendField("Utilisation", "Créer une partie : **/dice <mise> <num>**.\nRejoindre une partie **/dice <num>**", false)
-				.appendField("Restrictions", "Le numéro doit être compris entre 1 et 6.\nVous ne pouvez pas miser un numéro qui a déjà été choisi par un autre utilisateur.", false)
-				.appendField("Gains", "Le gagnant remporte " + MULTIPLIER + " fois la mise commune multipliée par le nombre de participants.", false);
+				.appendDescription("**Start a dice game with a common bet or join a game in progress.**")
+				.appendField("Usage", "Create a game: **/dice <bet> <num>**.\nJoin a game **/dice <num>**", false)
+				.appendField("Restrictions", "The number must be between 1 and 6.\nYou can't bet on a number that has already been chosen by another player.", false)
+				.appendField("Gains", "The winner gets " + MULTIPLIER + " times the common bet multiplied by the number of players.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

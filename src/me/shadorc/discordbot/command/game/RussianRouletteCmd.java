@@ -20,12 +20,12 @@ public class RussianRouletteCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(MathUtils.rand(6) == 0) {
-			BotUtils.sendMessage(Emoji.DICE + " Une goutte de sueur coule sur votre front, vous pressez la détente... **PAN** ... "
-					+ "Désolé, vous êtes mort, vous perdez tous vos gains.", context.getChannel());
+			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **PAN** ... "
+					+ "Sorry, you died, you lose all your coins.", context.getChannel());
 			context.getUser().setCoins(0);
 		} else {
-			BotUtils.sendMessage(Emoji.DICE + " Une goutte de sueur coule sur votre front, vous pressez la détente... **click** ... "
-					+ "Pfiou, vous êtes toujours en vie, vous remportez " + GAIN + " coins !", context.getChannel());
+			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **click** ... "
+					+ "Phew, you are still alive, you gets " + GAIN + " coins !", context.getChannel());
 			context.getUser().addCoins(GAIN);
 		}
 	}
@@ -33,11 +33,11 @@ public class RussianRouletteCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Joue à la roulette russe.**")
-				.appendField("Gains", "Vous avez 5/6 chance de gagner " + GAIN + " coins et 1/6 de perdre la totalité de vos coins.", false);
+				.appendDescription("**Play russian roulette.**")
+				.appendField("Gains", "You have 5-in-6 chance to win " + GAIN + " coins and a 1-in-6 chance to lose all your coins.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

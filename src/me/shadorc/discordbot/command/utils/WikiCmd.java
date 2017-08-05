@@ -30,7 +30,7 @@ public class WikiCmd extends Command {
 		try {
 			String searchEncoded = URLEncoder.encode(context.getArg(), "UTF-8");
 			//Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-			String json = HtmlUtils.getHTML(new URL("https://fr.wikipedia.org/w/api.php?"
+			String json = HtmlUtils.getHTML(new URL("https://en.wikipedia.org/w/api.php?"
 					+ "action=query"
 					+ "&titles=" + searchEncoded
 					+ "&prop=extracts"
@@ -44,7 +44,7 @@ public class WikiCmd extends Command {
 			JSONObject searchObj = pagesObj.getJSONObject(pageId);
 
 			if(pageId.equals("-1") || searchObj.getString("extract").isEmpty()) {
-				BotUtils.sendMessage(Emoji.WARNING + " Aucun résultat pour : " + context.getArg(), context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " No result for : " + context.getArg(), context.getChannel());
 				return;
 			}
 
@@ -54,22 +54,22 @@ public class WikiCmd extends Command {
 					.withAuthorIcon(context.getAuthor().getAvatarURL())
 					.withColor(new Color(170, 196, 222))
 					.appendDesc(searchObj.getString("extract"))
-					.withFooterText("Page Wikipédia : https://fr.wikipedia.org/wiki/" + URLEncoder.encode(searchObj.getString("title"), "UTF-8"));
+					.withFooterText("Wikipédia Page: https://fr.wikipedia.org/wiki/" + URLEncoder.encode(searchObj.getString("title"), "UTF-8"));
 
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 		} catch (IOException e) {
-			Log.error("Une erreur est survenue lors de la récupération des informations sur Wikipédia.", e, context.getChannel());
+			Log.error("An error occured while getting Wikipedia information.", e, context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.withDescription("**Affiche la description Wikipedia d'une recherche.**")
-				.appendField("Utlisation", "/wiki <recherche>", false);
+				.withDescription("**Show Wikipedia description for a search.**")
+				.appendField("Usage", "/wiki <search>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

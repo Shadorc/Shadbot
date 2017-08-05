@@ -37,14 +37,14 @@ public class TransferCoinsCmd extends Command {
 			}
 
 			if(senderUser.getCoins() < coins) {
-				BotUtils.sendMessage(Emoji.BANK + " Vous n'avez pas assez de coins pour effectuer ce transfert.", context.getChannel());
+				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to do this.", context.getChannel());
 				return;
 			}
 
 			senderUser.addCoins(-coins);
 			receiverUser.addCoins(coins);
 
-			BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " a transféré " + coins + " coins à " + receiverUser.mention(), context.getChannel());
+			BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " has transfered " + coins + " coins to " + receiverUser.mention(), context.getChannel());
 		} catch(NumberFormatException e1) {
 			throw new IllegalArgumentException();
 		}
@@ -53,12 +53,12 @@ public class TransferCoinsCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Transfert des coins à l'utilisateur mentionné.**")
-				.appendField("Utilisation", "/transfert <coins> <@utilisateur>", false)
-				.appendField("Restrictions", "Le montant transféré doit être strictement supérieur à 0.\nVous ne pouvez pas vous transférer de coins à vous-même.", false);
+				.appendDescription("**Transfer of coins to the mentioned user.**")
+				.appendField("Usage", "/transfer <coins> <@user>", false)
+				.appendField("Restrictions", "The transferred amount must be strictly positive.\nYou can't transfer coins to yourself.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

@@ -28,8 +28,7 @@ public class PlayCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(context.getArg() == null) {
-			BotUtils.sendMessage(Emoji.WARNING + " Merci d'entrer l'URL ou le nom d'une musique à écouter.", context.getChannel());
-			return;
+			throw new IllegalArgumentException();
 		}
 
 		final StringBuilder identifier = new StringBuilder();
@@ -44,7 +43,7 @@ public class PlayCmd extends Command {
 
 		if(botVoiceChannel == null) {
 			if(userVoiceChannel == null) {
-				BotUtils.sendMessage(Emoji.WARNING + " Rejoignez un salon vocal avant d'utiliser cette commande pour que je puisse vous rejoindre.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " Join a vocal channel before using this command.", context.getChannel());
 				return;
 			}
 			userVoiceChannel.join();
@@ -57,7 +56,7 @@ public class PlayCmd extends Command {
 			@Override
 			public void trackLoaded(AudioTrack track) {
 				if(musicManager.getScheduler().isPlaying()) {
-					BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Ajout de **" + StringUtils.formatTrackName(track.getInfo()) + "** à la playlist.", context.getChannel());
+					BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", context.getChannel());
 				}
 				musicManager.getScheduler().queue(track);
 			}
@@ -68,7 +67,7 @@ public class PlayCmd extends Command {
 
 				if(identifier.toString().startsWith("ytsearch: ")) {
 					if(musicManager.getScheduler().isPlaying()) {
-						BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Ajout de **" + StringUtils.formatTrackName(tracks.get(0).getInfo()) + "** à la playlist.", context.getChannel());
+						BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(tracks.get(0).getInfo()) + "** has been added to the playlist.", context.getChannel());
 					}
 					musicManager.getScheduler().queue(tracks.get(0));
 					return;
@@ -78,18 +77,18 @@ public class PlayCmd extends Command {
 					AudioTrack track = tracks.get(i);
 					musicManager.getScheduler().queue(track);
 				}
-				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Toutes les musiques ont été ajoutés à la playlist, elle contient maintenant " + musicManager.getScheduler().getPlaylist().size() + " éléments.", context.getChannel());
+				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size() + " musics have been added to the playlist.", context.getChannel());
 			}
 
 			@Override
 			public void noMatches() {
-				BotUtils.sendMessage(Emoji.WARNING + " Aucun résultat n'a été trouvé pour \"" + identifier.toString() + "\"", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " No result for \"" + identifier.toString() + "\"", context.getChannel());
 				GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 			}
 
 			@Override
 			public void loadFailed(FriendlyException e) {
-				Log.error("Le chargement de la musique a échoué.", e, context.getChannel());
+				Log.error("Music loading has failed.", e, context.getChannel());
 				GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 			}
 		});
@@ -98,11 +97,11 @@ public class PlayCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Joue la musique passée en URL.**")
-				.appendField("Utilisation", "/play <url>", false);
+				.appendDescription("**Play the music from the url. Search tags or playlist are also possible.**")
+				.appendField("Usage", "/play <url>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

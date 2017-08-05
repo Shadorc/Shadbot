@@ -23,7 +23,7 @@ public class PlaylistCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.WARNING + " Aucune musique en cours de lecture.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " No currently playing music.", context.getChannel());
 			return;
 		}
 
@@ -33,10 +33,10 @@ public class PlaylistCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche la playlist en cours.**");
+				.appendDescription("**Show the current playlist.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }
