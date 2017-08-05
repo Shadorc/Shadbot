@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.utils;
+package me.shadorc.discordbot.command.french;
 
 
 import java.awt.Color;
@@ -15,7 +15,7 @@ import twitter4j.TwitterException;
 public class HolidaysCmd extends Command {
 
 	public HolidaysCmd() {
-		super(false, "vacances", "vacs", "holidays");
+		super(false, "vacs", "vacances");
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class HolidaysCmd extends Command {
 			if(e.getErrorCode() == 34) {
 				throw new IllegalArgumentException();
 			} else {
-				Log.error("Une erreur est survenue lors de la récupération des informations concernant les vacances.", e, context.getChannel());
+				Log.error("An error occured while getting holidays information.", e, context.getChannel());
 			}
 		}
 	}
@@ -40,11 +40,11 @@ public class HolidaysCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche le nombre de jours restants avant les prochaines vacances scolaires pour la zone indiquée.**")
-				.appendField("Utilisation", "/vacs <A|B|C>", false);
+				.appendDescription("**Show the number of remaining days before the next school holidays for the indicated zone.**")
+				.appendField("Usage", "/vacs <A|B|C>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

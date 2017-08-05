@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.fun;
+package me.shadorc.discordbot.command.french;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -30,17 +30,17 @@ public class BashCmd extends Command {
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");
 			BotUtils.sendMessage("```" + quote + "```", context.getChannel());
 		} catch (IOException e) {
-			Log.error("Une erreur est survenue lors de la récupération d'une quote sur danstonchat.com", e, context.getChannel());
+			Log.error("An error occured while getting a quote from DansTonChat.com", e, context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche une quote aléatoire issue du site danstonchat.com.**");
+				.appendDescription("**Show a random quote from DansTonChat.com**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

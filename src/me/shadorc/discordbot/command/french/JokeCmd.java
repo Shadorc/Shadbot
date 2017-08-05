@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.fun;
+package me.shadorc.discordbot.command.french;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -29,17 +29,17 @@ public class JokeCmd extends Command {
 			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
 			BotUtils.sendMessage("```" + StringUtils.convertHtmlToUTF8(joke).replace("\n\n", "\n") + "```", context.getChannel());
 		} catch (IOException e) {
-			Log.error("Une erreur est survenue lors de la récupération de la blague.", e, context.getChannel());
+			Log.error("An error occured while getting joke.", e, context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Aide pour la commande /" + context.getArg())
+				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-				.appendDescription("**Affiche une blague aléatoire provenant du site blague-drole.net.**");
+				.appendDescription("**Show a random joke from blague-drole.net.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }
