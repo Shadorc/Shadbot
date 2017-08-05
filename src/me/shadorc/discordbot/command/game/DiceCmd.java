@@ -23,7 +23,7 @@ public class DiceCmd extends Command {
 	private static final int MULTIPLIER = 6;
 
 	public DiceCmd() {
-		super(false, "des", "dice");
+		super(false, "dice", "des");
 	}
 
 	@Override

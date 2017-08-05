@@ -23,7 +23,7 @@ public class WeatherCmd extends Command {
 	private final static SimpleDateFormat SDF = new SimpleDateFormat("MMMMM d, yyyy - hh:mm aa", Locale.ENGLISH);
 
 	public WeatherCmd() {
-		super(false, "meteo", "weather");
+		super(false, "weather", "meteo");
 	}
 
 	@Override

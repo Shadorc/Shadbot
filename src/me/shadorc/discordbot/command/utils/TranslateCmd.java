@@ -12,7 +12,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class TranslateCmd extends Command {
 
 	public TranslateCmd() {
-		super(false, "trad", "translate", "traduire");
+		super(false, "translate", "traduire", "trad");
 	}
 
 	@Override

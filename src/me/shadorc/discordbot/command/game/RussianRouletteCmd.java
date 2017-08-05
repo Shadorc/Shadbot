@@ -13,7 +13,7 @@ public class RussianRouletteCmd extends Command {
 	private static final int GAIN = 25;
 
 	public RussianRouletteCmd() {
-		super(false, "roulette_russe", "russian_roulette");
+		super(false, "russian_roulette", "roulette_russe");
 	}
 
 	@Override

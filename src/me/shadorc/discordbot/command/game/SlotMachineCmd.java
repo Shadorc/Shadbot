@@ -23,7 +23,7 @@ public class SlotMachineCmd extends Command {
 			SlotOptions.GIFT }; // Winning chance : 0.2%
 
 	public SlotMachineCmd() {
-		super(false, "machine_sous", "slot_machine");
+		super(false, "slot_machine", "machine_sous");
 	}
 
 	@Override

@@ -16,7 +16,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class OverwatchCmd extends Command {
 
 	public OverwatchCmd() {
-		super(false, "overwatch");
+		super(false, "overwatch", "ow");
 	}
 
 	@Override
