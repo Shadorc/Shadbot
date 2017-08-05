@@ -1,12 +1,12 @@
 package me.shadorc.discordbot.command.utils;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -52,7 +52,7 @@ public class WikiCmd extends Command {
 					.withAuthorName(searchObj.getString("title"))
 					.withThumbnail("https://s1.qwant.com/thumbr/300x0/2/8/50c4ce83955fe31f8f070e40c10926/b_0_q_0_p_0.jpg?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fd1%2FWikipedia-logo-v2-fr.svg%2F892px-Wikipedia-logo-v2-fr.svg.png&q=0&b=0&p=0&a=0")
 					.withAuthorIcon(context.getAuthor().getAvatarURL())
-					.withColor(new Color(170, 196, 222))
+					.withColor(Config.BOT_COLOR)
 					.appendDesc(searchObj.getString("extract"))
 					.withFooterText("Wikipédia Page: https://fr.wikipedia.org/wiki/" + URLEncoder.encode(searchObj.getString("title"), "UTF-8"));
 
@@ -65,9 +65,9 @@ public class WikiCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.withDescription("**Show Wikipedia description for a search.**")
 				.appendField("Usage", "/wiki <search>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

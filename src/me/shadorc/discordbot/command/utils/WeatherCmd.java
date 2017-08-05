@@ -1,10 +1,10 @@
 package me.shadorc.discordbot.command.utils;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
@@ -49,7 +49,7 @@ public class WeatherCmd extends Command {
 						.withDesc("Last updatee on " + SDF.format(weather.getDateTime()))
 						.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
 						.withAuthorIcon(context.getAuthor().getAvatarURL())
-						.withColor(new Color(170, 196, 222))
+						.withColor(Config.BOT_COLOR)
 						.appendField(Emoji.CLOUD + " Clouds", clouds, true)
 						.appendField(Emoji.WIND + " Wind", windDesc + "\n" + String.format("%.1f", windSpeed) + " km/h", true)
 						.appendField(Emoji.RAIN + " Rain", rain, true)
@@ -69,9 +69,9 @@ public class WeatherCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show weather report for a city.**")
 				.appendField("Usage", "/weather <city>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

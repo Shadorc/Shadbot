@@ -1,12 +1,12 @@
 package me.shadorc.discordbot.command.info;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
@@ -53,7 +53,7 @@ public class CounterStrikeCmd extends Command {
 					.withAuthorName("Statistiques Counter-Strike: Global Offensive")
 					.withAuthorIcon("http://www.icon100.com/up/2841/256/csgo.png")
 					.withThumbnail(userObj.getString("avatarfull"))
-					.withColor(new Color(170, 196, 222))
+					.withColor(Config.BOT_COLOR)
 					.withDesc("Stats for **" + userObj.getString("personaname") + "**")
 					.appendField("Kills", Integer.toString(this.getValue(statsArray, "total_kills")), true)
 					.appendField("Deaths", Integer.toString(this.getValue(statsArray, "total_deaths")), true)
@@ -81,9 +81,9 @@ public class CounterStrikeCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show stats of a player for Counter-Strike: Global Offensive.**")
 				.appendField("Usage", "/cs <steamID>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

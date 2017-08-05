@@ -33,8 +33,8 @@ import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.rpg.CharacterCmd;
-import me.shadorc.discordbot.command.utils.CalcCmd;
 import me.shadorc.discordbot.command.rpg.FightCmd;
+import me.shadorc.discordbot.command.utils.CalcCmd;
 import me.shadorc.discordbot.command.utils.TranslateCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
 import me.shadorc.discordbot.command.utils.WikiCmd;
@@ -80,8 +80,8 @@ public class CommandManager {
 				new CounterStrikeCmd(),
 				new DebugCmd(),
 				new CharacterCmd(),
-				new InfoCmd()
-				);
+				new FightCmd(),
+				new InfoCmd());
 	}
 
 	private void register(Command... cmds) {

@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.info;
 
-import java.awt.Color;
-
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -18,7 +17,7 @@ public class HelpCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Shadbot Help")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.withDesc("Get more information by using /help <command>.")
 				.appendField("Utils Commands:",
 						"`/translate`"
@@ -65,9 +64,9 @@ public class HelpCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show help for all the commands.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

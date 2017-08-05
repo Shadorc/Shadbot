@@ -1,10 +1,10 @@
 package me.shadorc.discordbot.command.info;
 
-import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -50,7 +50,7 @@ public class OverwatchCmd extends Command {
 					.withAuthorName("Overwatch Stats")
 					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
 					.withThumbnail(icon)
-					.withColor(new Color(170, 196, 222))
+					.withColor(Config.BOT_COLOR)
 					.withDesc("Stats for user **" + battletag + "**.")
 					.appendField("Level", level, true)
 					.appendField("Competitive rank", rank, true)
@@ -69,9 +69,9 @@ public class OverwatchCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show user stats for Overwatch.**")
 				.appendField("Usage", "/overwatch <pc|psn|xbl> <eu|us|cn|kr> <battletag#0000>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

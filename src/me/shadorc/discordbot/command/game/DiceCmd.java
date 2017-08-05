@@ -1,10 +1,10 @@
 package me.shadorc.discordbot.command.game;
 
-import java.awt.Color;
 import java.util.HashMap;
 
 import javax.swing.Timer;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
@@ -127,7 +127,7 @@ public class DiceCmd extends Command {
 					.withAuthorName("Dice Game")
 					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
-					.withColor(new Color(170, 196, 222))
+					.withColor(Config.BOT_COLOR)
 					.appendField(croupier.getName() + " started a dice game.",
 							"Use `/dice <num>` to join the game with a **" + bet + " coins** putting.", false)
 					.withFooterText("You have " + (timer.getDelay() / 1000) + " seconds to make your bets.");
@@ -169,9 +169,9 @@ public class DiceCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Start a dice game with a common bet or join a game in progress.**")
 				.appendField("Usage", "Create a game: **/dice <bet> <num>**.\nJoin a game **/dice <num>**", false)
 				.appendField("Restrictions", "The number must be between 1 and 6.\nYou can't bet on a number that has already been chosen by another player.", false)

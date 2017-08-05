@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.rpg;
 
-import java.awt.Color;
-
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -19,7 +18,7 @@ public class CharacterCmd extends Command {
 				.withAuthorName("RPG Stats")
 				.withAuthorIcon(context.getAuthor().getAvatarURL())
 				.withThumbnail("http://image.flaticon.com/icons/png/512/297/297806.png")
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.withDesc("Informations sur le personnage de " + context.getAuthorName() + ".")
 				.appendField("Niveau", Integer.toString(context.getUser().getLevel()), true)
 				.appendField("Vie", Integer.toString(context.getUser().getLife()), true)
@@ -33,7 +32,7 @@ public class CharacterCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Aide pour la commande /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Affiche votre niveaue.\nPour connaître le niveau d'un autre utilisateur, mentionnez le.**")
 				.appendField("Utilisation", "/level ou /level <@user>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

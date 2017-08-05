@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.music;
 
-import java.awt.Color;
-
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -42,9 +41,9 @@ public class VolumeCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show or change the current volume level.**")
 				.appendField("Usage", "/volume or /volume <0-100>", false);
 

@@ -17,7 +17,7 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		Log.info("------------------- Shadbot is connected [BETA:" + Main.IS_BETA + "] -------------------");
+		Log.info("------------------- Shadbot is connected [BETA:" + Config.IS_BETA + "] -------------------");
 		event.getClient().changePlayingText("/help");
 	}
 
@@ -30,8 +30,8 @@ public class EventListener {
 			return;
 		}
 
-		if((Main.IS_BETA && !event.getChannel().getStringID().equals(Main.DEBUG_CHANNEL_ID))
-				|| (!Main.IS_BETA && event.getChannel().getStringID().equals(Main.DEBUG_CHANNEL_ID))) {
+		if((Config.IS_BETA && !event.getChannel().getStringID().equals(Config.DEBUG_CHANNEL_ID))
+				|| (!Config.IS_BETA && event.getChannel().getStringID().equals(Config.DEBUG_CHANNEL_ID))) {
 			return;
 		}
 

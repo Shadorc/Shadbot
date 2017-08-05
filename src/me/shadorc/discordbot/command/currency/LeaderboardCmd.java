@@ -1,9 +1,9 @@
 package me.shadorc.discordbot.command.currency;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -42,7 +42,7 @@ public class LeaderboardCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Leaderboard")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.withDescription(strBuilder.toString());
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
@@ -51,9 +51,9 @@ public class LeaderboardCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show coins leaderboard for this server.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

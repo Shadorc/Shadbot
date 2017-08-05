@@ -1,11 +1,11 @@
 package me.shadorc.discordbot.command.french;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
 
 import org.json.JSONArray;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
@@ -37,9 +37,9 @@ public class BashCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show a random quote from DansTonChat.com**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

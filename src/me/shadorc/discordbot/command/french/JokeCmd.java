@@ -1,10 +1,10 @@
 package me.shadorc.discordbot.command.french;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -36,9 +36,9 @@ public class JokeCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show a random joke from blague-drole.net.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

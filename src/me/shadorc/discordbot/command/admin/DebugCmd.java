@@ -1,8 +1,8 @@
 package me.shadorc.discordbot.command.admin;
 
-import java.awt.Color;
 import java.util.stream.Collectors;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -20,7 +20,7 @@ public class DebugCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Debug Info")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendField("Ping", Integer.toString(NetUtils.getPing()), true)
 				.appendField("Guild ID", context.getGuild().getStringID(), true)
 				.appendField("Members count", Integer.toString(context.getGuild().getTotalMemberCount()), true)
@@ -35,9 +35,9 @@ public class DebugCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show debug info.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

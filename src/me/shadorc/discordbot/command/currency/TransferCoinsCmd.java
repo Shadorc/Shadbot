@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.currency;
 
-import java.awt.Color;
-
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
@@ -53,9 +52,9 @@ public class TransferCoinsCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Transfer of coins to the mentioned user.**")
 				.appendField("Usage", "/transfer <coins> <@user>", false)
 				.appendField("Restrictions", "The transferred amount must be strictly positive.\nYou can't transfer coins to yourself.", false);

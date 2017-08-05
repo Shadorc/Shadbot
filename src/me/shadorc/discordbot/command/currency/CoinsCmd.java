@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.currency;
 
-import java.awt.Color;
-
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
@@ -32,9 +31,9 @@ public class CoinsCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show how many coins you have.\nYou can also see how much coins have an user by mentioning him.**")
 				.appendField("Usage", "/coins or /coins <@user>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

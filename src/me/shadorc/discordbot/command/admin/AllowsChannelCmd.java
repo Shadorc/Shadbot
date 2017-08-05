@@ -1,9 +1,9 @@
 package me.shadorc.discordbot.command.admin;
 
-import java.awt.Color;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
@@ -36,9 +36,9 @@ public class AllowsChannelCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Allow Shadbot to only post messages in the mentioned channels.\nBy default, all the channels are allowed.**")
 				.appendField("Usage", "/allows_channel <#channel>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

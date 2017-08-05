@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.fun;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -8,6 +7,7 @@ import java.net.URLEncoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
@@ -73,9 +73,9 @@ public class GifCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show a random gif or a gif corresponding to a tag.**")
 				.appendField("Usage", "/gif or /gif <tag>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.game;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,6 +12,7 @@ import javax.swing.Timer;
 
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
@@ -99,7 +99,7 @@ public class TriviaCmd extends Command {
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Trivia")
 					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
-					.withColor(new Color(170, 196, 222))
+					.withColor(Config.BOT_COLOR)
 					.appendField("Question", strBuilder.toString(), false)
 					.appendField("Category", "`" + category + "`", true)
 					.appendField("Type", "`" + type + "`", true)
@@ -140,9 +140,9 @@ public class TriviaCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Start a Trivia game. Once one started, everyone can participate.**")
 				.appendField("Gains", "The winner gets " + GAINS + " coins.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

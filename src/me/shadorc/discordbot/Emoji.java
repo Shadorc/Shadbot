@@ -31,4 +31,5 @@ public interface Emoji {
 	String GEAR = ":gear:";
 
 	String SWORDS = ":crossed_swords:";
+	String SHIELD = ":shield:";
 }

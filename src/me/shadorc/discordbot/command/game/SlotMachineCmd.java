@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.game;
 
-import java.awt.Color;
-
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -58,9 +57,9 @@ public class SlotMachineCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + context.getArg())
+				.withAuthorName("Help for /" + this.getNames()[0])
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
-				.withColor(new Color(170, 196, 222))
+				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Play a game of slot machine for " + PAID_COST + " coins.**")
 				.appendField("Gains", "You have a 12.5% chance of winning 30 coins, a 5.3% chance of winning 150 coins and a 0.2% chance of winning 5000 coins.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
