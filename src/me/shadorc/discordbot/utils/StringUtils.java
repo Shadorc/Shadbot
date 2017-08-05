@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.utils;
 
-import java.io.File;
 import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -42,10 +41,7 @@ public class StringUtils {
 
 	public static String formatTrackName(AudioTrackInfo info) {
 		StringBuilder strBuilder = new StringBuilder();
-		if(info.author.equals("Unknown artist") && info.title.equals("Unknown title")) {
-			String fileName = new File(info.uri).getName();
-			strBuilder.append(fileName.substring(0, fileName.indexOf(".")));
-		} else if(info.author.equals("Unknown artist")) {
+		if(info.author.equals("Unknown artist")) {
 			strBuilder.append(info.title);
 		} else {
 			strBuilder.append(info.author + " - " + info.title);
@@ -80,28 +76,5 @@ public class StringUtils {
 			}
 		}
 		return true;
-	}
-
-	public static int getLevenshteinDistance(String word1, String word2) {
-		int[][] distance = new int[word1.length() + 1][word2.length() + 1];
-
-		for (int i = 0; i <= word1.length(); i++) {
-			distance[i][0] = i;
-		}
-		for (int j = 1; j <= word2.length(); j++) {
-			distance[0][j] = j;
-		}
-
-		for (int i = 1; i <= word1.length(); i++) {
-			for (int j = 1; j <= word2.length(); j++) {
-				distance[i][j] = Math.min(
-						Math.min(
-								distance[i - 1][j] + 1,
-								distance[i][j - 1] + 1),
-						distance[i - 1][j - 1] + ((word1.charAt(i - 1) == word2.charAt(j - 1)) ? 0 : 1));
-			}
-		}
-
-		return distance[word1.length()][word2.length()];
 	}
 }

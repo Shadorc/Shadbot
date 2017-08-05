@@ -6,14 +6,24 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 
 public class Utils {
+
+	public static List<String> convertArrayToList(JSONArray array) {
+		List<String> list = new ArrayList<>();
+		for(int i = 0; i < array.length(); i++) {
+			list.add(array.getString(i));
+		}
+		return list;
+	}
 
 	public static String translate(String langFrom, String langTo, String word) throws IOException {
 		String url = "https://translate.googleapis.com/translate_a/single?"+
