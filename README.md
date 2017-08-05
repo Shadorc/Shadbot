@@ -3,13 +3,13 @@
    <header>
       <img align="right" src="https://i.imgur.com/bP970dP.png" height="220" width="220">
       <h1>Shadbot</h1>
-      <p><b>Shadbot is a French Discord Bot that executes games, fun, useful commands and plays Musics !</b></p>
+      <p><b>Shadbot is a Discord Bot that executes Fun & Useful Commands and play Games & Musics !</b></p>
    </header>
    <body>
       <hr>
       <h2>Usage</h2>
       <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=3296256">link</a> !</b></p>
-      <p>During the first launch, you have to indicate the channels in which Shadbot can post by typing
+      <p>You can indicate the channels in which Shadbot can post by using
          <br>/allows_channel &lt;#channel | all&gt;
       </p>
       <hr>
