@@ -27,12 +27,12 @@ public class InfoCmd extends Command {
 		long allocatedMemory = runtime.totalMemory();
 		long freeMemory = runtime.freeMemory();
 		long uptime = Duration.between(Discord4J.getLaunchTime().atZone(ZoneId.systemDefault()).toInstant(), Instant.now()).toMillis();
-		int mb = 1024*1024;
+		int mb = 1024 * 1024;
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("```prolog");
 		sb.append("\n-= Performance Info =-");
-		sb.append("\nMemory : " + String.format("%.1f MB / %.1f MB", (float) (allocatedMemory-freeMemory)/mb, (float) allocatedMemory/mb));
+		sb.append("\nMemory : " + String.format("%.1f MB / %.1f MB", (float) (allocatedMemory - freeMemory) / mb, (float) allocatedMemory / mb));
 		sb.append("\nThreads Count : " + Thread.activeCount());
 		sb.append("\n\n-= APIs Info =-");
 		sb.append("\n" + Discord4J.NAME + " Version: " + Discord4J.VERSION);

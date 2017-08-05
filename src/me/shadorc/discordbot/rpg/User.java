@@ -70,7 +70,7 @@ public class User {
 	}
 
 	public int getXpToNextLevel() {
-		return (int) Math.round(8.25*level+10);
+		return (int) Math.round(8.25 * level + 10);
 	}
 
 	public String getStringID() {
@@ -101,7 +101,7 @@ public class User {
 	}
 
 	public void hurt(int dmg) {
-		this.life = Math.max(0, life-dmg);
+		this.life = Math.max(0, life - dmg);
 		this.save();
 	}
 

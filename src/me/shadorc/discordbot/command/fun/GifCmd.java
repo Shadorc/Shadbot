@@ -26,10 +26,11 @@ public class GifCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		//		if(!context.getChannel().isNSFW()) {
-		//			BotUtils.sendMessage(Emoji.WARNING + " Vous devez être dans un salon NSFW pour utiliser les gifs.", context.getChannel());
-		//			return;
-		//		}
+		// if(!context.getChannel().isNSFW()) {
+		// BotUtils.sendMessage(Emoji.WARNING + " Vous devez être dans un salon NSFW pour utiliser les gifs.",
+		// context.getChannel());
+		// return;
+		// }
 
 		if(context.getArg() == null) {
 			try {
@@ -42,12 +43,13 @@ public class GifCmd extends Command {
 				Log.error("An arror occured while getting a gif from Giphy.", e, context.getChannel());
 			}
 
-			//			try {
-			//				String gifUrl = HtmlUtils.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"", "\">");
-			//				BotUtils.sendMessage(gifUrl, context.getChannel());
-			//			} catch (IOException e) {
-			//				Log.error("Une erreur est survenue lors de la récupération d'un gif sur Gifland.", e, context.getChannel());
-			//			}
+			// try {
+			// String gifUrl = HtmlUtils.parseHTML(new URL("http://gifland.us"), "<meta name=\"twitter:image:src", "content=\"",
+			// "\">");
+			// BotUtils.sendMessage(gifUrl, context.getChannel());
+			// } catch (IOException e) {
+			// Log.error("Une erreur est survenue lors de la récupération d'un gif sur Gifland.", e, context.getChannel());
+			// }
 		}
 
 		else {

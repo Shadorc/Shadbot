@@ -18,7 +18,7 @@ public class TranslateCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		//Country doc https://ctrlq.org/code/19899-google-translate-languages
+		// Country doc https://ctrlq.org/code/19899-google-translate-languages
 		if(context.getArg() == null) {
 			throw new IllegalArgumentException();
 		}

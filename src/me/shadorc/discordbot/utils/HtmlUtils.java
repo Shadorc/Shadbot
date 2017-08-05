@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class HtmlUtils {
 
 	/**
-	 * @param  url - webpage's url
+	 * @param url - webpage's url
 	 * @return Whole HTML from the URL
 	 * @throws IOException
 	 */
@@ -44,13 +44,13 @@ public class HtmlUtils {
 	}
 
 	/**
-	 * @param  text - text to parse
-	 * @param  start - starting String
-	 * @param  end - ending String
+	 * @param text - text to parse
+	 * @param start - starting String
+	 * @param end - ending String
 	 * @return All substrings between start and end Strings in text
 	 */
-	public static ArrayList <String> getAllSubstring(String text, String start, String end) {
-		ArrayList <String> lines = new ArrayList<>();
+	public static ArrayList<String> getAllSubstring(String text, String start, String end) {
+		ArrayList<String> lines = new ArrayList<>();
 		Pattern p = Pattern.compile(Pattern.quote(start) + "(?s)(.*?)" + Pattern.quote(end));
 		Matcher m = p.matcher(text);
 		while(m.find()) {
@@ -61,10 +61,10 @@ public class HtmlUtils {
 	}
 
 	/**
-	 * @param  url - webpage's url
-	 * @param  toMatch - String to match in HTML code
-	 * @param  start - parsing begin
-	 * @param  end - parsing ending
+	 * @param url - webpage's url
+	 * @param toMatch - String to match in HTML code
+	 * @param start - parsing begin
+	 * @param end - parsing ending
 	 * @return Parsed HTML from "start" to "end"
 	 * @throws IOException
 	 */
@@ -100,10 +100,10 @@ public class HtmlUtils {
 	}
 
 	/**
-	 * @param  html - webpage's html
-	 * @param  toMatch - String to match in HTML code
-	 * @param  start - parsing begin
-	 * @param  end - parsing ending
+	 * @param html - webpage's html
+	 * @param toMatch - String to match in HTML code
+	 * @param start - parsing begin
+	 * @param end - parsing ending
 	 * @return Parsed HTML from "start" to "end"
 	 */
 	public static String parseTextHTML(String html, String toMatch, String start, String end) {

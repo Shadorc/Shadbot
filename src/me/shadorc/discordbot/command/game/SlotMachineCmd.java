@@ -19,9 +19,9 @@ public class SlotMachineCmd extends Command {
 
 	private static final int PAID_COST = 5;
 	private static final SlotOptions[] slotsArray = new SlotOptions[] {
-			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, //Winning chance : 12.5%
-			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, 									//Winning chance : 5.3%
-			SlotOptions.GIFT}; 																		//Winning chance : 0.2%
+			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, // Winning chance : 12.5%
+			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, // Winning chance : 5.3%
+			SlotOptions.GIFT }; // Winning chance : 0.2%
 
 	public SlotMachineCmd() {
 		super(false, "machine_sous", "slot_machine");
@@ -42,18 +42,16 @@ public class SlotMachineCmd extends Command {
 
 		if(slot1 == SlotOptions.CHERRIES && slot2 == SlotOptions.CHERRIES && slot3 == SlotOptions.CHERRIES) {
 			gains = 30;
-		}
-		else if(slot1 == SlotOptions.BELL && slot2 == SlotOptions.BELL && slot3 == SlotOptions.BELL) {
+		} else if(slot1 == SlotOptions.BELL && slot2 == SlotOptions.BELL && slot3 == SlotOptions.BELL) {
 			gains = 150;
-		}
-		else if(slot1 == SlotOptions.GIFT && slot2 == SlotOptions.GIFT && slot3 == SlotOptions.GIFT) {
+		} else if(slot1 == SlotOptions.GIFT && slot2 == SlotOptions.GIFT && slot3 == SlotOptions.GIFT) {
 			gains = 5000;
 		}
 		context.getUser().addCoins(gains);
 
 		StringBuilder message = new StringBuilder();
 		message.append(":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":");
-		message.append("\nYou have "+ (gains > 0 ? "win" : "lost") + " " + Math.abs(gains) + " coins !");
+		message.append("\nYou have " + (gains > 0 ? "win" : "lost") + " " + Math.abs(gains) + " coins !");
 		BotUtils.sendMessage(message.toString(), context.getChannel());
 	}
 

@@ -20,7 +20,7 @@ public class AllowsChannelCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		List <IChannel> channels = context.getMessage().getChannelMentions();
+		List<IChannel> channels = context.getMessage().getChannelMentions();
 		if(channels.size() == 0) {
 			throw new IllegalArgumentException();
 		}

@@ -40,7 +40,7 @@ public class PauseCmd extends Command {
 				.withAuthorName("Help for /" + context.getArg())
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
-		.appendDescription("**Pause the current playing music. Use this command again to resume.**");
+				.appendDescription("**Pause the current playing music. Use this command again to resume.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

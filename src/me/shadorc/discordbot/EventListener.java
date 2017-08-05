@@ -30,7 +30,7 @@ public class EventListener {
 			return;
 		}
 
-		if((Main.IS_BETA && !event.getChannel().getStringID().equals(Main.DEBUG_CHANNEL_ID)) 
+		if((Main.IS_BETA && !event.getChannel().getStringID().equals(Main.DEBUG_CHANNEL_ID))
 				|| (!Main.IS_BETA && event.getChannel().getStringID().equals(Main.DEBUG_CHANNEL_ID))) {
 			return;
 		}
@@ -38,8 +38,7 @@ public class EventListener {
 		GuildTriviaManager gtm = TriviaCmd.getGuildTriviaManager(event.getGuild());
 		if(gtm != null && gtm.isStarted()) {
 			gtm.checkAnswer(message);
-		}
-		else if(message.getContent().startsWith("/")) {
+		} else if(message.getContent().startsWith("/")) {
 			BotUtils.executeCommand(event);
 		}
 	}
@@ -58,7 +57,7 @@ public class EventListener {
 				BotUtils.sendMessage(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.", gmm.getChannel());
 				gmm.getScheduler().setPaused(true);
 				gmm.scheduleLeave();
-			} else if(!this.isAlone(botVoiceChannel) && gmm.isCancelling()){
+			} else if(!this.isAlone(botVoiceChannel) && gmm.isCancelling()) {
 				BotUtils.sendMessage(Emoji.INFO + " Somebody joined me, music resumed.", gmm.getChannel());
 				gmm.getScheduler().setPaused(false);
 				gmm.cancelLeave();

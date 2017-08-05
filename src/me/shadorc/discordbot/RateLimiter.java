@@ -7,7 +7,7 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class RateLimiter {
 
-	private static final HashMap <IGuild, HashMap <IUser, Long>> GUILDS_RATELIMITER = new HashMap<>();
+	private static final HashMap<IGuild, HashMap<IUser, Long>> GUILDS_RATELIMITER = new HashMap<>();
 
 	private final int timeout;
 
@@ -19,14 +19,14 @@ public class RateLimiter {
 		long currentTime = System.currentTimeMillis();
 
 		if(!GUILDS_RATELIMITER.containsKey(guild)) {
-			GUILDS_RATELIMITER.put(guild, new HashMap <IUser, Long>());
+			GUILDS_RATELIMITER.put(guild, new HashMap<IUser, Long>());
 			GUILDS_RATELIMITER.get(guild).put(user, currentTime);
 			return false;
 		}
 
 		long lastTime = GUILDS_RATELIMITER.get(guild).get(user);
 		long diff = currentTime - lastTime;
-		if(diff > timeout*1000) {
+		if(diff > timeout * 1000) {
 			GUILDS_RATELIMITER.get(guild).put(user, currentTime);
 			return false;
 		}
@@ -35,7 +35,7 @@ public class RateLimiter {
 	}
 
 	public long getRemainingTime(IGuild guild, IUser user) {
-		return timeout - (System.currentTimeMillis() - GUILDS_RATELIMITER.get(guild).get(user))/1000;
+		return timeout - (System.currentTimeMillis() - GUILDS_RATELIMITER.get(guild).get(user)) / 1000;
 	}
 
 	public int getTimeout() {

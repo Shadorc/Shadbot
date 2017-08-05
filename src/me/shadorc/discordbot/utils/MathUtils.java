@@ -12,7 +12,7 @@ public class MathUtils {
 	 * @return the next pseudorandom, uniformly distributed int value between min (inclusive) and max (inclusive)
 	 */
 	public static int rand(int min, int max) {
-		return min + MathUtils.rand(max-min+1);
+		return min + MathUtils.rand(max - min + 1);
 	}
 
 	public static int rand(int bound) {

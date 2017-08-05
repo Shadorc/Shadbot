@@ -25,9 +25,9 @@ public class DebugCmd extends Command {
 				.appendField("Guild ID", context.getGuild().getStringID(), true)
 				.appendField("Members count", Integer.toString(context.getGuild().getTotalMemberCount()), true)
 				.appendField("Channel(s)", context.getGuild().getChannels().stream().map(
-						channel -> channel.mention() 
-						+ " | ID: " + channel.getStringID()
-						+ " | Authorized : " + BotUtils.isChannelAllowed(context.getGuild(), channel))
+						channel -> channel.mention()
+								+ " | ID: " + channel.getStringID()
+								+ " | Authorized : " + BotUtils.isChannelAllowed(context.getGuild(), channel))
 						.collect(Collectors.joining("\n")), true);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

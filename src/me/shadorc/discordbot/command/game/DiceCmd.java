@@ -19,7 +19,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class DiceCmd extends Command {
 
-	private static final HashMap <IGuild, DiceManager> GUILDS_DICE = new HashMap<>();
+	private static final HashMap<IGuild, DiceManager> GUILDS_DICE = new HashMap<>();
 	private static final int MULTIPLIER = 6;
 
 	public DiceCmd() {
@@ -100,7 +100,7 @@ public class DiceCmd extends Command {
 			this.numsPlayers = new HashMap<>();
 			this.numsPlayers.put(num, user);
 			this.bet = bet;
-			this.timer = new Timer(30*1000, e -> {
+			this.timer = new Timer(30 * 1000, e -> {
 				this.stop();
 			});
 			this.start();
@@ -130,7 +130,7 @@ public class DiceCmd extends Command {
 					.withColor(new Color(170, 196, 222))
 					.appendField(croupier.getName() + " started a dice game.",
 							"Use `/dice <num>` to join the game with a **" + bet + " coins** putting.", false)
-					.withFooterText("You have " + (timer.getDelay()/1000) + " seconds to make your bets.");
+					.withFooterText("You have " + (timer.getDelay() / 1000) + " seconds to make your bets.");
 			BotUtils.sendEmbed(builder.build(), channel);
 
 			this.timer.start();
@@ -144,7 +144,7 @@ public class DiceCmd extends Command {
 
 			if(numsPlayers.containsKey(rand)) {
 				IUser winner = numsPlayers.get(rand);
-				int gains = bet*numsPlayers.size()*MULTIPLIER;
+				int gains = bet * numsPlayers.size() * MULTIPLIER;
 				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win " + gains + " coins !", channel);
 				Storage.getUser(channel.getGuild(), winner).addCoins(gains);
 				numsPlayers.remove(rand);

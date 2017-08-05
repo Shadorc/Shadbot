@@ -30,7 +30,7 @@ public class GuildMusicManager {
 		this.scheduler = new TrackScheduler(player);
 		this.audioEventListener = new AudioEventListener(guild, scheduler);
 		this.player.addListener(audioEventListener);
-		this.leaveTimer = new Timer(60*1000, e -> {
+		this.leaveTimer = new Timer(60 * 1000, e -> {
 			this.scheduler.stop();
 			this.leave();
 		});

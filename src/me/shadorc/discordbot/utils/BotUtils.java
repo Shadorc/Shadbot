@@ -30,7 +30,7 @@ public class BotUtils {
 		}
 	}
 
-	//EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
+	// EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
 		try {
 			RequestBuffer.request(() -> {
@@ -54,7 +54,7 @@ public class BotUtils {
 	 */
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
 		JSONArray channelsArray = Storage.getAllowedChannels(guild);
-		//If no permissions were defined, authorize by default all the channels
+		// If no permissions were defined, authorize by default all the channels
 		if(channelsArray == null) {
 			return true;
 		}

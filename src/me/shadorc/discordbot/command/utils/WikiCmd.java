@@ -29,7 +29,7 @@ public class WikiCmd extends Command {
 
 		try {
 			String searchEncoded = URLEncoder.encode(context.getArg(), "UTF-8");
-			//Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
+			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
 			String json = HtmlUtils.getHTML(new URL("https://en.wikipedia.org/w/api.php?"
 					+ "action=query"
 					+ "&titles=" + searchEncoded

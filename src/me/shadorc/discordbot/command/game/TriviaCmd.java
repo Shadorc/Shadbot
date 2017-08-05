@@ -55,7 +55,7 @@ public class TriviaCmd extends Command {
 	public class GuildTriviaManager {
 
 		private final IChannel channel;
-		private final List <IUser> alreadyAnswered;
+		private final List<IUser> alreadyAnswered;
 		private final Timer timer;
 		private boolean isStarted;
 		private String correctAnswer;
@@ -65,13 +65,13 @@ public class TriviaCmd extends Command {
 			this.channel = channel;
 			this.alreadyAnswered = new ArrayList<>();
 			this.isStarted = false;
-			this.timer = new Timer(30*1000, e -> {
+			this.timer = new Timer(30 * 1000, e -> {
 				BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the good answer was " + correctAnswer + ".", channel);
 				this.stop();
 			});
 		}
 
-		//Trivia API doc : https://opentdb.com/api_config.php
+		// Trivia API doc : https://opentdb.com/api_config.php
 		private void start() throws MalformedURLException, IOException {
 			String json = HtmlUtils.getHTML(new URL("https://opentdb.com/api.php?amount=1"));
 			JSONObject result = new JSONObject(json).getJSONArray("results").getJSONObject(0);
@@ -86,7 +86,7 @@ public class TriviaCmd extends Command {
 
 			StringBuilder strBuilder = new StringBuilder("**" + StringUtils.convertHtmlToUTF8(question) + "**");
 			if(type.equals("multiple")) {
-				//Place the correct answer randomly in the list
+				// Place the correct answer randomly in the list
 				int index = MathUtils.rand(incorrectAnswers.size());
 				for(int i = 0; i < incorrectAnswers.size(); i++) {
 					if(i == index) {
@@ -101,10 +101,10 @@ public class TriviaCmd extends Command {
 					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
 					.withColor(new Color(170, 196, 222))
 					.appendField("Question", strBuilder.toString(), false)
-					.appendField("Category",  "`" + category + "`", true)
+					.appendField("Category", "`" + category + "`", true)
 					.appendField("Type", "`" + type + "`", true)
 					.appendField("Difficulty", "`" + difficulty + "`", true)
-					.withFooterText("You have " + (timer.getDelay()/1000) + " seconds to answer.");
+					.withFooterText("You have " + (timer.getDelay() / 1000) + " seconds to answer.");
 
 			BotUtils.sendEmbed(builder.build(), channel);
 
@@ -116,12 +116,10 @@ public class TriviaCmd extends Command {
 		public void checkAnswer(IMessage message) {
 			if(alreadyAnswered.contains(message.getAuthor())) {
 				BotUtils.sendMessage(Emoji.WARNING + " Sorry " + message.getAuthor().getName() + ", you can only answer once.", message.getChannel());
-			}
-			else if(incorrectAnswers.stream().anyMatch(message.getContent()::equalsIgnoreCase)) {
+			} else if(incorrectAnswers.stream().anyMatch(message.getContent()::equalsIgnoreCase)) {
 				BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", channel);
 				alreadyAnswered.add(message.getAuthor());
-			}
-			else if(message.getContent().equalsIgnoreCase(this.correctAnswer)) {
+			} else if(message.getContent().equalsIgnoreCase(this.correctAnswer)) {
 				BotUtils.sendMessage(Emoji.CLAP + " Correct ! " + message.getAuthor().getName() + ", you won **" + GAINS + " coins**.", channel);
 				Storage.getUser(message.getGuild(), message.getAuthor()).addCoins(GAINS);
 				this.stop();

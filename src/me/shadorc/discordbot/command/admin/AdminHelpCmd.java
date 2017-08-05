@@ -20,7 +20,7 @@ public class AdminHelpCmd extends Command {
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(new Color(170, 196, 222))
 				.withDesc("Get more information by using /help <command>.")
-				.appendField("Commands:",			
+				.appendField("Commands:",
 						"`/allows_channel`"
 								+ " `/debug`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")

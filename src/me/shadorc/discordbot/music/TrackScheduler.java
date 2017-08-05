@@ -42,7 +42,7 @@ public class TrackScheduler {
 		return StringUtils.formatTrackName(audioPlayer.getPlayingTrack().getInfo());
 	}
 
-	public BlockingQueue <AudioTrack> getPlaylist() {
+	public BlockingQueue<AudioTrack> getPlaylist() {
 		return queue;
 	}
 

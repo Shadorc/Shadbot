@@ -28,7 +28,7 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-		//Create a new Thread avoid java.net.SocketException by leaving the time to the sockets to close
+		// Create a new Thread avoid java.net.SocketException by leaving the time to the sockets to close
 		new Thread(() -> {
 			if(endReason.mayStartNext) {
 				if(scheduler.isRepeating()) {

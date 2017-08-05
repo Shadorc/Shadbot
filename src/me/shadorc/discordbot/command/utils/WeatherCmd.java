@@ -18,7 +18,7 @@ import net.aksingh.owmjapis.OpenWeatherMap;
 import net.aksingh.owmjapis.OpenWeatherMap.Units;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class WeatherCmd extends Command{
+public class WeatherCmd extends Command {
 
 	private final static SimpleDateFormat SDF = new SimpleDateFormat("MMMMM d, yyyy - hh:mm aa", Locale.ENGLISH);
 
@@ -38,7 +38,7 @@ public class WeatherCmd extends Command{
 
 			if(weather.isValid()) {
 				String clouds = StringUtils.capitalize(weather.getWeatherInstance(0).getWeatherDescription());
-				float windSpeed = weather.getWindInstance().getWindSpeed()*3.6f;
+				float windSpeed = weather.getWindInstance().getWindSpeed() * 3.6f;
 				String windDesc = this.getWindDesc(windSpeed);
 				String rain = weather.hasRainInstance() ? String.format("%.1f mm/h", weather.getRainInstance().getRain3h()) : "None";
 				float humidity = weather.getMainInstance().getHumidity();
@@ -104,6 +104,6 @@ public class WeatherCmd extends Command{
 			return "Violent storm";
 		} else {
 			return "Hurricane";
-		} 
+		}
 	}
 }

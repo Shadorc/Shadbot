@@ -24,7 +24,7 @@ public class JokeCmd extends Command {
 	public void execute(Context context) {
 		try {
 			String htmlPage = HtmlUtils.getHTML(new URL("https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 10) + ".html?tri=top"));
-			ArrayList <String> jokesList = HtmlUtils.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
+			ArrayList<String> jokesList = HtmlUtils.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
 			String joke = jokesList.get(MathUtils.rand(jokesList.size()));
 			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
 			BotUtils.sendMessage("```" + StringUtils.convertHtmlToUTF8(joke).replace("\n\n", "\n") + "```", context.getChannel());

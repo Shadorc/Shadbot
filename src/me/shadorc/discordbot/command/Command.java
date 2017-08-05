@@ -13,6 +13,7 @@ public abstract class Command {
 	}
 
 	public abstract void execute(Context context);
+
 	public abstract void showHelp(Context context);
 
 	public boolean isAdminCmd() {

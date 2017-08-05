@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.french;
 
-
 import java.awt.Color;
 
 import me.shadorc.discordbot.Emoji;

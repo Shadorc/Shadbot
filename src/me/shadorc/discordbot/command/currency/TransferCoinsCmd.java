@@ -45,7 +45,7 @@ public class TransferCoinsCmd extends Command {
 			receiverUser.addCoins(coins);
 
 			BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " has transfered " + coins + " coins to " + receiverUser.mention(), context.getChannel());
-		} catch(NumberFormatException e1) {
+		} catch (NumberFormatException e1) {
 			throw new IllegalArgumentException();
 		}
 	}

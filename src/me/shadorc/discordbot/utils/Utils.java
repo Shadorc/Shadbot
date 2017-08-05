@@ -26,8 +26,8 @@ public class Utils {
 	}
 
 	public static String translate(String langFrom, String langTo, String word) throws IOException {
-		String url = "https://translate.googleapis.com/translate_a/single?"+
-				"client=gtx&"+
+		String url = "https://translate.googleapis.com/translate_a/single?" +
+				"client=gtx&" +
 				"sl=" + langFrom +
 				"&tl=" + langTo +
 				"&dt=t&q=" + URLEncoder.encode(word, "UTF-8");
@@ -60,7 +60,6 @@ public class Utils {
 						Map.Entry::getKey,
 						Map.Entry::getValue,
 						(e1, e2) -> e1,
-						LinkedHashMap::new
-						));
+						LinkedHashMap::new));
 	}
 }

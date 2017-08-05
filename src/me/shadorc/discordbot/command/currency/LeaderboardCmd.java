@@ -20,7 +20,7 @@ public class LeaderboardCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-		Map <IUser, Integer> usersCoin = new HashMap<>();
+		Map<IUser, Integer> usersCoin = new HashMap<>();
 		for(IUser user : context.getGuild().getUsers()) {
 			int userCoin = Storage.getUser(context.getGuild(), user).getCoins();
 			if(userCoin > 0) {

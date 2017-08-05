@@ -44,7 +44,7 @@ public class NetUtils {
 
 			int average = 0;
 			String[] array = builder.toString().split(" = ");
-			average = Integer.parseInt(array[array.length-1].replaceAll("[^\\d]", ""));
+			average = Integer.parseInt(array[array.length - 1].replaceAll("[^\\d]", ""));
 
 			return average;
 

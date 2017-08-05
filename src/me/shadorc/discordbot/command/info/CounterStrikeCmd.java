@@ -56,10 +56,10 @@ public class CounterStrikeCmd extends Command {
 					.withColor(new Color(170, 196, 222))
 					.withDesc("Stats for **" + userObj.getString("personaname") + "**")
 					.appendField("Kills", Integer.toString(this.getValue(statsArray, "total_kills")), true)
-					.appendField("Deaths",  Integer.toString(this.getValue(statsArray, "total_deaths")), true)
-					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills")/this.getValue(statsArray, "total_deaths")), true)
-					.appendField("Total wins",  Integer.toString(this.getValue(statsArray, "total_wins")), true)
-					.appendField("Total MVP",  Integer.toString(this.getValue(statsArray, "total_mvps")), true)
+					.appendField("Deaths", Integer.toString(this.getValue(statsArray, "total_deaths")), true)
+					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills") / this.getValue(statsArray, "total_deaths")), true)
+					.appendField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
+					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true)
 					.withFooterText("Steam Profile: http://steamcommunity.com/profiles/" + context.getArg() + "/");
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
