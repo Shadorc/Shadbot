@@ -16,7 +16,7 @@ public class SlotMachineCmd extends Command {
 		GIFT
 	}
 
-	private static final int PAID_COST = 5;
+	private static final int PAID_COST = 10;
 	private static final SlotOptions[] slotsArray = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, // Winning chance : 12.5%
 			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, // Winning chance : 5.3%
@@ -44,7 +44,7 @@ public class SlotMachineCmd extends Command {
 		} else if(slot1 == SlotOptions.BELL && slot2 == SlotOptions.BELL && slot3 == SlotOptions.BELL) {
 			gains = 150;
 		} else if(slot1 == SlotOptions.GIFT && slot2 == SlotOptions.GIFT && slot3 == SlotOptions.GIFT) {
-			gains = 5000;
+			gains = 3000;
 		}
 		context.getUser().addCoins(gains);
 
@@ -61,7 +61,8 @@ public class SlotMachineCmd extends Command {
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Play a game of slot machine for " + PAID_COST + " coins.**")
-				.appendField("Gains", "You have a 12.5% chance of winning 30 coins, a 5.3% chance of winning 150 coins and a 0.2% chance of winning 5000 coins.", false);
+				.appendField("Cost", "A game costs " + PAID_COST + " coins.", false)
+				.appendField("Gains", "You have a 12.5% chance of winning 30 coins, a 5.3% chance of winning 150 coins and a 0.2% chance of winning 3000 coins.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

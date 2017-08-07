@@ -10,7 +10,6 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends Command {
 
-	private static final int GAIN = 25;
 
 	public RussianRouletteCmd() {
 		super(false, "russian_roulette", "roulette_russe");
@@ -18,14 +17,17 @@ public class RussianRouletteCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
+		int userCoins = context.getUser().getCoins();
 		if(MathUtils.rand(6) == 0) {
+			int loss = (int) Math.ceil(-userCoins*0.50);
 			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **PAN** ... "
-					+ "Sorry, you died, you lose all your coins.", context.getChannel());
-			context.getUser().setCoins(0);
+					+ "Sorry, you died, you lose **" + Math.abs(loss) + " coins**.", context.getChannel());
+			context.getUser().addCoins(loss);
 		} else {
+			int gain = (int) Math.ceil(userCoins*0.30);
 			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **click** ... "
-					+ "Phew, you are still alive, you gets " + GAIN + " coins !", context.getChannel());
-			context.getUser().addCoins(GAIN);
+					+ "Phew, you are still alive, you gets **" + gain + " coins** !", context.getChannel());
+			context.getUser().addCoins(gain);
 		}
 	}
 
@@ -36,7 +38,7 @@ public class RussianRouletteCmd extends Command {
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Play russian roulette.**")
-				.appendField("Gains", "You have 5-in-6 chance to win " + GAIN + " coins and a 1-in-6 chance to lose all your coins.", false);
+				.appendField("Gains", "You have 5-in-6 chance to win 30% of your coins and a 1-in-6 chance to lose 50% of your coins.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }
