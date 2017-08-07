@@ -1,7 +1,10 @@
 package me.shadorc.discordbot.command.game;
 
+import java.time.temporal.ChronoUnit;
+
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -22,12 +25,20 @@ public class SlotMachineCmd extends Command {
 			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, // Winning chance : 5.3%
 			SlotOptions.GIFT }; // Winning chance : 0.2%
 
+	private final RateLimiter rateLimiter;
+
 	public SlotMachineCmd() {
 		super(false, "slot_machine", "machine_sous");
+		this.rateLimiter = new RateLimiter(10, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) {
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			BotUtils.sendMessage(Emoji.WARNING + " You can use the slot machine only once every " + rateLimiter.getTimeout() + " seconds.", context.getChannel());
+			return;
+		}
+
 		if(context.getUser().getCoins() < PAID_COST) {
 			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to play the slot machine, one game costs " + PAID_COST + " coins.", context.getChannel());
 			return;

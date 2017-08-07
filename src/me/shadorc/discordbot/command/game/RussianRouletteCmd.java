@@ -1,7 +1,10 @@
 package me.shadorc.discordbot.command.game;
 
+import java.time.temporal.ChronoUnit;
+
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -10,13 +13,20 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends Command {
 
+	private RateLimiter rateLimiter;
 
 	public RussianRouletteCmd() {
 		super(false, "russian_roulette", "roulette_russe");
+		this.rateLimiter = new RateLimiter(10, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) {
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			BotUtils.sendMessage(Emoji.WARNING + " You can use this command only once every " + rateLimiter.getTimeout() + " seconds.", context.getChannel());
+			return;
+		}
+
 		int userCoins = context.getUser().getCoins();
 		if(MathUtils.rand(6) == 0) {
 			int loss = (int) Math.ceil(-userCoins*0.50);
