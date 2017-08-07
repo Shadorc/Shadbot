@@ -13,7 +13,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends Command {
 
-	private RateLimiter rateLimiter;
+	private final RateLimiter rateLimiter;
 
 	public RussianRouletteCmd() {
 		super(false, "russian_roulette", "roulette_russe");
@@ -23,18 +23,18 @@ public class RussianRouletteCmd extends Command {
 	@Override
 	public void execute(Context context) {
 		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			BotUtils.sendMessage(Emoji.WARNING + " You can use this command only once every " + rateLimiter.getTimeout() + " seconds.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " You can use the russian roulette only once every " + rateLimiter.getTimeout() + " seconds.", context.getChannel());
 			return;
 		}
 
 		int userCoins = context.getUser().getCoins();
 		if(MathUtils.rand(6) == 0) {
-			int loss = (int) Math.ceil(-userCoins*0.50);
+			int loss = (int) Math.ceil(-userCoins * 0.50);
 			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **PAN** ... "
 					+ "Sorry, you died, you lose **" + Math.abs(loss) + " coins**.", context.getChannel());
 			context.getUser().addCoins(loss);
 		} else {
-			int gain = (int) Math.ceil(userCoins*0.30);
+			int gain = (int) Math.ceil(userCoins * 0.30);
 			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **click** ... "
 					+ "Phew, you are still alive, you gets **" + gain + " coins** !", context.getChannel());
 			context.getUser().addCoins(gain);
