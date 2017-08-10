@@ -25,31 +25,41 @@ public class Utils {
 		return list;
 	}
 
-	public static String translate(String langFrom, String langTo, String word) throws IOException {
-		String url = "https://translate.googleapis.com/translate_a/single?" +
-				"client=gtx&" +
-				"sl=" + langFrom +
-				"&tl=" + langTo +
-				"&dt=t&q=" + URLEncoder.encode(word, "UTF-8");
+	public static String translate(String langFrom, String langTo, String sourceText) throws IllegalArgumentException, IOException {
+		BufferedReader in = null;
+		try {
+			URL url = new URL("https://translate.googleapis.com/translate_a/single?" +
+					"client=gtx&" +
+					"sl=" + langFrom +
+					"&tl=" + langTo +
+					"&dt=t&q=" + URLEncoder.encode(sourceText, "UTF-8"));
 
-		URL obj = new URL(url);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-		con.setRequestProperty("User-Agent", "Mozilla/5.0");
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestProperty("User-Agent", "Mozilla/5.0");
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
+			in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+			StringBuilder response = new StringBuilder();
 
-		while((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
+			String inputLine;
+			while((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+
+			JSONArray result = new JSONArray(response.toString());
+			if(result.get(0) instanceof JSONArray) {
+				return ((JSONArray) ((JSONArray) result.get(0)).get(0)).get(0).toString();
+			} else {
+				throw new IllegalArgumentException();
+			}
+
+		} catch (IOException e) {
+			throw e;
+
+		} finally {
+			if(in != null) {
+				in.close();
+			}
 		}
-		in.close();
-
-		JSONArray jsonArray1 = new JSONArray(response.toString());
-		JSONArray jsonArray2 = (JSONArray) jsonArray1.get(0);
-		JSONArray jsonArray3 = (JSONArray) jsonArray2.get(0);
-
-		return jsonArray3.get(0).toString();
 	}
 
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
