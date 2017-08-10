@@ -48,7 +48,6 @@
          <url>file:///${project.basedir}/lib</url>
       </repository>
       <repository>
-         <!-- This repo fixes issues with transitive dependencies -->
          <id>jcenter</id>
          <url>http://jcenter.bintray.com</url>
       </repository>
@@ -65,8 +64,13 @@
       </dependency>
       <dependency>
          <groupId>org.slf4j</groupId>
-         <artifactId>slf4j-simple</artifactId>
-         <version>1.7.24</version>
+         <artifactId>slf4j-api</artifactId>
+         <version>1.7.6</version>
+      </dependency>
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-log4j12</artifactId>
+         <version>1.7.5</version>
       </dependency>
       <dependency>
          <groupId>org.twitter4j</groupId>
