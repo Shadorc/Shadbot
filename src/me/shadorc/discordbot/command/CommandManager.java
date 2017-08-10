@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.command.admin.AdminHelpCmd;
 import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
 import me.shadorc.discordbot.command.admin.DebugCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
@@ -79,7 +78,6 @@ public class CommandManager {
 				new OverwatchCmd(),
 				new CounterStrikeCmd(),
 				// Info Commands
-				new AdminHelpCmd(),
 				new InfoCmd(),
 				new PingCmd(),
 				// French Commands

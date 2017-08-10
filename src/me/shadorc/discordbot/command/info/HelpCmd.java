@@ -15,7 +15,6 @@ public class HelpCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
-
 		if(context.getArg() != null && CommandManager.getInstance().getCommand(context.getArg()) != null) {
 			CommandManager.getInstance().getCommand(context.getArg()).showHelp(context);
 			return;
@@ -56,8 +55,7 @@ public class HelpCmd extends Command {
 						"`/overwatch`"
 								+ " `/cs`", false)
 				.appendField("Info Commands:",
-						"`/admin_help`"
-								+ " `/info`"
+						"`/info`"
 								+ " `/ping`", false)
 				.appendField("French Commands:",
 						"`/dtc`"
@@ -65,6 +63,12 @@ public class HelpCmd extends Command {
 								+ " `/vacs`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
 				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
+
+		if(context.isAuthorAdmin()) {
+			builder.appendField("Admin Commands:",
+					"`/allows_channel`"
+							+ " `/debug`", false);
+		}
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
