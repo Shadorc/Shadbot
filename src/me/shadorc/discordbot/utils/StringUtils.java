@@ -26,14 +26,17 @@ public class StringUtils {
 	}
 
 	public static String formatPlaylist(BlockingQueue<AudioTrack> queue) {
-		StringBuilder playlist = new StringBuilder(queue.size() + " musique(s) en attente");
-		if(queue.isEmpty()) {
-			playlist.append("Aucune");
-		}
+		StringBuilder playlist = new StringBuilder(queue.size() + " music(s) in the playlist");
+
+		int count = 1;
 		for(AudioTrack track : queue) {
-			String name = "\n\t- " + track.getInfo().author + " - " + track.getInfo().title;
-			if(playlist.length() + name.length() < 2000) {
+			String name = "\n\t" + count + ". " + StringUtils.formatTrackName(track.getInfo());
+			if(playlist.length() + name.length() < 1800) {
 				playlist.append(name);
+				count++;
+			} else {
+				playlist.append("\n\t...");
+				break;
 			}
 		}
 		return playlist.toString();

@@ -26,7 +26,7 @@ public class PlaylistCmd extends Command {
 			return;
 		}
 
-		BotUtils.sendMessage(StringUtils.formatPlaylist(scheduler.getPlaylist()), context.getChannel());
+		BotUtils.sendMessage("```" + StringUtils.formatPlaylist(scheduler.getPlaylist()) + "```", context.getChannel());
 	}
 
 	@Override
