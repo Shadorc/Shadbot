@@ -9,27 +9,27 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class RateLimiter {
 
-	private static final HashMap<IGuild, HashMap<IUser, Long>> GUILDS_RATELIMITER = new HashMap<>();
-
+	private final HashMap<IGuild, HashMap<IUser, Long>> guildsRateLimiter;
 	private final long timeout;
 
 	public RateLimiter(int timeout, ChronoUnit unit) {
 		this.timeout = Duration.of(timeout, unit).toMillis();
+		this.guildsRateLimiter = new HashMap<>();
 	}
 
 	public boolean isLimited(IGuild guild, IUser user) {
 		long currentTime = System.currentTimeMillis();
 
-		if(!GUILDS_RATELIMITER.containsKey(guild)) {
-			GUILDS_RATELIMITER.put(guild, new HashMap<IUser, Long>());
-			GUILDS_RATELIMITER.get(guild).put(user, currentTime);
+		if(!guildsRateLimiter.containsKey(guild)) {
+			guildsRateLimiter.put(guild, new HashMap<IUser, Long>());
+			guildsRateLimiter.get(guild).put(user, currentTime);
 			return false;
 		}
 
-		long lastTime = GUILDS_RATELIMITER.get(guild).get(user);
+		long lastTime = guildsRateLimiter.get(guild).get(user);
 		long diff = currentTime - lastTime;
 		if(diff > timeout) {
-			GUILDS_RATELIMITER.get(guild).put(user, currentTime);
+			guildsRateLimiter.get(guild).remove(user);
 			return false;
 		}
 
@@ -37,7 +37,7 @@ public class RateLimiter {
 	}
 
 	public long getRemainingTime(IGuild guild, IUser user) {
-		return timeout - (System.currentTimeMillis() - GUILDS_RATELIMITER.get(guild).get(user));
+		return timeout - (System.currentTimeMillis() - guildsRateLimiter.get(guild).get(user));
 	}
 
 	public long getTimeout() {
