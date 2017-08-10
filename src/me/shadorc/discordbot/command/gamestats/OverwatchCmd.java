@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.info;
+package me.shadorc.discordbot.command.gamestats;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
