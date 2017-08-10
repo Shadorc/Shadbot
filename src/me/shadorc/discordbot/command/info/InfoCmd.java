@@ -8,6 +8,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -35,9 +36,11 @@ public class InfoCmd extends Command {
 		sb.append("\nMemory : " + String.format("%.1f MB / %.1f MB", (float) (allocatedMemory - freeMemory) / mb, (float) allocatedMemory / mb));
 		sb.append("\nThreads Count : " + Thread.activeCount());
 		sb.append("\n\n-= APIs Info =-");
+		sb.append("\nJava Version: " + System.getProperty("java.version"));
 		sb.append("\n" + Discord4J.NAME + " Version: " + Discord4J.VERSION);
 		sb.append("\nLavaPlayer Version: " + PlayerLibrary.VERSION);
 		sb.append("\n\n-= Shadbot Info =-");
+		sb.append("\nVersion: " + Config.VERSION.toString());
 		sb.append("\nUptime: " + DurationFormatUtils.formatDuration(uptime, "HH:mm:ss", true));
 		sb.append("\nPing: " + NetUtils.getPing() + "ms");
 		sb.append("```");
