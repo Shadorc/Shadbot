@@ -42,31 +42,31 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedE
 
 public class CommandManager {
 
-	private static CommandManager COMMAND_MANAGER = new CommandManager();
+	private final static CommandManager COMMAND_MANAGER = new CommandManager();
 
 	private final Map<String, Command> commandsMap = new HashMap<>();
 
 	public CommandManager() {
 		this.register(
 				new HelpCmd(),
-				//Utils Commands
+				// Utils Commands
 				new TranslateCmd(),
 				new WikiCmd(),
 				new CalcCmd(),
 				new WeatherCmd(),
-				//Fun Commands
+				// Fun Commands
 				new ChatCmd(),
 				new GifCmd(),
-				//Games Commands
+				// Games Commands
 				new DiceCmd(),
 				new SlotMachineCmd(),
 				new RussianRouletteCmd(),
 				new TriviaCmd(),
-				//Currency Commands
+				// Currency Commands
 				new TransferCoinsCmd(),
 				new LeaderboardCmd(),
 				new CoinsCmd(),
-				//Music Commands
+				// Music Commands
 				new PlayCmd(),
 				new VolumeCmd(),
 				new PauseCmd(),
@@ -75,18 +75,18 @@ public class CommandManager {
 				new NextCmd(),
 				new NameCmd(),
 				new PlaylistCmd(),
-				//Games Stats Commands
+				// Games Stats Commands
 				new OverwatchCmd(),
 				new CounterStrikeCmd(),
-				//Info Commands
+				// Info Commands
 				new AdminHelpCmd(),
 				new InfoCmd(),
 				new PingCmd(),
-				//French Commands
+				// French Commands
 				new BashCmd(),
 				new JokeCmd(),
 				new HolidaysCmd(),
-				//Admin Commands
+				// Admin Commands
 				new AllowsChannelCmd(),
 				new DebugCmd());
 	}

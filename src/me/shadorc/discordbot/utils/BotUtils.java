@@ -46,15 +46,12 @@ public class BotUtils {
 	 */
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
 		JSONArray channelsArray = Storage.getAllowedChannels(guild);
+
 		// If no permissions were defined, authorize by default all the channels
 		if(channelsArray == null) {
 			return true;
 		}
-		for(int i = 0; i < channelsArray.length(); i++) {
-			if(channelsArray.get(i).equals(channel.getStringID())) {
-				return true;
-			}
-		}
-		return false;
+
+		return Utils.convertArrayToList(channelsArray).contains(channel.getStringID());
 	}
 }
