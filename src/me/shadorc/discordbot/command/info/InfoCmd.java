@@ -40,6 +40,9 @@ public class InfoCmd extends Command {
 		sb.append("\n" + Discord4J.NAME + " Version: " + Discord4J.VERSION);
 		sb.append("\nLavaPlayer Version: " + PlayerLibrary.VERSION);
 		sb.append("\n\n-= Shadbot Info =-");
+		sb.append("\nDeveloper: Shadorc#8423");
+		sb.append("\nServers: " + context.getClient().getGuilds().size());
+		sb.append("\nUsers: " + context.getClient().getUsers().size());
 		sb.append("\nVersion: " + Config.VERSION.toString());
 		sb.append("\nUptime: " + DurationFormatUtils.formatDuration(uptime, "HH:mm:ss", true));
 		sb.append("\nPing: " + NetUtils.getPing() + "ms");
