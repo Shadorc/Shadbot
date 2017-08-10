@@ -1,5 +1,7 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.events;
 
+import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
@@ -18,11 +20,10 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		Log.info("------------------- Shadbot is connected [BETA:" + Config.IS_BETA + "] -------------------");
+		Log.info("------------------- Shadbot is connected [BETA:" + Config.VERSION.isBeta() + "] -------------------");
 		event.getClient().changePlayingText("/help");
 	}
 
-	@SuppressWarnings("unused")
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
 		IMessage message = event.getMessage();
@@ -31,8 +32,8 @@ public class EventListener {
 			return;
 		}
 
-		if((Config.IS_BETA && !event.getChannel().getStringID().equals(Config.DEBUG_CHANNEL_ID))
-				|| (!Config.IS_BETA && event.getChannel().getStringID().equals(Config.DEBUG_CHANNEL_ID))) {
+		if((Config.VERSION.isBeta() && !event.getChannel().getStringID().equals(Config.DEBUG_CHANNEL_ID))
+				|| (!Config.VERSION.isBeta() && event.getChannel().getStringID().equals(Config.DEBUG_CHANNEL_ID))) {
 			return;
 		}
 

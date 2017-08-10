@@ -3,6 +3,7 @@ package me.shadorc.discordbot;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
 import me.shadorc.discordbot.Storage.ApiKeys;
+import me.shadorc.discordbot.events.EventListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;

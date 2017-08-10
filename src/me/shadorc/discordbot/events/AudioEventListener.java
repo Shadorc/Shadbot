@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.music;
+package me.shadorc.discordbot.events;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -6,6 +6,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.music.GuildMusicManager;
+import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IChannel;
