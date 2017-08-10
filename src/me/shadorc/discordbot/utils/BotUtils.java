@@ -3,9 +3,7 @@ package me.shadorc.discordbot.utils;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.command.CommandManager;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.DiscordException;
@@ -13,8 +11,6 @@ import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
 
 public class BotUtils {
-
-	private final static CommandManager CMD_MANAGER = new CommandManager();
 
 	public static void sendMessage(String message, IChannel channel) {
 		try {
@@ -41,10 +37,6 @@ public class BotUtils {
 		} catch (DiscordException e) {
 			Log.error("Discord exception while sending embed : " + e.getErrorMessage(), e);
 		}
-	}
-
-	public static void executeCommand(MessageReceivedEvent event) {
-		CMD_MANAGER.manage(event);
 	}
 
 	/**

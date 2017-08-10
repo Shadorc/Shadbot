@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.info;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
@@ -14,6 +15,12 @@ public class HelpCmd extends Command {
 
 	@Override
 	public void execute(Context context) {
+
+		if(context.getArg() != null && CommandManager.getInstance().getCommand(context.getArg()) != null) {
+			CommandManager.getInstance().getCommand(context.getArg()).showHelp(context);
+			return;
+		}
+
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Shadbot Help")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
@@ -49,7 +56,8 @@ public class HelpCmd extends Command {
 						"`/overwatch`"
 								+ " `/cs`", false)
 				.appendField("Info Commands:",
-						" `/info`"
+						"`/admin_help`"
+								+ " `/info`"
 								+ " `/ping`", false)
 				.appendField("French Commands:",
 						"`/dtc`"

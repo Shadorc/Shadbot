@@ -1,5 +1,6 @@
 package me.shadorc.discordbot;
 
+import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -39,7 +40,7 @@ public class EventListener {
 		if(gtm != null && gtm.isStarted()) {
 			gtm.checkAnswer(message);
 		} else if(message.getContent().startsWith("/")) {
-			BotUtils.executeCommand(event);
+			CommandManager.getInstance().manage(event);
 		}
 	}
 

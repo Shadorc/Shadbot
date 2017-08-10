@@ -32,8 +32,6 @@ import me.shadorc.discordbot.command.music.PlaylistCmd;
 import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
-import me.shadorc.discordbot.command.rpg.CharacterCmd;
-import me.shadorc.discordbot.command.rpg.FightCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
 import me.shadorc.discordbot.command.utils.TranslateCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
@@ -44,54 +42,63 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedE
 
 public class CommandManager {
 
-	private final Map<String, Command> commands = new HashMap<>();
+	private static CommandManager COMMAND_MANAGER = new CommandManager();
+
+	private final Map<String, Command> commandsMap = new HashMap<>();
 
 	public CommandManager() {
 		this.register(
 				new HelpCmd(),
-				new AdminHelpCmd(),
+				//Utils Commands
 				new TranslateCmd(),
 				new WikiCmd(),
-				new HolidaysCmd(),
 				new CalcCmd(),
 				new WeatherCmd(),
+				//Fun Commands
 				new ChatCmd(),
 				new GifCmd(),
-				new BashCmd(),
-				new JokeCmd(),
-				new TransferCoinsCmd(),
+				//Games Commands
 				new DiceCmd(),
-				new RussianRouletteCmd(),
 				new SlotMachineCmd(),
+				new RussianRouletteCmd(),
 				new TriviaCmd(),
+				//Currency Commands
+				new TransferCoinsCmd(),
+				new LeaderboardCmd(),
 				new CoinsCmd(),
+				//Music Commands
 				new PlayCmd(),
 				new VolumeCmd(),
 				new PauseCmd(),
+				new RepeatCmd(),
 				new StopCmd(),
 				new NextCmd(),
 				new NameCmd(),
 				new PlaylistCmd(),
-				new RepeatCmd(),
-				new AllowsChannelCmd(),
-				new LeaderboardCmd(),
-				new PingCmd(),
+				//Games Stats Commands
 				new OverwatchCmd(),
 				new CounterStrikeCmd(),
-				new DebugCmd(),
-				new CharacterCmd(),
-				new FightCmd(),
-				new InfoCmd());
+				//Info Commands
+				new AdminHelpCmd(),
+				new InfoCmd(),
+				new PingCmd(),
+				//French Commands
+				new BashCmd(),
+				new JokeCmd(),
+				new HolidaysCmd(),
+				//Admin Commands
+				new AllowsChannelCmd(),
+				new DebugCmd());
 	}
 
 	private void register(Command... cmds) {
 		for(Command command : cmds) {
 			for(String name : command.getNames()) {
-				if(commands.containsKey(name)) {
+				if(commandsMap.containsKey(name)) {
 					Log.warn("Command name collision " + name + " in " + command.getClass().getName());
 					continue;
 				}
-				commands.put(name, command);
+				commandsMap.put(name, command);
 			}
 		}
 	}
@@ -103,24 +110,30 @@ public class CommandManager {
 			return;
 		}
 
-		if(context.getCommand().equals("help") && context.getArg() != null && commands.containsKey(context.getArg().replace("/", ""))) {
-			commands.get(context.getArg()).showHelp(context);
+		if(!commandsMap.containsKey(context.getCommand())) {
+			Log.warn("Command \"" + context.getCommand() + "\" has been tried without result.");
 			return;
 		}
 
-		if(commands.containsKey(context.getCommand())) {
-			Command command = commands.get(context.getCommand());
-			if(command.isAdminCmd() && !context.isAuthorAdmin()) {
-				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You have to be an administrator to execute this command.", event.getChannel());
-			} else {
-				try {
-					command.execute(context);
-				} catch (IllegalArgumentException e) {
-					command.showHelp(context);
-				}
-			}
-		} else {
-			Log.warn("Command \"" + context.getCommand() + "\" has been tried without result.");
+		Command command = commandsMap.get(context.getCommand());
+
+		if(command.isAdminCmd() && !context.isAuthorAdmin()) {
+			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You have to be an administrator to execute this command.", event.getChannel());
+			return;
 		}
+
+		try {
+			command.execute(context);
+		} catch (IllegalArgumentException e) {
+			command.showHelp(context);
+		}
+	}
+
+	public Command getCommand(String name) {
+		return commandsMap.containsKey(name) ? commandsMap.get(name) : null;
+	}
+
+	public static CommandManager getInstance() {
+		return COMMAND_MANAGER;
 	}
 }
