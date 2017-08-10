@@ -91,7 +91,7 @@ public class Storage {
 					writer.close();
 				}
 			} catch (IOException e) {
-				Log.error("Error while closing writer during saving of the permissions.", e);
+				Log.error("Error while closing writer during the saving of the permissions.", e);
 			}
 		}
 	}
@@ -125,7 +125,7 @@ public class Storage {
 					writer.close();
 				}
 			} catch (IOException e) {
-				Log.error("Error while closing writer during saving of the user.", e);
+				Log.error("Error while closing writer during the saving of the user.", e);
 			}
 		}
 	}
@@ -143,7 +143,6 @@ public class Storage {
 					return guildObj.getJSONArray(Permissions.AUTHORIZED_CHANNELS);
 				}
 			}
-
 		} catch (IOException e) {
 			Log.error("Error while reading data file.", e);
 		}
@@ -164,7 +163,6 @@ public class Storage {
 					return new User(guild, user.getLongID(), guildObj.getJSONObject(user.getStringID()));
 				}
 			}
-
 		} catch (IOException e) {
 			Log.error("Error while reading data file.", e);
 		}

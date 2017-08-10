@@ -62,7 +62,7 @@ public class OverwatchCmd extends Command {
 		} catch (FileNotFoundException fnf) {
 			BotUtils.sendMessage(Emoji.WARNING + " Plateform, region or Battletag is invalid.", context.getChannel());
 		} catch (IOException e) {
-			Log.error("An error occured while getting information from Overwatch profil, try again later.", e, context.getChannel());
+			Log.error("An error occured while getting information from Overwatch profil, please try again later.", e, context.getChannel());
 		}
 	}
 

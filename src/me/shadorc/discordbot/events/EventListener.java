@@ -20,7 +20,7 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		Log.info("------------------- Shadbot is connected [BETA:" + Config.VERSION.isBeta() + "] -------------------");
+		Log.info("------------------- Shadbot is ready [BETA:" + Config.VERSION.isBeta() + "] -------------------");
 		event.getClient().changePlayingText("/help");
 	}
 

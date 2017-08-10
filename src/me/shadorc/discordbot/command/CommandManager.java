@@ -93,7 +93,7 @@ public class CommandManager {
 		for(Command command : cmds) {
 			for(String name : command.getNames()) {
 				if(commandsMap.containsKey(name)) {
-					Log.warn("Command name collision " + name + " in " + command.getClass().getName());
+					Log.warn("Command name collision between " + command.getClass() + " and " + commandsMap.get(name).getClass());
 					continue;
 				}
 				commandsMap.put(name, command);
@@ -109,7 +109,7 @@ public class CommandManager {
 		}
 
 		if(!commandsMap.containsKey(context.getCommand())) {
-			Log.warn("Command \"" + context.getCommand() + "\" has been tried without result.");
+			Log.warn("Guild \"" + context.getGuild().getName() + "\" (ID: " + context.getGuild().getStringID() + ") - Command not found : \"" + context.getCommand() + "\".");
 			return;
 		}
 

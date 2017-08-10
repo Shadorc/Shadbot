@@ -29,7 +29,7 @@ public class JokeCmd extends Command {
 			joke = joke.substring(0, joke.lastIndexOf("\"")).trim();
 			BotUtils.sendMessage("```" + StringUtils.convertHtmlToUTF8(joke).replace("\n\n", "\n") + "```", context.getChannel());
 		} catch (IOException e) {
-			Log.error("An error occured while getting joke.", e, context.getChannel());
+			Log.error("An error occured while getting a joke.", e, context.getChannel());
 		}
 	}
 

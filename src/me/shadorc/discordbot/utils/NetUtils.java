@@ -49,7 +49,7 @@ public class NetUtils {
 			return average;
 
 		} catch (IOException e) {
-			Log.error("Error while parsing ping.", e);
+			Log.error("An error occured while parsing ping.", e);
 
 		} finally {
 			if(in != null) {
