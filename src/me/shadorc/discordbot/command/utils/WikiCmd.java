@@ -30,7 +30,7 @@ public class WikiCmd extends Command {
 		try {
 			String searchEncoded = URLEncoder.encode(context.getArg(), "UTF-8");
 			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-			String json = HtmlUtils.getHTML(new URL("https://en.wikipedia.org/w/api.php?"
+			String jsonStr = HtmlUtils.getHTML(new URL("https://en.wikipedia.org/w/api.php?"
 					+ "action=query"
 					+ "&titles=" + searchEncoded
 					+ "&prop=extracts"
@@ -39,24 +39,24 @@ public class WikiCmd extends Command {
 					+ "&exintro=true"
 					+ "&exsentences=5"));
 
-			JSONObject pagesObj = new JSONObject(json).getJSONObject("query").getJSONObject("pages");
-			String pageId = pagesObj.names().getString(0);
-			JSONObject searchObj = pagesObj.getJSONObject(pageId);
+			JSONObject mainObj = new JSONObject(jsonStr).getJSONObject("query").getJSONObject("pages");
+			String pageId = mainObj.names().getString(0);
+			JSONObject resultObj = mainObj.getJSONObject(pageId);
 
-			if(pageId.equals("-1") || searchObj.getString("extract").isEmpty()) {
+			if(pageId.equals("-1") || resultObj.getString("extract").isEmpty()) {
 				BotUtils.sendMessage(Emoji.WARNING + " No result for : " + context.getArg(), context.getChannel());
 				return;
 			}
 
 			EmbedBuilder builder = new EmbedBuilder()
-					.withAuthorName(searchObj.getString("title"))
+					.withAuthorName(resultObj.getString("title"))
+					.withUrl("https://fr.wikipedia.org/wiki/" + resultObj.getString("title").replace(" ", "_"))
 					.withThumbnail("https://s1.qwant.com/thumbr/300x0/2/8/50c4ce83955fe31f8f070e40c10926/b_0_q_0_p_0.jpg?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fd1%2FWikipedia-logo-v2-fr.svg%2F892px-Wikipedia-logo-v2-fr.svg.png&q=0&b=0&p=0&a=0")
 					.withAuthorIcon(context.getAuthor().getAvatarURL())
 					.withColor(Config.BOT_COLOR)
-					.appendDesc(searchObj.getString("extract"))
-					.withFooterText("Wikipédia Page: https://fr.wikipedia.org/wiki/" + URLEncoder.encode(searchObj.getString("title"), "UTF-8"));
-
+					.appendDesc(resultObj.getString("extract"));
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
+
 		} catch (IOException e) {
 			Log.error("An error occured while getting Wikipedia information.", e, context.getChannel());
 		}
