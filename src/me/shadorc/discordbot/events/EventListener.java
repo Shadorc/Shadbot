@@ -40,7 +40,7 @@ public class EventListener {
 		GuildTriviaManager gtm = TriviaCmd.getGuildTriviaManager(event.getGuild());
 		if(gtm != null && gtm.isStarted()) {
 			gtm.checkAnswer(message);
-		} else if(message.getContent().startsWith("/")) {
+		} else if(message.getContent().startsWith(Config.PREFIX)) {
 			CommandManager.getInstance().manage(event);
 		}
 	}
