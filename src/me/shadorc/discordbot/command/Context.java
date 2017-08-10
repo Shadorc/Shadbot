@@ -15,6 +15,7 @@ public class Context {
 	private final MessageReceivedEvent event;
 	private final String command;
 	private final String arg;
+	private User user;
 
 	public Context(MessageReceivedEvent event) {
 		this.event = event;
@@ -25,7 +26,10 @@ public class Context {
 	}
 
 	public User getUser() {
-		return Storage.getUser(this.getGuild(), this.getAuthor());
+		if(user == null) {
+			user = Storage.getUser(this.getGuild(), this.getAuthor());
+		}
+		return user;
 	}
 
 	public IUser getAuthor() {
