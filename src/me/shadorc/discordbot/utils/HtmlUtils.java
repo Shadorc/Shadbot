@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,8 +50,8 @@ public class HtmlUtils {
 	 * @param end - ending String
 	 * @return All substrings between start and end Strings in text
 	 */
-	public static ArrayList<String> getAllSubstring(String text, String start, String end) {
-		ArrayList<String> lines = new ArrayList<>();
+	public static List<String> getAllSubstring(String text, String start, String end) {
+		List<String> lines = new ArrayList<>();
 		Pattern p = Pattern.compile(Pattern.quote(start) + "(?s)(.*?)" + Pattern.quote(end));
 		Matcher m = p.matcher(text);
 		while(m.find()) {
