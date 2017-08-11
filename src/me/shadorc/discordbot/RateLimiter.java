@@ -22,6 +22,10 @@ public class RateLimiter {
 
 		if(!guildsRateLimiter.containsKey(guild)) {
 			guildsRateLimiter.put(guild, new HashMap<IUser, Long>());
+			return false;
+		}
+
+		if(!guildsRateLimiter.get(guild).containsKey(user)) {
 			guildsRateLimiter.get(guild).put(user, currentTime);
 			return false;
 		}
@@ -36,8 +40,9 @@ public class RateLimiter {
 		return true;
 	}
 
-	public long getRemainingTime(IGuild guild, IUser user) {
-		return timeout - (System.currentTimeMillis() - guildsRateLimiter.get(guild).get(user));
+	public float getRemainingTime(IGuild guild, IUser user) {
+		long remainingMillis = timeout - (System.currentTimeMillis() - guildsRateLimiter.get(guild).get(user));
+		return remainingMillis / 1000f;
 	}
 
 	public long getTimeout() {
