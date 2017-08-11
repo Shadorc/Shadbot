@@ -34,6 +34,7 @@ import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
 import me.shadorc.discordbot.command.utils.TranslateCmd;
+import me.shadorc.discordbot.command.utils.UrbanCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
 import me.shadorc.discordbot.command.utils.WikiCmd;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -54,6 +55,7 @@ public class CommandManager {
 				new WikiCmd(),
 				new CalcCmd(),
 				new WeatherCmd(),
+				new UrbanCmd(),
 				// Fun Commands
 				new ChatCmd(),
 				new GifCmd(),

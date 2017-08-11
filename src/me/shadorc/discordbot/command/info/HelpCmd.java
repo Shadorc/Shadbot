@@ -29,9 +29,11 @@ public class HelpCmd extends Command {
 						"`/translate`"
 								+ " `/wiki`"
 								+ " `/calc`"
-								+ " `/weather`", false)
+								+ " `/weather`"
+								+ " `/urban`", false)
 				.appendField("Fun Commands:",
 						"`/chat`"
+								+ " `/image`"
 								+ " `/gif`", false)
 				.appendField("Games Commands:",
 						"`/dice`"
