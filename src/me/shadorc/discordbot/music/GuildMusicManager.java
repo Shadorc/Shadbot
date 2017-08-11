@@ -16,7 +16,7 @@ import sx.blah.discord.handle.obj.IGuild;
 public class GuildMusicManager {
 
 	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
-	private final static Map<Long, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
+	private final static Map<IGuild, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
 
 	private final IGuild guild;
 	private final AudioPlayer player;
@@ -48,6 +48,7 @@ public class GuildMusicManager {
 	public void leave() {
 		guild.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel().leave();
 		leaveTimer.stop();
+		MUSIC_MANAGERS.remove(guild);
 	}
 
 	public void setChannel(IChannel channel) {
@@ -76,11 +77,11 @@ public class GuildMusicManager {
 	}
 
 	public static synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {
-		GuildMusicManager musicManager = MUSIC_MANAGERS.get(guild.getLongID());
+		GuildMusicManager musicManager = MUSIC_MANAGERS.get(guild);
 
 		if(musicManager == null) {
 			musicManager = new GuildMusicManager(guild, PLAYER_MANAGER);
-			MUSIC_MANAGERS.put(guild.getLongID(), musicManager);
+			MUSIC_MANAGERS.put(guild, musicManager);
 		}
 
 		guild.getAudioManager().setAudioProvider(musicManager.getAudioProvider());
