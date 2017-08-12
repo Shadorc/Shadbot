@@ -67,6 +67,11 @@ public class ImageCmd extends Command {
 			// resultObj = this.getRandomResult(encodedSearch);
 			// }
 
+			if(resultObj == null) {
+				BotUtils.sendMessage(Emoji.WARNING + " No results for \"" + context.getArg() + "\"", context.getChannel());
+				return;
+			}
+
 			JSONObject authorObj = resultObj.getJSONObject("author");
 			JSONObject contentObj = resultObj.getJSONObject("content");
 
