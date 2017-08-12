@@ -139,11 +139,14 @@ public class Storage {
 
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
-			if(mainObj.has(guild.getStringID())) {
-				JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
-				if(guildObj.has(setting)) {
-					return guildObj.get(setting);
-				}
+
+			if(!mainObj.has(guild.getStringID())) {
+				mainObj.put(guild.getStringID(), Storage.getNewGuildObject());
+			}
+
+			JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
+			if(guildObj.has(setting)) {
+				return guildObj.get(setting);
 			}
 		} catch (IOException e) {
 			Log.error("Error while reading data file.", e);
