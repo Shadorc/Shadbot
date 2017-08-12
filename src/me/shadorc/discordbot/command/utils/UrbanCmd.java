@@ -41,7 +41,7 @@ public class UrbanCmd extends Command {
 
 			String definition = resultObj.getString("definition");
 			if(definition.length() > EmbedBuilder.DESCRIPTION_CONTENT_LIMIT) {
-				definition = definition.substring(0, EmbedBuilder.DESCRIPTION_CONTENT_LIMIT-3) + "...";
+				definition = definition.substring(0, EmbedBuilder.DESCRIPTION_CONTENT_LIMIT - 3) + "...";
 			}
 
 			EmbedBuilder builder = new EmbedBuilder()

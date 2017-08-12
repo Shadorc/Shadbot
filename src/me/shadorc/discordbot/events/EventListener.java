@@ -11,6 +11,7 @@ import me.shadorc.discordbot.utils.Log;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
+import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelEvent;
 import sx.blah.discord.handle.obj.IMessage;
@@ -32,8 +33,8 @@ public class EventListener {
 			return;
 		}
 
-		if((Config.VERSION.isBeta() && !event.getChannel().getStringID().equals(Config.DEBUG_CHANNEL_ID))
-				|| (!Config.VERSION.isBeta() && event.getChannel().getStringID().equals(Config.DEBUG_CHANNEL_ID))) {
+		if((Config.VERSION.isBeta() && event.getChannel().getLongID() != Config.DEBUG_CHANNEL_ID)
+				|| (!Config.VERSION.isBeta() && event.getChannel().getLongID() == Config.DEBUG_CHANNEL_ID)) {
 			return;
 		}
 
@@ -47,7 +48,16 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onGuildCreateEvent(GuildCreateEvent event) {
-		Log.info("Shadbot is now connected to guild: " + event.getGuild().getName() + " (ID: " + event.getGuild().getStringID() + ")");
+		Log.info("Shadbot is now connected to guild: " + event.getGuild().getName()
+				+ " (ID: " + event.getGuild().getStringID()
+				+ " | Users: " + event.getGuild().getUsers().size() + ")");
+	}
+
+	@EventSubscriber
+	public void onGuildLeaveEvent(GuildLeaveEvent event) {
+		Log.info("Shadbot has been kicked from: " + event.getGuild().getName()
+				+ " (ID: " + event.getGuild().getStringID()
+				+ " | Users: " + event.getGuild().getUsers().size() + ")");
 	}
 
 	@EventSubscriber
