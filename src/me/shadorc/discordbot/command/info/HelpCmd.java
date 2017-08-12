@@ -58,6 +58,7 @@ public class HelpCmd extends Command {
 								+ " `/cs`", false)
 				.appendField("Info Commands:",
 						"`/info`"
+								+ " `/suggest`"
 								+ " `/ping`", false)
 				.appendField("French Commands:",
 						"`/dtc`"

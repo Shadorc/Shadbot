@@ -23,6 +23,7 @@ import me.shadorc.discordbot.command.gamestats.OverwatchCmd;
 import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.InfoCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
+import me.shadorc.discordbot.command.info.SuggestCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
 import me.shadorc.discordbot.command.music.NextCmd;
 import me.shadorc.discordbot.command.music.PauseCmd;
@@ -83,6 +84,7 @@ public class CommandManager {
 				// Info Commands
 				new InfoCmd(),
 				new PingCmd(),
+				new SuggestCmd(),
 				// French Commands
 				new BashCmd(),
 				new JokeCmd(),
