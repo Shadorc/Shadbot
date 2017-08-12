@@ -10,6 +10,7 @@ import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
@@ -53,6 +54,7 @@ public class EventListener {
 		Log.info("Shadbot is now connected to guild: " + event.getGuild().getName()
 				+ " (ID: " + event.getGuild().getStringID()
 				+ " | Users: " + event.getGuild().getUsers().size() + ")");
+		NetUtils.postStats(event.getClient());
 	}
 
 	@EventSubscriber
@@ -60,6 +62,7 @@ public class EventListener {
 		Log.info("Shadbot has been kicked from: " + event.getGuild().getName()
 				+ " (ID: " + event.getGuild().getStringID()
 				+ " | Users: " + event.getGuild().getUsers().size() + ")");
+		NetUtils.postStats(event.getClient());
 	}
 
 	@EventSubscriber

@@ -31,7 +31,8 @@ public class Storage {
 		STEAM_API_KEY,
 		OPENWEATHERMAP_API_KEY,
 		DEVIANTART_CLIENT_ID,
-		DEVIANTART_API_SECRET
+		DEVIANTART_API_SECRET,
+		DISCORD_BOTS_TOKEN
 	}
 
 	private static void init() {

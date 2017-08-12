@@ -1,12 +1,18 @@
 package me.shadorc.discordbot.utils;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.json.JSONObject;
+
 import me.shadorc.discordbot.Log;
+import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.Storage.ApiKeys;
+import sx.blah.discord.api.IDiscordClient;
 
 public class NetUtils {
 
@@ -64,6 +70,38 @@ public class NetUtils {
 		}
 
 		return -1;
+	}
+
+	/**
+	 * @param client - Shadbot client
+	 */
+	public static void postStats(IDiscordClient client) {
+		DataOutputStream printout = null;
+		try {
+			URL url = new URL("https://bots.discord.pw/api/bots/" + client.getOurUser().getStringID() + "/stats");
+
+			URLConnection urlConn = url.openConnection();
+			urlConn.setRequestProperty("Content-Type", "application/json");
+			urlConn.setRequestProperty("Authorization", Storage.getApiKey(ApiKeys.DISCORD_BOTS_TOKEN));
+			urlConn.setDoOutput (true);
+			urlConn.setUseCaches (false);
+
+			JSONObject content = new JSONObject().put("server_count", client.getGuilds().size());
+
+			printout = new DataOutputStream(urlConn.getOutputStream());
+			printout.writeBytes(content.toString());
+			printout.flush();
+		} catch (Exception ignored) {
+			//Ignored
+		} finally {
+			try {
+				if(printout != null) {
+					printout.close();
+				}
+			} catch (Exception ignored) {
+				//Ignored
+			}
+		}
 	}
 
 }
