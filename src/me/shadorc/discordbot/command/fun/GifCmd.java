@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
@@ -25,7 +26,7 @@ public class GifCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		// if(!context.getChannel().isNSFW()) {
 		// BotUtils.sendMessage(Emoji.WARNING + " Vous devez être dans un salon NSFW pour utiliser les gifs.",
 		// context.getChannel());

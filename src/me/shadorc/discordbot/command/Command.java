@@ -1,5 +1,7 @@
 package me.shadorc.discordbot.command;
 
+import me.shadorc.discordbot.MissingArgumentException;
+
 public abstract class Command {
 
 	private final String[] names;
@@ -12,12 +14,12 @@ public abstract class Command {
 		System.arraycopy(names, 0, this.names, 1, names.length);
 	}
 
-	public abstract void execute(Context context);
+	public abstract void execute(Context context) throws MissingArgumentException;
 
 	public abstract void showHelp(Context context);
 
 	public boolean isAdminCmd() {
-		return isAdminCmd;
+		return this.isAdminCmd;
 	}
 
 	public String[] getNames() {

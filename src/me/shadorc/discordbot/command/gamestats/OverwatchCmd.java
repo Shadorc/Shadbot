@@ -6,6 +6,7 @@ import java.net.URL;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -20,14 +21,14 @@ public class OverwatchCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() == null) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		String[] splitArgs = context.getArg().split(" ", 3);
 		if(splitArgs.length != 3) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		String plateform = splitArgs[0].toLowerCase();

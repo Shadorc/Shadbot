@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
 import me.shadorc.discordbot.command.currency.LeaderboardCmd;
@@ -126,7 +127,7 @@ public class CommandManager {
 
 		try {
 			command.execute(context);
-		} catch (IllegalArgumentException e) {
+		} catch (MissingArgumentException e) {
 			command.showHelp(context);
 		}
 	}

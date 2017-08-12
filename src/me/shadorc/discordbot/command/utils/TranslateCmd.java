@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -18,14 +19,14 @@ public class TranslateCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() == null) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		String[] args = context.getArg().split(" ", 3);
 		if(args.length < 2) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		if(args.length == 3 && args[0].equalsIgnoreCase(args[1])) {

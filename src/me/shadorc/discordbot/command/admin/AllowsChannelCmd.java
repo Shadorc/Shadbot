@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -19,10 +20,10 @@ public class AllowsChannelCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		List<IChannel> channels = context.getMessage().getChannelMentions();
 		if(channels.size() == 0) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		for(IChannel channel : channels) {

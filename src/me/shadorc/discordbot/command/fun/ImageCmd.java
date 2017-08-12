@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
@@ -35,9 +36,9 @@ public class ImageCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() == null) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {

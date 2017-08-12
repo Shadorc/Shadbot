@@ -6,6 +6,7 @@ import javax.swing.Timer;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -27,22 +28,22 @@ public class DiceCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(!GUILDS_DICE.containsKey(context.getGuild())) {
 			if(context.getArg() == null) {
-				throw new IllegalArgumentException();
+				throw new MissingArgumentException();
 			}
 
 			String[] splitArgs = context.getArg().split(" ");
 			if(splitArgs.length != 2 || !StringUtils.isInteger(splitArgs[0]) || !StringUtils.isInteger(splitArgs[1])) {
-				throw new IllegalArgumentException();
+				throw new MissingArgumentException();
 			}
 
 			int bet = Integer.parseInt(splitArgs[0]);
 			int num = Integer.parseInt(splitArgs[1]);
 
 			if(num < 1 || num > 6) {
-				throw new IllegalArgumentException();
+				throw new MissingArgumentException();
 			}
 
 			if(context.getUser().getCoins() < bet) {
@@ -67,13 +68,13 @@ public class DiceCmd extends Command {
 			}
 
 			if(context.getArg() == null || !StringUtils.isInteger(context.getArg())) {
-				throw new IllegalArgumentException();
+				throw new MissingArgumentException();
 			}
 
 			int num = Integer.parseInt(context.getArg());
 
 			if(num < 1 || num > 6) {
-				throw new IllegalArgumentException();
+				throw new MissingArgumentException();
 			}
 
 			if(diceManager.isAlreadyBet(num)) {

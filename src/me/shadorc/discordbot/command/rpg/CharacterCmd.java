@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.rpg;
 
 import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -13,7 +14,7 @@ public class CharacterCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("RPG Stats")
 				.withAuthorIcon(context.getAuthor().getAvatarURL())

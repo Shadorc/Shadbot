@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.rpg;
 
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.rpg.Mob;
@@ -15,7 +16,7 @@ public class FightCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		User user = context.getUser();
 		Mob mob = new Mob(user.getLevel());
 

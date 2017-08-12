@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
@@ -27,9 +28,9 @@ public class WeatherCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() == null) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		try {

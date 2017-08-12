@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.info;
 
 import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
@@ -14,7 +15,7 @@ public class HelpCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() != null && CommandManager.getInstance().getCommand(context.getArg()) != null) {
 			CommandManager.getInstance().getCommand(context.getArg()).showHelp(context);
 			return;

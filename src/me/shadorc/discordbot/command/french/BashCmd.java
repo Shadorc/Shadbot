@@ -6,6 +6,7 @@ import java.net.URL;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
@@ -22,7 +23,7 @@ public class BashCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		try {
 			String json = HtmlUtils.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
 					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)

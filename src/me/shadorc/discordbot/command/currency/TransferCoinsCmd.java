@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.currency;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -16,14 +17,14 @@ public class TransferCoinsCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() == null) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		String[] splitCmd = context.getArg().split(" ", 2);
 		if(splitCmd.length != 2 || context.getMessage().getMentions().size() != 1) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		try {
@@ -32,7 +33,7 @@ public class TransferCoinsCmd extends Command {
 			User senderUser = context.getUser();
 
 			if(coins <= 0 || senderUser.equals(receiverUser)) {
-				throw new IllegalArgumentException();
+				throw new MissingArgumentException();
 			}
 
 			if(senderUser.getCoins() < coins) {
@@ -45,7 +46,7 @@ public class TransferCoinsCmd extends Command {
 
 			BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " has transfered " + coins + " coins to " + receiverUser.mention(), context.getChannel());
 		} catch (NumberFormatException e1) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 	}
 

@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.currency;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -16,7 +17,7 @@ public class CoinsCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(context.getMessage().getMentions().isEmpty()) {
 			BotUtils.sendMessage(Emoji.PURSE + " You have **" + context.getUser().getCoins() + " coin(s)**.", context.getChannel());
 		}

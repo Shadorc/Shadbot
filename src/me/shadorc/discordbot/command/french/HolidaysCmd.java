@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.french;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -17,9 +18,9 @@ public class HolidaysCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() == null) {
-			throw new IllegalArgumentException();
+			throw new MissingArgumentException();
 		}
 
 		try {
@@ -28,7 +29,7 @@ public class HolidaysCmd extends Command {
 			BotUtils.sendMessage(Emoji.BEACH + " " + holidays, context.getChannel());
 		} catch (TwitterException e) {
 			if(e.getErrorCode() == 34) {
-				throw new IllegalArgumentException();
+				throw new MissingArgumentException();
 			} else {
 				Log.error("An error occured while getting holidays information.", e, context.getChannel());
 			}

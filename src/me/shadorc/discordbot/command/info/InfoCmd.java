@@ -9,6 +9,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
 import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -22,7 +23,7 @@ public class InfoCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		Runtime runtime = Runtime.getRuntime();
 
 		long allocatedMemory = runtime.totalMemory();

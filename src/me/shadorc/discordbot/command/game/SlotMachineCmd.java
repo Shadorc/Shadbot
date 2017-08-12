@@ -4,6 +4,7 @@ import java.time.temporal.ChronoUnit;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -33,7 +34,7 @@ public class SlotMachineCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
 			BotUtils.sendMessage(Emoji.WARNING + " You can use the slot machine only once every " + rateLimiter.getTimeout() + " seconds.", context.getChannel());
 			return;

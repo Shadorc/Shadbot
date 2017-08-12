@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 
+import me.shadorc.discordbot.MissingArgumentException;
+
 public class Utils {
 
 	public static List<String> convertArrayToList(JSONArray array) {
@@ -25,7 +27,7 @@ public class Utils {
 		return list;
 	}
 
-	public static String translate(String langFrom, String langTo, String sourceText) throws IllegalArgumentException, IOException {
+	public static String translate(String langFrom, String langTo, String sourceText) throws MissingArgumentException, IOException {
 		BufferedReader in = null;
 		try {
 			URL url = new URL("https://translate.googleapis.com/translate_a/single?" +
@@ -49,7 +51,7 @@ public class Utils {
 			if(result.get(0) instanceof JSONArray) {
 				return ((JSONArray) ((JSONArray) result.get(0)).get(0)).get(0).toString();
 			} else {
-				throw new IllegalArgumentException();
+				throw new MissingArgumentException();
 			}
 
 		} catch (IOException e) {

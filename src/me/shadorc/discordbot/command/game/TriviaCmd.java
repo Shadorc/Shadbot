@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -39,7 +40,7 @@ public class TriviaCmd extends Command {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public void execute(Context context) throws MissingArgumentException {
 		try {
 			GUILDS_TRIVIA.put(context.getGuild(), new GuildTriviaManager(context.getChannel()));
 			GUILDS_TRIVIA.get(context.getGuild()).start();
