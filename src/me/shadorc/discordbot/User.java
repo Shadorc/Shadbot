@@ -18,10 +18,10 @@ public class User {
 		this.coins = 0;
 	}
 
-	public User(IGuild guild, long id, JSONObject obj) {
+	public User(IGuild guild, IUser user, JSONObject userObj) {
 		this.guild = guild;
-		this.user = guild.getUserByID(id);
-		this.coins = obj.getInt("coins");
+		this.user = user;
+		this.coins = userObj.getInt("coins");
 	}
 
 	public IGuild getGuild() {

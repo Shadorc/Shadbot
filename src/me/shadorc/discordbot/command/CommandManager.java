@@ -6,7 +6,7 @@ import java.util.Map;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
+import me.shadorc.discordbot.command.admin.SettingsCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
 import me.shadorc.discordbot.command.currency.LeaderboardCmd;
 import me.shadorc.discordbot.command.currency.TransferCoinsCmd;
@@ -91,7 +91,7 @@ public class CommandManager {
 				new JokeCmd(),
 				new HolidaysCmd(),
 				// Admin Commands
-				new AllowsChannelCmd());
+				new SettingsCmd());
 	}
 
 	private void register(Command... cmds) {

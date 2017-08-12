@@ -4,11 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -17,8 +15,9 @@ public class Storage {
 	private static final File API_KEYS_FILE = new File("api_keys.json");
 	private static final File DATA_FILE = new File("data.json");
 
-	private interface Permissions {
-		String AUTHORIZED_CHANNELS = "authorizedChannels";
+	public interface Setting {
+		String ALLOWED_CHANNELS = "allowed_channels";
+		String PREFIX = "prefix";
 	}
 
 	public enum ApiKeys {
@@ -59,7 +58,13 @@ public class Storage {
 		}
 	}
 
-	public static synchronized void storePermission(IGuild guild, IChannel channel) {
+	private static JSONObject getNewGuildObject() {
+		JSONObject guildObj = new JSONObject();
+		guildObj.put(Setting.PREFIX, Config.DEFAULT_PREFIX);
+		return guildObj;
+	}
+
+	public static synchronized void storeSetting(IGuild guild, String setting, Object value) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -69,21 +74,18 @@ public class Storage {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 
 			if(!mainObj.has(guild.getStringID())) {
-				mainObj.put(guild.getStringID(), new JSONObject());
+				mainObj.put(guild.getStringID(), Storage.getNewGuildObject());
 			}
+
 			JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
-			if(guildObj.has(Permissions.AUTHORIZED_CHANNELS)) {
-				guildObj.put(Permissions.AUTHORIZED_CHANNELS, Storage.getAllowedChannels(guild).put(channel.getStringID()));
-			} else {
-				guildObj.put(Permissions.AUTHORIZED_CHANNELS, new JSONArray().put(channel.getStringID()));
-			}
+			guildObj.put(setting, value);
 
 			writer = new FileWriter(DATA_FILE);
 			writer.write(mainObj.toString(2));
 			writer.flush();
 
 		} catch (IOException e) {
-			Log.error("Error while saving permissions.", e);
+			Log.error("Error while saving setting.", e);
 
 		} finally {
 			try {
@@ -91,7 +93,7 @@ public class Storage {
 					writer.close();
 				}
 			} catch (IOException e) {
-				Log.error("Error while closing writer during the saving of the permissions.", e);
+				Log.error("Error while closing writer during the saving of the setting.", e);
 			}
 		}
 	}
@@ -106,10 +108,10 @@ public class Storage {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 
 			if(!mainObj.has(user.getGuild().getStringID())) {
-				mainObj.put(user.getGuild().getStringID(), new JSONObject());
+				mainObj.put(user.getGuild().getStringID(), Storage.getNewGuildObject());
 			}
-			JSONObject guildObj = mainObj.getJSONObject(user.getGuild().getStringID());
 
+			JSONObject guildObj = mainObj.getJSONObject(user.getGuild().getStringID());
 			guildObj.put(user.getStringID(), user.toJSON());
 
 			writer = new FileWriter(DATA_FILE);
@@ -130,7 +132,7 @@ public class Storage {
 		}
 	}
 
-	public static synchronized JSONArray getAllowedChannels(IGuild guild) {
+	public static synchronized Object getSetting(IGuild guild, String setting) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -139,8 +141,8 @@ public class Storage {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 			if(mainObj.has(guild.getStringID())) {
 				JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
-				if(guildObj.has(Permissions.AUTHORIZED_CHANNELS)) {
-					return guildObj.getJSONArray(Permissions.AUTHORIZED_CHANNELS);
+				if(guildObj.has(setting)) {
+					return guildObj.get(setting);
 				}
 			}
 		} catch (IOException e) {
@@ -156,11 +158,10 @@ public class Storage {
 
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
-
 			if(mainObj.has(guild.getStringID())) {
 				JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
 				if(guildObj.has(user.getStringID())) {
-					return new User(guild, user.getLongID(), guildObj.getJSONObject(user.getStringID()));
+					return new User(guild, user, guildObj.getJSONObject(user.getStringID()));
 				}
 			}
 		} catch (IOException e) {
@@ -173,7 +174,9 @@ public class Storage {
 	public static synchronized String getApiKey(ApiKeys key) {
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(API_KEYS_FILE.toURI().toURL().openStream()));
-			return mainObj.getString(key.toString());
+			if(mainObj.has(key.toString())) {
+				return mainObj.getString(key.toString());
+			}
 		} catch (IOException e) {
 			Log.error("Error while reading API keys file.", e);
 		}

@@ -4,6 +4,7 @@ import org.json.JSONArray;
 
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.Storage.Setting;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -46,9 +47,9 @@ public class BotUtils {
 	 * @return true if Shadbot is allowed to send a message in the channel, false otherwise
 	 */
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
-		JSONArray channelsArray = Storage.getAllowedChannels(guild);
+		JSONArray channelsArray = (JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS);
 
-		// If no permissions were defined, authorize by default all the channels
+		// If no permissions were defined, authorize all the channels by default.
 		if(channelsArray == null) {
 			return true;
 		}

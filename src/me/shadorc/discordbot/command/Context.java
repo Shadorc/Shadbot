@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command;
 
 import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.User;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -54,6 +55,10 @@ public class Context {
 
 	public IDiscordClient getClient() {
 		return event.getClient();
+	}
+
+	public String getPrefix() {
+		return Storage.getSetting(this.getGuild(), Setting.PREFIX).toString();
 	}
 
 	public String getCommand() {
