@@ -32,11 +32,11 @@ public class CoinsCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show how many coins you have.\nYou can also see how much coins have an user by mentioning him.**")
-				.appendField("Usage", "/coins or /coins <@user>", false);
+				.appendField("Usage", context.getPrefix() + "coins or " + context.getPrefix() + "coins <@user>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

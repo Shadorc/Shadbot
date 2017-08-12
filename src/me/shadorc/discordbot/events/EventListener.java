@@ -3,6 +3,8 @@ package me.shadorc.discordbot.events;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Log;
+import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
@@ -22,7 +24,7 @@ public class EventListener {
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
 		Log.info("------------------- Shadbot is ready [BETA:" + Config.VERSION.isBeta() + "] -------------------");
-		event.getClient().changePlayingText("/help");
+		event.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
 	}
 
 	@EventSubscriber
@@ -41,7 +43,7 @@ public class EventListener {
 		GuildTriviaManager gtm = TriviaCmd.getGuildTriviaManager(event.getGuild());
 		if(gtm != null && gtm.isStarted()) {
 			gtm.checkAnswer(message);
-		} else if(message.getContent().startsWith(Config.PREFIX)) {
+		} else if(message.getContent().startsWith(Storage.getSetting(event.getGuild(), Setting.PREFIX).toString())) {
 			CommandManager.getInstance().manage(event);
 		}
 	}

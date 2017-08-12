@@ -35,11 +35,11 @@ public class CalcCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Calculate an expression.**")
-				.appendField("Usage", "/calc <expression>", false);
+				.appendField("Usage", context.getPrefix() + "calc <expression>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

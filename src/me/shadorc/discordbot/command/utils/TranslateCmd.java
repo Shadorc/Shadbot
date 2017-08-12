@@ -42,7 +42,7 @@ public class TranslateCmd extends Command {
 			String translatedText = Utils.translate(sourceLang, targetLang, sourceText);
 			BotUtils.sendMessage(Emoji.MAP + " Translation : " + translatedText, context.getChannel());
 		} catch (IllegalArgumentException argErr) {
-			BotUtils.sendMessage(Emoji.WARNING + " One of the specified language isn't supported or doesn't exist. Use /help translate to see a complete list of supported languages.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " One of the specified language isn't supported or doesn't exist. Use " + context.getPrefix() + "help translate to see a complete list of supported languages.", context.getChannel());
 		} catch (IOException ioErr) {
 			Log.error("An error occured during the translation.", ioErr, context.getChannel());
 		}
@@ -51,13 +51,13 @@ public class TranslateCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Translate a text from a language to another.**")
 				.appendField("Arguments", "<lang1> is optional, by leaving it blank the source language will be automatically detected.", false)
 				.appendField("Documentation", "List of supported languages : https://cloud.google.com/translate/docs/languages", false)
-				.appendField("Usage", "/translate [<lang1>] <lang2> <text>", false);
+				.appendField("Usage", context.getPrefix() + "translate [<lang1>] <lang2> <text>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

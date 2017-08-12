@@ -43,11 +43,11 @@ public class SuggestCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Send a message to my developer, this can be a suggestion, a bug report, anything.**")
-				.appendField("Usage", "/suggest <message>", false);
+				.appendField("Usage", context.getPrefix() + "suggest <message>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

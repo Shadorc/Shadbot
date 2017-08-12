@@ -70,11 +70,11 @@ public class WeatherCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show weather report for a city.**")
-				.appendField("Usage", "/weather <city>", false);
+				.appendField("Usage", context.getPrefix() + "weather <city>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

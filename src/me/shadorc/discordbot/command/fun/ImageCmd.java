@@ -146,11 +146,11 @@ public class ImageCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Search for a random image on DeviantArt.**")
-				.appendField("Usage", "/image <search>", false);
+				.appendField("Usage", context.getPrefix() + "image <search>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

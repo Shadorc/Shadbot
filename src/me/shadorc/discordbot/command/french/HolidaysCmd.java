@@ -39,11 +39,11 @@ public class HolidaysCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show the number of remaining days before the next school holidays for the indicated zone.**")
-				.appendField("Usage", "/vacs <A|B|C>", false);
+				.appendField("Usage", context.getPrefix() + "vacs <A|B|C>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

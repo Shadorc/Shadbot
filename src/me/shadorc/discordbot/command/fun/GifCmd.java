@@ -74,11 +74,11 @@ public class GifCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show a random gif or a gif corresponding to a tag.**")
-				.appendField("Usage", "/gif or /gif <tag>", false);
+				.appendField("Usage", context.getPrefix() + "gif or " + context.getPrefix() + "gif <tag>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

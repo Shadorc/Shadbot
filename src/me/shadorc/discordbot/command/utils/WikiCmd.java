@@ -66,11 +66,11 @@ public class WikiCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.withDescription("**Show Wikipedia description for a search.**")
-				.appendField("Usage", "/wiki <search>", false);
+				.appendField("Usage", context.getPrefix() + "wiki <search>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

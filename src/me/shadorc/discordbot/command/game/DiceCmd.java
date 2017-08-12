@@ -8,6 +8,7 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -130,7 +131,7 @@ public class DiceCmd extends Command {
 					.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 					.withColor(Config.BOT_COLOR)
 					.appendField(croupier.getName() + " started a dice game.",
-							"Use `/dice <num>` to join the game with a **" + bet + " coins** putting.", false)
+							"Use `" + Storage.getSetting(channel.getGuild(), Setting.PREFIX) + "dice <num>` to join the game with a **" + bet + " coins** putting.", false)
 					.withFooterText("You have " + (timer.getDelay() / 1000) + " seconds to make your bets.");
 			BotUtils.sendEmbed(builder.build(), channel);
 
@@ -170,11 +171,11 @@ public class DiceCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Start a dice game with a common bet or join a game in progress.**")
-				.appendField("Usage", "Create a game: **/dice <bet> <num>**.\nJoin a game **/dice <num>**", false)
+				.appendField("Usage", "Create a game: **" + context.getPrefix() + "dice <bet> <num>**.\nJoin a game **" + context.getPrefix() + "dice <num>**", false)
 				.appendField("Restrictions", "The number must be between 1 and 6.\nYou can't bet on a number that has already been chosen by another player.", false)
 				.appendField("Gains", "The winner gets " + MULTIPLIER + " times the common bet multiplied by the number of players.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

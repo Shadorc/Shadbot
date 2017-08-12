@@ -62,11 +62,11 @@ public class ChatCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Chat with the artificial intelligence A.L.I.C.E.**")
-				.appendField("Usage", "/chat <message>", false);
+				.appendField("Usage", context.getPrefix() + "chat <message>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

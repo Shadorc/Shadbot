@@ -25,52 +25,52 @@ public class HelpCmd extends Command {
 				.withAuthorName("Shadbot Help")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.withDesc("Get more information by using /help <command>.")
+				.withDesc("Get more information by using " + context.getPrefix() + "help <command>.")
 				.appendField("Utils Commands:",
-						"`/translate`"
-								+ " `/wiki`"
-								+ " `/calc`"
-								+ " `/weather`"
-								+ " `/urban`", false)
+						"`" + context.getPrefix() + "translate`"
+								+ " `" + context.getPrefix() + "wiki`"
+								+ " `" + context.getPrefix() + "calc`"
+								+ " `" + context.getPrefix() + "weather`"
+								+ " `" + context.getPrefix() + "urban`", false)
 				.appendField("Fun Commands:",
-						"`/chat`"
-								+ " `/image`"
-								+ " `/gif`", false)
+						"`" + context.getPrefix() + "chat`"
+								+ " `" + context.getPrefix() + "image`"
+								+ " `" + context.getPrefix() + "gif`", false)
 				.appendField("Games Commands:",
-						"`/dice`"
-								+ " `/slot_machine`"
-								+ " `/russian_roulette`"
-								+ " `/trivia`", false)
+						"`" + context.getPrefix() + "dice`"
+								+ " `" + context.getPrefix() + "slot_machine`"
+								+ " `" + context.getPrefix() + "russian_roulette`"
+								+ " `" + context.getPrefix() + "trivia`", false)
 				.appendField("Currency Commands:",
-						"`/transfer`"
-								+ " `/leaderboard`"
-								+ " `/coins`", false)
+						"`" + context.getPrefix() + "transfer`"
+								+ " `" + context.getPrefix() + "leaderboard`"
+								+ " `" + context.getPrefix() + "coins`", false)
 				.appendField("Music Commands:",
-						"`/play`"
-								+ " `/volume`"
-								+ " `/pause`"
-								+ " `/repeat`"
-								+ " `/stop`"
-								+ " `/next`"
-								+ " `/name`"
-								+ " `/playlist`", false)
+						"`" + context.getPrefix() + "play`"
+								+ " `" + context.getPrefix() + "volume`"
+								+ " `" + context.getPrefix() + "pause`"
+								+ " `" + context.getPrefix() + "repeat`"
+								+ " `" + context.getPrefix() + "stop`"
+								+ " `" + context.getPrefix() + "next`"
+								+ " `" + context.getPrefix() + "name`"
+								+ " `" + context.getPrefix() + "playlist`", false)
 				.appendField("Games Stats Commands:",
-						"`/overwatch`"
-								+ " `/cs`", false)
+						"`" + context.getPrefix() + "overwatch`"
+								+ " `" + context.getPrefix() + "cs`", false)
 				.appendField("Info Commands:",
-						"`/info`"
-								+ " `/suggest`"
-								+ " `/ping`", false)
+						"`" + context.getPrefix() + "info`"
+								+ " `" + context.getPrefix() + "suggest`"
+								+ " `" + context.getPrefix() + "ping`", false)
 				.appendField("French Commands:",
-						"`/dtc`"
-								+ " `/blague`"
-								+ " `/vacs`", false)
+						"`" + context.getPrefix() + "dtc`"
+								+ " `" + context.getPrefix() + "blague`"
+								+ " `" + context.getPrefix() + "vacs`", false)
 				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
 				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
 
 		if(context.isAuthorAdmin()) {
 			builder.appendField("Admin Commands:",
-					"`/allows_channel`", false);
+					"`" + context.getPrefix() + "settings`", false);
 		}
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
@@ -79,7 +79,7 @@ public class HelpCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show help for all the commands.**");

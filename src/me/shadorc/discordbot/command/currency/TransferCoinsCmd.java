@@ -53,11 +53,11 @@ public class TransferCoinsCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Transfer of coins to the mentioned user.**")
-				.appendField("Usage", "/transfer <coins> <@user>", false)
+				.appendField("Usage", context.getPrefix() + "transfer <coins> <@user>", false)
 				.appendField("Restrictions", "The transferred amount must be strictly positive.\nYou can't transfer coins to yourself.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

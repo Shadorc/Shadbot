@@ -98,11 +98,11 @@ public class PlayCmd extends Command {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for /" + this.getNames()[0])
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Play the music from the url. Search tags or playlist are also possible.**")
-				.appendField("Usage", "/play <url>", false);
+				.appendField("Usage", context.getPrefix() + "play <url>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }
