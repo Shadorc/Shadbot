@@ -68,8 +68,7 @@ public class HelpCmd extends Command {
 
 		if(context.isAuthorAdmin()) {
 			builder.appendField("Admin Commands:",
-					"`/allows_channel`"
-							+ " `/debug`", false);
+					"`/allows_channel`", false);
 		}
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
