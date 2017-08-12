@@ -15,6 +15,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.Discord4J;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class InfoCmd extends Command {
 
@@ -54,7 +55,12 @@ public class InfoCmd extends Command {
 
 	@Override
 	public void showHelp(Context context) {
-		// TODO Auto-generated method stub
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
+				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withColor(Config.BOT_COLOR)
+				.appendDescription("**Show Shadbot's info.**");
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
 }

@@ -54,19 +54,7 @@ public class ImageCmd extends Command {
 			}
 
 			String encodedSearch = URLEncoder.encode(context.getArg(), "UTF-8");
-			// String encodedSearch = URLEncoder.encode(context.getArg().replace(" ", ""), "UTF-8");
-
 			JSONObject resultObj = this.getRandomPopularResult(encodedSearch);
-			// JSONObject resultObj = this.getRandomResult(encodedSearch);
-
-			// if(resultObj == null) {
-			// encodedSearch = this.getTag(encodedSearch);
-			// if(encodedSearch == null) {
-			// BotUtils.sendMessage(Emoji.WARNING + " No result found for \"" + context.getArg() + "\"", context.getChannel());
-			// return;
-			// }
-			// resultObj = this.getRandomResult(encodedSearch);
-			// }
 
 			if(resultObj == null) {
 				BotUtils.sendMessage(Emoji.WARNING + " No results for \"" + context.getArg() + "\"", context.getChannel());
@@ -114,13 +102,6 @@ public class ImageCmd extends Command {
 		}
 	}
 
-	/*
-	 * private JSONObject getRandomResult(String encodedSearch) throws IOException { JSONObject mainObj = new JSONObject(HtmlUtils.getHTML(new
-	 * URL(API_URL+ "browse/tags?" + "tag=" + encodedSearch + "&limit=1" //The pagination limit (min: 1 max: 50) + "&offset=" + MathUtils.rand(5000) //The
-	 * pagination offset (min: 0 max: 50000) + "&access_token=" + this.deviantArtToken))); JSONArray resultsArray = mainObj.getJSONArray("results");
-	 * if(resultsArray.length() == 0) { return null; } return resultsArray.getJSONObject(MathUtils.rand(resultsArray.length())); }
-	 */
-
 	private JSONObject getRandomPopularResult(String encodedSearch) throws IOException {
 		JSONObject mainObj = new JSONObject(HtmlUtils.getHTML(new URL(API_URL + "browse/popular?"
 				+ "q=" + encodedSearch
@@ -136,12 +117,6 @@ public class ImageCmd extends Command {
 
 		return resultsArray.getJSONObject(MathUtils.rand(resultsArray.length()));
 	}
-
-	/*
-	 * private String getTag(String encodedSearch) throws IOException { JSONObject mainObj = new JSONObject(HtmlUtils.getHTML(new URL(API_URL +
-	 * "browse/tags/search?" + "tag_name=" + encodedSearch + "&access_token=" + deviantArtToken))); JSONArray resultsArray =
-	 * mainObj.getJSONArray("results"); if(resultsArray.length() == 0) { return null; } return resultsArray.getJSONObject(0).getString("tag_name"); }
-	 */
 
 	@Override
 	public void showHelp(Context context) {
