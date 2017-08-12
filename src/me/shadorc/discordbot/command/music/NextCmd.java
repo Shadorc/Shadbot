@@ -13,7 +13,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class NextCmd extends Command {
 
 	public NextCmd() {
-		super(false, "next", "suivante");
+		super(false, "next", "skip");
 	}
 
 	@Override
