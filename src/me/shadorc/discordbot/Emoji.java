@@ -30,7 +30,4 @@ public interface Emoji {
 	String SPEECH = ":speech_balloon:";
 	String CLAP = ":clap:";
 	String GEAR = ":gear:";
-
-	String SWORDS = ":crossed_swords:";
-	String SHIELD = ":shield:";
 }
