@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.admin.AllowsChannelCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
@@ -39,7 +40,6 @@ import me.shadorc.discordbot.command.utils.UrbanCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
 import me.shadorc.discordbot.command.utils.WikiCmd;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.Log;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 public class CommandManager {

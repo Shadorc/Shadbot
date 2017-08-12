@@ -1,8 +1,7 @@
-package me.shadorc.discordbot.rpg;
+package me.shadorc.discordbot;
 
 import org.json.JSONObject;
 
-import me.shadorc.discordbot.Storage;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 

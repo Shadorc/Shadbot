@@ -2,6 +2,7 @@ package me.shadorc.discordbot.utils;
 
 import org.json.JSONArray;
 
+import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.Storage;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;

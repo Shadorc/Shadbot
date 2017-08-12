@@ -6,13 +6,13 @@ import java.util.Locale;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.Log;
 import me.shadorc.discordbot.utils.StringUtils;
 import net.aksingh.owmjapis.CurrentWeather;
 import net.aksingh.owmjapis.OpenWeatherMap;

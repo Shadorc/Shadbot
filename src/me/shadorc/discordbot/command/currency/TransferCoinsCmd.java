@@ -4,9 +4,9 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.User;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.rpg.User;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 

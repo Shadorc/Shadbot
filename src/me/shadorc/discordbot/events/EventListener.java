@@ -2,12 +2,12 @@ package me.shadorc.discordbot.events;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.Log;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;

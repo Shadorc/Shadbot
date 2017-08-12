@@ -1,9 +1,9 @@
-package me.shadorc.discordbot.utils;
+package me.shadorc.discordbot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.handle.obj.IChannel;
 
 public class Log {

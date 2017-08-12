@@ -1,7 +1,7 @@
 package me.shadorc.discordbot.command;
 
 import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.rpg.User;
+import me.shadorc.discordbot.User;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;

@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+import me.shadorc.discordbot.Log;
+
 public class NetUtils {
 
 	/**

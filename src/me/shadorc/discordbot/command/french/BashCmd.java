@@ -6,6 +6,7 @@ import java.net.URL;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
@@ -13,7 +14,6 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.HtmlUtils;
-import me.shadorc.discordbot.utils.Log;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class BashCmd extends Command {
