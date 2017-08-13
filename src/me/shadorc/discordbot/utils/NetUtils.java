@@ -83,8 +83,8 @@ public class NetUtils {
 			URLConnection urlConn = url.openConnection();
 			urlConn.setRequestProperty("Content-Type", "application/json");
 			urlConn.setRequestProperty("Authorization", Storage.getApiKey(ApiKeys.DISCORD_BOTS_TOKEN));
-			urlConn.setDoOutput (true);
-			urlConn.setUseCaches (false);
+			urlConn.setDoOutput(true);
+			urlConn.setUseCaches(false);
 
 			JSONObject content = new JSONObject().put("server_count", client.getGuilds().size());
 
@@ -92,14 +92,14 @@ public class NetUtils {
 			printout.writeBytes(content.toString());
 			printout.flush();
 		} catch (Exception ignored) {
-			//Ignored
+			// Ignored
 		} finally {
 			try {
 				if(printout != null) {
 					printout.close();
 				}
 			} catch (Exception ignored) {
-				//Ignored
+				// Ignored
 			}
 		}
 	}

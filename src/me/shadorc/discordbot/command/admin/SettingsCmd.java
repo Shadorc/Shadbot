@@ -84,11 +84,11 @@ public class SettingsCmd extends Command {
 				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Change Shadbot's server settings.**")
-				.appendField("Name: prefix", 
+				.appendField("Name: prefix",
 						"**Description:** Change Shadbot's prefix for this server."
 								+ "\n**arg:** prefix"
 								+ "\n**Example:** " + context.getPrefix() + "settings prefix !", false)
-				.appendField("Name: allowed_channels", 
+				.appendField("Name: allowed_channels",
 						"**Description:** Allow Shadbot to only post messages in the mentioned channels. By default, all the channels are allowed."
 								+ "\n**arg:** #channel(s)"
 								+ "\n**Example:** " + context.getPrefix() + "settings allowed_channels #general", false)
