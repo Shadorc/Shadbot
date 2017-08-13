@@ -43,15 +43,16 @@ public class WikiCmd extends Command {
 		try {
 			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
 			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://en.wikipedia.org/w/api.php?"
-					+ "action=query"
+					+ "format=json"
+					+ "&action=query"
 					+ "&titles=" + URLEncoder.encode(context.getArg(), "UTF-8")
+					+ "&redirects=true"
 					+ "&prop=extracts"
-					+ "&format=json"
 					+ "&explaintext=true"
 					+ "&exintro=true"
 					+ "&exsentences=5");
 
-			JSONObject pagesObj = new JSONObject(mainObj).getJSONObject("query").getJSONObject("pages");
+			JSONObject pagesObj = mainObj.getJSONObject("query").getJSONObject("pages");
 			String pageId = pagesObj.names().getString(0);
 			JSONObject resultObj = pagesObj.getJSONObject(pageId);
 
