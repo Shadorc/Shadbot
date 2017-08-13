@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.time.temporal.ChronoUnit;
 
 import org.json.JSONObject;
 
@@ -9,6 +10,7 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -18,14 +20,22 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class WikiCmd extends Command {
 
+	private final RateLimiter rateLimiter;
+
 	public WikiCmd() {
 		super(false, "wiki", "wikipedia");
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() == null) {
 			throw new MissingArgumentException();
+		}
+
+		if(rateLimiter.isLimitedAndNotWarned(context.getGuild(), context.getAuthor())) {
+			rateLimiter.warn("Take it easy, don't spam :)", context);
+			return;
 		}
 
 		try {

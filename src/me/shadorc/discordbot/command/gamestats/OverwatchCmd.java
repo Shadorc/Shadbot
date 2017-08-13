@@ -3,11 +3,13 @@ package me.shadorc.discordbot.command.gamestats;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.time.temporal.ChronoUnit;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -17,8 +19,11 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class OverwatchCmd extends Command {
 
+	private final RateLimiter rateLimiter;
+
 	public OverwatchCmd() {
 		super(false, "overwatch", "ow");
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override
@@ -30,6 +35,11 @@ public class OverwatchCmd extends Command {
 		String[] splitArgs = context.getArg().split(" ", 3);
 		if(splitArgs.length != 3) {
 			throw new MissingArgumentException();
+		}
+
+		if(rateLimiter.isLimitedAndNotWarned(context.getGuild(), context.getAuthor())) {
+			rateLimiter.warn("Take it easy, don't spam :)", context);
+			return;
 		}
 
 		String plateform = splitArgs[0].toLowerCase();

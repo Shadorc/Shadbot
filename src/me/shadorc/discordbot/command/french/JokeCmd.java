@@ -24,7 +24,7 @@ public class JokeCmd extends Command {
 
 	public JokeCmd() {
 		super(false, "blague", "joke");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override

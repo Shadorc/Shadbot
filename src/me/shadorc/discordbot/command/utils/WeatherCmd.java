@@ -2,12 +2,14 @@ package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
@@ -24,14 +26,22 @@ public class WeatherCmd extends Command {
 
 	private final static SimpleDateFormat SDF = new SimpleDateFormat("MMMMM d, yyyy - hh:mm aa", Locale.ENGLISH);
 
+	private final RateLimiter rateLimiter;
+
 	public WeatherCmd() {
 		super(false, "weather", "meteo");
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() == null) {
 			throw new MissingArgumentException();
+		}
+
+		if(rateLimiter.isLimitedAndNotWarned(context.getGuild(), context.getAuthor())) {
+			rateLimiter.warn("Take it easy, don't spam :)", context);
+			return;
 		}
 
 		try {

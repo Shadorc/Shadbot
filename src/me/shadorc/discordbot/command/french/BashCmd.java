@@ -25,7 +25,7 @@ public class BashCmd extends Command {
 
 	public BashCmd() {
 		super(false, "dtc", "bash");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override
