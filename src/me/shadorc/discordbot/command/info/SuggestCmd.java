@@ -10,7 +10,6 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
 
 public class SuggestCmd extends Command {
 
@@ -32,11 +31,7 @@ public class SuggestCmd extends Command {
 			return;
 		}
 
-		RequestBuffer.request(() -> {
-			context.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID).sendMessage(
-					context.getAuthorName() + " from Guild \"" + context.getGuild().getName() + "\" suggests : " + context.getArg());
-		});
-
+		BotUtils.sendMessage(context.getAuthorName() + " from Guild \"" + context.getGuild().getName() + "\" suggested : " + context.getArg(), context.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID));
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " Suggestion has been sent, thank you !", context.getChannel());
 	}
 
