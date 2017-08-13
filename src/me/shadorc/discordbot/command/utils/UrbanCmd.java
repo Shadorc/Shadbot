@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 
 import org.json.JSONObject;
@@ -14,7 +13,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class UrbanCmd extends Command {
@@ -30,9 +29,8 @@ public class UrbanCmd extends Command {
 		}
 
 		try {
-			String jsonStr = HtmlUtils.getHTML(new URL("https://api.urbandictionary.com/v0/define?"
-					+ "term=" + URLEncoder.encode(context.getArg(), "UTF-8")));
-			JSONObject mainObj = new JSONObject(jsonStr);
+			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://api.urbandictionary.com/v0/define?"
+					+ "term=" + URLEncoder.encode(context.getArg(), "UTF-8"));
 
 			if(mainObj.getString("result_type").equals("no_results")) {
 				BotUtils.sendMessage(Emoji.WARNING + " No results for \"" + context.getArg() + "\"", context.getChannel());

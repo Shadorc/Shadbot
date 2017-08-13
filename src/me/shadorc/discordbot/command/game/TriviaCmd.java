@@ -2,7 +2,6 @@ package me.shadorc.discordbot.command.game;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,7 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -75,16 +74,16 @@ public class TriviaCmd extends Command {
 
 		// Trivia API doc : https://opentdb.com/api_config.php
 		private void start() throws MalformedURLException, IOException {
-			String json = HtmlUtils.getHTML(new URL("https://opentdb.com/api.php?amount=1"));
-			JSONObject result = new JSONObject(json).getJSONArray("results").getJSONObject(0);
+			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://opentdb.com/api.php?amount=1");
+			JSONObject resultObj = mainObj.getJSONArray("results").getJSONObject(0);
 
-			String category = result.getString("category");
-			String type = result.getString("type");
-			String difficulty = result.getString("difficulty");
-			String question = result.getString("question");
-			String correct_answer = result.getString("correct_answer");
+			String category = resultObj.getString("category");
+			String type = resultObj.getString("type");
+			String difficulty = resultObj.getString("difficulty");
+			String question = resultObj.getString("question");
+			String correct_answer = resultObj.getString("correct_answer");
 
-			this.incorrectAnswers = Utils.convertArrayToList(result.getJSONArray("incorrect_answers"));
+			this.incorrectAnswers = Utils.convertArrayToList(resultObj.getJSONArray("incorrect_answers"));
 
 			StringBuilder strBuilder = new StringBuilder("**" + StringUtils.convertHtmlToUTF8(question) + "**");
 			if(type.equals("multiple")) {

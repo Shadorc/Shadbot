@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.fun;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 
@@ -19,7 +18,7 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class GifCmd extends Command {
@@ -39,15 +38,15 @@ public class GifCmd extends Command {
 		}
 
 		try {
-			String json = HtmlUtils.getHTML(new URL("https://api.giphy.com/v1/gifs/random?"
+			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://api.giphy.com/v1/gifs/random?"
 					+ "api_key=" + Storage.getApiKey(ApiKeys.GIPHY_API_KEY)
-					+ ((context.getArg() == null) ? "" : "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8"))));
-			JSONObject obj = new JSONObject(json);
-			if(obj.get("data") instanceof JSONArray) {
+					+ ((context.getArg() == null) ? "" : "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8")));
+
+			if(mainObj.get("data") instanceof JSONArray) {
 				BotUtils.sendMessage(Emoji.WARNING + " Aucun résultat pour " + context.getArg(), context.getChannel());
 				return;
 			}
-			String url = obj.getJSONObject("data").getString("url");
+			String url = mainObj.getJSONObject("data").getString("url");
 			BotUtils.sendMessage(url, context.getChannel());
 		} catch (IOException e) {
 			Log.error("An arror occured while getting a gif from Giphy.", e, context.getChannel());

@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 
 import org.json.JSONObject;
@@ -14,7 +13,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class WikiCmd extends Command {
@@ -30,20 +29,19 @@ public class WikiCmd extends Command {
 		}
 
 		try {
-			String searchEncoded = URLEncoder.encode(context.getArg(), "UTF-8");
 			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-			String jsonStr = HtmlUtils.getHTML(new URL("https://en.wikipedia.org/w/api.php?"
+			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://en.wikipedia.org/w/api.php?"
 					+ "action=query"
-					+ "&titles=" + searchEncoded
+					+ "&titles=" + URLEncoder.encode(context.getArg(), "UTF-8")
 					+ "&prop=extracts"
 					+ "&format=json"
 					+ "&explaintext=true"
 					+ "&exintro=true"
-					+ "&exsentences=5"));
+					+ "&exsentences=5");
 
-			JSONObject mainObj = new JSONObject(jsonStr).getJSONObject("query").getJSONObject("pages");
-			String pageId = mainObj.names().getString(0);
-			JSONObject resultObj = mainObj.getJSONObject(pageId);
+			JSONObject pagesObj = new JSONObject(mainObj).getJSONObject("query").getJSONObject("pages");
+			String pageId = pagesObj.names().getString(0);
+			JSONObject resultObj = pagesObj.getJSONObject(pageId);
 
 			if(pageId.equals("-1") || resultObj.getString("extract").isEmpty()) {
 				BotUtils.sendMessage(Emoji.WARNING + " No result for : " + context.getArg(), context.getChannel());

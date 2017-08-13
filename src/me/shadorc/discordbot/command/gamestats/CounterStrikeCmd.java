@@ -16,6 +16,7 @@ import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -39,17 +40,17 @@ public class CounterStrikeCmd extends Command {
 				steamids = context.getArg();
 			}
 
-			URL statsUrl = new URL("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
+			JSONObject mainStatsObj = JsonUtils.getJsonFromUrl("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
 					+ "appid=730"
 					+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
 					+ "&steamid=" + steamids);
 
-			URL userUrl = new URL("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
+			JSONObject mainUserObj = JsonUtils.getJsonFromUrl("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
 					+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
 					+ "&steamids=" + steamids);
 
-			JSONArray statsArray = new JSONObject(HtmlUtils.getHTML(statsUrl)).getJSONObject("playerstats").getJSONArray("stats");
-			JSONObject userObj = new JSONObject(HtmlUtils.getHTML(userUrl)).getJSONObject("response").getJSONArray("players").getJSONObject(0);
+			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");
+			JSONObject userObj = mainUserObj.getJSONObject("response").getJSONArray("players").getJSONObject(0);
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Statistiques Counter-Strike: Global Offensive")
