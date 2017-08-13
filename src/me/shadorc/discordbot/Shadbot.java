@@ -11,6 +11,8 @@ import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.Permissions;
 
 public class Shadbot {
 
@@ -40,5 +42,9 @@ public class Shadbot {
 
 	public static IDiscordClient getClient() {
 		return CLIENT;
+	}
+
+	public static boolean hasPermission(IGuild guild, Permissions permission) {
+		return CLIENT.getOurUser().getPermissionsForGuild(guild).contains(permission);
 	}
 }

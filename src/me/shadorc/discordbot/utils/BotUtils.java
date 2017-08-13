@@ -2,12 +2,15 @@ package me.shadorc.discordbot.utils;
 
 import org.json.JSONArray;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Log;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
@@ -30,6 +33,11 @@ public class BotUtils {
 
 	// EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
+		if(!Shadbot.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
+			BotUtils.sendMessage(Emoji.WARNING + " I'm not allowed to send Embed links in this channel :(", channel);
+			return;
+		}
+
 		try {
 			RequestBuffer.request(() -> {
 				channel.sendMessage(embed);
@@ -54,6 +62,6 @@ public class BotUtils {
 			return true;
 		}
 
-		return Utils.convertArrayToList(channelsArray).contains(channel.getStringID());
+		return JsonUtils.convertArrayToList(channelsArray).contains(channel.getStringID());
 	}
 }
