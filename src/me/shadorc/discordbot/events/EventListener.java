@@ -1,5 +1,8 @@
 package me.shadorc.discordbot.events;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Log;
@@ -10,6 +13,7 @@ import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
@@ -25,6 +29,19 @@ public class EventListener {
 	public void onReadyEvent(ReadyEvent event) {
 		Log.info("------------------- Shadbot is ready [BETA:" + Config.VERSION.isBeta() + "] -------------------");
 		event.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
+
+		// Update Shadbot stats every hour
+		final int period = 1000 * 60 * 60;
+		Timer timer = new Timer();
+		TimerTask timerTask = new TimerTask() {
+			@Override
+			public void run() {
+				System.err.println("Posting stats");
+				NetUtils.postStats();
+				System.err.println("Posted stats");
+			}
+		};
+		timer.schedule(timerTask, 0, period);
 	}
 
 	@EventSubscriber

@@ -85,6 +85,7 @@ public class NetUtils {
 			urlConn.setRequestProperty("Content-Type", "application/json");
 			urlConn.setRequestProperty("Authorization", Storage.getApiKey(token));
 			urlConn.setDoOutput(true);
+			urlConn.setDoInput(false);
 			urlConn.setUseCaches(false);
 
 			JSONObject content = new JSONObject().put("server_count", Shadbot.getClient().getGuilds().size());
@@ -93,7 +94,6 @@ public class NetUtils {
 			printout.writeBytes(content.toString());
 			printout.flush();
 		} catch (Exception ignored) {
-			Log.error("Error while posting stats", ignored);
 			// Ignored
 		} finally {
 			try {
@@ -101,7 +101,6 @@ public class NetUtils {
 					printout.close();
 				}
 			} catch (Exception ignored) {
-				Log.error("Error while posting stats", ignored);
 				// Ignored
 			}
 		}
