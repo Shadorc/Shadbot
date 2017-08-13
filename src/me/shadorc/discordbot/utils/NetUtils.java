@@ -72,13 +72,18 @@ public class NetUtils {
 	}
 
 	public static void postStats() {
+		NetUtils.postStatsOn("https://bots.discord.pw", ApiKeys.BOTS_DISCORD_PW_TOKEN);
+		NetUtils.postStatsOn("https://discordbots.org", ApiKeys.DISCORD_BOTS_ORG_TOKEN);
+	}
+
+	private static void postStatsOn(String site, ApiKeys token) {
 		DataOutputStream printout = null;
 		try {
-			URL url = new URL("https://bots.discord.pw/api/bots/" + Shadbot.getClient().getOurUser().getStringID() + "/stats");
+			URL url = new URL(site + "/api/bots/" + Shadbot.getClient().getOurUser().getStringID() + "/stats");
 
 			URLConnection urlConn = url.openConnection();
 			urlConn.setRequestProperty("Content-Type", "application/json");
-			urlConn.setRequestProperty("Authorization", Storage.getApiKey(ApiKeys.DISCORD_BOTS_TOKEN));
+			urlConn.setRequestProperty("Authorization", Storage.getApiKey(token));
 			urlConn.setDoOutput(true);
 			urlConn.setUseCaches(false);
 
@@ -88,6 +93,7 @@ public class NetUtils {
 			printout.writeBytes(content.toString());
 			printout.flush();
 		} catch (Exception ignored) {
+			Log.error("Error while posting stats", ignored);
 			// Ignored
 		} finally {
 			try {
@@ -95,6 +101,7 @@ public class NetUtils {
 					printout.close();
 				}
 			} catch (Exception ignored) {
+				Log.error("Error while posting stats", ignored);
 				// Ignored
 			}
 		}
