@@ -36,9 +36,7 @@ public class EventListener {
 		TimerTask timerTask = new TimerTask() {
 			@Override
 			public void run() {
-				System.err.println("Posting stats");
 				NetUtils.postStats();
-				System.err.println("Posted stats");
 			}
 		};
 		timer.schedule(timerTask, 0, period);
