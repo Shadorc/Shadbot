@@ -23,7 +23,6 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.JsonUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
-import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -83,7 +82,7 @@ public class TriviaCmd extends Command {
 			String question = resultObj.getString("question");
 			String correct_answer = resultObj.getString("correct_answer");
 
-			this.incorrectAnswers = Utils.convertArrayToList(resultObj.getJSONArray("incorrect_answers"));
+			this.incorrectAnswers = JsonUtils.convertArrayToList(resultObj.getJSONArray("incorrect_answers"));
 
 			StringBuilder strBuilder = new StringBuilder("**" + StringUtils.convertHtmlToUTF8(question) + "**");
 			if(type.equals("multiple")) {

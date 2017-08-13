@@ -6,11 +6,26 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonUtils {
+
+	/**
+	 * @param array - JSONArray to convert
+	 * @return List containing array elements
+	 */
+	public static List<String> convertArrayToList(JSONArray array) {
+		List<String> list = new ArrayList<>();
+		for(int i = 0; i < array.length(); i++) {
+			list.add(array.getString(i));
+		}
+		return list;
+	}
 
 	/**
 	 * @param url - webpage's url
