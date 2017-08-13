@@ -2,11 +2,11 @@ package me.shadorc.discordbot.command.fun;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
@@ -20,7 +20,7 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -42,11 +42,12 @@ public class ImageCmd extends Command {
 			throw new MissingArgumentException();
 		}
 
-		if(rateLimiter.isLimitedAndNotWarned(context.getGuild(), context.getAuthor())) {
-			rateLimiter.warn("Take it easy, don't spam :)", context);
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
+				rateLimiter.warn("Take it easy, don't spam :)", context);
+			}
 			return;
 		}
-
 		try {
 			if(this.deviantArtToken == null) {
 				this.generateAccessToken();
@@ -64,57 +65,61 @@ public class ImageCmd extends Command {
 			JSONObject contentObj = resultObj.getJSONObject("content");
 
 			EmbedBuilder builder = new EmbedBuilder()
-					.withAuthorName("DeviantArt Search (" + encodedSearch + ")")
+					.withAuthorName("DeviantArt Search (" + context.getArg() + ")")
 					.withAuthorIcon(context.getGuild().getClient().getOurUser().getAvatarURL())
+					.withUrl(resultObj.getString("url"))
 					.withThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
 					.withColor(Config.BOT_COLOR)
-					.appendField("Author", authorObj.getString("username"), false)
 					.appendField("Title", resultObj.getString("title"), false)
+					.appendField("Author", authorObj.getString("username"), false)
 					.appendField("Category", resultObj.getString("category_path"), false)
-					.appendField("URL", resultObj.getString("url"), false)
 					.withImage(contentObj.getString("src"));
 
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (SocketTimeoutException sterr) {
 			BotUtils.sendMessage(Emoji.WARNING + " DeviantArt's servers are busy, please try again later.", context.getChannel());
+
 		} catch (IOException e) {
 			Log.error("An error occured while getting image.", e, context.getChannel());
 		}
 	}
 
-	private void generateAccessToken() throws SocketTimeoutException {
-		this.deviantArtToken = null;
-
-		try {
-			String oauthStr = HtmlUtils.getHTML(new URL("https://www.deviantart.com/oauth2/token?"
-					+ "client_id=" + Storage.getApiKey(ApiKeys.DEVIANTART_CLIENT_ID)
-					+ "&client_secret=" + Storage.getApiKey(ApiKeys.DEVIANTART_API_SECRET)
-					+ "&grant_type=client_credentials"));
-			JSONObject oauthObj = new JSONObject(oauthStr);
-			this.deviantArtToken = oauthObj.getString("access_token");
-
-		} catch (SocketTimeoutException sterr) {
-			throw sterr;
-		} catch (IOException e) {
-			Log.error("Error while getting DeviantArt Access Token.", e);
-		}
+	private void generateAccessToken() throws JSONException, IOException {
+		JSONObject oauthObj = JsonUtils.getJsonFromUrl("https://www.deviantart.com/oauth2/token?"
+				+ "client_id=" + Storage.getApiKey(ApiKeys.DEVIANTART_CLIENT_ID)
+				+ "&client_secret=" + Storage.getApiKey(ApiKeys.DEVIANTART_API_SECRET)
+				+ "&grant_type=client_credentials");
+		this.deviantArtToken = oauthObj.getString("access_token");
 	}
 
-	private JSONObject getRandomPopularResult(String encodedSearch) throws IOException {
-		JSONObject mainObj = new JSONObject(HtmlUtils.getHTML(new URL(API_URL + "browse/popular?"
-				+ "q=" + encodedSearch
-				+ "&timerange=alltime"
-				+ "&limit=1" // The pagination limit (min: 1 max: 50)
-				+ "&offset=" + MathUtils.rand(150) // The pagination offset (min: 0 max: 50000)
-				+ "&access_token=" + this.deviantArtToken)));
-		JSONArray resultsArray = mainObj.getJSONArray("results");
+	private JSONObject getRandomPopularResult(String encodedSearch) throws JSONException, IOException {
+		JSONObject result = null;
+		try {
+			JSONObject mainObj = JsonUtils.getJsonFromUrl(API_URL + "browse/popular?"
+					+ "q=" + encodedSearch
+					+ "&timerange=alltime"
+					+ "&limit=1" // The pagination limit (min: 1 max: 50)
+					+ "&offset=" + MathUtils.rand(150) // The pagination offset (min: 0 max: 50000)
+					+ "&access_token=" + this.deviantArtToken);
+			JSONArray resultsArray = mainObj.getJSONArray("results");
 
-		if(resultsArray.length() == 0) {
-			return null;
+			if(resultsArray.length() != 0) {
+				result = resultsArray.getJSONObject(MathUtils.rand(resultsArray.length()));
+			}
+
+		} catch (IOException e) {
+			if(e.getMessage().contains("401")) {
+				try {
+					this.generateAccessToken();
+					result = getRandomPopularResult(encodedSearch);
+				} catch (JSONException | IOException e1) {
+					throw e1;
+				}
+			}
 		}
 
-		return resultsArray.getJSONObject(MathUtils.rand(resultsArray.length()));
+		return result;
 	}
 
 	@Override
