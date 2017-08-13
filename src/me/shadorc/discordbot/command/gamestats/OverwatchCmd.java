@@ -49,20 +49,21 @@ public class OverwatchCmd extends Command {
 		String battletag = splitArgs[2];
 
 		try {
-			URL url = new URL("https://playoverwatch.com/fr-fr/career/" + plateform + "/" + region + "/" + battletag.replace("#", "-"));
+			URL url = new URL("https://playoverwatch.com/en-gb/career/" + plateform + "/" + region + "/" + battletag.replace("#", "-"));
 			String html = HtmlUtils.getHTML(url);
 
 			String icon = HtmlUtils.parseTextHTML(html, "<div class=\"masthead-player\"><img src=\"", "<div class=\"masthead-player\"><img src=\"", "\" class=\"player-portrait\">");
 			String level = HtmlUtils.parseTextHTML(html, "class=\"player-level\">", "<div class=\"u-vertical-center\">", "</div>");
-			String wins = HtmlUtils.parseTextHTML(html, "<p class=\"masthead-detail h4\"><span>", "<p class=\"masthead-detail h4\"><span>", " parties remportées</span>");
+			String wins = HtmlUtils.parseTextHTML(html, "<p class=\"masthead-detail h4\"><span>", "<p class=\"masthead-detail h4\"><span>", " games won</span></p>");
 			String topHero = HtmlUtils.parseTextHTML(html, "<div class=\"title\">", "<div class=\"title\">", "</div>");
 			String topHeroTime = HtmlUtils.parseTextHTML(html, "<div class=\"description\">", "<div class=\"description\">", "</div>");
-			String timePlayed = HtmlUtils.parseTextHTML(html, "<td>Temps de jeu</td>", "<td>Temps de jeu</td><td>", "</td>");
+			String timePlayed = HtmlUtils.parseTextHTML(html, "<td>Time Played</td>", "<td>Time Played</td><td>", "</td>");
 			String rank = HtmlUtils.parseTextHTML(html, "<div class=\"u-align-center h6\">", "<div class=\"u-align-center h6\">", "</div>");
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Overwatch Stats")
 					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
+					.withUrl(url.toString())
 					.withThumbnail(icon)
 					.withColor(Config.BOT_COLOR)
 					.withDesc("Stats for user **" + battletag + "**.")
