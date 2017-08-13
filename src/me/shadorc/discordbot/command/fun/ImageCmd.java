@@ -43,7 +43,7 @@ public class ImageCmd extends Command {
 		}
 
 		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			BotUtils.sendMessage(Emoji.INFO + " " + context.getAuthorName() + ", you have to wait "
+			BotUtils.sendMessage(Emoji.STOPWATCH + " " + context.getAuthorName() + ", you have to wait "
 					+ String.format("%.1f", rateLimiter.getRemainingTime(context.getGuild(), context.getAuthor()))
 					+ " second(s) before using this command again.", context.getChannel());
 			return;

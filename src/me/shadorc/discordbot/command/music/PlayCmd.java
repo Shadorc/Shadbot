@@ -90,7 +90,7 @@ public class PlayCmd extends Command {
 
 			@Override
 			public void loadFailed(FriendlyException e) {
-				Log.error("Music loading has failed.", e, context.getChannel());
+				Log.error("Sorry, something went wrong when loading/playing the track :(", e, context.getChannel());
 				GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 			}
 		});

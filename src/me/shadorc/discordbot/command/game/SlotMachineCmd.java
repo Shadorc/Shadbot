@@ -37,7 +37,7 @@ public class SlotMachineCmd extends Command {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			BotUtils.sendMessage(Emoji.WARNING + " You can use the slot machine only once every " + rateLimiter.getTimeout() + " seconds.", context.getChannel());
+			BotUtils.sendMessage(Emoji.STOPWATCH + " You can use the slot machine only once every " + rateLimiter.getTimeout() + " seconds.", context.getChannel());
 			return;
 		}
 

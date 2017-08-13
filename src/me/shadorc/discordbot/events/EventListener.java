@@ -57,7 +57,7 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onGuildLeaveEvent(GuildLeaveEvent event) {
-		Log.info("Shadbot has been kicked from: " + event.getGuild().getName()
+		Log.info("Shadbot has been disconnected from guild: " + event.getGuild().getName()
 				+ " (ID: " + event.getGuild().getStringID()
 				+ " | Users: " + event.getGuild().getUsers().size() + ")");
 	}
