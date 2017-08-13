@@ -100,7 +100,7 @@ public class CommandManager {
 		for(Command command : cmds) {
 			for(String name : command.getNames()) {
 				if(commandsMap.containsKey(name)) {
-					Log.warn("Command name collision between " + command.getClass() + " and " + commandsMap.get(name).getClass());
+					Log.error("Command name collision between " + command.getClass() + " and " + commandsMap.get(name).getClass());
 					continue;
 				}
 				commandsMap.put(name, command);

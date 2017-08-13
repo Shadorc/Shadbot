@@ -64,7 +64,7 @@ public class ChatCmd extends Command {
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 
 		} catch (SocketTimeoutException e) {
-			BotUtils.sendMessage(Emoji.WARNING + " Chat isn't currently available.", context.getChannel());
+			BotUtils.sendMessage(Emoji.WARNING + " Sorry, chat isn't currently available, try again later.", context.getChannel());
 			Log.warn("A.L.I.C.E. doesn't respond (" + e.getMessage() + ").");
 
 		} catch (IOException e) {

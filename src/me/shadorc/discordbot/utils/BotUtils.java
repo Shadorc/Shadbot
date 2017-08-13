@@ -25,7 +25,7 @@ public class BotUtils {
 				});
 			}
 		} catch (MissingPermissionsException e) {
-			Log.warn("Missing permissions for channel \"" + channel.getName() + "\" (ID: " + channel.getStringID() + ")");
+			Log.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
 		} catch (DiscordException e) {
 			Log.error("Discord exception while sending message : " + e.getErrorMessage(), e);
 		}
@@ -43,7 +43,7 @@ public class BotUtils {
 				channel.sendMessage(embed);
 			});
 		} catch (MissingPermissionsException e) {
-			Log.warn("Missing permissions for channel \"" + channel.getName() + "\" (ID: " + channel.getStringID() + ")");
+			Log.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
 		} catch (DiscordException e) {
 			Log.error("Discord exception while sending embed : " + e.getErrorMessage(), e);
 		}
