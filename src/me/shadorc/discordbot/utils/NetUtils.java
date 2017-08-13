@@ -10,9 +10,9 @@ import java.net.URLConnection;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Log;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
-import me.shadorc.discordbot.Shadbot;
 
 public class NetUtils {
 
@@ -34,11 +34,11 @@ public class NetUtils {
 	/**
 	 * @return time to send a packet of 32 bytes, -1 if an exception occured
 	 */
-	public static int getPing() {
+	public static float getPing() {
 		BufferedReader in = null;
 
 		try {
-			String command = "ping -n 1 www.discordapp.com";
+			String command = "ping -c 1 www.discordapp.com";
 
 			Process p = Runtime.getRuntime().exec(command);
 			in = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -50,13 +50,12 @@ public class NetUtils {
 				builder.append(line + "\n");
 			}
 
-			int average = 0;
-			String[] array = builder.toString().split(" = ");
-			average = Integer.parseInt(array[array.length - 1].replaceAll("[^\\d]", ""));
+			String result = builder.toString();
+			String time = result.substring(result.indexOf("time=") + 5, result.indexOf(" ms"));
 
-			return average;
+			return Float.parseFloat(time);
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Log.error("An error occured while parsing ping.", e);
 
 		} finally {
