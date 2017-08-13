@@ -31,4 +31,8 @@ public interface Emoji {
 	String SPEECH = ":speech_balloon:";
 	String CLAP = ":clap:";
 	String GEAR = ":gear:";
+
+	String SCISSORS = ":scissors:";
+	String GEM = ":gem:";
+	String LEAF = ":leaves:";
 }

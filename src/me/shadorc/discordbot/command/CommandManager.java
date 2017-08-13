@@ -17,6 +17,7 @@ import me.shadorc.discordbot.command.fun.ChatCmd;
 import me.shadorc.discordbot.command.fun.GifCmd;
 import me.shadorc.discordbot.command.fun.ImageCmd;
 import me.shadorc.discordbot.command.game.DiceCmd;
+import me.shadorc.discordbot.command.game.RpsCmd;
 import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd;
@@ -66,6 +67,7 @@ public class CommandManager {
 				new SlotMachineCmd(),
 				new RussianRouletteCmd(),
 				new TriviaCmd(),
+				new RpsCmd(),
 				// Currency Commands
 				new TransferCoinsCmd(),
 				new LeaderboardCmd(),

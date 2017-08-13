@@ -41,7 +41,8 @@ public class HelpCmd extends Command {
 						"`" + context.getPrefix() + "dice`"
 								+ " `" + context.getPrefix() + "slot_machine`"
 								+ " `" + context.getPrefix() + "russian_roulette`"
-								+ " `" + context.getPrefix() + "trivia`", false)
+								+ " `" + context.getPrefix() + "trivia`"
+								+ " `" + context.getPrefix() + "rps`", false)
 				.appendField("Currency Commands:",
 						"`" + context.getPrefix() + "transfer`"
 								+ " `" + context.getPrefix() + "leaderboard`"
