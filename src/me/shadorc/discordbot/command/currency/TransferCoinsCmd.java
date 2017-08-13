@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command.currency;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.User;
 import me.shadorc.discordbot.command.Command;
@@ -54,7 +55,7 @@ public class TransferCoinsCmd extends Command {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Transfer of coins to the mentioned user.**")
 				.appendField("Usage", context.getPrefix() + "transfer <coins> <@user>", false)

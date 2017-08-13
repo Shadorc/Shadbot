@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
@@ -83,7 +84,7 @@ public class CounterStrikeCmd extends Command {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show stats of a player for Counter-Strike: Global Offensive.**")
 				.appendField("Usage", context.getPrefix() + "cs <steamID>", false);

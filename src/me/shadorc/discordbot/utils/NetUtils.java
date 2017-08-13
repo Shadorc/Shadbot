@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
-import sx.blah.discord.api.IDiscordClient;
+import me.shadorc.discordbot.Shadbot;
 
 public class NetUtils {
 
@@ -72,13 +72,10 @@ public class NetUtils {
 		return -1;
 	}
 
-	/**
-	 * @param client - Shadbot client
-	 */
-	public static void postStats(IDiscordClient client) {
+	public static void postStats() {
 		DataOutputStream printout = null;
 		try {
-			URL url = new URL("https://bots.discord.pw/api/bots/" + client.getOurUser().getStringID() + "/stats");
+			URL url = new URL("https://bots.discord.pw/api/bots/" + Shadbot.getClient().getOurUser().getStringID() + "/stats");
 
 			URLConnection urlConn = url.openConnection();
 			urlConn.setRequestProperty("Content-Type", "application/json");
@@ -86,7 +83,7 @@ public class NetUtils {
 			urlConn.setDoOutput(true);
 			urlConn.setUseCaches(false);
 
-			JSONObject content = new JSONObject().put("server_count", client.getGuilds().size());
+			JSONObject content = new JSONObject().put("server_count", Shadbot.getClient().getGuilds().size());
 
 			printout = new DataOutputStream(urlConn.getOutputStream());
 			printout.writeBytes(content.toString());

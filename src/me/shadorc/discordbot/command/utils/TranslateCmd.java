@@ -6,6 +6,7 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -52,7 +53,7 @@ public class TranslateCmd extends Command {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Translate a text from a language to another.**")
 				.appendField("Arguments", "<lang1> is optional, by leaving it blank the source language will be automatically detected.", false)

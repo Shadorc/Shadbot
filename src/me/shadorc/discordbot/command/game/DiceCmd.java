@@ -7,6 +7,7 @@ import javax.swing.Timer;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.Command;
@@ -172,7 +173,7 @@ public class DiceCmd extends Command {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Start a dice game with a common bet or join a game in progress.**")
 				.appendField("Usage", "Create a game: **" + context.getPrefix() + "dice <bet> <num>**.\nJoin a game **" + context.getPrefix() + "dice <num>**", false)

@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.info;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
@@ -23,7 +24,7 @@ public class HelpCmd extends Command {
 
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Shadbot Help")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.withDesc("Get more information by using " + context.getPrefix() + "help <command>.")
 				.appendField("Utils Commands:",
@@ -80,7 +81,7 @@ public class HelpCmd extends Command {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show help for all the commands.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

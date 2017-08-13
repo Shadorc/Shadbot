@@ -3,7 +3,6 @@ package me.shadorc.discordbot.command;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.User;
-import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -51,10 +50,6 @@ public class Context {
 
 	public IMessage getMessage() {
 		return event.getMessage();
-	}
-
-	public IDiscordClient getClient() {
-		return event.getClient();
 	}
 
 	public String getPrefix() {

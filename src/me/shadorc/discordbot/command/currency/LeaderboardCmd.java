@@ -5,6 +5,7 @@ import java.util.Map;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -42,7 +43,7 @@ public class LeaderboardCmd extends Command {
 
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Leaderboard")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.withDescription(strBuilder.toString());
 
@@ -53,7 +54,7 @@ public class LeaderboardCmd extends Command {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show coins leaderboard for this server.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

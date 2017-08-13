@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.Command;
@@ -39,7 +40,7 @@ public class BashCmd extends Command {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show a random quote from DansTonChat.com**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

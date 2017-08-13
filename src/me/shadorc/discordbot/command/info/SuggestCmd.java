@@ -6,6 +6,7 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -31,7 +32,7 @@ public class SuggestCmd extends Command {
 			return;
 		}
 
-		BotUtils.sendMessage(context.getAuthorName() + " from Guild \"" + context.getGuild().getName() + "\" suggested : " + context.getArg(), context.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID));
+		BotUtils.sendMessage(context.getAuthorName() + " from Guild \"" + context.getGuild().getName() + "\" suggested : " + context.getArg(), Shadbot.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID));
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " Suggestion has been sent, thank you !", context.getChannel());
 	}
 
@@ -39,7 +40,7 @@ public class SuggestCmd extends Command {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Send a message to my developer, this can be a suggestion, a bug report, anything.**")
 				.appendField("Usage", context.getPrefix() + "suggest <message>", false);

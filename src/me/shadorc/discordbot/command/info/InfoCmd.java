@@ -10,6 +10,7 @@ import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -43,8 +44,8 @@ public class InfoCmd extends Command {
 		sb.append("\nLavaPlayer Version: " + PlayerLibrary.VERSION);
 		sb.append("\n\n-= Shadbot Info =-");
 		sb.append("\nDeveloper: Shadorc#8423");
-		sb.append("\nServers: " + context.getClient().getGuilds().size());
-		sb.append("\nUsers: " + context.getClient().getUsers().size());
+		sb.append("\nServers: " + Shadbot.getClient().getGuilds().size());
+		sb.append("\nUsers: " + Shadbot.getClient().getUsers().size());
 		sb.append("\nVersion: " + Config.VERSION.toString());
 		sb.append("\nUptime: " + DurationFormatUtils.formatDuration(uptime, "HH:mm:ss", true));
 		sb.append("\nPing: " + NetUtils.getPing() + "ms");
@@ -57,7 +58,7 @@ public class InfoCmd extends Command {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(context.getClient().getOurUser().getAvatarURL())
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show Shadbot's info.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

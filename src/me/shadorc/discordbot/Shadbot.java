@@ -12,14 +12,16 @@ import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 
-public class Main {
+public class Shadbot {
+
+	private static IDiscordClient CLIENT;
 
 	public static void main(String[] args) {
-		IDiscordClient client = new ClientBuilder()
+		CLIENT = new ClientBuilder()
 				.withToken(Storage.getApiKey(ApiKeys.DISCORD_TOKEN))
 				.login();
 
-		client.getDispatcher().registerListener(new EventListener());
+		CLIENT.getDispatcher().registerListener(new EventListener());
 
 		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
 		AudioSourceManagers.registerLocalSource(GuildMusicManager.PLAYER_MANAGER);
@@ -30,9 +32,13 @@ public class Main {
 		TimerTask timerTask = new TimerTask() {
 			@Override
 			public void run() {
-				NetUtils.postStats(client);
+				NetUtils.postStats();
 			}
 		};
-		timer.schedule(timerTask, period, period);
+		timer.schedule(timerTask, 0, period);
+	}
+
+	public static IDiscordClient getClient() {
+		return CLIENT;
 	}
 }
