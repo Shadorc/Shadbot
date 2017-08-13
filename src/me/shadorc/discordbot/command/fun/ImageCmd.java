@@ -42,10 +42,8 @@ public class ImageCmd extends Command {
 			throw new MissingArgumentException();
 		}
 
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			BotUtils.sendMessage(Emoji.STOPWATCH + " " + context.getAuthorName() + ", you have to wait "
-					+ String.format("%.1f", rateLimiter.getRemainingTime(context.getGuild(), context.getAuthor()))
-					+ " second(s) before using this command again.", context.getChannel());
+		if(rateLimiter.isLimitedAndNotWarned(context.getGuild(), context.getAuthor())) {
+			rateLimiter.warn("Take it easy, don't spam :)", context);
 			return;
 		}
 

@@ -27,8 +27,8 @@ public class SuggestCmd extends Command {
 			throw new MissingArgumentException();
 		}
 
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			BotUtils.sendMessage(Emoji.STOPWATCH + " You can send a suggestion only once every " + rateLimiter.getTimeout() + " seconds.", context.getChannel());
+		if(rateLimiter.isLimitedAndNotWarned(context.getGuild(), context.getAuthor())) {
+			rateLimiter.warn("Take it easy, don't spam :)", context);
 			return;
 		}
 

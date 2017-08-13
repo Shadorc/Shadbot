@@ -2,10 +2,10 @@ package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import me.shadorc.discordbot.Config;
-import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
@@ -20,12 +20,20 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class JokeCmd extends Command {
 
+	private final RateLimiter rateLimiter;
+
 	public JokeCmd() {
 		super(false, "blague", "joke");
+		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isLimitedAndNotWarned(context.getGuild(), context.getAuthor())) {
+			rateLimiter.warn("Take it easy, don't spam :)", context);
+			return;
+		}
+
 		try {
 			String htmlPage = HtmlUtils.getHTML(new URL("https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 10) + ".html?tri=top"));
 			List<String> jokesList = HtmlUtils.getAllSubstring(htmlPage, " \"description\": \"", "</script>");

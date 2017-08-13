@@ -48,7 +48,7 @@ public class GuildMusicManager {
 
 	public void leave() {
 		IVoiceChannel voiceChannel = guild.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
-		//voiceChannel can be null if Shadbot never joined the voice channel because of NoMatches, LoadFailed...
+		// voiceChannel can be null if Shadbot never joined the voice channel because of NoMatches, LoadFailed...
 		if(voiceChannel != null) {
 			voiceChannel.leave();
 		}

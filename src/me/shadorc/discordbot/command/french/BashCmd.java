@@ -2,12 +2,14 @@ package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.temporal.ChronoUnit;
 
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
@@ -19,12 +21,20 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class BashCmd extends Command {
 
+	private final RateLimiter rateLimiter;
+
 	public BashCmd() {
 		super(false, "dtc", "bash");
+		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isLimitedAndNotWarned(context.getGuild(), context.getAuthor())) {
+			rateLimiter.warn("Take it easy, don't spam :)", context);
+			return;
+		}
+
 		try {
 			String json = HtmlUtils.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
 					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)

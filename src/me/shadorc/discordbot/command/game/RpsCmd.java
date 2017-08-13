@@ -46,8 +46,8 @@ public class RpsCmd extends Command {
 
 		String botHandsign = HANDSIGNS.get(MathUtils.rand(HANDSIGNS.size()));
 
-		String userHandsignForm = EMOJIS.get(HANDSIGNS.indexOf(userHandsign)) + " " + StringUtils.capitalize(userHandsign); 
-		String botHandsignForm = EMOJIS.get(HANDSIGNS.indexOf(botHandsign)) + " " + StringUtils.capitalize(botHandsign); 
+		String userHandsignForm = EMOJIS.get(HANDSIGNS.indexOf(userHandsign)) + " " + StringUtils.capitalize(userHandsign);
+		String botHandsignForm = EMOJIS.get(HANDSIGNS.indexOf(botHandsign)) + " " + StringUtils.capitalize(botHandsign);
 
 		StringBuilder strBuilder = new StringBuilder();
 		strBuilder.append("**" + context.getAuthorName() + "**: " + userHandsignForm + ".\n");
