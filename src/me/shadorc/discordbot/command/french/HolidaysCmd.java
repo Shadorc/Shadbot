@@ -30,8 +30,10 @@ public class HolidaysCmd extends Command {
 			throw new MissingArgumentException();
 		}
 
-		if(rateLimiter.isLimitedAndNotWarned(context.getGuild(), context.getAuthor())) {
-			rateLimiter.warn("Take it easy, don't spam :)", context);
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
+				rateLimiter.warn("Take it easy, don't spam :)", context);
+			}
 			return;
 		}
 

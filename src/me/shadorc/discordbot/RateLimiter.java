@@ -21,11 +21,7 @@ public class RateLimiter {
 		this.warningsRateLimiter = new HashMap<>();
 	}
 
-	public boolean isLimitedAndNotWarned(IGuild guild, IUser user) {
-		return this.isLimited(guild, user) && !this.isWarned(guild, user);
-	}
-
-	private boolean isLimited(IGuild guild, IUser user) {
+	public boolean isLimited(IGuild guild, IUser user) {
 		long currentTime = System.currentTimeMillis();
 
 		if(!guildsRateLimiter.containsKey(guild)) {
@@ -51,7 +47,7 @@ public class RateLimiter {
 		return true;
 	}
 
-	private boolean isWarned(IGuild guild, IUser user) {
+	public boolean isWarned(IGuild guild, IUser user) {
 		return warningsRateLimiter.get(guild).get(user);
 	}
 
