@@ -24,6 +24,10 @@ public class BotUtils {
 					channel.sendMessage(message);
 				});
 			}
+		} catch (NullPointerException e) {
+			Log.error("NullPointerException while sending message... Investigating...", e);
+			Log.error(Thread.getAllStackTraces().toString());
+			Thread.dumpStack();
 		} catch (MissingPermissionsException e) {
 			Log.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
 		} catch (DiscordException e) {
