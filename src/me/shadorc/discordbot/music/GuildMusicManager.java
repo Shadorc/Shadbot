@@ -12,6 +12,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import me.shadorc.discordbot.events.AudioEventListener;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class GuildMusicManager {
 
@@ -46,7 +47,11 @@ public class GuildMusicManager {
 	}
 
 	public void leave() {
-		guild.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel().leave();
+		IVoiceChannel voiceChannel = guild.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
+		//voiceChannel can be null if Shadbot never joined the voice channel because of NoMatches, LoadFailed...
+		if(voiceChannel != null) {
+			voiceChannel.leave();
+		}
 		leaveTimer.stop();
 		MUSIC_MANAGERS.remove(guild);
 	}
