@@ -10,6 +10,7 @@ import me.shadorc.discordbot.Storage.Setting;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
@@ -19,10 +20,14 @@ public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
 		try {
-			if(!message.isEmpty()) {
+			if(!message.isEmpty() && message.length() <= IMessage.MAX_MESSAGE_LENGTH) {
 				RequestBuffer.request(() -> {
 					channel.sendMessage(message);
 				});
+			}
+
+			if(message.length() > 1000) {
+				Log.warn("Shadbot sent a huge message (length:" + message.length() + "):\n" + message);
 			}
 		} catch (NullPointerException e) {
 			Log.error("NullPointerException while sending message... Investigating...", e);
@@ -39,6 +44,7 @@ public class BotUtils {
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
 		if(!Shadbot.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm not allowed to send Embed links in this channel :(", channel);
+			Log.warn("Shadbot wasn't allowed to post Embed links in Guild : \"" + channel.getGuild() + "\"");
 			return;
 		}
 
