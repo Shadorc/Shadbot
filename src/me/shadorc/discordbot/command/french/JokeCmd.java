@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class JokeCmd extends Command {
 		}
 
 		try {
-			String htmlPage = HtmlUtils.getHTML(new URL("https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 10) + ".html?tri=top"));
+			String htmlPage = HtmlUtils.getHTML("https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 10) + ".html?tri=top");
 			List<String> jokesList = HtmlUtils.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
 			String joke = jokesList.get(MathUtils.rand(jokesList.size()));
 			joke = joke.substring(0, joke.lastIndexOf("\"")).replace("&amp;", "&").trim();

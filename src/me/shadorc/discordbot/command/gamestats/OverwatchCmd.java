@@ -2,7 +2,6 @@ package me.shadorc.discordbot.command.gamestats;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.time.temporal.ChronoUnit;
 
 import me.shadorc.discordbot.Config;
@@ -49,7 +48,7 @@ public class OverwatchCmd extends Command {
 		String battletag = splitArgs[2];
 
 		try {
-			URL url = new URL("https://playoverwatch.com/en-gb/career/" + plateform + "/" + region + "/" + battletag.replace("#", "-"));
+			String url = "https://playoverwatch.com/en-gb/career/" + plateform + "/" + region + "/" + battletag.replace("#", "-");
 			String html = HtmlUtils.getHTML(url);
 
 			String icon = HtmlUtils.parseTextHTML(html, "<div class=\"masthead-player\"><img src=\"", "<div class=\"masthead-player\"><img src=\"", "\" class=\"player-portrait\">");
@@ -63,7 +62,7 @@ public class OverwatchCmd extends Command {
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Overwatch Stats")
 					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
-					.withUrl(url.toString())
+					.withUrl(url)
 					.withThumbnail(icon)
 					.withColor(Config.BOT_COLOR)
 					.withDesc("Stats for user **" + battletag + "**.")

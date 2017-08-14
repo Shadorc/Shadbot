@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.temporal.ChronoUnit;
 
 import org.json.JSONArray;
@@ -38,9 +37,9 @@ public class BashCmd extends Command {
 		}
 
 		try {
-			String json = HtmlUtils.getHTML(new URL("http://api.danstonchat.com/0.3/view/random?"
+			String json = HtmlUtils.getHTML("http://api.danstonchat.com/0.3/view/random?"
 					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)
-					+ "&format=json"));
+					+ "&format=json");
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");
 			BotUtils.sendMessage("```" + quote + "```", context.getChannel());
 		} catch (IOException e) {

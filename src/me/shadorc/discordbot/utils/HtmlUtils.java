@@ -17,10 +17,10 @@ public class HtmlUtils {
 	 * @return Whole HTML from the URL
 	 * @throws IOException
 	 */
-	public static String getHTML(URL url) throws IOException {
+	public static String getHTML(String url) throws IOException {
 		BufferedReader reader = null;
 		try {
-			URLConnection connection = url.openConnection();
+			URLConnection connection = new URL(url).openConnection();
 			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.75 Safari/537.36 Vivaldi/1.0.219.50");
 			connection.setConnectTimeout(5000);
 			connection.setReadTimeout(5000);
@@ -69,10 +69,10 @@ public class HtmlUtils {
 	 * @return Parsed HTML from "start" to "end"
 	 * @throws IOException
 	 */
-	public static String parseHTML(URL url, String toMatch, String start, String end) throws IOException {
+	public static String parseHTML(String url, String toMatch, String start, String end) throws IOException {
 		BufferedReader reader = null;
 		try {
-			URLConnection connection = url.openConnection();
+			URLConnection connection = new URL(url).openConnection();
 			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.29 Safari/537.36");
 			connection.setConnectTimeout(5000);
 			connection.setReadTimeout(5000);

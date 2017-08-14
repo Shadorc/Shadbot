@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.gamestats;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.temporal.ChronoUnit;
 
 import org.json.JSONArray;
@@ -47,7 +46,7 @@ public class CounterStrikeCmd extends Command {
 		try {
 			String steamids;
 			if(!StringUtils.isInteger(context.getArg())) {
-				steamids = HtmlUtils.parseHTML(new URL("https://steamcommunity.com/id/" + context.getArg() + "/"), "\"steamid\":\"", "\"steamid\":\"", "\",\"");
+				steamids = HtmlUtils.parseHTML("https://steamcommunity.com/id/" + context.getArg() + "/", "\"steamid\":\"", "\"steamid\":\"", "\",\"");
 			} else {
 				steamids = context.getArg();
 			}

@@ -2,7 +2,6 @@ package me.shadorc.discordbot.command.fun;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -54,10 +53,10 @@ public class ChatCmd extends Command {
 
 		try {
 			String aliceState = GUILDS_CUSTID.get(context.getGuild());
-			String xmlString = HtmlUtils.getHTML(new URL("http://sheepridge.pandorabots.com/pandora/talk-xml?"
+			String xmlString = HtmlUtils.getHTML("http://sheepridge.pandorabots.com/pandora/talk-xml?"
 					+ "botid=b69b8d517e345aba"
 					+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
-					+ (aliceState != null ? "&custid=" + aliceState : "")));
+					+ (aliceState != null ? "&custid=" + aliceState : ""));
 			JSONObject result = XML.toJSONObject(xmlString).getJSONObject("result");
 			String response = result.getString("that").replace("<br>", "\n").trim();
 			GUILDS_CUSTID.put(context.getChannel().getGuild(), result.getString("custid"));
