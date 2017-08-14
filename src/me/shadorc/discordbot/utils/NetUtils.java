@@ -76,34 +76,44 @@ public class NetUtils {
 		NetUtils.postStatsOn("https://discordbots.org", ApiKeys.DISCORD_BOTS_ORG_TOKEN);
 	}
 
-	private static void postStatsOn(String site, ApiKeys token) {
-		DataOutputStream printout = null;
+	private static void postStatsOn(String homeUrl, ApiKeys token) {
+		DataOutputStream out = null;
+		BufferedReader in = null;
 		try {
-			URL url = new URL(site + "/api/bots/" + Shadbot.getClient().getOurUser().getStringID() + "/stats");
+			URL url = new URL(homeUrl + "/api/bots/" + Shadbot.getClient().getOurUser().getStringID() + "/stats");
 
 			URLConnection urlConn = url.openConnection();
 			urlConn.setRequestProperty("Content-Type", "application/json");
 			urlConn.setRequestProperty("Authorization", Storage.getApiKey(token));
 			urlConn.setDoOutput(true);
-			urlConn.setDoInput(false);
+			urlConn.setDoInput(true);
 			urlConn.setUseCaches(false);
 
 			JSONObject content = new JSONObject().put("server_count", Shadbot.getClient().getGuilds().size());
 
-			printout = new DataOutputStream(urlConn.getOutputStream());
-			printout.writeBytes(content.toString());
-			printout.flush();
-		} catch (Exception ignored) {
-			// Ignored
+			out = new DataOutputStream(urlConn.getOutputStream());
+			out.writeBytes(content.toString());
+			out.flush();
+
+			in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+
+			String s;
+			while((s = in.readLine()) != null) {
+				Log.info(homeUrl + " response while posting stats: " + s);
+			}
+		} catch (Exception e) {
+			Log.error("An error occured while posting stats.", e);
 		} finally {
 			try {
-				if(printout != null) {
-					printout.close();
+				if(out != null) {
+					out.close();
 				}
-			} catch (Exception ignored) {
-				// Ignored
+				if(in != null) {
+					in.close();
+				}
+			} catch (Exception e) {
+				Log.error("An error occured while posting stats.", e);
 			}
 		}
 	}
-
 }

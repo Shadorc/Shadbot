@@ -53,6 +53,7 @@ public class PlayCmd extends Command {
 		if(NetUtils.isValidURL(context.getArg())) {
 			identifier.append(context.getArg());
 		} else {
+			//TODO: Add SoundCloud search "scsearch: "
 			identifier.append("ytsearch: " + context.getArg());
 		}
 
@@ -112,7 +113,7 @@ public class PlayCmd extends Command {
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Play the music from the url. Search tags or playlist are also possible.**")
+				.appendDescription("**Play the music from the url. Search terms or playlist are also possible.**")
 				.appendField("Usage", context.getPrefix() + "play <url>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
