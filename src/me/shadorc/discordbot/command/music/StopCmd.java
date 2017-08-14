@@ -20,15 +20,15 @@ public class StopCmd extends Command {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		TrackScheduler scheduler = musicManager.getScheduler();
 
+		TrackScheduler scheduler = musicManager.getScheduler();
 		if(!scheduler.isPlaying()) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " No currently playing music.", context.getChannel());
 			return;
 		}
 
+		musicManager.leaveVoiceChannel();
 		BotUtils.sendMessage(Emoji.EXCLAMATION + " Music has been stopped by " + context.getAuthorName() + ".", context.getChannel());
-		GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 	}
 
 	@Override

@@ -13,21 +13,22 @@ public class Log {
 	public static void error(String msg, Exception e, IChannel channel) {
 		LOGGER.error(msg, e);
 		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, channel);
-		Log.sendMessage("An error occured and users have been warned: **" + msg + "**", Config.BUGS_REPORT_CHANNEL_ID);
+		Log.sendMessage("[ERROR] An error occured and users have been warned: **" + msg + "**", Config.BUGS_REPORT_CHANNEL_ID);
 	}
 
 	public static void error(String msg, Exception e) {
 		LOGGER.error(msg, e);
-		Log.sendMessage("An error occured: **" + msg + "**", Config.BUGS_REPORT_CHANNEL_ID);
+		Log.sendMessage("[ERROR] An error occured: **" + msg + "**", Config.BUGS_REPORT_CHANNEL_ID);
 	}
 
 	public static void error(String msg) {
 		LOGGER.error(msg);
-		Log.sendMessage("An error occured: **" + msg + "**", Config.BUGS_REPORT_CHANNEL_ID);
+		Log.sendMessage("[ERROR] An error occured: **" + msg + "**", Config.BUGS_REPORT_CHANNEL_ID);
 	}
 
 	public static void warn(String msg) {
 		LOGGER.warn(msg);
+		Log.sendMessage("[WARN] **" + msg + "**", Config.BUGS_REPORT_CHANNEL_ID);
 	}
 
 	public static void info(String msg) {

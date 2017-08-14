@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.events.AudioEventListener;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -17,6 +18,7 @@ import sx.blah.discord.handle.obj.IVoiceChannel;
 public class GuildMusicManager {
 
 	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
+
 	private final static Map<IGuild, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
 
 	private final IGuild guild;
@@ -34,7 +36,7 @@ public class GuildMusicManager {
 		this.player.addListener(audioEventListener);
 		this.leaveTimer = new Timer(60 * 1000, e -> {
 			this.scheduler.stop();
-			this.leave();
+			this.leaveVoiceChannel();
 		});
 	}
 
@@ -46,9 +48,13 @@ public class GuildMusicManager {
 		leaveTimer.stop();
 	}
 
-	public void leave() {
-		IVoiceChannel voiceChannel = guild.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
-		// voiceChannel can be null if Shadbot never joined the voice channel because of NoMatches, LoadFailed...
+	public void joinVoiceChannel(IVoiceChannel voiceChannel, IChannel channel) {
+		voiceChannel.join();
+		this.setChannel(channel);
+	}
+
+	public void leaveVoiceChannel() {
+		IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
 		if(voiceChannel != null) {
 			voiceChannel.leave();
 		}
@@ -77,7 +83,7 @@ public class GuildMusicManager {
 		return channel;
 	}
 
-	public boolean isCancelling() {
+	public boolean isLeavingScheduled() {
 		return leaveTimer.isRunning();
 	}
 

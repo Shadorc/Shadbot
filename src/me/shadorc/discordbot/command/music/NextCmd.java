@@ -29,7 +29,7 @@ public class NextCmd extends Command {
 
 		if(!scheduler.nextTrack()) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", context.getChannel());
-			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
+			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leaveVoiceChannel();
 		}
 	}
 

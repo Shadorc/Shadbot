@@ -33,6 +33,22 @@ public class PlayCmd extends Command {
 			throw new MissingArgumentException();
 		}
 
+		IVoiceChannel botVoiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel();
+		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
+		if(userVoiceChannel == null) {
+			if(botVoiceChannel == null) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Join a vocal channel before using this command.", context.getChannel());
+			} else {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in channel \"" + botVoiceChannel.getName() + "\", join him before using this command.", context.getChannel());
+			}
+			return;
+		}
+
+		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in channel \"" + botVoiceChannel.getName() + "\", join him before using this command.", context.getChannel());
+			return;
+		}
+
 		final StringBuilder identifier = new StringBuilder();
 		if(NetUtils.isValidURL(context.getArg())) {
 			identifier.append(context.getArg());
@@ -40,23 +56,14 @@ public class PlayCmd extends Command {
 			identifier.append("ytsearch: " + context.getArg());
 		}
 
-		IVoiceChannel botVoiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel();
-		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
-
-		if(botVoiceChannel == null) {
-			if(userVoiceChannel == null) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Join a vocal channel before using this command.", context.getChannel());
-				return;
-			}
-			userVoiceChannel.join();
-		}
-
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		musicManager.setChannel(context.getChannel());
-
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier.toString(), new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
+				if(botVoiceChannel == null) {
+					musicManager.joinVoiceChannel(userVoiceChannel, context.getChannel());
+				}
+
 				if(musicManager.getScheduler().isPlaying()) {
 					BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", context.getChannel());
 				}
@@ -65,6 +72,10 @@ public class PlayCmd extends Command {
 
 			@Override
 			public void playlistLoaded(AudioPlaylist playlist) {
+				if(botVoiceChannel == null) {
+					musicManager.joinVoiceChannel(userVoiceChannel, context.getChannel());
+				}
+
 				List<AudioTrack> tracks = playlist.getTracks();
 
 				if(identifier.toString().startsWith("ytsearch: ")) {
@@ -85,13 +96,12 @@ public class PlayCmd extends Command {
 			@Override
 			public void noMatches() {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.toString() + "\"", context.getChannel());
-				GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
+				Log.warn("No result for \"" + identifier.toString() + "\"");
 			}
 
 			@Override
 			public void loadFailed(FriendlyException e) {
 				Log.error("Sorry, something went wrong when loading/playing the track :(", e, context.getChannel());
-				GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 			}
 		});
 	}

@@ -82,11 +82,11 @@ public class EventListener {
 		IVoiceChannel botVoiceChannel = event.getClient().getOurUser().getVoiceStateForGuild(event.getGuild()).getChannel();
 		if(botVoiceChannel != null) {
 			GuildMusicManager gmm = GuildMusicManager.getGuildAudioPlayer(botVoiceChannel.getGuild());
-			if(this.isAlone(botVoiceChannel) && !gmm.isCancelling()) {
+			if(this.isAlone(botVoiceChannel) && !gmm.isLeavingScheduled()) {
 				BotUtils.sendMessage(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.", gmm.getChannel());
 				gmm.getScheduler().setPaused(true);
 				gmm.scheduleLeave();
-			} else if(!this.isAlone(botVoiceChannel) && gmm.isCancelling()) {
+			} else if(!this.isAlone(botVoiceChannel) && gmm.isLeavingScheduled()) {
 				BotUtils.sendMessage(Emoji.INFO + " Somebody joined me, music resumed.", gmm.getChannel());
 				gmm.getScheduler().setPaused(false);
 				gmm.cancelLeave();

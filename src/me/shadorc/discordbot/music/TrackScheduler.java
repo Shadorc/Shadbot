@@ -30,12 +30,12 @@ public class TrackScheduler {
 		}
 	}
 
-	public void stop() {
-		audioPlayer.stopTrack();
-	}
-
 	public boolean nextTrack() {
 		return audioPlayer.startTrack(queue.poll(), false);
+	}
+
+	public void stop() {
+		audioPlayer.stopTrack();
 	}
 
 	public String getCurrentTrackName() {
