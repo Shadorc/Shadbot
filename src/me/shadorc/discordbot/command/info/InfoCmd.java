@@ -28,15 +28,15 @@ public class InfoCmd extends Command {
 	public void execute(Context context) throws MissingArgumentException {
 		Runtime runtime = Runtime.getRuntime();
 
-		long allocatedMemory = runtime.totalMemory();
-		long freeMemory = runtime.freeMemory();
+		long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+		long maxMemory = runtime.maxMemory();
 		long uptime = Duration.between(Discord4J.getLaunchTime().atZone(ZoneId.systemDefault()).toInstant(), Instant.now()).toMillis();
 		int mb = 1024 * 1024;
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("```prolog");
 		sb.append("\n-= Performance Info =-");
-		sb.append("\nMemory : " + String.format("%.1f MB / %.1f MB", (float) (allocatedMemory - freeMemory) / mb, (float) allocatedMemory / mb));
+		sb.append("\nMemory : " + String.format("%d MB / %d MB", usedMemory / mb, maxMemory / mb));
 		sb.append("\nThreads Count : " + Thread.activeCount());
 		sb.append("\n\n-= APIs Info =-");
 		sb.append("\nJava Version: " + System.getProperty("java.version"));
@@ -47,7 +47,7 @@ public class InfoCmd extends Command {
 		sb.append("\nServers: " + Shadbot.getClient().getGuilds().size());
 		sb.append("\nUsers: " + Shadbot.getClient().getUsers().size());
 		sb.append("\nVersion: " + Config.VERSION.toString());
-		sb.append("\nUptime: " + DurationFormatUtils.formatDuration(uptime, "HH:mm:ss", true));
+		sb.append("\nUptime: " + DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true));
 		sb.append("\nPing: " + NetUtils.getPing() + "ms");
 		sb.append("```");
 
