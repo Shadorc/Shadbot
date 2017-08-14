@@ -39,13 +39,13 @@ public class PlayCmd extends Command {
 			if(botVoiceChannel == null) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Join a vocal channel before using this command.", context.getChannel());
 			} else {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in channel \"" + botVoiceChannel.getName() + "\", join him before using this command.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in voice channel " + botVoiceChannel.mention() + ", join him before using this command.", context.getChannel());
 			}
 			return;
 		}
 
 		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in channel \"" + botVoiceChannel.getName() + "\", join him before using this command.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in voice channel " + botVoiceChannel.mention() + ", join him before using this command.", context.getChannel());
 			return;
 		}
 
@@ -53,7 +53,7 @@ public class PlayCmd extends Command {
 		if(NetUtils.isValidURL(context.getArg())) {
 			identifier.append(context.getArg());
 		} else {
-			//TODO: Add SoundCloud search "scsearch: "
+			// TODO: Add SoundCloud search "scsearch: "
 			identifier.append("ytsearch: " + context.getArg());
 		}
 
@@ -97,6 +97,7 @@ public class PlayCmd extends Command {
 			@Override
 			public void noMatches() {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.toString() + "\"", context.getChannel());
+				// TODO: Remove
 				Log.warn("No result for \"" + identifier.toString() + "\"");
 			}
 

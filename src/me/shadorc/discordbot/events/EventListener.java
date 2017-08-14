@@ -27,7 +27,7 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		Log.info("------------------- Shadbot is ready [BETA:" + Config.VERSION.isBeta() + "] -------------------");
+		Log.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
 		event.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
 
 		// Update Shadbot stats every hour
@@ -81,11 +81,20 @@ public class EventListener {
 	public void onUserVoiceChannelEvent(UserVoiceChannelEvent event) {
 		IVoiceChannel botVoiceChannel = event.getClient().getOurUser().getVoiceStateForGuild(event.getGuild()).getChannel();
 		if(botVoiceChannel != null) {
+
 			GuildMusicManager gmm = GuildMusicManager.getGuildAudioPlayer(botVoiceChannel.getGuild());
+
+			// TODO: Remove
+			if(gmm.getChannel() == null) {
+				Log.warn("Somewhere, womething very strange happened... Shadbot was in a guild without channel set.");
+				return;
+			}
+
 			if(this.isAlone(botVoiceChannel) && !gmm.isLeavingScheduled()) {
 				BotUtils.sendMessage(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.", gmm.getChannel());
 				gmm.getScheduler().setPaused(true);
 				gmm.scheduleLeave();
+
 			} else if(!this.isAlone(botVoiceChannel) && gmm.isLeavingScheduled()) {
 				BotUtils.sendMessage(Emoji.INFO + " Somebody joined me, music resumed.", gmm.getChannel());
 				gmm.getScheduler().setPaused(false);
@@ -95,6 +104,6 @@ public class EventListener {
 	}
 
 	private boolean isAlone(IVoiceChannel voiceChannel) {
-		return voiceChannel.getConnectedUsers().size() <= 1;
+		return voiceChannel.getConnectedUsers().size() == 1;
 	}
 }
