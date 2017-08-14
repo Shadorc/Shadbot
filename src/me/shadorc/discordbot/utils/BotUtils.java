@@ -32,6 +32,8 @@ public class BotUtils {
 
 			if(message.length() > 1000) {
 				Log.warn("Shadbot sent a huge message (length:" + message.length() + "):\n" + message);
+				Log.error(Thread.getAllStackTraces().toString());
+				Thread.dumpStack();
 			}
 		} catch (NullPointerException e) {
 			Log.error("NullPointerException while sending message... Investigating...", e);
