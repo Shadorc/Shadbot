@@ -24,13 +24,13 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class WeatherCmd extends Command {
 
-	private final static SimpleDateFormat SDF = new SimpleDateFormat("MMMMM d, yyyy - hh:mm aa", Locale.ENGLISH);
-
 	private final RateLimiter rateLimiter;
+	private final SimpleDateFormat dateFormatter;
 
 	public WeatherCmd() {
 		super(false, "weather", "meteo");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy - hh:mm aa", Locale.ENGLISH);
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class WeatherCmd extends Command {
 
 				EmbedBuilder builder = new EmbedBuilder()
 						.withAuthorName("Weather in " + weather.getCityName() + " City")
-						.withDesc("Last updatee on " + SDF.format(weather.getDateTime()))
+						.withDesc("Last updatee on " + dateFormatter.format(weather.getDateTime()))
 						.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
 						.withAuthorIcon(context.getAuthor().getAvatarURL())
 						.withColor(Config.BOT_COLOR)
