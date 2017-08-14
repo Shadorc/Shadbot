@@ -26,6 +26,10 @@ public class BotUtils {
 				});
 			}
 
+			if(message.length() > IMessage.MAX_MESSAGE_LENGTH) {
+				BotUtils.sendMessage("I've tried to send a huge message... This is weird, I'm going to look into that. Sorry for the inconvenience.", channel);
+			}
+
 			if(message.length() > 1000) {
 				Log.warn("Shadbot sent a huge message (length:" + message.length() + "):\n" + message);
 			}
