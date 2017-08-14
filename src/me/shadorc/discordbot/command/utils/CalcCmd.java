@@ -29,7 +29,7 @@ public class CalcCmd extends Command {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			BotUtils.sendMessage(context.getArg() + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException e) {
-			BotUtils.sendMessage(Emoji.WARNING + " Invalid expression.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid expression.", context.getChannel());
 		}
 	}
 

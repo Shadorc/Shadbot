@@ -45,7 +45,7 @@ public class PlayCmd extends Command {
 
 		if(botVoiceChannel == null) {
 			if(userVoiceChannel == null) {
-				BotUtils.sendMessage(Emoji.WARNING + " Join a vocal channel before using this command.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Join a vocal channel before using this command.", context.getChannel());
 				return;
 			}
 			userVoiceChannel.join();
@@ -84,7 +84,7 @@ public class PlayCmd extends Command {
 
 			@Override
 			public void noMatches() {
-				BotUtils.sendMessage(Emoji.WARNING + " No result for \"" + identifier.toString() + "\"", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.toString() + "\"", context.getChannel());
 				GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 			}
 

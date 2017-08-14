@@ -40,7 +40,7 @@ public class RpsCmd extends Command {
 		String userHandsign = context.getArg().toLowerCase();
 
 		if(!HANDSIGNS.contains(userHandsign)) {
-			BotUtils.sendMessage(Emoji.WARNING + " Invalid handsign, please use \"rock\", \"paper\" or \"scissors\".", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid handsign, please use \"rock\", \"paper\" or \"scissors\".", context.getChannel());
 			return;
 		}
 

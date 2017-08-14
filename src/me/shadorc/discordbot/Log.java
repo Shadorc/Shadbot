@@ -12,7 +12,7 @@ public class Log {
 
 	public static void error(String msg, Exception e, IChannel channel) {
 		LOGGER.error(msg, e);
-		BotUtils.sendMessage(Emoji.ERROR + " " + msg, channel);
+		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, channel);
 		Log.sendMessage("An error occured and users have been warned: " + msg + "\nSee logs for more info.", Config.BUGS_REPORT_CHANNEL_ID);
 	}
 

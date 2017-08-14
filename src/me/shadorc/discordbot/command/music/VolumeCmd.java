@@ -23,7 +23,7 @@ public class VolumeCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.WARNING + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " No currently playing music.", context.getChannel());
 			return;
 		}
 
@@ -36,7 +36,7 @@ public class VolumeCmd extends Command {
 			scheduler.setVolume(Integer.parseInt(context.getArg()));
 			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Volume level set to " + scheduler.getVolume() + "%", context.getChannel());
 		} catch (NumberFormatException e) {
-			BotUtils.sendMessage(Emoji.WARNING + " Please use a value between 0 and 100.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Please use a value between 0 and 100.", context.getChannel());
 		}
 	}
 

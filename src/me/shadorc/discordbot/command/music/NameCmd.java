@@ -23,7 +23,7 @@ public class NameCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.WARNING + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " No currently playing music.", context.getChannel());
 			return;
 		}
 

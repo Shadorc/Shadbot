@@ -23,11 +23,11 @@ public class StopCmd extends Command {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.WARNING + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " No currently playing music.", context.getChannel());
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.WARNING + " Music has been stopped by " + context.getAuthorName() + ".", context.getChannel());
+		BotUtils.sendMessage(Emoji.EXCLAMATION + " Music has been stopped by " + context.getAuthorName() + ".", context.getChannel());
 		GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leave();
 	}
 

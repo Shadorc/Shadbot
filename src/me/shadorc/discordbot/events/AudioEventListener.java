@@ -36,7 +36,7 @@ public class AudioEventListener extends AudioEventAdapter {
 				if(scheduler.isRepeating()) {
 					scheduler.queue(track.makeClone());
 				} else if(!scheduler.nextTrack()) {
-					BotUtils.sendMessage(Emoji.WARNING + " End of the playlist.", channel);
+					BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
 					GuildMusicManager.getGuildAudioPlayer(guild).leave();
 				}
 			}

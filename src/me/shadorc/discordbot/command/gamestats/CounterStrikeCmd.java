@@ -78,7 +78,7 @@ public class CounterStrikeCmd extends Command {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (IOException e) {
-			BotUtils.sendMessage(Emoji.WARNING + " Steam ID is invalid.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Steam ID is invalid.", context.getChannel());
 		}
 	}
 

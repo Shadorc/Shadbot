@@ -38,7 +38,7 @@ public class BotUtils {
 	// EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
 		if(!Shadbot.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
-			BotUtils.sendMessage(Emoji.WARNING + " I'm not allowed to send Embed links in this channel :(", channel);
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm not allowed to send Embed links in this channel :(", channel);
 			return;
 		}
 

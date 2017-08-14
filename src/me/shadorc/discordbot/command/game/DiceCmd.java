@@ -65,7 +65,7 @@ public class DiceCmd extends Command {
 			}
 
 			if(diceManager.isAlreadyPlaye(context.getAuthor())) {
-				BotUtils.sendMessage(Emoji.WARNING + " " + context.getAuthor().mention() + ", you're already participating.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " " + context.getAuthor().mention() + ", you're already participating.", context.getChannel());
 				return;
 			}
 
@@ -80,7 +80,7 @@ public class DiceCmd extends Command {
 			}
 
 			if(diceManager.isAlreadyBet(num)) {
-				BotUtils.sendMessage(Emoji.WARNING + " This number has already been bet, please try with another one.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
 				return;
 			}
 
@@ -154,7 +154,7 @@ public class DiceCmd extends Command {
 			}
 
 			if(numsPlayers.size() > 0) {
-				StringBuilder strBuilder = new StringBuilder(Emoji.LOST_MONEY + " Sorry, ");
+				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
 				for(int num : numsPlayers.keySet()) {
 					if(rand != num) {
 						Storage.getUser(channel.getGuild(), numsPlayers.get(num)).addCoins(-bet);

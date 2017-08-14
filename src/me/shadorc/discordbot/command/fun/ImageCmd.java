@@ -57,7 +57,7 @@ public class ImageCmd extends Command {
 			JSONObject resultObj = this.getRandomPopularResult(encodedSearch);
 
 			if(resultObj == null) {
-				BotUtils.sendMessage(Emoji.WARNING + " No results for \"" + context.getArg() + "\"", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " No results for \"" + context.getArg() + "\"", context.getChannel());
 				return;
 			}
 
@@ -78,7 +78,7 @@ public class ImageCmd extends Command {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (SocketTimeoutException sterr) {
-			BotUtils.sendMessage(Emoji.WARNING + " DeviantArt's servers are busy, please try again later.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " DeviantArt's servers are busy, please try again later.", context.getChannel());
 
 		} catch (IOException e) {
 			Log.error("An error occured while getting image.", e, context.getChannel());

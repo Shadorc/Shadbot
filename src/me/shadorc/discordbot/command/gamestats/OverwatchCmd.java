@@ -74,7 +74,7 @@ public class OverwatchCmd extends Command {
 					.withFooterText("Career link: " + url.toString());
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 		} catch (FileNotFoundException fnf) {
-			BotUtils.sendMessage(Emoji.WARNING + " Plateform, region or Battletag is invalid.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Plateform, region or Battletag is invalid.", context.getChannel());
 		} catch (IOException e) {
 			Log.error("An error occured while getting information from Overwatch profil, please try again later.", e, context.getChannel());
 		}

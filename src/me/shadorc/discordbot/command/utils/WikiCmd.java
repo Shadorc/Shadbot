@@ -57,7 +57,7 @@ public class WikiCmd extends Command {
 			JSONObject resultObj = pagesObj.getJSONObject(pageId);
 
 			if(pageId.equals("-1") || resultObj.getString("extract").isEmpty()) {
-				BotUtils.sendMessage(Emoji.WARNING + " No result for : " + context.getArg(), context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for : " + context.getArg(), context.getChannel());
 				return;
 			}
 

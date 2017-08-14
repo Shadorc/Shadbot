@@ -41,12 +41,12 @@ public class SettingsCmd extends Command {
 
 			String prefix = args[1].trim();
 			if(prefix.contains(" ")) {
-				BotUtils.sendMessage(Emoji.WARNING + " Prefix cannot contain space.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Prefix cannot contain space.", context.getChannel());
 				return;
 			}
 
 			if(prefix.length() > PREFIX_MAX_LENGTH) {
-				BotUtils.sendMessage(Emoji.WARNING + " Prefix cannot contain more than " + PREFIX_MAX_LENGTH + " characters.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Prefix cannot contain more than " + PREFIX_MAX_LENGTH + " characters.", context.getChannel());
 				return;
 			}
 

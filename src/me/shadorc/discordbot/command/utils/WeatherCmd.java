@@ -67,13 +67,13 @@ public class WeatherCmd extends Command {
 						.appendField(Emoji.CLOUD + " Clouds", clouds, true)
 						.appendField(Emoji.WIND + " Wind", windDesc + "\n" + String.format("%.1f", windSpeed) + " km/h", true)
 						.appendField(Emoji.RAIN + " Rain", rain, true)
-						.appendField(Emoji.WATER + " Humidity", humidity + "%", true)
+						.appendField(Emoji.DROPLET + " Humidity", humidity + "%", true)
 						.appendField(Emoji.THERMOMETER + " Temperature", String.format("%.1f", temperature) + "°C", true)
 						.withFooterText("Information obtained from OpenWeatherMap.org");
 
 				BotUtils.sendEmbed(builder.build(), context.getChannel());
 			} else {
-				BotUtils.sendMessage(Emoji.WARNING + " City not found.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " City not found.", context.getChannel());
 			}
 		} catch (IOException e) {
 			Log.error("An error occured while getting weather information.", e, context.getChannel());

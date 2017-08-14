@@ -115,7 +115,7 @@ public class TriviaCmd extends Command {
 
 		public void checkAnswer(IMessage message) {
 			if(alreadyAnswered.contains(message.getAuthor())) {
-				BotUtils.sendMessage(Emoji.WARNING + " Sorry " + message.getAuthor().getName() + ", you can only answer once.", message.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry " + message.getAuthor().getName() + ", you can only answer once.", message.getChannel());
 			} else if(incorrectAnswers.stream().anyMatch(message.getContent()::equalsIgnoreCase)) {
 				BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", channel);
 				alreadyAnswered.add(message.getAuthor());

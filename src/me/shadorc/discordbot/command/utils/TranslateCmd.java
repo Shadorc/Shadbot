@@ -43,7 +43,7 @@ public class TranslateCmd extends Command {
 		}
 
 		if(args.length == 3 && args[0].equalsIgnoreCase(args[1])) {
-			BotUtils.sendMessage(Emoji.WARNING + " The source language and the targetted language must be different.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " The source language and the targetted language must be different.", context.getChannel());
 			return;
 		}
 
@@ -55,7 +55,7 @@ public class TranslateCmd extends Command {
 			String translatedText = Utils.translate(sourceLang, targetLang, sourceText);
 			BotUtils.sendMessage(Emoji.MAP + " Translation : " + translatedText, context.getChannel());
 		} catch (IllegalArgumentException argErr) {
-			BotUtils.sendMessage(Emoji.WARNING + " One of the specified language isn't supported or doesn't exist. Use " + context.getPrefix() + "help translate to see a complete list of supported languages.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language isn't supported or doesn't exist. Use " + context.getPrefix() + "help translate to see a complete list of supported languages.", context.getChannel());
 		} catch (IOException ioErr) {
 			Log.error("An error occured during the translation.", ioErr, context.getChannel());
 		}
