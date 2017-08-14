@@ -19,30 +19,26 @@ import sx.blah.discord.util.RequestBuffer;
 public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
-		try {
-			if(!message.isEmpty() && message.length() <= IMessage.MAX_MESSAGE_LENGTH) {
-				RequestBuffer.request(() -> {
+		if(!message.isEmpty() && message.length() <= IMessage.MAX_MESSAGE_LENGTH) {
+			RequestBuffer.request(() -> {
+				try {
 					channel.sendMessage(message);
-				});
-			}
+				} catch (MissingPermissionsException e) {
+					Log.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
+				} catch (DiscordException e) {
+					Log.error("Discord exception while sending message : " + e.getErrorMessage(), e);
+				}
+			});
+		}
 
-			if(message.length() > IMessage.MAX_MESSAGE_LENGTH) {
-				BotUtils.sendMessage("I've tried to send a huge message... This is weird, I'm going to look into that. Sorry for the inconvenience.", channel);
-			}
+		// TODO: Remove
+		if(message.length() > IMessage.MAX_MESSAGE_LENGTH) {
+			BotUtils.sendMessage("I've tried to send a huge message... This is weird, I'm going to look into that. Sorry for the inconvenience.", channel);
+		}
 
-			if(message.length() > 1000) {
-				Log.warn("Shadbot sent a huge message (length:" + message.length() + "):\n" + message);
-				Log.error(Thread.getAllStackTraces().toString());
-				Thread.dumpStack();
-			}
-		} catch (NullPointerException e) {
-			Log.error("NullPointerException while sending message... Investigating...", e);
-			Log.error(Thread.getAllStackTraces().toString());
-			Thread.dumpStack();
-		} catch (MissingPermissionsException e) {
-			Log.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
-		} catch (DiscordException e) {
-			Log.error("Discord exception while sending message : " + e.getErrorMessage(), e);
+		// TODO: Remove
+		if(message.length() > 1000) {
+			Log.warn("Shadbot sent a huge message (length:" + message.length() + "):\n" + message.substring(0, Math.min(1900, message.length())) + "...");
 		}
 	}
 
@@ -54,15 +50,15 @@ public class BotUtils {
 			return;
 		}
 
-		try {
-			RequestBuffer.request(() -> {
+		RequestBuffer.request(() -> {
+			try {
 				channel.sendMessage(embed);
-			});
-		} catch (MissingPermissionsException e) {
-			Log.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
-		} catch (DiscordException e) {
-			Log.error("Discord exception while sending embed : " + e.getErrorMessage(), e);
-		}
+			} catch (MissingPermissionsException e) {
+				Log.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
+			} catch (DiscordException e) {
+				Log.error("Discord exception while sending embed : " + e.getErrorMessage(), e);
+			}
+		});
 	}
 
 	/**
