@@ -116,7 +116,7 @@ public class CommandManager {
 		}
 
 		if(!commandsMap.containsKey(context.getCommand())) {
-			Log.warn("Guild \"" + context.getGuild().getName() + "\" (ID: " + context.getGuild().getStringID() + ") - Command not found : \"" + context.getCommand() + "\".");
+			Log.info("Guild \"" + context.getGuild().getName() + "\" (ID: " + context.getGuild().getStringID() + ") - Command not found : \"" + context.getCommand() + "\".");
 			return;
 		}
 
