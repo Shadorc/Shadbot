@@ -67,9 +67,7 @@ public class HelpCmd extends Command {
 				.appendField("French Commands:",
 						"`" + context.getPrefix() + "dtc`"
 								+ " `" + context.getPrefix() + "blague`"
-								+ " `" + context.getPrefix() + "vacs`", false)
-				.withFooterText("GitHub Project Page : https://github.com/Shadorc/Shadbot")
-				.withFooterIcon("https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png");
+								+ " `" + context.getPrefix() + "vacs`", false);
 
 		if(context.isAuthorAdmin()) {
 			builder.appendField("Admin Commands:",
