@@ -51,6 +51,7 @@ public class HelpCmd extends Command {
 						"`" + context.getPrefix() + "play`"
 								+ " `" + context.getPrefix() + "volume`"
 								+ " `" + context.getPrefix() + "pause`"
+								+ " `" + context.getPrefix() + "resume`"
 								+ " `" + context.getPrefix() + "repeat`"
 								+ " `" + context.getPrefix() + "stop`"
 								+ " `" + context.getPrefix() + "next`"

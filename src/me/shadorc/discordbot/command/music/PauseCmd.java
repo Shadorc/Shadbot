@@ -14,7 +14,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class PauseCmd extends Command {
 
 	public PauseCmd() {
-		super(false, "pause");
+		super(false, "pause", "resume");
 	}
 
 	@Override
