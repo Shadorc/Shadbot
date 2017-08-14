@@ -46,7 +46,7 @@ public class Storage {
 				writer.flush();
 
 			} catch (IOException e) {
-				Log.error("Error while saving data file during initialization.", e);
+				Log.error("An error occured during data file initialization.", e);
 
 			} finally {
 				try {
@@ -54,7 +54,7 @@ public class Storage {
 						writer.close();
 					}
 				} catch (IOException e) {
-					Log.error("Error while closing writer during initialization.", e);
+					Log.error("An error occured while closing FileWriter during data file initialization.", e);
 				}
 			}
 		}
@@ -95,7 +95,7 @@ public class Storage {
 					writer.close();
 				}
 			} catch (IOException e) {
-				Log.error("Error while closing writer during the saving of the setting.", e);
+				Log.error("An error occured while closing FileWriter during setting saving.", e);
 			}
 		}
 	}
@@ -129,7 +129,7 @@ public class Storage {
 					writer.close();
 				}
 			} catch (IOException e) {
-				Log.error("Error while closing writer during the saving of the user.", e);
+				Log.error("An error occured while closing FileWriter during user saving.", e);
 			}
 		}
 	}

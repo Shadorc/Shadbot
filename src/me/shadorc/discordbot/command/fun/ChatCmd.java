@@ -63,11 +63,16 @@ public class ChatCmd extends Command {
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 
 		} catch (SocketTimeoutException e) {
-			BotUtils.sendMessage(Emoji.WARNING + " Sorry, chat isn't currently available, try again later.", context.getChannel());
-			Log.warn("A.L.I.C.E. doesn't respond (" + e.getMessage() + ").");
+			BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, please try again later :)", context.getChannel());
+			Log.warn("SocketTimeoutException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
 
 		} catch (IOException e) {
-			Log.error("An error occured while discussing with A.L.I.C.E.", e, context.getChannel());
+			if(e.getMessage().contains("502")) {
+				BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, please try again later :)", context.getChannel());
+				Log.warn("IOException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
+			} else {
+				Log.error("An error occured while discussing with A.L.I.C.E.", e, context.getChannel());
+			}
 		}
 	}
 
