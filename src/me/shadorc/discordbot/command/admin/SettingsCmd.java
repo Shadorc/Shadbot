@@ -14,6 +14,7 @@ import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -65,7 +66,7 @@ public class SettingsCmd extends Command {
 			}
 
 			for(IChannel channel : channels) {
-				if(!BotUtils.isChannelAllowed(context.getGuild(), channel)) {
+				if(!JsonUtils.convertArrayToList(channelsArray).contains(channel.getStringID())) {
 					channelsArray.put(channel.getStringID());
 				}
 			}
