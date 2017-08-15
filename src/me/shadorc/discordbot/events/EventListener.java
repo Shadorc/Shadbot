@@ -95,7 +95,7 @@ public class EventListener {
 			// TODO: Remove
 			if(gmm.getChannel() == null && !Config.VERSION.isBeta()) {
 				LogUtils.warn("Somewhere, something very strange happened... Shadbot was in a guild without channel set.");
-				gmm.setChannel(event.getGuild().getGeneralChannel());
+				gmm.setChannel(BotUtils.getFirstAvailableChannel(event.getGuild()));
 			}
 
 			if(this.isAlone(botVoiceChannel) && !gmm.isLeavingScheduled()) {
