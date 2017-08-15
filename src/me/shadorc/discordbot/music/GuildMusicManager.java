@@ -14,6 +14,7 @@ import me.shadorc.discordbot.events.AudioEventListener;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IVoiceChannel;
+import sx.blah.discord.handle.obj.Permissions;
 
 public class GuildMusicManager {
 
@@ -48,9 +49,13 @@ public class GuildMusicManager {
 		leaveTimer.stop();
 	}
 
-	public void joinVoiceChannel(IVoiceChannel voiceChannel, IChannel channel) {
+	public boolean joinVoiceChannel(IVoiceChannel voiceChannel, IChannel channel) {
+		if(!Shadbot.hasPermission(guild, Permissions.VOICE_CONNECT) || !Shadbot.hasPermission(guild, Permissions.VOICE_SPEAK)) {
+			return false;
+		}
 		voiceChannel.join();
 		this.setChannel(channel);
+		return true;
 	}
 
 	public void leaveVoiceChannel() {

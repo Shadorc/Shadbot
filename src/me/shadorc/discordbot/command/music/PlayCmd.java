@@ -61,8 +61,9 @@ public class PlayCmd extends AbstractCommand {
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier.toString(), new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				if(botVoiceChannel == null) {
-					musicManager.joinVoiceChannel(userVoiceChannel, context.getChannel());
+				if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel, context.getChannel())) {
+					BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect to this voice channel due to the lack of permission.", context.getChannel());
+					return;
 				}
 
 				if(musicManager.getScheduler().isPlaying()) {
@@ -73,8 +74,9 @@ public class PlayCmd extends AbstractCommand {
 
 			@Override
 			public void playlistLoaded(AudioPlaylist playlist) {
-				if(botVoiceChannel == null) {
-					musicManager.joinVoiceChannel(userVoiceChannel, context.getChannel());
+				if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel, context.getChannel())) {
+					BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect to this voice channel due to the lack of permission.", context.getChannel());
+					return;
 				}
 
 				List<AudioTrack> tracks = playlist.getTracks();
