@@ -6,17 +6,17 @@ import java.time.temporal.ChronoUnit;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class OverwatchCmd extends Command {
+public class OverwatchCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
@@ -27,7 +27,7 @@ public class OverwatchCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -71,12 +71,12 @@ public class OverwatchCmd extends Command {
 					.appendField("Wins", wins, true)
 					.appendField("Game time", timePlayed, true)
 					.appendField("Top hero (Casual matchmaking)", topHero + " (" + topHeroTime + ")", true)
-					.withFooterText("Career link: " + url.toString());
+					.withFooterText("Career link: " + url);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 		} catch (FileNotFoundException fnf) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Plateform, region or Battletag is invalid.", context.getChannel());
 		} catch (IOException e) {
-			Log.error("An error occured while getting information from Overwatch profil, please try again later.", e, context.getChannel());
+			LogUtils.error("An error occured while getting information from Overwatch profil, please try again later.", e, context.getChannel());
 		}
 	}
 

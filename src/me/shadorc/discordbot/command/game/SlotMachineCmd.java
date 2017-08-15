@@ -7,13 +7,13 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class SlotMachineCmd extends Command {
+public class SlotMachineCmd extends AbstractCommand {
 
 	private enum SlotOptions {
 		CHERRIES,
@@ -22,7 +22,7 @@ public class SlotMachineCmd extends Command {
 	}
 
 	private static final int PAID_COST = 10;
-	private static final SlotOptions[] slotsArray = new SlotOptions[] {
+	private static final SlotOptions[] SLOTS_ARRAY = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, // Winning chance : 12.5%
 			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, // Winning chance : 5.3%
 			SlotOptions.GIFT }; // Winning chance : 0.2%
@@ -48,9 +48,9 @@ public class SlotMachineCmd extends Command {
 			return;
 		}
 
-		SlotOptions slot1 = slotsArray[MathUtils.rand(slotsArray.length)];
-		SlotOptions slot2 = slotsArray[MathUtils.rand(slotsArray.length)];
-		SlotOptions slot3 = slotsArray[MathUtils.rand(slotsArray.length)];
+		SlotOptions slot1 = SLOTS_ARRAY[MathUtils.rand(SLOTS_ARRAY.length)];
+		SlotOptions slot2 = SLOTS_ARRAY[MathUtils.rand(SLOTS_ARRAY.length)];
+		SlotOptions slot3 = SLOTS_ARRAY[MathUtils.rand(SLOTS_ARRAY.length)];
 
 		int gains = -PAID_COST;
 
@@ -63,9 +63,9 @@ public class SlotMachineCmd extends Command {
 		}
 		context.getUser().addCoins(gains);
 
-		StringBuilder message = new StringBuilder();
-		message.append(":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":");
-		message.append("\nYou have " + (gains > 0 ? "win" : "lost") + " " + Math.abs(gains) + " coins !");
+		StringBuilder message = new StringBuilder(
+				":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":"
+						+ "\nYou have " + (gains > 0 ? "win" : "lost") + " " + Math.abs(gains) + " coins !");
 		BotUtils.sendMessage(message.toString(), context.getChannel());
 	}
 

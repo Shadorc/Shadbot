@@ -6,12 +6,13 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.User;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class TransferCoinsCmd extends Command {
+public class TransferCoinsCmd extends AbstractCommand {
 
 	public TransferCoinsCmd() {
 		super(false, "transfer", "transfert");
@@ -19,7 +20,7 @@ public class TransferCoinsCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -28,27 +29,27 @@ public class TransferCoinsCmd extends Command {
 			throw new MissingArgumentException();
 		}
 
-		try {
-			int coins = Integer.parseInt(splitCmd[0]);
-			User receiverUser = Storage.getUser(context.getGuild(), context.getMessage().getMentions().get(0));
-			User senderUser = context.getUser();
-
-			if(coins <= 0 || senderUser.equals(receiverUser)) {
-				throw new MissingArgumentException();
-			}
-
-			if(senderUser.getCoins() < coins) {
-				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to do this.", context.getChannel());
-				return;
-			}
-
-			senderUser.addCoins(-coins);
-			receiverUser.addCoins(coins);
-
-			BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " has transfered " + coins + " coins to " + receiverUser.mention(), context.getChannel());
-		} catch (NumberFormatException e1) {
+		if(!StringUtils.isInteger(splitCmd[0])) {
 			throw new MissingArgumentException();
 		}
+
+		int coins = Integer.parseInt(splitCmd[0]);
+		User receiverUser = Storage.getUser(context.getGuild(), context.getMessage().getMentions().get(0));
+		User senderUser = context.getUser();
+
+		if(coins <= 0 || senderUser.equals(receiverUser)) {
+			throw new MissingArgumentException();
+		}
+
+		if(senderUser.getCoins() < coins) {
+			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to do this.", context.getChannel());
+			return;
+		}
+
+		senderUser.addCoins(-coins);
+		receiverUser.addCoins(coins);
+
+		BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " has transfered " + coins + " coins to " + receiverUser.mention(), context.getChannel());
 	}
 
 	@Override

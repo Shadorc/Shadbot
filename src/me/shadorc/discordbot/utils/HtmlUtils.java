@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
+
 public class HtmlUtils {
 
 	/**
@@ -38,9 +40,7 @@ public class HtmlUtils {
 			return html.toString();
 
 		} finally {
-			if(reader != null) {
-				reader.close();
-			}
+			IOUtils.closeQuietly(reader);
 		}
 	}
 
@@ -52,10 +52,10 @@ public class HtmlUtils {
 	 */
 	public static List<String> getAllSubstring(String text, String start, String end) {
 		List<String> lines = new ArrayList<>();
-		Pattern p = Pattern.compile(Pattern.quote(start) + "(?s)(.*?)" + Pattern.quote(end));
-		Matcher m = p.matcher(text);
-		while(m.find()) {
-			lines.add(m.group(1));
+		Pattern pattern = Pattern.compile(Pattern.quote(start) + "(?s)(.*?)" + Pattern.quote(end));
+		Matcher matcher = pattern.matcher(text);
+		while(matcher.find()) {
+			lines.add(matcher.group(1));
 		}
 
 		return lines;
@@ -83,18 +83,16 @@ public class HtmlUtils {
 			String line;
 			while((line = reader.readLine()) != null) {
 				if(line.contains(toMatch)) {
-					Pattern p = Pattern.compile(Pattern.quote(start) + "(.*?)" + Pattern.quote(end));
-					Matcher m = p.matcher(line);
-					if(m.find()) {
-						return m.group(1).trim();
+					Pattern pattern = Pattern.compile(Pattern.quote(start) + "(.*?)" + Pattern.quote(end));
+					Matcher matcher = pattern.matcher(line);
+					if(matcher.find()) {
+						return matcher.group(1).trim();
 					}
 				}
 			}
 
 		} finally {
-			if(reader != null) {
-				reader.close();
-			}
+			IOUtils.closeQuietly(reader);
 		}
 
 		return null;
@@ -110,10 +108,10 @@ public class HtmlUtils {
 	public static String parseTextHTML(String html, String toMatch, String start, String end) {
 		for(String line : html.split("\n")) {
 			if(line.contains(toMatch)) {
-				Pattern p = Pattern.compile(Pattern.quote(start) + "(.*?)" + Pattern.quote(end));
-				Matcher m = p.matcher(line);
-				if(m.find()) {
-					return m.group(1).trim();
+				Pattern pattern = Pattern.compile(Pattern.quote(start) + "(.*?)" + Pattern.quote(end));
+				Matcher matcher = pattern.matcher(line);
+				if(matcher.find()) {
+					return matcher.group(1).trim();
 				}
 			}
 		}

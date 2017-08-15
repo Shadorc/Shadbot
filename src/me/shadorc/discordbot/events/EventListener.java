@@ -5,7 +5,6 @@ import java.util.TimerTask;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.CommandManager;
@@ -13,6 +12,7 @@ import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
@@ -27,7 +27,7 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		Log.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
+		LogUtils.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
 		event.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
 
 		// Update Shadbot stats every hour
@@ -44,17 +44,16 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
-		IMessage message = event.getMessage();
-
 		if(event.getAuthor().isBot()) {
 			return;
 		}
 
-		if((Config.VERSION.isBeta() && event.getChannel().getLongID() != Config.DEBUG_CHANNEL_ID)
-				|| (!Config.VERSION.isBeta() && event.getChannel().getLongID() == Config.DEBUG_CHANNEL_ID)) {
+		if(Config.VERSION.isBeta() && event.getChannel().getLongID() != Config.DEBUG_CHANNEL_ID
+				|| !Config.VERSION.isBeta() && event.getChannel().getLongID() == Config.DEBUG_CHANNEL_ID) {
 			return;
 		}
 
+		IMessage message = event.getMessage();
 		GuildTriviaManager gtm = TriviaCmd.getGuildTriviaManager(event.getGuild());
 		if(gtm != null && gtm.isStarted()) {
 			gtm.checkAnswer(message);
@@ -65,14 +64,14 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onGuildCreateEvent(GuildCreateEvent event) {
-		Log.info("Shadbot is now connected to guild: " + event.getGuild().getName()
+		LogUtils.info("Shadbot is now connected to guild: " + event.getGuild().getName()
 				+ " (ID: " + event.getGuild().getStringID()
 				+ " | Users: " + event.getGuild().getUsers().size() + ")");
 	}
 
 	@EventSubscriber
 	public void onGuildLeaveEvent(GuildLeaveEvent event) {
-		Log.info("Shadbot has been disconnected from guild: " + event.getGuild().getName()
+		LogUtils.info("Shadbot has been disconnected from guild: " + event.getGuild().getName()
 				+ " (ID: " + event.getGuild().getStringID()
 				+ " | Users: " + event.getGuild().getUsers().size() + ")");
 	}
@@ -86,7 +85,7 @@ public class EventListener {
 
 			// TODO: Remove
 			if(gmm.getChannel() == null && !Config.VERSION.isBeta()) {
-				Log.warn("Somewhere, womething very strange happened... Shadbot was in a guild without channel set.");
+				LogUtils.warn("Somewhere, womething very strange happened... Shadbot was in a guild without channel set.");
 				return;
 			}
 

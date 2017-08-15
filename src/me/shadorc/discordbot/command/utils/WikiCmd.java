@@ -8,17 +8,17 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.JsonUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class WikiCmd extends Command {
+public class WikiCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
@@ -29,7 +29,7 @@ public class WikiCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -56,7 +56,7 @@ public class WikiCmd extends Command {
 			String pageId = pagesObj.names().getString(0);
 			JSONObject resultObj = pagesObj.getJSONObject(pageId);
 
-			if(pageId.equals("-1") || resultObj.getString("extract").isEmpty()) {
+			if("-1".equals(pageId) || resultObj.getString("extract").isEmpty()) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for : " + context.getArg(), context.getChannel());
 				return;
 			}
@@ -71,7 +71,7 @@ public class WikiCmd extends Command {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (IOException e) {
-			Log.error("An error occured while getting Wikipedia information.", e, context.getChannel());
+			LogUtils.error("An error occured while getting Wikipedia information.", e, context.getChannel());
 		}
 	}
 

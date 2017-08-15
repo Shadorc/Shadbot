@@ -13,7 +13,7 @@ import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.HtmlUtils;
@@ -21,7 +21,7 @@ import me.shadorc.discordbot.utils.JsonUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class CounterStrikeCmd extends Command {
+public class CounterStrikeCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
@@ -32,7 +32,7 @@ public class CounterStrikeCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -45,10 +45,10 @@ public class CounterStrikeCmd extends Command {
 
 		try {
 			String steamids;
-			if(!StringUtils.isInteger(context.getArg())) {
-				steamids = HtmlUtils.parseHTML("https://steamcommunity.com/id/" + context.getArg() + "/", "\"steamid\":\"", "\"steamid\":\"", "\",\"");
-			} else {
+			if(StringUtils.isInteger(context.getArg())) {
 				steamids = context.getArg();
+			} else {
+				steamids = HtmlUtils.parseHTML("https://steamcommunity.com/id/" + context.getArg() + "/", "\"steamid\":\"", "\"steamid\":\"", "\",\"");
 			}
 
 			JSONObject mainStatsObj = JsonUtils.getJsonFromUrl("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"

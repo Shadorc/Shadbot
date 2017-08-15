@@ -1,38 +1,50 @@
 package me.shadorc.discordbot;
 
-public interface Emoji {
-	String ACCESS_DENIED = ":no_entry_sign:";
-	String CHECK_MARK = ":white_check_mark:";
-	String EXCLAMATION = ":grey_exclamation:";
-	String RED_FLAG = ":triangular_flag_on_post:";
-	String INFO = ":information_source:";
-	String STOPWATCH = ":stopwatch:";
+public enum Emoji {
 
-	String MONEY_WINGS = ":money_with_wings:";
-	String HOURGLASS = ":hourglass:";
-	String PURSE = ":purse:";
-	String BANK = ":bank:";
-	String DICE = ":game_die:";
+	ACCESS_DENIED(":no_entry_sign:"),
+	CHECK_MARK(":white_check_mark:"),
+	EXCLAMATION(":grey_exclamation:"),
+	RED_FLAG(":triangular_flag_on_post:"),
+	INFO(":information_source:"),
+	STOPWATCH(":stopwatch:"),
 
-	String THERMOMETER = ":thermometer:";
-	String BEACH = ":beach_umbrella:";
-	String CLOUD = ":cloud:";
-	String WIND = ":wind_blowing_face:";
-	String RAIN = ":cloud_rain:";
-	String DROPLET = ":droplet:";
-	String MAP = ":map:";
+	MONEY_WINGS(":money_with_wings:"),
+	HOURGLASS(":hourglass:"),
+	PURSE(":purse:"),
+	BANK(":bank:"),
+	DICE(":game_die:"),
 
-	String MUSICAL_NOTE = ":musical_note:";
-	String REPEAT = ":repeat:";
-	String PAUSE = ":pause_button:";
-	String PLAY = ":arrow_forward:";
+	THERMOMETER(":thermometer:"),
+	BEACH(":beach_umbrella:"),
+	CLOUD(":cloud:"),
+	WIND(":wind_blowing_face:"),
+	RAIN(":cloud_rain:"),
+	DROPLET(":droplet:"),
+	MAP(":map:"),
 
-	String THUMBSDOWN = ":thumbsdown:";
-	String SPEECH = ":speech_balloon:";
-	String CLAP = ":clap:";
-	String GEAR = ":gear:";
+	MUSICAL_NOTE(":musical_note:"),
+	REPEAT(":repeat:"),
+	PAUSE(":pause_button:"),
+	PLAY(":arrow_forward:"),
 
-	String SCISSORS = ":scissors:";
-	String GEM = ":gem:";
-	String LEAF = ":leaves:";
+	THUMBSDOWN(":thumbsdown:"),
+	SPEECH(":speech_balloon:"),
+	CLAP(":clap:"),
+	GEAR(":gear:"),
+
+	SCISSORS(":scissors:"),
+	GEM(":gem:"),
+	LEAF(":leaves:");
+
+	private final String discordNotation;
+
+	Emoji(String discordNotation) {
+		this.discordNotation = discordNotation;
+	}
+
+	@Override
+	public String toString() {
+		return discordNotation;
+	}
 }

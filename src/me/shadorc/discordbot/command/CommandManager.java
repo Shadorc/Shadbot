@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.admin.SettingsCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
@@ -41,13 +40,14 @@ import me.shadorc.discordbot.command.utils.UrbanCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
 import me.shadorc.discordbot.command.utils.WikiCmd;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 public class CommandManager {
 
 	private final static CommandManager COMMAND_MANAGER = new CommandManager();
 
-	private final Map<String, Command> commandsMap = new HashMap<>();
+	private final Map<String, AbstractCommand> commandsMap = new HashMap<>();
 
 	public CommandManager() {
 		this.register(
@@ -96,11 +96,11 @@ public class CommandManager {
 				new SettingsCmd());
 	}
 
-	private void register(Command... cmds) {
-		for(Command command : cmds) {
+	private void register(AbstractCommand... cmds) {
+		for(AbstractCommand command : cmds) {
 			for(String name : command.getNames()) {
 				if(commandsMap.containsKey(name)) {
-					Log.error("Command name collision between " + command.getClass() + " and " + commandsMap.get(name).getClass());
+					LogUtils.error("Command name collision between " + command.getClass() + " and " + commandsMap.get(name).getClass());
 					continue;
 				}
 				commandsMap.put(name, command);
@@ -116,11 +116,11 @@ public class CommandManager {
 		}
 
 		if(!commandsMap.containsKey(context.getCommand())) {
-			Log.info("Guild \"" + context.getGuild().getName() + "\" (ID: " + context.getGuild().getStringID() + ") - Command not found : \"" + context.getCommand() + "\".");
+			LogUtils.info("Guild \"" + context.getGuild().getName() + "\" (ID: " + context.getGuild().getStringID() + ") - Command not found : \"" + context.getCommand() + "\".");
 			return;
 		}
 
-		Command command = commandsMap.get(context.getCommand());
+		AbstractCommand command = commandsMap.get(context.getCommand());
 
 		if(command.isAdminCmd() && !context.isAuthorAdmin()) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You have to be an administrator to execute this command.", event.getChannel());
@@ -134,7 +134,7 @@ public class CommandManager {
 		}
 	}
 
-	public Command getCommand(String name) {
+	public AbstractCommand getCommand(String name) {
 		return commandsMap.containsKey(name) ? commandsMap.get(name) : null;
 	}
 

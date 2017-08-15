@@ -7,10 +7,10 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
@@ -40,18 +40,18 @@ public class NetUtils {
 			return -42;
 		}
 
-		BufferedReader in = null;
+		BufferedReader reader = null;
 
 		try {
 			String command = "ping -c 1 www.discordapp.com";
 
-			Process p = Runtime.getRuntime().exec(command);
-			in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			Process process = Runtime.getRuntime().exec(command);
+			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
 			StringBuilder builder = new StringBuilder();
 
 			String line;
-			while((line = in.readLine()) != null) {
+			while((line = reader.readLine()) != null) {
 				builder.append(line + "\n");
 			}
 
@@ -60,17 +60,11 @@ public class NetUtils {
 
 			return Float.parseFloat(time);
 
-		} catch (Exception e) {
-			Log.error("An error occured while parsing ping.", e);
+		} catch (IOException e) {
+			LogUtils.error("An error occured while parsing ping.", e);
 
 		} finally {
-			if(in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					Log.error("Error while closing reader during ping parsing.", e);
-				}
-			}
+			IOUtils.closeQuietly(reader);
 		}
 
 		return -1;
@@ -86,7 +80,7 @@ public class NetUtils {
 
 	private static void postStatsOn(String homeUrl, ApiKeys token) {
 		DataOutputStream out = null;
-		BufferedReader in = null;
+		BufferedReader reader = null;
 		try {
 			URL url = new URL(homeUrl + "/api/bots/" + Shadbot.getClient().getOurUser().getStringID() + "/stats");
 
@@ -103,28 +97,21 @@ public class NetUtils {
 			out.writeBytes(content.toString());
 			out.flush();
 
-			in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
 
 			StringBuilder strBuilder = new StringBuilder();
 			String line;
-			while((line = in.readLine()) != null) {
+			while((line = reader.readLine()) != null) {
 				strBuilder.append(line);
 			}
-			Log.info("Stats have been posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
+			LogUtils.info("Stats have been posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
 
-		} catch (Exception e) {
-			Log.error("An error occured while posting stats.", e);
+		} catch (IOException e) {
+			LogUtils.error("An error occured while posting stats.", e);
+
 		} finally {
-			try {
-				if(out != null) {
-					out.close();
-				}
-				if(in != null) {
-					in.close();
-				}
-			} catch (Exception e) {
-				Log.error("An error occured while posting stats.", e);
-			}
+			IOUtils.closeQuietly(out);
+			IOUtils.closeQuietly(reader);
 		}
 	}
 }

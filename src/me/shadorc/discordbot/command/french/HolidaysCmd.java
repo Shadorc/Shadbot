@@ -1,23 +1,27 @@
 package me.shadorc.discordbot.command.french;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.TwitterUtils;
 import sx.blah.discord.util.EmbedBuilder;
 import twitter4j.TwitterException;
 
-public class HolidaysCmd extends Command {
+public class HolidaysCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
+
+	private static final List<String> ZONES = Arrays.asList("A", "B", "C");
 
 	public HolidaysCmd() {
 		super(false, "vacs", "vacances");
@@ -26,7 +30,7 @@ public class HolidaysCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -37,16 +41,17 @@ public class HolidaysCmd extends Command {
 			return;
 		}
 
+		String zone = context.getArg().toUpperCase();
+		if(!ZONES.contains(zone)) {
+			throw new MissingArgumentException();
+		}
+
 		try {
 			TwitterUtils.connection();
-			String holidays = TwitterUtils.getInstance().getUserTimeline("Vacances_Zone" + context.getArg().toUpperCase()).get(0).getText().replaceAll("#", "");
+			String holidays = TwitterUtils.getInstance().getUserTimeline("Vacances_Zone" + zone).get(0).getText().replaceAll("#", "");
 			BotUtils.sendMessage(Emoji.BEACH + " " + holidays, context.getChannel());
 		} catch (TwitterException e) {
-			if(e.getErrorCode() == 34) {
-				throw new MissingArgumentException();
-			} else {
-				Log.error("An error occured while getting holidays information.", e, context.getChannel());
-			}
+			LogUtils.error("An error occured while getting holidays information.", e, context.getChannel());
 		}
 	}
 

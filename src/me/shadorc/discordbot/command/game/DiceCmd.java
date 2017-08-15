@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.game;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Timer;
 
@@ -10,7 +11,7 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
@@ -20,10 +21,10 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class DiceCmd extends Command {
+public class DiceCmd extends AbstractCommand {
 
-	private static final HashMap<IGuild, DiceManager> GUILDS_DICE = new HashMap<>();
-	private static final int MULTIPLIER = 6;
+	protected static final Map<IGuild, DiceManager> GUILDS_DICE = new HashMap<>();
+	protected static final int MULTIPLIER = 6;
 
 	public DiceCmd() {
 		super(false, "dice", "des");
@@ -31,32 +32,7 @@ public class DiceCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!GUILDS_DICE.containsKey(context.getGuild())) {
-			if(context.getArg() == null) {
-				throw new MissingArgumentException();
-			}
-
-			String[] splitArgs = context.getArg().split(" ");
-			if(splitArgs.length != 2 || !StringUtils.isInteger(splitArgs[0]) || !StringUtils.isInteger(splitArgs[1])) {
-				throw new MissingArgumentException();
-			}
-
-			int bet = Integer.parseInt(splitArgs[0]);
-			int num = Integer.parseInt(splitArgs[1]);
-
-			if(num < 1 || num > 6) {
-				throw new MissingArgumentException();
-			}
-
-			if(context.getUser().getCoins() < bet) {
-				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
-				return;
-			}
-
-			GUILDS_DICE.put(context.getGuild(), new DiceManager(context.getChannel(), context.getAuthor(), num, bet));
-		}
-
-		else {
+		if(GUILDS_DICE.containsKey(context.getGuild())) {
 			DiceManager diceManager = GUILDS_DICE.get(context.getGuild());
 
 			if(context.getUser().getCoins() < diceManager.getBet()) {
@@ -64,7 +40,7 @@ public class DiceCmd extends Command {
 				return;
 			}
 
-			if(diceManager.isAlreadyPlaye(context.getAuthor())) {
+			if(diceManager.isAlreadyPlaying(context.getAuthor())) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " " + context.getAuthor().mention() + ", you're already participating.", context.getChannel());
 				return;
 			}
@@ -79,37 +55,62 @@ public class DiceCmd extends Command {
 				throw new MissingArgumentException();
 			}
 
-			if(diceManager.isAlreadyBet(num)) {
+			if(diceManager.hasAlreadyBet(num)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
 				return;
 			}
 
 			diceManager.addPlayer(context.getAuthor(), num);
 			BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " bet on " + num + ".", context.getChannel());
+
+		} else {
+			if(!context.hasArg()) {
+				throw new MissingArgumentException();
+			}
+
+			String[] splitArgs = context.getArg().split(" ");
+			if(splitArgs.length != 2 || !StringUtils.isInteger(splitArgs[0]) || !StringUtils.isInteger(splitArgs[1])) {
+				throw new MissingArgumentException();
+			}
+
+			int num = Integer.parseInt(splitArgs[1]);
+			if(num < 1 || num > 6) {
+				throw new MissingArgumentException();
+			}
+
+			int bet = Integer.parseInt(splitArgs[0]);
+			if(context.getUser().getCoins() < bet) {
+				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
+				return;
+			}
+
+			DiceManager diceManager = new DiceManager(context.getChannel(), context.getAuthor(), num, bet);
+			GUILDS_DICE.put(context.getGuild(), diceManager);
+			diceManager.start();
 		}
+
 	}
 
-	private class DiceManager {
+	protected class DiceManager {
 
-		private HashMap<Integer, IUser> numsPlayers;
-		private IChannel channel;
-		private IUser croupier;
-		private Timer timer;
-		private int bet;
+		private final Map<Integer, IUser> numsPlayers;
+		private final IChannel channel;
+		private final IUser croupier;
+		private final Timer timer;
+		private final int bet;
 
-		private DiceManager(IChannel channel, IUser user, int num, int bet) {
+		protected DiceManager(IChannel channel, IUser user, int num, int bet) {
 			this.channel = channel;
 			this.croupier = user;
 			this.numsPlayers = new HashMap<>();
 			this.numsPlayers.put(num, user);
 			this.bet = bet;
-			this.timer = new Timer(30 * 1000, e -> {
+			this.timer = new Timer(30 * 1000, event -> {
 				this.stop();
 			});
-			this.start();
 		}
 
-		private void addPlayer(IUser user, int num) {
+		protected void addPlayer(IUser user, int num) {
 			this.numsPlayers.put(num, user);
 		}
 
@@ -117,15 +118,15 @@ public class DiceCmd extends Command {
 			return bet;
 		}
 
-		private boolean isAlreadyPlaye(IUser user) {
+		protected boolean isAlreadyPlaying(IUser user) {
 			return numsPlayers.containsValue(user);
 		}
 
-		private boolean isAlreadyBet(int num) {
+		protected boolean hasAlreadyBet(int num) {
 			return numsPlayers.containsKey(num);
 		}
 
-		private void start() {
+		protected void start() {
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Dice Game")
 					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
@@ -139,7 +140,7 @@ public class DiceCmd extends Command {
 			this.timer.start();
 		}
 
-		private void stop() {
+		protected void stop() {
 			this.timer.stop();
 
 			int rand = MathUtils.rand(1, 6);
@@ -153,7 +154,7 @@ public class DiceCmd extends Command {
 				numsPlayers.remove(rand);
 			}
 
-			if(numsPlayers.size() > 0) {
+			if(!numsPlayers.isEmpty()) {
 				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
 				for(int num : numsPlayers.keySet()) {
 					if(rand != num) {

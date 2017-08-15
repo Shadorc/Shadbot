@@ -5,17 +5,17 @@ import java.time.temporal.ChronoUnit;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class TranslateCmd extends Command {
+public class TranslateCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
@@ -26,7 +26,7 @@ public class TranslateCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -57,7 +57,7 @@ public class TranslateCmd extends Command {
 		} catch (IllegalArgumentException argErr) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language isn't supported or doesn't exist. Use " + context.getPrefix() + "help translate to see a complete list of supported languages.", context.getChannel());
 		} catch (IOException ioErr) {
-			Log.error("An error occured during the translation.", ioErr, context.getChannel());
+			LogUtils.error("An error occured during the translation.", ioErr, context.getChannel());
 		}
 	}
 

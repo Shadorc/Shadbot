@@ -5,13 +5,13 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class CoinsCmd extends Command {
+public class CoinsCmd extends AbstractCommand {
 
 	public CoinsCmd() {
 		super(false, "coins", "coin");

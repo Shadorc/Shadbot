@@ -2,13 +2,13 @@ package me.shadorc.discordbot.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,20 +34,20 @@ public class JsonUtils {
 	 * @throws JSONException
 	 */
 	public static JSONObject getJsonFromUrl(String url) throws IOException, JSONException {
-		InputStream is = new URL(url).openStream();
+		BufferedReader reader = null;
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+			reader = new BufferedReader(new InputStreamReader(new URL(url).openStream(), Charset.forName("UTF-8")));
 
-			StringBuilder sb = new StringBuilder();
-			int cp;
-			while((cp = reader.read()) != -1) {
-				sb.append((char) cp);
+			StringBuilder strBuilder = new StringBuilder();
+			int charac;
+			while((charac = reader.read()) != -1) {
+				strBuilder.append((char) charac);
 			}
 
-			return new JSONObject(sb.toString());
+			return new JSONObject(strBuilder.toString());
 
 		} finally {
-			is.close();
+			IOUtils.closeQuietly(reader);
 		}
 	}
 }

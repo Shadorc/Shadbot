@@ -6,19 +6,19 @@ import java.time.temporal.ChronoUnit;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Config;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class BashCmd extends Command {
+public class BashCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
@@ -43,7 +43,7 @@ public class BashCmd extends Command {
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");
 			BotUtils.sendMessage("```" + quote + "```", context.getChannel());
 		} catch (IOException e) {
-			Log.error("An error occured while getting a quote from DansTonChat.com", e, context.getChannel());
+			LogUtils.error("An error occured while getting a quote from DansTonChat.com", e, context.getChannel());
 		}
 	}
 

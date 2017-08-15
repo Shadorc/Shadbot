@@ -20,6 +20,7 @@ public class AudioEventListener extends AudioEventAdapter {
 	private IChannel channel;
 
 	public AudioEventListener(IGuild guild, TrackScheduler scheduler) {
+		super();
 		this.guild = guild;
 		this.scheduler = scheduler;
 	}

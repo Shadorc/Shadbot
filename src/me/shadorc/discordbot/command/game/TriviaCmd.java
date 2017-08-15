@@ -13,14 +13,14 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.JsonUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IChannel;
@@ -29,9 +29,9 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class TriviaCmd extends Command {
+public class TriviaCmd extends AbstractCommand {
 
-	private static final int GAINS = 25;
+	protected static final int GAINS = 25;
 	private static final Map<IGuild, GuildTriviaManager> GUILDS_TRIVIA = new HashMap<>();
 
 	public TriviaCmd() {
@@ -44,7 +44,7 @@ public class TriviaCmd extends Command {
 			GUILDS_TRIVIA.put(context.getGuild(), new GuildTriviaManager(context.getChannel()));
 			GUILDS_TRIVIA.get(context.getGuild()).start();
 		} catch (IOException e) {
-			Log.error("An error occured while getting a question.", e, context.getChannel());
+			LogUtils.error("An error occured while getting a question.", e, context.getChannel());
 		}
 	}
 
@@ -61,18 +61,18 @@ public class TriviaCmd extends Command {
 		private String correctAnswer;
 		private List<String> incorrectAnswers;
 
-		private GuildTriviaManager(IChannel channel) {
+		protected GuildTriviaManager(IChannel channel) {
 			this.channel = channel;
 			this.alreadyAnswered = new ArrayList<>();
 			this.isStarted = false;
-			this.timer = new Timer(30 * 1000, e -> {
+			this.timer = new Timer(30 * 1000, event -> {
 				BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the good answer was " + correctAnswer + ".", channel);
 				this.stop();
 			});
 		}
 
 		// Trivia API doc : https://opentdb.com/api_config.php
-		private void start() throws MalformedURLException, IOException {
+		protected void start() throws MalformedURLException, IOException {
 			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://opentdb.com/api.php?amount=1");
 			JSONObject resultObj = mainObj.getJSONArray("results").getJSONObject(0);
 
@@ -80,17 +80,17 @@ public class TriviaCmd extends Command {
 			String type = resultObj.getString("type");
 			String difficulty = resultObj.getString("difficulty");
 			String question = resultObj.getString("question");
-			String correct_answer = resultObj.getString("correct_answer");
+			String correctAnswer = resultObj.getString("correct_answer");
 
 			this.incorrectAnswers = JsonUtils.convertArrayToList(resultObj.getJSONArray("incorrect_answers"));
 
 			StringBuilder strBuilder = new StringBuilder("**" + StringUtils.convertHtmlToUTF8(question) + "**");
-			if(type.equals("multiple")) {
+			if("multiple".equals(type)) {
 				// Place the correct answer randomly in the list
 				int index = MathUtils.rand(incorrectAnswers.size());
 				for(int i = 0; i < incorrectAnswers.size(); i++) {
 					if(i == index) {
-						strBuilder.append("\n\t- " + StringUtils.convertHtmlToUTF8(correct_answer));
+						strBuilder.append("\n\t- " + StringUtils.convertHtmlToUTF8(correctAnswer));
 					}
 					strBuilder.append("\n\t- " + StringUtils.convertHtmlToUTF8(incorrectAnswers.get(i)));
 				}
@@ -108,7 +108,7 @@ public class TriviaCmd extends Command {
 
 			BotUtils.sendEmbed(builder.build(), channel);
 
-			this.correctAnswer = StringUtils.convertHtmlToUTF8(correct_answer);
+			this.correctAnswer = StringUtils.convertHtmlToUTF8(correctAnswer);
 			this.isStarted = true;
 			this.timer.start();
 		}
@@ -126,7 +126,7 @@ public class TriviaCmd extends Command {
 			}
 		}
 
-		private void stop() {
+		protected void stop() {
 			this.alreadyAnswered.clear();
 			this.isStarted = false;
 			this.timer.stop();

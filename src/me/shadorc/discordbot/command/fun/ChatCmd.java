@@ -12,18 +12,18 @@ import org.json.XML;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class ChatCmd extends Command {
+public class ChatCmd extends AbstractCommand {
 
 	private static final Map<IGuild, String> GUILDS_CUSTID = new HashMap<>();
 
@@ -36,7 +36,7 @@ public class ChatCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -56,7 +56,7 @@ public class ChatCmd extends Command {
 			String xmlString = HtmlUtils.getHTML("http://sheepridge.pandorabots.com/pandora/talk-xml?"
 					+ "botid=b69b8d517e345aba"
 					+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
-					+ (aliceState != null ? "&custid=" + aliceState : ""));
+					+ (aliceState == null ? "" : "&custid=" + aliceState));
 			JSONObject result = XML.toJSONObject(xmlString).getJSONObject("result");
 			String response = result.getString("that").replace("<br>", "\n").trim();
 			GUILDS_CUSTID.put(context.getChannel().getGuild(), result.getString("custid"));
@@ -64,14 +64,14 @@ public class ChatCmd extends Command {
 
 		} catch (SocketTimeoutException e) {
 			BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, please try again later :)", context.getChannel());
-			Log.warn("SocketTimeoutException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
+			LogUtils.warn("SocketTimeoutException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
 
 		} catch (IOException e) {
 			if(e.getMessage().contains("502")) {
 				BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, please try again later :)", context.getChannel());
-				Log.warn("IOException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
+				LogUtils.warn("IOException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
 			} else {
-				Log.error("An error occured while discussing with A.L.I.C.E.", e, context.getChannel());
+				LogUtils.error("An error occured while discussing with A.L.I.C.E.", e, context.getChannel());
 			}
 		}
 	}

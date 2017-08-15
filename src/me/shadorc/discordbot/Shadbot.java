@@ -12,24 +12,24 @@ import sx.blah.discord.handle.obj.Permissions;
 
 public class Shadbot {
 
-	private static IDiscordClient CLIENT;
+	private static IDiscordClient client;
 
 	public static void main(String[] args) {
-		CLIENT = new ClientBuilder()
+		client = new ClientBuilder()
 				.withToken(Storage.getApiKey(ApiKeys.DISCORD_TOKEN))
 				.login();
 
-		CLIENT.getDispatcher().registerListener(new EventListener());
+		client.getDispatcher().registerListener(new EventListener());
 
 		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
 		AudioSourceManagers.registerLocalSource(GuildMusicManager.PLAYER_MANAGER);
 	}
 
 	public static IDiscordClient getClient() {
-		return CLIENT;
+		return client;
 	}
 
 	public static boolean hasPermission(IGuild guild, Permissions permission) {
-		return CLIENT.getOurUser().getPermissionsForGuild(guild).contains(permission);
+		return client.getOurUser().getPermissionsForGuild(guild).contains(permission);
 	}
 }

@@ -2,34 +2,55 @@ package me.shadorc.discordbot.command.game;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class RpsCmd extends Command {
+public class RpsCmd extends AbstractCommand {
 
-	private interface Handsign {
-		String ROCK = "rock";
-		String PAPER = "paper";
-		String SCISSORS = "scissors";
-	}
-
-	private static final List<String> HANDSIGNS = Arrays.asList(Handsign.ROCK, Handsign.PAPER, Handsign.SCISSORS);
-	private static final List<String> EMOJIS = Arrays.asList(Emoji.GEM, Emoji.LEAF, Emoji.SCISSORS);
 	private static final int GAINS = 20;
 
 	private final RateLimiter rateLimiter;
+
+	private enum Handsign {
+		ROCK("Rock", Emoji.GEM),
+		PAPER("Paper", Emoji.LEAF),
+		SCISSORS("Scissors", Emoji.SCISSORS);
+
+		private String handsign;
+		private Emoji emoji;
+
+		Handsign(String handsign, Emoji emoji) {
+			this.handsign = handsign;
+			this.emoji = emoji;
+		}
+
+		public String getValue() {
+			return handsign;
+		}
+
+		@Override
+		public String toString() {
+			return emoji + " " + handsign;
+		}
+
+		public static Handsign getEnum(String value) {
+			for(Handsign handsign : Handsign.values()) {
+				if(handsign.getValue().equalsIgnoreCase(value)) {
+					return handsign;
+				}
+			}
+			return null;
+		}
+	}
 
 	public RpsCmd() {
 		super(false, "rps");
@@ -38,7 +59,7 @@ public class RpsCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -49,21 +70,17 @@ public class RpsCmd extends Command {
 			return;
 		}
 
-		String userHandsign = context.getArg().toLowerCase();
+		Handsign userHandsign = Handsign.getEnum(context.getArg());
 
-		if(!HANDSIGNS.contains(userHandsign)) {
+		if(userHandsign == null) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid handsign, please use \"rock\", \"paper\" or \"scissors\".", context.getChannel());
 			return;
 		}
 
-		String botHandsign = HANDSIGNS.get(MathUtils.rand(HANDSIGNS.size()));
+		Handsign botHandsign = Arrays.asList(Handsign.values()).get(MathUtils.rand(Handsign.values().length));
 
-		String userHandsignForm = EMOJIS.get(HANDSIGNS.indexOf(userHandsign)) + " " + StringUtils.capitalize(userHandsign);
-		String botHandsignForm = EMOJIS.get(HANDSIGNS.indexOf(botHandsign)) + " " + StringUtils.capitalize(botHandsign);
-
-		StringBuilder strBuilder = new StringBuilder();
-		strBuilder.append("**" + context.getAuthorName() + "**: " + userHandsignForm + ".\n");
-		strBuilder.append("**Shadbot**: " + botHandsignForm + ".\n");
+		StringBuilder strBuilder = new StringBuilder("**" + context.getAuthorName() + "**: " + userHandsign.toString() + ".\n"
+				+ "**Shadbot**: " + botHandsign.toString() + ".\n");
 
 		if(userHandsign.equals(botHandsign)) {
 			strBuilder.append("It's a draw !");

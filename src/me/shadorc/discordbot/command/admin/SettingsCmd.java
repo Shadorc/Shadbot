@@ -11,14 +11,14 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.JsonUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class SettingsCmd extends Command {
+public class SettingsCmd extends AbstractCommand {
 
 	private static final int PREFIX_MAX_LENGTH = 5;
 
@@ -28,14 +28,14 @@ public class SettingsCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
 		String[] args = context.getArg().split(" ", 2);
 		String name = args[0];
 
-		if(name.equals("prefix")) {
+		if("prefix".equals(name)) {
 			if(args.length != 2) {
 				throw new MissingArgumentException();
 			}
@@ -54,9 +54,9 @@ public class SettingsCmd extends Command {
 			Storage.storeSetting(context.getGuild(), Setting.PREFIX, prefix);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " '" + prefix + "' is now the prefix for this server.", context.getChannel());
 
-		} else if(name.equals("allowed_channels")) {
+		} else if("allowed_channels".equals(name)) {
 			List<IChannel> channels = context.getMessage().getChannelMentions();
-			if(channels.size() == 0) {
+			if(channels.isEmpty()) {
 				throw new MissingArgumentException();
 			}
 

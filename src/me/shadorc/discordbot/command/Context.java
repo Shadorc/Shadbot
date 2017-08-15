@@ -22,7 +22,7 @@ public class Context {
 
 		String[] splitMessage = event.getMessage().getContent().split(" ", 2);
 		this.command = splitMessage[0].substring(1).toLowerCase().trim();
-		this.arg = (splitMessage.length > 1) ? splitMessage[1].trim() : null;
+		this.arg = splitMessage.length > 1 ? splitMessage[1].trim() : "";
 	}
 
 	public User getUser() {
@@ -62,6 +62,10 @@ public class Context {
 
 	public String getArg() {
 		return arg;
+	}
+
+	public boolean hasArg() {
+		return !arg.isEmpty();
 	}
 
 	public boolean isAuthorAdmin() {

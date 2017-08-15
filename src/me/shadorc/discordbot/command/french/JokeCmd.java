@@ -7,19 +7,19 @@ import java.util.List;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class JokeCmd extends Command {
+public class JokeCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
@@ -44,16 +44,16 @@ public class JokeCmd extends Command {
 			String joke;
 			do {
 				joke = jokesList.get(MathUtils.rand(jokesList.size()));
-				joke = joke.substring(0, joke.lastIndexOf("\"")).replace("&amp;", "&").trim();
+				joke = joke.substring(0, joke.lastIndexOf('"')).replace("&amp;", "&").trim();
 			} while(joke.length() > 1800);
 
 			BotUtils.sendMessage("```" + StringUtils.convertHtmlToUTF8(joke).replace("\n\n", "\n") + "```", context.getChannel());
 
 		} catch (SocketTimeoutException e) {
 			BotUtils.sendMessage(Emoji.HOURGLASS + " Jokes website is busy right now, please try again later.", context.getChannel());
-			Log.warn("SocketTimeoutException while getting a joke (" + e.getMessage() + ").");
+			LogUtils.warn("SocketTimeoutException while getting a joke (" + e.getMessage() + ").");
 		} catch (IOException e) {
-			Log.error("An error occured while getting a joke.", e, context.getChannel());
+			LogUtils.error("An error occured while getting a joke.", e, context.getChannel());
 		}
 	}
 

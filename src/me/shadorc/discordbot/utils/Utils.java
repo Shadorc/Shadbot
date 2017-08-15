@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.MissingArgumentException;
@@ -18,7 +19,7 @@ import me.shadorc.discordbot.MissingArgumentException;
 public class Utils {
 
 	public static String translate(String langFrom, String langTo, String sourceText) throws MissingArgumentException, IOException {
-		BufferedReader in = null;
+		BufferedReader reader = null;
 		try {
 			URL url = new URL("https://translate.googleapis.com/translate_a/single?" +
 					"client=gtx&" +
@@ -27,13 +28,13 @@ public class Utils {
 					"&dt=t&q=" + URLEncoder.encode(sourceText, "UTF-8"));
 
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestProperty("User-Agent", "Mozilla/5.0");
+			con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35");
 
-			in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+			reader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
 			StringBuilder response = new StringBuilder();
 
 			String inputLine;
-			while((inputLine = in.readLine()) != null) {
+			while((inputLine = reader.readLine()) != null) {
 				response.append(inputLine);
 			}
 
@@ -44,13 +45,8 @@ public class Utils {
 				throw new MissingArgumentException();
 			}
 
-		} catch (IOException e) {
-			throw e;
-
 		} finally {
-			if(in != null) {
-				in.close();
-			}
+			IOUtils.closeQuietly(reader);
 		}
 	}
 
@@ -61,7 +57,7 @@ public class Utils {
 				.collect(Collectors.toMap(
 						Map.Entry::getKey,
 						Map.Entry::getValue,
-						(e1, e2) -> e1,
+						(value1, value2) -> value1,
 						LinkedHashMap::new));
 	}
 }

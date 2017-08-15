@@ -4,13 +4,13 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class PingCmd extends Command {
+public class PingCmd extends AbstractCommand {
 
 	public PingCmd() {
 		super(false, "ping");

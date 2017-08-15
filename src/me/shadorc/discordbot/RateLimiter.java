@@ -3,6 +3,7 @@ package me.shadorc.discordbot;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.Map;
 
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -11,8 +12,8 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class RateLimiter {
 
-	private final HashMap<IGuild, HashMap<IUser, Long>> guildsRateLimiter;
-	private final HashMap<IGuild, HashMap<IUser, Boolean>> warningsRateLimiter;
+	private final Map<IGuild, HashMap<IUser, Long>> guildsRateLimiter;
+	private final Map<IGuild, HashMap<IUser, Boolean>> warningsRateLimiter;
 	private final long timeout;
 
 	public RateLimiter(int timeout, ChronoUnit unit) {
@@ -22,13 +23,13 @@ public class RateLimiter {
 	}
 
 	public boolean isLimited(IGuild guild, IUser user) {
-		long currentTime = System.currentTimeMillis();
-
 		if(!guildsRateLimiter.containsKey(guild)) {
 			guildsRateLimiter.put(guild, new HashMap<IUser, Long>());
 			warningsRateLimiter.put(guild, new HashMap<IUser, Boolean>());
 			return false;
 		}
+
+		long currentTime = System.currentTimeMillis();
 
 		if(!guildsRateLimiter.get(guild).containsKey(user)) {
 			guildsRateLimiter.get(guild).put(user, currentTime);

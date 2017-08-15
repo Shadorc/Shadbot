@@ -7,13 +7,13 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class RussianRouletteCmd extends Command {
+public class RussianRouletteCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 

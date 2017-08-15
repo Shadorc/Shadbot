@@ -3,7 +3,6 @@ package me.shadorc.discordbot.utils;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
@@ -23,9 +22,9 @@ public class BotUtils {
 				try {
 					channel.sendMessage(message);
 				} catch (MissingPermissionsException e) {
-					Log.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
+					LogUtils.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
 				} catch (DiscordException e) {
-					Log.error("Discord exception while sending message : " + e.getErrorMessage(), e);
+					LogUtils.error("Discord exception while sending message : " + e.getErrorMessage(), e);
 				}
 			});
 		}
@@ -35,7 +34,7 @@ public class BotUtils {
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
 		if(!Shadbot.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm not allowed to send Embed links in this channel :(", channel);
-			Log.warn("Shadbot wasn't allowed to post Embed links in Guild : \"" + channel.getGuild() + "\"");
+			LogUtils.warn("Shadbot wasn't allowed to post Embed links in Guild : \"" + channel.getGuild() + "\"");
 			return;
 		}
 
@@ -43,9 +42,9 @@ public class BotUtils {
 			try {
 				channel.sendMessage(embed);
 			} catch (MissingPermissionsException e) {
-				Log.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
+				LogUtils.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
 			} catch (DiscordException e) {
-				Log.error("Discord exception while sending embed : " + e.getErrorMessage(), e);
+				LogUtils.error("Discord exception while sending embed : " + e.getErrorMessage(), e);
 			}
 		});
 	}

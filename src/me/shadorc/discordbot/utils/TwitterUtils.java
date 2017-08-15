@@ -10,7 +10,7 @@ public class TwitterUtils {
 
 	private static Twitter twitter;
 
-	public static void connection() {
+	public synchronized static void connection() {
 		if(twitter == null) {
 			twitter = TwitterFactory.getSingleton();
 			twitter.setOAuthConsumer(Storage.getApiKey(ApiKeys.TWITTER_API_KEY), Storage.getApiKey(ApiKeys.TWITTER_API_SECRET));

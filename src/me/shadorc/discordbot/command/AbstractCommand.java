@@ -2,12 +2,12 @@ package me.shadorc.discordbot.command;
 
 import me.shadorc.discordbot.MissingArgumentException;
 
-public abstract class Command {
+public abstract class AbstractCommand {
 
 	private final String[] names;
 	private final boolean isAdminCmd;
 
-	public Command(boolean isAdminCmd, String name, String... names) {
+	public AbstractCommand(boolean isAdminCmd, String name, String... names) {
 		this.isAdminCmd = isAdminCmd;
 		this.names = new String[names.length + 1];
 		this.names[0] = name;
@@ -23,6 +23,6 @@ public abstract class Command {
 	}
 
 	public String[] getNames() {
-		return this.names;
+		return names.clone();
 	}
 }

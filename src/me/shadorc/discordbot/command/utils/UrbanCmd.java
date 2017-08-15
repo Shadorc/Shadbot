@@ -8,17 +8,17 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.JsonUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class UrbanCmd extends Command {
+public class UrbanCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
@@ -29,7 +29,7 @@ public class UrbanCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -71,7 +71,7 @@ public class UrbanCmd extends Command {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (IOException e) {
-			Log.error("An error occured while getting Urban Dictionary definition.", e, context.getChannel());
+			LogUtils.error("An error occured while getting Urban Dictionary definition.", e, context.getChannel());
 		}
 	}
 

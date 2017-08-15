@@ -4,14 +4,14 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class VolumeCmd extends Command {
+public class VolumeCmd extends AbstractCommand {
 
 	public VolumeCmd() {
 		super(false, "volume");
@@ -27,7 +27,7 @@ public class VolumeCmd extends Command {
 			return;
 		}
 
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Current volume level: " + scheduler.getVolume() + "%", context.getChannel());
 			return;
 		}

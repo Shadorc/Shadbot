@@ -4,7 +4,7 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.music.TrackScheduler;
@@ -12,7 +12,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class PlaylistCmd extends Command {
+public class PlaylistCmd extends AbstractCommand {
 
 	public PlaylistCmd() {
 		super(false, "playlist");

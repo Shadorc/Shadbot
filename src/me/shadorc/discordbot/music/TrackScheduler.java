@@ -71,6 +71,6 @@ public class TrackScheduler {
 	}
 
 	public boolean isPlaying() {
-		return (audioPlayer.getPlayingTrack() != null);
+		return audioPlayer.getPlayingTrack() != null;
 	}
 }

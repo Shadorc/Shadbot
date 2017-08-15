@@ -7,22 +7,22 @@ import java.util.Locale;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import net.aksingh.owmjapis.CurrentWeather;
 import net.aksingh.owmjapis.OpenWeatherMap;
 import net.aksingh.owmjapis.OpenWeatherMap.Units;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class WeatherCmd extends Command {
+public class WeatherCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 	private final SimpleDateFormat dateFormatter;
@@ -35,7 +35,7 @@ public class WeatherCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -76,7 +76,7 @@ public class WeatherCmd extends Command {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " City not found.", context.getChannel());
 			}
 		} catch (IOException e) {
-			Log.error("An error occured while getting weather information.", e, context.getChannel());
+			LogUtils.error("An error occured while getting weather information.", e, context.getChannel());
 		}
 	}
 

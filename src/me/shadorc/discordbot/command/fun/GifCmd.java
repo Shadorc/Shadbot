@@ -9,19 +9,19 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.JsonUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class GifCmd extends Command {
+public class GifCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
@@ -51,7 +51,7 @@ public class GifCmd extends Command {
 			String url = mainObj.getJSONObject("data").getString("url");
 			BotUtils.sendMessage(url, context.getChannel());
 		} catch (IOException e) {
-			Log.error("An arror occured while getting a gif from Giphy.", e, context.getChannel());
+			LogUtils.error("An arror occured while getting a gif from Giphy.", e, context.getChannel());
 		}
 	}
 

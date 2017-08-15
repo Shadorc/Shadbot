@@ -9,21 +9,21 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Command;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class PlayCmd extends Command {
+public class PlayCmd extends AbstractCommand {
 
-	private static final String YT_SEARCH = "ytsearch: ";
+	protected static final String YT_SEARCH = "ytsearch: ";
 
 	public PlayCmd() {
 		super(false, "play", "joue");
@@ -31,7 +31,7 @@ public class PlayCmd extends Command {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(context.getArg() == null) {
+		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
@@ -99,15 +99,15 @@ public class PlayCmd extends Command {
 			public void noMatches() {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.toString().replace(YT_SEARCH, "") + "\"", context.getChannel());
 				// TODO: Remove
-				Log.warn("No result for \"" + identifier.toString() + "\"");
+				LogUtils.warn("No result for \"" + identifier.toString() + "\"");
 			}
 
 			@Override
 			public void loadFailed(FriendlyException e) {
 				if(e.severity.equals(FriendlyException.Severity.FAULT)) {
-					Log.warn("Error while playing music (" + e.getMessage() + "), Shadbot might be able to continue playing music.");
+					LogUtils.warn("Error while playing music (" + e.getMessage() + "), Shadbot might be able to continue playing music.");
 				} else {
-					Log.error("Sorry, " + e.getMessage().toLowerCase() + " :(", e, context.getChannel());
+					LogUtils.error("Sorry, " + e.getMessage().toLowerCase() + " :(", e, context.getChannel());
 				}
 			}
 		});

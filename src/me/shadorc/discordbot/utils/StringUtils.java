@@ -44,7 +44,7 @@ public class StringUtils {
 
 	public static String formatTrackName(AudioTrackInfo info) {
 		StringBuilder strBuilder = new StringBuilder();
-		if(info.author.equals("Unknown artist")) {
+		if("Unknown artist".equals(info.author)) {
 			strBuilder.append(info.title);
 		} else {
 			strBuilder.append(info.author + " - " + info.title);
@@ -65,16 +65,16 @@ public class StringUtils {
 		if(length == 0) {
 			return false;
 		}
-		int i = 0;
+		int pos = 0;
 		if(str.charAt(0) == '-') {
 			if(length == 1) {
 				return false;
 			}
-			i = 1;
+			pos = 1;
 		}
-		for(; i < length; i++) {
-			char c = str.charAt(i);
-			if(c < '0' || c > '9') {
+		for(; pos < length; pos++) {
+			char charac = str.charAt(pos);
+			if(charac < '0' || charac > '9') {
 				return false;
 			}
 		}
