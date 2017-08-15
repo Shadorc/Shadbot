@@ -38,7 +38,7 @@ public class RussianRouletteCmd extends Command {
 					+ "Sorry, you died, you lose **" + Math.abs(loss) + " coins**.", context.getChannel());
 			context.getUser().addCoins(loss);
 		} else {
-			int gain = (int) Math.ceil(userCoins * 0.30);
+			int gain = (int) Math.max(10, Math.ceil(userCoins * 0.30));
 			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **click** ... "
 					+ "Phew, you are still alive, you gets **" + gain + " coins** !", context.getChannel());
 			context.getUser().addCoins(gain);
