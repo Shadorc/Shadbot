@@ -60,6 +60,7 @@ public class OverwatchCmd extends AbstractCommand {
 			String rank = HtmlUtils.parseTextHTML(html, "<div class=\"u-align-center h6\">", "<div class=\"u-align-center h6\">", "</div>");
 
 			EmbedBuilder builder = new EmbedBuilder()
+					.setLenient(true)
 					.withAuthorName("Overwatch Stats")
 					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
 					.withUrl(url)

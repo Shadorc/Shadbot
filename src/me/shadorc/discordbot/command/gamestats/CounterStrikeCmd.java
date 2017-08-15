@@ -64,6 +64,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			JSONObject userObj = mainUserObj.getJSONObject("response").getJSONArray("players").getJSONObject(0);
 
 			EmbedBuilder builder = new EmbedBuilder()
+					.setLenient(true)
 					.withAuthorName("Statistiques Counter-Strike: Global Offensive")
 					.withAuthorIcon("http://www.icon100.com/up/2841/256/csgo.png")
 					.withThumbnail(userObj.getString("avatarfull"))
