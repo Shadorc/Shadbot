@@ -21,7 +21,7 @@ public class HtmlUtils {
 		BufferedReader reader = null;
 		try {
 			URLConnection connection = new URL(url).openConnection();
-			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.75 Safari/537.36 Vivaldi/1.0.219.50");
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35");
 			connection.setConnectTimeout(5000);
 			connection.setReadTimeout(5000);
 			connection.connect();
@@ -73,7 +73,7 @@ public class HtmlUtils {
 		BufferedReader reader = null;
 		try {
 			URLConnection connection = new URL(url).openConnection();
-			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.29 Safari/537.36");
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35");
 			connection.setConnectTimeout(5000);
 			connection.setReadTimeout(5000);
 			connection.connect();
