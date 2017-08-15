@@ -16,6 +16,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import net.aksingh.owmjapis.CurrentWeather;
 import net.aksingh.owmjapis.OpenWeatherMap;
@@ -92,32 +93,34 @@ public class WeatherCmd extends AbstractCommand {
 	}
 
 	private String getWindDesc(float windSpeed) {
-		if(windSpeed >= 0 && windSpeed < 1) {
-			return "Calm";
-		} else if(windSpeed >= 1 && windSpeed < 6) {
-			return "Light air";
-		} else if(windSpeed >= 6 && windSpeed < 12) {
-			return "Light breeze";
-		} else if(windSpeed >= 12 && windSpeed < 20) {
-			return "Gentle breeze";
-		} else if(windSpeed >= 20 && windSpeed < 29) {
-			return "Moderate breeze";
-		} else if(windSpeed >= 29 && windSpeed < 39) {
-			return "Fresh breeze";
-		} else if(windSpeed >= 39 && windSpeed < 50) {
-			return "Strong breeze";
-		} else if(windSpeed >= 50 && windSpeed < 62) {
-			return "Near gale";
-		} else if(windSpeed >= 62 && windSpeed < 75) {
-			return "Gale";
-		} else if(windSpeed >= 75 && windSpeed < 89) {
-			return "Strong gale";
-		} else if(windSpeed >= 89 && windSpeed < 103) {
-			return "Storm";
-		} else if(windSpeed >= 103 && windSpeed < 118) {
-			return "Violent storm";
+		String windDesc;
+		if(windSpeed < 1) {
+			windDesc = "Calm";
+		} else if(MathUtils.inRange(windSpeed, 1, 6)) {
+			windDesc = "Light air";
+		} else if(MathUtils.inRange(windSpeed, 6, 12)) {
+			windDesc = "Light breeze";
+		} else if(MathUtils.inRange(windSpeed, 12, 20)) {
+			windDesc = "Gentle breeze";
+		} else if(MathUtils.inRange(windSpeed, 20, 29)) {
+			windDesc = "Moderate breeze";
+		} else if(MathUtils.inRange(windSpeed, 29, 39)) {
+			windDesc = "Fresh breeze";
+		} else if(MathUtils.inRange(windSpeed, 39, 50)) {
+			windDesc = "Strong breeze";
+		} else if(MathUtils.inRange(windSpeed, 50, 62)) {
+			windDesc = "Near gale";
+		} else if(MathUtils.inRange(windSpeed, 62, 75)) {
+			windDesc = "Gale";
+		} else if(MathUtils.inRange(windSpeed, 75, 89)) {
+			windDesc = "Strong gale";
+		} else if(MathUtils.inRange(windSpeed, 89, 103)) {
+			windDesc = "Storm";
+		} else if(MathUtils.inRange(windSpeed, 103, 118)) {
+			windDesc = "Violent storm";
 		} else {
-			return "Hurricane";
+			windDesc = "Hurricane";
 		}
+		return windDesc;
 	}
 }

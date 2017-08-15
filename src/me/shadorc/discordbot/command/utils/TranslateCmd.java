@@ -42,17 +42,27 @@ public class TranslateCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		if(args.length == 3 && args[0].equalsIgnoreCase(args[1])) {
+		String lang1 = "";
+		String lang2 = "";
+		String text = "";
+
+		if(args.length == 2) {
+			lang1 = "auto";
+			lang2 = args[0].toLowerCase();
+			text = args[1];
+		} else {
+			lang1 = args[0].toLowerCase();
+			lang2 = args[1].toLowerCase();
+			text = args[2];
+		}
+
+		if(lang1.equals(lang2)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " The source language and the targetted language must be different.", context.getChannel());
 			return;
 		}
 
-		String sourceLang = (args.length == 3) ? args[0] : "auto";
-		String targetLang = (args.length == 3) ? args[1] : args[0];
-		String sourceText = (args.length == 3) ? args[2] : args[1];
-
 		try {
-			String translatedText = Utils.translate(sourceLang, targetLang, sourceText);
+			String translatedText = Utils.translate(lang1, lang2, text);
 			BotUtils.sendMessage(Emoji.MAP + " Translation : " + translatedText, context.getChannel());
 		} catch (IllegalArgumentException argErr) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language isn't supported or doesn't exist. Use " + context.getPrefix() + "help translate to see a complete list of supported languages.", context.getChannel());

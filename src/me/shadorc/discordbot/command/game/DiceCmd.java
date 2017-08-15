@@ -33,6 +33,10 @@ public class DiceCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(GUILDS_DICE.containsKey(context.getGuild())) {
+			if(!context.hasArg()) {
+				throw new MissingArgumentException();
+			}
+
 			DiceManager diceManager = GUILDS_DICE.get(context.getGuild());
 
 			if(context.getUser().getCoins() < diceManager.getBet()) {
@@ -45,11 +49,13 @@ public class DiceCmd extends AbstractCommand {
 				return;
 			}
 
-			if(context.getArg() == null || !StringUtils.isInteger(context.getArg())) {
+			String numStr = context.getArg();
+
+			if(!StringUtils.isInteger(numStr)) {
 				throw new MissingArgumentException();
 			}
 
-			int num = Integer.parseInt(context.getArg());
+			int num = Integer.parseInt(numStr);
 
 			if(num < 1 || num > 6) {
 				throw new MissingArgumentException();
@@ -69,19 +75,26 @@ public class DiceCmd extends AbstractCommand {
 			}
 
 			String[] splitArgs = context.getArg().split(" ");
-			if(splitArgs.length != 2 || !StringUtils.isInteger(splitArgs[0]) || !StringUtils.isInteger(splitArgs[1])) {
+			if(splitArgs.length != 2) {
 				throw new MissingArgumentException();
 			}
 
-			int num = Integer.parseInt(splitArgs[1]);
-			if(num < 1 || num > 6) {
+			String betStr = splitArgs[0];
+			String numStr = splitArgs[1];
+
+			if(!StringUtils.isInteger(betStr) || !StringUtils.isInteger(numStr)) {
 				throw new MissingArgumentException();
 			}
 
-			int bet = Integer.parseInt(splitArgs[0]);
+			int bet = Integer.parseInt(betStr);
 			if(context.getUser().getCoins() < bet) {
 				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
 				return;
+			}
+
+			int num = Integer.parseInt(numStr);
+			if(num < 1 || num > 6) {
+				throw new MissingArgumentException();
 			}
 
 			DiceManager diceManager = new DiceManager(context.getChannel(), context.getAuthor(), num, bet);

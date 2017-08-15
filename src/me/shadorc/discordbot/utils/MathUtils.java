@@ -18,4 +18,14 @@ public class MathUtils {
 	public static int rand(int bound) {
 		return RAND.nextInt(bound);
 	}
+
+	/**
+	 * @param num - float to check
+	 * @param min - minimum value (inclusive)
+	 * @param max - maximum value (exclusive)
+	 * @return true if min <= num < max, false otherwise
+	 */
+	public static boolean inRange(float num, int min, int max) {
+		return min <= num && num < max;
+	}
 }

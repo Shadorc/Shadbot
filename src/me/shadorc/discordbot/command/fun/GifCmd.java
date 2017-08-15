@@ -42,7 +42,7 @@ public class GifCmd extends AbstractCommand {
 		try {
 			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://api.giphy.com/v1/gifs/random?"
 					+ "api_key=" + Storage.getApiKey(ApiKeys.GIPHY_API_KEY)
-					+ ((context.getArg() == null) ? "" : "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8")));
+					+ (context.hasArg() ? "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8") : ""));
 
 			if(mainObj.get("data") instanceof JSONArray) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Aucun résultat pour " + context.getArg(), context.getChannel());

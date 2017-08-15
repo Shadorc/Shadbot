@@ -52,11 +52,10 @@ public class PlayCmd extends AbstractCommand {
 		}
 
 		final StringBuilder identifier = new StringBuilder();
-		if(NetUtils.isValidURL(context.getArg())) {
-			identifier.append(context.getArg());
-		} else {
-			identifier.append(YT_SEARCH + context.getArg());
+		if(!NetUtils.isValidURL(context.getArg())) {
+			identifier.append(YT_SEARCH);
 		}
+		identifier.append(context.getArg());
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier.toString(), new AudioLoadResultHandler() {
@@ -103,11 +102,11 @@ public class PlayCmd extends AbstractCommand {
 			}
 
 			@Override
-			public void loadFailed(FriendlyException e) {
-				if(e.severity.equals(FriendlyException.Severity.FAULT)) {
-					LogUtils.warn("Error while playing music (" + e.getMessage() + "), Shadbot might be able to continue playing music.");
+			public void loadFailed(FriendlyException err) {
+				if(err.severity.equals(FriendlyException.Severity.FAULT)) {
+					LogUtils.warn("Error while playing music (" + err.getMessage() + "), Shadbot might be able to continue playing music.");
 				} else {
-					LogUtils.error("Sorry, " + e.getMessage().toLowerCase() + " :(", e, context.getChannel());
+					LogUtils.error("Sorry, " + err.getMessage().toLowerCase() + " :(", err, context.getChannel());
 				}
 			}
 		});
