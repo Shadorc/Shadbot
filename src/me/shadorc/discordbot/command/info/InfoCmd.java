@@ -45,6 +45,7 @@ public class InfoCmd extends AbstractCommand {
 						+ "\n\n-= Shadbot Info =-"
 						+ "\nDeveloper: Shadorc#8423"
 						+ "\nServers: " + Shadbot.getClient().getGuilds().size()
+						+ "\nVoice channels: " + Shadbot.getClient().getConnectedVoiceChannels().size()
 						+ "\nUsers: " + Shadbot.getClient().getUsers().size()
 						+ "\nVersion: " + Config.VERSION.toString()
 						+ "\nUptime: " + DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true)
