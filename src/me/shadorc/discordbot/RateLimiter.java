@@ -26,22 +26,15 @@ public class RateLimiter {
 		if(!guildsRateLimiter.containsKey(guild)) {
 			guildsRateLimiter.put(guild, new HashMap<IUser, Long>());
 			warningsRateLimiter.put(guild, new HashMap<IUser, Boolean>());
-			return false;
 		}
 
 		long currentTime = System.currentTimeMillis();
+		long lastTime = guildsRateLimiter.get(guild).containsKey(user) ? guildsRateLimiter.get(guild).get(user) : 0;
+		long diff = currentTime - lastTime;
 
-		if(!guildsRateLimiter.get(guild).containsKey(user)) {
+		if(diff > timeout) {
 			guildsRateLimiter.get(guild).put(user, currentTime);
 			warningsRateLimiter.get(guild).put(user, false);
-			return false;
-		}
-
-		long lastTime = guildsRateLimiter.get(guild).get(user);
-		long diff = currentTime - lastTime;
-		if(diff > timeout) {
-			guildsRateLimiter.get(guild).remove(user);
-			warningsRateLimiter.get(guild).remove(user);
 			return false;
 		}
 
