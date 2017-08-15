@@ -60,7 +60,7 @@ public class AudioEventListener extends AudioEventAdapter {
 				GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
 			}
 		} else {
-			//TODO: Remove
+			// TODO: Remove
 			LogUtils.warn("Channel was null on track exception event... what a mess...");
 		}
 	}
@@ -75,7 +75,7 @@ public class AudioEventListener extends AudioEventAdapter {
 				GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
 			}
 		} else {
-			//TODO: Remove
+			// TODO: Remove
 			LogUtils.warn("Channel was null on track stuck event... what a mess...");
 		}
 	}
