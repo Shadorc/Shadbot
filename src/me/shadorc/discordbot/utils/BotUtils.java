@@ -10,7 +10,6 @@ import me.shadorc.discordbot.Storage.Setting;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
@@ -19,7 +18,7 @@ import sx.blah.discord.util.RequestBuffer;
 public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
-		if(!message.isEmpty() && message.length() <= IMessage.MAX_MESSAGE_LENGTH) {
+		if(!message.isEmpty()) {
 			RequestBuffer.request(() -> {
 				try {
 					channel.sendMessage(message);
@@ -29,16 +28,6 @@ public class BotUtils {
 					Log.error("Discord exception while sending message : " + e.getErrorMessage(), e);
 				}
 			});
-		}
-
-		// TODO: Remove
-		if(message.length() > IMessage.MAX_MESSAGE_LENGTH) {
-			BotUtils.sendMessage("I've tried to send a huge message... This is weird, I'm going to look into that. Sorry for the inconvenience.", channel);
-		}
-
-		// TODO: Remove
-		if(message.length() > 1000) {
-			Log.warn("Shadbot sent a huge message (length:" + message.length() + "):\n" + message.substring(0, Math.min(1900, message.length())) + "...");
 		}
 	}
 

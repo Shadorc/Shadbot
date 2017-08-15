@@ -53,7 +53,6 @@ public class PlayCmd extends Command {
 		if(NetUtils.isValidURL(context.getArg())) {
 			identifier.append(context.getArg());
 		} else {
-			// TODO: Add SoundCloud search "scsearch: "
 			identifier.append("ytsearch: " + context.getArg());
 		}
 

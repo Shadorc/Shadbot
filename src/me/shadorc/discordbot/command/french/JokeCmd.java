@@ -40,9 +40,15 @@ public class JokeCmd extends Command {
 		try {
 			String htmlPage = HtmlUtils.getHTML("https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 25) + ".html?tri=top");
 			List<String> jokesList = HtmlUtils.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
-			String joke = jokesList.get(MathUtils.rand(jokesList.size()));
-			joke = joke.substring(0, joke.lastIndexOf("\"")).replace("&amp;", "&").trim();
+
+			String joke;
+			do {
+				joke = jokesList.get(MathUtils.rand(jokesList.size()));
+				joke = joke.substring(0, joke.lastIndexOf("\"")).replace("&amp;", "&").trim();
+			} while(joke.length() > 1800);
+
 			BotUtils.sendMessage("```" + StringUtils.convertHtmlToUTF8(joke).replace("\n\n", "\n") + "```", context.getChannel());
+
 		} catch (SocketTimeoutException e) {
 			BotUtils.sendMessage(Emoji.HOURGLASS + " Jokes website is busy right now, please try again later.", context.getChannel());
 			Log.warn("SocketTimeoutException while getting a joke (" + e.getMessage() + ").");
