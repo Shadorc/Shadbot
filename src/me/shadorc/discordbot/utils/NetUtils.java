@@ -9,6 +9,7 @@ import java.net.URLConnection;
 
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Log;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
@@ -35,6 +36,10 @@ public class NetUtils {
 	 * @return time to send a packet of 32 bytes, -1 if an exception occured
 	 */
 	public static float getPing() {
+		if(Config.VERSION.isBeta()) {
+			return -42;
+		}
+
 		BufferedReader in = null;
 
 		try {
@@ -72,6 +77,9 @@ public class NetUtils {
 	}
 
 	public static void postStats() {
+		if(Config.VERSION.isBeta()) {
+			return;
+		}
 		NetUtils.postStatsOn("https://bots.discord.pw", ApiKeys.BOTS_DISCORD_PW_TOKEN);
 		NetUtils.postStatsOn("https://discordbots.org", ApiKeys.DISCORD_BOTS_ORG_TOKEN);
 	}
