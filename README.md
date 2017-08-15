@@ -3,14 +3,15 @@
    <header>
       <img align="right" src="https://i.imgur.com/bP970dP.png" height="220" width="220">
       <h1>Shadbot</h1>
-      <p><b>Shadbot is a Discord Bot that executes Fun & Useful Commands and play Games & Musics !</b></p>
+      <p><b>Shadbot is a Discord Bot which plays musics, executes fun & useful commands, play games and more !</b></p>
    </header>
    <body>
       <hr>
       <h2>Usage</h2>
       <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=3296256">link</a> !</b></p>
       <p>You can indicate the channels in which Shadbot can post by using
-         <br>/allows_channel &lt;#channel | all&gt;
+         <br>/allows_channel &lt;#channel&gt;
+         <br>By default, all the channels are allowed.
       </p>
       <hr>
       <h2>Licence</h2>
