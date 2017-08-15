@@ -13,12 +13,12 @@ public class Log {
 	public static void error(String msg, Exception e, IChannel channel) {
 		LOGGER.error(msg, e);
 		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, channel);
-		Log.sendMessage("[ERROR] An error occured and users have been warned: **" + msg + " (" + e.getMessage() + ")**", Config.BUGS_REPORT_CHANNEL_ID);
+		Log.sendMessage("[ERROR] An error occured and users have been warned: **" + msg + "** (Error message: " + e.getMessage() + ")", Config.BUGS_REPORT_CHANNEL_ID);
 	}
 
 	public static void error(String msg, Exception e) {
 		LOGGER.error(msg, e);
-		Log.sendMessage("[ERROR] An error occured: **" + msg + " (" + e.getMessage() + ")**", Config.BUGS_REPORT_CHANNEL_ID);
+		Log.sendMessage("[ERROR] An error occured: **" + msg + "** (Error message: " + e.getMessage() + ")", Config.BUGS_REPORT_CHANNEL_ID);
 	}
 
 	public static void error(String msg) {

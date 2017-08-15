@@ -23,6 +23,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class PlayCmd extends Command {
 
+	private static final String YT_SEARCH = "ytsearch: ";
+
 	public PlayCmd() {
 		super(false, "play", "joue");
 	}
@@ -53,7 +55,7 @@ public class PlayCmd extends Command {
 		if(NetUtils.isValidURL(context.getArg())) {
 			identifier.append(context.getArg());
 		} else {
-			identifier.append("ytsearch: " + context.getArg());
+			identifier.append(YT_SEARCH + context.getArg());
 		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
@@ -78,7 +80,7 @@ public class PlayCmd extends Command {
 
 				List<AudioTrack> tracks = playlist.getTracks();
 
-				if(identifier.toString().startsWith("ytsearch: ")) {
+				if(identifier.toString().startsWith(YT_SEARCH)) {
 					if(musicManager.getScheduler().isPlaying()) {
 						BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(tracks.get(0).getInfo()) + "** has been added to the playlist.", context.getChannel());
 					}
@@ -95,14 +97,18 @@ public class PlayCmd extends Command {
 
 			@Override
 			public void noMatches() {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.toString() + "\"", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.toString().replace(YT_SEARCH, "") + "\"", context.getChannel());
 				// TODO: Remove
 				Log.warn("No result for \"" + identifier.toString() + "\"");
 			}
 
 			@Override
 			public void loadFailed(FriendlyException e) {
-				Log.error("Sorry, something went wrong when loading/playing the track :(", e, context.getChannel());
+				if(e.severity.equals(FriendlyException.Severity.FAULT)) {
+					Log.warn("Error while playing music (" + e.getMessage() + "), Shadbot might be able to continue playing music.");
+				} else {
+					Log.error("Sorry, " + e.getMessage().toLowerCase() + " :(", e, context.getChannel());
+				}
 			}
 		});
 	}

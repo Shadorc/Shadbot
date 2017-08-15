@@ -85,7 +85,7 @@ public class EventListener {
 			GuildMusicManager gmm = GuildMusicManager.getGuildAudioPlayer(botVoiceChannel.getGuild());
 
 			// TODO: Remove
-			if(gmm.getChannel() == null) {
+			if(gmm.getChannel() == null && !Config.VERSION.isBeta()) {
 				Log.warn("Somewhere, womething very strange happened... Shadbot was in a guild without channel set.");
 				return;
 			}
