@@ -20,14 +20,9 @@ public class BotUtils {
 		if(!message.isEmpty()) {
 			RequestBuffer.request(() -> {
 				try {
-
-					// TODO: Remove
-					if(channel == null) {
-						LogUtils.warn("Somewhere, womething very strange happened... Shadbot tried to send a message in a channel that doesn't exist... (Message: " + message + ")");
-						return;
-					}
-
 					channel.sendMessage(message);
+				} catch (NullPointerException e) {
+					LogUtils.warn("Somewhere, womething very strange happened... Shadbot tried to send a message in a channel that doesn't exist... (Message: " + message + ", Channel: " + channel + ")");
 				} catch (MissingPermissionsException e) {
 					LogUtils.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
 				} catch (DiscordException e) {
@@ -39,9 +34,10 @@ public class BotUtils {
 
 	// EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
+
 		// TODO: Remove ?
 		if(!Shadbot.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm not allowed to send Embed links in this channel :(", channel);
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm not allowed to send embed links in this channel :(", channel);
 			LogUtils.warn("Shadbot wasn't allowed to post Embed links in Guild : \"" + channel.getGuild() + "\"");
 			return;
 		}
