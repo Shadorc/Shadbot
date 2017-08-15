@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.game;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Command;
 import me.shadorc.discordbot.command.Context;
@@ -27,14 +29,24 @@ public class RpsCmd extends Command {
 	private static final List<String> EMOJIS = Arrays.asList(Emoji.GEM, Emoji.LEAF, Emoji.SCISSORS);
 	private static final int GAINS = 20;
 
+	private final RateLimiter rateLimiter;
+
 	public RpsCmd() {
 		super(false, "rps");
+		this.rateLimiter = new RateLimiter(10, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(context.getArg() == null) {
 			throw new MissingArgumentException();
+		}
+
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
+				rateLimiter.warn("You can play Rock-paper-scissors only once every " + rateLimiter.getTimeout() + " seconds.", context);
+			}
+			return;
 		}
 
 		String userHandsign = context.getArg().toLowerCase();
