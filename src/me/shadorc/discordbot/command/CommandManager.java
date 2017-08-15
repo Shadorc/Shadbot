@@ -34,6 +34,7 @@ import me.shadorc.discordbot.command.music.PlaylistCmd;
 import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
+import me.shadorc.discordbot.command.owner.ShutdownCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
 import me.shadorc.discordbot.command.utils.TranslateCmd;
 import me.shadorc.discordbot.command.utils.UrbanCmd;
@@ -93,7 +94,9 @@ public class CommandManager {
 				new JokeCmd(),
 				new HolidaysCmd(),
 				// Admin Commands
-				new SettingsCmd());
+				new SettingsCmd(),
+				// Author Commands
+				new ShutdownCmd());
 	}
 
 	private void register(AbstractCommand... cmds) {

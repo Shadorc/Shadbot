@@ -1,8 +1,9 @@
 package me.shadorc.discordbot.command;
 
+import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Player;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
-import me.shadorc.discordbot.Player;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -70,5 +71,9 @@ public class Context {
 
 	public boolean isAuthorAdmin() {
 		return event.getAuthor().getPermissionsForGuild(event.getGuild()).contains(Permissions.ADMINISTRATOR);
+	}
+
+	public boolean isAuthorOwner() {
+		return event.getAuthor().getLongID() == Config.OWNER_ID;
 	}
 }

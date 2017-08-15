@@ -74,6 +74,11 @@ public class HelpCmd extends AbstractCommand {
 					"`" + context.getPrefix() + "settings`", false);
 		}
 
+		if(context.isAuthorOwner()) {
+			builder.appendField("Author Commands:",
+					"`" + context.getPrefix() + "shutdown`", false);
+		}
+
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
