@@ -51,7 +51,7 @@ public class SettingsCmd extends AbstractCommand {
 				return;
 			}
 
-			Storage.storeSetting(context.getGuild(), Setting.PREFIX, prefix);
+			Storage.saveSetting(context.getGuild(), Setting.PREFIX, prefix);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " '" + prefix + "' is now the prefix for this server.", context.getChannel());
 
 		} else if("allowed_channels".equals(name)) {
@@ -70,7 +70,7 @@ public class SettingsCmd extends AbstractCommand {
 					channelsArray.put(channel.getStringID());
 				}
 			}
-			Storage.storeSetting(context.getGuild(), Setting.ALLOWED_CHANNELS, channelsArray);
+			Storage.saveSetting(context.getGuild(), Setting.ALLOWED_CHANNELS, channelsArray);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel(s) " + channels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " have been added to the list of allowed channels.", context.getChannel());
 
 		} else {

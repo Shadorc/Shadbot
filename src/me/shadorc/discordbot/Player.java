@@ -28,8 +28,8 @@ public class Player {
 		return guild;
 	}
 
-	public String getStringID() {
-		return user.getStringID();
+	public IUser getUser() {
+		return user;
 	}
 
 	public int getCoins() {
@@ -41,10 +41,6 @@ public class Player {
 		this.save();
 	}
 
-	public String mention() {
-		return user.mention();
-	}
-
 	public JSONObject toJSON() {
 		JSONObject userJson = new JSONObject();
 		userJson.put("coins", coins);
@@ -52,6 +48,6 @@ public class Player {
 	}
 
 	private void save() {
-		Storage.storeUser(this);
+		Storage.savePlayer(this);
 	}
 }

@@ -15,7 +15,7 @@ public class Context {
 	private final MessageReceivedEvent event;
 	private final String command;
 	private final String arg;
-	private Player user;
+	private Player player;
 
 	public Context(MessageReceivedEvent event) {
 		this.event = event;
@@ -25,11 +25,11 @@ public class Context {
 		this.arg = splitMessage.length > 1 ? splitMessage[1].trim() : "";
 	}
 
-	public Player getUser() {
-		if(user == null) {
-			user = Storage.getUser(this.getGuild(), this.getAuthor());
+	public Player getPlayer() {
+		if(player == null) {
+			player = Storage.getPlayer(this.getGuild(), this.getAuthor());
 		}
-		return user;
+		return player;
 	}
 
 	public IUser getAuthor() {

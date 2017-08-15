@@ -3,9 +3,9 @@ package me.shadorc.discordbot.command.currency;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Player;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Player;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -34,22 +34,23 @@ public class TransferCoinsCmd extends AbstractCommand {
 		}
 
 		int coins = Integer.parseInt(splitCmd[0]);
-		Player receiverUser = Storage.getUser(context.getGuild(), context.getMessage().getMentions().get(0));
-		Player senderUser = context.getUser();
+		Player receiverPlayer = Storage.getPlayer(context.getGuild(), context.getMessage().getMentions().get(0));
+		Player senderPlayer = context.getPlayer();
 
-		if(coins <= 0 || senderUser.equals(receiverUser)) {
+		if(coins <= 0 || senderPlayer.equals(receiverPlayer)) {
 			throw new MissingArgumentException();
 		}
 
-		if(senderUser.getCoins() < coins) {
+		if(senderPlayer.getCoins() < coins) {
 			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to do this.", context.getChannel());
 			return;
 		}
 
-		senderUser.addCoins(-coins);
-		receiverUser.addCoins(coins);
+		senderPlayer.addCoins(-coins);
+		receiverPlayer.addCoins(coins);
 
-		BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " has transfered " + coins + " coins to " + receiverUser.mention(), context.getChannel());
+		BotUtils.sendMessage(Emoji.BANK + " " + senderPlayer.getUser().mention() + " has transfered "
+				+ coins + " coins to " + receiverPlayer.getUser().mention(), context.getChannel());
 	}
 
 	@Override

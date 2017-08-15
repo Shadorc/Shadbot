@@ -75,7 +75,7 @@ public class Storage {
 		return guildObj;
 	}
 
-	public static synchronized void storeSetting(IGuild guild, Setting setting, Object value) {
+	public static synchronized void saveSetting(IGuild guild, Setting setting, Object value) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -103,7 +103,7 @@ public class Storage {
 		}
 	}
 
-	public static synchronized void storeUser(Player user) {
+	public static synchronized void savePlayer(Player player) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -112,12 +112,12 @@ public class Storage {
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 
-			if(!mainObj.has(user.getGuild().getStringID())) {
-				mainObj.put(user.getGuild().getStringID(), Storage.getNewGuildObject());
+			if(!mainObj.has(player.getGuild().getStringID())) {
+				mainObj.put(player.getGuild().getStringID(), Storage.getNewGuildObject());
 			}
 
-			JSONObject guildObj = mainObj.getJSONObject(user.getGuild().getStringID());
-			guildObj.put(user.getStringID(), user.toJSON());
+			JSONObject guildObj = mainObj.getJSONObject(player.getGuild().getStringID());
+			guildObj.put(player.getUser().getStringID(), player.toJSON());
 
 			writer = new FileWriter(DATA_FILE);
 			writer.write(mainObj.toString(2));
@@ -159,7 +159,7 @@ public class Storage {
 		return null;
 	}
 
-	public static synchronized Player getUser(IGuild guild, IUser user) {
+	public static synchronized Player getPlayer(IGuild guild, IUser user) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}

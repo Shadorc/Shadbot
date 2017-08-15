@@ -121,7 +121,7 @@ public class TriviaCmd extends AbstractCommand {
 				alreadyAnswered.add(message.getAuthor());
 			} else if(message.getContent().equalsIgnoreCase(this.correctAnswer)) {
 				BotUtils.sendMessage(Emoji.CLAP + " Correct ! " + message.getAuthor().getName() + ", you won **" + GAINS + " coins**.", channel);
-				Storage.getUser(message.getGuild(), message.getAuthor()).addCoins(GAINS);
+				Storage.getPlayer(message.getGuild(), message.getAuthor()).addCoins(GAINS);
 				this.stop();
 			}
 		}

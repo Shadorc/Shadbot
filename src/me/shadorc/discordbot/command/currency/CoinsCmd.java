@@ -20,12 +20,12 @@ public class CoinsCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(context.getMessage().getMentions().isEmpty()) {
-			BotUtils.sendMessage(Emoji.PURSE + " You have **" + context.getUser().getCoins() + " coin(s)**.", context.getChannel());
+			BotUtils.sendMessage(Emoji.PURSE + " You have **" + context.getPlayer().getCoins() + " coin(s)**.", context.getChannel());
 		}
 
 		else {
 			IUser user = context.getMessage().getMentions().get(0);
-			int coins = Storage.getUser(context.getGuild(), user).getCoins();
+			int coins = Storage.getPlayer(context.getGuild(), user).getCoins();
 			BotUtils.sendMessage(Emoji.PURSE + " " + user.getName() + " has **" + coins + " coin(s)**.", context.getChannel());
 		}
 	}

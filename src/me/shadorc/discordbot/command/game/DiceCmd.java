@@ -39,7 +39,7 @@ public class DiceCmd extends AbstractCommand {
 
 			DiceManager diceManager = GUILDS_DICE.get(context.getGuild());
 
-			if(context.getUser().getCoins() < diceManager.getBet()) {
+			if(context.getPlayer().getCoins() < diceManager.getBet()) {
 				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to join this game.", context.getChannel());
 				return;
 			}
@@ -87,7 +87,7 @@ public class DiceCmd extends AbstractCommand {
 			}
 
 			int bet = Integer.parseInt(betStr);
-			if(context.getUser().getCoins() < bet) {
+			if(context.getPlayer().getCoins() < bet) {
 				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
 				return;
 			}
@@ -163,7 +163,7 @@ public class DiceCmd extends AbstractCommand {
 				IUser winner = numsPlayers.get(rand);
 				int gains = bet * numsPlayers.size() * MULTIPLIER;
 				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win " + gains + " coins !", channel);
-				Storage.getUser(channel.getGuild(), winner).addCoins(gains);
+				Storage.getPlayer(channel.getGuild(), winner).addCoins(gains);
 				numsPlayers.remove(rand);
 			}
 
@@ -171,7 +171,7 @@ public class DiceCmd extends AbstractCommand {
 				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
 				for(int num : numsPlayers.keySet()) {
 					if(rand != num) {
-						Storage.getUser(channel.getGuild(), numsPlayers.get(num)).addCoins(-bet);
+						Storage.getPlayer(channel.getGuild(), numsPlayers.get(num)).addCoins(-bet);
 						strBuilder.append(numsPlayers.get(num).mention() + ", ");
 					}
 				}
