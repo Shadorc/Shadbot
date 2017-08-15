@@ -105,10 +105,13 @@ public class NetUtils {
 
 			in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
 
-			String s;
-			while((s = in.readLine()) != null) {
-				Log.info(homeUrl + " response while posting stats: " + s);
+			StringBuilder strBuilder = new StringBuilder();
+			String line;
+			while((line = in.readLine()) != null) {
+				strBuilder.append(line);
 			}
+			Log.info("Stats have been posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
+
 		} catch (Exception e) {
 			Log.error("An error occured while posting stats.", e);
 		} finally {
