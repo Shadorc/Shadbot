@@ -20,6 +20,8 @@ import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelEvent;
+import sx.blah.discord.handle.impl.events.shard.DisconnectedEvent;
+import sx.blah.discord.handle.impl.events.shard.DisconnectedEvent.Reason;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
@@ -40,6 +42,13 @@ public class EventListener {
 			}
 		};
 		timer.schedule(timerTask, 0, period);
+	}
+
+	@EventSubscriber
+	public void onDisconnectedEvent(DisconnectedEvent event) {
+		if(event.getReason().equals(Reason.LOGGED_OUT)) {
+			LogUtils.info("------------------- Shadbot has been logout [Version:" + Config.VERSION.toString() + "] -------------------");
+		}
 	}
 
 	@EventSubscriber
