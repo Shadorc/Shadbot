@@ -17,6 +17,13 @@ import sx.blah.discord.util.RequestBuffer;
 public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
+
+		// TODO: Remove ?
+		if(channel != null && !Shadbot.hasPermission(channel.getGuild(), Permissions.SEND_MESSAGES)) {
+			LogUtils.warn("Shadbot wasn't allowed to send a message in Guild : \"" + channel.getGuild() + "\"");
+			return;
+		}
+
 		if(!message.isEmpty()) {
 			RequestBuffer.request(() -> {
 				try {
