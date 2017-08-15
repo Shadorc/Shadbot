@@ -26,7 +26,7 @@ public class PlayCmd extends AbstractCommand {
 	protected static final String YT_SEARCH = "ytsearch: ";
 
 	public PlayCmd() {
-		super(false, "play", "joue");
+		super(false, "play", "add");
 	}
 
 	@Override
