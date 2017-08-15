@@ -30,8 +30,8 @@ public class EventListener {
 		LogUtils.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
 		event.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
 
-		// Update Shadbot stats every hour
-		final int period = 1000 * 60 * 60;
+		// Update Shadbot stats every 3 hours
+		final int period = 1000 * 60 * 60 * 3;
 		Timer timer = new Timer();
 		TimerTask timerTask = new TimerTask() {
 			@Override
