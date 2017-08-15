@@ -3,18 +3,15 @@ package me.shadorc.discordbot.command.owner;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.json.JSONArray;
-
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -47,22 +44,18 @@ public class ShutdownCmd extends AbstractCommand {
 			@Override
 			public void run() {
 				for(IGuild guild : Shadbot.getClient().getGuilds()) {
-					if(BotUtils.isChannelAllowed(guild, guild.getGeneralChannel())) {
-						BotUtils.sendMessage(message, guild.getGeneralChannel());
+					IChannel channel = BotUtils.getFirstAvailableChannel(guild);
+					if(channel == null) {
+						LogUtils.info("Shutdown reason could not have been sent because there is no available channel.");
 					} else {
-						JSONArray allowedChannels = (JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS);
-						if(allowedChannels != null) {
-							BotUtils.sendMessage(message, guild.getChannelByID(Long.parseLong(allowedChannels.getString(0))));
-						} else {
-							LogUtils.info("Shutdown reason could not have been sent because there is no allowed channel.");
-						}
+						BotUtils.sendMessage(message, channel);
 					}
 				}
 				Shadbot.getClient().logout();
 			}
 		};
 
-		new Timer().schedule(task, time*1000);
+		new Timer().schedule(task, time * 1000);
 		BotUtils.sendMessage("Shadbot will restart in " + time + " seconds with the message:" + message, context.getChannel());
 	}
 

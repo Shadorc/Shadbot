@@ -75,4 +75,17 @@ public class BotUtils {
 
 		return JsonUtils.convertArrayToList(channelsArray).contains(channel.getStringID());
 	}
+
+	public static IChannel getFirstAvailableChannel(IGuild guild) {
+		IChannel channel = null;
+		if(BotUtils.isChannelAllowed(guild, guild.getGeneralChannel())) {
+			channel = guild.getGeneralChannel();
+		} else {
+			JSONArray allowedChannels = (JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS);
+			if(allowedChannels != null) {
+				channel = guild.getChannelByID(Long.parseLong(allowedChannels.getString(0)));
+			}
+		}
+		return channel;
+	}
 }
