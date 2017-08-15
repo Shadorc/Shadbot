@@ -103,7 +103,7 @@ public class Storage {
 		}
 	}
 
-	public static synchronized void storeUser(User user) {
+	public static synchronized void storeUser(Player user) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -159,7 +159,7 @@ public class Storage {
 		return null;
 	}
 
-	public static synchronized User getUser(IGuild guild, IUser user) {
+	public static synchronized Player getUser(IGuild guild, IUser user) {
 		if(!DATA_FILE.exists()) {
 			Storage.init();
 		}
@@ -169,14 +169,14 @@ public class Storage {
 			if(mainObj.has(guild.getStringID())) {
 				JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
 				if(guildObj.has(user.getStringID())) {
-					return new User(guild, user, guildObj.getJSONObject(user.getStringID()));
+					return new Player(guild, user, guildObj.getJSONObject(user.getStringID()));
 				}
 			}
 		} catch (IOException e) {
 			LogUtils.error("Error while reading data file.", e);
 		}
 
-		return new User(guild, user);
+		return new Player(guild, user);
 	}
 
 	public static synchronized String getApiKey(ApiKeys key) {

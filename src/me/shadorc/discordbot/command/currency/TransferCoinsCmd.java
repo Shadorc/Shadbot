@@ -5,7 +5,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.User;
+import me.shadorc.discordbot.Player;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -34,8 +34,8 @@ public class TransferCoinsCmd extends AbstractCommand {
 		}
 
 		int coins = Integer.parseInt(splitCmd[0]);
-		User receiverUser = Storage.getUser(context.getGuild(), context.getMessage().getMentions().get(0));
-		User senderUser = context.getUser();
+		Player receiverUser = Storage.getUser(context.getGuild(), context.getMessage().getMentions().get(0));
+		Player senderUser = context.getUser();
 
 		if(coins <= 0 || senderUser.equals(receiverUser)) {
 			throw new MissingArgumentException();
