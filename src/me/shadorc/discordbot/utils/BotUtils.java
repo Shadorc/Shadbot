@@ -22,7 +22,7 @@ public class BotUtils {
 				try {
 					channel.sendMessage(message);
 				} catch (NullPointerException e) {
-					LogUtils.warn("Somewhere, womething very strange happened... Shadbot tried to send a message in a channel that doesn't exist... (Message: " + message + ", Channel: " + channel + ")");
+					LogUtils.warn("Somewhere, something very strange happened... Shadbot tried to send a message in a channel that doesn't exist... (Message: " + message + ", Channel: " + channel + ")");
 				} catch (MissingPermissionsException e) {
 					LogUtils.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
 				} catch (DiscordException e) {

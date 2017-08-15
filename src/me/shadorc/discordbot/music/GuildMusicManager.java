@@ -53,8 +53,8 @@ public class GuildMusicManager {
 		if(!Shadbot.hasPermission(guild, Permissions.VOICE_CONNECT) || !Shadbot.hasPermission(guild, Permissions.VOICE_SPEAK)) {
 			return false;
 		}
-		voiceChannel.join();
 		this.setChannel(channel);
+		voiceChannel.join();
 		return true;
 	}
 

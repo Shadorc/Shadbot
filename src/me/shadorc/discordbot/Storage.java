@@ -138,7 +138,7 @@ public class Storage {
 
 		// TODO: Remove
 		if(guild == null) {
-			LogUtils.warn("Somewhere, womething very strange happened... Shadbot tried to get a setting from a non-existent guild... (Setting: " + setting.toString() + ")");
+			LogUtils.warn("Somewhere, something very strange happened... Shadbot tried to get a setting from a non-existent guild... (Setting: " + setting.toString() + ")");
 			return "/";
 		}
 
