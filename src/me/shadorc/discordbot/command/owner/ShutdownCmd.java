@@ -8,6 +8,7 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -44,11 +45,14 @@ public class ShutdownCmd extends AbstractCommand {
 			@Override
 			public void run() {
 				for(IGuild guild : Shadbot.getClient().getGuilds()) {
-					IChannel channel = BotUtils.getFirstAvailableChannel(guild);
-					if(channel == null) {
-						LogUtils.info("Shutdown reason could not have been sent because there is no available channel.");
-					} else {
-						BotUtils.sendMessage(message, channel);
+					if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel() != null) {
+						IChannel channel = GuildMusicManager.getGuildAudioPlayer(guild).getChannel();
+						if(channel == null) {
+							//TODO: Remove
+							LogUtils.info("Shutdown reason could not have been sent because channel is null.");
+						} else {
+							BotUtils.sendMessage(message, channel);
+						}
 					}
 				}
 				Shadbot.getClient().logout();
