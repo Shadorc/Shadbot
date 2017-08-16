@@ -35,6 +35,12 @@ public class EventListener {
 			return;
 		}
 
+		if(event.getChannel().isPrivate()) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry, Shadbot doesn't respond (yet ?) to private messages.", event.getChannel());
+			LogUtils.warn("Shadbot has received a private message.");
+			return;
+		}
+
 		if(Config.VERSION.isBeta() && event.getChannel().getLongID() != Config.DEBUG_CHANNEL_ID
 				|| !Config.VERSION.isBeta() && event.getChannel().getLongID() == Config.DEBUG_CHANNEL_ID) {
 			return;

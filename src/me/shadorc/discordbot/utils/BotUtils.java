@@ -22,8 +22,8 @@ public class BotUtils {
 			return;
 		}
 
-		// TODO: Remove ?
-		if(channel != null && !BotUtils.hasPermission(channel.getGuild(), Permissions.SEND_MESSAGES)) {
+		//TODO: Remove ?
+		if(channel != null && !channel.isPrivate() && !BotUtils.hasPermission(channel.getGuild(), Permissions.SEND_MESSAGES)) {
 			LogUtils.warn("Shadbot wasn't allowed to send a message in Guild : \"" + channel.getGuild() + "\"");
 			return;
 		}
@@ -51,9 +51,9 @@ public class BotUtils {
 		}
 
 		// TODO: Remove ?
-		if(!BotUtils.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
+		if(channel != null && !channel.isPrivate() && !BotUtils.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm not allowed to send embed links in this channel :(", channel);
-			LogUtils.warn("Shadbot wasn't allowed to post Embed links in Guild : \"" + channel.getGuild() + "\"");
+			LogUtils.warn("Shadbot wasn't allowed to send Embed links in Guild : \"" + channel.getGuild() + "\"");
 			return;
 		}
 

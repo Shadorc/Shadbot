@@ -70,7 +70,7 @@ public class AudioEventListener extends AudioEventAdapter {
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
 		if(channel != null) {
 			BotUtils.sendMessage("Music seems stuck, I'll try to play the next available song.", channel);
-			LogUtils.error("Music was stuck, skipping it. (Threshold: " + thresholdMs + " ms)");
+			LogUtils.warn("Music was stuck, skipping it. (Threshold: " + thresholdMs + " ms)");
 			if(!scheduler.nextTrack()) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
 				GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
