@@ -7,8 +7,6 @@ import me.shadorc.discordbot.events.ReadyListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.Permissions;
 
 public class Shadbot {
 
@@ -17,7 +15,7 @@ public class Shadbot {
 	public static void main(String[] args) {
 		client = new ClientBuilder()
 				.withToken(Storage.getApiKey(ApiKeys.DISCORD_TOKEN))
-				.setMaxMessageCacheCount(0)
+				.setMaxMessageCacheCount(0) //Disable message caching to avoid MissingPermissionsException (READ_MESSAGE_HISTORY)
 				.login();
 
 		client.getDispatcher().registerListener(new ReadyListener());
@@ -27,9 +25,5 @@ public class Shadbot {
 
 	public static IDiscordClient getClient() {
 		return client;
-	}
-
-	public static boolean hasPermission(IGuild guild, Permissions permission) {
-		return client.getOurUser().getPermissionsForGuild(guild).contains(permission);
 	}
 }

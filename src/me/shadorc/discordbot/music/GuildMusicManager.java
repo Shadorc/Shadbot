@@ -11,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.events.AudioEventListener;
+import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IVoiceChannel;
@@ -50,7 +51,7 @@ public class GuildMusicManager {
 	}
 
 	public boolean joinVoiceChannel(IVoiceChannel voiceChannel, IChannel channel) {
-		if(!Shadbot.hasPermission(guild, Permissions.VOICE_CONNECT) || !Shadbot.hasPermission(guild, Permissions.VOICE_SPEAK)) {
+		if(!BotUtils.hasPermission(guild, Permissions.VOICE_CONNECT) || !BotUtils.hasPermission(guild, Permissions.VOICE_SPEAK)) {
 			return false;
 		}
 		this.setChannel(channel);

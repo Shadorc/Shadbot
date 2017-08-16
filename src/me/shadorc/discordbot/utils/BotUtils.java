@@ -19,7 +19,7 @@ public class BotUtils {
 	public static void sendMessage(String message, IChannel channel) {
 
 		// TODO: Remove ?
-		if(channel != null && !Shadbot.hasPermission(channel.getGuild(), Permissions.SEND_MESSAGES)) {
+		if(channel != null && !BotUtils.hasPermission(channel.getGuild(), Permissions.SEND_MESSAGES)) {
 			LogUtils.warn("Shadbot wasn't allowed to send a message in Guild : \"" + channel.getGuild() + "\"");
 			return;
 		}
@@ -43,7 +43,7 @@ public class BotUtils {
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
 
 		// TODO: Remove ?
-		if(!Shadbot.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
+		if(!BotUtils.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm not allowed to send embed links in this channel :(", channel);
 			LogUtils.warn("Shadbot wasn't allowed to post Embed links in Guild : \"" + channel.getGuild() + "\"");
 			return;
@@ -74,6 +74,10 @@ public class BotUtils {
 		}
 
 		return JsonUtils.convertArrayToList(channelsArray).contains(channel.getStringID());
+	}
+
+	public static boolean hasPermission(IGuild guild, Permissions permission) {
+		return Shadbot.getClient().getOurUser().getPermissionsForGuild(guild).contains(permission);
 	}
 
 	public static IChannel getFirstAvailableChannel(IGuild guild) {
