@@ -77,7 +77,7 @@ public class SlotMachineCmd extends AbstractCommand {
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Play a game of slot machine for " + PAID_COST + " coins.**")
 				.appendField("Cost", "A game costs " + PAID_COST + " coins.", false)
-				.appendField("Gains", "You have a 12.5% chance of winning 30 coins, a 5.3% chance of winning 150 coins and a 0.2% chance of winning 3000 coins.", false);
+				.appendField("Gains", "You can win 30, 150 or 3000 coins ! Good luck.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

@@ -77,19 +77,8 @@ public class WeatherCmd extends AbstractCommand {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " City not found.", context.getChannel());
 			}
 		} catch (IOException e) {
-			LogUtils.error("An error occured while getting weather information.", e, context.getChannel());
+			LogUtils.error("Something went wrong while getting weather information... Please, try again later.", e, context.getChannel());
 		}
-	}
-
-	@Override
-	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Show weather report for a city.**")
-				.appendField("Usage", context.getPrefix() + "weather <city>", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
 	private String getWindDesc(float windSpeed) {
@@ -122,5 +111,16 @@ public class WeatherCmd extends AbstractCommand {
 			windDesc = "Hurricane";
 		}
 		return windDesc;
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
+				.withColor(Config.BOT_COLOR)
+				.appendDescription("**Show weather report for a city.**")
+				.appendField("Usage", context.getPrefix() + "weather <city>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

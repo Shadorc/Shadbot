@@ -43,7 +43,7 @@ public class BashCmd extends AbstractCommand {
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");
 			BotUtils.sendMessage("```" + quote + "```", context.getChannel());
 		} catch (IOException e) {
-			LogUtils.error("An error occured while getting a quote from DansTonChat.com", e, context.getChannel());
+			LogUtils.error("Something went wrong while getting a quote from DansTonChat.com... Please, try again later.", e, context.getChannel());
 		}
 	}
 

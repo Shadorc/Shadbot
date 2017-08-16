@@ -67,7 +67,7 @@ public class JokeCmd extends AbstractCommand {
 
 				BotUtils.sendMessage("```" + joke + "```", context.getChannel());
 			} catch (IOException e) {
-				LogUtils.error("An error occured while getting a joke. :(", e, context.getChannel());
+				LogUtils.error("Something went wrong while getting a joke... Please, try again later.", e, context.getChannel());
 			}
 		}
 	}
@@ -78,7 +78,7 @@ public class JokeCmd extends AbstractCommand {
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Show a random joke from blague-drole.net.**");
+				.appendDescription("**Show a random french joke.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

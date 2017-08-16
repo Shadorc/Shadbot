@@ -48,7 +48,7 @@ public class ShutdownCmd extends AbstractCommand {
 					if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel() != null) {
 						IChannel channel = GuildMusicManager.getGuildAudioPlayer(guild).getChannel();
 						if(channel == null) {
-							//TODO: Remove
+							// TODO: Remove
 							LogUtils.info("Shutdown reason could not have been sent because channel is null.");
 						} else {
 							BotUtils.sendMessage(message, channel);

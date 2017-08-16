@@ -67,7 +67,7 @@ public class TranslateCmd extends AbstractCommand {
 		} catch (IllegalArgumentException argErr) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language isn't supported or doesn't exist. Use " + context.getPrefix() + "help translate to see a complete list of supported languages.", context.getChannel());
 		} catch (IOException ioErr) {
-			LogUtils.error("An error occured during the translation.", ioErr, context.getChannel());
+			LogUtils.error("Something went wrong during translation... Please, try again later.", ioErr, context.getChannel());
 		}
 	}
 

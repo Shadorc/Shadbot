@@ -50,10 +50,6 @@ public class Storage {
 	}
 
 	private static void init() {
-		if(DATA_FILE.exists()) {
-			return;
-		}
-
 		FileWriter writer = null;
 		try {
 			DATA_FILE.createNewFile();

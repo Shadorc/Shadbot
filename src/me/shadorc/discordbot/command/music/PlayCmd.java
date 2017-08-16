@@ -106,7 +106,7 @@ public class PlayCmd extends AbstractCommand {
 			@Override
 			public void loadFailed(FriendlyException err) {
 				if(err.severity.equals(FriendlyException.Severity.FAULT)) {
-					LogUtils.warn("Error while playing music (" + err.getMessage() + "), Shadbot might be able to continue playing music.");
+					LogUtils.warn("Error while playing music (" + err.getMessage() + "), Shadbot might be able to continue playing.");
 				} else {
 					LogUtils.error("Sorry, " + err.getMessage().toLowerCase() + " :(", err, context.getChannel());
 				}

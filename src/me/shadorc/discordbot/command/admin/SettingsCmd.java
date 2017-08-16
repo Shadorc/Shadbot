@@ -14,7 +14,6 @@ import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.JsonUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -55,28 +54,26 @@ public class SettingsCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " '" + prefix + "' is now the prefix for this server.", context.getChannel());
 
 		} else if("allowed_channels".equals(name)) {
-			List<IChannel> channels = context.getMessage().getChannelMentions();
-			if(channels.isEmpty()) {
+			List<IChannel> mentionedChannels = context.getMessage().getChannelMentions();
+			if(mentionedChannels.isEmpty()) {
 				throw new MissingArgumentException();
 			}
 
-			JSONArray channelsArray = (JSONArray) Storage.getSetting(context.getGuild(), Setting.ALLOWED_CHANNELS);
-			if(channelsArray == null) {
-				channelsArray = new JSONArray();
+			JSONArray allowedChannelsArray = (JSONArray) Storage.getSetting(context.getGuild(), Setting.ALLOWED_CHANNELS);
+			if(allowedChannelsArray == null) {
+				allowedChannelsArray = new JSONArray();
 			}
 
-			for(IChannel channel : channels) {
-				if(!JsonUtils.convertArrayToList(channelsArray).contains(channel.getStringID())) {
-					channelsArray.put(channel.getStringID());
-				}
+			for(IChannel channel : mentionedChannels) {
+				allowedChannelsArray.put(channel.getStringID());
 			}
-			Storage.saveSetting(context.getGuild(), Setting.ALLOWED_CHANNELS, channelsArray);
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel(s) " + channels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " have been added to the list of allowed channels.", context.getChannel());
+
+			Storage.saveSetting(context.getGuild(), Setting.ALLOWED_CHANNELS, allowedChannelsArray);
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel(s) " + mentionedChannels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " have been added to the list of allowed channels.", context.getChannel());
 
 		} else {
 			throw new MissingArgumentException();
 		}
-
 	}
 
 	@Override

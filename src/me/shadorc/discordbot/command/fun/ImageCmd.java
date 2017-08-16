@@ -79,9 +79,9 @@ public class ImageCmd extends AbstractCommand {
 
 		} catch (SocketTimeoutException sterr) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " DeviantArt's servers are busy, please try again later.", context.getChannel());
-
+			LogUtils.warn("SocketTimeoutException while getting an image from DeviantArt (" + sterr.getMessage() + ").");
 		} catch (IOException e) {
-			LogUtils.error("An error occured while getting image.", e, context.getChannel());
+			LogUtils.error("Something went wrong while getting an image... Please, try again later.", e, context.getChannel());
 		}
 	}
 

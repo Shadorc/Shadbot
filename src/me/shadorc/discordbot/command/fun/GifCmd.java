@@ -51,7 +51,7 @@ public class GifCmd extends AbstractCommand {
 			String url = mainObj.getJSONObject("data").getString("url");
 			BotUtils.sendMessage(url, context.getChannel());
 		} catch (IOException e) {
-			LogUtils.error("An arror occured while getting a gif from Giphy.", e, context.getChannel());
+			LogUtils.error("Something went wrong while getting a gif from Giphy.... Please, try again later.", e, context.getChannel());
 		}
 	}
 

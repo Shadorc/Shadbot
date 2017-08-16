@@ -71,7 +71,7 @@ public class UrbanCmd extends AbstractCommand {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (IOException e) {
-			LogUtils.error("An error occured while getting Urban Dictionary definition.", e, context.getChannel());
+			LogUtils.error("Something went wrong while getting Urban Dictionary definition... Please, try again later.", e, context.getChannel());
 		}
 	}
 

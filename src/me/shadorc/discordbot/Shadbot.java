@@ -15,7 +15,7 @@ public class Shadbot {
 	public static void main(String[] args) {
 		client = new ClientBuilder()
 				.withToken(Storage.getApiKey(ApiKeys.DISCORD_TOKEN))
-				.setMaxMessageCacheCount(0) //Disable message caching to avoid MissingPermissionsException (READ_MESSAGE_HISTORY)
+				.setMaxMessageCacheCount(0) // Disable message caching to avoid MissingPermissionsException (READ_MESSAGE_HISTORY)
 				.login();
 
 		client.getDispatcher().registerListener(new ReadyListener());

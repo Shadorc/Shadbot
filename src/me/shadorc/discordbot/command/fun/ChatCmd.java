@@ -63,15 +63,15 @@ public class ChatCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 
 		} catch (SocketTimeoutException e) {
-			BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, please try again later :)", context.getChannel());
+			BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, try again later :)", context.getChannel());
 			LogUtils.warn("SocketTimeoutException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
 
 		} catch (IOException e) {
 			if(e.getMessage().contains("502")) {
-				BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, please try again later :)", context.getChannel());
+				BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, try again later :)", context.getChannel());
 				LogUtils.warn("IOException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
 			} else {
-				LogUtils.error("An error occured while discussing with A.L.I.C.E.", e, context.getChannel());
+				LogUtils.error("Something went wrong while discussing with A.L.I.C.E.... Please, try again later.", e, context.getChannel());
 			}
 		}
 	}

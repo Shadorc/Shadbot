@@ -31,14 +31,18 @@ public class LeaderboardCmd extends AbstractCommand {
 		}
 		usersCoin = Utils.sortByValue(usersCoin);
 
-		int count = 1;
+		int count = 0;
 		StringBuilder strBuilder = new StringBuilder();
 		for(IUser user : usersCoin.keySet()) {
 			if(count > 10) {
 				break;
 			}
-			strBuilder.append("\n" + count + ". **" + user.getName() + "** - " + usersCoin.get(user) + " coins");
 			count++;
+			strBuilder.append("\n" + count + ". **" + user.getName() + "** - " + usersCoin.get(user) + " coins");
+		}
+
+		if(count == 0) {
+			strBuilder.append("\nEveryone is poor here.");
 		}
 
 		EmbedBuilder builder = new EmbedBuilder()

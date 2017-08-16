@@ -71,7 +71,7 @@ public class WikiCmd extends AbstractCommand {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (IOException e) {
-			LogUtils.error("An error occured while getting Wikipedia information.", e, context.getChannel());
+			LogUtils.error("Something went wrong while getting Wikipedia information... Please, try again later.", e, context.getChannel());
 		}
 	}
 
