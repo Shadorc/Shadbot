@@ -54,7 +54,6 @@ public class GuildMusicManager {
 		if(!BotUtils.hasPermission(guild, Permissions.VOICE_CONNECT) || !BotUtils.hasPermission(guild, Permissions.VOICE_SPEAK)) {
 			return false;
 		}
-		this.setChannel(channel);
 		voiceChannel.join();
 		return true;
 	}

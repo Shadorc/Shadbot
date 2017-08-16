@@ -60,6 +60,7 @@ public class PlayCmd extends AbstractCommand {
 		identifier.append(context.getArg());
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
+		musicManager.setChannel(context.getChannel());
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier.toString(), new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack track) {
