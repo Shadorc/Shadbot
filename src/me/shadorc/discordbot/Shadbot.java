@@ -3,7 +3,7 @@ package me.shadorc.discordbot;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
 import me.shadorc.discordbot.Storage.ApiKeys;
-import me.shadorc.discordbot.events.EventListener;
+import me.shadorc.discordbot.events.ReadyListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
@@ -20,7 +20,7 @@ public class Shadbot {
 				.setMaxMessageCacheCount(0)
 				.login();
 
-		client.getDispatcher().registerListener(new EventListener());
+		client.getDispatcher().registerListener(new ReadyListener());
 
 		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
 	}

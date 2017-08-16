@@ -1,8 +1,5 @@
 package me.shadorc.discordbot.events;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
@@ -13,9 +10,7 @@ import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
-import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -26,23 +21,6 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class EventListener {
-
-	@EventSubscriber
-	public void onReadyEvent(ReadyEvent event) {
-		LogUtils.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
-		event.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
-
-		// Update Shadbot stats every 3 hours
-		final int period = 1000 * 60 * 60 * 3;
-		Timer timer = new Timer();
-		TimerTask timerTask = new TimerTask() {
-			@Override
-			public void run() {
-				NetUtils.postStats();
-			}
-		};
-		timer.schedule(timerTask, 0, period);
-	}
 
 	@EventSubscriber
 	public void onDisconnectedEvent(DisconnectedEvent event) {
