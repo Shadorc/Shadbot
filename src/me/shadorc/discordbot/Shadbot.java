@@ -23,7 +23,6 @@ public class Shadbot {
 		client.getDispatcher().registerListener(new EventListener());
 
 		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
-		AudioSourceManagers.registerLocalSource(GuildMusicManager.PLAYER_MANAGER);
 	}
 
 	public static IDiscordClient getClient() {
