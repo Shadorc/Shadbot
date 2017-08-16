@@ -33,13 +33,16 @@ public class BotUtils {
 				try {
 					channel.sendMessage(message);
 				} catch (NullPointerException e) {
-					LogUtils.warn("Somewhere, something very strange happened... Shadbot tried to send a message in a channel that doesn't exist... (Message: " + message + ", Channel: " + channel + ")");
+					LogUtils.error("Somewhere, something very strange happened... Shadbot tried to send a message in a channel that doesn't exist... (Message: " + message + ", Channel: " + channel + ")", e);
 				} catch (MissingPermissionsException e) {
 					LogUtils.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
 				} catch (DiscordException e) {
 					LogUtils.error("Discord exception while sending message : " + e.getErrorMessage(), e);
 				}
 			});
+		} else {
+			//TODO: Remove
+			LogUtils.warn("Shadbot has tried to send a null message... (Message: " + message + ", Guild: " + channel + ")");
 		}
 	}
 

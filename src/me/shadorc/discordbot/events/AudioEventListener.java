@@ -33,6 +33,9 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
+		if(channel == null) {
+			LogUtils.warn("Holy shit, channel was null onTrackStart (Guild: " + guild.getName() + ")");
+		}
 		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **" + StringUtils.formatTrackName(track.getInfo()) + "**", channel);
 	}
 

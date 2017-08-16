@@ -74,11 +74,11 @@ public class EventListener {
 		IVoiceChannel botVoiceChannel = event.getClient().getOurUser().getVoiceStateForGuild(event.getGuild()).getChannel();
 		if(botVoiceChannel != null) {
 
-			GuildMusicManager gmm = GuildMusicManager.getGuildAudioPlayer(botVoiceChannel.getGuild());
+			GuildMusicManager gmm = GuildMusicManager.getGuildAudioPlayer(event.getGuild());
 
 			// TODO: Remove
 			if(gmm.getChannel() == null && !Config.VERSION.isBeta()) {
-				LogUtils.warn("Somewhere, something very strange happened... Shadbot was in a guild without channel set.");
+				LogUtils.warn("Somewhere, something very strange happened... Shadbot was in a guild (" + event.getGuild().getName() + ") without channel set.");
 				gmm.setChannel(BotUtils.getFirstAvailableChannel(event.getGuild()));
 			}
 
