@@ -33,7 +33,7 @@ public class GuildMusicManager {
 	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
 		this.guild = guild;
 		this.player = manager.createPlayer();
-		this.scheduler = new TrackScheduler(player);
+		this.scheduler = new TrackScheduler(guild, player);
 		this.audioEventListener = new AudioEventListener(guild, scheduler);
 		this.player.addListener(audioEventListener);
 		this.leaveTimer = new Timer(60 * 1000, event -> {

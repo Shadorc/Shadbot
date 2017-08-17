@@ -6,8 +6,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.utils.StringUtils;
+import sx.blah.discord.handle.obj.IGuild;
 
 public class TrackScheduler {
 
@@ -16,11 +18,11 @@ public class TrackScheduler {
 
 	private boolean isRepeating;
 
-	public TrackScheduler(AudioPlayer player) {
+	public TrackScheduler(IGuild guild, AudioPlayer player) {
 		this.audioPlayer = player;
 		this.queue = new LinkedBlockingQueue<>();
 		this.isRepeating = false;
-		this.setVolume(Config.DEFAULT_VOLUME);
+		this.setVolume(Integer.parseInt(Storage.getSetting(guild, Setting.VOLUME).toString()));
 	}
 
 	public void queue(AudioTrack track) {
