@@ -13,7 +13,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class PingCmd extends AbstractCommand {
 
 	public PingCmd() {
-		super(false, "ping");
+		super(Role.USER, "ping");
 	}
 
 	@Override

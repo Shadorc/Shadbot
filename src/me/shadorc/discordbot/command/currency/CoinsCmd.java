@@ -14,7 +14,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class CoinsCmd extends AbstractCommand {
 
 	public CoinsCmd() {
-		super(false, "coins", "coin");
+		super(Role.USER, "coins", "coin");
 	}
 
 	@Override

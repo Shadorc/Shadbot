@@ -27,7 +27,7 @@ public class JokeCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public JokeCmd() {
-		super(false, "blague", "joke");
+		super(Role.USER, "blague", "joke");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 

@@ -16,7 +16,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class CalcCmd extends AbstractCommand {
 
 	public CalcCmd() {
-		super(false, "calc");
+		super(Role.USER, "calc");
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class NextCmd extends AbstractCommand {
 
 	public NextCmd() {
-		super(false, "next", "skip");
+		super(Role.USER, "next", "skip");
 	}
 
 	@Override

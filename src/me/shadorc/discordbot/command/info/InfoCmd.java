@@ -22,7 +22,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class InfoCmd extends AbstractCommand {
 
 	public InfoCmd() {
-		super(false, "info");
+		super(Role.USER, "info");
 	}
 
 	@Override

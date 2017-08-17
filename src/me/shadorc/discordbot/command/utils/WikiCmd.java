@@ -23,7 +23,7 @@ public class WikiCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public WikiCmd() {
-		super(false, "wiki", "wikipedia");
+		super(Role.USER, "wiki", "wikipedia");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 

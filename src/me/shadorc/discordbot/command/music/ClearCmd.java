@@ -13,7 +13,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class ClearCmd extends AbstractCommand {
 
 	public ClearCmd() {
-		super(false, "clear");
+		super(Role.USER, "clear");
 	}
 
 	@Override

@@ -15,7 +15,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class PlaylistCmd extends AbstractCommand {
 
 	public PlaylistCmd() {
-		super(false, "playlist");
+		super(Role.USER, "playlist");
 	}
 
 	@Override

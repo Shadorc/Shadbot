@@ -16,7 +16,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class PlayCmd extends AbstractCommand {
 
 	public PlayCmd() {
-		super(false, "play", "add");
+		super(Role.USER, "play", "add");
 	}
 
 	@Override

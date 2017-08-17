@@ -12,7 +12,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class HelpCmd extends AbstractCommand {
 
 	public HelpCmd() {
-		super(false, "help", "aide");
+		super(Role.USER, "help", "aide");
 	}
 
 	@Override
@@ -70,13 +70,13 @@ public class HelpCmd extends AbstractCommand {
 								+ " `" + context.getPrefix() + "blague`"
 								+ " `" + context.getPrefix() + "vacs`", false);
 
-		if(context.isAuthorAdmin()) {
+		if(context.getAuthorRole().equals(Role.ADMIN)) {
 			builder.appendField("Admin Commands:",
 					"`" + context.getPrefix() + "settings`", false);
 		}
 
-		if(context.isAuthorOwner()) {
-			builder.appendField("Author Commands:",
+		if(context.getAuthorRole().equals(Role.OWNER)) {
+			builder.appendField("Owner Commands:",
 					"`" + context.getPrefix() + "shutdown`", false);
 		}
 

@@ -17,7 +17,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class LeaderboardCmd extends AbstractCommand {
 
 	public LeaderboardCmd() {
-		super(false, "leaderboard", "classement");
+		super(Role.USER, "leaderboard", "classement");
 	}
 
 	@Override

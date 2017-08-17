@@ -35,7 +35,7 @@ public class TriviaCmd extends AbstractCommand {
 	private static final Map<IGuild, GuildTriviaManager> GUILDS_TRIVIA = new HashMap<>();
 
 	public TriviaCmd() {
-		super(false, "trivia", "quizz", "question");
+		super(Role.USER, "trivia", "quizz", "question");
 	}
 
 	@Override

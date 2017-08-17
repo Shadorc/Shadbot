@@ -14,7 +14,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class StopCmd extends AbstractCommand {
 
 	public StopCmd() {
-		super(false, "stop");
+		super(Role.USER, "stop");
 	}
 
 	@Override

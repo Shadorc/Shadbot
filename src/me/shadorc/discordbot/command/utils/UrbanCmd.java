@@ -23,7 +23,7 @@ public class UrbanCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public UrbanCmd() {
-		super(false, "urban", "ud");
+		super(Role.USER, "urban", "ud");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 

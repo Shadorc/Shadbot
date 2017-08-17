@@ -30,7 +30,7 @@ public class ChatCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public ChatCmd() {
-		super(false, "chat");
+		super(Role.USER, "chat");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 

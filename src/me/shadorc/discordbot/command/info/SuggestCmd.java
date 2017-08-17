@@ -17,7 +17,7 @@ public class SuggestCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public SuggestCmd() {
-		super(false, "suggest");
+		super(Role.USER, "suggest");
 		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 

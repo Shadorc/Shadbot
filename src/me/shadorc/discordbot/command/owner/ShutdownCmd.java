@@ -19,15 +19,11 @@ import sx.blah.discord.util.EmbedBuilder;
 public class ShutdownCmd extends AbstractCommand {
 
 	public ShutdownCmd() {
-		super(true, "shutdown");
+		super(Role.OWNER, "shutdown");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.isAuthorOwner()) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

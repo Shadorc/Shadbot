@@ -53,7 +53,7 @@ public class RpsCmd extends AbstractCommand {
 	}
 
 	public RpsCmd() {
-		super(false, "rps");
+		super(Role.USER, "rps");
 		this.rateLimiter = new RateLimiter(10, ChronoUnit.SECONDS);
 	}
 

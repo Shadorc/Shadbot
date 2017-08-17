@@ -5,10 +5,16 @@ import me.shadorc.discordbot.MissingArgumentException;
 public abstract class AbstractCommand {
 
 	private final String[] names;
-	private final boolean isAdminCmd;
+	private final Role role;
 
-	public AbstractCommand(boolean isAdminCmd, String name, String... names) {
-		this.isAdminCmd = isAdminCmd;
+	public enum Role {
+		USER,
+		ADMIN,
+		OWNER;
+	}
+
+	public AbstractCommand(Role role, String name, String... names) {
+		this.role = role;
 		this.names = new String[names.length + 1];
 		this.names[0] = name;
 		System.arraycopy(names, 0, this.names, 1, names.length);
@@ -18,8 +24,8 @@ public abstract class AbstractCommand {
 
 	public abstract void showHelp(Context context);
 
-	public boolean isAdminCmd() {
-		return this.isAdminCmd;
+	public Role getRole() {
+		return role;
 	}
 
 	public String[] getNames() {

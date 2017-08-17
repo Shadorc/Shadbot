@@ -24,7 +24,7 @@ public class BashCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public BashCmd() {
-		super(false, "dtc", "bash");
+		super(Role.USER, "dtc", "bash");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 

@@ -24,7 +24,7 @@ public class HolidaysCmd extends AbstractCommand {
 	private static final List<String> ZONES = Arrays.asList("A", "B", "C");
 
 	public HolidaysCmd() {
-		super(false, "vacs", "vacances");
+		super(Role.USER, "vacs", "vacances");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 

@@ -14,7 +14,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class NameCmd extends AbstractCommand {
 
 	public NameCmd() {
-		super(false, "name", "nom");
+		super(Role.USER, "name", "nom");
 	}
 
 	@Override

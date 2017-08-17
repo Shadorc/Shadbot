@@ -5,6 +5,7 @@ import java.util.Map;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.command.AbstractCommand.Role;
 import me.shadorc.discordbot.command.admin.SettingsCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
 import me.shadorc.discordbot.command.currency.LeaderboardCmd;
@@ -126,7 +127,11 @@ public class CommandManager {
 
 		AbstractCommand command = commandsMap.get(context.getCommand());
 
-		if(command.isAdminCmd() && !context.isAuthorAdmin()) {
+		if(command.getRole().equals(Role.OWNER) && !context.getAuthorRole().equals(Role.OWNER)) {
+			return;
+		}
+
+		if(command.getRole().equals(Role.ADMIN) && !context.getAuthorRole().equals(Role.ADMIN)) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You have to be an administrator to execute this command.", event.getChannel());
 			return;
 		}

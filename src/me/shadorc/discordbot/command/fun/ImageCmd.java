@@ -32,7 +32,7 @@ public class ImageCmd extends AbstractCommand {
 	private String deviantArtToken;
 
 	public ImageCmd() {
-		super(false, "image");
+		super(Role.USER, "image");
 		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 

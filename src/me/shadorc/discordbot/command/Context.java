@@ -4,6 +4,7 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Player;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
+import me.shadorc.discordbot.command.AbstractCommand.Role;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -41,6 +42,16 @@ public class Context {
 		return event.getAuthor().getName();
 	}
 
+	public Role getAuthorRole() {
+		if(event.getAuthor().getLongID() == Config.OWNER_ID) {
+			return Role.OWNER;
+		} else if(event.getAuthor().getPermissionsForGuild(event.getGuild()).contains(Permissions.ADMINISTRATOR)) {
+			return Role.ADMIN;
+		} else {
+			return Role.USER;
+		}
+	}
+
 	public IChannel getChannel() {
 		return event.getChannel();
 	}
@@ -67,13 +78,5 @@ public class Context {
 
 	public boolean hasArg() {
 		return !arg.isEmpty();
-	}
-
-	public boolean isAuthorAdmin() {
-		return event.getAuthor().getPermissionsForGuild(event.getGuild()).contains(Permissions.ADMINISTRATOR);
-	}
-
-	public boolean isAuthorOwner() {
-		return event.getAuthor().getLongID() == Config.OWNER_ID;
 	}
 }

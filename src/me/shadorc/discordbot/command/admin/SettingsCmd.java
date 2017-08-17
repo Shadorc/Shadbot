@@ -23,7 +23,7 @@ public class SettingsCmd extends AbstractCommand {
 	private static final int PREFIX_MAX_LENGTH = 5;
 
 	public SettingsCmd() {
-		super(true, "settings", "setting", "options", "option");
+		super(Role.ADMIN, "settings", "setting", "options", "option");
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class GifCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public GifCmd() {
-		super(false, "gif");
+		super(Role.USER, "gif");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
