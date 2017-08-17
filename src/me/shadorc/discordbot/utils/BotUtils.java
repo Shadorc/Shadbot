@@ -75,7 +75,7 @@ public class BotUtils {
 			return true;
 		}
 
-		return JSONUtils.convertArrayToList(channelsArray).contains(channel.getStringID());
+		return JsonUtils.convertArrayToList(channelsArray).contains(channel.getStringID());
 	}
 
 	public static boolean hasPermission(IGuild guild, Permissions permission) {

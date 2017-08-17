@@ -17,7 +17,7 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.JSONUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -40,7 +40,7 @@ public class GifCmd extends AbstractCommand {
 		}
 
 		try {
-			JSONObject mainObj = JSONUtils.getJsonFromUrl("https://api.giphy.com/v1/gifs/random?"
+			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://api.giphy.com/v1/gifs/random?"
 					+ "api_key=" + Storage.getApiKey(ApiKeys.GIPHY_API_KEY)
 					+ (context.hasArg() ? "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8") : ""));
 

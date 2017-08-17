@@ -14,7 +14,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.JSONUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -41,7 +41,7 @@ public class UrbanCmd extends AbstractCommand {
 		}
 
 		try {
-			JSONObject mainObj = JSONUtils.getJsonFromUrl("https://api.urbandictionary.com/v0/define?"
+			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://api.urbandictionary.com/v0/define?"
 					+ "term=" + URLEncoder.encode(context.getArg(), "UTF-8"));
 
 			if(mainObj.getString("result_type").equals("no_results")) {

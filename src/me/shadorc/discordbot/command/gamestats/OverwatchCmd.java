@@ -12,7 +12,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HTMLUtils;
+import me.shadorc.discordbot.utils.HtmlUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -49,15 +49,15 @@ public class OverwatchCmd extends AbstractCommand {
 
 		try {
 			String url = "https://playoverwatch.com/en-gb/career/" + plateform + "/" + region + "/" + battletag.replace("#", "-");
-			String html = HTMLUtils.getHTML(url);
+			String html = HtmlUtils.getHTML(url);
 
-			String icon = HTMLUtils.parseTextHTML(html, "<div class=\"masthead-player\"><img src=\"", "<div class=\"masthead-player\"><img src=\"", "\" class=\"player-portrait\">");
-			String level = HTMLUtils.parseTextHTML(html, "class=\"player-level\">", "<div class=\"u-vertical-center\">", "</div>");
-			String wins = HTMLUtils.parseTextHTML(html, "<p class=\"masthead-detail h4\"><span>", "<p class=\"masthead-detail h4\"><span>", " games won</span></p>");
-			String topHero = HTMLUtils.parseTextHTML(html, "<div class=\"title\">", "<div class=\"title\">", "</div>");
-			String topHeroTime = HTMLUtils.parseTextHTML(html, "<div class=\"description\">", "<div class=\"description\">", "</div>");
-			String timePlayed = HTMLUtils.parseTextHTML(html, "<td>Time Played</td>", "<td>Time Played</td><td>", "</td>");
-			String rank = HTMLUtils.parseTextHTML(html, "<div class=\"u-align-center h6\">", "<div class=\"u-align-center h6\">", "</div>");
+			String icon = HtmlUtils.parseTextHTML(html, "<div class=\"masthead-player\"><img src=\"", "<div class=\"masthead-player\"><img src=\"", "\" class=\"player-portrait\">");
+			String level = HtmlUtils.parseTextHTML(html, "class=\"player-level\">", "<div class=\"u-vertical-center\">", "</div>");
+			String wins = HtmlUtils.parseTextHTML(html, "<p class=\"masthead-detail h4\"><span>", "<p class=\"masthead-detail h4\"><span>", " games won</span></p>");
+			String topHero = HtmlUtils.parseTextHTML(html, "<div class=\"title\">", "<div class=\"title\">", "</div>");
+			String topHeroTime = HtmlUtils.parseTextHTML(html, "<div class=\"description\">", "<div class=\"description\">", "</div>");
+			String timePlayed = HtmlUtils.parseTextHTML(html, "<td>Time Played</td>", "<td>Time Played</td><td>", "</td>");
+			String rank = HtmlUtils.parseTextHTML(html, "<div class=\"u-align-center h6\">", "<div class=\"u-align-center h6\">", "</div>");
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.setLenient(true)

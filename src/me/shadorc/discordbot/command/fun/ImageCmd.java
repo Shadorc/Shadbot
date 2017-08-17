@@ -19,7 +19,7 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.JSONUtils;
+import me.shadorc.discordbot.utils.JsonUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import sx.blah.discord.util.EmbedBuilder;
@@ -86,7 +86,7 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	private void generateAccessToken() throws JSONException, IOException {
-		JSONObject oauthObj = JSONUtils.getJsonFromUrl("https://www.deviantart.com/oauth2/token?"
+		JSONObject oauthObj = JsonUtils.getJsonFromUrl("https://www.deviantart.com/oauth2/token?"
 				+ "client_id=" + Storage.getApiKey(ApiKeys.DEVIANTART_CLIENT_ID)
 				+ "&client_secret=" + Storage.getApiKey(ApiKeys.DEVIANTART_API_SECRET)
 				+ "&grant_type=client_credentials");
@@ -96,7 +96,7 @@ public class ImageCmd extends AbstractCommand {
 	private JSONObject getRandomPopularResult(String encodedSearch) throws JSONException, IOException {
 		JSONObject result = null;
 		try {
-			JSONObject mainObj = JSONUtils.getJsonFromUrl(API_URL + "browse/popular?"
+			JSONObject mainObj = JsonUtils.getJsonFromUrl(API_URL + "browse/popular?"
 					+ "q=" + encodedSearch
 					+ "&timerange=alltime"
 					+ "&limit=1" // The pagination limit (min: 1 max: 50)
