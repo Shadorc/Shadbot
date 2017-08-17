@@ -132,16 +132,6 @@ public class Storage {
 			Storage.init();
 		}
 
-		// TODO: Remove
-		if(guild == null) {
-			LogUtils.warn("Somewhere, something very strange happened... Shadbot tried to get a setting from a non-existent guild... (Setting: " + setting.toString() + ")");
-			if(setting.equals(Setting.PREFIX)) {
-				return Config.DEFAULT_PREFIX;
-			} else if(setting.equals(Setting.ALLOWED_CHANNELS)) {
-				return null;
-			}
-		}
-
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 

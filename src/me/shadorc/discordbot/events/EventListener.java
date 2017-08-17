@@ -36,8 +36,8 @@ public class EventListener {
 		}
 
 		if(event.getChannel().isPrivate()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry, Shadbot doesn't respond (yet ?) to private messages.", event.getChannel());
-			LogUtils.warn("Shadbot has received a private message.");
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry, I don't respond (yet ?) to private messages.", event.getChannel());
+			LogUtils.warn("Shadbot has received a private message. (Message: " + event.getMessage().getContent() + ")");
 			return;
 		}
 
@@ -75,12 +75,6 @@ public class EventListener {
 		if(botVoiceChannel != null) {
 
 			GuildMusicManager gmm = GuildMusicManager.getGuildAudioPlayer(event.getGuild());
-
-			// TODO: Remove
-			if(gmm.getChannel() == null && !Config.VERSION.isBeta()) {
-				LogUtils.warn("Somewhere, something very strange happened... Shadbot was in a guild (" + event.getGuild().getName() + ") without channel set.");
-				gmm.setChannel(BotUtils.getFirstAvailableChannel(event.getGuild()));
-			}
 
 			if(this.isAlone(botVoiceChannel) && !gmm.isLeavingScheduled()) {
 				BotUtils.sendMessage(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.", gmm.getChannel());

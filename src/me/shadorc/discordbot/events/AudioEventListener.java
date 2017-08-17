@@ -33,9 +33,6 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		if(channel == null) {
-			LogUtils.warn("Holy shit, channel was null onTrackStart (Guild: " + guild.getName() + ")");
-		}
 		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **" + StringUtils.formatTrackName(track.getInfo()) + "**", channel);
 	}
 
@@ -56,31 +53,20 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
-		if(channel != null) {
-			BotUtils.sendMessage(Emoji.RED_FLAG + " " + err.getMessage() + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
-			LogUtils.warn("An error occured while playing music and users have been warned: " + err.getMessage());
-			if(!scheduler.nextTrack()) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
-				GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
-			}
-		} else {
-			// TODO: Remove
-			LogUtils.warn("Channel was null on track exception event... what a mess...");
+		LogUtils.error(err.getMessage() + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
+		if(!scheduler.nextTrack()) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
+			GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
 		}
 	}
 
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-		if(channel != null) {
-			BotUtils.sendMessage("Music seems stuck, I'll try to play the next available song.", channel);
-			LogUtils.warn("Music was stuck, skipping it. (Threshold: " + thresholdMs + " ms)");
-			if(!scheduler.nextTrack()) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
-				GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
-			}
-		} else {
-			// TODO: Remove
-			LogUtils.warn("Channel was null on track stuck event... what a mess...");
+		BotUtils.sendMessage("Music seems stuck, I'll try to play the next available song.", channel);
+		LogUtils.warn("Music was stuck, skipping it. (Threshold: " + thresholdMs + " ms)");
+		if(!scheduler.nextTrack()) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
+			GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
 		}
 	}
 }

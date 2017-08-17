@@ -41,14 +41,14 @@ public class PlayCmd extends AbstractCommand {
 			if(botVoiceChannel == null) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Join a vocal channel before using this command.", context.getChannel());
 			} else {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in voice channel " + botVoiceChannel.mention() 
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in voice channel " + botVoiceChannel.mention()
 				+ ", join him before using this command.", context.getChannel());
 			}
 			return;
 		}
 
 		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in voice channel " + botVoiceChannel.mention() 
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in voice channel " + botVoiceChannel.mention()
 			+ ", join him before using this command.", context.getChannel());
 			return;
 		}
@@ -102,8 +102,6 @@ public class PlayCmd extends AbstractCommand {
 			@Override
 			public void noMatches() {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.toString().replace(YT_SEARCH, "") + "\"", context.getChannel());
-				// TODO: Remove
-				LogUtils.warn("No result for \"" + identifier.toString() + "\"");
 			}
 
 			@Override
@@ -111,7 +109,8 @@ public class PlayCmd extends AbstractCommand {
 				if(err.severity.equals(FriendlyException.Severity.FAULT)) {
 					LogUtils.warn("Error while playing music (" + err.getMessage() + "), Shadbot might be able to continue playing.");
 				} else {
-					LogUtils.error("Sorry, " + err.getMessage().toLowerCase() + " :(", err, context.getChannel());
+					BotUtils.sendMessage(Emoji.GEAR + " Sorry, " + err.getMessage().toLowerCase(), context.getChannel());
+					LogUtils.warn("Load failed: " + err.getMessage());
 				}
 			}
 		});

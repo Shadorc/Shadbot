@@ -12,7 +12,6 @@ import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -46,13 +45,7 @@ public class ShutdownCmd extends AbstractCommand {
 			public void run() {
 				for(IGuild guild : Shadbot.getClient().getGuilds()) {
 					if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel() != null) {
-						IChannel channel = GuildMusicManager.getGuildAudioPlayer(guild).getChannel();
-						if(channel == null) {
-							// TODO: Remove
-							LogUtils.info("Shutdown reason could not have been sent because channel is null.");
-						} else {
-							BotUtils.sendMessage(message, channel);
-						}
+						BotUtils.sendMessage(message, GuildMusicManager.getGuildAudioPlayer(guild).getChannel());
 					}
 				}
 				Shadbot.getClient().logout();
@@ -60,7 +53,7 @@ public class ShutdownCmd extends AbstractCommand {
 		};
 
 		new Timer().schedule(task, time * 1000);
-		BotUtils.sendMessage("Shadbot will restart in " + time + " seconds with the message:" + message, context.getChannel());
+		LogUtils.warn("Shadbot will restart in " + time + " seconds with the message:" + message);
 	}
 
 	@Override
