@@ -36,7 +36,7 @@ public class ReadyListener {
 				try {
 					Storage.saveSetting(
 							Shadbot.getClient().getGuildByID(Long.parseLong(namesArray.getString(i))),
-							Setting.VOLUME,
+							Setting.DEFAULT_VOLUME,
 							Config.DEFAULT_VOLUME);
 				} catch (NullPointerException e) {
 					Storage.removeGuild(namesArray.getString(i));

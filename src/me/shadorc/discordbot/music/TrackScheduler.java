@@ -22,7 +22,7 @@ public class TrackScheduler {
 		this.audioPlayer = player;
 		this.queue = new LinkedBlockingQueue<>();
 		this.isRepeating = false;
-		this.setVolume(Integer.parseInt(Storage.getSetting(guild, Setting.VOLUME).toString()));
+		this.setVolume(Integer.parseInt(Storage.getSetting(guild, Setting.DEFAULT_VOLUME).toString()));
 	}
 
 	public void queue(AudioTrack track) {

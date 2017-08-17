@@ -14,6 +14,7 @@ import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -34,7 +35,7 @@ public class SettingsCmd extends AbstractCommand {
 		String[] args = context.getArg().split(" ", 2);
 		String name = args[0];
 
-		if("prefix".equals(name)) {
+		if(Setting.PREFIX.toString().equals(name)) {
 			if(args.length != 2) {
 				throw new MissingArgumentException();
 			}
@@ -53,7 +54,7 @@ public class SettingsCmd extends AbstractCommand {
 			Storage.saveSetting(context.getGuild(), Setting.PREFIX, prefix);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " '" + prefix + "' is now the prefix for this server.", context.getChannel());
 
-		} else if("allowed_channels".equals(name)) {
+		} else if(Setting.ALLOWED_CHANNELS.toString().equals(name)) {
 			List<IChannel> mentionedChannels = context.getMessage().getChannelMentions();
 			if(mentionedChannels.isEmpty()) {
 				throw new MissingArgumentException();
@@ -70,6 +71,26 @@ public class SettingsCmd extends AbstractCommand {
 
 			Storage.saveSetting(context.getGuild(), Setting.ALLOWED_CHANNELS, allowedChannelsArray);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel(s) " + mentionedChannels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " have been added to the list of allowed channels.", context.getChannel());
+
+		} else if(Setting.DEFAULT_VOLUME.toString().equals(name)) {
+			if(args.length != 2) {
+				throw new MissingArgumentException();
+			}
+
+			String volStr = args[1].trim();
+			if(!StringUtils.isInteger(volStr)) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Please, enter a valid number.", context.getChannel());
+				return;
+			}
+
+			int vol = Integer.parseInt(volStr);
+			if(vol < 1 || vol > 50) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Default volume must be between 1 and 50. ", context.getChannel());
+				return;
+			}
+
+			Storage.getSetting(context.getGuild(), Setting.DEFAULT_VOLUME);
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + vol + "% is now the default volume for this server.", context.getChannel());
 
 		} else {
 			throw new MissingArgumentException();

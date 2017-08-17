@@ -20,7 +20,7 @@ public class Storage {
 	public enum Setting {
 		ALLOWED_CHANNELS("allowed_channels"),
 		PREFIX("prefix"),
-		VOLUME("volume");
+		DEFAULT_VOLUME("default_volume");
 
 		private final String key;
 
@@ -69,7 +69,7 @@ public class Storage {
 	private static JSONObject getNewGuildObject() {
 		JSONObject guildObj = new JSONObject();
 		guildObj.put(Setting.PREFIX.toString(), Config.DEFAULT_PREFIX);
-		guildObj.put(Setting.VOLUME.toString(), Config.DEFAULT_VOLUME);
+		guildObj.put(Setting.DEFAULT_VOLUME.toString(), Config.DEFAULT_VOLUME);
 		return guildObj;
 	}
 
