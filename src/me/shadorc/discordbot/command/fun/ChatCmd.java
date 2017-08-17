@@ -55,7 +55,7 @@ public class ChatCmd extends AbstractCommand {
 			String aliceState = GUILDS_CUSTID.get(context.getGuild());
 			String xmlString = NetUtils.getDoc("http://sheepridge.pandorabots.com/pandora/talk-xml?"
 					+ "botid=b69b8d517e345aba"
-					+ "&input=" + URLEncoder.encode("hi", "UTF-8")
+					+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
 					+ (aliceState == null ? "" : "&custid=" + aliceState)).toString();
 			JSONObject resultObj = XML.toJSONObject(xmlString).getJSONObject("result");
 			String response = resultObj.getString("that").replace("<br>", "\n").replace("  ", " ").trim();
