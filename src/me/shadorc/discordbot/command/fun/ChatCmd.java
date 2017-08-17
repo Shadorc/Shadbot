@@ -18,7 +18,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.HTMLUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.EmbedBuilder;
@@ -53,7 +53,7 @@ public class ChatCmd extends AbstractCommand {
 
 		try {
 			String aliceState = GUILDS_CUSTID.get(context.getGuild());
-			String xmlString = HtmlUtils.getHTML("http://sheepridge.pandorabots.com/pandora/talk-xml?"
+			String xmlString = HTMLUtils.getHTML("http://sheepridge.pandorabots.com/pandora/talk-xml?"
 					+ "botid=b69b8d517e345aba"
 					+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
 					+ (aliceState == null ? "" : "&custid=" + aliceState));

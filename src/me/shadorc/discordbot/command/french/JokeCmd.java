@@ -11,7 +11,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.HTMLUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -38,8 +38,8 @@ public class JokeCmd extends AbstractCommand {
 		boolean success = false;
 
 		try {
-			String htmlPage = HtmlUtils.getHTML("https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 25) + ".html?tri=top");
-			List<String> jokesList = HtmlUtils.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
+			String htmlPage = HTMLUtils.getHTML("https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 25) + ".html?tri=top");
+			List<String> jokesList = HTMLUtils.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
 
 			String joke;
 			do {
@@ -56,8 +56,8 @@ public class JokeCmd extends AbstractCommand {
 
 		if(!success) {
 			try {
-				String htmlPage = HtmlUtils.getHTML("http://www.une-blague.com/blagues-courtes.html?page=2&cat=16&p=" + MathUtils.rand(1, 5) + "&call=1");
-				List<String> jokesList = HtmlUtils.getAllSubstring(htmlPage, "class=\"texte \">", "</h4>");
+				String htmlPage = HTMLUtils.getHTML("http://www.une-blague.com/blagues-courtes.html?page=2&cat=16&p=" + MathUtils.rand(1, 5) + "&call=1");
+				List<String> jokesList = HTMLUtils.getAllSubstring(htmlPage, "class=\"texte \">", "</h4>");
 
 				String joke;
 				do {

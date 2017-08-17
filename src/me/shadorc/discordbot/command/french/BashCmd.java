@@ -14,7 +14,7 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HtmlUtils;
+import me.shadorc.discordbot.utils.HTMLUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -37,7 +37,7 @@ public class BashCmd extends AbstractCommand {
 		}
 
 		try {
-			String json = HtmlUtils.getHTML("http://api.danstonchat.com/0.3/view/random?"
+			String json = HTMLUtils.getHTML("http://api.danstonchat.com/0.3/view/random?"
 					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)
 					+ "&format=json");
 			String quote = new JSONArray(json).getJSONObject(0).getString("content");

@@ -14,7 +14,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.JsonUtils;
+import me.shadorc.discordbot.utils.JSONUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -42,7 +42,7 @@ public class WikiCmd extends AbstractCommand {
 
 		try {
 			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://en.wikipedia.org/w/api.php?"
+			JSONObject mainObj = JSONUtils.getJsonFromUrl("https://en.wikipedia.org/w/api.php?"
 					+ "format=json"
 					+ "&action=query"
 					+ "&titles=" + URLEncoder.encode(context.getArg(), "UTF-8")
