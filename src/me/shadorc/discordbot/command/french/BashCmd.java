@@ -1,8 +1,10 @@
 package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.temporal.ChronoUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Config;
@@ -14,7 +16,6 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HTMLUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -37,11 +38,11 @@ public class BashCmd extends AbstractCommand {
 		}
 
 		try {
-			String json = HTMLUtils.getHTML("http://api.danstonchat.com/0.3/view/random?"
+			String url = "http://api.danstonchat.com/0.3/view/random?"
 					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)
-					+ "&format=json");
-			String quote = new JSONArray(json).getJSONObject(0).getString("content");
-			BotUtils.sendMessage("```" + quote + "```", context.getChannel());
+					+ "&format=json";
+			JSONArray arrayObj = new JSONArray(IOUtils.toString(new URL(url), "UTF-8"));
+			BotUtils.sendMessage("```" + arrayObj.getJSONObject(0).getString("content") + "```", context.getChannel());
 		} catch (IOException e) {
 			LogUtils.error("Something went wrong while getting a quote from DansTonChat.com... Please, try again later.", e, context.getChannel());
 		}
