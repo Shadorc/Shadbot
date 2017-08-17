@@ -48,7 +48,8 @@ public class BotUtils {
 		}
 
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.EMBED_LINKS)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " I can't send embed links due to the lack of permission. :(", channel);
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " I cannot send embed links due to the lack of permission. :("
+					+ " Please, check my permissions and channel-specific ones to verify that \"Send Embed links\" is checked.", channel);
 			LogUtils.warn("Shadbot wasn't allowed to send embed link in guild: "
 					+ "\"" + channel.getGuild().getName() + "\" (ID: " + channel.getGuild().getStringID() + ")");
 			return;

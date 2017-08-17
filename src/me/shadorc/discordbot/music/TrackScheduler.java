@@ -74,4 +74,8 @@ public class TrackScheduler {
 	public boolean isPlaying() {
 		return audioPlayer.getPlayingTrack() != null;
 	}
+
+	public void clearPlaylist() {
+		queue.clear();
+	}
 }
