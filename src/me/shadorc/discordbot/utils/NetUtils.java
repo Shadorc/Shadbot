@@ -9,6 +9,8 @@ import java.net.URLConnection;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Shadbot;
@@ -16,6 +18,13 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 
 public class NetUtils {
+
+	public static Document getDoc(String url) throws IOException {
+		return Jsoup.connect(url)
+				.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35")
+				.timeout(5000)
+				.get();
+	}
 
 	/**
 	 * @param stringUrl - String to check

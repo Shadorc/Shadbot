@@ -66,7 +66,7 @@ public class JokeCmd extends AbstractCommand {
 		do {
 			Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
 			joke = Arrays.stream(element.html().split("<p>|<br>")).map(line -> line.trim()).collect(Collectors.joining("\n"));
-			joke = StringEscapeUtils.unescapeHtml4(joke.replace("\n\n", "\n").replaceAll("\\<.*?>","") );
+			joke = StringEscapeUtils.unescapeHtml4(joke.replace("\n\n", "\n").replaceAll("\\<.*?>", ""));
 		} while(joke.length() > 1000);
 		return joke;
 	}

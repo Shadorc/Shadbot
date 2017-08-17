@@ -4,6 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
@@ -12,8 +15,8 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HTMLUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class OverwatchCmd extends AbstractCommand {
@@ -49,15 +52,20 @@ public class OverwatchCmd extends AbstractCommand {
 
 		try {
 			String url = "https://playoverwatch.com/en-gb/career/" + plateform + "/" + region + "/" + battletag.replace("#", "-");
-			String html = HTMLUtils.getHTML(url);
+			Document doc = NetUtils.getDoc(url);
 
-			String icon = HTMLUtils.parseTextHTML(html, "<div class=\"masthead-player\"><img src=\"", "<div class=\"masthead-player\"><img src=\"", "\" class=\"player-portrait\">");
-			String level = HTMLUtils.parseTextHTML(html, "class=\"player-level\">", "<div class=\"u-vertical-center\">", "</div>");
-			String wins = HTMLUtils.parseTextHTML(html, "<p class=\"masthead-detail h4\"><span>", "<p class=\"masthead-detail h4\"><span>", " games won</span></p>");
-			String topHero = HTMLUtils.parseTextHTML(html, "<div class=\"title\">", "<div class=\"title\">", "</div>");
-			String topHeroTime = HTMLUtils.parseTextHTML(html, "<div class=\"description\">", "<div class=\"description\">", "</div>");
-			String timePlayed = HTMLUtils.parseTextHTML(html, "<td>Time Played</td>", "<td>Time Played</td><td>", "</td>");
-			String rank = HTMLUtils.parseTextHTML(html, "<div class=\"u-align-center h6\">", "<div class=\"u-align-center h6\">", "</div>");
+			String icon = doc.getElementsByClass("masthead-player").select("img").first().absUrl("src");
+			String level = doc.getElementsByClass("masthead-player").first().getElementsByClass("u-vertical-center").text();
+			String wins = doc.getElementsByClass("masthead-detail").first().text().split(" ")[0];
+			String topHero = doc.getElementsByClass("progress-category").first().getElementsByClass("title").first().text();
+			String topHeroTime = doc.getElementsByClass("progress-category").first().getElementsByClass("description").first().text();
+			String timePlayed = doc.getElementsByClass("column xs-12 md-6 xl-4").get(6).select("td").get(1).text();
+			String rank = null;
+
+			Element rankElem = doc.getElementsByClass("u-align-center h6").first();
+			if(rankElem != null) {
+				rank = rankElem.text();
+			}
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.setLenient(true)

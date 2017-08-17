@@ -1,8 +1,10 @@
 package me.shadorc.discordbot.command.gamestats;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.temporal.ChronoUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,8 +18,7 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HTMLUtils;
-import me.shadorc.discordbot.utils.JSONUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -48,17 +49,23 @@ public class CounterStrikeCmd extends AbstractCommand {
 			if(StringUtils.isInteger(context.getArg())) {
 				steamids = context.getArg();
 			} else {
-				steamids = HTMLUtils.parseHTML("https://steamcommunity.com/id/" + context.getArg() + "/", "\"steamid\":\"", "\"steamid\":\"", "\",\"");
+				String html = NetUtils.getDoc("https://steamcommunity.com/id/" + context.getArg() + "/")
+						.getElementsByClass("responsive_page_template_content")
+						.html();
+				JSONObject userObj = new JSONObject(html.substring(html.indexOf('{'), html.indexOf('}') + 1));
+				steamids = userObj.getString("steamid");
 			}
 
-			JSONObject mainStatsObj = JSONUtils.getJsonFromUrl("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
-					+ "appid=730"
-					+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
-					+ "&steamid=" + steamids);
+			JSONObject mainStatsObj = new JSONObject(IOUtils.toString(new URL(
+					"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
+							+ "appid=730"
+							+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
+							+ "&steamid=" + steamids), "UTF-8"));
 
-			JSONObject mainUserObj = JSONUtils.getJsonFromUrl("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
-					+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
-					+ "&steamids=" + steamids);
+			JSONObject mainUserObj = new JSONObject(IOUtils.toString(new URL(
+					"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
+							+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
+							+ "&steamids=" + steamids), "UTF-8"));
 
 			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");
 			JSONObject userObj = mainUserObj.getJSONObject("response").getJSONArray("players").getJSONObject(0);
