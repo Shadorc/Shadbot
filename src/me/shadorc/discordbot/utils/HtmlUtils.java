@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 
-public class HtmlUtils {
+public class HTMLUtils {
 
 	/**
 	 * @param url - webpage's url

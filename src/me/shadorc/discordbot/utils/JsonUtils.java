@@ -13,7 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonUtils {
+public class JSONUtils {
 
 	/**
 	 * @param array - JSONArray to convert
