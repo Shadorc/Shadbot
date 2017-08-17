@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -44,19 +45,20 @@ public class ShutdownCmd extends AbstractCommand {
 		int time = Integer.parseInt(timeStr);
 		String message = splitArgs[1].trim();
 
+		for(IGuild guild : Shadbot.getClient().getGuilds()) {
+			if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel() != null) {
+				BotUtils.sendMessage(Emoji.INFO + " " + message, GuildMusicManager.getGuildAudioPlayer(guild).getChannel());
+			}
+		}
+
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				for(IGuild guild : Shadbot.getClient().getGuilds()) {
-					if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel() != null) {
-						BotUtils.sendMessage(message, GuildMusicManager.getGuildAudioPlayer(guild).getChannel());
-					}
-				}
 				Shadbot.getClient().logout();
 			}
 		};
-
 		new Timer().schedule(task, time * 1000);
+
 		LogUtils.warn("Shadbot will restart in " + time + " seconds with the message:" + message);
 	}
 
