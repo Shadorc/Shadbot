@@ -15,6 +15,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.Discord4J;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -37,18 +38,19 @@ public class InfoCmd extends AbstractCommand {
 				"```prolog"
 						+ "\n-= Performance Info =-"
 						+ "\nMemory : " + String.format("%d MB / %d MB", usedMemory / mbUnit, maxMemory / mbUnit)
+						+ "\nCPU Usage : " + String.format("%.1f", Utils.getProcessCpuLoad()) + "%"
 						+ "\nThreads Count : " + Thread.activeCount()
 						+ "\n\n-= APIs Info =-"
 						+ "\nJava Version: " + System.getProperty("java.version")
 						+ "\n" + Discord4J.NAME + " Version: " + Discord4J.VERSION
 						+ "\nLavaPlayer Version: " + PlayerLibrary.VERSION
 						+ "\n\n-= Shadbot Info =-"
+						+ "\nUptime: " + DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true)
+						+ "\nVersion: " + Config.VERSION.toString()
 						+ "\nDeveloper: Shadorc#8423"
 						+ "\nServers: " + Shadbot.getClient().getGuilds().size()
-						+ "\nVoice channels: " + Shadbot.getClient().getConnectedVoiceChannels().size()
+						+ "\nVoice Channel(s): " + Shadbot.getClient().getConnectedVoiceChannels().size()
 						+ "\nUsers: " + Shadbot.getClient().getUsers().size()
-						+ "\nVersion: " + Config.VERSION.toString()
-						+ "\nUptime: " + DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true)
 						+ "\nPing: " + NetUtils.getPing() + "ms"
 						+ "```");
 

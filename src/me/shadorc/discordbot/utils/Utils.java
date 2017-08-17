@@ -3,6 +3,7 @@ package me.shadorc.discordbot.utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -10,6 +11,14 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -59,5 +68,34 @@ public class Utils {
 						Map.Entry::getValue,
 						(value1, value2) -> value1,
 						LinkedHashMap::new));
+	}
+
+	/**
+	 * @return double representing process CPU load percentage value, Double.NaN if not available
+	 */
+	public static double getProcessCpuLoad() {
+		double cpuLoad;
+		try {
+			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+			ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+			AttributeList list = mbs.getAttributes(name, new String[] { "ProcessCpuLoad" });
+
+			if(list.isEmpty()) {
+				return Double.NaN;
+			}
+
+			Attribute att = (Attribute) list.get(0);
+			Double value = (Double) att.getValue();
+
+			if(value == -1.0) {
+				return Double.NaN;
+			}
+
+			cpuLoad = value * 100d;
+		} catch (InstanceNotFoundException | ReflectionException | MalformedObjectNameException e) {
+			cpuLoad = Double.NaN;
+		}
+
+		return cpuLoad;
 	}
 }
