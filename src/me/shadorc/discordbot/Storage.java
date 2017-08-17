@@ -182,4 +182,23 @@ public class Storage {
 		}
 		return null;
 	}
+
+	//TODO: Remove in next release
+	public static synchronized void removeGuild(String guildId) {
+		FileWriter writer = null;
+		try {
+			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
+			mainObj.remove(guildId);
+
+			writer = new FileWriter(DATA_FILE);
+			writer.write(mainObj.toString(2));
+			writer.flush();
+
+		} catch (IOException e) {
+			LogUtils.error("Error while removing guild.", e);
+
+		} finally {
+			IOUtils.closeQuietly(writer);
+		}
+	}
 }
