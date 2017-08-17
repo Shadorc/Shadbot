@@ -23,6 +23,10 @@ public class ShutdownCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(!context.isAuthorOwner()) {
+			return;
+		}
+
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
