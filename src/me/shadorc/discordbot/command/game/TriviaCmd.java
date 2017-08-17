@@ -19,7 +19,7 @@ import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.JsonUtils;
+import me.shadorc.discordbot.utils.JSONUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -73,7 +73,7 @@ public class TriviaCmd extends AbstractCommand {
 
 		// Trivia API doc : https://opentdb.com/api_config.php
 		protected void start() throws MalformedURLException, IOException {
-			JSONObject mainObj = JsonUtils.getJsonFromUrl("https://opentdb.com/api.php?amount=1");
+			JSONObject mainObj = JSONUtils.getJsonFromUrl("https://opentdb.com/api.php?amount=1");
 			JSONObject resultObj = mainObj.getJSONArray("results").getJSONObject(0);
 
 			String category = resultObj.getString("category");
@@ -82,7 +82,7 @@ public class TriviaCmd extends AbstractCommand {
 			String question = resultObj.getString("question");
 			String correctAnswer = resultObj.getString("correct_answer");
 
-			this.incorrectAnswers = JsonUtils.convertArrayToList(resultObj.getJSONArray("incorrect_answers"));
+			this.incorrectAnswers = JSONUtils.convertArrayToList(resultObj.getJSONArray("incorrect_answers"));
 
 			StringBuilder strBuilder = new StringBuilder("**" + StringUtils.convertHtmlToUTF8(question) + "**");
 			if("multiple".equals(type)) {
