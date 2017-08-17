@@ -49,7 +49,7 @@ public class PlayCmd extends AbstractCommand {
 
 		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in voice channel " + botVoiceChannel.mention()
-			+ ", join him before using this command.", context.getChannel());
+					+ ", join him before using this command.", context.getChannel());
 			return;
 		}
 
