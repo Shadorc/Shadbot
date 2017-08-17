@@ -103,15 +103,20 @@ public class SettingsCmd extends AbstractCommand {
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
+				.withThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
 				.appendDescription("**Change Shadbot's server settings.**")
-				.appendField("Name: prefix",
+				.appendField("Name: " + Setting.PREFIX.toString(),
 						"**Description:** Change Shadbot's prefix for this server."
-								+ "\n**arg:** prefix"
-								+ "\n**Example:** " + context.getPrefix() + "settings prefix !", false)
-				.appendField("Name: allowed_channels",
+								+ "\n**arg:** prefix (Max length: 5, must not contain spaces)"
+								+ "\n**Example:** " + context.getPrefix() + "settings " + Setting.PREFIX.toString() + " !", false)
+				.appendField("Name: " + Setting.ALLOWED_CHANNELS.toString(),
 						"**Description:** Allow Shadbot to only post messages in the mentioned channels. By default, all the channels are allowed."
 								+ "\n**arg:** #channel(s)"
-								+ "\n**Example:** " + context.getPrefix() + "settings allowed_channels #general", false)
+								+ "\n**Example:** " + context.getPrefix() + "settings " + Setting.ALLOWED_CHANNELS.toString() + " #general", false)
+				.appendField("Name: " + Setting.DEFAULT_VOLUME.toString(),
+						"**Description:** Change music default volume for this server."
+								+ "\n**arg:** volume (Min: 1/Max: 50/Default: " + Config.DEFAULT_VOLUME + ")"
+								+ "\n**Example:** " + context.getPrefix() + "settings " + Setting.DEFAULT_VOLUME.toString() + " 42", false)
 				.appendField("Usage", context.getPrefix() + "settings <name> <arg>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
