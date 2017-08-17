@@ -3,6 +3,7 @@ package me.shadorc.discordbot.utils;
 import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
@@ -48,6 +49,12 @@ public class StringUtils {
 			strBuilder.append(info.title);
 		} else {
 			strBuilder.append(info.author + " - " + info.title);
+		}
+
+		if(info.isStream) {
+			strBuilder.append(" (Stream)");
+		} else {
+			strBuilder.append(" (" + DurationFormatUtils.formatDuration(info.length, "mm:ss", false) + ")");
 		}
 
 		return strBuilder.toString();

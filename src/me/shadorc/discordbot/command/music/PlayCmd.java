@@ -44,10 +44,15 @@ public class PlayCmd extends AbstractCommand {
 		}
 
 		final StringBuilder identifier = new StringBuilder();
-		if(!NetUtils.isValidURL(context.getArg())) {
+		if(context.getArg().startsWith("soundcloud ")) {
+			identifier.append(AudioLoadResultListener.SC_SEARCH);
+			identifier.append(context.getArg().replace("soundcloud ", ""));
+		} else if(NetUtils.isValidURL(context.getArg())) {
+			identifier.append(context.getArg());
+		} else {
 			identifier.append(AudioLoadResultListener.YT_SEARCH);
+			identifier.append(context.getArg());
 		}
-		identifier.append(context.getArg());
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
 		musicManager.setChannel(context.getChannel());
@@ -61,7 +66,7 @@ public class PlayCmd extends AbstractCommand {
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Play the music from the url. Search terms or playlist are also possible.**")
+				.appendDescription("**Play the music(s) from the url, search terms or playlist. You can also search on SoundCloud by using /play soundcloud <search>**")
 				.appendField("Usage", context.getPrefix() + "play <url>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

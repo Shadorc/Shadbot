@@ -17,6 +17,7 @@ import sx.blah.discord.handle.obj.IVoiceChannel;
 public class AudioLoadResultListener implements AudioLoadResultHandler {
 
 	public static final String YT_SEARCH = "ytsearch: ";
+	public static final String SC_SEARCH = "scsearch: ";
 
 	private final String identifier;
 	private final IVoiceChannel botVoiceChannel;
@@ -45,6 +46,11 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
 	@Override
 	public void playlistLoaded(AudioPlaylist playlist) {
+		if(playlist.getTracks().isEmpty()) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+			return;
+		}
+
 		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect to this voice channel due to the lack of permission.", musicManager.getChannel());
 			return;
@@ -52,7 +58,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
 		List<AudioTrack> tracks = playlist.getTracks();
 
-		if(identifier.startsWith(YT_SEARCH)) {
+		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
 			if(musicManager.getScheduler().isPlaying()) {
 				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(tracks.get(0).getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
 			}
@@ -69,7 +75,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
 	@Override
 	public void noMatches() {
-		BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.replace(YT_SEARCH, "") + "\"", musicManager.getChannel());
+		BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
 	}
 
 	@Override
