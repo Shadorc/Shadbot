@@ -7,7 +7,7 @@ public class Config {
 	public static final Version VERSION = new Version(1, 2, 8, false);
 
 	public static final long DEBUG_CHANNEL_ID = 342074301840752640L;
-	public static final long BUGS_REPORT_CHANNEL_ID = 346311941829951489L;
+	public static final long LOGS_CHANNEL_ID = 346311941829951489L;
 	public static final long SUGGEST_CHANNEL_ID = 345898633805430785L;
 
 	public static final long OWNER_ID = 275616469906358273L;
