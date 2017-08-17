@@ -50,7 +50,7 @@ public class GuildMusicManager {
 		leaveTimer.stop();
 	}
 
-	public boolean joinVoiceChannel(IVoiceChannel voiceChannel, IChannel channel) {
+	public boolean joinVoiceChannel(IVoiceChannel voiceChannel) {
 		if(!BotUtils.hasPermission(guild, Permissions.VOICE_CONNECT) || !BotUtils.hasPermission(guild, Permissions.VOICE_SPEAK)) {
 			return false;
 		}

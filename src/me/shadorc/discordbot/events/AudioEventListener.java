@@ -62,7 +62,7 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-		BotUtils.sendMessage("Music seems stuck, I'll try to play the next available song.", channel);
+		BotUtils.sendMessage(Emoji.GEAR + " Music seems stuck, I'll try to play the next available song.", channel);
 		LogUtils.warn("Music was stuck, skipping it. (Threshold: " + thresholdMs + " ms)");
 		if(!scheduler.nextTrack()) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
