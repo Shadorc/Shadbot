@@ -51,7 +51,7 @@ public class GuildMusicManager {
 	}
 
 	public boolean joinVoiceChannel(IVoiceChannel voiceChannel) {
-		if(!BotUtils.hasPermission(guild, Permissions.VOICE_CONNECT) || !BotUtils.hasPermission(guild, Permissions.VOICE_SPEAK)) {
+		if(!BotUtils.hasPermission(voiceChannel, Permissions.VOICE_CONNECT, Permissions.VOICE_SPEAK)) {
 			return false;
 		}
 		voiceChannel.join();

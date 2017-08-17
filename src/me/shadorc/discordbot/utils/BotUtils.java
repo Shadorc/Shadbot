@@ -9,6 +9,7 @@ import me.shadorc.discordbot.Storage.Setting;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
@@ -22,8 +23,9 @@ public class BotUtils {
 			return;
 		}
 
-		if(!channel.isPrivate() && !BotUtils.hasPermission(channel.getGuild(), Permissions.SEND_MESSAGES)) {
-			LogUtils.warn("Shadbot wasn't allowed to send message in Guild : \"" + channel.getGuild() + "\"");
+		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES)) {
+			LogUtils.warn("Shadbot wasn't allowed to send message in guild: "
+					+ "\"" + channel.getGuild().getName() + "\" (ID: " + channel.getGuild().getStringID() + ")");
 			return;
 		}
 
@@ -45,9 +47,10 @@ public class BotUtils {
 			return;
 		}
 
-		if(!channel.isPrivate() && !BotUtils.hasPermission(channel.getGuild(), Permissions.EMBED_LINKS)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " I cannot send embed links due to the lack of permission. :(", channel);
-			LogUtils.warn("Shadbot wasn't allowed to send Embed links in Guild : \"" + channel.getGuild() + "\"");
+		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.EMBED_LINKS)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " I can't send embed links due to the lack of permission. :(", channel);
+			LogUtils.warn("Shadbot wasn't allowed to send embed link in guild: "
+					+ "\"" + channel.getGuild().getName() + "\" (ID: " + channel.getGuild().getStringID() + ")");
 			return;
 		}
 
@@ -78,7 +81,21 @@ public class BotUtils {
 		return JSONUtils.convertArrayToList(channelsArray).contains(channel.getStringID());
 	}
 
-	public static boolean hasPermission(IGuild guild, Permissions permission) {
-		return Shadbot.getClient().getOurUser().getPermissionsForGuild(guild).contains(permission);
+	public static boolean hasPermission(IChannel channel, Permissions permission, Permissions... permissions) {
+		for(Permissions perm : permissions) {
+			if(!channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(perm)) {
+				return false;
+			}
+		}
+		return channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(permission);
+	}
+
+	public static boolean hasPermission(IVoiceChannel voiceChannel, Permissions permission, Permissions... permissions) {
+		for(Permissions perm : permissions) {
+			if(!voiceChannel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(perm)) {
+				return false;
+			}
+		}
+		return voiceChannel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(permission);
 	}
 }

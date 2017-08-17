@@ -183,7 +183,7 @@ public class Storage {
 		return null;
 	}
 
-	//TODO: Remove in next release
+	// TODO: Remove in next release
 	public static synchronized void removeGuild(String guildId) {
 		FileWriter writer = null;
 		try {

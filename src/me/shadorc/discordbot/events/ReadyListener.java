@@ -28,7 +28,7 @@ public class ReadyListener {
 		Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
 		Shadbot.getClient().getDispatcher().registerListener(new EventListener());
 
-		//TODO: Remove in next release
+		// TODO: Remove in next release
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(new File("data.json").toURI().toURL().openStream()));
 			JSONArray namesArray = mainObj.names();
