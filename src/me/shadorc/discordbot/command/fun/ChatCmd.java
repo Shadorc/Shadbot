@@ -58,7 +58,7 @@ public class ChatCmd extends AbstractCommand {
 					+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
 					+ (aliceState == null ? "" : "&custid=" + aliceState));
 			JSONObject result = XML.toJSONObject(xmlString).getJSONObject("result");
-			String response = result.getString("that").replace("<br>", "\n").trim();
+			String response = result.getString("that").replace("<br>", "\n").replace("  ", " ").trim();
 			GUILDS_CUSTID.put(context.getChannel().getGuild(), result.getString("custid"));
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 
