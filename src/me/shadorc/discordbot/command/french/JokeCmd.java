@@ -2,7 +2,13 @@ package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
@@ -11,10 +17,9 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.HTMLUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
-import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class JokeCmd extends AbstractCommand {
@@ -35,41 +40,35 @@ public class JokeCmd extends AbstractCommand {
 			return;
 		}
 
-		boolean success = false;
-
 		try {
-			String htmlPage = HTMLUtils.getHTML("https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 25) + ".html?tri=top");
-			List<String> jokesList = HTMLUtils.getAllSubstring(htmlPage, " \"description\": \"", "</script>");
-
-			String joke;
-			do {
-				joke = jokesList.get(MathUtils.rand(jokesList.size()));
-				joke = joke.substring(0, joke.lastIndexOf('"')).replace("&amp;", "&").replace("\n\n", "\n").trim();
-				joke = StringUtils.convertHtmlToUTF8(joke);
-			} while(joke.length() > 1800);
-
+			String joke = this.getJoke(
+					"https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 25) + ".html?tri=top",
+					"text-justify texte");
 			BotUtils.sendMessage("```" + joke + "```", context.getChannel());
 
-		} catch (IOException ignored) {
-			success = false;
-		}
-
-		if(!success) {
+		} catch (IOException err) {
 			try {
-				String htmlPage = HTMLUtils.getHTML("http://www.une-blague.com/blagues-courtes.html?page=2&cat=16&p=" + MathUtils.rand(1, 5) + "&call=1");
-				List<String> jokesList = HTMLUtils.getAllSubstring(htmlPage, "class=\"texte \">", "</h4>");
-
-				String joke;
-				do {
-					joke = jokesList.get(MathUtils.rand(jokesList.size()));
-					joke = joke.replace("<br>", "\n").replace("<br />", "\n").trim();
-				} while(joke.length() > 1800);
-
+				String joke = this.getJoke(
+						"http://www.une-blague.com/blagues-courtes.html?page=2&cat=16&p=" + MathUtils.rand(1, 5) + "&call=1",
+						"texte ");
 				BotUtils.sendMessage("```" + joke + "```", context.getChannel());
+
 			} catch (IOException e) {
 				LogUtils.error("Something went wrong while getting a joke... Please, try again later.", e, context.getChannel());
 			}
 		}
+	}
+
+	private String getJoke(String url, String className) throws IOException {
+		Document doc = NetUtils.getDoc(url);
+		Elements jokesElements = doc.getElementsByClass(className);
+		String joke;
+		do {
+			Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
+			joke = Arrays.stream(element.html().split("<p>|<br>")).map(line -> line.trim()).collect(Collectors.joining("\n"));
+			joke = StringEscapeUtils.unescapeHtml4(joke.replace("\n\n", "\n").replaceAll("\\<.*?>","") );
+		} while(joke.length() > 1000);
+		return joke;
 	}
 
 	@Override
