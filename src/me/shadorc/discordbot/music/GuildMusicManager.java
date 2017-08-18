@@ -9,9 +9,11 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 
+import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.events.AudioEventListener;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IVoiceChannel;
@@ -29,6 +31,9 @@ public class GuildMusicManager {
 	private final AudioEventListener audioEventListener;
 	private final Timer leaveTimer;
 	private IChannel channel;
+
+	// TODO: Remove
+	private boolean ended;
 
 	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
 		this.guild = guild;
@@ -48,6 +53,17 @@ public class GuildMusicManager {
 
 	public void cancelLeave() {
 		leaveTimer.stop();
+	}
+
+	public void end() {
+		// TODO: Remove
+		if(ended) {
+			LogUtils.warn("Debug: Music has tried to end multiple times...");
+			return;
+		}
+		ended = true;
+		BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
+		this.leaveVoiceChannel();
 	}
 
 	public boolean joinVoiceChannel(IVoiceChannel voiceChannel) {

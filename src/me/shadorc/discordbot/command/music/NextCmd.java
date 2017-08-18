@@ -28,8 +28,7 @@ public class NextCmd extends AbstractCommand {
 		}
 
 		if(!scheduler.nextTrack()) {
-			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", context.getChannel());
-			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leaveVoiceChannel();
+			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).end();
 		}
 	}
 

@@ -47,8 +47,7 @@ public class AudioEventListener extends AudioEventAdapter {
 				if(scheduler.isRepeating()) {
 					scheduler.queue(track.makeClone());
 				} else if(!scheduler.nextTrack()) {
-					BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
-					GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
+					GuildMusicManager.getGuildAudioPlayer(guild).end();
 				}
 			}
 		}).start();
@@ -68,8 +67,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		BotUtils.sendMessage(Emoji.GEAR + " " + err.getMessage() + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
 		LogUtils.warn("Track exception: " + err.getMessage());
 		if(!scheduler.nextTrack()) {
-			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
-			GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
+			GuildMusicManager.getGuildAudioPlayer(guild).end();
 		}
 	}
 
@@ -78,8 +76,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		BotUtils.sendMessage(Emoji.GEAR + " Music seems stuck, I'll try to play the next available song.", channel);
 		LogUtils.warn("Music was stuck, skipping it.");
 		if(!scheduler.nextTrack()) {
-			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
-			GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
+			GuildMusicManager.getGuildAudioPlayer(guild).end();
 		}
 	}
 }
