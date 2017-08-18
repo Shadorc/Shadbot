@@ -1,11 +1,8 @@
 package me.shadorc.discordbot.utils;
 
-import java.util.concurrent.BlockingQueue;
-
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 public class StringUtils {
@@ -24,23 +21,6 @@ public class StringUtils {
 	 */
 	public static String convertHtmlToUTF8(String text) {
 		return StringEscapeUtils.unescapeHtml3(text);
-	}
-
-	public static String formatPlaylist(BlockingQueue<AudioTrack> queue) {
-		StringBuilder playlist = new StringBuilder(queue.size() + " music(s) in the playlist");
-
-		int count = 1;
-		for(AudioTrack track : queue) {
-			String name = "\n\t" + count + ". " + StringUtils.formatTrackName(track.getInfo());
-			if(playlist.length() + name.length() < 1800) {
-				playlist.append(name);
-				count++;
-			} else {
-				playlist.append("\n\t...");
-				break;
-			}
-		}
-		return playlist.toString();
 	}
 
 	public static String formatTrackName(AudioTrackInfo info) {

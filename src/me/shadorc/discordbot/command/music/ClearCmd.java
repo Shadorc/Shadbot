@@ -19,7 +19,7 @@ public class ClearCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		GuildMusicManager.getGuildAudioPlayer(context.getGuild()).getScheduler().clearPlaylist();
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist has been cleared.", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist cleared.", context.getChannel());
 	}
 
 	@Override

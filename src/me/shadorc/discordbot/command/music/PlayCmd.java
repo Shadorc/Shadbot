@@ -66,7 +66,7 @@ public class PlayCmd extends AbstractCommand {
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Play the music(s) from the url, search terms or playlist. You can also search on SoundCloud by using /play soundcloud <search>**")
+				.appendDescription("**Play the music(s) from the url, search terms or playlist.\nYou can also search on SoundCloud by using /play soundcloud <search>**")
 				.appendField("Usage", context.getPrefix() + "play <url>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

@@ -1,5 +1,9 @@
 package me.shadorc.discordbot.command.music;
 
+import java.util.concurrent.BlockingQueue;
+
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
@@ -28,7 +32,12 @@ public class PlaylistCmd extends AbstractCommand {
 			return;
 		}
 
-		BotUtils.sendMessage("```" + StringUtils.formatPlaylist(scheduler.getPlaylist()) + "```", context.getChannel());
+		EmbedBuilder embed = new EmbedBuilder()
+				.withAuthorName("Playlist")
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
+				.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
+				.withDescription(this.formatPlaylist(scheduler.getPlaylist()));
+		BotUtils.sendEmbed(embed.build(), context.getChannel());
 	}
 
 	@Override
@@ -39,5 +48,22 @@ public class PlaylistCmd extends AbstractCommand {
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show the current playlist.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
+	}
+
+	private String formatPlaylist(BlockingQueue<AudioTrack> queue) {
+		StringBuilder playlist = new StringBuilder("**" + queue.size() + " music(s) in the playlist:**\n");
+
+		int count = 1;
+		for(AudioTrack track : queue) {
+			String name = "\n\t" + count + ". " + StringUtils.formatTrackName(track.getInfo());
+			if(playlist.length() + name.length() < 1800) {
+				playlist.append(name);
+				count++;
+			} else {
+				playlist.append("\n\t...");
+				break;
+			}
+		}
+		return playlist.toString();
 	}
 }

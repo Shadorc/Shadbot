@@ -19,7 +19,7 @@ public class ShuffleCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		GuildMusicManager.getGuildAudioPlayer(context.getGuild()).getScheduler().shufflePlaylist();
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist has been shuffled.", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist shuffled.", context.getChannel());
 	}
 
 	@Override
