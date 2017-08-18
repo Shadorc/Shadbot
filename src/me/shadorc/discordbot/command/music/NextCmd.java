@@ -23,12 +23,12 @@ public class NextCmd extends AbstractCommand {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		if(!scheduler.nextTrack()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", context.getChannel());
+			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", context.getChannel());
 			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).leaveVoiceChannel();
 		}
 	}

@@ -44,7 +44,7 @@ public class AudioEventListener extends AudioEventAdapter {
 				if(scheduler.isRepeating()) {
 					scheduler.queue(track.makeClone());
 				} else if(!scheduler.nextTrack()) {
-					BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
+					BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
 					GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
 				}
 			}
@@ -53,9 +53,10 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
-		LogUtils.error(err.getMessage() + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
+		BotUtils.sendMessage(Emoji.GEAR + " " + err.getMessage() + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
+		LogUtils.warn("Track exception: " + err.getMessage());
 		if(!scheduler.nextTrack()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
+			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
 			GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
 		}
 	}
@@ -63,9 +64,9 @@ public class AudioEventListener extends AudioEventAdapter {
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
 		BotUtils.sendMessage(Emoji.GEAR + " Music seems stuck, I'll try to play the next available song.", channel);
-		LogUtils.warn("Music was stuck, skipping it. (Threshold: " + thresholdMs + " ms)");
+		LogUtils.warn("Music was stuck, skipping it.");
 		if(!scheduler.nextTrack()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " End of the playlist.", channel);
+			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
 			GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
 		}
 	}

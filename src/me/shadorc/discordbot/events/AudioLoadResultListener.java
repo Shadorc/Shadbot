@@ -47,7 +47,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 	@Override
 	public void playlistLoaded(AudioPlaylist playlist) {
 		if(playlist.getTracks().isEmpty()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
 			return;
 		}
 
@@ -75,7 +75,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
 	@Override
 	public void noMatches() {
-		BotUtils.sendMessage(Emoji.EXCLAMATION + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
 	}
 
 	@Override

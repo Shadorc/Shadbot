@@ -45,7 +45,7 @@ public class UrbanCmd extends AbstractCommand {
 					+ "term=" + URLEncoder.encode(context.getArg(), "UTF-8"));
 
 			if(mainObj.getString("result_type").equals("no_results")) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " No results for \"" + context.getArg() + "\"", context.getChannel());
+				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No results for \"" + context.getArg() + "\"", context.getChannel());
 				return;
 			}
 

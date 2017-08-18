@@ -36,7 +36,7 @@ public class EventListener {
 		}
 
 		if(event.getChannel().isPrivate()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry, I don't respond (yet ?) to private messages.", event.getChannel());
+			BotUtils.sendMessage(Emoji.INFO + " Sorry, I don't respond (yet ?) to private messages.", event.getChannel());
 			LogUtils.warn("Shadbot has received a private message. (Message: " + event.getMessage().getContent() + ")");
 			return;
 		}

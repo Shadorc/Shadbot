@@ -7,7 +7,9 @@ public enum Emoji {
 	EXCLAMATION(":grey_exclamation:"),
 	RED_FLAG(":triangular_flag_on_post:"),
 	INFO(":information_source:"),
+	MAGNIFYING_GLASS(":mag:"),
 	STOPWATCH(":stopwatch:"),
+	GEAR(":gear:"),
 
 	MONEY_WINGS(":money_with_wings:"),
 	HOURGLASS(":hourglass:"),
@@ -24,14 +26,15 @@ public enum Emoji {
 	MAP(":map:"),
 
 	MUSICAL_NOTE(":musical_note:"),
-	REPEAT(":repeat:"),
-	PAUSE(":pause_button:"),
 	PLAY(":arrow_forward:"),
+	PAUSE(":pause_button:"),
+	REPEAT(":repeat:"),
+	SPEAKER(":speaker:"),
+	MUTE(":mute:"),
 
 	THUMBSDOWN(":thumbsdown:"),
 	SPEECH(":speech_balloon:"),
 	CLAP(":clap:"),
-	GEAR(":gear:"),
 
 	SCISSORS(":scissors:"),
 	GEM(":gem:"),

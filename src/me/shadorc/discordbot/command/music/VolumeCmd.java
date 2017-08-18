@@ -23,18 +23,18 @@ public class VolumeCmd extends AbstractCommand {
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		if(!context.hasArg()) {
-			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Current volume level: " + scheduler.getVolume() + "%", context.getChannel());
+			BotUtils.sendMessage(Emoji.SPEAKER + " Current volume level: " + scheduler.getVolume() + "%", context.getChannel());
 			return;
 		}
 
 		try {
 			scheduler.setVolume(Integer.parseInt(context.getArg()));
-			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Volume level set to " + scheduler.getVolume() + "%", context.getChannel());
+			BotUtils.sendMessage(Emoji.SPEAKER + " Volume level set to " + scheduler.getVolume() + "%", context.getChannel());
 		} catch (NumberFormatException e) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Please use a value between 0 and 100.", context.getChannel());
 		}

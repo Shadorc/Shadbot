@@ -18,12 +18,6 @@ public class LogUtils {
 		LogUtils.sendMessage("**[ERROR]** An error occured and users have been warned: *" + msg + "* (Error message: " + err.getMessage() + ")", Config.LOGS_CHANNEL_ID);
 	}
 
-	public static void error(String msg, IChannel channel) {
-		LOGGER.error(msg);
-		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, channel);
-		LogUtils.sendMessage("**[ERROR]** An error occured and users have been warned: *" + msg + "* (Message: " + msg + ")", Config.LOGS_CHANNEL_ID);
-	}
-
 	public static void error(String msg, Exception err) {
 		LOGGER.error(msg, err);
 		LogUtils.sendMessage("**[ERROR]** An error occured: *" + msg + "* (Error message: " + err.getMessage() + ")", Config.LOGS_CHANNEL_ID);

@@ -23,12 +23,12 @@ public class StopCmd extends AbstractCommand {
 
 		TrackScheduler scheduler = musicManager.getScheduler();
 		if(!scheduler.isPlaying()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		musicManager.leaveVoiceChannel();
-		BotUtils.sendMessage(Emoji.EXCLAMATION + " Music has been stopped by " + context.getAuthorName() + ".", context.getChannel());
+		BotUtils.sendMessage(Emoji.INFO + " Music has been stopped by " + context.getAuthorName() + ".", context.getChannel());
 	}
 
 	@Override

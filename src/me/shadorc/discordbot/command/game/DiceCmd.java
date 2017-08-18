@@ -45,7 +45,7 @@ public class DiceCmd extends AbstractCommand {
 			}
 
 			if(diceManager.isAlreadyPlaying(context.getAuthor())) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " " + context.getAuthor().mention() + ", you're already participating.", context.getChannel());
+				BotUtils.sendMessage(Emoji.INFO + " " + context.getAuthor().mention() + ", you're already participating.", context.getChannel());
 				return;
 			}
 
