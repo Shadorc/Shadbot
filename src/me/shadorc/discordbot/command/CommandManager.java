@@ -22,6 +22,7 @@ import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.gamestats.CounterStrikeCmd;
+import me.shadorc.discordbot.command.gamestats.DiabloCmd;
 import me.shadorc.discordbot.command.gamestats.OverwatchCmd;
 import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.InfoCmd;
@@ -88,6 +89,7 @@ public class CommandManager {
 				// Games Stats Commands
 				new OverwatchCmd(),
 				new CounterStrikeCmd(),
+				new DiabloCmd(),
 				// Info Commands
 				new InfoCmd(),
 				new PingCmd(),

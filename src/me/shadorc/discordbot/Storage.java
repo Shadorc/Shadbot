@@ -47,7 +47,8 @@ public class Storage {
 		DEVIANTART_CLIENT_ID,
 		DEVIANTART_API_SECRET,
 		BOTS_DISCORD_PW_TOKEN,
-		DISCORD_BOTS_ORG_TOKEN
+		DISCORD_BOTS_ORG_TOKEN,
+		BLIZZARD_API_KEY
 	}
 
 	private static void init() {

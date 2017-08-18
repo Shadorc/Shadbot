@@ -60,6 +60,7 @@ public class HelpCmd extends AbstractCommand {
 								+ " `" + context.getPrefix() + "clear`", false)
 				.appendField("Games Stats Commands:",
 						"`" + context.getPrefix() + "overwatch`"
+								+ " `" + context.getPrefix() + "diablo`"
 								+ " `" + context.getPrefix() + "cs`", false)
 				.appendField("Info Commands:",
 						"`" + context.getPrefix() + "info`"
