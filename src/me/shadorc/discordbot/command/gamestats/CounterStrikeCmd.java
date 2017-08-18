@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.nodes.Document;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
@@ -18,6 +19,7 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
@@ -49,18 +51,29 @@ public class CounterStrikeCmd extends AbstractCommand {
 			if(StringUtils.isInteger(context.getArg())) {
 				steamids = context.getArg();
 			} else {
-				String html = NetUtils.getDoc("https://steamcommunity.com/id/" + context.getArg() + "/")
-						.getElementsByClass("responsive_page_template_content")
-						.html();
+				Document userPage = NetUtils.getDoc("https://steamcommunity.com/id/" + context.getArg() + "/");
+
+				if(!userPage.getElementsByClass("error_ctn").isEmpty()) {
+					BotUtils.sendMessage(Emoji.EXCLAMATION + " This user does not exist.", context.getChannel());
+					return;
+				}
+
+				String html = userPage.getElementsByClass("responsive_page_template_content").html();
 				JSONObject userObj = new JSONObject(html.substring(html.indexOf('{'), html.indexOf('}') + 1));
 				steamids = userObj.getString("steamid");
 			}
 
-			JSONObject mainStatsObj = new JSONObject(IOUtils.toString(new URL(
-					"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
-							+ "appid=730"
-							+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
-							+ "&steamid=" + steamids), "UTF-8"));
+			JSONObject mainStatsObj;
+			try {
+				mainStatsObj = new JSONObject(IOUtils.toString(new URL(
+						"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
+								+ "appid=730"
+								+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
+								+ "&steamid=" + steamids), "UTF-8"));
+			} catch (IOException e) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " This user doesn't exist or doesn't play to Counter-Strike: Global Offensive.", context.getChannel());
+				return;
+			}
 
 			JSONObject mainUserObj = new JSONObject(IOUtils.toString(new URL(
 					"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
@@ -86,7 +99,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (IOException e) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Steam ID is invalid.", context.getChannel());
+			LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", e, context.getChannel());
 		}
 	}
 
