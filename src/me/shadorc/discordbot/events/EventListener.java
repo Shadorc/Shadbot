@@ -5,8 +5,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.CommandManager;
-import me.shadorc.discordbot.command.game.TriviaCmd;
-import me.shadorc.discordbot.command.game.TriviaCmd.GuildTriviaManager;
+import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -47,10 +46,12 @@ public class EventListener {
 		}
 
 		IMessage message = event.getMessage();
-		GuildTriviaManager gtm = TriviaCmd.getGuildTriviaManager(event.getGuild());
-		if(gtm != null && gtm.isStarted()) {
-			gtm.checkAnswer(message);
-		} else if(message.getContent().startsWith(Storage.getSetting(event.getGuild(), Setting.PREFIX).toString())) {
+		if(MessageManager.isWaitingForMessage(event.getGuild())) {
+			MessageManager.notify(message);
+			return;
+		}
+
+		if(message.getContent().startsWith(Storage.getSetting(event.getGuild(), Setting.PREFIX).toString())) {
 			CommandManager.getInstance().manage(event);
 		}
 	}

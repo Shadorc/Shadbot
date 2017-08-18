@@ -3,9 +3,7 @@ package me.shadorc.discordbot.command.game;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Timer;
 
@@ -18,13 +16,14 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.message.MessageListener;
+import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.JSONUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
@@ -32,7 +31,6 @@ import sx.blah.discord.util.EmbedBuilder;
 public class TriviaCmd extends AbstractCommand {
 
 	protected static final int GAINS = 25;
-	protected static final Map<IGuild, GuildTriviaManager> GUILDS_TRIVIA = new HashMap<>();
 
 	public TriviaCmd() {
 		super(Role.USER, "trivia", "quizz", "question");
@@ -41,32 +39,37 @@ public class TriviaCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		try {
-			GUILDS_TRIVIA.put(context.getGuild(), new GuildTriviaManager(context.getChannel()));
-			GUILDS_TRIVIA.get(context.getGuild()).start();
+			new GuildTriviaManager(context.getChannel()).start();
 		} catch (IOException e) {
 			LogUtils.error("Something went wrong while getting a question.... Please, try again later.", e, context.getChannel());
 		}
 	}
 
-	public static GuildTriviaManager getGuildTriviaManager(IGuild guild) {
-		return GUILDS_TRIVIA.get(guild);
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
+				.withColor(Config.BOT_COLOR)
+				.appendDescription("**Start a Trivia game. Once one started, everyone can participate.**")
+				.appendField("Gains", "The winner gets " + GAINS + " coins.", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
-	public class GuildTriviaManager {
+	public class GuildTriviaManager implements MessageListener {
 
 		private final IChannel channel;
 		private final List<IUser> alreadyAnswered;
 		private final Timer timer;
-		private boolean isStarted;
+
 		private String correctAnswer;
 		private List<String> incorrectAnswers;
 
 		protected GuildTriviaManager(IChannel channel) {
 			this.channel = channel;
 			this.alreadyAnswered = new ArrayList<>();
-			this.isStarted = false;
 			this.timer = new Timer(30 * 1000, event -> {
-				BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the good answer was " + correctAnswer + ".", channel);
+				BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the good answer was **" + correctAnswer + "**.", channel);
 				this.stop();
 			});
 		}
@@ -108,42 +111,35 @@ public class TriviaCmd extends AbstractCommand {
 
 			BotUtils.sendEmbed(builder.build(), channel);
 
+			MessageManager.addListener(channel.getGuild(), this);
+
 			this.correctAnswer = StringUtils.convertHtmlToUTF8(correctAnswer);
-			this.isStarted = true;
 			this.timer.start();
 		}
 
-		public void checkAnswer(IMessage message) {
-			if(alreadyAnswered.contains(message.getAuthor())) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry " + message.getAuthor().getName() + ", you can only answer once.", message.getChannel());
-			} else if(incorrectAnswers.stream().anyMatch(message.getContent()::equalsIgnoreCase)) {
+		private void stop() {
+			MessageManager.removeListener(channel.getGuild());
+			timer.stop();
+		}
+
+		@Override
+		public void onMessageReceived(IMessage message) {
+			boolean wrongAnswer = incorrectAnswers.stream().anyMatch(message.getContent()::equalsIgnoreCase);
+			boolean goodAnswer = message.getContent().equalsIgnoreCase(this.correctAnswer);
+			IUser author = message.getAuthor();
+
+			if(alreadyAnswered.contains(author) && (wrongAnswer || goodAnswer)) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry " + author.getName() + ", you can only answer once.", message.getChannel());
+
+			} else if(wrongAnswer) {
 				BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", channel);
-				alreadyAnswered.add(message.getAuthor());
-			} else if(message.getContent().equalsIgnoreCase(this.correctAnswer)) {
-				BotUtils.sendMessage(Emoji.CLAP + " Correct ! " + message.getAuthor().getName() + ", you won **" + GAINS + " coins**.", channel);
-				Storage.getPlayer(message.getGuild(), message.getAuthor()).addCoins(GAINS);
+				alreadyAnswered.add(author);
+
+			} else if(goodAnswer) {
+				BotUtils.sendMessage(Emoji.CLAP + " Correct ! " + author.getName() + ", you won **" + GAINS + " coins**.", channel);
+				Storage.getPlayer(message.getGuild(), author).addCoins(GAINS);
 				this.stop();
 			}
 		}
-
-		protected void stop() {
-			timer.stop();
-			GUILDS_TRIVIA.remove(channel.getGuild());
-		}
-
-		public boolean isStarted() {
-			return isStarted;
-		}
-	}
-
-	@Override
-	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Start a Trivia game. Once one started, everyone can participate.**")
-				.appendField("Gains", "The winner gets " + GAINS + " coins.", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }
