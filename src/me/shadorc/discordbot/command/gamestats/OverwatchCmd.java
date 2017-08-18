@@ -1,9 +1,10 @@
 package me.shadorc.discordbot.command.gamestats;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 
+import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -47,7 +48,17 @@ public class OverwatchCmd extends AbstractCommand {
 		}
 
 		String plateform = splitArgs[0].toLowerCase();
+		if(!Arrays.asList("pc", "psn", "xbl").contains(plateform)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Plateform is invalid. Options: pc, psn, xbl.", context.getChannel());
+			return;
+		}
+
 		String region = splitArgs[1].toLowerCase();
+		if(!Arrays.asList("eu", "us", "cn", "kr").contains(region)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Region is invalid. Options: eu, us, cn, kr.", context.getChannel());
+			return;
+		}
+
 		String battletag = splitArgs[2];
 
 		try {
@@ -57,8 +68,8 @@ public class OverwatchCmd extends AbstractCommand {
 			String icon = doc.getElementsByClass("masthead-player").select("img").first().absUrl("src");
 			String level = doc.getElementsByClass("masthead-player").first().getElementsByClass("u-vertical-center").text();
 			String wins = doc.getElementsByClass("masthead-detail").first().text().split(" ")[0];
-			String topHero = doc.getElementsByClass("progress-category").first().getElementsByClass("title").first().text();
-			String topHeroTime = doc.getElementsByClass("progress-category").first().getElementsByClass("description").first().text();
+			String topTimePlayed = this.getTopThreeHeroes(doc.getElementsByClass("progress-category").get(0));
+			String topEliminationsPerKill = this.getTopThreeHeroes(doc.getElementsByClass("progress-category").get(3));
 			String timePlayed = doc.getElementsByClass("column xs-12 md-6 xl-4").get(6).select("td").get(1).text();
 			String rank = null;
 
@@ -79,14 +90,24 @@ public class OverwatchCmd extends AbstractCommand {
 					.appendField("Competitive rank", rank, true)
 					.appendField("Wins", wins, true)
 					.appendField("Game time", timePlayed, true)
-					.appendField("Top hero (Casual matchmaking)", topHero + " (" + topHeroTime + ")", true)
-					.withFooterText("Career link: " + url);
+					.appendField("Top hero (Time played)", topTimePlayed, true)
+					.appendField("Top hero (Eliminations per life)", topEliminationsPerKill, true);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
-		} catch (FileNotFoundException fnf) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Plateform, region or Battletag is invalid.", context.getChannel());
+		} catch (HttpStatusException e) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " This user doesn't play to Overwatch or doesn't exist.", context.getChannel());
 		} catch (IOException e) {
 			LogUtils.error("Something went wrong while getting information from Overwatch profil.... Please, try again later.", e, context.getChannel());
 		}
+	}
+
+	private String getTopThreeHeroes(Element element) {
+		StringBuilder strBuilder = new StringBuilder();
+		for(int i = 0; i < Math.min(element.getElementsByClass("bar-text").size(), 3); i++) {
+			String hero = element.getElementsByClass("title").get(i).text();
+			String desc = element.getElementsByClass("description").get(i).text();
+			strBuilder.append((i+1) + ". " + hero + " (" + desc + ")\n");
+		}
+		return strBuilder.toString();
 	}
 
 	@Override
