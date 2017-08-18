@@ -45,6 +45,7 @@ public class ReadyListener {
 			}
 		} catch (JSONException | IOException e) {
 			e.printStackTrace();
+			Shadbot.getClient().logout();
 			System.exit(0);
 		}
 

@@ -2,11 +2,13 @@ package me.shadorc.discordbot.command.game;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Timer;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
@@ -76,7 +78,7 @@ public class TriviaCmd extends AbstractCommand {
 
 		// Trivia API doc : https://opentdb.com/api_config.php
 		protected void start() throws MalformedURLException, IOException {
-			JSONObject mainObj = JSONUtils.getJsonFromUrl("https://opentdb.com/api.php?amount=1");
+			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://opentdb.com/api.php?amount=1"), "UTF-8"));
 			JSONObject resultObj = mainObj.getJSONArray("results").getJSONObject(0);
 
 			String category = resultObj.getString("category");

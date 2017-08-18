@@ -2,9 +2,11 @@ package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,7 +21,6 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.JSONUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import sx.blah.discord.util.EmbedBuilder;
@@ -86,22 +87,22 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	private void generateAccessToken() throws JSONException, IOException {
-		JSONObject oauthObj = JSONUtils.getJsonFromUrl("https://www.deviantart.com/oauth2/token?"
+		JSONObject oauthObj = new JSONObject(IOUtils.toString(new URL("https://www.deviantart.com/oauth2/token?"
 				+ "client_id=" + Storage.getApiKey(ApiKeys.DEVIANTART_CLIENT_ID)
 				+ "&client_secret=" + Storage.getApiKey(ApiKeys.DEVIANTART_API_SECRET)
-				+ "&grant_type=client_credentials");
+				+ "&grant_type=client_credentials"), "UTF-8"));
 		this.deviantArtToken = oauthObj.getString("access_token");
 	}
 
 	private JSONObject getRandomPopularResult(String encodedSearch) throws JSONException, IOException {
 		JSONObject result = null;
 		try {
-			JSONObject mainObj = JSONUtils.getJsonFromUrl(API_URL + "browse/popular?"
+			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL(API_URL + "browse/popular?"
 					+ "q=" + encodedSearch
 					+ "&timerange=alltime"
 					+ "&limit=1" // The pagination limit (min: 1 max: 50)
 					+ "&offset=" + MathUtils.rand(150) // The pagination offset (min: 0 max: 50000)
-					+ "&access_token=" + this.deviantArtToken);
+					+ "&access_token=" + this.deviantArtToken), "UTF-8"));
 			JSONArray resultsArray = mainObj.getJSONArray("results");
 
 			if(resultsArray.length() != 0) {

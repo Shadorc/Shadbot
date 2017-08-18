@@ -1,9 +1,11 @@
 package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
@@ -14,7 +16,6 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.JSONUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -42,7 +43,7 @@ public class WikiCmd extends AbstractCommand {
 
 		try {
 			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-			JSONObject mainObj = JSONUtils.getJsonFromUrl("https://en.wikipedia.org/w/api.php?"
+			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://en.wikipedia.org/w/api.php?"
 					+ "format=json"
 					+ "&action=query"
 					+ "&titles=" + URLEncoder.encode(context.getArg(), "UTF-8")
@@ -50,7 +51,7 @@ public class WikiCmd extends AbstractCommand {
 					+ "&prop=extracts"
 					+ "&explaintext=true"
 					+ "&exintro=true"
-					+ "&exsentences=5");
+					+ "&exsentences=5"), "UTF-8"));
 
 			JSONObject pagesObj = mainObj.getJSONObject("query").getJSONObject("pages");
 			String pageId = pagesObj.names().getString(0);
