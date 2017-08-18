@@ -32,7 +32,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class TriviaCmd extends AbstractCommand {
 
 	protected static final int GAINS = 25;
-	private static final Map<IGuild, GuildTriviaManager> GUILDS_TRIVIA = new HashMap<>();
+	protected static final Map<IGuild, GuildTriviaManager> GUILDS_TRIVIA = new HashMap<>();
 
 	public TriviaCmd() {
 		super(Role.USER, "trivia", "quizz", "question");
@@ -127,9 +127,8 @@ public class TriviaCmd extends AbstractCommand {
 		}
 
 		protected void stop() {
-			this.alreadyAnswered.clear();
-			this.isStarted = false;
-			this.timer.stop();
+			timer.stop();
+			GUILDS_TRIVIA.remove(channel.getGuild());
 		}
 
 		public boolean isStarted() {
