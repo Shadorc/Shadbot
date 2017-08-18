@@ -89,7 +89,7 @@ public class SettingsCmd extends AbstractCommand {
 				return;
 			}
 
-			Storage.getSetting(context.getGuild(), Setting.DEFAULT_VOLUME);
+			Storage.saveSetting(context.getGuild(), Setting.DEFAULT_VOLUME, vol);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + vol + "% is now the default volume for this server.", context.getChannel());
 
 		} else {
