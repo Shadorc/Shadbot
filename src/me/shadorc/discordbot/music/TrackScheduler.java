@@ -1,5 +1,8 @@
 package me.shadorc.discordbot.music;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -77,5 +80,12 @@ public class TrackScheduler {
 
 	public void clearPlaylist() {
 		queue.clear();
+	}
+
+	public void shufflePlaylist() {
+		List<AudioTrack> tempList = new ArrayList<>(queue);
+		Collections.shuffle(tempList);
+		queue.clear();
+		queue.addAll(tempList);
 	}
 }

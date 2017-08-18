@@ -57,7 +57,8 @@ public class HelpCmd extends AbstractCommand {
 								+ " `" + context.getPrefix() + "next`"
 								+ " `" + context.getPrefix() + "name`"
 								+ " `" + context.getPrefix() + "playlist`"
-								+ " `" + context.getPrefix() + "clear`", false)
+								+ " `" + context.getPrefix() + "clear`"
+								+ " `" + context.getPrefix() + "shuffle`", false)
 				.appendField("Games Stats Commands:",
 						"`" + context.getPrefix() + "overwatch`"
 								+ " `" + context.getPrefix() + "diablo`"
