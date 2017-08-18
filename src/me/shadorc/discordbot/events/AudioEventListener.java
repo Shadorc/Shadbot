@@ -20,11 +20,13 @@ public class AudioEventListener extends AudioEventAdapter {
 	private final IGuild guild;
 	private final TrackScheduler scheduler;
 	private IChannel channel;
+	private int errorCount;
 
 	public AudioEventListener(IGuild guild, TrackScheduler scheduler) {
 		super();
 		this.guild = guild;
 		this.scheduler = scheduler;
+		this.errorCount = 0;
 	}
 
 	public void setChannel(IChannel channel) {
@@ -41,6 +43,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		// Create a new Thread avoid java.net.SocketException by leaving the time to the sockets to close
 		new Thread(() -> {
 			if(endReason.mayStartNext) {
+				errorCount = 0; // Everything seems to be fine, reset error count.
 				if(scheduler.isRepeating()) {
 					scheduler.queue(track.makeClone());
 				} else if(!scheduler.nextTrack()) {
@@ -53,6 +56,15 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
+		errorCount++;
+		if(errorCount > 3) {
+			LogUtils.error("Something went terribly wrong, too many errors in a row. I'm stopping music to avoid spam. "
+					+ "You can retry after this, sorry for the inconvenience.", err, channel);
+			scheduler.stop();
+			GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
+			return;
+		}
+
 		BotUtils.sendMessage(Emoji.GEAR + " " + err.getMessage() + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
 		LogUtils.warn("Track exception: " + err.getMessage());
 		if(!scheduler.nextTrack()) {
