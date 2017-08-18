@@ -37,6 +37,7 @@ public class HelpCmd extends AbstractCommand {
 						"`" + context.getPrefix() + "chat`", false)
 				.appendField("Image Commands:",
 						"`" + context.getPrefix() + "image`"
+								+ " `" + context.getPrefix() + "suicidegirls`"
 								+ " `" + context.getPrefix() + "gif`", false)
 				.appendField("Games Commands:",
 						"`" + context.getPrefix() + "dice`"
