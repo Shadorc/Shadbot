@@ -121,7 +121,7 @@ public class GuildMusicManager {
 		return leaveTimer.isRunning();
 	}
 
-	public static GuildMusicManager createGuildAudioPlayer(IGuild guild) {
+	public static GuildMusicManager createGuildMusicManager(IGuild guild) {
 		GuildMusicManager musicManager = new GuildMusicManager(guild, PLAYER_MANAGER);
 		MUSIC_MANAGERS.put(guild, musicManager);
 
@@ -130,7 +130,7 @@ public class GuildMusicManager {
 		return musicManager;
 	}
 
-	public static GuildMusicManager getGuildAudioPlayer(IGuild guild) {
+	public static GuildMusicManager getGuildMusicManager(IGuild guild) {
 		return MUSIC_MANAGERS.get(guild);
 	}
 }

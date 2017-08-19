@@ -19,7 +19,7 @@ public class NameCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
+		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 		TrackScheduler scheduler = musicManager.getScheduler();
 
 		if(!scheduler.isPlaying()) {

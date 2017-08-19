@@ -47,7 +47,7 @@ public class AudioEventListener extends AudioEventAdapter {
 				if(scheduler.isRepeating()) {
 					scheduler.queue(track.makeClone());
 				} else if(!scheduler.nextTrack()) {
-					GuildMusicManager.getGuildAudioPlayer(guild).end();
+					GuildMusicManager.getGuildMusicManager(guild).end();
 				}
 			}
 		}).start();
@@ -59,7 +59,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		if(errorCount > 3) {
 			LogUtils.error("Something went terribly wrong, too many errors in a row. I'm stopping music to avoid spam. "
 					+ "You can retry after this, sorry for the inconvenience.", err, channel);
-			GuildMusicManager.getGuildAudioPlayer(guild).leaveVoiceChannel();
+			GuildMusicManager.getGuildMusicManager(guild).leaveVoiceChannel();
 			return;
 		}
 
@@ -67,7 +67,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		LogUtils.warn("{AudioEventListener} {Guild: " + channel.getGuild().getName()
 				+ " (ID: " + channel.getGuild().getStringID() + ")} Track exception: " + err.getMessage());
 		if(!scheduler.nextTrack()) {
-			GuildMusicManager.getGuildAudioPlayer(guild).end();
+			GuildMusicManager.getGuildMusicManager(guild).end();
 		}
 	}
 
@@ -77,7 +77,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		LogUtils.warn("{AudioEventListener} {Guild: " + channel.getGuild().getName()
 				+ " (ID: " + channel.getGuild().getStringID() + ")} Music stuck, skipping it.");
 		if(!scheduler.nextTrack()) {
-			GuildMusicManager.getGuildAudioPlayer(guild).end();
+			GuildMusicManager.getGuildMusicManager(guild).end();
 		}
 	}
 }

@@ -43,7 +43,7 @@ public class ShutdownCmd extends AbstractCommand {
 
 		for(IGuild guild : Shadbot.getClient().getGuilds()) {
 			if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() != null) {
-				BotUtils.sendMessage(Emoji.INFO + " " + message, GuildMusicManager.getGuildAudioPlayer(guild).getChannel());
+				BotUtils.sendMessage(Emoji.INFO + " " + message, GuildMusicManager.getGuildMusicManager(guild).getChannel());
 			}
 		}
 
