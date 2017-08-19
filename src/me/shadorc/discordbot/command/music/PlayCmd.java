@@ -55,6 +55,9 @@ public class PlayCmd extends AbstractCommand {
 		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
+		if(musicManager == null) {
+			musicManager = GuildMusicManager.createGuildAudioPlayer(context.getGuild());
+		}
 		musicManager.setChannel(context.getChannel());
 		musicManager.setDj(context.getAuthor());
 		AudioLoadResultListener resultListener = new AudioLoadResultListener(identifier.toString(), botVoiceChannel, userVoiceChannel, musicManager);

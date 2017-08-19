@@ -20,13 +20,13 @@ public class RepeatCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		TrackScheduler scheduler = musicManager.getScheduler();
 
-		if(!scheduler.isPlaying()) {
+		if(musicManager == null) {
 			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
+		TrackScheduler scheduler = musicManager.getScheduler();
 		scheduler.setRepeatEnabled(!scheduler.isRepeating());
 		if(scheduler.isRepeating()) {
 			BotUtils.sendMessage(Emoji.REPEAT + " Repetition enabled.", context.getChannel());

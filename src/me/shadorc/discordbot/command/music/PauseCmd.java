@@ -20,13 +20,13 @@ public class PauseCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		TrackScheduler scheduler = musicManager.getScheduler();
 
-		if(!scheduler.isPlaying()) {
+		if(musicManager == null) {
 			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
+		TrackScheduler scheduler = musicManager.getScheduler();
 		scheduler.setPaused(!scheduler.isPaused());
 		if(scheduler.isPaused()) {
 			BotUtils.sendMessage(Emoji.PAUSE + " Music paused by " + context.getAuthorName() + ".", context.getChannel());

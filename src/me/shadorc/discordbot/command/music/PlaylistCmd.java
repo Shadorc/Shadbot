@@ -11,7 +11,6 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
-import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
@@ -25,9 +24,8 @@ public class PlaylistCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		TrackScheduler scheduler = musicManager.getScheduler();
 
-		if(!scheduler.isPlaying()) {
+		if(musicManager == null) {
 			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
@@ -36,7 +34,7 @@ public class PlaylistCmd extends AbstractCommand {
 				.withAuthorName("Playlist")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-				.withDescription(this.formatPlaylist(scheduler.getPlaylist()));
+				.withDescription(this.formatPlaylist(musicManager.getScheduler().getPlaylist()));
 		BotUtils.sendEmbed(embed.build(), context.getChannel());
 	}
 

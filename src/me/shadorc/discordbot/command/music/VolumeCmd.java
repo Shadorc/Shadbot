@@ -20,13 +20,13 @@ public class VolumeCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		TrackScheduler scheduler = musicManager.getScheduler();
 
-		if(!scheduler.isPlaying()) {
+		if(musicManager == null) {
 			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
+		TrackScheduler scheduler = musicManager.getScheduler();
 		if(!context.hasArg()) {
 			BotUtils.sendMessage(Emoji.SPEAKER + " Current volume level: " + scheduler.getVolume() + "%", context.getChannel());
 			return;

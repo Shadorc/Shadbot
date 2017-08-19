@@ -7,7 +7,6 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
-import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -20,15 +19,14 @@ public class NextCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
-		TrackScheduler scheduler = musicManager.getScheduler();
 
-		if(!scheduler.isPlaying()) {
+		if(musicManager == null) {
 			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
-		if(!scheduler.nextTrack()) {
-			GuildMusicManager.getGuildAudioPlayer(context.getGuild()).end();
+		if(!musicManager.getScheduler().nextTrack()) {
+			musicManager.end();
 		}
 	}
 

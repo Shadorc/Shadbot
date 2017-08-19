@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.music;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
@@ -24,7 +23,7 @@ public class GuildMusicManager {
 
 	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
 
-	private final static Map<IGuild, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
+	private final static ConcurrentHashMap<IGuild, GuildMusicManager> MUSIC_MANAGERS = new ConcurrentHashMap<>();
 
 	private final IGuild guild;
 	private final AudioPlayer audioPlayer;
@@ -122,16 +121,16 @@ public class GuildMusicManager {
 		return leaveTimer.isRunning();
 	}
 
-	public static synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {
-		GuildMusicManager musicManager = MUSIC_MANAGERS.get(guild);
-
-		if(musicManager == null) {
-			musicManager = new GuildMusicManager(guild, PLAYER_MANAGER);
-			MUSIC_MANAGERS.put(guild, musicManager);
-		}
+	public static GuildMusicManager createGuildAudioPlayer(IGuild guild) {
+		GuildMusicManager musicManager = new GuildMusicManager(guild, PLAYER_MANAGER);
+		MUSIC_MANAGERS.put(guild, musicManager);
 
 		guild.getAudioManager().setAudioProvider(musicManager.getAudioProvider());
 
 		return musicManager;
+	}
+
+	public static GuildMusicManager getGuildAudioPlayer(IGuild guild) {
+		return MUSIC_MANAGERS.get(guild);
 	}
 }
