@@ -38,10 +38,6 @@ public class TrackScheduler {
 		return audioPlayer.startTrack(queue.poll(), false);
 	}
 
-	public void stop() {
-		audioPlayer.stopTrack();
-	}
-
 	public String getCurrentTrackName() {
 		return StringUtils.formatTrackName(audioPlayer.getPlayingTrack().getInfo());
 	}

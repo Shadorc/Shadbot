@@ -27,7 +27,7 @@ public class GuildMusicManager {
 	private final static Map<IGuild, GuildMusicManager> MUSIC_MANAGERS = new HashMap<>();
 
 	private final IGuild guild;
-	private final AudioPlayer player;
+	private final AudioPlayer audioPlayer;
 	private final TrackScheduler scheduler;
 	private final AudioEventListener audioEventListener;
 	private final Timer leaveTimer;
@@ -40,12 +40,11 @@ public class GuildMusicManager {
 
 	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
 		this.guild = guild;
-		this.player = manager.createPlayer();
-		this.scheduler = new TrackScheduler(guild, player);
+		this.audioPlayer = manager.createPlayer();
+		this.scheduler = new TrackScheduler(guild, audioPlayer);
 		this.audioEventListener = new AudioEventListener(guild, scheduler);
-		this.player.addListener(audioEventListener);
+		this.audioPlayer.addListener(audioEventListener);
 		this.leaveTimer = new Timer(60 * 1000, event -> {
-			this.scheduler.stop();
 			this.leaveVoiceChannel();
 		});
 	}
@@ -86,6 +85,7 @@ public class GuildMusicManager {
 			voiceChannel.leave();
 		}
 		leaveTimer.stop();
+		audioPlayer.destroy();
 		MUSIC_MANAGERS.remove(guild);
 	}
 
@@ -103,11 +103,11 @@ public class GuildMusicManager {
 	}
 
 	public AudioProvider getAudioProvider() {
-		return new AudioProvider(player);
+		return new AudioProvider(audioPlayer);
 	}
 
 	public AudioPlayer getAudioPlayer() {
-		return player;
+		return audioPlayer;
 	}
 
 	public TrackScheduler getScheduler() {
