@@ -18,7 +18,7 @@ import sx.blah.discord.util.RequestBuffer;
 public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
-		if(!Shadbot.getClient().isReady() || !Shadbot.getClient().isLoggedIn()) {
+		if(!(channel.getShard().isReady() && channel.getShard().isLoggedIn())) {
 			LogUtils.info("Shadbot has not established a connection with the Discord gateway on all shards yet, aborting attempt to send message.");
 			return;
 		}
@@ -42,7 +42,7 @@ public class BotUtils {
 
 	// EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
-		if(!Shadbot.getClient().isReady() || !Shadbot.getClient().isLoggedIn()) {
+		if(!(channel.getShard().isReady() && channel.getShard().isLoggedIn())) {
 			LogUtils.info("Shadbot has not established a connection with the Discord gateway on all shards yet, aborting attempt to send embed.");
 			return;
 		}
