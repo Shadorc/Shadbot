@@ -77,7 +77,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			BotUtils.sendEmbed(embed.build(), musicManager.getChannel());
 
 			resultsTracks = tracks;
-			MessageManager.addListener(musicManager.getChannel().getGuild(), this);
+			MessageManager.addListener(musicManager.getChannel(), this);
 			return;
 		}
 
@@ -113,7 +113,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		if(message.getContent().equalsIgnoreCase(Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel")) {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
 			resultsTracks.clear();
-			MessageManager.removeListener(musicManager.getChannel().getGuild());
+			MessageManager.removeListener(musicManager.getChannel());
 			return;
 		}
 
@@ -143,6 +143,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		musicManager.getScheduler().queue(track);
 
 		resultsTracks.clear();
-		MessageManager.removeListener(musicManager.getChannel().getGuild());
+		MessageManager.removeListener(musicManager.getChannel());
 	}
 }

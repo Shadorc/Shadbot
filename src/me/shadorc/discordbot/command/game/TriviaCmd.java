@@ -103,7 +103,7 @@ public class TriviaCmd extends AbstractCommand {
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Trivia")
-					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
+					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withColor(Config.BOT_COLOR)
 					.appendField("Question", strBuilder.toString(), false)
 					.appendField("Category", "`" + category + "`", true)
@@ -113,14 +113,14 @@ public class TriviaCmd extends AbstractCommand {
 
 			BotUtils.sendEmbed(builder.build(), channel);
 
-			MessageManager.addListener(channel.getGuild(), this);
+			MessageManager.addListener(channel, this);
 
 			this.correctAnswer = StringUtils.convertHtmlToUTF8(correctAnswer);
 			this.timer.start();
 		}
 
 		private void stop() {
-			MessageManager.removeListener(channel.getGuild());
+			MessageManager.removeListener(channel);
 			timer.stop();
 		}
 

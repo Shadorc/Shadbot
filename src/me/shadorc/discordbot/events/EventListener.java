@@ -46,7 +46,7 @@ public class EventListener {
 		}
 
 		IMessage message = event.getMessage();
-		if(MessageManager.isWaitingForMessage(event.getGuild())) {
+		if(MessageManager.isWaitingForMessage(event.getChannel())) {
 			MessageManager.notify(message);
 			return;
 		}

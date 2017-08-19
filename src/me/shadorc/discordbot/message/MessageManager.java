@@ -2,29 +2,29 @@ package me.shadorc.discordbot.message;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 
 public class MessageManager {
 
-	private final static ConcurrentHashMap<IGuild, MessageListener> GUILDS_LISTENERS = new ConcurrentHashMap<>();
+	private final static ConcurrentHashMap<IChannel, MessageListener> CHANNELS_LISTENERS = new ConcurrentHashMap<>();
 
-	public static void addListener(IGuild guild, MessageListener listener) {
-		GUILDS_LISTENERS.put(guild, listener);
+	public static void addListener(IChannel channel, MessageListener listener) {
+		CHANNELS_LISTENERS.put(channel, listener);
 	}
 
-	public static void removeListener(IGuild guild) {
-		GUILDS_LISTENERS.remove(guild);
+	public static void removeListener(IChannel channel) {
+		CHANNELS_LISTENERS.remove(channel);
 	}
 
 	public static void notify(IMessage message) {
-		for(IGuild guild : GUILDS_LISTENERS.keySet()) {
-			GUILDS_LISTENERS.get(guild).onMessageReceived(message);
+		for(IChannel channel : CHANNELS_LISTENERS.keySet()) {
+			CHANNELS_LISTENERS.get(channel).onMessageReceived(message);
 		}
 	}
 
-	public static boolean isWaitingForMessage(IGuild guild) {
-		return GUILDS_LISTENERS.containsKey(guild);
+	public static boolean isWaitingForMessage(IChannel channel) {
+		return CHANNELS_LISTENERS.containsKey(channel);
 	}
 
 }
