@@ -74,6 +74,8 @@ public class GuildMusicManager {
 					+ "Shadbot wasn't allowed to connect/speak.");
 			return false;
 		}
+		LogUtils.info("{GuildMusicManager} {Guild: " + voiceChannel.getGuild().getName()
+				+ " (ID: " + voiceChannel.getGuild().getStringID() + ")} Voice channel joined.");
 		voiceChannel.join();
 		return true;
 	}
@@ -86,6 +88,9 @@ public class GuildMusicManager {
 		leaveTimer.stop();
 		audioPlayer.destroy();
 		MUSIC_MANAGERS.remove(guild);
+		LogUtils.info("{GuildMusicManager} {Guild: " + voiceChannel.getGuild().getName()
+				+ " (ID: " + voiceChannel.getGuild().getStringID() + ")} Voice channel leaved.");
+
 	}
 
 	public void setChannel(IChannel channel) {

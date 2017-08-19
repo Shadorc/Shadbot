@@ -34,7 +34,7 @@ public class StringUtils {
 		if(info.isStream) {
 			strBuilder.append(" (Stream)");
 		} else {
-			strBuilder.append(" (" + DurationFormatUtils.formatDuration(info.length, "mm:ss", false) + ")");
+			strBuilder.append(" (" + DurationFormatUtils.formatDuration(info.length, "m:ss", true) + ")");
 		}
 
 		return strBuilder.toString();
