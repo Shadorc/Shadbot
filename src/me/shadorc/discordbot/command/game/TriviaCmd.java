@@ -21,10 +21,10 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.JSONUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
@@ -87,7 +87,7 @@ public class TriviaCmd extends AbstractCommand {
 			String question = resultObj.getString("question");
 			String correctAnswer = resultObj.getString("correct_answer");
 
-			this.incorrectAnswers = JSONUtils.convertArrayToList(resultObj.getJSONArray("incorrect_answers"));
+			this.incorrectAnswers = Utils.convertArrayToList(resultObj.getJSONArray("incorrect_answers"));
 
 			StringBuilder strBuilder = new StringBuilder("**" + StringUtils.convertHtmlToUTF8(question) + "**");
 			if("multiple".equals(type)) {

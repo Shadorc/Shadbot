@@ -59,7 +59,7 @@ public class UrbanCmd extends AbstractCommand {
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Urban Dictionary: " + resultObj.getString("word"))
-					.withAuthorIcon(context.getGuild().getClient().getOurUser().getAvatarURL())
+					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
 					.withColor(Config.BOT_COLOR)
 					.withDescription(definition);

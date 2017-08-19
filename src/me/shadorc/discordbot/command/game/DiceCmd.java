@@ -142,7 +142,7 @@ public class DiceCmd extends AbstractCommand {
 		protected void start() {
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("Dice Game")
-					.withAuthorIcon(channel.getClient().getOurUser().getAvatarURL())
+					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 					.withColor(Config.BOT_COLOR)
 					.appendField(croupier.getName() + " started a dice game.",

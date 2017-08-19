@@ -67,7 +67,7 @@ public class ImageCmd extends AbstractCommand {
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.withAuthorName("DeviantArt Search (" + context.getArg() + ")")
-					.withAuthorIcon(context.getGuild().getClient().getOurUser().getAvatarURL())
+					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withUrl(resultObj.getString("url"))
 					.withThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
 					.withColor(Config.BOT_COLOR)
