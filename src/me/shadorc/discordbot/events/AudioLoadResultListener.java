@@ -120,12 +120,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		String numStr = message.getContent();
 		if(!StringUtils.isInteger(numStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid choice.", musicManager.getChannel());
+			LogUtils.info("Sending \"Invalid coice\" to guild: " + musicManager.getChannel().getGuild().getName());
 			return;
 		}
 
 		int num = Integer.parseInt(numStr);
 		if(num < 1 || num > Math.min(5, resultsTracks.size())) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid choice.", musicManager.getChannel());
+			LogUtils.info("Sending \"Invalid coice\" to guild: " + musicManager.getChannel().getGuild().getName());
 			return;
 		}
 

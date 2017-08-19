@@ -83,6 +83,11 @@ public class BotUtils {
 	}
 
 	public static boolean hasPermission(IChannel channel, Permissions permission, Permissions... permissions) {
+		if(channel == null) {
+			LogUtils.warn("Shadbot tried to check permission on a non-existing channel.");
+			return false;
+		}
+
 		for(Permissions perm : permissions) {
 			if(!channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(perm)) {
 				return false;
@@ -92,6 +97,11 @@ public class BotUtils {
 	}
 
 	public static boolean hasPermission(IVoiceChannel voiceChannel, Permissions permission, Permissions... permissions) {
+		if(voiceChannel == null) {
+			LogUtils.warn("Shadbot tried to check permission on a non-existing voice channel.");
+			return false;
+		}
+
 		for(Permissions perm : permissions) {
 			if(!voiceChannel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(perm)) {
 				return false;
