@@ -1,14 +1,13 @@
 package me.shadorc.discordbot.message;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 
 public class MessageManager {
 
-	private final static Map<IGuild, MessageListener> GUILDS_LISTENERS = new HashMap<>();
+	private final static ConcurrentHashMap<IGuild, MessageListener> GUILDS_LISTENERS = new ConcurrentHashMap<>();
 
 	public static void addListener(IGuild guild, MessageListener listener) {
 		GUILDS_LISTENERS.put(guild, listener);
