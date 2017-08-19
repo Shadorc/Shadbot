@@ -123,16 +123,17 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		if(message.getContent().equalsIgnoreCase(Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel")) {
+		String prefix = Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX).toString();
+		if(message.getContent().equalsIgnoreCase(prefix + "cancel")) {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
 			this.stopWaiting();
 			return;
 		}
 
-		String numStr = message.getContent();
+		String numStr = message.getContent().replace(prefix, "");
 		if(!StringUtils.isInteger(numStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid choice. "
-					+ "You can use \"" + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel\" to cancel.",
+					+ "You can use \"" + prefix + "cancel\" to cancel.",
 					musicManager.getChannel());
 			LogUtils.info("Sending \"Invalid choice\" to guild: " + musicManager.getChannel().getGuild().getName());
 			return;
@@ -141,7 +142,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		int num = Integer.parseInt(numStr);
 		if(num < 1 || num > Math.min(5, resultsTracks.size())) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid choice. "
-					+ "You can use \"" + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel\" to cancel.",
+					+ "You can use \"" + prefix + "cancel\" to cancel.",
 					musicManager.getChannel());
 			LogUtils.info("Sending \"Invalid choice\" to guild: " + musicManager.getChannel().getGuild().getName());
 			return;
