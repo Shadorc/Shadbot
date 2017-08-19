@@ -2,6 +2,8 @@ package me.shadorc.discordbot.events;
 
 import java.util.List;
 
+import javax.swing.Timer;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -32,6 +34,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private final GuildMusicManager musicManager;
 
 	private List<AudioTrack> resultsTracks;
+	private Timer cancelTimer;
 
 	public AudioLoadResultListener(String identifier, IVoiceChannel botVoiceChannel, IVoiceChannel userVoiceChannel, GuildMusicManager musicManager) {
 		this.identifier = identifier;
@@ -73,8 +76,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					.withAuthorName("Results (Type: " + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel to cancel)")
 					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-					.withDescription("**Enter your choice.**\n" + strBuilder.toString());
+					.withDescription("**Enter your choice.**\n" + strBuilder.toString())
+					.withFooterText("This choice will be canceled in 30 seconds.");
 			BotUtils.sendEmbed(embed.build(), musicManager.getChannel());
+
+			cancelTimer = new Timer(30 * 1000, event -> {
+				this.stopWaiting();
+			});
+			cancelTimer.start();
 
 			resultsTracks = tracks;
 			MessageManager.addListener(musicManager.getChannel(), this);
@@ -116,8 +125,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		if(message.getContent().equalsIgnoreCase(Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel")) {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
-			resultsTracks.clear();
-			MessageManager.removeListener(musicManager.getChannel());
+			this.stopWaiting();
 			return;
 		}
 
@@ -150,6 +158,11 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 		musicManager.getScheduler().queue(track);
 
+		this.stopWaiting();
+	}
+
+	private void stopWaiting() {
+		cancelTimer.stop();
 		resultsTracks.clear();
 		MessageManager.removeListener(musicManager.getChannel());
 	}
