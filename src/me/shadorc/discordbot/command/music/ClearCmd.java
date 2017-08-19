@@ -7,6 +7,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
+import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -18,7 +19,15 @@ public class ClearCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		GuildMusicManager.getGuildAudioPlayer(context.getGuild()).getScheduler().clearPlaylist();
+		GuildMusicManager musicManager = GuildMusicManager.getGuildAudioPlayer(context.getGuild());
+		TrackScheduler scheduler = musicManager.getScheduler();
+
+		if(!scheduler.isPlaying()) {
+			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			return;
+		}
+
+		musicManager.getScheduler().clearPlaylist();
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist cleared.", context.getChannel());
 	}
 
