@@ -110,6 +110,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 	@Override
 	public void onMessageReceived(IMessage message) {
+		if(!message.getAuthor().equals(musicManager.getDj())) {
+			return;
+		}
+
 		if(message.getContent().equalsIgnoreCase(Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel")) {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
 			resultsTracks.clear();
@@ -120,14 +124,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		String numStr = message.getContent();
 		if(!StringUtils.isInteger(numStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid choice.", musicManager.getChannel());
-			LogUtils.info("Sending \"Invalid coice\" to guild: " + musicManager.getChannel().getGuild().getName());
+			LogUtils.info("Sending \"Invalid choice\" to guild: " + musicManager.getChannel().getGuild().getName());
 			return;
 		}
 
 		int num = Integer.parseInt(numStr);
 		if(num < 1 || num > Math.min(5, resultsTracks.size())) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid choice.", musicManager.getChannel());
-			LogUtils.info("Sending \"Invalid coice\" to guild: " + musicManager.getChannel().getGuild().getName());
+			LogUtils.info("Sending \"Invalid choice\" to guild: " + musicManager.getChannel().getGuild().getName());
 			return;
 		}
 

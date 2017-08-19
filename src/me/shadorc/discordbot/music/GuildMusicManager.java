@@ -16,6 +16,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.handle.obj.Permissions;
 
@@ -30,7 +31,9 @@ public class GuildMusicManager {
 	private final TrackScheduler scheduler;
 	private final AudioEventListener audioEventListener;
 	private final Timer leaveTimer;
+
 	private IChannel channel;
+	private IUser userDj;
 
 	// TODO: Remove
 	private boolean ended;
@@ -86,6 +89,14 @@ public class GuildMusicManager {
 	public void setChannel(IChannel channel) {
 		this.channel = channel;
 		this.audioEventListener.setChannel(channel);
+	}
+
+	public void setDj(IUser userDj) {
+		this.userDj = userDj;
+	}
+
+	public IUser getDj() {
+		return userDj;
 	}
 
 	public AudioProvider getAudioProvider() {
