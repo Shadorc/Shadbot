@@ -123,14 +123,18 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		String numStr = message.getContent();
 		if(!StringUtils.isInteger(numStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid choice.", musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid music number. "
+					+ "You can use \"" + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "\" to cancel.",
+					musicManager.getChannel());
 			LogUtils.info("Sending \"Invalid choice\" to guild: " + musicManager.getChannel().getGuild().getName());
 			return;
 		}
 
 		int num = Integer.parseInt(numStr);
 		if(num < 1 || num > Math.min(5, resultsTracks.size())) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid choice.", musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid music number. "
+					+ "You can use \"" + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel\" to cancel.",
+					musicManager.getChannel());
 			LogUtils.info("Sending \"Invalid choice\" to guild: " + musicManager.getChannel().getGuild().getName());
 			return;
 		}
