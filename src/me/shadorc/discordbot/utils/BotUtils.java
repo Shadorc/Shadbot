@@ -19,13 +19,13 @@ public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
 		if(!(channel.getShard().isReady() && channel.getShard().isLoggedIn())) {
-			LogUtils.info("Shadbot has not established a connection with the Discord gateway on all shards yet, aborting attempt to send message.");
+			LogUtils.info("Shard isn't ready/connected, aborting attempt to send message.");
 			return;
 		}
 
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES)) {
-			LogUtils.warn("Shadbot wasn't allowed to send message in guild: "
-					+ "\"" + channel.getGuild().getName() + "\" (ID: " + channel.getGuild().getStringID() + ")");
+			LogUtils.warn("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
+					+ "Shadbot wasn't allowed to send message.");
 			return;
 		}
 
@@ -33,7 +33,8 @@ public class BotUtils {
 			try {
 				channel.sendMessage(message);
 			} catch (MissingPermissionsException e) {
-				LogUtils.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
+				LogUtils.error("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
+						+ "Missing permissions.", e);
 			} catch (DiscordException e) {
 				LogUtils.error("Discord exception while sending message : " + e.getErrorMessage(), e);
 			}
@@ -43,15 +44,15 @@ public class BotUtils {
 	// EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
 		if(!(channel.getShard().isReady() && channel.getShard().isLoggedIn())) {
-			LogUtils.info("Shadbot has not established a connection with the Discord gateway on all shards yet, aborting attempt to send embed.");
+			LogUtils.info("Shard isn't ready/connected, aborting attempt to send message.");
 			return;
 		}
 
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.EMBED_LINKS)) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot send embed links due to the lack of permission. :("
 					+ " Please, check my permissions and channel-specific ones to verify that \"Send Embed links\" is checked.", channel);
-			LogUtils.warn("Shadbot wasn't allowed to send embed link in guild: "
-					+ "\"" + channel.getGuild().getName() + "\" (ID: " + channel.getGuild().getStringID() + ")");
+			LogUtils.warn("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
+					+ "Shadbot wasn't allowed to send embed link.");
 			return;
 		}
 
@@ -59,7 +60,8 @@ public class BotUtils {
 			try {
 				channel.sendMessage(embed);
 			} catch (MissingPermissionsException e) {
-				LogUtils.error("Missing permissions for guild \"" + channel.getGuild() + "\" (ID: " + channel.getGuild().getStringID() + ")", e);
+				LogUtils.error("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
+						+ "Missing permissions.", e);
 			} catch (DiscordException e) {
 				LogUtils.error("Discord exception while sending embed : " + e.getErrorMessage(), e);
 			}

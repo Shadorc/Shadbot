@@ -61,7 +61,8 @@ public class GuildMusicManager {
 	public void end() {
 		// TODO: Remove
 		if(ended) {
-			LogUtils.warn("Debug: Music has tried to end multiple times...");
+			LogUtils.warn("{GuildMusicManager} {Guild: " + channel.getGuild().getName()
+					+ " (ID: " + channel.getGuild().getStringID() + ")} Music has tried to end multiple times.");
 			return;
 		}
 		ended = true;
@@ -71,6 +72,8 @@ public class GuildMusicManager {
 
 	public boolean joinVoiceChannel(IVoiceChannel voiceChannel) {
 		if(!BotUtils.hasPermission(voiceChannel, Permissions.VOICE_CONNECT, Permissions.VOICE_SPEAK)) {
+			LogUtils.warn("{Guild: " + voiceChannel.getGuild().getName() + " (ID: " + voiceChannel.getGuild().getStringID() + ")} "
+					+ "Shadbot wasn't allowed to connect/speak.");
 			return false;
 		}
 		voiceChannel.join();

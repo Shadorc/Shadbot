@@ -7,6 +7,7 @@ import java.util.Map;
 
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -55,6 +56,8 @@ public class RateLimiter {
 	}
 
 	public void warn(String message, Context context) {
+		LogUtils.info("{RateLimiter} {Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")} "
+				+ "User (ID:" + context.getAuthor().getStringID() + ") warned.");
 		BotUtils.sendMessage(Emoji.STOPWATCH + " " + message, context.getChannel());
 		warningsRateLimiter.get(context.getGuild()).put(context.getAuthor(), true);
 	}

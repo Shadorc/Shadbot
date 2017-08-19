@@ -110,10 +110,12 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	@Override
 	public void loadFailed(FriendlyException err) {
 		if(err.severity.equals(FriendlyException.Severity.FAULT)) {
-			LogUtils.warn("Error while playing music (" + err.getMessage() + "), Shadbot might be able to continue playing.");
+			LogUtils.warn("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
+					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Load failed, Shadbot might be able to continue playing: " + err.getMessage());
 		} else {
 			BotUtils.sendMessage(Emoji.GEAR + " Sorry, " + err.getMessage().toLowerCase(), musicManager.getChannel());
-			LogUtils.warn("Load failed: " + err.getMessage());
+			LogUtils.warn("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
+					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Load failed: " + err.getMessage());
 		}
 	}
 
@@ -135,7 +137,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid choice. "
 					+ "You can use \"" + prefix + "cancel\" to cancel.",
 					musicManager.getChannel());
-			LogUtils.info("Sending \"Invalid choice\" to guild: " + musicManager.getChannel().getGuild().getName());
+			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
+					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Invalid choice: " + message.getContent());
 			return;
 		}
 
@@ -144,7 +147,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid choice. "
 					+ "You can use \"" + prefix + "cancel\" to cancel.",
 					musicManager.getChannel());
-			LogUtils.info("Sending \"Invalid choice\" to guild: " + musicManager.getChannel().getGuild().getName());
+			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
+					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Invalid choice: " + message.getContent());
 			return;
 		}
 

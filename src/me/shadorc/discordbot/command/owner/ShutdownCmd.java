@@ -55,7 +55,7 @@ public class ShutdownCmd extends AbstractCommand {
 		};
 		new Timer().schedule(task, time * 1000);
 
-		LogUtils.warn("Shadbot will restart in " + time + " seconds with the message:" + message);
+		LogUtils.warn("Shadbot will restart in " + time + " seconds with the message: " + message);
 	}
 
 	@Override

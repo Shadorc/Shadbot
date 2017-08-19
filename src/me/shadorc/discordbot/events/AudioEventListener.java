@@ -65,7 +65,8 @@ public class AudioEventListener extends AudioEventAdapter {
 		}
 
 		BotUtils.sendMessage(Emoji.GEAR + " " + err.getMessage() + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
-		LogUtils.warn("Track exception: " + err.getMessage());
+		LogUtils.warn("{AudioEventListener} {Guild: " + channel.getGuild().getName()
+				+ " (ID: " + channel.getGuild().getStringID() + ")} Track exception: " + err.getMessage());
 		if(!scheduler.nextTrack()) {
 			GuildMusicManager.getGuildAudioPlayer(guild).end();
 		}
@@ -74,7 +75,8 @@ public class AudioEventListener extends AudioEventAdapter {
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
 		BotUtils.sendMessage(Emoji.GEAR + " Music seems stuck, I'll try to play the next available song.", channel);
-		LogUtils.warn("Music was stuck, skipping it.");
+		LogUtils.warn("{AudioEventListener} {Guild: " + channel.getGuild().getName()
+				+ " (ID: " + channel.getGuild().getStringID() + ")} Music stuck, skipping it.");
 		if(!scheduler.nextTrack()) {
 			GuildMusicManager.getGuildAudioPlayer(guild).end();
 		}

@@ -11,6 +11,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class CalcCmd extends AbstractCommand {
@@ -29,6 +30,7 @@ public class CalcCmd extends AbstractCommand {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			BotUtils.sendMessage(context.getArg() + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException e) {
+			LogUtils.info("{CalcCmd} {Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")} Invalid expression: " + context.getArg() + ".");
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid expression.", context.getChannel());
 		}
 	}
