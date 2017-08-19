@@ -105,17 +105,26 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	@Override
 	public void noMatches() {
 		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+
+		if(musicManager.getScheduler().isStopped()) {
+			musicManager.leaveVoiceChannel();
+		}
 	}
 
 	@Override
 	public void loadFailed(FriendlyException err) {
 		if(err.severity.equals(FriendlyException.Severity.FAULT)) {
 			LogUtils.warn("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
-					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Load failed, Shadbot might be able to continue playing: " + err.getMessage());
+					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} "
+					+ "Load failed (Severity: " + err.severity.toString() + "), Shadbot might be able to continue playing: " + err.getMessage());
 		} else {
 			BotUtils.sendMessage(Emoji.GEAR + " Sorry, " + err.getMessage().toLowerCase(), musicManager.getChannel());
 			LogUtils.warn("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
 					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Load failed: " + err.getMessage());
+		}
+
+		if(musicManager.getScheduler().isStopped()) {
+			musicManager.leaveVoiceChannel();
 		}
 	}
 
