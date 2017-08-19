@@ -77,10 +77,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 					.withDescription("**Enter your choice.**\n" + strBuilder.toString())
-					.withFooterText("This choice will be canceled in 30 seconds.");
+					.withFooterText("This choice will be canceled in 15 seconds.");
 			BotUtils.sendEmbed(embed.build(), musicManager.getChannel());
 
-			cancelTimer = new Timer(30 * 1000, event -> {
+			cancelTimer = new Timer(15 * 1000, event -> {
 				this.stopWaiting();
 			});
 			cancelTimer.start();
