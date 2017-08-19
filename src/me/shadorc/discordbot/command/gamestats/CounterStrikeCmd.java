@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.gamestats;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.io.IOUtils;
@@ -51,7 +52,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			if(StringUtils.isInteger(context.getArg())) {
 				steamids = context.getArg();
 			} else {
-				Document userPage = NetUtils.getDoc("https://steamcommunity.com/id/" + context.getArg() + "/");
+				Document userPage = NetUtils.getDoc("https://steamcommunity.com/id/" + URLEncoder.encode(context.getArg(), "UTF-8") + "/");
 
 				if(!userPage.getElementsByClass("error_ctn").isEmpty()) {
 					BotUtils.sendMessage(Emoji.EXCLAMATION + " This user does not exist.", context.getChannel());
