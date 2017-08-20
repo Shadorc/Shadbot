@@ -47,7 +47,8 @@ public class ServerInfoCmd extends AbstractCommand {
 								+ "\n**Default volume:** " + Storage.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
 								+ "\n**Allowed channels:** " + (Storage.getSetting(guild, Setting.ALLOWED_CHANNELS) == null ? "All" : "\n"
 										+ Utils.convertArrayToList((JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS)).stream().map(
-												idStr -> "\t" + guild.getChannelByID(Long.parseLong(idStr)).getName()).collect(Collectors.joining("\n"))), true)
+												idStr -> "\t" + (guild.getChannelByID(Long.parseLong(idStr)) == null ? "" : guild.getChannelByID(Long.parseLong(idStr)).getName()))
+												.collect(Collectors.joining("\n"))), true)
 				.appendField("Server ID", Long.toString(guild.getLongID()), true);
 		BotUtils.sendEmbed(embed.build(), context.getChannel());
 	}
