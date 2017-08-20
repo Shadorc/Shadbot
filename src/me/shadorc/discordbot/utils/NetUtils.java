@@ -46,44 +46,6 @@ public class NetUtils {
 		return true;
 	}
 
-	/**
-	 * @return time to send a packet of 32 bytes, -1 if an exception occured
-	 */
-	public static float getPing() {
-		if(Config.VERSION.isBeta()) {
-			return -42;
-		}
-
-		BufferedReader reader = null;
-
-		try {
-			String command = "ping -c 1 www.discordapp.com";
-
-			Process process = Runtime.getRuntime().exec(command);
-			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-			StringBuilder builder = new StringBuilder();
-
-			String line;
-			while((line = reader.readLine()) != null) {
-				builder.append(line + "\n");
-			}
-
-			String result = builder.toString();
-			String time = result.substring(result.indexOf("time=") + 5, result.indexOf(" ms"));
-
-			return Float.parseFloat(time);
-
-		} catch (IOException e) {
-			LogUtils.error("An error occured while parsing ping.", e);
-
-		} finally {
-			IOUtils.closeQuietly(reader);
-		}
-
-		return -1;
-	}
-
 	public static void postStats() {
 		if(Config.VERSION.isBeta()) {
 			return;

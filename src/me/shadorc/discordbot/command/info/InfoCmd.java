@@ -2,7 +2,9 @@ package me.shadorc.discordbot.command.info;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
@@ -14,7 +16,6 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.Discord4J;
 import sx.blah.discord.util.EmbedBuilder;
@@ -29,6 +30,7 @@ public class InfoCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		Runtime runtime = Runtime.getRuntime();
 
+		long ping = ChronoUnit.MILLIS.between(LocalDateTime.now(), context.getMessage().getCreationDate());
 		long usedMemory = runtime.totalMemory() - runtime.freeMemory();
 		long maxMemory = runtime.maxMemory();
 		long uptime = Duration.between(Discord4J.getLaunchTime().atZone(ZoneId.systemDefault()).toInstant(), Instant.now()).toMillis();
@@ -51,7 +53,7 @@ public class InfoCmd extends AbstractCommand {
 						+ "\nVoice Channels: " + Shadbot.getClient().getConnectedVoiceChannels().size()
 						+ "\nServers: " + Shadbot.getClient().getGuilds().size()
 						+ "\nUsers: " + Shadbot.getClient().getUsers().size()
-						+ "\nPing: " + NetUtils.getPing() + "ms"
+						+ "\nPing: " + ping + "ms"
 						+ "```");
 
 		BotUtils.sendMessage(info, context.getChannel());
