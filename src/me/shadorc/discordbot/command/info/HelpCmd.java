@@ -62,8 +62,7 @@ public class HelpCmd extends AbstractCommand {
 								+ " `name`"
 								+ " `playlist`"
 								+ " `clear`"
-								+ " `shuffle`"
-								+ " `join`", false)
+								+ " `shuffle`", false)
 				.appendField("Games Stats Commands:",
 						"`overwatch`"
 								+ " `diablo`"

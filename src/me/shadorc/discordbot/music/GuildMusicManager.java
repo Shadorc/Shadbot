@@ -70,7 +70,7 @@ public class GuildMusicManager {
 
 	public boolean joinVoiceChannel(IVoiceChannel voiceChannel) {
 		if(!BotUtils.hasPermission(voiceChannel, Permissions.VOICE_CONNECT, Permissions.VOICE_SPEAK)) {
-			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I can't connect/speak in this voice channel due to the lack of permission."
+			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect/speak in this voice channel due to the lack of permission."
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Voice connect** and **Voice speak** "
 					+ "are checked.", channel);
 			LogUtils.info("{Guild: " + voiceChannel.getGuild().getName() + " (ID: " + voiceChannel.getGuild().getStringID() + ")} "
