@@ -8,7 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 public class StringUtils {
 
 	/**
-	 * @param str - String to capitalize
+	 * @param str - the String to capitalize
 	 * @return str with the first letter capitalized
 	 */
 	public static String capitalize(String str) {
@@ -40,13 +40,17 @@ public class StringUtils {
 		return strBuilder.toString();
 	}
 
+	/**
+	 * @param duration - the duration to format
+	 * @return the formatted duration
+	 */
 	public static String formatDuration(long duration) {
 		return DurationFormatUtils.formatDuration(duration, "m:ss", true);
 	}
 
 	/**
-	 * @param str - String to check
-	 * @return true if it can be cast to an Integer, false otherwise
+	 * @param str - the String to check
+	 * @return true if it can be cast as an Integer, false otherwise
 	 */
 	public static boolean isInteger(String str) {
 		if(str == null) {

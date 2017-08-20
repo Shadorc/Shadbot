@@ -18,6 +18,9 @@ public class TwitterUtils {
 		}
 	}
 
+	/**
+	 * @return Twitter instance
+	 */
 	public static Twitter getInstance() {
 		return twitter;
 	}

@@ -15,12 +15,16 @@ public class MathUtils {
 		return min + MathUtils.rand(max - min + 1);
 	}
 
+	/**
+	 * @param bound - the upper bound (exclusive). Must be positive.
+	 * @return the next pseudorandom, uniformly distributed int value between zero (inclusive) and bound (exclusive)
+	 */
 	public static int rand(int bound) {
 		return RAND.nextInt(bound);
 	}
 
 	/**
-	 * @param num - float to check
+	 * @param num - the float to check
 	 * @param min - minimum value (inclusive)
 	 * @param max - maximum value (exclusive)
 	 * @return true if min <= num < max, false otherwise

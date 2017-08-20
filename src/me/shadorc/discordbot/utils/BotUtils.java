@@ -69,9 +69,9 @@ public class BotUtils {
 	}
 
 	/**
-	 * @param guild - the guild of the channel
+	 * @param guild - the channel's guild
 	 * @param channel - the channel to check
-	 * @return true if Shadbot is allowed to send a message in the channel, false otherwise
+	 * @return true if Shadbot is allowed to send a message in channel, false otherwise
 	 */
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
 		JSONArray channelsArray = (JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS);
@@ -84,6 +84,12 @@ public class BotUtils {
 		return Utils.convertArrayToList(channelsArray).contains(channel.getStringID());
 	}
 
+	/**
+	 * @param channel - the channel to check
+	 * @param permission - permission to check
+	 * @param permissions - optional permissions
+	 * @return true if Shadbot has all permissions in channel
+	 */
 	public static boolean hasPermission(IChannel channel, Permissions permission, Permissions... permissions) {
 		if(channel == null) {
 			LogUtils.warn("Shadbot tried to check permission on a non-existing channel.");
@@ -98,6 +104,12 @@ public class BotUtils {
 		return channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(permission);
 	}
 
+	/**
+	 * @param voiceChannel - the voice channel to check
+	 * @param permission - permission to check
+	 * @param permissions - optional permissions
+	 * @return true if Shadbot has all permissions in channel
+	 */
 	public static boolean hasPermission(IVoiceChannel voiceChannel, Permissions permission, Permissions... permissions) {
 		if(voiceChannel == null) {
 			LogUtils.warn("Shadbot tried to check permission on a non-existing voice channel.");

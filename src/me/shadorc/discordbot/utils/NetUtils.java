@@ -19,6 +19,11 @@ import me.shadorc.discordbot.Storage.ApiKeys;
 
 public class NetUtils {
 
+	/**
+	 * @param url - the String representing URL
+	 * @return the Document from url
+	 * @throws IOException
+	 */
 	public static Document getDoc(String url) throws IOException {
 		return Jsoup.connect(url)
 				.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35")
@@ -27,7 +32,7 @@ public class NetUtils {
 	}
 
 	/**
-	 * @param stringUrl - String to check
+	 * @param stringUrl - the String to check
 	 * @return true if stringUrl is a valid URL, false otherwise
 	 */
 	public static boolean isValidURL(String stringUrl) {
