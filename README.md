@@ -8,7 +8,7 @@
    <body>
       <hr>
       <h2>Usage</h2>
-      <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=20147200">link</a> !</b></p>
+      <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=3369984">link</a> !</b></p>
       <hr>
       <h2>Licence</h2>
       <p>Copyright (C) 2017 <b>Shadorc</b>
