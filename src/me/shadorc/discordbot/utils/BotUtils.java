@@ -24,7 +24,7 @@ public class BotUtils {
 		}
 
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES)) {
-			LogUtils.warn("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
+			LogUtils.info("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
 					+ "Shadbot wasn't allowed to send message.");
 			return;
 		}
@@ -51,7 +51,7 @@ public class BotUtils {
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.EMBED_LINKS)) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I can't send embed links due to the lack of permission."
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Send Embed links** is checked.", channel);
-			LogUtils.warn("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
+			LogUtils.info("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
 					+ "Shadbot wasn't allowed to send embed link.");
 			return;
 		}
