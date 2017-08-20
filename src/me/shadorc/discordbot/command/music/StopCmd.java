@@ -26,7 +26,7 @@ public class StopCmd extends AbstractCommand {
 		}
 
 		musicManager.leaveVoiceChannel();
-		BotUtils.sendMessage(Emoji.INFO + " Music has been stopped by " + context.getAuthorName() + ".", context.getChannel());
+		BotUtils.sendMessage(Emoji.INFO + " Music stopped by " + context.getAuthorName() + ".", context.getChannel());
 	}
 
 	@Override

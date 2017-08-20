@@ -35,7 +35,7 @@ public class SuggestCmd extends AbstractCommand {
 		}
 
 		BotUtils.sendMessage(context.getAuthorName() + " from Guild \"" + context.getGuild().getName() + "\" suggested : " + context.getArg(), Shadbot.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID));
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Suggestion has been sent, thank you !", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " Suggestion sent, thank you !", context.getChannel());
 	}
 
 	@Override

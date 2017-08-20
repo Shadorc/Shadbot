@@ -24,7 +24,7 @@ public class EventListener {
 	@EventSubscriber
 	public void onDisconnectedEvent(DisconnectedEvent event) {
 		if(event.getReason().equals(Reason.LOGGED_OUT)) {
-			LogUtils.info("------------------- Shadbot has been logout [Version:" + Config.VERSION.toString() + "] -------------------");
+			LogUtils.info("------------------- Shadbot logged out [Version:" + Config.VERSION.toString() + "] -------------------");
 		}
 	}
 
@@ -58,14 +58,14 @@ public class EventListener {
 
 	@EventSubscriber
 	public void onGuildCreateEvent(GuildCreateEvent event) {
-		LogUtils.info("Shadbot is now connected to guild: " + event.getGuild().getName()
+		LogUtils.info("Shadbot connected to guild: " + event.getGuild().getName()
 				+ " (ID: " + event.getGuild().getStringID()
 				+ " | Users: " + event.getGuild().getUsers().size() + ")");
 	}
 
 	@EventSubscriber
 	public void onGuildLeaveEvent(GuildLeaveEvent event) {
-		LogUtils.info("Shadbot has been disconnected from guild: " + event.getGuild().getName()
+		LogUtils.info("Shadbot disconnected from guild: " + event.getGuild().getName()
 				+ " (ID: " + event.getGuild().getStringID()
 				+ " | Users: " + event.getGuild().getUsers().size() + ")");
 	}
