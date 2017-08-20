@@ -30,7 +30,7 @@ public class InfoCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		Runtime runtime = Runtime.getRuntime();
 
-		long ping = ChronoUnit.MILLIS.between(LocalDateTime.now(), context.getMessage().getCreationDate());
+		long ping = Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), context.getMessage().getCreationDate()));
 		long usedMemory = runtime.totalMemory() - runtime.freeMemory();
 		long maxMemory = runtime.maxMemory();
 		long uptime = Duration.between(Discord4J.getLaunchTime().atZone(ZoneId.systemDefault()).toInstant(), Instant.now()).toMillis();
