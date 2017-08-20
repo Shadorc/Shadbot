@@ -62,7 +62,7 @@ public class PruneCmd extends AbstractCommand {
 		try {
 			history = new ArrayList<IMessage>(context.getChannel().getMessageHistory(num));
 		} catch (ArrayIndexOutOfBoundsException e) {
-			LogUtils.warn("{Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")} "
+			LogUtils.warn("{PruneCmd} {Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")} "
 					+ "Getting full message history.");
 			history = context.getChannel().getFullMessageHistory();
 		}
