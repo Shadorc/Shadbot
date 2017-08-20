@@ -3,7 +3,7 @@
    <header>
       <img align="right" src="https://i.imgur.com/bP970dP.png" height="220" width="220">
       <h1>Shadbot</h1>
-      <p><b>Shadbot is a Discord Bot which plays musics, executes fun & useful commands, play games and more !</b></p>
+      <p><b>Shadbot is a Discord Bot which plays musics, executes useful, admin and fun commands, play games and more !</b></p>
    </header>
    <body>
       <hr>
