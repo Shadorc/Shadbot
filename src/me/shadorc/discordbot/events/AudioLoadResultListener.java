@@ -139,7 +139,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		String numStr = message.getContent();
+		String numStr = message.getContent().replaceAll("[^\\d.]", "");
 		if(!StringUtils.isInteger(numStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid number. "
 					+ "You can use \"" + prefix + "cancel\" to cancel.",
