@@ -33,6 +33,7 @@ import me.shadorc.discordbot.command.info.ServerInfoCmd;
 import me.shadorc.discordbot.command.info.SuggestCmd;
 import me.shadorc.discordbot.command.info.UserInfoCmd;
 import me.shadorc.discordbot.command.music.ClearCmd;
+import me.shadorc.discordbot.command.music.JoinCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
 import me.shadorc.discordbot.command.music.NextCmd;
 import me.shadorc.discordbot.command.music.PauseCmd;
@@ -96,6 +97,7 @@ public class CommandManager {
 				new ClearCmd(),
 				new ShuffleCmd(),
 				new PositionCmd(),
+				new JoinCmd(),
 				// Games Stats Commands
 				new OverwatchCmd(),
 				new CounterStrikeCmd(),
