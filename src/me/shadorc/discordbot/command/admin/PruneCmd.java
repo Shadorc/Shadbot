@@ -57,16 +57,29 @@ public class PruneCmd extends AbstractCommand {
 
 		int num = Math.min(100, Integer.parseInt(numArg));
 
-		List<IMessage> history = new ArrayList<IMessage>(context.getChannel().getMessageHistory(num));
+		// If channel contains less than num messages, it throws an ArrayIndexOutOfBoundsException
+		List<IMessage> history;
+		try {
+			history = new ArrayList<IMessage>(context.getChannel().getMessageHistory(num));
+		} catch (ArrayIndexOutOfBoundsException e) {
+			LogUtils.warn("{Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")} "
+					+ "Getting full message history.");
+			history = context.getChannel().getFullMessageHistory();
+		}
+
 		for(int i = 0; i < Math.min(num, history.size()); i++) {
 			if(!usersMentioned.contains(history.get(i).getAuthor())) {
 				history.remove(i);
 			}
 		}
 
-		context.getChannel().bulkDelete(history);
+		if(history.isEmpty()) {
+			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
+			return;
+		}
 
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " " + history.size() + " messages deleted.", context.getChannel());
+		context.getChannel().bulkDelete(history);
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " " + history.size() + " message(s) deleted.", context.getChannel());
 	}
 
 	@Override
@@ -75,9 +88,9 @@ public class PruneCmd extends AbstractCommand {
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Delete users messages.**")
+				.appendDescription("**Delete user's messages.**")
 				.appendField("Usage", context.getPrefix() + "prune <@user(s)> <num>", false)
-				.appendField("Arguments", "num - Number of messages to delete (max: 100)", false);
+				.appendField("Arguments", "num - Number of messages to check (max: 100)", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
