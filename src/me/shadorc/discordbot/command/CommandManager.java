@@ -6,6 +6,7 @@ import java.util.Map;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.AbstractCommand.Role;
+import me.shadorc.discordbot.command.admin.PruneCmd;
 import me.shadorc.discordbot.command.admin.SettingsCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
 import me.shadorc.discordbot.command.currency.LeaderboardCmd;
@@ -111,6 +112,7 @@ public class CommandManager {
 				new HolidaysCmd(),
 				// Admin Commands
 				new SettingsCmd(),
+				new PruneCmd(),
 				// Author Commands
 				new ShutdownCmd());
 	}

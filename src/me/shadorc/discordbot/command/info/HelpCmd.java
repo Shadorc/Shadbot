@@ -80,7 +80,8 @@ public class HelpCmd extends AbstractCommand {
 
 		if(context.getAuthorRole().equals(Role.ADMIN)) {
 			builder.appendField("Admin Commands:",
-					"`" + context.getPrefix() + "settings`", false);
+					"`" + context.getPrefix() + "prune`"
+							+ " `" + context.getPrefix() + "settings`", false);
 		}
 
 		if(context.getAuthorRole().equals(Role.OWNER)) {
