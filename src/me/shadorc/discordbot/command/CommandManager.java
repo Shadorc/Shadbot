@@ -28,6 +28,7 @@ import me.shadorc.discordbot.command.image.SuicideGirlsCmd;
 import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.InfoCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
+import me.shadorc.discordbot.command.info.ServerInfoCmd;
 import me.shadorc.discordbot.command.info.SuggestCmd;
 import me.shadorc.discordbot.command.info.UserInfoCmd;
 import me.shadorc.discordbot.command.music.ClearCmd;
@@ -103,6 +104,7 @@ public class CommandManager {
 				new PingCmd(),
 				new SuggestCmd(),
 				new UserInfoCmd(),
+				new ServerInfoCmd(),
 				// French Commands
 				new BashCmd(),
 				new JokeCmd(),

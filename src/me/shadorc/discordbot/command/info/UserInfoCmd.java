@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.info;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
@@ -31,12 +32,12 @@ public class UserInfoCmd extends AbstractCommand {
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withThumbnail(user.getAvatarURL())
 				.appendField("Display name", user.getDisplayName(context.getGuild()), true)
-				.appendField("ID", Long.toString(user.getLongID()), true)
+				.appendField("User ID", Long.toString(user.getLongID()), true)
 				.appendField("Creation date", user.getCreationDate().format(dateFormatter), true)
 				.appendField("Join date", context.getGuild().getJoinTimeForUser(user).format(dateFormatter), true)
 				.appendField("Status", user.getPresence().getStatus().toString(), true)
 				.appendField("Playing text", user.getPresence().getPlayingText().orElse(null), true)
-				.appendField("Roles", user.getRolesForGuild(context.getGuild()).toString().replace("[", "").replace("]", ""), true);
+				.appendField("Roles", user.getRolesForGuild(context.getGuild()).stream().map(role -> role.getName()).collect(Collectors.joining("\n")), true);
 		BotUtils.sendEmbed(embed.build(), context.getChannel());
 	}
 
