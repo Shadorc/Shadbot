@@ -69,6 +69,7 @@ public class HelpCmd extends AbstractCommand {
 								+ " `" + context.getPrefix() + "cs`", false)
 				.appendField("Info Commands:",
 						"`" + context.getPrefix() + "info`"
+								+ " `" + context.getPrefix() + "userinfo`"
 								+ " `" + context.getPrefix() + "suggest`"
 								+ " `" + context.getPrefix() + "ping`", false)
 				.appendField("French Commands:",

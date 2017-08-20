@@ -29,6 +29,7 @@ import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.InfoCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
 import me.shadorc.discordbot.command.info.SuggestCmd;
+import me.shadorc.discordbot.command.info.UserInfoCmd;
 import me.shadorc.discordbot.command.music.ClearCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
 import me.shadorc.discordbot.command.music.NextCmd;
@@ -101,6 +102,7 @@ public class CommandManager {
 				new InfoCmd(),
 				new PingCmd(),
 				new SuggestCmd(),
+				new UserInfoCmd(),
 				// French Commands
 				new BashCmd(),
 				new JokeCmd(),
