@@ -23,70 +23,70 @@ public class HelpCmd extends AbstractCommand {
 		}
 
 		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Shadbot Help (Prefix: " + context.getPrefix() + ")")
+				.withAuthorName("Shadbot Help")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.withDesc("Get more information by using " + context.getPrefix() + "help <command>.")
 				.appendField("Utils Commands:",
-						"`translate`"
-								+ " `wiki`"
-								+ " `calc`"
-								+ " `weather`"
-								+ " `urban`", false)
+						"`" + context.getPrefix() + "translate`"
+								+ " `" + context.getPrefix() + "wiki`"
+								+ " `" + context.getPrefix() + "calc`"
+								+ " `" + context.getPrefix() + "weather`"
+								+ " `" + context.getPrefix() + "urban`", false)
 				.appendField("Fun Commands:",
-						"`chat`", false)
+						"`" + context.getPrefix() + "chat`", false)
 				.appendField("Image Commands:",
-						"`image`"
-								+ " `suicidegirls`"
-								+ " `gif`", false)
+						"`" + context.getPrefix() + "image`"
+								+ " `" + context.getPrefix() + "suicidegirls`"
+								+ " `" + context.getPrefix() + "gif`", false)
 				.appendField("Games Commands:",
-						"`dice`"
-								+ " `slot_machine`"
-								+ " `russian_roulette`"
-								+ " `trivia`"
-								+ " `rps`", false)
+						"`" + context.getPrefix() + "dice`"
+								+ " `" + context.getPrefix() + "slot_machine`"
+								+ " `" + context.getPrefix() + "russian_roulette`"
+								+ " `" + context.getPrefix() + "trivia`"
+								+ " `" + context.getPrefix() + "rps`", false)
 				.appendField("Currency Commands:",
-						"`transfer`"
-								+ " `leaderboard`"
-								+ " `coins`", false)
+						"`" + context.getPrefix() + "transfer`"
+								+ " `" + context.getPrefix() + "leaderboard`"
+								+ " `" + context.getPrefix() + "coins`", false)
 				.appendField("Music Commands:",
-						"`play`"
-								+ " `pause`"
-								+ " `resume`"
-								+ " `stop`"
-								+ " `repeat`"
-								+ " `volume`"
-								+ " `next`"
-								+ " `backward`"
-								+ " `forward`"
-								+ " `name`"
-								+ " `playlist`"
-								+ " `clear`"
-								+ " `shuffle`", false)
+						"`" + context.getPrefix() + "play`"
+								+ " `" + context.getPrefix() + "pause`"
+								+ " `" + context.getPrefix() + "resume`"
+								+ " `" + context.getPrefix() + "stop`"
+								+ " `" + context.getPrefix() + "repeat`"
+								+ " `" + context.getPrefix() + "volume`"
+								+ " `" + context.getPrefix() + "next`"
+								+ " `" + context.getPrefix() + "backward`"
+								+ " `" + context.getPrefix() + "forward`"
+								+ " `" + context.getPrefix() + "name`"
+								+ " `" + context.getPrefix() + "playlist`"
+								+ " `" + context.getPrefix() + "clear`"
+								+ " `" + context.getPrefix() + "shuffle`", false)
 				.appendField("Games Stats Commands:",
-						"`overwatch`"
-								+ " `diablo`"
-								+ " `cs`", false)
+						"`" + context.getPrefix() + "overwatch`"
+								+ " `" + context.getPrefix() + "diablo`"
+								+ " `" + context.getPrefix() + "cs`", false)
 				.appendField("Info Commands:",
-						"`info`"
-								+ " `userinfo`"
-								+ " `serverinfo`"
-								+ " `suggest`"
-								+ " `ping`", false)
+						"`" + context.getPrefix() + "info`"
+								+ " `" + context.getPrefix() + "userinfo`"
+								+ " `" + context.getPrefix() + "serverinfo`"
+								+ " `" + context.getPrefix() + "suggest`"
+								+ " `" + context.getPrefix() + "ping`", false)
 				.appendField("French Commands:",
-						"`dtc`"
-								+ " `blague`"
-								+ " `vacs`", false);
+						"`" + context.getPrefix() + "dtc`"
+								+ " `" + context.getPrefix() + "blague`"
+								+ " `" + context.getPrefix() + "vacs`", false);
 
 		if(context.getAuthorRole().equals(Role.ADMIN)) {
 			builder.appendField("Admin Commands:",
-					"`prune`"
-							+ " `settings`", false);
+					"`" + context.getPrefix() + "prune`"
+							+ " `" + context.getPrefix() + "settings`", false);
 		}
 
 		if(context.getAuthorRole().equals(Role.OWNER)) {
 			builder.appendField("Owner Commands:",
-					"`shutdown`", false);
+					"`" + context.getPrefix() + "shutdown`", false);
 		}
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
