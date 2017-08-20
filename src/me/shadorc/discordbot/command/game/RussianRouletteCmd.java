@@ -18,7 +18,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public RussianRouletteCmd() {
-		super(Role.USER, "russian_roulette", "roulette_russe");
+		super(Role.USER, "russian_roulette", "russian-roulette");
 		this.rateLimiter = new RateLimiter(10, ChronoUnit.SECONDS);
 	}
 

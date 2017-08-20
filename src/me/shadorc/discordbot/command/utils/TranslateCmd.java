@@ -20,7 +20,7 @@ public class TranslateCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public TranslateCmd() {
-		super(Role.USER, "translate", "trans", "traduire", "trad");
+		super(Role.USER, "translate", "trans");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 

@@ -17,7 +17,7 @@ public class UserInfoCmd extends AbstractCommand {
 	private final DateTimeFormatter dateFormatter;
 
 	public UserInfoCmd() {
-		super(Role.USER, "userinfo", "user_info");
+		super(Role.USER, "userinfo", "user_info", "user-info");
 		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
 	}
 

@@ -27,7 +27,7 @@ public class DiceCmd extends AbstractCommand {
 	protected static final int MULTIPLIER = 6;
 
 	public DiceCmd() {
-		super(Role.USER, "dice", "des");
+		super(Role.USER, "dice");
 	}
 
 	@Override

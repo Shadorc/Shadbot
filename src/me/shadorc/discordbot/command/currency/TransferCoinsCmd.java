@@ -15,7 +15,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class TransferCoinsCmd extends AbstractCommand {
 
 	public TransferCoinsCmd() {
-		super(Role.USER, "transfer", "transfert");
+		super(Role.USER, "transfer");
 	}
 
 	@Override
