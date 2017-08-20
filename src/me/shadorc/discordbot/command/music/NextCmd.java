@@ -20,7 +20,7 @@ public class NextCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
-		if(musicManager == null) {
+		if(musicManager == null || musicManager.getScheduler().isStopped()) {
 			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
