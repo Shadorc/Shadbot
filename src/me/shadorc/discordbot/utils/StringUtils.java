@@ -34,10 +34,14 @@ public class StringUtils {
 		if(info.isStream) {
 			strBuilder.append(" (Stream)");
 		} else {
-			strBuilder.append(" (" + DurationFormatUtils.formatDuration(info.length, "m:ss", true) + ")");
+			strBuilder.append(" (" + StringUtils.formatDuration(info.length) + ")");
 		}
 
 		return strBuilder.toString();
+	}
+
+	public static String formatDuration(long duration) {
+		return DurationFormatUtils.formatDuration(duration, "m:ss", true);
 	}
 
 	/**

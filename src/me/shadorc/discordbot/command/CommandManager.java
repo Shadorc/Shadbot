@@ -35,6 +35,7 @@ import me.shadorc.discordbot.command.music.NextCmd;
 import me.shadorc.discordbot.command.music.PauseCmd;
 import me.shadorc.discordbot.command.music.PlayCmd;
 import me.shadorc.discordbot.command.music.PlaylistCmd;
+import me.shadorc.discordbot.command.music.PositionCmd;
 import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.ShuffleCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
@@ -91,6 +92,7 @@ public class CommandManager {
 				new PlaylistCmd(),
 				new ClearCmd(),
 				new ShuffleCmd(),
+				new PositionCmd(),
 				// Games Stats Commands
 				new OverwatchCmd(),
 				new CounterStrikeCmd(),

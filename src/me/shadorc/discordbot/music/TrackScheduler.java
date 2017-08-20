@@ -50,6 +50,10 @@ public class TrackScheduler {
 		return audioPlayer.getVolume();
 	}
 
+	public long getPosition() {
+		return audioPlayer.getPlayingTrack().getPosition();
+	}
+
 	public void setVolume(int volume) {
 		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
 	}
@@ -76,6 +80,14 @@ public class TrackScheduler {
 
 	public boolean isStopped() {
 		return queue.isEmpty() && !this.isPlaying();
+	}
+
+	public void skip(long time) {
+		long newPosition = audioPlayer.getPlayingTrack().getPosition() + time;
+		if(newPosition < 0 || newPosition > audioPlayer.getPlayingTrack().getDuration()) {
+			throw new IllegalArgumentException();
+		}
+		audioPlayer.getPlayingTrack().setPosition(newPosition);
 	}
 
 	public void clearPlaylist() {

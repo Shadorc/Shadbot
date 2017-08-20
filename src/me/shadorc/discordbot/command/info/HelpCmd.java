@@ -57,6 +57,8 @@ public class HelpCmd extends AbstractCommand {
 								+ " `" + context.getPrefix() + "repeat`"
 								+ " `" + context.getPrefix() + "stop`"
 								+ " `" + context.getPrefix() + "next`"
+								+ " `" + context.getPrefix() + "backward`"
+								+ " `" + context.getPrefix() + "forward`"
 								+ " `" + context.getPrefix() + "name`"
 								+ " `" + context.getPrefix() + "playlist`"
 								+ " `" + context.getPrefix() + "clear`"
