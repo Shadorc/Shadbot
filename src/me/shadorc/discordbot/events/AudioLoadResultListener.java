@@ -46,7 +46,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	@Override
 	public void trackLoaded(AudioTrack track) {
 		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
-			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect to this voice channel due to the lack of permission.", musicManager.getChannel());
 			return;
 		}
 
@@ -76,7 +75,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					.withAuthorName("Results (Type: " + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel to cancel)")
 					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-					.withDescription("**Enter your choice.**\n" + strBuilder.toString())
+					.withDescription("**Select a music by typing the corresponding number.**\n" + strBuilder.toString())
 					.withFooterText("This choice will be canceled in 15 seconds.");
 			BotUtils.sendEmbed(embed.build(), musicManager.getChannel());
 
@@ -91,7 +90,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
-			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect to this voice channel due to the lack of permission.", musicManager.getChannel());
 			return;
 		}
 
@@ -141,9 +139,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		String numStr = message.getContent().replace(prefix, "");
+		String numStr = message.getContent();
 		if(!StringUtils.isInteger(numStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid choice. "
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid number. "
 					+ "You can use \"" + prefix + "cancel\" to cancel.",
 					musicManager.getChannel());
 			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
@@ -153,7 +151,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		int num = Integer.parseInt(numStr);
 		if(num < 1 || num > Math.min(5, resultsTracks.size())) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid choice. "
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid number. "
 					+ "You can use \"" + prefix + "cancel\" to cancel.",
 					musicManager.getChannel());
 			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
@@ -162,7 +160,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
-			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect to this voice channel due to the lack of permission.", musicManager.getChannel());
 			return;
 		}
 

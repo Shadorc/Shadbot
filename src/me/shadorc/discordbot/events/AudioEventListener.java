@@ -19,6 +19,7 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	private final IGuild guild;
 	private final TrackScheduler scheduler;
+
 	private IChannel channel;
 	private int errorCount;
 
@@ -40,7 +41,7 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-		// Create a new Thread avoid java.net.SocketException by leaving the time to the sockets to close
+		// Create a new Thread avoid SocketException by leaving the time to the sockets to close
 		new Thread(() -> {
 			if(endReason.mayStartNext) {
 				errorCount = 0; // Everything seems to be fine, reset error count.

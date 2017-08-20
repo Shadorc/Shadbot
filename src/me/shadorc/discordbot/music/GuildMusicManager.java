@@ -70,8 +70,11 @@ public class GuildMusicManager {
 
 	public boolean joinVoiceChannel(IVoiceChannel voiceChannel) {
 		if(!BotUtils.hasPermission(voiceChannel, Permissions.VOICE_CONNECT, Permissions.VOICE_SPEAK)) {
+			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I can't connect/speak in this voice channel due to the lack of permission."
+					+ "\nPlease, check my permissions and channel-specific ones to verify that **Voice connect** and **Voice speak** "
+					+ "are checked.", channel);
 			LogUtils.warn("{Guild: " + voiceChannel.getGuild().getName() + " (ID: " + voiceChannel.getGuild().getStringID() + ")} "
-					+ "Shadbot wasn't allowed to connect/speak.");
+					+ "Shadbot wasn't allowed to connect/speak in a voice channel.");
 			return false;
 		}
 		LogUtils.info("{GuildMusicManager} {Guild: " + voiceChannel.getGuild().getName()
@@ -88,8 +91,8 @@ public class GuildMusicManager {
 		leaveTimer.stop();
 		audioPlayer.destroy();
 		MUSIC_MANAGERS.remove(guild);
-		LogUtils.info("{GuildMusicManager} {Guild: " + voiceChannel.getGuild().getName()
-				+ " (ID: " + voiceChannel.getGuild().getStringID() + ")} Voice channel leaved.");
+		LogUtils.info("{GuildMusicManager} {Guild: " + guild.getName()
+				+ " (ID: " + guild.getStringID() + ")} Voice channel leaved.");
 
 	}
 
