@@ -43,9 +43,9 @@ public class ServerInfoCmd extends AbstractCommand {
 				.appendField("Channels", Integer.toString(guild.getChannels().size()), true)
 				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
 				.appendField("Settings",
-						"*Prefix:* " + Storage.getSetting(guild, Setting.PREFIX)
-								+ "\n*Default volume:* " + Storage.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
-								+ "\n*Allowed channels:* " + (Storage.getSetting(guild, Setting.ALLOWED_CHANNELS) == null ? "All" : "\n"
+						"**Prefix:** " + Storage.getSetting(guild, Setting.PREFIX)
+								+ "\n**Default volume:** " + Storage.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
+								+ "\n**Allowed channels:** " + (Storage.getSetting(guild, Setting.ALLOWED_CHANNELS) == null ? "All" : "\n"
 										+ Utils.convertArrayToList((JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS)).stream().map(
 												idStr -> "\t" + guild.getChannelByID(Long.parseLong(idStr)).getName()).collect(Collectors.joining("\n"))), true)
 				.appendField("Server ID", Long.toString(guild.getLongID()), true);
