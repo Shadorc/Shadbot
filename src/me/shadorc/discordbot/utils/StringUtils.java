@@ -53,26 +53,11 @@ public class StringUtils {
 	 * @return true if it can be cast as an Integer, false otherwise
 	 */
 	public static boolean isInteger(String str) {
-		if(str == null) {
+		try {
+			Integer.parseInt(str);
+			return true;
+		} catch (NumberFormatException e) {
 			return false;
 		}
-		int length = str.length();
-		if(length == 0) {
-			return false;
-		}
-		int pos = 0;
-		if(str.charAt(0) == '-') {
-			if(length == 1) {
-				return false;
-			}
-			pos = 1;
-		}
-		for(; pos < length; pos++) {
-			char charac = str.charAt(pos);
-			if(charac < '0' || charac > '9') {
-				return false;
-			}
-		}
-		return true;
 	}
 }
