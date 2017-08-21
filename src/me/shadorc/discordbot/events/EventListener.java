@@ -95,7 +95,7 @@ public class EventListener {
 
 			GuildMusicManager gmm = GuildMusicManager.getGuildMusicManager(guild);
 
-			if(gmm == null) {
+			if(gmm == null && !Config.VERSION.isBeta()) {
 				LogUtils.warn("{EventListener} {Guild: " + guild.getName() + " (ID: " + guild.getStringID() + ")} "
 						+ "GuildMusicManager was null while Shadbot was in a voice channel.");
 				return;
