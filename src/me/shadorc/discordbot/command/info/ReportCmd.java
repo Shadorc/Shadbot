@@ -12,12 +12,12 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class SuggestCmd extends AbstractCommand {
+public class ReportCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
-	public SuggestCmd() {
-		super(Role.USER, "suggest");
+	public ReportCmd() {
+		super(Role.USER, "report", "suggest");
 		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
@@ -35,7 +35,7 @@ public class SuggestCmd extends AbstractCommand {
 		}
 
 		BotUtils.sendMessage(context.getAuthorName() + " from Guild \"" + context.getGuild().getName() + "\" suggested : " + context.getArg(), Shadbot.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID));
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Suggestion sent, thank you !", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " Report sent, thank you !", context.getChannel());
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class SuggestCmd extends AbstractCommand {
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Send a message to my developer, this can be a suggestion, a bug report, anything.**")
-				.appendField("Usage", context.getPrefix() + "suggest <message>", false);
+				.appendField("Usage", context.getPrefix() + "report <message>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

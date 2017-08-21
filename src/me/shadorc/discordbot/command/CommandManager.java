@@ -30,7 +30,7 @@ import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.InfoCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
 import me.shadorc.discordbot.command.info.ServerInfoCmd;
-import me.shadorc.discordbot.command.info.SuggestCmd;
+import me.shadorc.discordbot.command.info.ReportCmd;
 import me.shadorc.discordbot.command.info.UserInfoCmd;
 import me.shadorc.discordbot.command.music.ClearCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
@@ -103,7 +103,7 @@ public class CommandManager {
 				// Info Commands
 				new InfoCmd(),
 				new PingCmd(),
-				new SuggestCmd(),
+				new ReportCmd(),
 				new UserInfoCmd(),
 				new ServerInfoCmd(),
 				// French Commands
