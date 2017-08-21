@@ -115,6 +115,6 @@ public class EventListener {
 	}
 
 	private boolean isAlone(IVoiceChannel voiceChannel) {
-		return voiceChannel.getConnectedUsers().size() == 1;
+		return voiceChannel.getConnectedUsers().stream().filter(user -> !user.isBot()).count() == 0;
 	}
 }
