@@ -32,7 +32,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 	public CounterStrikeCmd() {
 		super(Role.USER, "cs", "csgo");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 
 	public SuicideGirlsCmd() {
 		super(Role.USER, "suicidegirls", "sg");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override

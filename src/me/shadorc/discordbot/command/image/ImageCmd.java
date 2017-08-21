@@ -32,7 +32,7 @@ public class ImageCmd extends AbstractCommand {
 
 	public ImageCmd() {
 		super(Role.USER, "image");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override

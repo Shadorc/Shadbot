@@ -35,7 +35,7 @@ public class DiabloCmd extends AbstractCommand {
 
 	public DiabloCmd() {
 		super(Role.USER, "diablo", "d3");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override
