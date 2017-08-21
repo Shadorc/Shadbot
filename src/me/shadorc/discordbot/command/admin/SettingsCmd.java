@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.admin;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 
@@ -70,7 +69,9 @@ public class SettingsCmd extends AbstractCommand {
 			}
 
 			Storage.saveSetting(context.getGuild(), Setting.ALLOWED_CHANNELS, allowedChannelsArray);
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel(s) " + mentionedChannels.stream().map(channel -> channel.mention()).collect(Collectors.joining(", ")).trim() + " have been added to the list of allowed channels.", context.getChannel());
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel(s) "
+					+ StringUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
+					+ " have been added to the list of allowed channels.", context.getChannel());
 
 		} else if(Setting.DEFAULT_VOLUME.toString().equals(name)) {
 			if(args.length != 2) {

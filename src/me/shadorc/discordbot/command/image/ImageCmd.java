@@ -27,8 +27,6 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class ImageCmd extends AbstractCommand {
 
-	private static final String API_URL = "https://www.deviantart.com/api/v1/oauth2/";
-
 	private final RateLimiter rateLimiter;
 	private String deviantArtToken;
 
@@ -49,6 +47,7 @@ public class ImageCmd extends AbstractCommand {
 			}
 			return;
 		}
+
 		try {
 			if(this.deviantArtToken == null) {
 				this.generateAccessToken();
@@ -97,7 +96,7 @@ public class ImageCmd extends AbstractCommand {
 	private JSONObject getRandomPopularResult(String encodedSearch) throws JSONException, IOException {
 		JSONObject result = null;
 		try {
-			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL(API_URL + "browse/popular?"
+			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
 					+ "q=" + encodedSearch
 					+ "&timerange=alltime"
 					+ "&limit=1" // The pagination limit (min: 1 max: 50)

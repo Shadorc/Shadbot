@@ -9,10 +9,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,6 +25,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class DiabloCmd extends AbstractCommand {
@@ -100,14 +99,12 @@ public class DiabloCmd extends AbstractCommand {
 							"**Normal:** " + mainObj.getInt("paragonLevelSeason")
 									+ "\n**Hardcore:** " + mainObj.getInt("paragonLevelSeasonHardcore"), true)
 					.appendField("__Heroes__",
-							heroesList.stream().map(
+							StringUtils.formatList(heroesList,
 									heroObj -> "**" + heroObj.getString("name") + "** "
-											+ "(*" + StringUtils.capitalize(heroObj.getString("class").replace("-", " ")) + "*)")
-									.collect(Collectors.joining("\n")), true)
+											+ "(*" + StringUtils.capitalize(heroObj.getString("class").replace("-", " ")) + "*)", "\n"), true)
 					.appendField("__Damage__",
-							heroesList.stream().map(
-									heroObj -> formatter.format(heroObj.getJSONObject("stats").getDouble("damage")) + " DPS")
-									.collect(Collectors.joining("\n")), true);
+							StringUtils.formatList(heroesList,
+									heroObj -> formatter.format(heroObj.getJSONObject("stats").getDouble("damage")) + " DPS", "\n"), true);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (FileNotFoundException e) {

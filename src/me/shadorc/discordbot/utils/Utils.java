@@ -106,6 +106,9 @@ public class Utils {
 	 * @return List<String> containing array elements
 	 */
 	public static List<String> convertArrayToList(JSONArray array) {
+		if(array == null) {
+			return null;
+		}
 		List<String> list = new ArrayList<>();
 		for(int i = 0; i < array.length(); i++) {
 			list.add(array.getString(i));

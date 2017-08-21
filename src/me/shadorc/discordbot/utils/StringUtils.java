@@ -1,5 +1,9 @@
 package me.shadorc.discordbot.utils;
 
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
@@ -60,4 +64,15 @@ public class StringUtils {
 			return false;
 		}
 	}
+
+	/**
+	 * @param list - the list to format
+	 * @param mapper - a non-interfering, stateless function to apply to each element
+	 * @param delimiter - the delimiter to be used between each element
+	 * @return formatted list
+	 */
+	public static <T> String formatList(List<T> list, Function<T, String> mapper, String delimiter) {
+		return list.stream().map(mapper).collect(Collectors.joining(delimiter)).toString().trim();
+	}
+
 }

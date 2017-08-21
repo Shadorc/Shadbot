@@ -3,7 +3,6 @@ package me.shadorc.discordbot.command.french;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Document;
@@ -20,6 +19,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class JokeCmd extends AbstractCommand {
@@ -65,7 +65,7 @@ public class JokeCmd extends AbstractCommand {
 		String joke;
 		do {
 			Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
-			joke = Arrays.stream(element.html().split("<p>|<br>")).map(line -> line.trim()).collect(Collectors.joining("\n"));
+			joke = StringUtils.formatList(Arrays.asList(element.html().split("<p>|<br>")), line -> line.trim(), "\n");
 			joke = StringEscapeUtils.unescapeHtml4(joke.replace("\n\n", "\n").replaceAll("\\<.*?>", ""));
 		} while(joke.length() > 1000);
 		return joke;
