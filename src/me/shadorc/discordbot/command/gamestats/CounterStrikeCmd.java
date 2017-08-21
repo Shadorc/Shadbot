@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 
 import me.shadorc.discordbot.Config;
@@ -99,11 +100,14 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.withFooterText("Steam Profile: http://steamcommunity.com/profiles/" + context.getArg() + "/");
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
-		} catch (IOException e) {
-			if(e.getMessage().contains("404")) {
+		} catch (HttpStatusException e) {
+			if(e.getStatusCode() == 404) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid Steam ID.", context.getChannel());
 				return;
+			} else {
+				LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", e, context.getChannel());
 			}
+		} catch (IOException e) {
 			LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", e, context.getChannel());
 		}
 	}
