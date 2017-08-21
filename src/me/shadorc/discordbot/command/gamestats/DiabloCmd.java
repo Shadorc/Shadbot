@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
@@ -30,15 +32,24 @@ import sx.blah.discord.util.EmbedBuilder;
 public class DiabloCmd extends AbstractCommand {
 
 	private final DecimalFormat formatter = new DecimalFormat("#,###");
+	private final RateLimiter rateLimiter;
 
 	public DiabloCmd() {
 		super(Role.USER, "diablo", "d3");
+		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
+		}
+
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
+				rateLimiter.warn("Take it easy, don't spam :)", context);
+			}
+			return;
 		}
 
 		String[] splitArgs = context.getArg().split(" ", 2);

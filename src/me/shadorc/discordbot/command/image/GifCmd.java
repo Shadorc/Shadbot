@@ -28,7 +28,7 @@ public class GifCmd extends AbstractCommand {
 
 	public GifCmd() {
 		super(Role.USER, "gif");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
 	@Override

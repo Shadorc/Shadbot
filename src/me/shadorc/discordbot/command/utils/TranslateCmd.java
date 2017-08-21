@@ -21,7 +21,7 @@ public class TranslateCmd extends AbstractCommand {
 
 	public TranslateCmd() {
 		super(Role.USER, "translate", "trans");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
 	@Override

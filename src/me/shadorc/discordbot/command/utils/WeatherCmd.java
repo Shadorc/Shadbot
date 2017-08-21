@@ -30,7 +30,7 @@ public class WeatherCmd extends AbstractCommand {
 
 	public WeatherCmd() {
 		super(Role.USER, "weather");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 		this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy - hh:mm aa", Locale.ENGLISH);
 	}
 

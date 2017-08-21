@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,6 +10,7 @@ import org.jsoup.select.Elements;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
@@ -21,14 +23,24 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class SuicideGirlsCmd extends AbstractCommand {
 
+	private final RateLimiter rateLimiter;
+
 	public SuicideGirlsCmd() {
 		super(Role.USER, "suicidegirls", "sg");
+		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(!context.getChannel().isNSFW()) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This must be a NSFW-channel.", context.getChannel());
+			return;
+		}
+
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
+				rateLimiter.warn("Take it easy, don't spam :)", context);
+			}
 			return;
 		}
 

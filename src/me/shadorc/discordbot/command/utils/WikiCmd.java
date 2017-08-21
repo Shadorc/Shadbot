@@ -25,7 +25,7 @@ public class WikiCmd extends AbstractCommand {
 
 	public WikiCmd() {
 		super(Role.USER, "wiki", "wikipedia");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
 	@Override

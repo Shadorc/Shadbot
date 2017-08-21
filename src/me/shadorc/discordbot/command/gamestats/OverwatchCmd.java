@@ -27,7 +27,7 @@ public class OverwatchCmd extends AbstractCommand {
 
 	public OverwatchCmd() {
 		super(Role.USER, "overwatch", "ow");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
 	@Override
