@@ -1,7 +1,9 @@
 package me.shadorc.discordbot.command.gamestats;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +13,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
@@ -53,11 +54,10 @@ public class DiabloCmd extends AbstractCommand {
 
 		String battletag = splitArgs[1].replaceAll("#", "-");
 		try {
-			String url = "https://" + region + ".api.battle.net/d3/profile/" + battletag + "/?"
+			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://" + region + ".api.battle.net/d3/profile"
+					+ "/" + URLEncoder.encode(battletag, "UTF-8") + "/?"
 					+ "locale=en_GB&"
-					+ "apikey=" + Storage.getApiKey(ApiKeys.BLIZZARD_API_KEY);
-
-			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL(url), "UTF-8"));
+					+ "apikey=" + Storage.getApiKey(ApiKeys.BLIZZARD_API_KEY)), "UTF-8"));
 
 			if(mainObj.has("code") && mainObj.getString("code").equals("NOTFOUND")) {
 				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Diablo 3 or doesn't exist.", context.getChannel());
@@ -68,7 +68,8 @@ public class DiabloCmd extends AbstractCommand {
 			JSONArray heroesArray = mainObj.getJSONArray("heroes");
 			for(int i = 0; i < heroesArray.length(); i++) {
 				JSONObject heroObj = new JSONObject(IOUtils.toString(new URL(
-						"https://" + region + ".api.battle.net/d3/profile/" + battletag + "/hero/" + heroesArray.getJSONObject(i).getLong("id")
+						"https://" + region + ".api.battle.net/d3/profile/" + URLEncoder.encode(battletag, "UTF-8")
+								+ "/hero/" + heroesArray.getJSONObject(i).getLong("id")
 								+ "?locale=en_GB"
 								+ "&apikey=" + Storage.getApiKey(ApiKeys.BLIZZARD_API_KEY)), "UTF-8"));
 				heroesList.add(heroObj);
@@ -98,7 +99,9 @@ public class DiabloCmd extends AbstractCommand {
 									.collect(Collectors.joining("\n")), true);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
-		} catch (JSONException | IOException e) {
+		} catch (FileNotFoundException e) {
+			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Diablo 3 or doesn't exist.", context.getChannel());
+		} catch (IOException e) {
 			LogUtils.error("Something went wrong while getting Diablo 3 stats.... Please, try again later.", e, context.getChannel());
 		}
 	}

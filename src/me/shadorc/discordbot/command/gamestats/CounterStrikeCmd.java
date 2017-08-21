@@ -56,7 +56,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 				Document userPage = NetUtils.getDoc("https://steamcommunity.com/id/" + URLEncoder.encode(context.getArg(), "UTF-8") + "/");
 
 				if(!userPage.getElementsByClass("error_ctn").isEmpty()) {
-					BotUtils.sendMessage(Emoji.EXCLAMATION + " This user does not exist.", context.getChannel());
+					BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't exist.", context.getChannel());
 					return;
 				}
 
@@ -65,17 +65,11 @@ public class CounterStrikeCmd extends AbstractCommand {
 				steamids = userObj.getString("steamid");
 			}
 
-			JSONObject mainStatsObj;
-			try {
-				mainStatsObj = new JSONObject(IOUtils.toString(new URL(
-						"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
-								+ "appid=730"
-								+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
-								+ "&steamid=" + steamids), "UTF-8"));
-			} catch (IOException e) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " This user doesn't exist or doesn't play to Counter-Strike: Global Offensive.", context.getChannel());
-				return;
-			}
+			JSONObject mainStatsObj = new JSONObject(IOUtils.toString(new URL(
+					"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
+							+ "appid=730"
+							+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
+							+ "&steamid=" + steamids), "UTF-8"));
 
 			JSONObject mainUserObj = new JSONObject(IOUtils.toString(new URL(
 					"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
@@ -101,14 +95,13 @@ public class CounterStrikeCmd extends AbstractCommand {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (HttpStatusException e) {
-			if(e.getStatusCode() == 404) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid Steam ID.", context.getChannel());
-				return;
+			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Counter-Strike: Global Offensive or doesn't exist.", context.getChannel());
+		} catch (IOException e) {
+			if(e.getMessage().contains("400")) {
+				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Counter-Strike: Global Offensive or doesn't exist.", context.getChannel());
 			} else {
 				LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", e, context.getChannel());
 			}
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", e, context.getChannel());
 		}
 	}
 

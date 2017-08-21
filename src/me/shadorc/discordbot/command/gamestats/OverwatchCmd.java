@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.gamestats;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
@@ -62,7 +63,10 @@ public class OverwatchCmd extends AbstractCommand {
 		String battletag = splitArgs[2];
 
 		try {
-			String url = "https://playoverwatch.com/en-gb/career/" + plateform + "/" + region + "/" + battletag.replace("#", "-");
+			String url = "https://playoverwatch.com/en-gb/career"
+					+ "/" + plateform
+					+ "/" + region
+					+ "/" + URLEncoder.encode(battletag.replace("#", "-"), "UTF-8");
 			Document doc = NetUtils.getDoc(url);
 
 			String icon = doc.getElementsByClass("masthead-player").select("img").first().absUrl("src");
