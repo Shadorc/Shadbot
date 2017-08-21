@@ -35,10 +35,16 @@ public class ShutdownCmd extends AbstractCommand {
 
 		String timeStr = splitArgs[0];
 		if(!StringUtils.isInteger(timeStr)) {
-			throw new MissingArgumentException();
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid time.", context.getChannel());
+			return;
 		}
 
 		int time = Integer.parseInt(timeStr);
+		if(time < 0) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Time must be positive.", context.getChannel());
+			return;
+		}
+
 		String message = splitArgs[1].trim();
 
 		for(IGuild guild : Shadbot.getClient().getGuilds()) {

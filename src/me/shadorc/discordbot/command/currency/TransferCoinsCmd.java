@@ -29,16 +29,23 @@ public class TransferCoinsCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		if(!StringUtils.isInteger(splitCmd[0])) {
-			throw new MissingArgumentException();
+		String coinsStr = splitCmd[0];
+		if(!StringUtils.isInteger(coinsStr)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid amount.", context.getChannel());
+			return;
 		}
 
-		int coins = Integer.parseInt(splitCmd[0]);
+		int coins = Integer.parseInt(coinsStr);
+		if(coins <= 0) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " The transferred amount cannot be negative.", context.getChannel());
+			return;
+		}
+
 		Player receiverPlayer = Storage.getPlayer(context.getGuild(), context.getMessage().getMentions().get(0));
 		Player senderPlayer = context.getPlayer();
-
-		if(coins <= 0 || senderPlayer.equals(receiverPlayer)) {
-			throw new MissingArgumentException();
+		if(senderPlayer.equals(receiverPlayer)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " You cannot transfer coins to yourself.", context.getChannel());
+			return;
 		}
 
 		if(senderPlayer.getCoins() < coins) {

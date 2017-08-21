@@ -50,15 +50,15 @@ public class DiceCmd extends AbstractCommand {
 			}
 
 			String numStr = context.getArg();
-
 			if(!StringUtils.isInteger(numStr)) {
-				throw new MissingArgumentException();
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+				return;
 			}
 
 			int num = Integer.parseInt(numStr);
-
 			if(num < 1 || num > 6) {
-				throw new MissingArgumentException();
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+				return;
 			}
 
 			if(diceManager.hasAlreadyBet(num)) {
@@ -80,10 +80,15 @@ public class DiceCmd extends AbstractCommand {
 			}
 
 			String betStr = splitArgs[0];
-			String numStr = splitArgs[1];
+			if(!StringUtils.isInteger(betStr)) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
+				return;
+			}
 
-			if(!StringUtils.isInteger(betStr) || !StringUtils.isInteger(numStr)) {
-				throw new MissingArgumentException();
+			String numStr = splitArgs[1];
+			if(!StringUtils.isInteger(numStr)) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+				return;
 			}
 
 			int bet = Integer.parseInt(betStr);
@@ -94,7 +99,8 @@ public class DiceCmd extends AbstractCommand {
 
 			int num = Integer.parseInt(numStr);
 			if(num < 1 || num > 6) {
-				throw new MissingArgumentException();
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+				return;
 			}
 
 			DiceManager diceManager = new DiceManager(context.getChannel(), context.getAuthor(), num, bet);
