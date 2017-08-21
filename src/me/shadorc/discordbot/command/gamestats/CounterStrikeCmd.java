@@ -100,6 +100,10 @@ public class CounterStrikeCmd extends AbstractCommand {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (IOException e) {
+			if(e.getMessage().contains("404")) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid Steam ID.", context.getChannel());
+				return;
+			}
 			LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", e, context.getChannel());
 		}
 	}
