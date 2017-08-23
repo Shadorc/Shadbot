@@ -16,6 +16,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
+import sx.blah.discord.util.MessageHistory;
 
 public class PruneCmd extends AbstractCommand {
 
@@ -55,31 +56,37 @@ public class PruneCmd extends AbstractCommand {
 			return;
 		}
 
-		int num = Math.min(100, Integer.parseInt(numArg));
-
-		// If channel contains less than num messages, it throws an ArrayIndexOutOfBoundsException
-		List<IMessage> history;
-		try {
-			history = new ArrayList<IMessage>(context.getChannel().getMessageHistory(num));
-		} catch (ArrayIndexOutOfBoundsException e) {
-			LogUtils.warn("{PruneCmd} {Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")} "
-					+ "Getting full message history.");
-			history = new ArrayList<IMessage>(context.getChannel().getFullMessageHistory());
-		}
-
-		for(int i = 0; i < Math.min(num, history.size()); i++) {
-			if(!usersMentioned.contains(history.get(i).getAuthor())) {
-				history.remove(i);
-			}
-		}
-
-		if(history.isEmpty()) {
-			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
+		int num = Integer.parseInt(numArg);
+		if(num < 0) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " You cannot delete a negative number of messages, that doesn't make any sense.", context.getChannel());
 			return;
 		}
 
-		context.getChannel().bulkDelete(history);
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " " + history.size() + " message(s) deleted.", context.getChannel());
+		//bulkDelete() cannot delete more than 100 messages
+		num = Math.min(100, num);
+
+		MessageHistory history = context.getChannel().getMessageHistory(context.getChannel().getMaxInternalCacheCount());
+		List<IMessage> historyList = new ArrayList<IMessage>(history);
+
+		for(IMessage message : history) {
+			if(!usersMentioned.contains(message.getAuthor())) {
+				historyList.remove(message);
+			}
+		}
+
+		historyList = historyList.subList(0, Math.min(num, historyList.size()));
+
+		if(historyList.isEmpty()) {
+			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
+			return;
+		} else if(historyList.size() == 1) {
+			//MessageList#bulkDelete(List<IMessage> messages) cannot delete a single message
+			historyList.get(0).delete();
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + historyList.size() + " message deleted.", context.getChannel());
+		} else {
+			context.getChannel().bulkDelete(historyList);
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + historyList.size() + " message(s) deleted.", context.getChannel());
+		}
 	}
 
 	@Override
@@ -90,7 +97,7 @@ public class PruneCmd extends AbstractCommand {
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Delete user's messages.**")
 				.appendField("Usage", context.getPrefix() + "prune <@user(s)> <num>", false)
-				.appendField("Arguments", "num - Number of messages to check (max: 100)", false);
+				.appendField("Arguments", "num - Number of messages to delete (max: 100)", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
