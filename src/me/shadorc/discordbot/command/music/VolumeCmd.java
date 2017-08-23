@@ -14,7 +14,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class VolumeCmd extends AbstractCommand {
 
 	public VolumeCmd() {
-		super(Role.USER, "volume");
+		super(Role.USER, "volume", "vol");
 	}
 
 	@Override

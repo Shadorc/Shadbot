@@ -14,7 +14,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class RepeatCmd extends AbstractCommand {
 
 	public RepeatCmd() {
-		super(Role.USER, "repeat");
+		super(Role.USER, "repeat", "loop");
 	}
 
 	@Override
