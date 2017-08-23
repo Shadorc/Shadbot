@@ -43,15 +43,13 @@ public class PlayCmd extends AbstractCommand {
 			return;
 		}
 
-		final StringBuilder identifier = new StringBuilder();
+		String identifier;
 		if(context.getArg().startsWith("soundcloud ")) {
-			identifier.append(AudioLoadResultListener.SC_SEARCH);
-			identifier.append(context.getArg().replace("soundcloud ", ""));
+			identifier = AudioLoadResultListener.SC_SEARCH + context.getArg().replace("soundcloud ", "");
 		} else if(NetUtils.isValidURL(context.getArg())) {
-			identifier.append(context.getArg());
+			identifier = context.getArg();
 		} else {
-			identifier.append(AudioLoadResultListener.YT_SEARCH);
-			identifier.append(context.getArg());
+			identifier = AudioLoadResultListener.YT_SEARCH + context.getArg();
 		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
@@ -60,8 +58,8 @@ public class PlayCmd extends AbstractCommand {
 		}
 		musicManager.setChannel(context.getChannel());
 		musicManager.setDj(context.getAuthor());
-		AudioLoadResultListener resultListener = new AudioLoadResultListener(identifier.toString(), botVoiceChannel, userVoiceChannel, musicManager);
-		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier.toString(), resultListener);
+		AudioLoadResultListener resultListener = new AudioLoadResultListener(identifier, botVoiceChannel, userVoiceChannel, musicManager);
+		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, resultListener);
 	}
 
 	@Override

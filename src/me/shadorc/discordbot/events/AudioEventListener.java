@@ -41,17 +41,14 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-		// Create a new Thread avoid SocketException by leaving the time to the sockets to close
-		new Thread(() -> {
-			if(endReason.mayStartNext) {
-				errorCount = 0; // Everything seems to be fine, reset error count.
-				if(scheduler.isRepeating()) {
-					scheduler.queue(track.makeClone());
-				} else if(!scheduler.nextTrack()) {
-					GuildMusicManager.getGuildMusicManager(guild).end();
-				}
+		if(endReason.mayStartNext) {
+			errorCount = 0; // Everything seems to be fine, reset error count.
+			if(scheduler.isRepeating()) {
+				scheduler.queue(track.makeClone());
+			} else if(!scheduler.nextTrack()) {
+				GuildMusicManager.getGuildMusicManager(guild).end();
 			}
-		}).start();
+		}
 	}
 
 	@Override

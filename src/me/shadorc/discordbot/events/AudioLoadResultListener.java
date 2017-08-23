@@ -94,8 +94,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		for(int i = 0; i < Math.min(200, tracks.size()); i++) {
-			AudioTrack track = tracks.get(i);
-			musicManager.getScheduler().queue(track);
+			musicManager.getScheduler().queue(tracks.get(i));
 		}
 		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size() + " musics have been added to the playlist.", musicManager.getChannel());
 	}
