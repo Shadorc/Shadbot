@@ -62,7 +62,7 @@ public class PruneCmd extends AbstractCommand {
 			return;
 		}
 
-		//bulkDelete() cannot delete more than 100 messages
+		// bulkDelete() cannot delete more than 100 messages
 		num = Math.min(100, num);
 
 		MessageHistory history = context.getChannel().getMessageHistory(context.getChannel().getMaxInternalCacheCount());
@@ -80,7 +80,7 @@ public class PruneCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
 			return;
 		} else if(historyList.size() == 1) {
-			//MessageList#bulkDelete(List<IMessage> messages) cannot delete a single message
+			// MessageList#bulkDelete(List<IMessage> messages) cannot delete a single message
 			historyList.get(0).delete();
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + historyList.size() + " message deleted.", context.getChannel());
 		} else {

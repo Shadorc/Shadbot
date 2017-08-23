@@ -139,7 +139,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		//Remove all non numeric characters
+		// Remove all non numeric characters
 		String numStr = message.getContent().replaceAll("[^\\d]", "");
 		if(!StringUtils.isInteger(numStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid number. "

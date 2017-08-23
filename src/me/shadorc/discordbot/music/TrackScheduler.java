@@ -21,8 +21,8 @@ public class TrackScheduler {
 
 	private boolean isRepeating;
 
-	public TrackScheduler(IGuild guild, AudioPlayer player) {
-		this.audioPlayer = player;
+	public TrackScheduler(IGuild guild, AudioPlayer audioPlayer) {
+		this.audioPlayer = audioPlayer;
 		this.queue = new LinkedBlockingQueue<>();
 		this.isRepeating = false;
 		this.setVolume(Integer.parseInt(Storage.getSetting(guild, Setting.DEFAULT_VOLUME).toString()));
@@ -36,6 +36,25 @@ public class TrackScheduler {
 
 	public boolean nextTrack() {
 		return audioPlayer.startTrack(queue.poll(), false);
+	}
+
+	public void skip(long time) {
+		long newPosition = audioPlayer.getPlayingTrack().getPosition() + time;
+		if(newPosition < 0 || newPosition > audioPlayer.getPlayingTrack().getDuration()) {
+			throw new IllegalArgumentException();
+		}
+		audioPlayer.getPlayingTrack().setPosition(newPosition);
+	}
+
+	public void clearPlaylist() {
+		queue.clear();
+	}
+
+	public void shufflePlaylist() {
+		List<AudioTrack> tempList = new ArrayList<>(queue);
+		Collections.shuffle(tempList);
+		queue.clear();
+		queue.addAll(tempList);
 	}
 
 	public String getCurrentTrackName() {
@@ -80,24 +99,5 @@ public class TrackScheduler {
 
 	public boolean isStopped() {
 		return queue.isEmpty() && !this.isPlaying();
-	}
-
-	public void skip(long time) {
-		long newPosition = audioPlayer.getPlayingTrack().getPosition() + time;
-		if(newPosition < 0 || newPosition > audioPlayer.getPlayingTrack().getDuration()) {
-			throw new IllegalArgumentException();
-		}
-		audioPlayer.getPlayingTrack().setPosition(newPosition);
-	}
-
-	public void clearPlaylist() {
-		queue.clear();
-	}
-
-	public void shufflePlaylist() {
-		List<AudioTrack> tempList = new ArrayList<>(queue);
-		Collections.shuffle(tempList);
-		queue.clear();
-		queue.addAll(tempList);
 	}
 }

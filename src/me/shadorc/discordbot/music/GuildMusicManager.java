@@ -78,12 +78,11 @@ public class GuildMusicManager {
 		if(voiceChannel != null) {
 			voiceChannel.leave();
 		}
-		leaveTimer.stop();
+		this.cancelLeave();
 		audioPlayer.destroy();
 		MUSIC_MANAGERS.remove(guild);
 		LogUtils.info("{GuildMusicManager} {Guild: " + guild.getName()
 				+ " (ID: " + guild.getStringID() + ")} Voice channel leaved.");
-
 	}
 
 	public void setChannel(IChannel channel) {
@@ -101,10 +100,6 @@ public class GuildMusicManager {
 
 	public AudioProvider getAudioProvider() {
 		return new AudioProvider(audioPlayer);
-	}
-
-	public AudioPlayer getAudioPlayer() {
-		return audioPlayer;
 	}
 
 	public TrackScheduler getScheduler() {
