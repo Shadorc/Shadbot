@@ -34,9 +34,6 @@ public class GuildMusicManager {
 	private IChannel channel;
 	private IUser userDj;
 
-	// TODO: Remove
-	private boolean ended;
-
 	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
 		this.guild = guild;
 		this.audioPlayer = manager.createPlayer();
@@ -57,13 +54,6 @@ public class GuildMusicManager {
 	}
 
 	public void end() {
-		// TODO: Remove
-		if(ended) {
-			LogUtils.warn("{GuildMusicManager} {Guild: " + channel.getGuild().getName()
-					+ " (ID: " + channel.getGuild().getStringID() + ")} Music has tried to end multiple times.");
-			return;
-		}
-		ended = true;
 		BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
 		this.leaveVoiceChannel();
 	}

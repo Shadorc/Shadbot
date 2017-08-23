@@ -57,7 +57,7 @@ public class RateLimiter {
 
 	public void warn(String message, Context context) {
 		LogUtils.info("{RateLimiter} {Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")} "
-				+ "User (ID:" + context.getAuthor().getStringID() + ") warned.");
+				+ "User (ID:" + context.getAuthor().getStringID() + ") warned. Command: " + context.getCommand());
 		BotUtils.sendMessage(Emoji.STOPWATCH + " " + message, context.getChannel());
 		warningsRateLimiter.get(context.getGuild()).put(context.getAuthor(), true);
 	}
