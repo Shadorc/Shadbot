@@ -74,15 +74,22 @@ public class GuildMusicManager {
 	}
 
 	public void leaveVoiceChannel() {
-		IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
-		if(voiceChannel != null) {
-			voiceChannel.leave();
-		}
-		this.cancelLeave();
-		audioPlayer.destroy();
-		MUSIC_MANAGERS.remove(guild);
-		LogUtils.info("{GuildMusicManager} {Guild: " + guild.getName()
-				+ " (ID: " + guild.getStringID() + ")} Voice channel leaved.");
+		// FIXME: Temporary fix to avoid SocketClosed exception
+		new Thread(new Runnable() {
+			@Override
+			@SuppressWarnings("PMD.AccessorMethodGeneration")
+			public void run() {
+				IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
+				if(voiceChannel != null) {
+					voiceChannel.leave();
+				}
+				GuildMusicManager.this.cancelLeave();
+				audioPlayer.destroy();
+				MUSIC_MANAGERS.remove(guild);
+				LogUtils.info("{GuildMusicManager} {Guild: " + guild.getName()
+						+ " (ID: " + guild.getStringID() + ")} Voice channel leaved.");
+			}
+		}).start();
 	}
 
 	public void setChannel(IChannel channel) {
