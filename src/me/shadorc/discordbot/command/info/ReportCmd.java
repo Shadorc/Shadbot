@@ -34,7 +34,9 @@ public class ReportCmd extends AbstractCommand {
 			return;
 		}
 
-		BotUtils.sendMessage(context.getAuthorName() + " from Guild \"" + context.getGuild().getName() + "\" suggested : " + context.getArg(), Shadbot.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID));
+		BotUtils.sendMessage("{Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")} "
+				+ context.getAuthorName() + " (ID: " + context.getAuthor().getLongID() + ") say: " + context.getArg(),
+				Shadbot.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID));
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " Report sent, thank you !", context.getChannel());
 	}
 
@@ -44,7 +46,7 @@ public class ReportCmd extends AbstractCommand {
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Send a message to my developer, this can be a suggestion, a bug report, anything.**")
+				.appendDescription("**Send a message to my author, this can be a suggestion, a bug report, anything.**")
 				.appendField("Usage", context.getPrefix() + "report <message>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

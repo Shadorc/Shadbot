@@ -22,71 +22,74 @@ public class HelpCmd extends AbstractCommand {
 			return;
 		}
 
+		String prefix = context.getPrefix();
+
 		EmbedBuilder builder = new EmbedBuilder()
 				.withAuthorName("Shadbot Help")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.withDesc("Get more information by using " + context.getPrefix() + "help <command>.")
+				.withDesc("Get more information by using " + prefix + "help <command>.")
 				.appendField("Utils Commands:",
-						"`" + context.getPrefix() + "translate`"
-								+ " `" + context.getPrefix() + "wiki`"
-								+ " `" + context.getPrefix() + "calc`"
-								+ " `" + context.getPrefix() + "weather`"
-								+ " `" + context.getPrefix() + "urban`", false)
+						"`" + prefix + "translate`"
+								+ " `" + prefix + "wiki`"
+								+ " `" + prefix + "calc`"
+								+ " `" + prefix + "weather`"
+								+ " `" + prefix + "urban`", false)
 				.appendField("Fun Commands:",
-						"`" + context.getPrefix() + "chat`", false)
+						"`" + prefix + "chat`", false)
 				.appendField("Image Commands:",
-						"`" + context.getPrefix() + "image`"
-								+ " `" + context.getPrefix() + "suicidegirls`"
-								+ " `" + context.getPrefix() + "gif`", false)
+						"`" + prefix + "image`"
+								+ " `" + prefix + "suicidegirls`"
+								+ " `" + prefix + "gif`", false)
 				.appendField("Games Commands:",
-						"`" + context.getPrefix() + "dice`"
-								+ " `" + context.getPrefix() + "slot_machine`"
-								+ " `" + context.getPrefix() + "russian_roulette`"
-								+ " `" + context.getPrefix() + "trivia`"
-								+ " `" + context.getPrefix() + "rps`", false)
+						"`" + prefix + "dice`"
+								+ " `" + prefix + "slot_machine`"
+								+ " `" + prefix + "russian_roulette`"
+								+ " `" + prefix + "trivia`"
+								+ " `" + prefix + "rps`", false)
 				.appendField("Currency Commands:",
-						"`" + context.getPrefix() + "transfer`"
-								+ " `" + context.getPrefix() + "leaderboard`"
-								+ " `" + context.getPrefix() + "coins`", false)
+						"`" + prefix + "transfer`"
+								+ " `" + prefix + "leaderboard`"
+								+ " `" + prefix + "coins`", false)
 				.appendField("Music Commands:",
-						"`" + context.getPrefix() + "play`"
-								+ " `" + context.getPrefix() + "pause`"
-								+ " `" + context.getPrefix() + "resume`"
-								+ " `" + context.getPrefix() + "stop`"
-								+ " `" + context.getPrefix() + "repeat`"
-								+ " `" + context.getPrefix() + "volume`"
-								+ " `" + context.getPrefix() + "next`"
-								+ " `" + context.getPrefix() + "backward`"
-								+ " `" + context.getPrefix() + "forward`"
-								+ " `" + context.getPrefix() + "name`"
-								+ " `" + context.getPrefix() + "playlist`"
-								+ " `" + context.getPrefix() + "clear`"
-								+ " `" + context.getPrefix() + "shuffle`", false)
+						"`" + prefix + "play`"
+								+ " `" + prefix + "pause`"
+								+ " `" + prefix + "resume`"
+								+ " `" + prefix + "stop`"
+								+ " `" + prefix + "repeat`"
+								+ " `" + prefix + "volume`"
+								+ " `" + prefix + "next`"
+								+ " `" + prefix + "backward`"
+								+ " `" + prefix + "forward`"
+								+ " `" + prefix + "name`"
+								+ " `" + prefix + "playlist`"
+								+ " `" + prefix + "clear`"
+								+ " `" + prefix + "shuffle`", false)
 				.appendField("Games Stats Commands:",
-						"`" + context.getPrefix() + "overwatch`"
-								+ " `" + context.getPrefix() + "diablo`"
-								+ " `" + context.getPrefix() + "cs`", false)
+						"`" + prefix + "overwatch`"
+								+ " `" + prefix + "diablo`"
+								+ " `" + prefix + "cs`", false)
 				.appendField("Info Commands:",
-						"`" + context.getPrefix() + "info`"
-								+ " `" + context.getPrefix() + "userinfo`"
-								+ " `" + context.getPrefix() + "serverinfo`"
-								+ " `" + context.getPrefix() + "report`"
-								+ " `" + context.getPrefix() + "ping`", false)
+						"`" + prefix + "info`"
+								+ " `" + prefix + "userinfo`"
+								+ " `" + prefix + "serverinfo`"
+								+ " `" + prefix + "ping`", false)
 				.appendField("French Commands:",
-						"`" + context.getPrefix() + "dtc`"
-								+ " `" + context.getPrefix() + "blague`"
-								+ " `" + context.getPrefix() + "vacs`", false);
+						"`" + prefix + "dtc`"
+								+ " `" + prefix + "blague`"
+								+ " `" + prefix + "vacs`", false)
+				.withFooterIcon("http://www.urbanleagueneb.org/wp-content/uploads/2016/10/E-mail-Icon.png")
+				.withFooterText("You can send me a suggestion, a bug report, anything by using: " + prefix + "report <message>");
 
 		if(context.getAuthorRole().equals(Role.ADMIN) || context.getAuthorRole().equals(Role.OWNER)) {
 			builder.appendField("Admin Commands:",
-					"`" + context.getPrefix() + "prune`"
-							+ " `" + context.getPrefix() + "settings`", false);
+					"`" + prefix + "prune`"
+							+ " `" + prefix + "settings`", false);
 		}
 
 		if(context.getAuthorRole().equals(Role.OWNER)) {
 			builder.appendField("Owner Commands:",
-					"`" + context.getPrefix() + "shutdown`", false);
+					"`" + prefix + "shutdown`", false);
 		}
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
