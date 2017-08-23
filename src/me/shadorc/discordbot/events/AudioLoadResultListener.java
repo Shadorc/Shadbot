@@ -72,7 +72,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 
 			EmbedBuilder embed = new EmbedBuilder()
-					.withAuthorName("Results (Type: " + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel to cancel)")
+					.withAuthorName("Results (Use " + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel to cancel the selection)")
 					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 					.withDescription("**Select a music by typing the corresponding number.**\n" + strBuilder.toString())
@@ -139,10 +139,11 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		String numStr = message.getContent().replaceAll("[^\\d.]", "");
+		//Remove all non numeric characters
+		String numStr = message.getContent().replaceAll("[^\\d]", "");
 		if(!StringUtils.isInteger(numStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid number. "
-					+ "You can use \"" + prefix + "cancel\" to cancel.",
+					+ "You can use \"" + prefix + "cancel\" to cancel the selection.",
 					musicManager.getChannel());
 			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
 					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Invalid choice: " + message.getContent());
@@ -152,7 +153,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		int num = Integer.parseInt(numStr);
 		if(num < 1 || num > Math.min(5, resultsTracks.size())) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid number. "
-					+ "You can use \"" + prefix + "cancel\" to cancel.",
+					+ "You can use \"" + prefix + "cancel\" to cancel the selection.",
 					musicManager.getChannel());
 			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
 					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Invalid choice: " + message.getContent());
