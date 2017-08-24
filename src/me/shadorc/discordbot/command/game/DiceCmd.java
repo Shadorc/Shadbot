@@ -17,13 +17,12 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class DiceCmd extends AbstractCommand {
 
-	protected static final Map<IGuild, DiceManager> GUILDS_DICE = new HashMap<>();
+	protected static final Map<IChannel, DiceManager> CHANNELS_DICE = new HashMap<>();
 	protected static final int MULTIPLIER = 6;
 
 	public DiceCmd() {
@@ -32,62 +31,21 @@ public class DiceCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(GUILDS_DICE.containsKey(context.getGuild())) {
-			if(!context.hasArg()) {
-				throw new MissingArgumentException();
-			}
+		if(!context.hasArg()) {
+			throw new MissingArgumentException();
+		}
 
-			DiceManager diceManager = GUILDS_DICE.get(context.getGuild());
+		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel());
 
-			if(context.getPlayer().getCoins() < diceManager.getBet()) {
-				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to join this game.", context.getChannel());
-				return;
-			}
-
-			if(diceManager.isAlreadyPlaying(context.getAuthor())) {
-				BotUtils.sendMessage(Emoji.INFO + " " + context.getAuthor().mention() + ", you're already participating.", context.getChannel());
-				return;
-			}
-
-			String numStr = context.getArg();
-			if(!StringUtils.isInteger(numStr)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
-				return;
-			}
-
-			int num = Integer.parseInt(numStr);
-			if(num < 1 || num > 6) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
-				return;
-			}
-
-			if(diceManager.hasAlreadyBet(num)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
-				return;
-			}
-
-			diceManager.addPlayer(context.getAuthor(), num);
-			BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " bet on " + num + ".", context.getChannel());
-
-		} else {
-			if(!context.hasArg()) {
-				throw new MissingArgumentException();
-			}
-
+		if(diceManager == null) {
 			String[] splitArgs = context.getArg().split(" ");
 			if(splitArgs.length != 2) {
 				throw new MissingArgumentException();
 			}
 
 			String betStr = splitArgs[0];
-			if(!StringUtils.isInteger(betStr)) {
+			if(!StringUtils.isPositiveInteger(betStr)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
-				return;
-			}
-
-			String numStr = splitArgs[1];
-			if(!StringUtils.isInteger(numStr)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 				return;
 			}
 
@@ -97,20 +55,72 @@ public class DiceCmd extends AbstractCommand {
 				return;
 			}
 
-			int num = Integer.parseInt(numStr);
-			if(num < 1 || num > 6) {
+			String numStr = splitArgs[1];
+			if(!DiceCmd.isValidDiceNum(numStr)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 				return;
 			}
 
-			DiceManager diceManager = new DiceManager(context.getChannel(), context.getAuthor(), num, bet);
-			GUILDS_DICE.put(context.getGuild(), diceManager);
-			diceManager.start();
-		}
+			int num = Integer.parseInt(numStr);
 
+			diceManager = new DiceManager(context.getChannel(), context.getAuthor(), bet);
+			diceManager.addPlayer(context.getAuthor(), num);
+			diceManager.start();
+			CHANNELS_DICE.put(context.getChannel(), diceManager);
+
+		} else {
+			if(context.getPlayer().getCoins() < diceManager.getBet()) {
+				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to join this game.", context.getChannel());
+				return;
+			}
+
+			if(diceManager.isPlaying(context.getAuthor())) {
+				BotUtils.sendMessage(Emoji.INFO + " You're already participating.", context.getChannel());
+				return;
+			}
+
+			String numStr = context.getArg();
+			if(!DiceCmd.isValidDiceNum(numStr)) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+				return;
+			}
+
+			int num = Integer.parseInt(numStr);
+
+			if(diceManager.isBet(num)) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
+				return;
+			}
+
+			diceManager.addPlayer(context.getAuthor(), num);
+			BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " bet on " + num + ".", context.getChannel());
+		}
+	}
+
+	private static boolean isValidDiceNum(String str) {
+		if(StringUtils.isInteger(str)) {
+			int num = Integer.parseInt(str);
+			return num >= 1 && num <= 6;
+		}
+		return false;
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
+				.withColor(Config.BOT_COLOR)
+				.appendDescription("**Start a dice game with a common bet or join a game in progress.**")
+				.appendField("Usage", "Create a game: **" + context.getPrefix() + "dice <bet> <num>**.\nJoin a game **" + context.getPrefix() + "dice <num>**", false)
+				.appendField("Restrictions", "The number must be between 1 and 6.\nYou can't bet on a number that has already been chosen by another player.", false)
+				.appendField("Gains", "The winner gets " + MULTIPLIER + " times the common bet multiplied by the number of players.", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
 	protected class DiceManager {
+
+		private static final int GAME_DURATION = 30;
 
 		private final Map<Integer, IUser> numsPlayers;
 		private final IChannel channel;
@@ -118,30 +128,29 @@ public class DiceCmd extends AbstractCommand {
 		private final Timer timer;
 		private final int bet;
 
-		protected DiceManager(IChannel channel, IUser user, int num, int bet) {
+		protected DiceManager(IChannel channel, IUser croupier, int bet) {
 			this.channel = channel;
-			this.croupier = user;
-			this.numsPlayers = new HashMap<>();
-			this.numsPlayers.put(num, user);
+			this.croupier = croupier;
 			this.bet = bet;
-			this.timer = new Timer(30 * 1000, event -> {
+			this.numsPlayers = new HashMap<>();
+			this.timer = new Timer(GAME_DURATION * 1000, event -> {
 				this.stop();
 			});
 		}
 
 		protected void addPlayer(IUser user, int num) {
-			this.numsPlayers.put(num, user);
+			numsPlayers.put(num, user);
 		}
 
 		public int getBet() {
 			return bet;
 		}
 
-		protected boolean isAlreadyPlaying(IUser user) {
+		protected boolean isPlaying(IUser user) {
 			return numsPlayers.containsValue(user);
 		}
 
-		protected boolean hasAlreadyBet(int num) {
+		protected boolean isBet(int num) {
 			return numsPlayers.containsKey(num);
 		}
 
@@ -156,49 +165,34 @@ public class DiceCmd extends AbstractCommand {
 					.withFooterText("You have " + (timer.getDelay() / 1000) + " seconds to make your bets.");
 			BotUtils.sendEmbed(builder.build(), channel);
 
-			this.timer.start();
+			timer.start();
 		}
 
 		protected void stop() {
-			this.timer.stop();
+			timer.stop();
 
-			int rand = MathUtils.rand(1, 6);
-			BotUtils.sendMessage(Emoji.DICE + " The dice is rolling... **" + rand + "** !", channel);
+			int winningNum = MathUtils.rand(1, 6);
+			BotUtils.sendMessage(Emoji.DICE + " The dice is rolling... **" + winningNum + "** !", channel);
 
-			if(numsPlayers.containsKey(rand)) {
-				IUser winner = numsPlayers.get(rand);
+			if(this.isBet(winningNum)) {
+				IUser winner = numsPlayers.get(winningNum);
 				int gains = bet * numsPlayers.size() * MULTIPLIER;
 				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win " + gains + " coins !", channel);
 				Storage.getPlayer(channel.getGuild(), winner).addCoins(gains);
-				numsPlayers.remove(rand);
+				numsPlayers.remove(winningNum);
 			}
 
 			if(!numsPlayers.isEmpty()) {
 				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
 				for(int num : numsPlayers.keySet()) {
-					if(rand != num) {
-						Storage.getPlayer(channel.getGuild(), numsPlayers.get(num)).addCoins(-bet);
-						strBuilder.append(numsPlayers.get(num).mention() + ", ");
-					}
+					Storage.getPlayer(channel.getGuild(), numsPlayers.get(num)).addCoins(-bet);
+					strBuilder.append(numsPlayers.get(num).mention() + ", ");
 				}
 				strBuilder.append("you have lost " + bet + " coin(s).");
 				BotUtils.sendMessage(strBuilder.toString(), channel);
 			}
 
-			GUILDS_DICE.remove(channel.getGuild());
+			CHANNELS_DICE.remove(channel);
 		}
-	}
-
-	@Override
-	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Start a dice game with a common bet or join a game in progress.**")
-				.appendField("Usage", "Create a game: **" + context.getPrefix() + "dice <bet> <num>**.\nJoin a game **" + context.getPrefix() + "dice <num>**", false)
-				.appendField("Restrictions", "The number must be between 1 and 6.\nYou can't bet on a number that has already been chosen by another player.", false)
-				.appendField("Gains", "The winner gets " + MULTIPLIER + " times the common bet multiplied by the number of players.", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

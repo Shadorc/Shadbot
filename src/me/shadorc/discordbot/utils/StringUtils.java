@@ -67,6 +67,18 @@ public class StringUtils {
 
 	/**
 	 * @param str - the String to check
+	 * @return true if it can be cast as a strictly positive Integer, false otherwise
+	 */
+	public static boolean isPositiveInteger(String str) {
+		try {
+			return Integer.parseInt(str) > 0;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * @param str - the String to check
 	 * @return true if it can be cast as a Long, false otherwise
 	 */
 	public static boolean isLong(String str) {
