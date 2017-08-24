@@ -23,6 +23,7 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
+@SuppressWarnings("ucd")
 public class EventListener {
 
 	@EventSubscriber

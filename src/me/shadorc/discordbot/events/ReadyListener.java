@@ -10,6 +10,7 @@ import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 
+@SuppressWarnings("ucd")
 public class ReadyListener {
 
 	@EventSubscriber

@@ -31,15 +31,15 @@ public class PlayCmd extends AbstractCommand {
 			if(botVoiceChannel == null) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Join a vocal channel before using this command.", context.getChannel());
 			} else {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in voice channel " + botVoiceChannel.mention()
-						+ ", join him before using this command.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
+						+ ", join me before using this command.", context.getChannel());
 			}
 			return;
 		}
 
 		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Shadbot is currently playing music in voice channel " + botVoiceChannel.mention()
-					+ ", join him before using this command.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
+					+ ", join me before using this command.", context.getChannel());
 			return;
 		}
 

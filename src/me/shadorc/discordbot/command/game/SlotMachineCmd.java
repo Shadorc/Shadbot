@@ -11,6 +11,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class SlotMachineCmd extends AbstractCommand {
@@ -54,18 +55,18 @@ public class SlotMachineCmd extends AbstractCommand {
 
 		int gains = -PAID_COST;
 
-		if(slot1 == SlotOptions.CHERRIES && slot2 == SlotOptions.CHERRIES && slot3 == SlotOptions.CHERRIES) {
+		if(Utils.allEqual(SlotOptions.CHERRIES, slot1, slot2, slot3)) {
 			gains = 30;
-		} else if(slot1 == SlotOptions.BELL && slot2 == SlotOptions.BELL && slot3 == SlotOptions.BELL) {
+		} else if(Utils.allEqual(SlotOptions.BELL, slot1, slot2, slot3)) {
 			gains = 150;
-		} else if(slot1 == SlotOptions.GIFT && slot2 == SlotOptions.GIFT && slot3 == SlotOptions.GIFT) {
+		} else if(Utils.allEqual(SlotOptions.GIFT, slot1, slot2, slot3)) {
 			gains = 3000;
 		}
 		context.getPlayer().addCoins(gains);
 
 		StringBuilder message = new StringBuilder(
 				":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":"
-						+ "\nYou have " + (gains > 0 ? "win" : "lost") + " " + Math.abs(gains) + " coins !");
+						+ "\nYou " + (gains > 0 ? "win" : "have lost") + " " + Math.abs(gains) + " coins !");
 		BotUtils.sendMessage(message.toString(), context.getChannel());
 	}
 

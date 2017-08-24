@@ -115,4 +115,13 @@ public class Utils {
 		}
 		return list;
 	}
+
+	public static boolean allEqual(Object key, Object... objs) {
+		for(Object obj : objs) {
+			if(!obj.equals(key)) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
