@@ -17,7 +17,9 @@ public class Context {
 	private final MessageReceivedEvent event;
 	private final String command;
 	private final String arg;
+
 	private Player player;
+	private String prefix;
 
 	public Context(MessageReceivedEvent event) {
 		this.event = event;
@@ -65,7 +67,10 @@ public class Context {
 	}
 
 	public String getPrefix() {
-		return Storage.getSetting(this.getGuild(), Setting.PREFIX).toString();
+		if(prefix == null) {
+			prefix = Storage.getSetting(this.getGuild(), Setting.PREFIX).toString();
+		}
+		return prefix;
 	}
 
 	public String getCommand() {
