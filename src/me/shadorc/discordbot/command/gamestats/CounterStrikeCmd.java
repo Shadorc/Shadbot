@@ -49,7 +49,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			String steamid = null;
 			if(context.getArg().contains("/")) {
 				String[] splittedUrl = context.getArg().split("/");
-				steamid = splittedUrl[splittedUrl.length-1].trim();
+				steamid = splittedUrl[splittedUrl.length - 1].trim();
 			} else if(StringUtils.isLong(context.getArg())) {
 				steamid = context.getArg().trim();
 			} else {
