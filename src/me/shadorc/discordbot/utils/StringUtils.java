@@ -66,6 +66,19 @@ public class StringUtils {
 	}
 
 	/**
+	 * @param str - the String to check
+	 * @return true if it can be cast as a Long, false otherwise
+	 */
+	public static boolean isLong(String str) {
+		try {
+			Long.parseLong(str);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	/**
 	 * @param list - the list to format
 	 * @param mapper - a non-interfering, stateless function to apply to each element
 	 * @param delimiter - the delimiter to be used between each element
