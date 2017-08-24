@@ -151,7 +151,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		for(String str : content.split(",")) {
 			// Remove all non numeric characters
 			String numStr = str.replaceAll("[^\\d]", "").trim();
-			if(!StringUtils.isInteger(numStr)) {
+			if(!StringUtils.isPositiveInteger(numStr)) {
 				this.sendInvalidChoice(str.trim(), prefix, message);
 				return;
 			}

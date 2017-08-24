@@ -29,18 +29,6 @@ public class TransferCoinsCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String coinsStr = splitCmd[0];
-		if(!StringUtils.isInteger(coinsStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid amount.", context.getChannel());
-			return;
-		}
-
-		int coins = Integer.parseInt(coinsStr);
-		if(coins <= 0) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " The transferred amount cannot be negative.", context.getChannel());
-			return;
-		}
-
 		Player receiverPlayer = Storage.getPlayer(context.getGuild(), context.getMessage().getMentions().get(0));
 		Player senderPlayer = context.getPlayer();
 		if(senderPlayer.equals(receiverPlayer)) {
@@ -48,6 +36,13 @@ public class TransferCoinsCmd extends AbstractCommand {
 			return;
 		}
 
+		String coinsStr = splitCmd[0];
+		if(!StringUtils.isPositiveInteger(coinsStr)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid amount.", context.getChannel());
+			return;
+		}
+
+		int coins = Integer.parseInt(coinsStr);
 		if(senderPlayer.getCoins() < coins) {
 			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to do this.", context.getChannel());
 			return;

@@ -51,16 +51,12 @@ public class PruneCmd extends AbstractCommand {
 		}
 
 		String numArg = splitArgs[splitArgs.length - 1];
-		if(!StringUtils.isInteger(numArg)) {
+		if(!StringUtils.isPositiveInteger(numArg)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number.", context.getChannel());
 			return;
 		}
 
 		int num = Integer.parseInt(numArg);
-		if(num < 0) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " You cannot delete a negative number of messages, that doesn't make any sense.", context.getChannel());
-			return;
-		}
 
 		// bulkDelete() cannot delete more than 100 messages
 		num = Math.min(100, num);

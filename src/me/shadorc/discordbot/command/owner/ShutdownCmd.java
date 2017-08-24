@@ -34,19 +34,12 @@ public class ShutdownCmd extends AbstractCommand {
 		}
 
 		String timeStr = splitArgs[0];
-		if(!StringUtils.isInteger(timeStr)) {
+		if(!StringUtils.isPositiveInteger(timeStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid time.", context.getChannel());
 			return;
 		}
 
-		int time = Integer.parseInt(timeStr);
-		if(time < 0) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Time must be positive.", context.getChannel());
-			return;
-		}
-
 		String message = splitArgs[1].trim();
-
 		for(IGuild guild : Shadbot.getClient().getGuilds()) {
 			GuildMusicManager gmm = GuildMusicManager.getGuildMusicManager(guild);
 			if(gmm != null && gmm.getChannel() != null) {
@@ -54,6 +47,7 @@ public class ShutdownCmd extends AbstractCommand {
 			}
 		}
 
+		int time = Integer.parseInt(timeStr);
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {

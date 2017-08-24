@@ -31,7 +31,7 @@ public class PositionCmd extends AbstractCommand {
 		}
 
 		String numStr = context.getArg().trim();
-		if(!StringUtils.isInteger(numStr)) {
+		if(!StringUtils.isPositiveInteger(numStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number.", context.getChannel());
 			return;
 		}
