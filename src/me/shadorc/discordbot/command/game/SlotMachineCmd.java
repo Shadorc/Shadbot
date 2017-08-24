@@ -31,7 +31,7 @@ public class SlotMachineCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public SlotMachineCmd() {
-		super(Role.USER, "slot_machine", "slot-machine");
+		super(Role.USER, "slot_machine", "slot-machine", "slotmachine");
 		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
 	}
 
