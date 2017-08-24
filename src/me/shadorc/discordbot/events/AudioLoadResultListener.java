@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.events;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Timer;
@@ -75,11 +76,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					.withAuthorName("Results (Use " + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel to cancel the selection)")
 					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-					.withDescription("**Select a music by typing the corresponding number.**\n" + strBuilder.toString())
-					.withFooterText("This choice will be canceled in 15 seconds.");
+					.withDescription("**Select a music by typing the corresponding number.**"
+							+ "\nYou can choose several musics by separating them with a comma."
+							+ "\nExample: 1,3,4"
+							+ "\n" + strBuilder.toString())
+					.withFooterText("This choice will be canceled in 20 seconds.");
 			BotUtils.sendEmbed(embed.build(), musicManager.getChannel());
 
-			cancelTimer = new Timer(15 * 1000, event -> {
+			cancelTimer = new Timer(20 * 1000, event -> {
 				this.stopWaiting();
 			});
 			cancelTimer.start();
@@ -102,6 +106,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	@Override
 	public void noMatches() {
 		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+		LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
+				+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} "
+				+ "No matches: " + identifier);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
@@ -138,36 +145,37 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		// Remove all non numeric characters
-		String numStr = message.getContent().replaceAll("[^\\d]", "");
-		if(!StringUtils.isInteger(numStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid number. "
-					+ "You can use \"" + prefix + "cancel\" to cancel the selection.",
-					musicManager.getChannel());
-			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
-					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Invalid choice: " + message.getContent());
-			return;
-		}
+		String content = message.getContent().replace("/", "").replace("play", "").trim();
 
-		int num = Integer.parseInt(numStr);
-		if(num < 1 || num > Math.min(5, resultsTracks.size())) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " This is not a valid number. "
-					+ "You can use \"" + prefix + "cancel\" to cancel the selection.",
-					musicManager.getChannel());
-			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
-					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Invalid choice: " + message.getContent());
-			return;
+		List<Integer> choices = new ArrayList<>();
+		for(String str : content.split(",")) {
+			// Remove all non numeric characters
+			String numStr = str.replaceAll("[^\\d]", "").trim();
+			if(!StringUtils.isInteger(numStr)) {
+				this.sendInvalidChoice(str.trim(), prefix, message);
+				return;
+			}
+
+			int num = Integer.parseInt(numStr);
+			if(num < 1 || num > Math.min(5, resultsTracks.size())) {
+				this.sendInvalidChoice(str.trim(), prefix, message);
+				return;
+			}
+
+			choices.add(num);
 		}
 
 		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
 			return;
 		}
 
-		AudioTrack track = resultsTracks.get(num - 1);
-		if(musicManager.getScheduler().isPlaying()) {
-			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
+		for(int choice : choices) {
+			AudioTrack track = resultsTracks.get(choice - 1);
+			if(musicManager.getScheduler().isPlaying()) {
+				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
+			}
+			musicManager.getScheduler().queue(track);
 		}
-		musicManager.getScheduler().queue(track);
 
 		this.stopWaiting();
 	}
@@ -176,5 +184,13 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		cancelTimer.stop();
 		resultsTracks.clear();
 		MessageManager.removeListener(musicManager.getChannel());
+	}
+
+	private void sendInvalidChoice(String choice, String prefix, IMessage message) {
+		BotUtils.sendMessage(Emoji.EXCLAMATION + " \"" + choice + "\" is not a valid number. "
+				+ "You can use \"" + prefix + "cancel\" to cancel the selection.",
+				musicManager.getChannel());
+		LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
+				+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Invalid choice: " + message.getContent());
 	}
 }

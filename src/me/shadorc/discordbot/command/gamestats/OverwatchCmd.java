@@ -109,7 +109,7 @@ public class OverwatchCmd extends AbstractCommand {
 		for(int i = 0; i < Math.min(element.getElementsByClass("bar-text").size(), 3); i++) {
 			String hero = element.getElementsByClass("title").get(i).text();
 			String desc = element.getElementsByClass("description").get(i).text();
-			strBuilder.append((i + 1) + ". " + hero + " (" + desc + ")\n");
+			strBuilder.append("**" + (i + 1) + "**. " + hero + " (" + desc + ")\n");
 		}
 		return strBuilder.toString();
 	}
