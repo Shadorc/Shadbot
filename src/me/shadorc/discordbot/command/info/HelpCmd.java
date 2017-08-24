@@ -36,7 +36,8 @@ public class HelpCmd extends AbstractCommand {
 								+ " `" + prefix + "weather`"
 								+ " `" + prefix + "urban`", false)
 				.appendField("Fun Commands:",
-						"`" + prefix + "chat`", false)
+						"`" + prefix + "leet`"
+								+ " `" + prefix + "chat`", false)
 				.appendField("Image Commands:",
 						"`" + prefix + "image`"
 								+ " `" + prefix + "suicidegirls`"

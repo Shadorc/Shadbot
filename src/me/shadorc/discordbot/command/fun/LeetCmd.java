@@ -1,0 +1,62 @@
+package me.shadorc.discordbot.command.fun;
+
+import java.time.temporal.ChronoUnit;
+
+import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
+import me.shadorc.discordbot.Shadbot;
+import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.utils.BotUtils;
+import sx.blah.discord.util.EmbedBuilder;
+
+public class LeetCmd extends AbstractCommand {
+
+	private final RateLimiter rateLimiter;
+
+	public LeetCmd() {
+		super(Role.USER, "leet");
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+	}
+
+	@Override
+	public void execute(Context context) throws MissingArgumentException {
+		if(!context.hasArg()) {
+			throw new MissingArgumentException();
+		}
+
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
+				rateLimiter.warn("Take it easy, don't spam :)", context);
+			}
+			return;
+		}
+
+		String text = context.getArg()
+				.toUpperCase()
+				.replace("A", "4")
+				.replace("B", "8")
+				.replace("E", "3")
+				.replace("G", "6")
+				.replace("L", "1")
+				.replace("O", "0")
+				.replace("S", "5")
+				.replace("T", "7");
+
+		BotUtils.sendMessage(Emoji.KEYBOARD + " " + text, context.getChannel());
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = new EmbedBuilder()
+				.withAuthorName("Help for " + this.getNames()[0] + " command")
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
+				.withColor(Config.BOT_COLOR)
+				.appendDescription("**Leetify a text.**")
+				.appendField("Usage", context.getPrefix() + "leet <text>", false);
+		BotUtils.sendEmbed(builder.build(), context.getChannel());
+	}
+
+}

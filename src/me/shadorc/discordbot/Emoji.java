@@ -34,6 +34,7 @@ public enum Emoji {
 
 	THUMBSDOWN(":thumbsdown:"),
 	SPEECH(":speech_balloon:"),
+	KEYBOARD(":keyboard:"),
 	CLAP(":clap:"),
 
 	SCISSORS(":scissors:"),

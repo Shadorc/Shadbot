@@ -15,6 +15,7 @@ import me.shadorc.discordbot.command.french.BashCmd;
 import me.shadorc.discordbot.command.french.HolidaysCmd;
 import me.shadorc.discordbot.command.french.JokeCmd;
 import me.shadorc.discordbot.command.fun.ChatCmd;
+import me.shadorc.discordbot.command.fun.LeetCmd;
 import me.shadorc.discordbot.command.game.DiceCmd;
 import me.shadorc.discordbot.command.game.RpsCmd;
 import me.shadorc.discordbot.command.game.RussianRouletteCmd;
@@ -70,6 +71,7 @@ public class CommandManager {
 				new UrbanCmd(),
 				// Fun Commands
 				new ChatCmd(),
+				new LeetCmd(),
 				// Image Commands
 				new GifCmd(),
 				new ImageCmd(),
