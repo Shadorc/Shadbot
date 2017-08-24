@@ -9,7 +9,6 @@ import me.shadorc.discordbot.Storage.Setting;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
@@ -97,20 +96,5 @@ public class BotUtils {
 			}
 		}
 		return channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(permission);
-	}
-
-	/**
-	 * @param voiceChannel - the voice channel to check
-	 * @param permission - permission to check
-	 * @param permissions - optional permissions
-	 * @return true if Shadbot has all permissions in channel
-	 */
-	public static boolean hasPermission(IVoiceChannel voiceChannel, Permissions permission, Permissions... permissions) {
-		for(Permissions perm : permissions) {
-			if(!voiceChannel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(perm)) {
-				return false;
-			}
-		}
-		return voiceChannel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(permission);
 	}
 }
