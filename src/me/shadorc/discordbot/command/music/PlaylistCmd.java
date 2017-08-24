@@ -49,6 +49,10 @@ public class PlaylistCmd extends AbstractCommand {
 	}
 
 	private String formatPlaylist(BlockingQueue<AudioTrack> queue) {
+		if(queue.isEmpty()) {
+			return "**The playlist is empty.**";
+		}
+
 		StringBuilder playlist = new StringBuilder("**" + queue.size() + " music(s) in the playlist:**\n");
 
 		int count = 1;
