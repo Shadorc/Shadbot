@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.swing.Timer;
 
+import org.jsoup.Jsoup;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -117,14 +119,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 	@Override
 	public void loadFailed(FriendlyException err) {
+		String errMessage = Jsoup.parse(err.getMessage().replace("Watch on YouTube", "")).text().trim();
 		if(err.severity.equals(FriendlyException.Severity.FAULT)) {
 			LogUtils.warn("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
 					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} "
-					+ "Load failed (Severity: " + err.severity.toString() + "), Shadbot might be able to continue playing: " + err.getMessage());
+					+ "Load failed, Shadbot might be able to continue playing: " + errMessage);
 		} else {
-			BotUtils.sendMessage(Emoji.GEAR + " Sorry, " + err.getMessage().toLowerCase(), musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.GEAR + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
 			LogUtils.warn("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
-					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Load failed: " + err.getMessage());
+					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Load failed: " + errMessage);
 		}
 
 		if(musicManager.getScheduler().isStopped()) {
