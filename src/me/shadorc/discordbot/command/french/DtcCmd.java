@@ -19,11 +19,11 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class BashCmd extends AbstractCommand {
+public class DtcCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
-	public BashCmd() {
+	public DtcCmd() {
 		super(Role.USER, "dtc");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}

@@ -11,7 +11,7 @@ import me.shadorc.discordbot.command.admin.SettingsCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
 import me.shadorc.discordbot.command.currency.LeaderboardCmd;
 import me.shadorc.discordbot.command.currency.TransferCoinsCmd;
-import me.shadorc.discordbot.command.french.BashCmd;
+import me.shadorc.discordbot.command.french.DtcCmd;
 import me.shadorc.discordbot.command.french.HolidaysCmd;
 import me.shadorc.discordbot.command.french.JokeCmd;
 import me.shadorc.discordbot.command.fun.ChatCmd;
@@ -109,7 +109,7 @@ public class CommandManager {
 				new UserInfoCmd(),
 				new ServerInfoCmd(),
 				// French Commands
-				new BashCmd(),
+				new DtcCmd(),
 				new JokeCmd(),
 				new HolidaysCmd(),
 				// Admin Commands
