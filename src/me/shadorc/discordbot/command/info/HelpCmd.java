@@ -41,6 +41,7 @@ public class HelpCmd extends AbstractCommand {
 				.appendField("Image Commands:",
 						"`" + prefix + "image`"
 								+ " `" + prefix + "suicidegirls`"
+								+ " `" + prefix + "rule34`"
 								+ " `" + prefix + "gif`", false)
 				.appendField("Games Commands:",
 						"`" + prefix + "dice`"

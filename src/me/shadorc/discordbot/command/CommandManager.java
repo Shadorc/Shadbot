@@ -26,6 +26,7 @@ import me.shadorc.discordbot.command.gamestats.DiabloCmd;
 import me.shadorc.discordbot.command.gamestats.OverwatchCmd;
 import me.shadorc.discordbot.command.image.GifCmd;
 import me.shadorc.discordbot.command.image.ImageCmd;
+import me.shadorc.discordbot.command.image.Rule34Cmd;
 import me.shadorc.discordbot.command.image.SuicideGirlsCmd;
 import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.InfoCmd;
@@ -76,6 +77,7 @@ public class CommandManager {
 				new GifCmd(),
 				new ImageCmd(),
 				new SuicideGirlsCmd(),
+				new Rule34Cmd(),
 				// Games Commands
 				new DiceCmd(),
 				new SlotMachineCmd(),
