@@ -13,12 +13,12 @@ import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class NextCmd extends AbstractCommand {
-	
+public class SkipCmd extends AbstractCommand {
+
 	private final RateLimiter rateLimiter;
 
-	public NextCmd() {
-		super(Role.USER, "next", "skip");
+	public SkipCmd() {
+		super(Role.USER, "skip", "next");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
@@ -30,7 +30,7 @@ public class NextCmd extends AbstractCommand {
 			}
 			return;
 		}
-		
+
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {

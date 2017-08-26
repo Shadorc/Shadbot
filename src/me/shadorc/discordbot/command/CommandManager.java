@@ -36,7 +36,7 @@ import me.shadorc.discordbot.command.info.ReportCmd;
 import me.shadorc.discordbot.command.info.UserInfoCmd;
 import me.shadorc.discordbot.command.music.ClearCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
-import me.shadorc.discordbot.command.music.NextCmd;
+import me.shadorc.discordbot.command.music.SkipCmd;
 import me.shadorc.discordbot.command.music.PauseCmd;
 import me.shadorc.discordbot.command.music.PlayCmd;
 import me.shadorc.discordbot.command.music.PlaylistCmd;
@@ -94,7 +94,7 @@ public class CommandManager {
 				new PauseCmd(),
 				new RepeatCmd(),
 				new StopCmd(),
-				new NextCmd(),
+				new SkipCmd(),
 				new NameCmd(),
 				new PlaylistCmd(),
 				new ClearCmd(),

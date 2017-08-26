@@ -60,7 +60,7 @@ public class HelpCmd extends AbstractCommand {
 								+ " `" + prefix + "stop`"
 								+ " `" + prefix + "repeat`"
 								+ " `" + prefix + "volume`"
-								+ " `" + prefix + "next`"
+								+ " `" + prefix + "skip`"
 								+ " `" + prefix + "backward`"
 								+ " `" + prefix + "forward`"
 								+ " `" + prefix + "name`"
