@@ -1,5 +1,9 @@
 package me.shadorc.discordbot.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Emoji;
@@ -17,9 +21,15 @@ import sx.blah.discord.util.RequestBuffer;
 
 public class BotUtils {
 
+	private static final ConcurrentHashMap<IChannel, List<String>> MESSAGE_QUEUE = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<IChannel, List<EmbedObject>> EMBED_QUEUE = new ConcurrentHashMap<>();
+
 	public static void sendMessage(String message, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			LogUtils.info("Shard isn't ready, aborting attempt to send message.");
+			List<String> messageList = MESSAGE_QUEUE.get(channel) == null ? new ArrayList<>() : MESSAGE_QUEUE.get(channel);
+			messageList.add(message);
+			MESSAGE_QUEUE.put(channel, messageList);
+			LogUtils.info("Shard isn't ready, message added to the queue.");
 			return;
 		}
 
@@ -44,7 +54,10 @@ public class BotUtils {
 	// EmbedBuilder doc: https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			LogUtils.info("Shard isn't ready, aborting attempt to send embed link.");
+			List<EmbedObject> embedList = EMBED_QUEUE.get(channel) == null ? new ArrayList<>() : EMBED_QUEUE.get(channel);
+			embedList.add(embed);
+			EMBED_QUEUE.put(channel, embedList);
+			LogUtils.info("Shard isn't ready, embed link added to the queue.");
 			return;
 		}
 
@@ -97,5 +110,25 @@ public class BotUtils {
 			}
 		}
 		return channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(permission);
+	}
+
+	public static void sendQueues() {
+		LogUtils.info("Sending pending messages...");
+		for(IChannel channel : MESSAGE_QUEUE.keySet()) {
+			for(String message : MESSAGE_QUEUE.get(channel)) {
+				BotUtils.sendMessage(message, channel);
+			}
+		}
+		LogUtils.info("Pending messages sent.");
+		MESSAGE_QUEUE.clear();
+
+		LogUtils.info("Sending pending embed...");
+		for(IChannel channel : EMBED_QUEUE.keySet()) {
+			for(EmbedObject embed : EMBED_QUEUE.get(channel)) {
+				BotUtils.sendEmbed(embed, channel);
+			}
+		}
+		LogUtils.info("Pending embed sent.");
+		EMBED_QUEUE.clear();
 	}
 }
