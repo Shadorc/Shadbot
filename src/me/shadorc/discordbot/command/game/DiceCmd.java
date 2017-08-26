@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.game;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
@@ -22,7 +23,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class DiceCmd extends AbstractCommand {
 
-	protected static final Map<IChannel, DiceManager> CHANNELS_DICE = new HashMap<>();
+	protected static final ConcurrentHashMap<IChannel, DiceManager> CHANNELS_DICE = new ConcurrentHashMap<>();
 	protected static final int MULTIPLIER = 6;
 
 	public DiceCmd() {

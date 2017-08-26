@@ -3,8 +3,7 @@ package me.shadorc.discordbot.command.fun;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,8 +29,8 @@ import sx.blah.discord.util.EmbedBuilder;
 public class ChatCmd extends AbstractCommand {
 
 	private static final String API_KEY = Storage.getApiKey(ApiKeys.CLEVERBOT_API_KEY);
-	private static final Map<IChannel, String> CHANNELS_CONV_ID = new HashMap<>();
-	private static final Map<IChannel, String> CHANNELS_CUSTID = new HashMap<>();
+	private static final ConcurrentHashMap<IChannel, String> CHANNELS_CONV_ID = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<IChannel, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
 
 	private final RateLimiter rateLimiter;
 
