@@ -38,6 +38,14 @@ public class TrackScheduler {
 		return audioPlayer.startTrack(queue.poll(), false);
 	}
 
+	public void skipTo(int num) {
+		AudioTrack track = null;
+		for(int i = 0; i < num; i++) {
+			track = queue.poll();
+		}
+		audioPlayer.playTrack(track.makeClone());
+	}
+
 	public void changePosition(long time) {
 		long newPosition = audioPlayer.getPlayingTrack().getPosition() + time;
 		if(newPosition < 0 || newPosition > audioPlayer.getPlayingTrack().getDuration()) {

@@ -165,7 +165,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 				return;
 			}
 
-			if(choices.contains(num)) {
+			if(!choices.contains(num)) {
 				choices.add(num);
 			}
 		}
