@@ -35,15 +35,15 @@ public class BotUtils {
 				LogUtils.error("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
 						+ "Missing permissions.", e);
 			} catch (DiscordException e) {
-				LogUtils.error("Discord exception while sending message : " + e.getErrorMessage(), e);
+				LogUtils.error("Discord exception while sending message: " + e.getErrorMessage(), e);
 			}
 		});
 	}
 
-	// EmbedBuilder doc : https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
+	// EmbedBuilder doc: https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
 		if(!(channel.getShard().isReady() && channel.getShard().isLoggedIn())) {
-			LogUtils.info("Shard isn't ready/connected, aborting attempt to send message.");
+			LogUtils.info("Shard isn't ready/connected, aborting attempt to send embed link.");
 			return;
 		}
 
@@ -62,7 +62,7 @@ public class BotUtils {
 				LogUtils.error("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
 						+ "Missing permissions.", e);
 			} catch (DiscordException e) {
-				LogUtils.error("Discord exception while sending embed : " + e.getErrorMessage(), e);
+				LogUtils.error("Discord exception while sending embed link: " + e.getErrorMessage(), e);
 			}
 		});
 	}

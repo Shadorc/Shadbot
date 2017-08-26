@@ -63,7 +63,7 @@ public class TranslateCmd extends AbstractCommand {
 
 		try {
 			String translatedText = Utils.translate(lang1, lang2, text);
-			BotUtils.sendMessage(Emoji.MAP + " Translation : " + translatedText, context.getChannel());
+			BotUtils.sendMessage(Emoji.MAP + " Translation: " + translatedText, context.getChannel());
 		} catch (IllegalArgumentException argErr) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language isn't supported or doesn't exist. Use " + context.getPrefix() + "help translate to see a complete list of supported languages.", context.getChannel());
 		} catch (IOException ioErr) {
@@ -79,7 +79,7 @@ public class TranslateCmd extends AbstractCommand {
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Translate a text from a language to another.**")
 				.appendField("Arguments", "<lang1> is optional, by leaving it blank the source language will be automatically detected.", false)
-				.appendField("Documentation", "List of supported languages : https://cloud.google.com/translate/docs/languages", false)
+				.appendField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false)
 				.appendField("Usage", context.getPrefix() + "translate [<lang1>] <lang2> <text>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

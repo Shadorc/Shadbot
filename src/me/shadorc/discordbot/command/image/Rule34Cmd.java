@@ -51,7 +51,7 @@ public class Rule34Cmd extends AbstractCommand {
 			}
 
 			JSONArray postsArray = postsObj.getJSONArray("post");
-			JSONObject postObj = postsArray.getJSONObject(MathUtils.rand(postsArray.length()-1));
+			JSONObject postObj = postsArray.getJSONObject(MathUtils.rand(postsArray.length() - 1));
 
 			String tags = postObj.getString("tags").trim().replace(" ", ", ");
 			if(tags.length() > 400) {

@@ -126,7 +126,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					+ "Load failed, Shadbot might be able to continue playing: " + errMessage);
 		} else {
 			BotUtils.sendMessage(Emoji.GEAR + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
-			LogUtils.warn("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
+			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
 					+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Load failed: " + errMessage);
 		}
 

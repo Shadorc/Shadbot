@@ -39,9 +39,9 @@ public class InfoCmd extends AbstractCommand {
 		String info = new String(
 				"```prolog"
 						+ "\n-= Performance Info =-"
-						+ "\nMemory : " + String.format("%d MB / %d MB", usedMemory / mbUnit, maxMemory / mbUnit)
-						+ "\nCPU Usage : " + String.format("%.1f", Utils.getProcessCpuLoad()) + "%"
-						+ "\nThreads Count : " + Thread.activeCount()
+						+ "\nMemory: " + String.format("%d MB / %d MB", usedMemory / mbUnit, maxMemory / mbUnit)
+						+ "\nCPU Usage: " + String.format("%.1f", Utils.getProcessCpuLoad()) + "%"
+						+ "\nThreads Count: " + Thread.activeCount()
 						+ "\n\n-= APIs Info =-"
 						+ "\nJava Version: " + System.getProperty("java.version")
 						+ "\n" + Discord4J.NAME + " Version: " + Discord4J.VERSION
