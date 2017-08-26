@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.events.ReadyListener;
+import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
@@ -20,6 +21,7 @@ public class Shadbot {
 				.login();
 
 		client.getDispatcher().registerListener(new ReadyListener());
+		client.getDispatcher().registerListener(new ShardListener());
 
 		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
 	}

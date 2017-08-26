@@ -18,7 +18,6 @@ public class ReadyListener {
 		LogUtils.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
 
 		Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
-		Shadbot.getClient().getDispatcher().registerListener(new ShardListener());
 		Shadbot.getClient().getDispatcher().registerListener(new GuildListener());
 		Shadbot.getClient().getDispatcher().registerListener(new MessageListener());
 		Shadbot.getClient().getDispatcher().registerListener(new VoiceChannelListener());
