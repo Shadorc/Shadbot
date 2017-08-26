@@ -94,5 +94,10 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.10.3</version>
 		</dependency>
+		<dependency>
+			<groupId>com.michaelwflaherty</groupId>
+			<artifactId>cleverbotapi</artifactId>
+			<version>1.0.2</version>
+		</dependency>
 	</dependencies>
 </project>
