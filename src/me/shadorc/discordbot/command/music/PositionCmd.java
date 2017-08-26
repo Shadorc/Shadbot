@@ -15,7 +15,7 @@ import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class PositionCmd extends AbstractCommand {
-	
+
 	private final RateLimiter rateLimiter;
 
 	public PositionCmd() {
@@ -31,7 +31,7 @@ public class PositionCmd extends AbstractCommand {
 			}
 			return;
 		}
-		
+
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
@@ -52,7 +52,7 @@ public class PositionCmd extends AbstractCommand {
 		int time = (context.getCommand().equals("backward") ? -1 : 1) * Integer.parseInt(numStr) * 1000;
 
 		try {
-			musicManager.getScheduler().skip(time);
+			musicManager.getScheduler().changePosition(time);
 		} catch (IllegalArgumentException err) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " New position is negative or superior to the music duration.", context.getChannel());
 			return;
@@ -68,7 +68,8 @@ public class PositionCmd extends AbstractCommand {
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Fast forward/fast backward the current song a specified amount of time (in seconds).**")
-				.appendField("Usage", context.getPrefix() + "forward <sec> or " + context.getPrefix() + "backward <sec>", false);
+				.appendField("Usage", context.getPrefix() + "forward <sec>"
+						+ "\n" + context.getPrefix() + "backward <sec>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

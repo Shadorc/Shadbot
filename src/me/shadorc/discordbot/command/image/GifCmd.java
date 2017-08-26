@@ -64,7 +64,8 @@ public class GifCmd extends AbstractCommand {
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show a random gif or a gif corresponding to a tag.**")
-				.appendField("Usage", context.getPrefix() + "gif or " + context.getPrefix() + "gif <tag>", false);
+				.appendField("Usage", context.getPrefix() + "gif"
+						+ "\n" + context.getPrefix() + "gif <tag>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

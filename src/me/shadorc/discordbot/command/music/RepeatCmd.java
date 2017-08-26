@@ -17,7 +17,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class RepeatCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
-	
+
 	public RepeatCmd() {
 		super(Role.USER, "repeat", "loop");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
@@ -31,7 +31,7 @@ public class RepeatCmd extends AbstractCommand {
 			}
 			return;
 		}
-		
+
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {

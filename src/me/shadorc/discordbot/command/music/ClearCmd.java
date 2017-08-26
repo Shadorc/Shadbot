@@ -16,7 +16,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class ClearCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
-	
+
 	public ClearCmd() {
 		super(Role.USER, "clear");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
@@ -30,7 +30,7 @@ public class ClearCmd extends AbstractCommand {
 			}
 			return;
 		}
-		
+
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {

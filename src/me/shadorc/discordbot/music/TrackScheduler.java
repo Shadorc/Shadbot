@@ -38,7 +38,7 @@ public class TrackScheduler {
 		return audioPlayer.startTrack(queue.poll(), false);
 	}
 
-	public void skip(long time) {
+	public void changePosition(long time) {
 		long newPosition = audioPlayer.getPlayingTrack().getPosition() + time;
 		if(newPosition < 0 || newPosition > audioPlayer.getPlayingTrack().getDuration()) {
 			throw new IllegalArgumentException();

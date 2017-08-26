@@ -14,7 +14,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class StopCmd extends AbstractCommand {
-	
+
 	private final RateLimiter rateLimiter;
 
 	public StopCmd() {
@@ -30,7 +30,7 @@ public class StopCmd extends AbstractCommand {
 			}
 			return;
 		}
-		
+
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager != null) {

@@ -18,7 +18,7 @@ import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class PlaylistCmd extends AbstractCommand {
-	
+
 	private final RateLimiter rateLimiter;
 
 	public PlaylistCmd() {
@@ -34,7 +34,7 @@ public class PlaylistCmd extends AbstractCommand {
 			}
 			return;
 		}
-		
+
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {

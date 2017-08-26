@@ -35,7 +35,8 @@ public class CoinsCmd extends AbstractCommand {
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show how many coins you have.\nYou can also see how much coins have an user by mentioning him.**")
-				.appendField("Usage", context.getPrefix() + "coins or " + context.getPrefix() + "coins <@user>", false);
+				.appendField("Usage", context.getPrefix() + "coins"
+						+ "\n" + context.getPrefix() + "coins <@user>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

@@ -15,7 +15,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class VolumeCmd extends AbstractCommand {
-	
+
 	private final RateLimiter rateLimiter;
 
 	public VolumeCmd() {
@@ -31,7 +31,7 @@ public class VolumeCmd extends AbstractCommand {
 			}
 			return;
 		}
-		
+
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
@@ -60,7 +60,8 @@ public class VolumeCmd extends AbstractCommand {
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
 				.appendDescription("**Show or change the current volume level.**")
-				.appendField("Usage", context.getPrefix() + "volume or " + context.getPrefix() + "volume <0-100>", false);
+				.appendField("Usage", context.getPrefix() + "volume"
+						+ "\n" + context.getPrefix() + "volume <0-100>", false);
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
