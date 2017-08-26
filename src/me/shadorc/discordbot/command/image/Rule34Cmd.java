@@ -42,7 +42,6 @@ public class Rule34Cmd extends AbstractCommand {
 					+ "page=dapi"
 					+ "&s=post"
 					+ "&q=index"
-					+ "&limit=5"
 					+ "&tags=" + URLEncoder.encode(context.getArg(), "UTF-8")), "UTF-8"));
 			JSONObject postsObj = mainObj.getJSONObject("posts");
 
@@ -54,13 +53,19 @@ public class Rule34Cmd extends AbstractCommand {
 			JSONArray postsArray = postsObj.getJSONArray("post");
 			JSONObject postObj = postsArray.getJSONObject(MathUtils.rand(postsArray.length()-1));
 
+			String tags = postObj.getString("tags").trim().replace(" ", ", ");
+			if(tags.length() > 400) {
+				tags = tags.substring(0, 400) + "...";
+			}
+
 			EmbedBuilder embed = new EmbedBuilder()
+					.setLenient(true)
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
 					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
 					.appendField("Resolution", postObj.getInt("width") + "x" + postObj.getInt("height"), false)
 					.appendField("Source", postObj.getString("source"), false)
-					.appendField("Tags", postObj.getString("tags").trim().replace(" ", ", "), false)
+					.appendField("Tags", tags, false)
 					.withImage(postObj.getString("file_url"));
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
 
@@ -76,7 +81,7 @@ public class Rule34Cmd extends AbstractCommand {
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Show an image corresponding to a tag from Rule34 website.**")
+				.appendDescription("**Show a random image corresponding to a tag from Rule34 website.**")
 				.appendField("Usage", context.getPrefix() + "rule34 <tag(s)>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
