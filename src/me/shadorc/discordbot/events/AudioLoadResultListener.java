@@ -165,7 +165,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 				return;
 			}
 
-			choices.add(num);
+			if(choices.contains(num)) {
+				choices.add(num);
+			}
 		}
 
 		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
