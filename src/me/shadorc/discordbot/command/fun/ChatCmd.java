@@ -1,9 +1,13 @@
 package me.shadorc.discordbot.command.fun;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.json.JSONObject;
+import org.json.XML;
 
 import com.michaelwflaherty.cleverbotapi.CleverBotQuery;
 
@@ -18,12 +22,14 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class ChatCmd extends AbstractCommand {
 
 	private static final String API_KEY = Storage.getApiKey(ApiKeys.CLEVERBOT_API_KEY);
+	private static final Map<IChannel, String> CHANNELS_CONV_ID = new HashMap<>();
 	private static final Map<IChannel, String> CHANNELS_CUSTID = new HashMap<>();
 
 	private final RateLimiter rateLimiter;
@@ -46,41 +52,26 @@ public class ChatCmd extends AbstractCommand {
 			return;
 		}
 
-		/*
-				if(!GUILDS_CUSTID.containsKey(context.getGuild())) {
-					GUILDS_CUSTID.put(context.getGuild(), null);
-				}
-
-				try {
-					String aliceState = GUILDS_CUSTID.get(context.getGuild());
-					String xmlString = NetUtils.getDoc("http://sheepridge.pandorabots.com/pandora/talk-xml?"
-							+ "botid=b69b8d517e345aba"
-							+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
-							+ (aliceState == null ? "" : "&custid=" + aliceState)).toString();
-					JSONObject resultObj = XML.toJSONObject(xmlString).getJSONObject("result");
-					String response = resultObj.getString("that").replace("<br>", "\n").replace("  ", " ").trim();
-					GUILDS_CUSTID.put(context.getChannel().getGuild(), resultObj.getString("custid"));
-					BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
-
-				} catch (SocketTimeoutException e) {
-					BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, try again later :)", context.getChannel());
-					LogUtils.warn("SocketTimeoutException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
-
-				} catch (IOException e) {
-					if(e.getMessage().contains("502")) {
-						BotUtils.sendMessage(Emoji.HOURGLASS + " Sorry, A.L.I.C.E. is AFK, I'm sure she will be back very soon, try again later :)", context.getChannel());
-						LogUtils.warn("IOException while chatting with A.L.I.C.E. (" + e.getMessage() + ").");
-					} else {
-						LogUtils.error("Something went wrong while discussing with A.L.I.C.E.... Please, try again later.", e, context.getChannel());
-					}
-				}
-		 */
+		try {
+			String xmlString = NetUtils.getDoc("http://sheepridge.pandorabots.com/pandora/talk-xml?"
+					+ "botid=b69b8d517e345aba"
+					+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
+					+ (CHANNELS_CUSTID.get(context.getChannel()) == null ? "" : "&custid=" + CHANNELS_CUSTID.get(context.getChannel())))
+					.toString();
+			JSONObject resultObj = XML.toJSONObject(xmlString).getJSONObject("result");
+			String response = resultObj.getString("that").replace("<br>", "\n").replace("  ", " ").trim();
+			CHANNELS_CUSTID.put(context.getChannel(), resultObj.getString("custid"));
+			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
+			return;
+		} catch (IOException e) {
+			LogUtils.warn("Something went wrong while discussing with A.L.I.C.E... (Error: " + e.getMessage() + ") Using Cleverbot instead.");
+		}
 
 		try {
 			CleverBotQuery bot = new CleverBotQuery(API_KEY, context.getArg());
-			bot.setConversationID(CHANNELS_CUSTID.get(context.getChannel()) == null ? "" : CHANNELS_CUSTID.get(context.getChannel()));
+			bot.setConversationID(CHANNELS_CONV_ID.get(context.getChannel()) == null ? "" : CHANNELS_CONV_ID.get(context.getChannel()));
 			bot.sendRequest();
-			CHANNELS_CUSTID.put(context.getChannel(), bot.getConversationID());
+			CHANNELS_CONV_ID.put(context.getChannel(), bot.getConversationID());
 			BotUtils.sendMessage(Emoji.SPEECH + " " + bot.getResponse(), context.getChannel());
 		} catch (IOException e) {
 			LogUtils.error("Something went wrong while discussing with Cleverbot... Please, try again later.", e, context.getChannel());
