@@ -1,8 +1,11 @@
 package me.shadorc.discordbot.command.music;
 
+import java.time.temporal.ChronoUnit;
+
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
@@ -13,12 +16,22 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RepeatCmd extends AbstractCommand {
 
+	private final RateLimiter rateLimiter;
+	
 	public RepeatCmd() {
 		super(Role.USER, "repeat", "loop");
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
+				rateLimiter.warn("Take it easy, don't spam :)", context);
+			}
+			return;
+		}
+		
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {

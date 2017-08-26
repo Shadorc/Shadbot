@@ -159,7 +159,7 @@ public class CommandManager {
 
 		try {
 			command.execute(context);
-		} catch (MissingArgumentException e) {
+		} catch (MissingArgumentException err) {
 			command.showHelp(context);
 		}
 	}
