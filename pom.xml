@@ -62,7 +62,7 @@
 		<dependency>
 			<groupId>com.github.austinv11</groupId>
 			<artifactId>Discord4J</artifactId>
-			<version>dev-SNAPSHOT</version>
+			<version>c76f50ff05f69d89e1270c802d812ecacd8e3b03</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
