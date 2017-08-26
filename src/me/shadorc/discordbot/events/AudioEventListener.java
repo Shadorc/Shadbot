@@ -1,5 +1,7 @@
 package me.shadorc.discordbot.events;
 
+import org.jsoup.Jsoup;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -61,9 +63,10 @@ public class AudioEventListener extends AudioEventAdapter {
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.GEAR + " " + err.getMessage() + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
+		String errMessage = Jsoup.parse(err.getMessage().replace("Watch on YouTube", "")).text().trim();
+		BotUtils.sendMessage(Emoji.GEAR + " " + errMessage + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
 		LogUtils.warn("{AudioEventListener} {Guild: " + channel.getGuild().getName()
-				+ " (ID: " + channel.getGuild().getStringID() + ")} Track exception: " + err.getMessage());
+				+ " (ID: " + channel.getGuild().getStringID() + ")} Track exception: " + errMessage);
 
 		if(!scheduler.nextTrack()) {
 			GuildMusicManager.getGuildMusicManager(guild).end();
