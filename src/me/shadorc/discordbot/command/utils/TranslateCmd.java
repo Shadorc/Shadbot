@@ -3,6 +3,8 @@ package me.shadorc.discordbot.command.utils;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 
+import org.json.JSONException;
+
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
@@ -66,8 +68,8 @@ public class TranslateCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.MAP + " Translation: " + translatedText, context.getChannel());
 		} catch (IllegalArgumentException argErr) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language isn't supported or doesn't exist. Use " + context.getPrefix() + "help translate to see a complete list of supported languages.", context.getChannel());
-		} catch (IOException ioErr) {
-			LogUtils.error("Something went wrong during translation... Please, try again later.", ioErr, context.getChannel());
+		} catch (JSONException | IOException err) {
+			LogUtils.error("Something went wrong during translation... Please, try again later.", err, context.getChannel());
 		}
 	}
 

@@ -45,17 +45,19 @@ public class JokeCmd extends AbstractCommand {
 					"https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 25) + ".html?tri=top",
 					"text-justify texte");
 			BotUtils.sendMessage("```" + joke + "```", context.getChannel());
+			return;
+		} catch (IOException err) {
+			LogUtils.info("Something went wrong while getting joke from www.blague-drole.net... (Error: " + err.getMessage() + ") Using www.une-blague.com instead.");
+		}
+
+		try {
+			String joke = this.getJoke(
+					"http://www.une-blague.com/blagues-courtes.html?page=2&cat=16&p=" + MathUtils.rand(1, 5) + "&call=1",
+					"texte ");
+			BotUtils.sendMessage("```" + joke + "```", context.getChannel());
 
 		} catch (IOException err) {
-			try {
-				String joke = this.getJoke(
-						"http://www.une-blague.com/blagues-courtes.html?page=2&cat=16&p=" + MathUtils.rand(1, 5) + "&call=1",
-						"texte ");
-				BotUtils.sendMessage("```" + joke + "```", context.getChannel());
-
-			} catch (IOException e) {
-				LogUtils.error("Something went wrong while getting a joke... Please, try again later.", e, context.getChannel());
-			}
+			LogUtils.error("Something went wrong while getting a joke... Please, try again later.", err, context.getChannel());
 		}
 	}
 

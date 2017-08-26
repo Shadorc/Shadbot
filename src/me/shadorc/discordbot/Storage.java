@@ -60,8 +60,8 @@ public class Storage {
 			writer.write(new JSONObject().toString());
 			writer.flush();
 
-		} catch (IOException e) {
-			LogUtils.error("An error occured during data file initialization.", e);
+		} catch (IOException err) {
+			LogUtils.error("An error occured during data file initialization.", err);
 
 		} finally {
 			IOUtils.closeQuietly(writer);
@@ -95,8 +95,8 @@ public class Storage {
 			writer.write(mainObj.toString(2));
 			writer.flush();
 
-		} catch (IOException e) {
-			LogUtils.error("Error while saving setting.", e);
+		} catch (IOException err) {
+			LogUtils.error("Error while saving setting.", err);
 
 		} finally {
 			IOUtils.closeQuietly(writer);
@@ -123,8 +123,8 @@ public class Storage {
 			writer.write(mainObj.toString(2));
 			writer.flush();
 
-		} catch (IOException e) {
-			LogUtils.error("Error while saving user.", e);
+		} catch (IOException err) {
+			LogUtils.error("Error while saving user.", err);
 
 		} finally {
 			IOUtils.closeQuietly(writer);
@@ -147,8 +147,8 @@ public class Storage {
 			if(guildObj.has(setting.toString())) {
 				return guildObj.get(setting.toString());
 			}
-		} catch (IOException e) {
-			LogUtils.error("Error while reading data file.", e);
+		} catch (IOException err) {
+			LogUtils.error("Error while reading data file.", err);
 		}
 		return null;
 	}
@@ -166,8 +166,8 @@ public class Storage {
 					return new Player(guild, user, guildObj.getJSONObject(user.getStringID()));
 				}
 			}
-		} catch (IOException e) {
-			LogUtils.error("Error while reading data file.", e);
+		} catch (IOException err) {
+			LogUtils.error("Error while reading data file.", err);
 		}
 
 		return new Player(guild, user);
@@ -179,8 +179,8 @@ public class Storage {
 			if(mainObj.has(key.toString())) {
 				return mainObj.getString(key.toString());
 			}
-		} catch (IOException e) {
-			LogUtils.error("Error while reading API keys file.", e);
+		} catch (IOException err) {
+			LogUtils.error("Error while reading API keys file.", err);
 		}
 		return null;
 	}

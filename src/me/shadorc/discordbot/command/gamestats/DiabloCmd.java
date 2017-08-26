@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
@@ -107,10 +108,10 @@ public class DiabloCmd extends AbstractCommand {
 									heroObj -> formatter.format(heroObj.getJSONObject("stats").getDouble("damage")) + " DPS", "\n"), true);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException err) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Diablo 3 or doesn't exist.", context.getChannel());
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting Diablo 3 stats.... Please, try again later.", e, context.getChannel());
+		} catch (JSONException | IOException err) {
+			LogUtils.error("Something went wrong while getting Diablo 3 stats.... Please, try again later.", err, context.getChannel());
 		}
 	}
 

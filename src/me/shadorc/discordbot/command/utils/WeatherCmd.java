@@ -76,8 +76,8 @@ public class WeatherCmd extends AbstractCommand {
 			} else {
 				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " City not found.", context.getChannel());
 			}
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting weather information... Please, try again later.", e, context.getChannel());
+		} catch (IOException err) {
+			LogUtils.error("Something went wrong while getting weather information... Please, try again later.", err, context.getChannel());
 		}
 	}
 

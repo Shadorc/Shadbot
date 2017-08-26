@@ -42,11 +42,11 @@ public class BotUtils {
 		RequestBuffer.request(() -> {
 			try {
 				channel.sendMessage(message);
-			} catch (MissingPermissionsException e) {
+			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
-						+ "Missing permissions.", e);
-			} catch (DiscordException e) {
-				LogUtils.error("Discord exception while sending message: " + e.getErrorMessage(), e);
+						+ "Missing permissions.", err);
+			} catch (DiscordException err) {
+				LogUtils.error("Discord exception while sending message: " + err.getErrorMessage(), err);
 			}
 		});
 	}
@@ -72,11 +72,11 @@ public class BotUtils {
 		RequestBuffer.request(() -> {
 			try {
 				channel.sendMessage(embed);
-			} catch (MissingPermissionsException e) {
+			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getStringID() + ")} "
-						+ "Missing permissions.", e);
-			} catch (DiscordException e) {
-				LogUtils.error("Discord exception while sending embed link: " + e.getErrorMessage(), e);
+						+ "Missing permissions.", err);
+			} catch (DiscordException err) {
+				LogUtils.error("Discord exception while sending embed link: " + err.getErrorMessage(), err);
 			}
 		});
 	}

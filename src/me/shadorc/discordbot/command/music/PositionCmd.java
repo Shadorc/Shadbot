@@ -40,7 +40,7 @@ public class PositionCmd extends AbstractCommand {
 
 		try {
 			musicManager.getScheduler().skip(time);
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException err) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " New position is negative or superior to the music duration.", context.getChannel());
 			return;
 		}

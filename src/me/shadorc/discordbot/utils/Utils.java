@@ -24,12 +24,13 @@ import javax.management.ReflectionException;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import me.shadorc.discordbot.MissingArgumentException;
 
 public class Utils {
 
-	public static String translate(String langFrom, String langTo, String sourceText) throws MissingArgumentException, IOException {
+	public static String translate(String langFrom, String langTo, String sourceText) throws MissingArgumentException, JSONException, IOException {
 		BufferedReader reader = null;
 		try {
 			URL url = new URL("https://translate.googleapis.com/translate_a/single?" +
@@ -94,7 +95,7 @@ public class Utils {
 			}
 
 			cpuLoad = value * 100d;
-		} catch (InstanceNotFoundException | ReflectionException | MalformedObjectNameException e) {
+		} catch (InstanceNotFoundException | ReflectionException | MalformedObjectNameException err) {
 			cpuLoad = Double.NaN;
 		}
 

@@ -35,7 +35,7 @@ public class VolumeCmd extends AbstractCommand {
 		try {
 			scheduler.setVolume(Integer.parseInt(context.getArg()));
 			BotUtils.sendMessage(Emoji.SPEAKER + " Volume level set to " + scheduler.getVolume() + "%", context.getChannel());
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException err) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Please use a value between 0 and 100.", context.getChannel());
 		}
 	}

@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.game;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.List;
 import javax.swing.Timer;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
@@ -42,8 +42,8 @@ public class TriviaCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		try {
 			new GuildTriviaManager(context.getChannel()).start();
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting a question.... Please, try again later.", e, context.getChannel());
+		} catch (JSONException | IOException err) {
+			LogUtils.error("Something went wrong while getting a question.... Please, try again later.", err, context.getChannel());
 		}
 	}
 
@@ -77,7 +77,7 @@ public class TriviaCmd extends AbstractCommand {
 		}
 
 		// Trivia API doc : https://opentdb.com/api_config.php
-		protected void start() throws MalformedURLException, IOException {
+		protected void start() throws JSONException, IOException {
 			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://opentdb.com/api.php?amount=1"), "UTF-8"));
 			JSONObject resultObj = mainObj.getJSONArray("results").getJSONObject(0);
 

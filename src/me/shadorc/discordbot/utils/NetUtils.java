@@ -40,7 +40,7 @@ public class NetUtils {
 			URL url = new URL(stringUrl);
 			URLConnection conn = url.openConnection();
 			conn.connect();
-		} catch (IOException e) {
+		} catch (IOException err) {
 			return false;
 		}
 		return true;
@@ -82,8 +82,8 @@ public class NetUtils {
 			}
 			LogUtils.info("Stats have been posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
 
-		} catch (IOException e) {
-			LogUtils.info("An error occured while posting stats. (" + e.getClass() + ": " + e.getMessage() + ")");
+		} catch (IOException err) {
+			LogUtils.info("An error occured while posting stats. (" + err.getClass() + ": " + err.getMessage() + ")");
 
 		} finally {
 			IOUtils.closeQuietly(out);

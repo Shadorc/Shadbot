@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
@@ -90,11 +91,11 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true)
 					.withFooterText("Steam Profile: http://steamcommunity.com/profiles/" + steamid);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
-		} catch (IOException e) {
-			if(e.getMessage().contains("400")) {
+		} catch (JSONException | IOException err) {
+			if(err.getMessage().contains("400")) {
 				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Counter-Strike: Global Offensive or doesn't exist.", context.getChannel());
 			} else {
-				LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", e, context.getChannel());
+				LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", err, context.getChannel());
 			}
 		}
 	}

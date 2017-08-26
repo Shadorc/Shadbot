@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
@@ -43,8 +44,8 @@ public class DtcCmd extends AbstractCommand {
 					+ "&format=json";
 			JSONArray arrayObj = new JSONArray(IOUtils.toString(new URL(url), "UTF-8"));
 			BotUtils.sendMessage("```" + arrayObj.getJSONObject(0).getString("content") + "```", context.getChannel());
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting a quote from DansTonChat.com... Please, try again later.", e, context.getChannel());
+		} catch (JSONException | IOException err) {
+			LogUtils.error("Something went wrong while getting a quote from DansTonChat.com... Please, try again later.", err, context.getChannel());
 		}
 	}
 

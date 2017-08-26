@@ -80,8 +80,8 @@ public class ImageCmd extends AbstractCommand {
 		} catch (SocketTimeoutException sterr) {
 			BotUtils.sendMessage(Emoji.GEAR + " DeviantArt's servers are busy, please try again later.", context.getChannel());
 			LogUtils.warn("SocketTimeoutException while getting an image from DeviantArt (" + sterr.getMessage() + ").");
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting an image... Please, try again later.", e, context.getChannel());
+		} catch (JSONException | IOException err) {
+			LogUtils.error("Something went wrong while getting an image... Please, try again later.", err, context.getChannel());
 		}
 	}
 
@@ -108,8 +108,8 @@ public class ImageCmd extends AbstractCommand {
 				result = resultsArray.getJSONObject(MathUtils.rand(resultsArray.length()));
 			}
 
-		} catch (IOException e) {
-			if(e.getMessage().contains("401")) {
+		} catch (JSONException | IOException err) {
+			if(err.getMessage().contains("401")) {
 				this.generateAccessToken();
 				result = getRandomPopularResult(encodedSearch);
 			}

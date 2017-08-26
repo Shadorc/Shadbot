@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 
@@ -69,8 +70,8 @@ public class Rule34Cmd extends AbstractCommand {
 					.withImage(postObj.getString("file_url"));
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
 
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting an image from Rule34... Please, try again later.", e, context.getChannel());
+		} catch (JSONException | IOException err) {
+			LogUtils.error("Something went wrong while getting an image from Rule34... Please, try again later.", err, context.getChannel());
 		}
 
 	}

@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
@@ -51,8 +52,8 @@ public class GifCmd extends AbstractCommand {
 			}
 			String url = mainObj.getJSONObject("data").getString("url");
 			BotUtils.sendMessage(url, context.getChannel());
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting a gif from Giphy.... Please, try again later.", e, context.getChannel());
+		} catch (JSONException | IOException err) {
+			LogUtils.error("Something went wrong while getting a gif from Giphy.... Please, try again later.", err, context.getChannel());
 		}
 	}
 

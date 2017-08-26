@@ -63,8 +63,8 @@ public class SuicideGirlsCmd extends AbstractCommand {
 					.withImage(imageUrl);
 
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting SuicideGirls image... Please, try again later.", e, context.getChannel());
+		} catch (IOException err) {
+			LogUtils.error("Something went wrong while getting SuicideGirls image... Please, try again later.", err, context.getChannel());
 		}
 	}
 

@@ -60,7 +60,7 @@ public class StringUtils {
 		try {
 			Integer.parseInt(str);
 			return true;
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException err) {
 			return false;
 		}
 	}
@@ -72,7 +72,7 @@ public class StringUtils {
 	public static boolean isPositiveInteger(String str) {
 		try {
 			return Integer.parseInt(str) > 0;
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException err) {
 			return false;
 		}
 	}
@@ -85,7 +85,7 @@ public class StringUtils {
 		try {
 			Long.parseLong(str);
 			return true;
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException err) {
 			return false;
 		}
 	}

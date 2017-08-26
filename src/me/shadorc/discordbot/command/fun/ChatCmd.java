@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 
@@ -63,8 +64,8 @@ public class ChatCmd extends AbstractCommand {
 			CHANNELS_CUSTID.put(context.getChannel(), resultObj.getString("custid"));
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 			return;
-		} catch (IOException e) {
-			LogUtils.warn("Something went wrong while discussing with A.L.I.C.E... (Error: " + e.getMessage() + ") Using Cleverbot instead.");
+		} catch (JSONException | IOException err) {
+			LogUtils.warn("Something went wrong while discussing with A.L.I.C.E... (Error: " + err.getMessage() + ") Using Cleverbot instead.");
 		}
 
 		try {
@@ -73,8 +74,8 @@ public class ChatCmd extends AbstractCommand {
 			bot.sendRequest();
 			CHANNELS_CONV_ID.put(context.getChannel(), bot.getConversationID());
 			BotUtils.sendMessage(Emoji.SPEECH + " " + bot.getResponse(), context.getChannel());
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while discussing with Cleverbot... Please, try again later.", e, context.getChannel());
+		} catch (IOException err) {
+			LogUtils.error("Something went wrong while discussing with Cleverbot... Please, try again later.", err, context.getChannel());
 		}
 	}
 

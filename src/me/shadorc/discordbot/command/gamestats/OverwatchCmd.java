@@ -97,10 +97,10 @@ public class OverwatchCmd extends AbstractCommand {
 					.appendField("Top hero (Time played)", topTimePlayed, true)
 					.appendField("Top hero (Eliminations per life)", topEliminationsPerKill, true);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
-		} catch (HttpStatusException e) {
+		} catch (HttpStatusException err) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Overwatch or doesn't exist.", context.getChannel());
-		} catch (IOException e) {
-			LogUtils.error("Something went wrong while getting information from Overwatch profil.... Please, try again later.", e, context.getChannel());
+		} catch (IOException err) {
+			LogUtils.error("Something went wrong while getting information from Overwatch profil.... Please, try again later.", err, context.getChannel());
 		}
 	}
 

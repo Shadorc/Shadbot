@@ -51,8 +51,8 @@ public class HolidaysCmd extends AbstractCommand {
 			TwitterUtils.connection();
 			String holidays = TwitterUtils.getInstance().getUserTimeline("Vacances_Zone" + zone).get(0).getText().replaceAll("#", "");
 			BotUtils.sendMessage(Emoji.BEACH + " " + holidays, context.getChannel());
-		} catch (TwitterException e) {
-			LogUtils.error("Something went wrong while getting holidays information... Please, try again later.", e, context.getChannel());
+		} catch (TwitterException err) {
+			LogUtils.error("Something went wrong while getting holidays information... Please, try again later.", err, context.getChannel());
 		}
 	}
 
