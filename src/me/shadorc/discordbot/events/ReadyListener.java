@@ -18,7 +18,10 @@ public class ReadyListener {
 		LogUtils.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
 
 		Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
-		Shadbot.getClient().getDispatcher().registerListener(new EventListener());
+		Shadbot.getClient().getDispatcher().registerListener(new ShardListener());
+		Shadbot.getClient().getDispatcher().registerListener(new GuildListener());
+		Shadbot.getClient().getDispatcher().registerListener(new MessageListener());
+		Shadbot.getClient().getDispatcher().registerListener(new VoiceChannelListener());
 
 		// Update Shadbot stats every 3 hours
 		final int period = 1000 * 60 * 60 * 3;
@@ -31,5 +34,4 @@ public class ReadyListener {
 		};
 		timer.schedule(timerTask, 0, period);
 	}
-
 }

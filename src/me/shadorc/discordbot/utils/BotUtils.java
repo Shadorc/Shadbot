@@ -6,6 +6,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
+import me.shadorc.discordbot.events.ShardListener;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -17,8 +18,8 @@ import sx.blah.discord.util.RequestBuffer;
 public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
-		if(!(channel.getShard().isReady() && channel.getShard().isLoggedIn())) {
-			LogUtils.info("Shard isn't ready/connected, aborting attempt to send message.");
+		if(!ShardListener.isShardConnected(channel.getShard())) {
+			LogUtils.info("Shard isn't ready, aborting attempt to send message.");
 			return;
 		}
 
@@ -42,8 +43,8 @@ public class BotUtils {
 
 	// EmbedBuilder doc: https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static void sendEmbed(EmbedObject embed, IChannel channel) {
-		if(!(channel.getShard().isReady() && channel.getShard().isLoggedIn())) {
-			LogUtils.info("Shard isn't ready/connected, aborting attempt to send embed link.");
+		if(!ShardListener.isShardConnected(channel.getShard())) {
+			LogUtils.info("Shard isn't ready, aborting attempt to send embed link.");
 			return;
 		}
 
