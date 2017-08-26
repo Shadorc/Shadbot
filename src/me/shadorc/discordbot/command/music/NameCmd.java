@@ -38,7 +38,7 @@ public class NameCmd extends AbstractCommand {
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **" + musicManager.getScheduler().getCurrentTrackName() + "**", context.getChannel());
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **" + musicManager.getScheduler().getPlayingTrackName() + "**", context.getChannel());
 	}
 
 	@Override

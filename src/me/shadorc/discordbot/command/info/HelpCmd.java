@@ -35,7 +35,8 @@ public class HelpCmd extends AbstractCommand {
 								+ " `" + prefix + "calc`"
 								+ " `" + prefix + "weather`"
 								+ " `" + prefix + "urban`"
-								+ " `" + prefix + "poll`", false)
+								+ " `" + prefix + "poll`"
+								+ " `" + prefix + "lyrics", false)
 				.appendField("Fun Commands:",
 						"`" + prefix + "leet`"
 								+ " `" + prefix + "chat`", false)

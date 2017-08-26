@@ -36,17 +36,18 @@ import me.shadorc.discordbot.command.info.ServerInfoCmd;
 import me.shadorc.discordbot.command.info.UserInfoCmd;
 import me.shadorc.discordbot.command.music.ClearCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
-import me.shadorc.discordbot.command.music.SkipCmd;
 import me.shadorc.discordbot.command.music.PauseCmd;
 import me.shadorc.discordbot.command.music.PlayCmd;
 import me.shadorc.discordbot.command.music.PlaylistCmd;
 import me.shadorc.discordbot.command.music.PositionCmd;
 import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.ShuffleCmd;
+import me.shadorc.discordbot.command.music.SkipCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.owner.ShutdownCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
+import me.shadorc.discordbot.command.utils.LyricsCmd;
 import me.shadorc.discordbot.command.utils.PollCmd;
 import me.shadorc.discordbot.command.utils.TranslateCmd;
 import me.shadorc.discordbot.command.utils.UrbanCmd;
@@ -72,6 +73,7 @@ public class CommandManager {
 				new WeatherCmd(),
 				new UrbanCmd(),
 				new PollCmd(),
+				new LyricsCmd(),
 				// Fun Commands
 				new ChatCmd(),
 				new LeetCmd(),

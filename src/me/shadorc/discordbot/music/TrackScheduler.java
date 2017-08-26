@@ -65,7 +65,7 @@ public class TrackScheduler {
 		queue.addAll(tempList);
 	}
 
-	public String getCurrentTrackName() {
+	public String getPlayingTrackName() {
 		return StringUtils.formatTrackName(audioPlayer.getPlayingTrack().getInfo());
 	}
 
