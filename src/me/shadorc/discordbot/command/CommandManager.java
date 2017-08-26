@@ -31,8 +31,8 @@ import me.shadorc.discordbot.command.image.SuicideGirlsCmd;
 import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.InfoCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
-import me.shadorc.discordbot.command.info.ServerInfoCmd;
 import me.shadorc.discordbot.command.info.ReportCmd;
+import me.shadorc.discordbot.command.info.ServerInfoCmd;
 import me.shadorc.discordbot.command.info.UserInfoCmd;
 import me.shadorc.discordbot.command.music.ClearCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
@@ -47,6 +47,7 @@ import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.owner.ShutdownCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
+import me.shadorc.discordbot.command.utils.PollCmd;
 import me.shadorc.discordbot.command.utils.TranslateCmd;
 import me.shadorc.discordbot.command.utils.UrbanCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
@@ -70,6 +71,7 @@ public class CommandManager {
 				new CalcCmd(),
 				new WeatherCmd(),
 				new UrbanCmd(),
+				new PollCmd(),
 				// Fun Commands
 				new ChatCmd(),
 				new LeetCmd(),
