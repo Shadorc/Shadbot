@@ -17,14 +17,15 @@ public class MessageManager {
 		CHANNELS_LISTENERS.remove(channel);
 	}
 
-	public static void notify(IMessage message) {
-		for(IChannel channel : CHANNELS_LISTENERS.keySet()) {
-			CHANNELS_LISTENERS.get(channel).onMessageReceived(message);
-		}
-	}
-
 	public static boolean isWaitingForMessage(IChannel channel) {
 		return CHANNELS_LISTENERS.containsKey(channel);
 	}
 
+	public static boolean notify(IMessage message) {
+		boolean isBlocking = false;
+		for(IChannel channel : CHANNELS_LISTENERS.keySet()) {
+			isBlocking = CHANNELS_LISTENERS.get(channel).onMessageReceived(message);
+		}
+		return isBlocking;
+	}
 }

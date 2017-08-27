@@ -33,8 +33,7 @@ public class MessageListener {
 		}
 
 		IMessage message = event.getMessage();
-		if(MessageManager.isWaitingForMessage(event.getChannel())) {
-			MessageManager.notify(message);
+		if(MessageManager.isWaitingForMessage(event.getChannel()) && MessageManager.notify(message)) {
 			return;
 		}
 

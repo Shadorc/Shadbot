@@ -4,6 +4,10 @@ import sx.blah.discord.handle.obj.IMessage;
 
 public interface MessageListener {
 
-	void onMessageReceived(IMessage message);
+	/**
+	 * @param message - message received
+	 * @return true if the execution of the other commands is blocked, false otherwise
+	 */
+	boolean onMessageReceived(IMessage message);
 
 }

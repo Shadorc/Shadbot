@@ -125,7 +125,7 @@ public class TriviaCmd extends AbstractCommand {
 		}
 
 		@Override
-		public void onMessageReceived(IMessage message) {
+		public boolean onMessageReceived(IMessage message) {
 			boolean wrongAnswer = incorrectAnswers.stream().anyMatch(message.getContent()::equalsIgnoreCase);
 			boolean goodAnswer = message.getContent().equalsIgnoreCase(this.correctAnswer);
 			IUser author = message.getAuthor();
@@ -142,6 +142,7 @@ public class TriviaCmd extends AbstractCommand {
 				Storage.getPlayer(message.getGuild(), author).addCoins(GAINS);
 				this.stop();
 			}
+			return true;
 		}
 	}
 }

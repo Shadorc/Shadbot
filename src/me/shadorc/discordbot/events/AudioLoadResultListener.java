@@ -136,16 +136,16 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	@Override
-	public void onMessageReceived(IMessage message) {
+	public boolean onMessageReceived(IMessage message) {
 		if(!message.getAuthor().equals(musicManager.getDj())) {
-			return;
+			return false;
 		}
 
 		String prefix = Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX).toString();
 		if(message.getContent().equalsIgnoreCase(prefix + "cancel")) {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
 			this.stopWaiting();
-			return;
+			return true;
 		}
 
 		String content = message.getContent().replace("/", "").replace("play", "").trim();
@@ -156,13 +156,13 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			String numStr = str.replaceAll("[^\\d]", "").trim();
 			if(!StringUtils.isPositiveInteger(numStr)) {
 				this.sendInvalidChoice(str.trim(), prefix, message);
-				return;
+				return true;
 			}
 
 			int num = Integer.parseInt(numStr);
 			if(num < 1 || num > Math.min(5, resultsTracks.size())) {
 				this.sendInvalidChoice(str.trim(), prefix, message);
-				return;
+				return true;
 			}
 
 			if(!choices.contains(num)) {
@@ -171,7 +171,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
-			return;
+			return true;
 		}
 
 		for(int choice : choices) {
@@ -183,6 +183,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		this.stopWaiting();
+		return true;
 	}
 
 	private void stopWaiting() {
@@ -193,7 +194,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 	private void sendInvalidChoice(String choice, String prefix, IMessage message) {
 		BotUtils.sendMessage(Emoji.EXCLAMATION + " \"" + choice + "\" is not a valid number. "
-				+ "You can use \"" + prefix + "cancel\" to cancel the selection.",
+				+ "You can use " + prefix + "cancel to cancel the selection.",
 				musicManager.getChannel());
 		LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
 				+ " (ID: " + musicManager.getChannel().getGuild().getStringID() + ")} Invalid choice: " + message.getContent());
