@@ -67,7 +67,7 @@ public class DiceCmd extends AbstractCommand {
 			diceManager = new DiceManager(context.getChannel(), context.getAuthor(), bet);
 			diceManager.addPlayer(context.getAuthor(), num);
 			diceManager.start();
-			CHANNELS_DICE.put(context.getChannel(), diceManager);
+			CHANNELS_DICE.putIfAbsent(context.getChannel(), diceManager);
 
 		} else {
 			if(context.getPlayer().getCoins() < diceManager.getBet()) {

@@ -93,7 +93,7 @@ public class PollCmd extends AbstractCommand {
 
 			pollManager = new PollManager(context.getChannel(), context.getAuthor(), duration, question, choicesList);
 			pollManager.start();
-			CHANNELS_POLL.put(context.getChannel(), pollManager);
+			CHANNELS_POLL.putIfAbsent(context.getChannel(), pollManager);
 			return;
 		}
 

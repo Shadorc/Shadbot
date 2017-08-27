@@ -23,10 +23,8 @@ public class RateLimiter {
 	}
 
 	public boolean isLimited(IGuild guild, IUser user) {
-		if(!guildsRateLimiter.containsKey(guild)) {
-			guildsRateLimiter.put(guild, new ConcurrentHashMap<IUser, Long>());
-			warningsRateLimiter.put(guild, new ConcurrentHashMap<IUser, Boolean>());
-		}
+		guildsRateLimiter.putIfAbsent(guild, new ConcurrentHashMap<IUser, Long>());
+		warningsRateLimiter.putIfAbsent(guild, new ConcurrentHashMap<IUser, Boolean>());
 
 		long currentTime = System.currentTimeMillis();
 		long lastTime = guildsRateLimiter.get(guild).containsKey(user) ? guildsRateLimiter.get(guild).get(user) : 0;
