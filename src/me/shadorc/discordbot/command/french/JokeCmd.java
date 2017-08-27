@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -41,36 +40,18 @@ public class JokeCmd extends AbstractCommand {
 		}
 
 		try {
-			String joke = this.getJoke(
-					"https://www.blague-drole.net/blagues-" + MathUtils.rand(1, 25) + ".html?tri=top",
-					"text-justify texte");
-			BotUtils.sendMessage("```" + joke + "```", context.getChannel());
-			return;
-		} catch (IOException err) {
-			LogUtils.info("Something went wrong while getting joke from www.blague-drole.net... (Error: " + err.getMessage() + ") Using www.une-blague.com instead.");
-		}
-
-		try {
-			String joke = this.getJoke(
-					"http://www.une-blague.com/blagues-courtes.html?page=2&cat=16&p=" + MathUtils.rand(1, 5) + "&call=1",
-					"texte ");
+			Document doc = NetUtils.getDoc("http://www.une-blague.com/blagues-courtes.html?&p=" + MathUtils.rand(1, 5));
+			Elements jokesElements = doc.getElementsByClass("texte ");
+			String joke;
+			do {
+				Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
+				joke = StringUtils.formatList(Arrays.asList(element.html().split("<br>")), line -> line.trim(), "\n");
+			} while(joke.length() > 1000);
 			BotUtils.sendMessage("```" + joke + "```", context.getChannel());
 
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while getting a joke... Please, try again later.", err, context.getChannel());
 		}
-	}
-
-	private String getJoke(String url, String className) throws IOException {
-		Document doc = NetUtils.getDoc(url);
-		Elements jokesElements = doc.getElementsByClass(className);
-		String joke;
-		do {
-			Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
-			joke = StringUtils.formatList(Arrays.asList(element.html().split("<p>|<br>")), line -> line.trim(), "\n").trim();
-			joke = StringEscapeUtils.unescapeHtml4(joke.replace("\n\n", "\n").replaceAll("\\<.*?>", ""));
-		} while(joke.length() > 1000);
-		return joke;
 	}
 
 	@Override
