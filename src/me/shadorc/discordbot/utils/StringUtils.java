@@ -1,7 +1,10 @@
 package me.shadorc.discordbot.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -100,4 +103,17 @@ public class StringUtils {
 		return list.stream().map(mapper).collect(Collectors.joining(delimiter)).toString().trim();
 	}
 
+	/**
+	 * @param text - the text to extract quoted words from
+	 * @return List containing all quoted words
+	 */
+	public static List<String> getQuotedWords(String text) {
+		List<String> words = new ArrayList<>();
+		Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+		Matcher matcher = pattern.matcher(text);
+		while(matcher.find()) {
+			words.add(matcher.group(1));
+		}
+		return words;
+	}
 }

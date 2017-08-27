@@ -3,8 +3,6 @@ package me.shadorc.discordbot.command.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.Timer;
 
@@ -78,13 +76,7 @@ public class PollCmd extends AbstractCommand {
 				return;
 			}
 
-			List<String> substrings = new ArrayList<String>();
-
-			Pattern regex = Pattern.compile("\"([^\"]*)\"");
-			Matcher matcher = regex.matcher(splitArgs[1]);
-			while(matcher.find()) {
-				substrings.add(matcher.group(1));
-			}
+			List<String> substrings = StringUtils.getQuotedWords(splitArgs[1]);
 
 			if(substrings.size() < MIN_CHOICES_NUM + 1) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must indicate at least two choices.", context.getChannel());

@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.admin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import me.shadorc.discordbot.Config;
@@ -40,48 +41,61 @@ public class PruneCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String[] splitArgs = context.getArg().split(" ");
-		if(splitArgs.length < 2) {
-			throw new MissingArgumentException();
+		List<String> argsList = Arrays.asList(context.getArg().split(" "));
+
+		String word = null;
+		if(argsList.contains("-c")) {
+			List<String> wordsList = StringUtils.getQuotedWords(context.getArg());
+			if(wordsList.isEmpty()) {
+				throw new MissingArgumentException();
+			}
+			word = wordsList.get(0);
+		}
+
+		int num = -1;
+		if(argsList.contains("-n")) {
+			if(argsList.indexOf("-n") + 1 >= argsList.size()) {
+				throw new MissingArgumentException();
+			}
+			String numStr = argsList.get(argsList.indexOf("-n") + 1);
+			if(!StringUtils.isPositiveInteger(numStr)) {
+				throw new MissingArgumentException();
+			}
+			num = Integer.parseInt(numStr);
 		}
 
 		List<IUser> usersMentioned = context.getMessage().getMentions();
-		if(usersMentioned.isEmpty()) {
-			throw new MissingArgumentException();
-		}
 
-		String numArg = splitArgs[splitArgs.length - 1];
-		if(!StringUtils.isPositiveInteger(numArg)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number.", context.getChannel());
-			return;
-		}
+		MessageHistory historyList = context.getChannel().getMessageHistory(context.getChannel().getMaxInternalCacheCount());
+		List<IMessage> toDeleteList = new ArrayList<IMessage>();
 
-		int num = Integer.parseInt(numArg);
-
-		// bulkDelete() cannot delete more than 100 messages
-		num = Math.min(100, num);
-
-		MessageHistory history = context.getChannel().getMessageHistory(context.getChannel().getMaxInternalCacheCount());
-		List<IMessage> historyList = new ArrayList<IMessage>(history);
-
-		for(IMessage message : history) {
-			if(!usersMentioned.contains(message.getAuthor())) {
-				historyList.remove(message);
+		int count = 0;
+		for(IMessage message : historyList) {
+			if(num != -1 && count >= num) {
+				break;
 			}
+			if(!usersMentioned.isEmpty() && !usersMentioned.contains(message.getAuthor())) {
+				continue;
+			}
+			if(word != null && !message.getContent().contains(word)) {
+				continue;
+			}
+			toDeleteList.add(message);
+			count++;
 		}
 
-		historyList = historyList.subList(0, Math.min(num, historyList.size()));
+		toDeleteList = toDeleteList.subList(0, Math.min(100, toDeleteList.size()));
 
-		if(historyList.isEmpty()) {
+		if(toDeleteList.isEmpty()) {
 			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
 			return;
-		} else if(historyList.size() == 1) {
+		} else if(toDeleteList.size() == 1) {
 			// MessageList#bulkDelete(List<IMessage> messages) cannot delete a single message
-			historyList.get(0).delete();
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + historyList.size() + " message deleted.", context.getChannel());
+			toDeleteList.get(0).delete();
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + toDeleteList.size() + " message deleted.", context.getChannel());
 		} else {
-			context.getChannel().bulkDelete(historyList);
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + historyList.size() + " message(s) deleted.", context.getChannel());
+			context.getChannel().bulkDelete(toDeleteList);
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + toDeleteList.size() + " message(s) deleted.", context.getChannel());
 		}
 	}
 
@@ -91,9 +105,13 @@ public class PruneCmd extends AbstractCommand {
 				.withAuthorName("Help for " + this.getNames()[0] + " command")
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withColor(Config.BOT_COLOR)
-				.appendDescription("**Delete user's messages.**")
-				.appendField("Usage", context.getPrefix() + "prune <@user(s)> <num>", false)
-				.appendField("Arguments", "num - Number of messages to delete (max: 100)", false);
+				.appendDescription("**Delete messages.**")
+				.appendField("Usage", context.getPrefix() + "prune [*@user(s)*] [-c *\"words\"*] [-n *num*]", false)
+				.appendField("Options", "**num** - number of messages to delete (max: 100)"
+						+ "\n**user(s)** - from these users"
+						+ "\n**words** - containing these words", false)
+				.appendField("Example", "Delete **15** messages from user **@Shadbot** containing **hi guys**:"
+						+ "\n" + context.getPrefix() + "prune @Shadbot -c \"hi guys\" -n 15", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
