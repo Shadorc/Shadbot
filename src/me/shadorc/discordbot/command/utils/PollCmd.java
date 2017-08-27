@@ -48,6 +48,12 @@ public class PollCmd extends AbstractCommand {
 		PollManager pollManager = CHANNELS_POLL.get(context.getChannel());
 
 		if(pollManager == null) {
+			if(context.getArg().length() > EmbedBuilder.DESCRIPTION_CONTENT_LIMIT) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Your message is waaay too long, it must not contain more than "
+						+ EmbedBuilder.DESCRIPTION_CONTENT_LIMIT + " characters.", context.getChannel());
+				return;
+			}
+
 			String[] splitArgs = context.getArg().split(" ", 2);
 			if(splitArgs.length != 2) {
 				throw new MissingArgumentException();
@@ -60,37 +66,20 @@ public class PollCmd extends AbstractCommand {
 			}
 
 			int duration = Integer.parseInt(durationStr);
-			if(duration < MIN_DURATION) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Duration must be at least 10 seconds.", context.getChannel());
-				return;
-			}
-
-			if(duration > MAX_DURATION) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Duration cannot be higher than 3600 seconds (1 hour).", context.getChannel());
-				return;
-			}
-
-			if(context.getArg().length() > EmbedBuilder.DESCRIPTION_CONTENT_LIMIT) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Your message is waaay too long, it must not contain more than "
-						+ EmbedBuilder.DESCRIPTION_CONTENT_LIMIT + " characters.", context.getChannel());
+			if(duration < MIN_DURATION || duration > MAX_DURATION) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Duration must be between " + MIN_DURATION + "sec and " + MAX_DURATION + "sec.", context.getChannel());
 				return;
 			}
 
 			List<String> substrings = StringUtils.getQuotedWords(splitArgs[1]);
+			List<String> choicesList = new ArrayList<>(substrings.subList(1, substrings.size()));
 
-			if(substrings.size() < MIN_CHOICES_NUM + 1) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must indicate at least two choices.", context.getChannel());
-				return;
-			}
-
-			if(substrings.size() > MAX_CHOICES_NUM + 1) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " You cannot have more than 10 choices.", context.getChannel());
+			if(choicesList.size() < MIN_CHOICES_NUM || choicesList.size() > MAX_CHOICES_NUM) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and " + MAX_CHOICES_NUM + " choices.", context.getChannel());
 				return;
 			}
 
 			String question = substrings.get(0);
-			List<String> choicesList = new ArrayList<>(substrings.subList(1, substrings.size()));
-
 			pollManager = new PollManager(context.getChannel(), context.getAuthor(), duration, question, choicesList);
 			pollManager.start();
 			CHANNELS_POLL.putIfAbsent(context.getChannel(), pollManager);
@@ -105,7 +94,7 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		String numStr = context.getArg();
-		if(!StringUtils.isInteger(numStr)) {
+		if(!StringUtils.isPositiveInteger(numStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number.", context.getChannel());
 			return;
 		}
@@ -166,8 +155,7 @@ public class PollCmd extends AbstractCommand {
 		protected boolean vote(IUser user, int num) {
 			List<String> choicesList = new ArrayList<String>(choicesMap.keySet());
 			for(String choice : choicesList) {
-				if(choicesMap.get(choice).contains(user)) {
-					choicesMap.get(choice).remove(user);
+				if(choicesMap.get(choice).remove(user)) {
 					break;
 				}
 			}

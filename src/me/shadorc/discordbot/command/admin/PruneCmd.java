@@ -88,14 +88,13 @@ public class PruneCmd extends AbstractCommand {
 
 		if(toDeleteList.isEmpty()) {
 			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
-			return;
 		} else if(toDeleteList.size() == 1) {
 			// MessageList#bulkDelete(List<IMessage> messages) cannot delete a single message
 			toDeleteList.get(0).delete();
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + toDeleteList.size() + " message deleted.", context.getChannel());
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " 1 message deleted.", context.getChannel());
 		} else {
 			context.getChannel().bulkDelete(toDeleteList);
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + toDeleteList.size() + " message(s) deleted.", context.getChannel());
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + toDeleteList.size() + " messages deleted.", context.getChannel());
 		}
 	}
 
