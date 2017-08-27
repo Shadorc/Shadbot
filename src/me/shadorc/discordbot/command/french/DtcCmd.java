@@ -18,6 +18,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.MathUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class DtcCmd extends AbstractCommand {
@@ -43,7 +44,11 @@ public class DtcCmd extends AbstractCommand {
 					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)
 					+ "&format=json";
 			JSONArray arrayObj = new JSONArray(IOUtils.toString(new URL(url), "UTF-8"));
-			BotUtils.sendMessage("```" + arrayObj.getJSONObject(0).getString("content") + "```", context.getChannel());
+			String quote;
+			do {
+				quote = arrayObj.getJSONObject(MathUtils.rand(arrayObj.length())).getString("content");
+			} while(quote.length() > 1000);
+			BotUtils.sendMessage("```" + quote + "```", context.getChannel());
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting a quote from DansTonChat.com... Please, try again later.", err, context.getChannel());
 		}
