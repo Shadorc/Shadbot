@@ -64,10 +64,12 @@ public class Rule34Cmd extends AbstractCommand {
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
 					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
+					.withUrl(postObj.getString("file_url"))
 					.appendField("Resolution", postObj.getInt("width") + "x" + postObj.getInt("height"), false)
 					.appendField("Source", postObj.getString("source"), false)
 					.appendField("Tags", tags, false)
-					.withImage(postObj.getString("file_url"));
+					.withImage(postObj.getString("file_url"))
+					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {

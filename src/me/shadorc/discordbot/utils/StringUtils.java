@@ -100,7 +100,7 @@ public class StringUtils {
 	 * @return formatted list
 	 */
 	public static <T> String formatList(List<T> list, Function<T, String> mapper, String delimiter) {
-		return list.stream().map(mapper).collect(Collectors.joining(delimiter)).toString().trim();
+		return list.stream().map(mapper).collect(Collectors.joining(delimiter)).toString();
 	}
 
 	/**
