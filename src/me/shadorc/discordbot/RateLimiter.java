@@ -45,11 +45,6 @@ public class RateLimiter {
 		return warningsRateLimiter.get(guild).get(user);
 	}
 
-	public float getRemainingTime(IGuild guild, IUser user) {
-		long remainingMillis = timeout - (System.currentTimeMillis() - guildsRateLimiter.get(guild).get(user));
-		return remainingMillis / 1000f;
-	}
-
 	public long getTimeout() {
 		return Duration.of(timeout, ChronoUnit.MILLIS).getSeconds();
 	}
