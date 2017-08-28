@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
@@ -59,18 +58,16 @@ public class WeatherCmd extends AbstractCommand {
 				float humidity = weather.getMainInstance().getHumidity();
 				float temperature = weather.getMainInstance().getTemperature();
 
-				EmbedBuilder builder = new EmbedBuilder()
-						.withAuthorName("Weather in " + weather.getCityName() + " City")
-						.withAuthorIcon(context.getAuthor().getAvatarURL())
+				EmbedBuilder builder = Utils.getDefaultEmbed()
+						.withAuthorName("Weather for: " + weather.getCityName())
 						.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
-						.withColor(Config.BOT_COLOR)
-						.appendDescription("Last updatee on " + dateFormatter.format(weather.getDateTime()))
+						.withUrl("http://openweathermap.org/city/" + weather.getCityCode())
+						.appendDescription("Last update on " + dateFormatter.format(weather.getDateTime()))
 						.appendField(Emoji.CLOUD + " Clouds", clouds, true)
 						.appendField(Emoji.WIND + " Wind", windDesc + "\n" + String.format("%.1f", windSpeed) + " km/h", true)
 						.appendField(Emoji.RAIN + " Rain", rain, true)
 						.appendField(Emoji.DROPLET + " Humidity", humidity + "%", true)
-						.appendField(Emoji.THERMOMETER + " Temperature", String.format("%.1f", temperature) + "°C", true)
-						.withFooterText("Information obtained from OpenWeatherMap.org");
+						.appendField(Emoji.THERMOMETER + " Temperature", String.format("%.1f", temperature) + "°C", true);
 
 				BotUtils.sendEmbed(builder.build(), context.getChannel());
 			} else {
