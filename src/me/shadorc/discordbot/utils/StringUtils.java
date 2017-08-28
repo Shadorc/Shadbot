@@ -108,12 +108,11 @@ public class StringUtils {
 	 * @return List containing all quoted words
 	 */
 	public static List<String> getQuotedWords(String text) {
-		List<String> words = new ArrayList<>();
-		Pattern pattern = Pattern.compile("\"([^\"]*)\"");
-		Matcher matcher = pattern.matcher(text);
+		List<String> matches = new ArrayList<>();
+		Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(text);
 		while(matcher.find()) {
-			words.add(matcher.group(1));
+			matches.add(matcher.group(1));
 		}
-		return words;
+		return matches;
 	}
 }

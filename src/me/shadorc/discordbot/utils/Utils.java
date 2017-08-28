@@ -144,9 +144,7 @@ public class Utils {
 	 * @return the default command embed builder (with author name, author icon and color)
 	 */
 	public static EmbedBuilder getDefaultEmbed(AbstractCommand command) {
-		return new EmbedBuilder()
-				.withAuthorName("Help for " + command.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR);
+		return Utils.getDefaultEmbed()
+				.withAuthorName("Help for " + command.getNames()[0] + " command");
 	}
 }
