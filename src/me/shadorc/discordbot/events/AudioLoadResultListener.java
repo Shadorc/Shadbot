@@ -69,6 +69,12 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		List<AudioTrack> tracks = playlist.getTracks();
 
 		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
+
+			if(MessageManager.isWaitingForMessage(musicManager.getChannel())) {
+				BotUtils.sendMessage(Emoji.HOURGLASS + " Someone is already selecting a music, please wait for him to finish.", musicManager.getChannel());
+				return;
+			}
+
 			StringBuilder strBuilder = new StringBuilder();
 			for(int i = 0; i < Math.min(5, tracks.size()); i++) {
 				strBuilder.append("\n\t**" + (i + 1) + ".** " + StringUtils.formatTrackName(tracks.get(i).getInfo()));
