@@ -7,11 +7,10 @@ import java.time.temporal.ChronoUnit;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -19,6 +18,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class DtcCmd extends AbstractCommand {
@@ -44,11 +44,26 @@ public class DtcCmd extends AbstractCommand {
 					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)
 					+ "&format=json";
 			JSONArray arrayObj = new JSONArray(IOUtils.toString(new URL(url), "UTF-8"));
-			String quote;
+
+			JSONObject quoteObj;
+			String content;
 			do {
-				quote = arrayObj.getJSONObject(MathUtils.rand(arrayObj.length())).getString("content");
-			} while(quote.length() > 1000);
-			BotUtils.sendMessage("```" + quote + "```", context.getChannel());
+				quoteObj = arrayObj.getJSONObject(MathUtils.rand(arrayObj.length()));
+				content = quoteObj.getString("content");
+			} while(content.length() > 1000);
+
+			StringBuilder strBuilder = new StringBuilder();
+			for(String line : content.split("\n")) {
+				strBuilder.append("\n**" + line.substring(0, line.indexOf(' ')) + "**" + line.substring(line.indexOf(' ')));
+			}
+
+			EmbedBuilder embed = Utils.getDefaultEmbed()
+					.withAuthorName("Quote DansTonChat")
+					.withUrl("https://danstonchat.com/" + quoteObj.getString("id") + ".html")
+					.withThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+					.appendDescription(strBuilder.toString());
+			BotUtils.sendEmbed(embed.build(), context.getChannel());
+
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting a quote from DansTonChat.com... Please, try again later.", err, context.getChannel());
 		}
@@ -56,10 +71,7 @@ public class DtcCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show a random quote from DansTonChat.com**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
