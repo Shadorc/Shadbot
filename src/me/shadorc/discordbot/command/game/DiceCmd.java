@@ -44,12 +44,12 @@ public class DiceCmd extends AbstractCommand {
 			}
 
 			String betStr = splitArgs[0];
-			if(!StringUtils.isPositiveInteger(betStr)) {
+			if(!StringUtils.isLong(betStr)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
 				return;
 			}
 
-			int bet = Integer.parseInt(betStr);
+			long bet = Long.parseLong(betStr);
 			if(context.getPlayer().getCoins() < bet) {
 				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
 				return;
@@ -123,9 +123,9 @@ public class DiceCmd extends AbstractCommand {
 		private final IChannel channel;
 		private final IUser croupier;
 		private final Timer timer;
-		private final int bet;
+		private final long bet;
 
-		protected DiceManager(IChannel channel, IUser croupier, int bet) {
+		protected DiceManager(IChannel channel, IUser croupier, long bet) {
 			this.channel = channel;
 			this.croupier = croupier;
 			this.bet = bet;
@@ -139,7 +139,7 @@ public class DiceCmd extends AbstractCommand {
 			numsPlayers.put(num, user);
 		}
 
-		public int getBet() {
+		public long getBet() {
 			return bet;
 		}
 
@@ -171,7 +171,7 @@ public class DiceCmd extends AbstractCommand {
 
 			if(this.isBet(winningNum)) {
 				IUser winner = numsPlayers.get(winningNum);
-				int gains = bet * numsPlayers.size() * MULTIPLIER;
+				long gains = bet * numsPlayers.size() * MULTIPLIER;
 				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win " + gains + " coins !", channel);
 				Storage.getPlayer(channel.getGuild(), winner).addCoins(gains);
 				numsPlayers.remove(winningNum);

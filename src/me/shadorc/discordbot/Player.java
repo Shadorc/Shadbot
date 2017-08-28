@@ -10,7 +10,7 @@ public class Player {
 	private final IGuild guild;
 	private final IUser user;
 
-	private int coins;
+	private long coins;
 
 	public Player(IGuild guild, IUser user) {
 		this.guild = guild;
@@ -21,7 +21,7 @@ public class Player {
 	public Player(IGuild guild, IUser user, JSONObject userObj) {
 		this.guild = guild;
 		this.user = user;
-		this.coins = userObj.getInt("coins");
+		this.coins = userObj.getLong("coins");
 	}
 
 	public IGuild getGuild() {
@@ -32,11 +32,11 @@ public class Player {
 		return user;
 	}
 
-	public int getCoins() {
+	public long getCoins() {
 		return coins;
 	}
 
-	public void addCoins(int gains) {
+	public void addCoins(long gains) {
 		this.coins += gains;
 		this.save();
 	}

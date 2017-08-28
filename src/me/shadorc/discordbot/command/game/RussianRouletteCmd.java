@@ -34,14 +34,14 @@ public class RussianRouletteCmd extends AbstractCommand {
 			return;
 		}
 
-		int userCoins = context.getPlayer().getCoins();
+		long userCoins = context.getPlayer().getCoins();
 		if(MathUtils.rand(6) == 0) {
-			int loss = (int) Math.ceil(-userCoins * LOSE_RATE);
+			long loss = (long) Math.ceil(-userCoins * LOSE_RATE);
 			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **PAN** ... "
 					+ "Sorry, you died, you lose **" + Math.abs(loss) + " coins**.", context.getChannel());
 			context.getPlayer().addCoins(loss);
 		} else {
-			int gain = (int) Math.max(MIN_COINS_GAINED, Math.ceil(userCoins * WIN_RATE));
+			long gain = (long) Math.max(MIN_COINS_GAINED, Math.ceil(userCoins * WIN_RATE));
 			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **click** ... "
 					+ "Phew, you are still alive, you gets **" + gain + " coins** !", context.getChannel());
 			context.getPlayer().addCoins(gain);
