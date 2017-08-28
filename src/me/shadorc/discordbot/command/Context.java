@@ -1,7 +1,7 @@
 package me.shadorc.discordbot.command;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Player;
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.AbstractCommand.Role;
@@ -46,7 +46,7 @@ public class Context {
 	}
 
 	public Role getAuthorRole() {
-		if(event.getAuthor().getLongID() == Config.OWNER_ID) {
+		if(event.getAuthor().getLongID() == Shadbot.getClient().getApplicationOwner().getLongID()) {
 			return Role.OWNER;
 		} else if(event.getAuthor().getPermissionsForGuild(event.getGuild()).contains(Permissions.ADMINISTRATOR)) {
 			return Role.ADMIN;
