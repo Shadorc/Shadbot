@@ -30,7 +30,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class TriviaCmd extends AbstractCommand {
 
-	protected static final int GAINS = 25;
+	protected static final int GAINS = 250;
 
 	public TriviaCmd() {
 		super(Role.USER, "trivia", "quizz", "question");
