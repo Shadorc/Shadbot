@@ -2,15 +2,14 @@ package me.shadorc.discordbot.command.music;
 
 import java.time.temporal.ChronoUnit;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class StopCmd extends AbstractCommand {
@@ -47,10 +46,7 @@ public class StopCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Stop all the musics.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.music;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
@@ -10,6 +9,7 @@ import me.shadorc.discordbot.events.AudioLoadResultListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -64,10 +64,7 @@ public class PlayCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play the music(s) from the url, search terms or playlist.\nYou can also search on SoundCloud by using /play soundcloud <search>**")
 				.appendField("Usage", context.getPrefix() + "play <url>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

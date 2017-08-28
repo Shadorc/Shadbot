@@ -13,12 +13,12 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class OverwatchCmd extends AbstractCommand {
@@ -89,7 +89,7 @@ public class OverwatchCmd extends AbstractCommand {
 					.withUrl(url)
 					.withThumbnail(icon)
 					.withColor(Config.BOT_COLOR)
-					.withDesc("Stats for user **" + battletag + "**.")
+					.appendDescription("Stats for user **" + battletag + "**.")
 					.appendField("Level", level, true)
 					.appendField("Competitive rank", rank, true)
 					.appendField("Wins", wins, true)
@@ -116,10 +116,7 @@ public class OverwatchCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show user stats for Overwatch.**")
 				.appendField("Usage", context.getPrefix() + "overwatch <pc|psn|xbl> <eu|us|cn|kr> <battletag#0000>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

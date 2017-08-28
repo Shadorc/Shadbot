@@ -61,10 +61,7 @@ public class InfoCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show Shadbot's info.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

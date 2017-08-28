@@ -5,16 +5,15 @@ import java.util.concurrent.BlockingQueue;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class PlaylistCmd extends AbstractCommand {
@@ -42,20 +41,16 @@ public class PlaylistCmd extends AbstractCommand {
 			return;
 		}
 
-		EmbedBuilder embed = new EmbedBuilder()
+		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.withAuthorName("Playlist")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-				.withDescription(this.formatPlaylist(musicManager.getScheduler().getPlaylist()));
+				.appendDescription(this.formatPlaylist(musicManager.getScheduler().getPlaylist()));
 		BotUtils.sendEmbed(embed.build(), context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show the current playlist.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

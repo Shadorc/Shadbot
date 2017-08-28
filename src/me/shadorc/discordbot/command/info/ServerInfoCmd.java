@@ -6,9 +6,7 @@ import java.util.Locale;
 
 import org.json.JSONArray;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -33,10 +31,9 @@ public class ServerInfoCmd extends AbstractCommand {
 		IGuild guild = context.getGuild();
 		List<String> allowedChannels = Utils.convertArrayToList((JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS));
 
-		EmbedBuilder embed = new EmbedBuilder()
+		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName("Info about server " + guild.getName())
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withThumbnail(guild.getIconURL())
 				.appendField("Owner", guild.getOwner().getName(), true)
 				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
@@ -57,10 +54,7 @@ public class ServerInfoCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show info about this server.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

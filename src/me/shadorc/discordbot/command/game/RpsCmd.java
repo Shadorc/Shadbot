@@ -3,7 +3,6 @@ package me.shadorc.discordbot.command.game;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
@@ -12,6 +11,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class RpsCmd extends AbstractCommand {
@@ -98,10 +98,7 @@ public class RpsCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play a Rock–paper–scissors game.**")
 				.appendField("Usage", "/rps <rock|paper|scissors>", false)
 				.appendField("Gains", "The winner gets " + GAINS + " coins.", false);

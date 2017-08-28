@@ -10,15 +10,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class Rule34Cmd extends AbstractCommand {
@@ -59,12 +58,11 @@ public class Rule34Cmd extends AbstractCommand {
 				tags = tags.substring(0, 400) + "...";
 			}
 
-			EmbedBuilder embed = new EmbedBuilder()
+			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
-					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
 					.withUrl(postObj.getString("file_url"))
+					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
 					.appendField("Resolution", postObj.getInt("width") + "x" + postObj.getInt("height"), false)
 					.appendField("Source", postObj.getString("source"), false)
 					.appendField("Tags", tags, false)
@@ -80,10 +78,7 @@ public class Rule34Cmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show a random image corresponding to a tag from Rule34 website.**")
 				.appendField("Usage", context.getPrefix() + "rule34 <tag(s)>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

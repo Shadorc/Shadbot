@@ -3,9 +3,7 @@ package me.shadorc.discordbot.command.currency;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
@@ -45,21 +43,16 @@ public class LeaderboardCmd extends AbstractCommand {
 			strBuilder.append("\nEveryone is poor here.");
 		}
 
-		EmbedBuilder builder = new EmbedBuilder()
+		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.withAuthorName("Leaderboard")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
-				.withDescription(strBuilder.toString());
+				.appendDescription(strBuilder.toString());
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show coins leaderboard for this server.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

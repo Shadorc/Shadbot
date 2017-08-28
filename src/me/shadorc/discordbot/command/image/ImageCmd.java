@@ -11,11 +11,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -23,6 +21,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class ImageCmd extends AbstractCommand {
@@ -64,12 +63,10 @@ public class ImageCmd extends AbstractCommand {
 			JSONObject authorObj = resultObj.getJSONObject("author");
 			JSONObject contentObj = resultObj.getJSONObject("content");
 
-			EmbedBuilder builder = new EmbedBuilder()
+			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("DeviantArt Search (" + context.getArg() + ")")
-					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withUrl(resultObj.getString("url"))
 					.withThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
-					.withColor(Config.BOT_COLOR)
 					.appendField("Title", resultObj.getString("title"), false)
 					.appendField("Author", authorObj.getString("username"), false)
 					.appendField("Category", resultObj.getString("category_path"), false)
@@ -120,10 +117,7 @@ public class ImageCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Search for a random image on DeviantArt.**")
 				.appendField("Usage", context.getPrefix() + "image <search>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

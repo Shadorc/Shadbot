@@ -2,11 +2,9 @@ package me.shadorc.discordbot.command.game;
 
 import java.time.temporal.ChronoUnit;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -72,10 +70,7 @@ public class SlotMachineCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play a game of slot machine for " + PAID_COST + " coins.**")
 				.appendField("Cost", "A game costs " + PAID_COST + " coins.", false)
 				.appendField("Gains", "You can win 30, 150 or 3000 coins ! Good luck.", false);

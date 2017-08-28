@@ -6,16 +6,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -112,10 +111,7 @@ public class PollCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Create a poll.**")
 				.appendField("Usage", "**Create a poll:** " + context.getPrefix() + "poll <duration> \"question\" \"choice1\" \"choice2\"..."
 						+ "\n**Vote:** " + context.getPrefix() + "poll <choice>"
@@ -204,11 +200,10 @@ public class PollCmd extends AbstractCommand {
 			}
 
 			int remainingTime = (int) ((timer.getDelay() - (System.currentTimeMillis() - startTime)) / 1000);
-			EmbedBuilder embed = new EmbedBuilder()
-					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
+			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.withAuthorName("Poll (Created by: " + creator.getName() + ")")
 					.withThumbnail(creator.getAvatarURL())
-					.withDescription("**" + question + "**\n" + choicesStr.toString())
+					.appendDescription("**" + question + "**\n" + choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
 					.withFooterText("This poll " + (timer.isRunning() ? ("will end in " + remainingTime + " seconds.") : "is finished."));
 			this.sendPoll(embed.build());

@@ -11,10 +11,8 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
@@ -49,10 +47,7 @@ public class TriviaCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Start a Trivia game. Once one started, everyone can participate.**")
 				.appendField("Gains", "The winner gets " + GAINS + " coins.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
@@ -101,10 +96,8 @@ public class TriviaCmd extends AbstractCommand {
 				}
 			}
 
-			EmbedBuilder builder = new EmbedBuilder()
+			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Trivia")
-					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-					.withColor(Config.BOT_COLOR)
 					.appendField("Question", strBuilder.toString(), false)
 					.appendField("Category", "`" + category + "`", true)
 					.appendField("Type", "`" + type + "`", true)

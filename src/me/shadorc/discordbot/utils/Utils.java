@@ -26,7 +26,11 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.Shadbot;
+import me.shadorc.discordbot.command.AbstractCommand;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class Utils {
 
@@ -124,5 +128,25 @@ public class Utils {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * @return the default embed builder (with author icon and color)
+	 */
+	public static EmbedBuilder getDefaultEmbed() {
+		return new EmbedBuilder()
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
+				.withColor(Config.BOT_COLOR);
+	}
+
+	/**
+	 * @param command - the command
+	 * @return the default command embed builder (with author name, author icon and color)
+	 */
+	public static EmbedBuilder getDefaultEmbed(AbstractCommand command) {
+		return new EmbedBuilder()
+				.withAuthorName("Help for " + command.getNames()[0] + " command")
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
+				.withColor(Config.BOT_COLOR);
 	}
 }

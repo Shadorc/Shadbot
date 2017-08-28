@@ -14,7 +14,6 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -22,6 +21,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class CounterStrikeCmd extends AbstractCommand {
@@ -81,15 +81,15 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.setLenient(true)
 					.withAuthorName("Counter-Strike: Global Offensive Stats")
 					.withAuthorIcon("http://www.icon100.com/up/2841/256/csgo.png")
+					.withUrl("http://steamcommunity.com/profiles/" + steamid)
 					.withThumbnail(userObj.getString("avatarfull"))
 					.withColor(Config.BOT_COLOR)
-					.withDesc("Stats for **" + userObj.getString("personaname") + "**")
+					.appendDescription("Stats for **" + userObj.getString("personaname") + "**")
 					.appendField("Kills", Integer.toString(this.getValue(statsArray, "total_kills")), true)
 					.appendField("Deaths", Integer.toString(this.getValue(statsArray, "total_deaths")), true)
 					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills") / this.getValue(statsArray, "total_deaths")), true)
 					.appendField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
-					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true)
-					.withFooterText("Steam Profile: http://steamcommunity.com/profiles/" + steamid);
+					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 		} catch (JSONException | IOException err) {
 			if(err.getMessage().contains("400")) {
@@ -112,10 +112,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show stats of a player for Counter-Strike: Global Offensive.**")
 				.appendField("Usage", context.getPrefix() + "cs <steamID>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

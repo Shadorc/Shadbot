@@ -6,15 +6,14 @@ import java.net.URLEncoder;
 import org.json.JSONObject;
 import org.json.XML;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class LyricsCmd extends AbstractCommand {
@@ -48,9 +47,8 @@ public class LyricsCmd extends AbstractCommand {
 				return;
 			}
 
-			EmbedBuilder embed = new EmbedBuilder()
+			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.setLenient(true)
-					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withAuthorName("Lyrics")
 					.withUrl(resultObj.getString("LyricUrl"))
 					.withThumbnail(resultObj.getString("LyricCovertArtUrl"))
@@ -64,10 +62,7 @@ public class LyricsCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show lyrics for a song.**")
 				.appendField("Usage", context.getPrefix() + "lyrics <artist> - <title>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

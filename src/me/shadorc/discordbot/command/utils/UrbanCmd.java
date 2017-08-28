@@ -9,15 +9,14 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class UrbanCmd extends AbstractCommand {
@@ -58,12 +57,10 @@ public class UrbanCmd extends AbstractCommand {
 				definition = definition.substring(0, EmbedBuilder.DESCRIPTION_CONTENT_LIMIT - 3) + "...";
 			}
 
-			EmbedBuilder builder = new EmbedBuilder()
+			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Urban Dictionary: " + resultObj.getString("word"))
-					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
-					.withColor(Config.BOT_COLOR)
-					.withDescription(definition);
+					.appendDescription(definition);
 
 			String example = resultObj.getString("example");
 			if(!example.isEmpty()) {
@@ -79,10 +76,7 @@ public class UrbanCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Search a definition of a word with Urban Dictionary.**")
 				.appendField("Usage", context.getPrefix() + "urban <word>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

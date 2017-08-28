@@ -3,13 +3,12 @@ package me.shadorc.discordbot.command.info;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -26,10 +25,9 @@ public class UserInfoCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		IUser user = context.getMessage().getMentions().isEmpty() ? context.getAuthor() : context.getMessage().getMentions().get(0);
 
-		EmbedBuilder embed = new EmbedBuilder()
+		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName("Info about " + user.getName() + (user.isBot() ? " (Bot)" : ""))
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withThumbnail(user.getAvatarURL())
 				.appendField("Display name", user.getDisplayName(context.getGuild()), true)
 				.appendField("User ID", Long.toString(user.getLongID()), true)
@@ -43,10 +41,7 @@ public class UserInfoCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show info about an user.**")
 				.appendField("Usage", context.getPrefix() + "userinfo <@user>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

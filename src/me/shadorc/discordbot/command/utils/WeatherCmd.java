@@ -9,7 +9,6 @@ import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -18,6 +17,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.Utils;
 import net.aksingh.owmjapis.CurrentWeather;
 import net.aksingh.owmjapis.OpenWeatherMap;
 import net.aksingh.owmjapis.OpenWeatherMap.Units;
@@ -61,10 +61,10 @@ public class WeatherCmd extends AbstractCommand {
 
 				EmbedBuilder builder = new EmbedBuilder()
 						.withAuthorName("Weather in " + weather.getCityName() + " City")
-						.withDesc("Last updatee on " + dateFormatter.format(weather.getDateTime()))
-						.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
 						.withAuthorIcon(context.getAuthor().getAvatarURL())
+						.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
 						.withColor(Config.BOT_COLOR)
+						.appendDescription("Last updatee on " + dateFormatter.format(weather.getDateTime()))
 						.appendField(Emoji.CLOUD + " Clouds", clouds, true)
 						.appendField(Emoji.WIND + " Wind", windDesc + "\n" + String.format("%.1f", windSpeed) + " km/h", true)
 						.appendField(Emoji.RAIN + " Rain", rain, true)
@@ -115,10 +115,7 @@ public class WeatherCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show weather report for a city.**")
 				.appendField("Usage", context.getPrefix() + "weather <city>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

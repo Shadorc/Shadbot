@@ -15,11 +15,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -27,6 +25,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class DiabloCmd extends AbstractCommand {
@@ -86,12 +85,10 @@ public class DiabloCmd extends AbstractCommand {
 				heroesList.add(heroObj);
 			}
 
-			EmbedBuilder builder = new EmbedBuilder()
+			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Diablo 3 Stats")
-					.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 					.withThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
-					.withColor(Config.BOT_COLOR)
 					.appendDescription("Stats for **" + mainObj.getString("battleTag") + "** (Guild: **" + mainObj.getString("guildName") + "**)")
 					.appendField("__Parangon level__",
 							"**Normal:** " + mainObj.getInt("paragonLevel")
@@ -117,10 +114,7 @@ public class DiabloCmd extends AbstractCommand {
 
 	@Override
 	public void showHelp(Context context) {
-		EmbedBuilder builder = new EmbedBuilder()
-				.withAuthorName("Help for " + this.getNames()[0] + " command")
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR)
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show user stats for Diablo 3.**")
 				.appendField("Usage", context.getPrefix() + "diablo <eu|us|tw|kr> <battletag#0000>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
