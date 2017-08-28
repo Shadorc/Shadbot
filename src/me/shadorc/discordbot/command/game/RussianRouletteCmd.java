@@ -14,6 +14,10 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends AbstractCommand {
 
+	private static final float WIN_RATE = 0.30f;
+	private static final float LOSE_RATE = 0.55f;
+	private static final int MIN_COINS_GAINED = 10;
+
 	private final RateLimiter rateLimiter;
 
 	public RussianRouletteCmd() {
@@ -32,12 +36,12 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 		int userCoins = context.getPlayer().getCoins();
 		if(MathUtils.rand(6) == 0) {
-			int loss = (int) Math.ceil(-userCoins * 0.50);
+			int loss = (int) Math.ceil(-userCoins * LOSE_RATE);
 			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **PAN** ... "
 					+ "Sorry, you died, you lose **" + Math.abs(loss) + " coins**.", context.getChannel());
 			context.getPlayer().addCoins(loss);
 		} else {
-			int gain = (int) Math.max(10, Math.ceil(userCoins * 0.30));
+			int gain = (int) Math.max(MIN_COINS_GAINED, Math.ceil(userCoins * WIN_RATE));
 			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **click** ... "
 					+ "Phew, you are still alive, you gets **" + gain + " coins** !", context.getChannel());
 			context.getPlayer().addCoins(gain);
@@ -48,7 +52,8 @@ public class RussianRouletteCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play russian roulette.**")
-				.appendField("Gains", "You have 5-in-6 chance to win 30% of your coins and a 1-in-6 chance to lose 50% of your coins.", false);
+				.appendField("Gains", "You have 5-in-6 chance to win " + (int) (WIN_RATE * 100) + "% of your coins "
+						+ "and a 1-in-6 chance to lose " + (int) (LOSE_RATE * 100) + "% of your coins.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }
