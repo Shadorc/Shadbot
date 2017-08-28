@@ -1,13 +1,19 @@
 package me.shadorc.discordbot.command.utils;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
+import me.shadorc.discordbot.Storage;
+import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.events.ShardListener;
@@ -29,6 +35,8 @@ public class PollCmd extends AbstractCommand {
 
 	protected static final ConcurrentHashMap<IChannel, PollManager> CHANNELS_POLL = new ConcurrentHashMap<>();
 
+	private final RateLimiter rateLimiter;
+
 	private static final int MIN_CHOICES_NUM = 2;
 	private static final int MAX_CHOICES_NUM = 10;
 	private static final int MIN_DURATION = 10;
@@ -36,6 +44,7 @@ public class PollCmd extends AbstractCommand {
 
 	public PollCmd() {
 		super(Role.USER, "poll");
+		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
 	@Override
@@ -104,9 +113,14 @@ public class PollCmd extends AbstractCommand {
 			return;
 		}
 
-		if(!pollManager.vote(context.getAuthor(), num)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " " + context.getAuthorName() + ", you've already voted.", context.getChannel());
+		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
+			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
+				rateLimiter.warn("Take it easy, don't spam :)", context);
+			}
+			return;
 		}
+
+		pollManager.vote(context.getAuthor(), num);
 	}
 
 	@Override
@@ -129,7 +143,7 @@ public class PollCmd extends AbstractCommand {
 		private final IChannel channel;
 		private final IUser creator;
 		private final String question;
-		private final ConcurrentHashMap<String, List<IUser>> choicesMap;
+		private final Map<String, List<IUser>> choicesMap;
 		private final Timer timer;
 
 		private IMessage message;
@@ -139,7 +153,7 @@ public class PollCmd extends AbstractCommand {
 			this.channel = channel;
 			this.creator = creator;
 			this.question = question;
-			this.choicesMap = new ConcurrentHashMap<>();
+			this.choicesMap = new LinkedHashMap<String, List<IUser>>();
 			for(String choice : choicesList) {
 				choicesMap.put(choice, new ArrayList<>());
 			}
@@ -148,7 +162,7 @@ public class PollCmd extends AbstractCommand {
 			});
 		}
 
-		protected boolean vote(IUser user, int num) {
+		protected synchronized void vote(IUser user, int num) {
 			List<String> choicesList = new ArrayList<String>(choicesMap.keySet());
 			for(String choice : choicesList) {
 				if(choicesMap.get(choice).remove(user)) {
@@ -161,8 +175,6 @@ public class PollCmd extends AbstractCommand {
 			usersList.add(user);
 			choicesMap.put(choice, usersList);
 			this.show();
-
-			return true;
 		}
 
 		protected void start() {
@@ -203,7 +215,9 @@ public class PollCmd extends AbstractCommand {
 			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.withAuthorName("Poll (Created by: " + creator.getName() + ")")
 					.withThumbnail(creator.getAvatarURL())
-					.appendDescription("**" + question + "**\n" + choicesStr.toString())
+					.appendDescription("Vote by using: " + Storage.getSetting(channel.getGuild(), Setting.PREFIX) + "poll <choice>"
+							+ "\n\n__" + question + "__"
+							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
 					.withFooterText("This poll " + (timer.isRunning() ? ("will end in " + remainingTime + " seconds.") : "is finished."));
 			this.sendPoll(embed.build());
