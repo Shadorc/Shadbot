@@ -43,6 +43,7 @@ public class Rule34Cmd extends AbstractCommand {
 					+ "&s=post"
 					+ "&q=index"
 					+ "&tags=" + URLEncoder.encode(context.getArg(), "UTF-8")), "UTF-8"));
+
 			JSONObject postsObj = mainObj.getJSONObject("posts");
 
 			if(postsObj.getInt("count") == 0) {
@@ -50,8 +51,13 @@ public class Rule34Cmd extends AbstractCommand {
 				return;
 			}
 
-			JSONArray postsArray = postsObj.getJSONArray("post");
-			JSONObject postObj = postsArray.getJSONObject(MathUtils.rand(postsArray.length() - 1));
+			JSONObject postObj;
+			if(postsObj.get("post") instanceof JSONArray) {
+				JSONArray postsArray = postsObj.getJSONArray("post");
+				postObj = postsArray.getJSONObject(MathUtils.rand(postsArray.length() - 1));
+			} else {
+				postObj = postsObj.getJSONObject("post");
+			}
 
 			String tags = postObj.getString("tags").trim().replace(" ", ", ");
 			if(tags.length() > 400) {
