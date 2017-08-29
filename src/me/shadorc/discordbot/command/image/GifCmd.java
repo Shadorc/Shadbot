@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
@@ -49,8 +50,12 @@ public class GifCmd extends AbstractCommand {
 				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + context.getArg() + "\"", context.getChannel());
 				return;
 			}
-			String url = mainObj.getJSONObject("data").getString("url");
-			BotUtils.sendMessage(url, context.getChannel());
+
+			EmbedBuilder embed = new EmbedBuilder()
+					.withColor(Config.BOT_COLOR)
+					.withImage(mainObj.getJSONObject("data").getString("image_url"));
+			BotUtils.sendEmbed(embed.build(), context.getChannel());
+
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting a gif from Giphy.... Please, try again later.", err, context.getChannel());
 		}
