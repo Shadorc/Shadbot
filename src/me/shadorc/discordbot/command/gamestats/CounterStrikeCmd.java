@@ -63,19 +63,31 @@ public class CounterStrikeCmd extends AbstractCommand {
 				}
 			}
 
+			JSONObject mainUserObj = new JSONObject(IOUtils.toString(new URL(
+					"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
+							+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
+							+ "&steamids=" + steamid), "UTF-8"));
+
+			JSONObject userObj = mainUserObj.getJSONObject("response").getJSONArray("players").getJSONObject(0);
+
+			/*
+			 * CommunityVisibilityState
+			 * 1: Private
+			 * 2: FriendsOnly
+			 * 3: Public
+			 */
+			if(userObj.getInt("communityvisibilitystate") != 3) {
+				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " This profile is private.", context.getChannel());
+				return;
+			}
+
 			JSONObject mainStatsObj = new JSONObject(IOUtils.toString(new URL(
 					"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
 							+ "appid=730"
 							+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
 							+ "&steamid=" + steamid), "UTF-8"));
 
-			JSONObject mainUserObj = new JSONObject(IOUtils.toString(new URL(
-					"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
-							+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
-							+ "&steamids=" + steamid), "UTF-8"));
-
 			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");
-			JSONObject userObj = mainUserObj.getJSONObject("response").getJSONArray("players").getJSONObject(0);
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.setLenient(true)
