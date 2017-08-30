@@ -47,7 +47,9 @@ public class AudioEventListener extends AudioEventAdapter {
 			errorCount = 0; // Everything seems to be fine, reset error count.
 			if(scheduler.isRepeating()) {
 				scheduler.queue(track.makeClone());
-			} else if(!scheduler.nextTrack()) {
+			} else if(!scheduler.nextTrack()
+					// FIXME: Having to check null is weird
+					&& GuildMusicManager.getGuildMusicManager(guild) != null) {
 				GuildMusicManager.getGuildMusicManager(guild).end();
 			}
 		}
