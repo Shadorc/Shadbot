@@ -17,6 +17,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.MessageHistory;
+import sx.blah.discord.util.RequestBuffer;
 
 public class PruneCmd extends AbstractCommand {
 
@@ -83,18 +84,20 @@ public class PruneCmd extends AbstractCommand {
 			count++;
 		}
 
-		toDeleteList = toDeleteList.subList(0, Math.min(100, toDeleteList.size()));
+		final List<IMessage> truncDeleteList = new ArrayList<IMessage>(toDeleteList.subList(0, Math.min(100, toDeleteList.size())));
 
-		if(toDeleteList.isEmpty()) {
-			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
-		} else if(toDeleteList.size() == 1) {
-			// MessageList#bulkDelete(List<IMessage> messages) cannot delete a single message
-			toDeleteList.get(0).delete();
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " 1 message deleted.", context.getChannel());
-		} else {
-			context.getChannel().bulkDelete(toDeleteList);
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + toDeleteList.size() + " messages deleted.", context.getChannel());
-		}
+		RequestBuffer.request(() -> {
+			if(truncDeleteList.isEmpty()) {
+				BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
+			} else if(truncDeleteList.size() == 1) {
+				// MessageList#bulkDelete(List<IMessage> messages) cannot delete a single message
+				truncDeleteList.get(0).delete();
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " 1 message deleted.", context.getChannel());
+			} else {
+				context.getChannel().bulkDelete(truncDeleteList);
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " " + truncDeleteList.size() + " messages deleted.", context.getChannel());
+			}
+		});
 	}
 
 	@Override
