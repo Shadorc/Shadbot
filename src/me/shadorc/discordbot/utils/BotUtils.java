@@ -113,22 +113,26 @@ public class BotUtils {
 	}
 
 	public static void sendQueues() {
-		LogUtils.info("Sending pending messages...");
-		for(IChannel channel : MESSAGE_QUEUE.keySet()) {
-			for(String message : MESSAGE_QUEUE.get(channel)) {
-				BotUtils.sendMessage(message, channel);
+		if(!MESSAGE_QUEUE.isEmpty()) {
+			LogUtils.info("Sending pending messages...");
+			for(IChannel channel : MESSAGE_QUEUE.keySet()) {
+				for(String message : MESSAGE_QUEUE.get(channel)) {
+					BotUtils.sendMessage(message, channel);
+				}
 			}
+			LogUtils.info("Pending messages sent.");
+			MESSAGE_QUEUE.clear();
 		}
-		LogUtils.info("Pending messages sent.");
-		MESSAGE_QUEUE.clear();
 
-		LogUtils.info("Sending pending embed...");
-		for(IChannel channel : EMBED_QUEUE.keySet()) {
-			for(EmbedObject embed : EMBED_QUEUE.get(channel)) {
-				BotUtils.sendEmbed(embed, channel);
+		if(!EMBED_QUEUE.isEmpty()) {
+			LogUtils.info("Sending pending embed...");
+			for(IChannel channel : EMBED_QUEUE.keySet()) {
+				for(EmbedObject embed : EMBED_QUEUE.get(channel)) {
+					BotUtils.sendEmbed(embed, channel);
+				}
 			}
+			LogUtils.info("Pending embed sent.");
+			EMBED_QUEUE.clear();
 		}
-		LogUtils.info("Pending embed sent.");
-		EMBED_QUEUE.clear();
 	}
 }
