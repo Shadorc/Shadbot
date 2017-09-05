@@ -18,7 +18,7 @@ public class PauseCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public PauseCmd() {
-		super(Role.USER, "pause", "resume");
+		super(Role.USER, "pause", "unpause", "resume");
 		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
 	}
 
