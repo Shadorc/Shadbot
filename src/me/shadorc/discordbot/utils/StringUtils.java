@@ -115,4 +115,19 @@ public class StringUtils {
 		}
 		return matches;
 	}
+
+	/**
+	 * @param str - String to check
+	 * @param charac - Char to count
+	 * @return Number of characters occurrences in str
+	 */
+	public static int getCharCount(String str, char charac) {
+		int counter = 0;
+		for(int i = 0; i < str.length(); i++) {
+			if(str.charAt(i) == charac) {
+				counter++;
+			}
+		}
+		return counter;
+	}
 }

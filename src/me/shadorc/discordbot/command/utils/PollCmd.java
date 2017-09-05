@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.swing.Timer;
 
@@ -79,15 +80,24 @@ public class PollCmd extends AbstractCommand {
 				return;
 			}
 
+			if(StringUtils.getCharCount(splitArgs[1], '"') % 2 != 0) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " You forgot a quotation mark.", context.getChannel());
+				return;
+			}
+
 			List<String> substrings = StringUtils.getQuotedWords(splitArgs[1]);
-			List<String> choicesList = new ArrayList<>(substrings.subList(1, substrings.size()));
+			List<String> choicesList = new ArrayList<>(substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList()));
 
 			if(choicesList.size() < MIN_CHOICES_NUM || choicesList.size() > MAX_CHOICES_NUM) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and " + MAX_CHOICES_NUM + " choices.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and " + MAX_CHOICES_NUM + " different choices.", context.getChannel());
 				return;
 			}
 
 			String question = substrings.get(0);
+			if(question.isEmpty()) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " The question can not be empty.", context.getChannel());
+				return;
+			}
 			pollManager = new PollManager(context.getChannel(), context.getAuthor(), duration, question, choicesList);
 			pollManager.start();
 			CHANNELS_POLL.putIfAbsent(context.getChannel(), pollManager);
@@ -231,6 +241,7 @@ public class PollCmd extends AbstractCommand {
 			return new ArrayList<String>(choicesMap.keySet()).size();
 		}
 
+		// FIXME: Use BotUtils and not this ugly hack
 		private void sendPoll(EmbedObject embed) {
 			if(!ShardListener.isShardConnected(channel.getShard())) {
 				return;
