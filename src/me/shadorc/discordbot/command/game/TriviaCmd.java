@@ -41,7 +41,7 @@ public class TriviaCmd extends AbstractCommand {
 		try {
 			new GuildTriviaManager(context.getChannel()).start();
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting a question.... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting a question.... Please, try again later.", err, context);
 		}
 	}
 

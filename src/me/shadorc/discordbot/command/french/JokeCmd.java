@@ -49,7 +49,7 @@ public class JokeCmd extends AbstractCommand {
 			BotUtils.sendMessage("```" + joke + "```", context.getChannel());
 
 		} catch (IOException err) {
-			LogUtils.error("Something went wrong while getting a joke... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting a joke... Please, try again later.", err, context);
 		}
 	}
 

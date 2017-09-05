@@ -73,7 +73,7 @@ public class ChatCmd extends AbstractCommand {
 			CHANNELS_CONV_ID.put(context.getChannel(), bot.getConversationID());
 			BotUtils.sendMessage(Emoji.SPEECH + " " + bot.getResponse(), context.getChannel());
 		} catch (IOException err) {
-			LogUtils.error("Something went wrong while discussing with Cleverbot... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while discussing with Cleverbot... Please, try again later.", err, context);
 		}
 	}
 

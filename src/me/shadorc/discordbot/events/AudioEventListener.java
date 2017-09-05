@@ -59,8 +59,10 @@ public class AudioEventListener extends AudioEventAdapter {
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
 		errorCount++;
 		if(errorCount > 3) {
-			LogUtils.error("Something went terribly wrong, too many errors in a row. I'm stopping music to avoid spam. "
-					+ "You can retry after this, sorry for the inconvenience.", err, channel);
+			BotUtils.sendMessage(Emoji.RED_FLAG + " Something went terribly wrong, too many errors in a row."
+					+ " I'm stopping music to avoid spam."
+					+ " You can retry after this, sorry for the inconvenience.", channel);
+			LogUtils.error("Something went terribly wrong, too many errors in a row. Shadbot stopped the music to avoid spam.", err);
 			GuildMusicManager.getGuildMusicManager(guild).leaveVoiceChannel();
 			return;
 		}

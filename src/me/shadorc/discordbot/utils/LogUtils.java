@@ -6,38 +6,41 @@ import org.slf4j.LoggerFactory;
 import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Shadbot;
-import sx.blah.discord.handle.obj.IChannel;
+import me.shadorc.discordbot.command.Context;
 
 public class LogUtils {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("Logger");
 
-	public static void error(String msg, Exception err, IChannel channel) {
-		LOGGER.error(msg, err);
-		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, channel);
-		LogUtils.sendMessage("**[ERROR]** {Users warned} " + msg + " (Error message: " + err.getMessage() + ")", Config.LOGS_CHANNEL_ID);
+	public static void error(String msg, Exception err, Context context) {
+		LOGGER.error(msg + " (Input: " + context.getMessage().getContent() + ")", err);
+		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, context.getChannel());
+		LogUtils.sendLogs("**[ERROR]** {User warned} " + msg
+				+ "\nError message: " + err.getMessage()
+				+ "\nInput: " + context.getMessage().getContent());
 	}
 
 	public static void error(String msg, Exception err) {
 		LOGGER.error(msg, err);
-		LogUtils.sendMessage("**[ERROR]** " + msg + " (Error message: " + err.getMessage() + ")", Config.LOGS_CHANNEL_ID);
+		LogUtils.sendLogs("**[ERROR]** " + msg
+				+ "\nError message: " + err.getMessage());
 	}
 
 	public static void error(String msg) {
 		LOGGER.error(msg);
-		LogUtils.sendMessage("**[ERROR]** " + msg, Config.LOGS_CHANNEL_ID);
+		LogUtils.sendLogs("**[ERROR]** " + msg);
 	}
 
 	public static void warn(String msg) {
 		LOGGER.warn(msg);
-		LogUtils.sendMessage("**[WARN]** " + msg, Config.LOGS_CHANNEL_ID);
+		LogUtils.sendLogs("**[WARN]** " + msg);
 	}
 
 	public static void info(String msg) {
 		LOGGER.info(msg);
 	}
 
-	private static void sendMessage(String msg, long channelId) {
-		BotUtils.sendMessage(msg, Shadbot.getClient().getChannelByID(channelId));
+	private static void sendLogs(String msg) {
+		BotUtils.sendMessage(msg, Shadbot.getClient().getChannelByID(Config.LOGS_CHANNEL_ID));
 	}
 }

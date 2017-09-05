@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
@@ -74,11 +73,8 @@ public class ImageCmd extends AbstractCommand {
 
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
-		} catch (SocketTimeoutException sterr) {
-			BotUtils.sendMessage(Emoji.GEAR + " DeviantArt's servers are busy, please try again later.", context.getChannel());
-			LogUtils.warn("SocketTimeoutException while getting an image from DeviantArt (" + sterr.getMessage() + ").");
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting an image... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting an image... Please, try again later.", err, context);
 		}
 	}
 

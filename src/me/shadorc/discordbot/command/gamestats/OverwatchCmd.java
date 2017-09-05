@@ -100,7 +100,7 @@ public class OverwatchCmd extends AbstractCommand {
 		} catch (HttpStatusException err) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Overwatch or doesn't exist.", context.getChannel());
 		} catch (IOException err) {
-			LogUtils.error("Something went wrong while getting information from Overwatch profil.... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting information from Overwatch profil.... Please, try again later.", err, context);
 		}
 	}
 

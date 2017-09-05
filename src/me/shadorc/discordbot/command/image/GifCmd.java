@@ -57,7 +57,7 @@ public class GifCmd extends AbstractCommand {
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting a gif from Giphy.... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting a gif from Giphy.... Please, try again later.", err, context);
 		}
 	}
 

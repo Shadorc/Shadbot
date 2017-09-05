@@ -77,7 +77,7 @@ public class Rule34Cmd extends AbstractCommand {
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting an image from Rule34... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting an image from Rule34... Please, try again later.", err, context);
 		}
 
 	}

@@ -65,7 +65,7 @@ public class DtcCmd extends AbstractCommand {
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting a quote from DansTonChat.com... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting a quote from DansTonChat.com... Please, try again later.", err, context);
 		}
 	}
 

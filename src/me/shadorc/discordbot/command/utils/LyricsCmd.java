@@ -56,7 +56,7 @@ public class LyricsCmd extends AbstractCommand {
 					.appendField("Lyrics", resultObj.getString("LyricUrl"), false);
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
 		} catch (IOException err) {
-			LogUtils.error("Something went wrong while getting lyrics... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting lyrics... Please, try again later.", err, context);
 		}
 	}
 

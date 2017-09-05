@@ -70,7 +70,7 @@ public class UrbanCmd extends AbstractCommand {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting Urban Dictionary definition... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting Urban Dictionary definition... Please, try again later.", err, context);
 		}
 	}
 

@@ -108,7 +108,7 @@ public class DiabloCmd extends AbstractCommand {
 		} catch (FileNotFoundException err) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Diablo 3 or doesn't exist.", context.getChannel());
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting Diablo 3 stats.... Please, try again later.", err, context.getChannel());
+			LogUtils.error("Something went wrong while getting Diablo 3 stats.... Please, try again later.", err, context);
 		}
 	}
 
