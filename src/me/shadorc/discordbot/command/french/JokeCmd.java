@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -44,7 +45,7 @@ public class JokeCmd extends AbstractCommand {
 			String joke;
 			do {
 				Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
-				joke = StringUtils.formatList(Arrays.asList(element.html().split("<br>")), line -> line.trim(), "\n");
+				joke = StringUtils.formatList(Arrays.asList(element.html().split("<br>")), line -> Jsoup.parse(line).text().trim(), "\n");
 			} while(joke.length() > 1000);
 			BotUtils.sendMessage("```" + joke + "```", context.getChannel());
 
