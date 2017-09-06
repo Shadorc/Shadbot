@@ -9,14 +9,18 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends AbstractCommand {
 
-	private static final float WIN_RATE = 0.30f;
-	private static final float LOSE_RATE = 0.55f;
-	private static final int MIN_COINS_GAINED = 10;
+	/*
+	 * Expected value: -1/6*(100*bet) + 5/6*(20.6*bet) = 0.5 * bet
+	 */
+
+	private static final float WIN_MULTIPLIER = 20.6f;
+	private static final float LOSE_MULTIPLIER = 100;
 
 	private final RateLimiter rateLimiter;
 
@@ -27,6 +31,10 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(!context.hasArg()) {
+			throw new MissingArgumentException();
+		}
+
 		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
 			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
 				rateLimiter.warn("You can use the russian roulette only once every " + rateLimiter.getTimeout() + " seconds.", context);
@@ -34,26 +42,40 @@ public class RussianRouletteCmd extends AbstractCommand {
 			return;
 		}
 
-		long userCoins = context.getPlayer().getCoins();
-		if(MathUtils.rand(6) == 0) {
-			long loss = (long) Math.ceil(-userCoins * LOSE_RATE);
-			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **PAN** ... "
-					+ "Sorry, you died, you lose **" + Math.abs(loss) + " coins**.", context.getChannel());
-			context.getPlayer().addCoins(loss);
-		} else {
-			long gain = (long) Math.max(MIN_COINS_GAINED, Math.ceil(userCoins * WIN_RATE));
-			BotUtils.sendMessage(Emoji.DICE + " You break a sweat, you pull the trigger... **click** ... "
-					+ "Phew, you are still alive, you gets **" + gain + " coins** !", context.getChannel());
-			context.getPlayer().addCoins(gain);
+		String betStr = context.getArg();
+		if(!StringUtils.isPositiveLong(betStr)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
+			return;
 		}
+
+		long bet = Long.parseLong(betStr);
+		if(context.getPlayer().getCoins() < bet) {
+			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
+			return;
+		}
+
+		StringBuilder strBuilder = new StringBuilder(Emoji.DICE + " You break a sweat, you pull the trigger... ");
+
+		long gains;
+		if(MathUtils.rand(6) == 0) {
+			gains = - Math.min((long) (bet * LOSE_MULTIPLIER), context.getPlayer().getCoins());
+			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
+		} else {
+			gains = (long) (bet * WIN_MULTIPLIER);
+			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
+		}
+
+		context.getPlayer().addCoins(gains);
+		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play russian roulette.**")
-				.appendField("Gains", "You have 5-in-6 chance to win " + (int) (WIN_RATE * 100) + "% of your coins "
-						+ "and a 1-in-6 chance to lose " + (int) (LOSE_RATE * 100) + "% of your coins.", false);
+				.appendField("Usage", context.getPrefix() + "russian_roulette <bet>", false)
+				.appendField("Gains", "You have a 5-in-6 chance to win " + WIN_MULTIPLIER + " times your bet and "
+						+ "a 1-in-6 chance to lose " + LOSE_MULTIPLIER + " times your bet.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }
