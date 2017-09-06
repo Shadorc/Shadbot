@@ -229,15 +229,15 @@ public class PollCmd extends AbstractCommand {
 				}
 			}
 
-			int remainingTime = (int) ((timer.getDelay() - (System.currentTimeMillis() - startTime)) / 1000);
+			long remainingTime = (timer.getDelay() - (System.currentTimeMillis() - startTime));
 			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.withAuthorName("Poll (Created by: " + creator.getName() + ")")
 					.withThumbnail(creator.getAvatarURL())
-					.appendDescription("Vote by using: " + Storage.getSetting(channel.getGuild(), Setting.PREFIX) + "poll <choice>"
+					.appendDescription("Vote using: " + Storage.getSetting(channel.getGuild(), Setting.PREFIX) + "poll <choice>"
 							+ "\n\n__" + question + "__"
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
-					.withFooterText("This poll " + (timer.isRunning() ? ("will end in " + remainingTime + " seconds.") : "is finished."));
+					.withFooterText(timer.isRunning() ? ("Time left: " + StringUtils.formatDuration(remainingTime)) : "Finished");
 			this.sendPoll(embed.build());
 		}
 
