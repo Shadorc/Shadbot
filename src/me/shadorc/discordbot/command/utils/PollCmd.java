@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.utils;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,8 @@ public class PollCmd extends AbstractCommand {
 
 			int duration = Integer.parseInt(durationStr);
 			if(duration < MIN_DURATION || duration > MAX_DURATION) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Duration must be between " + MIN_DURATION + "sec and " + MAX_DURATION + "sec.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Duration must be between " + MIN_DURATION + "sec and "
+						+ MAX_DURATION + "sec.", context.getChannel());
 				return;
 			}
 
@@ -86,18 +88,24 @@ public class PollCmd extends AbstractCommand {
 			}
 
 			List<String> substrings = StringUtils.getQuotedWords(splitArgs[1]);
-			List<String> choicesList = new ArrayList<>(substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList()));
-
-			if(choicesList.size() < MIN_CHOICES_NUM || choicesList.size() > MAX_CHOICES_NUM) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and " + MAX_CHOICES_NUM + " different choices.", context.getChannel());
-				return;
-			}
 
 			String question = substrings.get(0);
 			if(question.isEmpty()) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " The question can not be empty.", context.getChannel());
 				return;
 			}
+
+			// Remove duplicate choices
+			List<String> choicesList = new ArrayList<>(substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList()));
+			// Remove empty choices
+			choicesList.removeAll(Collections.singleton(""));
+
+			if(choicesList.size() < MIN_CHOICES_NUM || choicesList.size() > MAX_CHOICES_NUM) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and "
+						+ MAX_CHOICES_NUM + " different non-empty choices.", context.getChannel());
+				return;
+			}
+
 			pollManager = new PollManager(context.getChannel(), context.getAuthor(), duration, question, choicesList);
 			pollManager.start();
 			CHANNELS_POLL.putIfAbsent(context.getChannel(), pollManager);
