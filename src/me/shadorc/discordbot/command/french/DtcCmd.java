@@ -56,7 +56,7 @@ public class DtcCmd extends AbstractCommand {
 			for(String line : content.split("\n")) {
 				strBuilder.append('\n');
 				if(line.contains(" ")) {
-					strBuilder.append("**" + line.substring(0, line.indexOf(' ')) + "**" + line.substring(line.indexOf(' ')));
+					strBuilder.append("**" + line.substring(0, line.indexOf(' ')) + "** " + line.substring(line.indexOf(' ') + 1));
 				} else {
 					strBuilder.append(line);
 				}
