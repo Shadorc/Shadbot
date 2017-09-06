@@ -68,6 +68,13 @@ public class CounterStrikeCmd extends AbstractCommand {
 							+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
 							+ "&steamids=" + steamid), "UTF-8"));
 
+			JSONArray players = mainUserObj.getJSONObject("response").getJSONArray("players");
+
+			if(players.length() == 0) {
+				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " User not found.", context.getChannel());
+				return;
+			}
+
 			JSONObject userObj = mainUserObj.getJSONObject("response").getJSONArray("players").getJSONObject(0);
 
 			/*
@@ -103,6 +110,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.appendField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
 					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
+
 		} catch (JSONException | IOException err) {
 			if(err.getMessage().contains("400")) {
 				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Counter-Strike: Global Offensive or doesn't exist.", context.getChannel());
