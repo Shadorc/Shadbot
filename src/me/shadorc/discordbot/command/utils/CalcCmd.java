@@ -27,7 +27,7 @@ public class CalcCmd extends AbstractCommand {
 
 		try {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
-			BotUtils.sendMessage(context.getArg() + " = " + engine.eval(context.getArg()), context.getChannel());
+			BotUtils.sendMessage(context.getArg().replace('*', 'x') + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException err) {
 			LogUtils.info("{CalcCmd} {Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")} Invalid expression: " + context.getArg() + ".");
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid expression.", context.getChannel());
