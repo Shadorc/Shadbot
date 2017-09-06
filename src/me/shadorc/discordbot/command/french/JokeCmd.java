@@ -47,7 +47,12 @@ public class JokeCmd extends AbstractCommand {
 				Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
 				joke = StringUtils.formatList(Arrays.asList(element.html().split("<br>")), line -> Jsoup.parse(line).text().trim(), "\n");
 			} while(joke.length() > 1000);
-			BotUtils.sendMessage("```" + joke + "```", context.getChannel());
+
+			EmbedBuilder embed = Utils.getDefaultEmbed()
+					.withAuthorName("Blague")
+					.withUrl("http://www.une-blague.com/")
+					.appendDescription(joke);
+			BotUtils.sendEmbed(embed.build(), context.getChannel());
 
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while getting a joke... Please, try again later.", err, context);
