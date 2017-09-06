@@ -36,7 +36,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 		}
 
 		String coinsStr = splitCmd[0];
-		if(!StringUtils.isLong(coinsStr)) {
+		if(!StringUtils.isPositiveLong(coinsStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid amount.", context.getChannel());
 			return;
 		}

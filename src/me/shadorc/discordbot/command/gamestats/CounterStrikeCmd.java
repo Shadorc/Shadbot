@@ -51,7 +51,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			if(context.getArg().contains("/")) {
 				String[] splittedUrl = context.getArg().split("/");
 				steamid = splittedUrl[splittedUrl.length - 1].trim();
-			} else if(StringUtils.isLong(context.getArg())) {
+			} else if(StringUtils.isPositiveLong(context.getArg())) {
 				steamid = context.getArg().trim();
 			} else {
 				JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?"

@@ -82,12 +82,11 @@ public class StringUtils {
 
 	/**
 	 * @param str - the String to check
-	 * @return true if it can be cast as a Long, false otherwise
+	 * @return true if it can be cast as a strictly positive Long, false otherwise
 	 */
-	public static boolean isLong(String str) {
+	public static boolean isPositiveLong(String str) {
 		try {
-			Long.parseLong(str);
-			return true;
+			return Long.parseLong(str) > 0;
 		} catch (NumberFormatException err) {
 			return false;
 		}

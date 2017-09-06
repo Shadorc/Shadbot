@@ -44,7 +44,7 @@ public class DiceCmd extends AbstractCommand {
 			}
 
 			String betStr = splitArgs[0];
-			if(!StringUtils.isLong(betStr)) {
+			if(!StringUtils.isPositiveLong(betStr)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
 				return;
 			}
