@@ -14,6 +14,10 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class SlotMachineCmd extends AbstractCommand {
 
+	/*
+	 * Expected value: 0.125*50 + 0.053*500 + 0.002*12725 - 0.82*10 = 50 coins
+	 */
+
 	private enum SlotOptions {
 		CHERRIES,
 		BELL,
@@ -54,11 +58,11 @@ public class SlotMachineCmd extends AbstractCommand {
 		int gains = -PAID_COST;
 
 		if(Utils.allEqual(SlotOptions.CHERRIES, slot1, slot2, slot3)) {
-			gains = 30;
+			gains = 50;
 		} else if(Utils.allEqual(SlotOptions.BELL, slot1, slot2, slot3)) {
-			gains = 150;
+			gains = 500;
 		} else if(Utils.allEqual(SlotOptions.GIFT, slot1, slot2, slot3)) {
-			gains = 3000;
+			gains = 12725;
 		}
 		context.getPlayer().addCoins(gains);
 
