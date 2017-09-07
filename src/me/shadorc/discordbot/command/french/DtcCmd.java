@@ -50,6 +50,7 @@ public class DtcCmd extends AbstractCommand {
 			do {
 				quoteObj = arrayObj.getJSONObject(MathUtils.rand(arrayObj.length()));
 				content = quoteObj.getString("content");
+				content = content.replace("*", "\\*");
 			} while(content.length() > 1000);
 
 			StringBuilder strBuilder = new StringBuilder();
