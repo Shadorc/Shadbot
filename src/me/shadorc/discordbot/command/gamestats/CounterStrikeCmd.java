@@ -113,7 +113,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 		} catch (JSONException | IOException err) {
 			if(err.getMessage().contains("400")) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Counter-Strike: Global Offensive or doesn't exist.", context.getChannel());
+				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive or doesn't exist.", context.getChannel());
 			} else {
 				LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", err, context);
 			}

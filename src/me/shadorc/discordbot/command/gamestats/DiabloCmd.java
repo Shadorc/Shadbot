@@ -70,7 +70,7 @@ public class DiabloCmd extends AbstractCommand {
 					+ "apikey=" + Storage.getApiKey(ApiKeys.BLIZZARD_API_KEY)), "UTF-8"));
 
 			if(mainObj.has("code") && mainObj.getString("code").equals("NOTFOUND")) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Diablo 3 or doesn't exist.", context.getChannel());
+				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
 				return;
 			}
 
@@ -106,7 +106,7 @@ public class DiabloCmd extends AbstractCommand {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (FileNotFoundException err) {
-			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play to Diablo 3 or doesn't exist.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting Diablo 3 stats.... Please, try again later.", err, context);
 		}
