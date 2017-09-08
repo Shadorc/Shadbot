@@ -87,28 +87,36 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	private JSONObject getRandomPopularResult(String encodedSearch) throws JSONException, IOException {
-		JSONObject result = null;
 		try {
 			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
 					+ "q=" + encodedSearch
 					+ "&timerange=alltime"
-					+ "&limit=1" // The pagination limit (min: 1 max: 50)
+					+ "&limit=25" // The pagination limit (min: 1 max: 50)
 					+ "&offset=" + MathUtils.rand(150) // The pagination offset (min: 0 max: 50000)
 					+ "&access_token=" + this.deviantArtToken), "UTF-8"));
 			JSONArray resultsArray = mainObj.getJSONArray("results");
 
-			if(resultsArray.length() != 0) {
-				result = resultsArray.getJSONObject(MathUtils.rand(resultsArray.length()));
-			}
+			JSONObject resultObj;
+			do {
+				if(resultsArray.length() == 0) {
+					return null;
+				}
+
+				int index = MathUtils.rand(resultsArray.length());
+				resultObj = resultsArray.getJSONObject(index);
+				resultsArray.remove(index);
+			} while(!resultObj.has("content"));
+
+			return resultObj;
 
 		} catch (JSONException | IOException err) {
 			if(err.getMessage().contains("401")) {
 				this.generateAccessToken();
-				result = getRandomPopularResult(encodedSearch);
+				return this.getRandomPopularResult(encodedSearch);
 			}
-		}
 
-		return result;
+			return null;
+		}
 	}
 
 	@Override
