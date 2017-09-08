@@ -25,6 +25,11 @@ public class SlotMachineCmd extends AbstractCommand {
 	}
 
 	private static final int PAID_COST = 10;
+
+	private static final int FIRST_GAINS = 50;
+	private static final int SECOND_GAINS = 500;
+	private static final int THIRD_GAINS = 12725;
+
 	private static final SlotOptions[] SLOTS_ARRAY = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, // Winning chance : 12.5%
 			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, // Winning chance : 5.3%
@@ -58,11 +63,11 @@ public class SlotMachineCmd extends AbstractCommand {
 		int gains = -PAID_COST;
 
 		if(Utils.allEqual(SlotOptions.CHERRIES, slot1, slot2, slot3)) {
-			gains = 50;
+			gains = FIRST_GAINS;
 		} else if(Utils.allEqual(SlotOptions.BELL, slot1, slot2, slot3)) {
-			gains = 500;
+			gains = SECOND_GAINS;
 		} else if(Utils.allEqual(SlotOptions.GIFT, slot1, slot2, slot3)) {
-			gains = 12725;
+			gains = THIRD_GAINS;
 		}
 		context.getPlayer().addCoins(gains);
 
@@ -75,9 +80,9 @@ public class SlotMachineCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Play a game of slot machine for " + PAID_COST + " coins.**")
+				.appendDescription("**Play slot machine.**")
 				.appendField("Cost", "A game costs " + PAID_COST + " coins.", false)
-				.appendField("Gains", "You can win 30, 150 or 3000 coins ! Good luck.", false);
+				.appendField("Gains", "You can win " + FIRST_GAINS + ", " + SECOND_GAINS + " or " + THIRD_GAINS + " coins ! Good luck.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

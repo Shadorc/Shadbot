@@ -50,7 +50,7 @@ public class PauseCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Pause the current playing music. Use this command again to resume.**");
+				.appendDescription("**Pause current music. Use this command again to resume.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

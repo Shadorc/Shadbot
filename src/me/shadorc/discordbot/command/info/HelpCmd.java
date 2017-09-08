@@ -99,7 +99,7 @@ public class HelpCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Show help for all the commands.**");
+				.appendDescription("**Show help for commands.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

@@ -75,9 +75,9 @@ public class TranslateCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Translate a text from a language to another.**")
+				.appendField("Usage", context.getPrefix() + "translate [<lang1>] <lang2> <text>", false)
 				.appendField("Arguments", "<lang1> is optional, by leaving it blank the source language will be automatically detected.", false)
-				.appendField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false)
-				.appendField("Usage", context.getPrefix() + "translate [<lang1>] <lang2> <text>", false);
+				.appendField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

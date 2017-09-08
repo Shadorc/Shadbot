@@ -117,7 +117,7 @@ public class OverwatchCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Show user stats for Overwatch.**")
+				.appendDescription("**Show player's stats for Overwatch.**")
 				.appendField("Usage", context.getPrefix() + "overwatch <pc|psn|xbl> <eu|us|cn|kr> <battletag#0000>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

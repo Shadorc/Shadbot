@@ -47,7 +47,7 @@ public class StopCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Stop all the musics.**");
+				.appendDescription("**Stop all musics.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

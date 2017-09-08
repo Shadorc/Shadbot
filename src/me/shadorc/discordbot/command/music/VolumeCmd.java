@@ -55,9 +55,10 @@ public class VolumeCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Show or change the current volume level.**")
+				.appendDescription("**Show or change current volume level.**")
 				.appendField("Usage", context.getPrefix() + "volume"
-						+ "\n" + context.getPrefix() + "volume <0-100>", false);
+						+ "\n" + context.getPrefix() + "volume <volume>", false)
+				.appendField("Restriction", "**volume** - must be between 0 and 100", false);
 
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

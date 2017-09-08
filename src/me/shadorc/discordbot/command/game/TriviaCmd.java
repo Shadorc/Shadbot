@@ -48,8 +48,8 @@ public class TriviaCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Start a Trivia game. Once one started, everyone can participate.**")
-				.appendField("Gains", "The winner gets " + GAINS + " coins.", false);
+				.appendDescription("**Start a Trivia game in which everyone can participate.**")
+				.appendField("Gains", "The winner gets **" + GAINS + " coins**.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

@@ -109,8 +109,10 @@ public class DiceCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Start a dice game with a common bet or join a game in progress.**")
-				.appendField("Usage", "Create a game: **" + context.getPrefix() + "dice <bet> <num>**.\nJoin a game **" + context.getPrefix() + "dice <num>**", false)
-				.appendField("Restrictions", "The number must be between 1 and 6.\nYou can't bet on a number that has already been chosen by another player.", false)
+				.appendField("Usage", "**Create a game:** " + context.getPrefix() + "dice <bet> <num>"
+						+ "\n**Join a game:** " + context.getPrefix() + "dice <num>", false)
+				.appendField("Restrictions", "**num** - must be between 1 and 6"
+						+ "\nYou can't bet on a number that has already been chosen by another player.", false)
 				.appendField("Gains", "The winner gets " + MULTIPLIER + " times the common bet multiplied by the number of players.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

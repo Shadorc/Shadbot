@@ -104,15 +104,15 @@ public class SettingsCmd extends AbstractCommand {
 				.withThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
 				.appendDescription("**Change Shadbot's server settings.**")
 				.appendField("Name: " + Setting.PREFIX.toString(),
-						"**Description:** Change Shadbot's prefix for this server."
+						"**Description:** Change Shadbot's prefix."
 								+ "\n**arg:** prefix (Max length: 5, must not contain spaces)"
 								+ "\n**Example:** " + context.getPrefix() + "settings " + Setting.PREFIX.toString() + " !", false)
 				.appendField("Name: " + Setting.ALLOWED_CHANNELS.toString(),
-						"**Description:** Allow Shadbot to only post messages in the mentioned channels. By default, all the channels are allowed."
+						"**Description:** Allow Shadbot to only post messages in the mentioned channels. By default all channels are allowed."
 								+ "\n**arg:** #channel(s)"
 								+ "\n**Example:** " + context.getPrefix() + "settings " + Setting.ALLOWED_CHANNELS.toString() + " #general", false)
 				.appendField("Name: " + Setting.DEFAULT_VOLUME.toString(),
-						"**Description:** Change music default volume for this server."
+						"**Description:** Change music default volume."
 								+ "\n**arg:** volume (Min: 1/Max: 50/Default: " + Config.DEFAULT_VOLUME + ")"
 								+ "\n**Example:** " + context.getPrefix() + "settings " + Setting.DEFAULT_VOLUME.toString() + " 42", false)
 				.appendField("Usage", context.getPrefix() + "settings <name> <arg>", false);

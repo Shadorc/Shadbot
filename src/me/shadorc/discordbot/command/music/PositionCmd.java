@@ -63,7 +63,7 @@ public class PositionCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Fast forward/fast backward the current song a specified amount of time (in seconds).**")
+				.appendDescription("**Fast forward/fast backward current song a specified amount of time (in seconds).**")
 				.appendField("Usage", context.getPrefix() + "forward <sec>"
 						+ "\n" + context.getPrefix() + "backward <sec>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

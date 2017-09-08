@@ -51,7 +51,7 @@ public class PlaylistCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Show the current playlist.**");
+				.appendDescription("**Show current playlist.**");
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

@@ -77,8 +77,8 @@ public class UrbanCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Search a definition of a word with Urban Dictionary.**")
-				.appendField("Usage", context.getPrefix() + "urban <word>", false);
+				.appendDescription("**Show Urban Dictionary definition for a search.**")
+				.appendField("Usage", context.getPrefix() + "urban <search>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
