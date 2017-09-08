@@ -67,7 +67,7 @@ public class ChatCmd extends AbstractCommand {
 		} catch (JSONException | IOException err) {
 			LogUtils.warn("Something went wrong while discussing with A.L.I.C.E. Using Cleverbot instead."
 					+ "\nError: " + err.getMessage()
-					+ "\nJSON: " + mainObj);
+					+ (mainObj == null ? "" : "\nJSON: " + mainObj));
 		}
 
 		try {
