@@ -79,7 +79,7 @@ public class SettingsCmd extends AbstractCommand {
 			}
 
 			String volStr = args[1].trim();
-			if(!StringUtils.isInteger(volStr)) {
+			if(!StringUtils.isPositiveInt(volStr)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Volume number isn't valid.", context.getChannel());
 				return;
 			}

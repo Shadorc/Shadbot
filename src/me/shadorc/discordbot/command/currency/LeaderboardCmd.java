@@ -20,9 +20,9 @@ public class LeaderboardCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		Map<IUser, Long> usersCoin = new HashMap<>();
+		Map<IUser, Integer> usersCoin = new HashMap<>();
 		for(IUser user : context.getGuild().getUsers()) {
-			long userCoin = Storage.getPlayer(context.getGuild(), user).getCoins();
+			int userCoin = Storage.getPlayer(context.getGuild(), user).getCoins();
 			if(userCoin > 0) {
 				usersCoin.put(user, userCoin);
 			}

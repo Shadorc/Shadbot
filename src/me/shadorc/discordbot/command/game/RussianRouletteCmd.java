@@ -43,12 +43,12 @@ public class RussianRouletteCmd extends AbstractCommand {
 		}
 
 		String betStr = context.getArg();
-		if(!StringUtils.isPositiveLong(betStr)) {
+		if(!StringUtils.isPositiveInt(betStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
 			return;
 		}
 
-		long bet = Long.parseLong(betStr);
+		int bet = Integer.parseInt(betStr);
 		if(context.getPlayer().getCoins() < bet) {
 			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
 			return;
@@ -56,12 +56,12 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 		StringBuilder strBuilder = new StringBuilder(Emoji.DICE + " You break a sweat, you pull the trigger... ");
 
-		long gains;
+		int gains;
 		if(MathUtils.rand(6) == 0) {
-			gains = -Math.min((long) (bet * LOSE_MULTIPLIER), context.getPlayer().getCoins());
+			gains = (int) -Math.min(bet * LOSE_MULTIPLIER, context.getPlayer().getCoins());
 			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
 		} else {
-			gains = (long) (bet * WIN_MULTIPLIER);
+			gains = (int) (bet * WIN_MULTIPLIER);
 			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
 		}
 

@@ -57,22 +57,9 @@ public class StringUtils {
 
 	/**
 	 * @param str - the String to check
-	 * @return true if it can be cast as an Integer, false otherwise
-	 */
-	public static boolean isInteger(String str) {
-		try {
-			Integer.parseInt(str);
-			return true;
-		} catch (NumberFormatException err) {
-			return false;
-		}
-	}
-
-	/**
-	 * @param str - the String to check
 	 * @return true if it can be cast as a strictly positive Integer, false otherwise
 	 */
-	public static boolean isPositiveInteger(String str) {
+	public static boolean isPositiveInt(String str) {
 		try {
 			return Integer.parseInt(str) > 0;
 		} catch (NumberFormatException err) {

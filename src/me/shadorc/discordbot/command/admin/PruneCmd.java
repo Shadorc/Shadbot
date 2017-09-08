@@ -58,7 +58,7 @@ public class PruneCmd extends AbstractCommand {
 				throw new MissingArgumentException();
 			}
 			String numStr = argsList.get(argsList.indexOf("-n") + 1);
-			if(!StringUtils.isPositiveInteger(numStr)) {
+			if(!StringUtils.isPositiveInt(numStr)) {
 				throw new MissingArgumentException();
 			}
 			num = Integer.parseInt(numStr);

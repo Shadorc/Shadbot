@@ -22,7 +22,7 @@ public class CoinsCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.PURSE + " You have **" + context.getPlayer().getCoins() + " coin(s)**.", context.getChannel());
 		} else {
 			IUser user = context.getMessage().getMentions().get(0);
-			long coins = Storage.getPlayer(context.getGuild(), user).getCoins();
+			int coins = Storage.getPlayer(context.getGuild(), user).getCoins();
 			BotUtils.sendMessage(Emoji.PURSE + " " + user.getName() + " has **" + coins + " coin(s)**.", context.getChannel());
 		}
 	}

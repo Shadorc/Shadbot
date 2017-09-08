@@ -34,7 +34,7 @@ public class ShutdownCmd extends AbstractCommand {
 		}
 
 		String timeStr = splitArgs[0];
-		if(!StringUtils.isPositiveInteger(timeStr)) {
+		if(!StringUtils.isPositiveInt(timeStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid time.", context.getChannel());
 			return;
 		}

@@ -40,7 +40,7 @@ public class SkipCmd extends AbstractCommand {
 
 		if(context.hasArg()) {
 			String numStr = context.getArg();
-			if(!StringUtils.isPositiveInteger(numStr)) {
+			if(!StringUtils.isPositiveInt(numStr)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Number must be between 1 and " + musicManager.getScheduler().getPlaylist().size() + ".", context.getChannel());
 				return;
 			}

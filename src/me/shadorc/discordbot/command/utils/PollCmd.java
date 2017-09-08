@@ -70,7 +70,7 @@ public class PollCmd extends AbstractCommand {
 			}
 
 			String durationStr = splitArgs[0];
-			if(!StringUtils.isPositiveInteger(durationStr)) {
+			if(!StringUtils.isPositiveInt(durationStr)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid duration.", context.getChannel());
 				return;
 			}
@@ -120,7 +120,7 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		String numStr = context.getArg();
-		if(!StringUtils.isPositiveInteger(numStr)) {
+		if(!StringUtils.isPositiveInt(numStr)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number.", context.getChannel());
 			return;
 		}
