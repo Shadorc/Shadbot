@@ -58,7 +58,7 @@ public class NetUtils {
 		DataOutputStream out = null;
 		BufferedReader reader = null;
 		try {
-			URL url = new URL(homeUrl + "/api/bots/" + Shadbot.getClient().getOurUser().getStringID() + "/stats");
+			URL url = new URL(homeUrl + "/api/bots/" + Shadbot.getClient().getOurUser().getLongID() + "/stats");
 
 			URLConnection urlConn = url.openConnection();
 			urlConn.setRequestProperty("Content-Type", "application/json");

@@ -11,14 +11,14 @@ public class GuildListener {
 	@EventSubscriber
 	public void onGuildCreateEvent(GuildCreateEvent event) {
 		LogUtils.info("Shadbot connected to guild: " + event.getGuild().getName()
-				+ " (ID: " + event.getGuild().getStringID()
+				+ " (ID: " + event.getGuild().getLongID()
 				+ " | Users: " + event.getGuild().getUsers().size() + ")");
 	}
 
 	@EventSubscriber
 	public void onGuildLeaveEvent(GuildLeaveEvent event) {
 		LogUtils.info("Shadbot disconnected from guild: " + event.getGuild().getName()
-				+ " (ID: " + event.getGuild().getStringID()
+				+ " (ID: " + event.getGuild().getLongID()
 				+ " | Users: " + event.getGuild().getUsers().size() + ")");
 	}
 }

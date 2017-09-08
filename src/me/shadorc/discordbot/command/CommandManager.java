@@ -145,7 +145,7 @@ public class CommandManager {
 		}
 
 		if(!commandsMap.containsKey(context.getCommand())) {
-			LogUtils.info("{Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getStringID() + ")}"
+			LogUtils.info("{Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getLongID() + ")}"
 					+ " Command not found: \"" + context.getCommand() + "\".");
 			return;
 		}
