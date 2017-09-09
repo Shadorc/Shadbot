@@ -82,13 +82,14 @@ public class HelpCmd extends AbstractCommand {
 				.withFooterIcon("http://www.urbanleagueneb.org/wp-content/uploads/2016/10/E-mail-Icon.png")
 				.withFooterText("You can send me a suggestion, a bug report, anything by using: " + prefix + "report <message>");
 
-		if(context.getAuthorRole().equals(Role.ADMIN) || context.getAuthorRole().equals(Role.OWNER)) {
+		Role authorRole = context.getAuthorRole();
+		if(authorRole.equals(Role.ADMIN) || authorRole.equals(Role.OWNER)) {
 			builder.appendField("Admin Commands:",
 					"`" + prefix + "prune`"
 							+ " `" + prefix + "settings`", false);
 		}
 
-		if(context.getAuthorRole().equals(Role.OWNER)) {
+		if(authorRole.equals(Role.OWNER)) {
 			builder.appendField("Owner Commands:",
 					"`" + prefix + "shutdown`", false);
 		}

@@ -151,11 +151,12 @@ public class CommandManager {
 
 		AbstractCommand command = commandsMap.get(context.getCommand());
 
-		if(command.getRole().equals(Role.OWNER) && !context.getAuthorRole().equals(Role.OWNER)) {
+		Role authorRole = context.getAuthorRole();
+		if(command.getRole().equals(Role.OWNER) && !authorRole.equals(Role.OWNER)) {
 			return;
 		}
 
-		if(command.getRole().equals(Role.ADMIN) && !context.getAuthorRole().equals(Role.ADMIN) && !context.getAuthorRole().equals(Role.OWNER)) {
+		if(command.getRole().equals(Role.ADMIN) && !authorRole.equals(Role.ADMIN) && !authorRole.equals(Role.OWNER)) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You have to be an administrator to execute this command.", event.getChannel());
 			return;
 		}
