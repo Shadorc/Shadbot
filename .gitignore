@@ -23,4 +23,5 @@ Thumbs.db
 # Project Files
 api_keys.json
 data.json
+stats.json
 Shadbot.log
