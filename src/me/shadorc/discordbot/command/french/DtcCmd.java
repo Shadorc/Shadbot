@@ -9,10 +9,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Config.APIKey;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -41,7 +41,7 @@ public class DtcCmd extends AbstractCommand {
 
 		try {
 			String url = "http://api.danstonchat.com/0.3/view/random?"
-					+ "key=" + Storage.getApiKey(ApiKeys.DTC_API_KEY)
+					+ "key=" + Config.getAPIKey(APIKey.DTC_API_KEY)
 					+ "&format=json";
 			JSONArray arrayObj = new JSONArray(IOUtils.toString(new URL(url), "UTF-8"));
 

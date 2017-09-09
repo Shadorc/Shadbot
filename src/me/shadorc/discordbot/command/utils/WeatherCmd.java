@@ -5,11 +5,11 @@ import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
+import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Config.APIKey;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -47,7 +47,7 @@ public class WeatherCmd extends AbstractCommand {
 		}
 
 		try {
-			OpenWeatherMap owm = new OpenWeatherMap(Units.METRIC, Storage.getApiKey(ApiKeys.OPENWEATHERMAP_API_KEY));
+			OpenWeatherMap owm = new OpenWeatherMap(Units.METRIC, Config.getAPIKey(APIKey.OPENWEATHERMAP_API_KEY));
 			CurrentWeather weather = owm.currentWeatherByCityName(context.getArg());
 
 			if(weather.isValid()) {

@@ -13,9 +13,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Config.APIKey;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.ApiKeys;
 
 public class NetUtils {
 
@@ -50,11 +49,11 @@ public class NetUtils {
 		if(Config.VERSION.isBeta()) {
 			return;
 		}
-		NetUtils.postStatsOn("https://bots.discord.pw", ApiKeys.BOTS_DISCORD_PW_TOKEN);
-		NetUtils.postStatsOn("https://discordbots.org", ApiKeys.DISCORD_BOTS_ORG_TOKEN);
+		NetUtils.postStatsOn("https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN);
+		NetUtils.postStatsOn("https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN);
 	}
 
-	private static void postStatsOn(String homeUrl, ApiKeys token) {
+	private static void postStatsOn(String homeUrl, APIKey token) {
 		DataOutputStream out = null;
 		BufferedReader reader = null;
 		try {
@@ -62,7 +61,7 @@ public class NetUtils {
 
 			URLConnection urlConn = url.openConnection();
 			urlConn.setRequestProperty("Content-Type", "application/json");
-			urlConn.setRequestProperty("Authorization", Storage.getApiKey(token));
+			urlConn.setRequestProperty("Authorization", Config.getAPIKey(token));
 			urlConn.setDoOutput(true);
 			urlConn.setDoInput(true);
 			urlConn.setUseCaches(false);

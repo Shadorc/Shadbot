@@ -15,10 +15,8 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class Storage {
 
-	private static final int INDENT_FACTOR = 2;
-
-	private static final File API_KEYS_FILE = new File("api_keys.json");
 	private static final File DATA_FILE = new File("data.json");
+	private static final int INDENT_FACTOR = 2;
 
 	public enum Setting {
 		ALLOWED_CHANNELS("allowed_channels"),
@@ -35,24 +33,6 @@ public class Storage {
 		public String toString() {
 			return key;
 		}
-	}
-
-	public enum ApiKeys {
-		GIPHY_API_KEY,
-		DTC_API_KEY,
-		DISCORD_TOKEN,
-		TWITTER_API_KEY,
-		TWITTER_API_SECRET,
-		TWITTER_TOKEN,
-		TWITTER_TOKEN_SECRET,
-		STEAM_API_KEY,
-		OPENWEATHERMAP_API_KEY,
-		DEVIANTART_CLIENT_ID,
-		DEVIANTART_API_SECRET,
-		BOTS_DISCORD_PW_TOKEN,
-		DISCORD_BOTS_ORG_TOKEN,
-		BLIZZARD_API_KEY,
-		CLEVERBOT_API_KEY;
 	}
 
 	private static void init() {
@@ -170,17 +150,5 @@ public class Storage {
 		}
 
 		return new Player(guild, user);
-	}
-
-	public static synchronized String getApiKey(ApiKeys key) {
-		try {
-			JSONObject mainObj = new JSONObject(new JSONTokener(API_KEYS_FILE.toURI().toURL().openStream()));
-			return mainObj.optString(key.toString());
-
-		} catch (IOException err) {
-			LogUtils.error("Error while reading API keys file.", err);
-		}
-
-		return null;
 	}
 }

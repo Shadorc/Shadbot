@@ -2,7 +2,7 @@ package me.shadorc.discordbot;
 
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
-import me.shadorc.discordbot.Storage.ApiKeys;
+import me.shadorc.discordbot.Config.APIKey;
 import me.shadorc.discordbot.events.ReadyListener;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -15,7 +15,7 @@ public class Shadbot {
 
 	public static void main(String[] args) {
 		client = new ClientBuilder()
-				.withToken(Storage.getApiKey(ApiKeys.DISCORD_TOKEN))
+				.withToken(Config.getAPIKey(APIKey.DISCORD_TOKEN))
 				.setMaxMessageCacheCount(250)
 				.setMaxReconnectAttempts(100)
 				.login();

@@ -11,11 +11,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Config.APIKey;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -55,7 +54,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 				steamid = context.getArg().trim();
 			} else {
 				JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?"
-						+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
+						+ "key=" + Config.getAPIKey(APIKey.STEAM_API_KEY)
 						+ "&vanityurl=" + URLEncoder.encode(context.getArg(), "UTF-8")), "UTF-8"));
 				JSONObject responseObj = mainObj.getJSONObject("response");
 				if(responseObj.has("steamid")) {
@@ -65,7 +64,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 			JSONObject mainUserObj = new JSONObject(IOUtils.toString(new URL(
 					"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
-							+ "key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
+							+ "key=" + Config.getAPIKey(APIKey.STEAM_API_KEY)
 							+ "&steamids=" + steamid), "UTF-8"));
 
 			JSONArray players = mainUserObj.getJSONObject("response").getJSONArray("players");
@@ -91,7 +90,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			JSONObject mainStatsObj = new JSONObject(IOUtils.toString(new URL(
 					"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
 							+ "appid=730"
-							+ "&key=" + Storage.getApiKey(ApiKeys.STEAM_API_KEY)
+							+ "&key=" + Config.getAPIKey(APIKey.STEAM_API_KEY)
 							+ "&steamid=" + steamid), "UTF-8"));
 
 			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");

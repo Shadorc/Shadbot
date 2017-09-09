@@ -11,11 +11,11 @@ import org.json.XML;
 
 import com.michaelwflaherty.cleverbotapi.CleverBotQuery;
 
+import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Config.APIKey;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -27,7 +27,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class ChatCmd extends AbstractCommand {
 
-	private static final String API_KEY = Storage.getApiKey(ApiKeys.CLEVERBOT_API_KEY);
+	private static final String API_KEY = Config.getAPIKey(APIKey.CLEVERBOT_API_KEY);
 	private static final ConcurrentHashMap<IChannel, String> CHANNELS_CONV_ID = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<IChannel, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
 

@@ -10,11 +10,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.Config.APIKey;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.ApiKeys;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -80,8 +80,8 @@ public class ImageCmd extends AbstractCommand {
 
 	private void generateAccessToken() throws JSONException, IOException {
 		JSONObject oauthObj = new JSONObject(IOUtils.toString(new URL("https://www.deviantart.com/oauth2/token?"
-				+ "client_id=" + Storage.getApiKey(ApiKeys.DEVIANTART_CLIENT_ID)
-				+ "&client_secret=" + Storage.getApiKey(ApiKeys.DEVIANTART_API_SECRET)
+				+ "client_id=" + Config.getAPIKey(APIKey.DEVIANTART_CLIENT_ID)
+				+ "&client_secret=" + Config.getAPIKey(APIKey.DEVIANTART_API_SECRET)
 				+ "&grant_type=client_credentials"), "UTF-8"));
 		this.deviantArtToken = oauthObj.getString("access_token");
 	}
