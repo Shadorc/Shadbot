@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -39,6 +40,11 @@ public class Stats {
 		FileWriter writer = null;
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(STATS_FILE.toURI().toURL().openStream()));
+			JSONArray unknownCommandsArray = mainObj.has("unknown_commands") ? mainObj.getJSONArray("unknown_commands") : new JSONArray();
+			if(unknownCommandsArray.toString().contains(command)) {
+				return;
+			}
+
 			mainObj.append("unknown_commands", command);
 
 			writer = new FileWriter(STATS_FILE);
