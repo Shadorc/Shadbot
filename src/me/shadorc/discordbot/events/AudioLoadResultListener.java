@@ -119,8 +119,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	public void noMatches() {
 		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \""
 				+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
-		LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
-				+ "No matches: " + identifier);
+		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} No matches: " + identifier);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
@@ -131,12 +130,11 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	public void loadFailed(FriendlyException err) {
 		String errMessage = Jsoup.parse(err.getMessage().replace("Watch on YouTube", "")).text().trim();
 		if(err.severity.equals(FriendlyException.Severity.FAULT)) {
-			LogUtils.warn("{" + this.getClass().getSimpleName() + "} {Guild ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
+			LogUtils.warn("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} "
 					+ "Load failed, Shadbot might be able to continue playing: " + errMessage);
 		} else {
 			BotUtils.sendMessage(Emoji.GEAR + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
-			LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
-					+ "Load failed: " + errMessage);
+			LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Load failed: " + errMessage);
 		}
 
 		if(musicManager.getScheduler().isStopped()) {
@@ -206,7 +204,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		BotUtils.sendMessage(Emoji.EXCLAMATION + " \"" + choice + "\" is not a valid number. "
 				+ "You can use " + prefix + "cancel to cancel the selection.",
 				musicManager.getChannel());
-		LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
-				+ "Invalid choice: " + message.getContent());
+		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Invalid choice: " + message.getContent());
 	}
 }

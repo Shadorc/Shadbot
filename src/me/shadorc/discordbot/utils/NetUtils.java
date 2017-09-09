@@ -79,10 +79,10 @@ public class NetUtils {
 			while((line = reader.readLine()) != null) {
 				strBuilder.append(line);
 			}
-			LogUtils.info("Stats have been posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
+			LogUtils.info("Stats posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
 
 		} catch (IOException err) {
-			LogUtils.info("An error occured while posting stats. (" + err.getClass() + ": " + err.getMessage() + ")");
+			LogUtils.info("An error occured while posting stats. (" + err.getClass().getSimpleName() + ": " + err.getMessage() + ")");
 
 		} finally {
 			IOUtils.closeQuietly(out);

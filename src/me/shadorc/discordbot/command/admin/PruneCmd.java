@@ -32,7 +32,7 @@ public class PruneCmd extends AbstractCommand {
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Manage messages** "
 					+ "and **Read message history** are checked.",
 					context.getChannel());
-			LogUtils.info("{Guild ID: " + context.getChannel().getGuild().getLongID() + ")} "
+			LogUtils.info("{Guild ID: " + context.getChannel().getGuild().getLongID() + "} "
 					+ "Shadbot wasn't allowed to manage messages/read message history.");
 			return;
 		}

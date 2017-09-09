@@ -63,10 +63,10 @@ public class GuildMusicManager {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect/speak in this voice channel due to the lack of permission."
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Voice connect** and **Voice speak** "
 					+ "are checked.", channel);
-			LogUtils.info("{Guild ID: " + voiceChannel.getGuild().getLongID() + ")} Shadbot wasn't allowed to connect/speak in a voice channel.");
+			LogUtils.info("{Guild ID: " + voiceChannel.getGuild().getLongID() + "} Shadbot wasn't allowed to connect/speak in a voice channel.");
 			return false;
 		}
-		LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + voiceChannel.getGuild().getLongID() + ")} Voice channel joined.");
+		LogUtils.info("{Guild ID: " + voiceChannel.getGuild().getLongID() + "} Voice channel joined.");
 		voiceChannel.join();
 		return true;
 	}
