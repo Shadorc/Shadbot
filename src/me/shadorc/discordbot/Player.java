@@ -43,7 +43,7 @@ public class Player {
 			this.coins = Math.addExact(coins, gains);
 		} catch (ArithmeticException err) {
 			this.coins = Integer.MAX_VALUE;
-			LogUtils.warn("A user's money exceeded the maximum value of an Integer. (ID: " + user.getLongID() + ")");
+			LogUtils.warn("User (ID: " + user.getLongID() + ") exceeded the maximum coins value.");
 		}
 		this.save();
 	}

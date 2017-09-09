@@ -84,7 +84,7 @@ public class GuildMusicManager {
 				GuildMusicManager.this.cancelLeave();
 				audioPlayer.destroy();
 				MUSIC_MANAGERS.remove(guild);
-				LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + guild.getLongID() + ")} Voice channel leaved.");
+				LogUtils.info("{" + GuildMusicManager.this.getClass().getSimpleName() + "} {Guild ID: " + guild.getLongID() + ")} Voice channel leaved.");
 			}
 		}).start();
 	}
