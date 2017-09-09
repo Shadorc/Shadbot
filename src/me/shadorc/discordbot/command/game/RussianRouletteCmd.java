@@ -16,11 +16,12 @@ import sx.blah.discord.util.EmbedBuilder;
 public class RussianRouletteCmd extends AbstractCommand {
 
 	/*
-	 * Expected value: -1/6*(100*bet) + 5/6*(20.6*bet) = 0.5 * bet
+	 * Expected value: -1/6*(10*bet) + 5/6*(2*bet) = 0
 	 */
 
-	private static final float WIN_MULTIPLIER = 20.6f;
-	private static final float LOSE_MULTIPLIER = 100;
+	private static final int MAX_BET = 500;
+	private static final int WIN_MULTIPLIER = 2;
+	private static final int LOSE_MULTIPLIER = 10;
 
 	private final RateLimiter rateLimiter;
 
@@ -54,14 +55,19 @@ public class RussianRouletteCmd extends AbstractCommand {
 			return;
 		}
 
+		if(bet > MAX_BET) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " You can't bet more than " + MAX_BET + " coins.", context.getChannel());
+			return;
+		}
+
 		StringBuilder strBuilder = new StringBuilder(Emoji.DICE + " You break a sweat, you pull the trigger... ");
 
 		int gains;
 		if(MathUtils.rand(6) == 0) {
-			gains = (int) -Math.min(bet * LOSE_MULTIPLIER, context.getPlayer().getCoins());
+			gains = -Math.min(bet * LOSE_MULTIPLIER, context.getPlayer().getCoins());
 			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
 		} else {
-			gains = (int) (bet * WIN_MULTIPLIER);
+			gains = bet * WIN_MULTIPLIER;
 			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
 		}
 
@@ -74,6 +80,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play russian roulette.**")
 				.appendField("Usage", context.getPrefix() + "russian_roulette <bet>", false)
+				.appendField("Restriction", "**bet** - You can not bet more than " + MAX_BET + " coins.", false)
 				.appendField("Gains", "You have a **5-in-6** chance to win **" + WIN_MULTIPLIER + " times** your bet and "
 						+ "a **1-in-6** chance to lose **" + LOSE_MULTIPLIER + " times** your bet.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
