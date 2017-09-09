@@ -17,6 +17,7 @@ public class Stats {
 
 	public enum Category {
 		UNKNOWN_COMMAND("unknown_command"),
+		LIMITED_COMMAND("limited_command"),
 		HELP_COMMAND("help_command"),
 		COMMAND("command");
 

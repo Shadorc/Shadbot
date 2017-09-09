@@ -5,8 +5,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ConcurrentHashMap;
 
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.data.Stats;
+import me.shadorc.discordbot.data.Stats.Category;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -48,9 +49,8 @@ public class RateLimiter {
 	}
 
 	public void warn(String message, Context context) {
-		LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + context.getGuild().getLongID() + ")} "
-				+ "User (ID: " + context.getAuthor().getLongID() + ") warned. Command: " + context.getCommand());
 		BotUtils.sendMessage(Emoji.STOPWATCH + " " + message, context.getChannel());
 		warningsRateLimiter.get(context.getGuild()).put(context.getAuthor(), true);
+		Stats.increment(Category.LIMITED_COMMAND, context.getCommand());
 	}
 }
