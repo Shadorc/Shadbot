@@ -15,7 +15,7 @@ public class ChannelListener {
 		JSONArray allowedChannelsArray = (JSONArray) Storage.getSetting(event.getGuild(), Setting.ALLOWED_CHANNELS);
 
 		for(int i = 0; i < allowedChannelsArray.length(); i++) {
-			if(allowedChannelsArray.getString(i).equals(event.getChannel().getStringID())) {
+			if(allowedChannelsArray.getLong(i) == event.getChannel().getLongID()) {
 				allowedChannelsArray.remove(i);
 				break;
 			}

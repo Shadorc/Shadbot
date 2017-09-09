@@ -90,7 +90,7 @@ public class BotUtils {
 			return true;
 		}
 
-		return Utils.convertArrayToList(channelsArray).contains(channel.getStringID());
+		return Utils.convertToLongList(channelsArray).contains(channel.getLongID());
 	}
 
 	/**

@@ -110,13 +110,28 @@ public class Utils {
 	 * @param array - JSONArray to convert
 	 * @return List<String> containing array elements
 	 */
-	public static List<String> convertArrayToList(JSONArray array) {
+	public static List<String> convertToStringList(JSONArray array) {
 		if(array == null) {
 			return null;
 		}
 		List<String> list = new ArrayList<>();
 		for(int i = 0; i < array.length(); i++) {
 			list.add(array.getString(i));
+		}
+		return list;
+	}
+
+	/**
+	 * @param array - JSONArray to convert
+	 * @return List<Long> containing array elements
+	 */
+	public static List<Long> convertToLongList(JSONArray array) {
+		if(array == null) {
+			return null;
+		}
+		List<Long> list = new ArrayList<>();
+		for(int i = 0; i < array.length(); i++) {
+			list.add(array.getLong(i));
 		}
 		return list;
 	}

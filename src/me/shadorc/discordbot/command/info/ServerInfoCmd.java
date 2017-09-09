@@ -29,7 +29,7 @@ public class ServerInfoCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		IGuild guild = context.getGuild();
-		List<String> allowedChannels = Utils.convertArrayToList((JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS));
+		List<Long> allowedChannels = Utils.convertToLongList((JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS));
 
 		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.setLenient(true)
@@ -45,8 +45,9 @@ public class ServerInfoCmd extends AbstractCommand {
 						"**Prefix:** " + Storage.getSetting(guild, Setting.PREFIX)
 								+ "\n**Default volume:** " + Storage.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
 								+ "\n**Allowed channels:** " + (allowedChannels.isEmpty() ? "All" : "\n"
-										+ StringUtils.formatList(allowedChannels,
-												idStr -> "\t" + guild.getChannelByID(Long.parseLong(idStr)).getName(),
+										+ StringUtils.formatList(
+												allowedChannels,
+												channelID -> "\t" + guild.getChannelByID(channelID).getName(),
 												"\n")), true)
 				.appendField("Server ID", Long.toString(guild.getLongID()), true);
 		BotUtils.sendEmbed(embed.build(), context.getChannel());

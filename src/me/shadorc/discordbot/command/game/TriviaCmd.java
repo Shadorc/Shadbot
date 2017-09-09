@@ -82,7 +82,7 @@ public class TriviaCmd extends AbstractCommand {
 			String question = resultObj.getString("question");
 			String correctAnswer = resultObj.getString("correct_answer");
 
-			this.incorrectAnswers = Utils.convertArrayToList(resultObj.getJSONArray("incorrect_answers"));
+			this.incorrectAnswers = Utils.convertToStringList(resultObj.getJSONArray("incorrect_answers"));
 
 			StringBuilder strBuilder = new StringBuilder("**" + StringUtils.convertHtmlToUTF8(question) + "**");
 			if("multiple".equals(type)) {
