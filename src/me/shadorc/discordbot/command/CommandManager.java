@@ -167,6 +167,7 @@ public class CommandManager {
 			Stats.increment(context.getCommand());
 		} catch (MissingArgumentException err) {
 			command.showHelp(context);
+			Stats.increment("help_" + context.getCommand());
 		}
 	}
 
