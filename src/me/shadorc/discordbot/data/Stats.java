@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -15,6 +14,23 @@ public class Stats {
 
 	private static final File STATS_FILE = new File("stats.json");
 	private static final int INDENT_FACTOR = 2;
+
+	public enum Category {
+		UNKNOWN_COMMAND("unknown_command"),
+		HELP_COMMAND("help_command"),
+		COMMAND("command");
+
+		private final String key;
+
+		Category(String key) {
+			this.key = key;
+		}
+
+		@Override
+		public String toString() {
+			return key;
+		}
+	}
 
 	private static void init() {
 		FileWriter writer = null;
@@ -32,7 +48,7 @@ public class Stats {
 		}
 	}
 
-	public static synchronized void addUnknownCommand(String command) {
+	public static synchronized void increment(Category category, String key) {
 		if(!STATS_FILE.exists()) {
 			Stats.init();
 		}
@@ -40,34 +56,9 @@ public class Stats {
 		FileWriter writer = null;
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(STATS_FILE.toURI().toURL().openStream()));
-			JSONArray unknownCommandsArray = mainObj.has("unknown_commands") ? mainObj.getJSONArray("unknown_commands") : new JSONArray();
-			if(unknownCommandsArray.toString().contains(command)) {
-				return;
-			}
-
-			mainObj.append("unknown_commands", command);
-
-			writer = new FileWriter(STATS_FILE);
-			writer.write(mainObj.toString(INDENT_FACTOR));
-			writer.flush();
-
-		} catch (IOException err) {
-			LogUtils.error("Error while saving unknown command.", err);
-
-		} finally {
-			IOUtils.closeQuietly(writer);
-		}
-	}
-
-	public static synchronized void increment(String key) {
-		if(!STATS_FILE.exists()) {
-			Stats.init();
-		}
-
-		FileWriter writer = null;
-		try {
-			JSONObject mainObj = new JSONObject(new JSONTokener(STATS_FILE.toURI().toURL().openStream()));
-			mainObj.increment(key);
+			JSONObject categObj = mainObj.has(category.toString()) ? mainObj.getJSONObject(category.toString()) : new JSONObject();
+			categObj.increment(key);
+			mainObj.put(category.toString(), categObj);
 
 			writer = new FileWriter(STATS_FILE);
 			writer.write(mainObj.toString(INDENT_FACTOR));
