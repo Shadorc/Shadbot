@@ -69,8 +69,7 @@ public class AudioEventListener extends AudioEventAdapter {
 
 		String errMessage = Jsoup.parse(err.getMessage().replace("Watch on YouTube", "")).text().trim();
 		BotUtils.sendMessage(Emoji.GEAR + " " + errMessage + ". Sorry for the inconveniences, I'll try to play the next available song.", channel);
-		LogUtils.info("{AudioEventListener} {Guild: " + channel.getGuild().getName()
-				+ " (ID: " + channel.getGuild().getLongID() + ")} Track exception: " + errMessage);
+		LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + channel.getGuild().getLongID() + ")} Track exception: " + errMessage);
 
 		if(!scheduler.nextTrack()) {
 			GuildMusicManager.getGuildMusicManager(guild).end();
@@ -80,8 +79,7 @@ public class AudioEventListener extends AudioEventAdapter {
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
 		BotUtils.sendMessage(Emoji.GEAR + " Music seems stuck, I'll try to play the next available song.", channel);
-		LogUtils.warn("{AudioEventListener} {Guild: " + channel.getGuild().getName()
-				+ " (ID: " + channel.getGuild().getLongID() + ")} Music stuck, skipping it.");
+		LogUtils.warn("{" + this.getClass().getSimpleName() + "} {Guild ID: " + channel.getGuild().getLongID() + ")} Music stuck, skipping it.");
 
 		if(!scheduler.nextTrack()) {
 			GuildMusicManager.getGuildMusicManager(guild).end();

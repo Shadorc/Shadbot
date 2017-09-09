@@ -9,7 +9,6 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -29,7 +28,6 @@ public class CalcCmd extends AbstractCommand {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			BotUtils.sendMessage(context.getArg().replace('*', 'x') + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException err) {
-			LogUtils.info("{CalcCmd} {Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getLongID() + ")} Invalid expression: " + context.getArg() + ".");
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid expression.", context.getChannel());
 		}
 	}

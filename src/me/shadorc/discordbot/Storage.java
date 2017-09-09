@@ -147,9 +147,11 @@ public class Storage {
 			if(guildObj.has(setting.toString())) {
 				return guildObj.get(setting.toString());
 			}
+
 		} catch (IOException err) {
 			LogUtils.error("Error while reading data file.", err);
 		}
+
 		return null;
 	}
 
@@ -166,6 +168,7 @@ public class Storage {
 					return new Player(guild, user, guildObj.getJSONObject(user.getStringID()));
 				}
 			}
+
 		} catch (IOException err) {
 			LogUtils.error("Error while reading data file.", err);
 		}
@@ -179,9 +182,11 @@ public class Storage {
 			if(mainObj.has(key.toString())) {
 				return mainObj.getString(key.toString());
 			}
+
 		} catch (IOException err) {
 			LogUtils.error("Error while reading API keys file.", err);
 		}
+
 		return null;
 	}
 }

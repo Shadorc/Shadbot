@@ -34,8 +34,7 @@ public class BotUtils {
 		}
 
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES)) {
-			LogUtils.info("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getLongID() + ")} "
-					+ "Shadbot wasn't allowed to send message.");
+			LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + ")} Shadbot wasn't allowed to send message.");
 			return;
 		}
 
@@ -43,8 +42,7 @@ public class BotUtils {
 			try {
 				channel.sendMessage(message);
 			} catch (MissingPermissionsException err) {
-				LogUtils.error("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getLongID() + ")} "
-						+ "Missing permissions.", err);
+				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + ")} Missing permissions.", err);
 			} catch (DiscordException err) {
 				LogUtils.error("Discord exception while sending message: " + err.getErrorMessage(), err);
 			}
@@ -64,8 +62,7 @@ public class BotUtils {
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS)) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot send embed links due to the lack of permission."
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Send Embed links** is checked.", channel);
-			LogUtils.info("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getLongID() + ")} "
-					+ "Shadbot wasn't allowed to send embed link.");
+			LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + ")} Shadbot wasn't allowed to send embed link.");
 			return;
 		}
 
@@ -73,8 +70,7 @@ public class BotUtils {
 			try {
 				channel.sendMessage(embed);
 			} catch (MissingPermissionsException err) {
-				LogUtils.error("{Guild: " + channel.getGuild().getName() + " (ID: " + channel.getGuild().getLongID() + ")} "
-						+ "Missing permissions.", err);
+				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + ")} Missing permissions.", err);
 			} catch (DiscordException err) {
 				LogUtils.error("Discord exception while sending embed link: " + err.getErrorMessage(), err);
 			}

@@ -53,7 +53,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		if(musicManager.getScheduler().isPlaying()) {
-			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **"
+					+ StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
 		}
 		musicManager.getScheduler().queue(track);
 	}
@@ -62,7 +63,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	public void playlistLoaded(AudioPlaylist playlist) {
 		// SoundCloud send empty playlist when no result are found
 		if(playlist.getTracks().isEmpty()) {
-			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \""
+					+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
 			return;
 		}
 
@@ -71,7 +73,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
 
 			if(MessageManager.isWaitingForMessage(musicManager.getChannel())) {
-				BotUtils.sendMessage(Emoji.HOURGLASS + " Someone is already selecting a music, please wait for him to finish.", musicManager.getChannel());
+				BotUtils.sendMessage(Emoji.HOURGLASS + " Someone is already selecting a music,"
+						+ " please wait for him to finish.", musicManager.getChannel());
 				return;
 			}
 
@@ -81,7 +84,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 
 			EmbedBuilder embed = Utils.getDefaultEmbed()
-					.withAuthorName("Results (Use " + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel to cancel the selection)")
+					.withAuthorName("Results (Use " + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel "
+							+ "to cancel the selection)")
 					.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 					.appendDescription("**Select a music by typing the corresponding number.**"
 							+ "\nYou can choose several musics by separating them with a comma."
@@ -107,14 +111,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		for(int i = 0; i < Math.min(200, tracks.size()); i++) {
 			musicManager.getScheduler().queue(tracks.get(i));
 		}
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size() + " musics have been added to the playlist.", musicManager.getChannel());
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
+				+ " musics have been added to the playlist.", musicManager.getChannel());
 	}
 
 	@Override
 	public void noMatches() {
-		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
-		LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
-				+ " (ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
+		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \""
+				+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+		LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
 				+ "No matches: " + identifier);
 
 		if(musicManager.getScheduler().isStopped()) {
@@ -126,13 +131,12 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	public void loadFailed(FriendlyException err) {
 		String errMessage = Jsoup.parse(err.getMessage().replace("Watch on YouTube", "")).text().trim();
 		if(err.severity.equals(FriendlyException.Severity.FAULT)) {
-			LogUtils.warn("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
-					+ " (ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
+			LogUtils.warn("{" + this.getClass().getSimpleName() + "} {Guild ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
 					+ "Load failed, Shadbot might be able to continue playing: " + errMessage);
 		} else {
 			BotUtils.sendMessage(Emoji.GEAR + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
-			LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
-					+ " (ID: " + musicManager.getChannel().getGuild().getLongID() + ")} Load failed: " + errMessage);
+			LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
+					+ "Load failed: " + errMessage);
 		}
 
 		if(musicManager.getScheduler().isStopped()) {
@@ -182,7 +186,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		for(int choice : choices) {
 			AudioTrack track = resultsTracks.get(choice - 1);
 			if(musicManager.getScheduler().isPlaying()) {
-				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
+				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo())
+						+ "** has been added to the playlist.", musicManager.getChannel());
 			}
 			musicManager.getScheduler().queue(track);
 		}
@@ -201,7 +206,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		BotUtils.sendMessage(Emoji.EXCLAMATION + " \"" + choice + "\" is not a valid number. "
 				+ "You can use " + prefix + "cancel to cancel the selection.",
 				musicManager.getChannel());
-		LogUtils.info("{AudioLoadResultListener} {Guild: " + musicManager.getChannel().getGuild().getName()
-				+ " (ID: " + musicManager.getChannel().getGuild().getLongID() + ")} Invalid choice: " + message.getContent());
+		LogUtils.info("{" + this.getClass().getSimpleName() + "} {Guild ID: " + musicManager.getChannel().getGuild().getLongID() + ")} "
+				+ "Invalid choice: " + message.getContent());
 	}
 }

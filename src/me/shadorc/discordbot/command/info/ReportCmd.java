@@ -35,7 +35,7 @@ public class ReportCmd extends AbstractCommand {
 			return;
 		}
 
-		BotUtils.sendMessage("{Guild: " + context.getGuild().getName() + " (ID: " + context.getGuild().getLongID() + ")} "
+		BotUtils.sendMessage("{Guild ID: " + context.getGuild().getLongID() + ")} "
 				+ context.getAuthorName() + " (ID: " + context.getAuthor().getLongID() + ") say: " + context.getArg(),
 				Shadbot.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID));
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " Report sent, thank you !", context.getChannel());
