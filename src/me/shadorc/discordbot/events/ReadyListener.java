@@ -20,6 +20,7 @@ public class ReadyListener {
 		Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
 		Shadbot.getClient().getDispatcher().registerListener(new GuildListener());
 		Shadbot.getClient().getDispatcher().registerListener(new MessageListener());
+		Shadbot.getClient().getDispatcher().registerListener(new ChannelListener());
 		Shadbot.getClient().getDispatcher().registerListener(new VoiceChannelListener());
 
 		// Update Shadbot stats every 3 hours
