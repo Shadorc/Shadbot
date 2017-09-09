@@ -86,7 +86,7 @@ public class BotUtils {
 		JSONArray channelsArray = (JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS);
 
 		// If no permissions were defined, authorize all the channels by default.
-		if(channelsArray == null) {
+		if(channelsArray.length() == 0) {
 			return true;
 		}
 

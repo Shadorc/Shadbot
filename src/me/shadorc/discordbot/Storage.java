@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -72,6 +73,7 @@ public class Storage {
 
 	private static JSONObject getNewGuildObject() {
 		JSONObject guildObj = new JSONObject();
+		guildObj.put(Setting.ALLOWED_CHANNELS.toString(), new JSONArray());
 		guildObj.put(Setting.PREFIX.toString(), Config.DEFAULT_PREFIX);
 		guildObj.put(Setting.DEFAULT_VOLUME.toString(), Config.DEFAULT_VOLUME);
 		return guildObj;
@@ -89,6 +91,7 @@ public class Storage {
 			String guildID = guild.getStringID();
 			JSONObject guildObj = mainObj.has(guildID) ? mainObj.getJSONObject(guildID) : Storage.getNewGuildObject();
 			guildObj.put(setting.toString(), value);
+			mainObj.put(guildID, guildObj);
 
 			writer = new FileWriter(DATA_FILE);
 			writer.write(mainObj.toString(INDENT_FACTOR));
@@ -114,6 +117,7 @@ public class Storage {
 			String guildID = player.getGuild().getStringID();
 			JSONObject guildObj = mainObj.has(guildID) ? mainObj.getJSONObject(guildID) : Storage.getNewGuildObject();
 			guildObj.put(player.getUser().getStringID(), player.toJSON());
+			mainObj.put(guildID, guildObj);
 
 			writer = new FileWriter(DATA_FILE);
 			writer.write(mainObj.toString(INDENT_FACTOR));

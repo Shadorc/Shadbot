@@ -60,10 +60,6 @@ public class SettingsCmd extends AbstractCommand {
 			}
 
 			JSONArray allowedChannelsArray = (JSONArray) Storage.getSetting(context.getGuild(), Setting.ALLOWED_CHANNELS);
-			if(allowedChannelsArray == null) {
-				allowedChannelsArray = new JSONArray();
-			}
-
 			for(IChannel channel : mentionedChannels) {
 				allowedChannelsArray.put(channel.getStringID());
 			}
