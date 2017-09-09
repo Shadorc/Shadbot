@@ -72,7 +72,7 @@ public class ChatCmd extends AbstractCommand {
 
 		try {
 			CleverBotQuery bot = new CleverBotQuery(API_KEY, context.getArg());
-			bot.setConversationID(CHANNELS_CONV_ID.get(context.getChannel()) == null ? "" : CHANNELS_CONV_ID.get(context.getChannel()));
+			bot.setConversationID(CHANNELS_CONV_ID.getOrDefault(context.getChannel(), ""));
 			bot.sendRequest();
 			CHANNELS_CONV_ID.put(context.getChannel(), bot.getConversationID());
 			BotUtils.sendMessage(Emoji.SPEECH + " " + bot.getResponse(), context.getChannel());
