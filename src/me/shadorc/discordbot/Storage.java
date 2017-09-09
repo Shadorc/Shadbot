@@ -14,6 +14,8 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class Storage {
 
+	private static final int INDENT_FACTOR = 2;
+
 	private static final File API_KEYS_FILE = new File("api_keys.json");
 	private static final File DATA_FILE = new File("data.json");
 
@@ -57,7 +59,7 @@ public class Storage {
 		try {
 			DATA_FILE.createNewFile();
 			writer = new FileWriter(DATA_FILE);
-			writer.write(new JSONObject().toString());
+			writer.write(new JSONObject().toString(INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
@@ -84,15 +86,12 @@ public class Storage {
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 
-			if(!mainObj.has(guild.getStringID())) {
-				mainObj.put(guild.getStringID(), Storage.getNewGuildObject());
-			}
-
-			JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
+			String guildID = guild.getStringID();
+			JSONObject guildObj = mainObj.has(guildID) ? mainObj.getJSONObject(guildID) : Storage.getNewGuildObject();
 			guildObj.put(setting.toString(), value);
 
 			writer = new FileWriter(DATA_FILE);
-			writer.write(mainObj.toString(2));
+			writer.write(mainObj.toString(INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
@@ -112,19 +111,16 @@ public class Storage {
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 
-			if(!mainObj.has(player.getGuild().getStringID())) {
-				mainObj.put(player.getGuild().getStringID(), Storage.getNewGuildObject());
-			}
-
-			JSONObject guildObj = mainObj.getJSONObject(player.getGuild().getStringID());
+			String guildID = player.getGuild().getStringID();
+			JSONObject guildObj = mainObj.has(guildID) ? mainObj.getJSONObject(guildID) : Storage.getNewGuildObject();
 			guildObj.put(player.getUser().getStringID(), player.toJSON());
 
 			writer = new FileWriter(DATA_FILE);
-			writer.write(mainObj.toString(2));
+			writer.write(mainObj.toString(INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
-			LogUtils.error("Error while saving user.", err);
+			LogUtils.error("Error while saving player.", err);
 
 		} finally {
 			IOUtils.closeQuietly(writer);
@@ -139,14 +135,10 @@ public class Storage {
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
 
-			if(!mainObj.has(guild.getStringID())) {
-				mainObj.put(guild.getStringID(), Storage.getNewGuildObject());
-			}
+			String guildID = guild.getStringID();
+			JSONObject guildObj = mainObj.has(guildID) ? mainObj.getJSONObject(guildID) : Storage.getNewGuildObject();
 
-			JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
-			if(guildObj.has(setting.toString())) {
-				return guildObj.get(setting.toString());
-			}
+			return guildObj.opt(setting.toString());
 
 		} catch (IOException err) {
 			LogUtils.error("Error while reading data file.", err);
@@ -179,9 +171,7 @@ public class Storage {
 	public static synchronized String getApiKey(ApiKeys key) {
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(API_KEYS_FILE.toURI().toURL().openStream()));
-			if(mainObj.has(key.toString())) {
-				return mainObj.getString(key.toString());
-			}
+			return mainObj.optString(key.toString());
 
 		} catch (IOException err) {
 			LogUtils.error("Error while reading API keys file.", err);
