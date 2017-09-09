@@ -268,7 +268,7 @@ public class PollCmd extends AbstractCommand {
 				} catch (MissingPermissionsException err) {
 					LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + ")} Missing permissions.", err);
 				} catch (DiscordException err) {
-					LogUtils.error("Discord exception while sending embed link: " + err.getErrorMessage(), err);
+					LogUtils.error("Discord exception while sending embed link.", err);
 				}
 			});
 		}
