@@ -59,15 +59,36 @@ public class SettingsCmd extends AbstractCommand {
 				throw new MissingArgumentException();
 			}
 
-			JSONArray allowedChannelsArray = (JSONArray) Storage.getSetting(context.getGuild(), Setting.ALLOWED_CHANNELS);
-			for(IChannel channel : mentionedChannels) {
-				allowedChannelsArray.put(channel.getLongID());
+			JSONArray allowedChannels = (JSONArray) Storage.getSetting(context.getGuild(), Setting.ALLOWED_CHANNELS);
+
+			if(args[1].startsWith("remove")) {
+				List<Long> newAllowedChannels = Utils.convertToLongList(allowedChannels);
+				for(IChannel channel : mentionedChannels) {
+					newAllowedChannels.remove(channel.getLongID());
+				}
+				allowedChannels = new JSONArray(newAllowedChannels);
+
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel "
+						+ StringUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
+						+ " has been removed from allowed channels.", context.getChannel());
+
+			} else {
+				if(allowedChannels.length() == 0
+						&& mentionedChannels.stream().filter(channel -> channel.getLongID() == context.getChannel().getLongID()).count() == 0) {
+					BotUtils.sendMessage(Emoji.WARNING + " You did not mentioned this channel. "
+							+ "I will not reply until it's added to the list of allowed channels.", context.getChannel());
+				}
+
+				for(IChannel channel : mentionedChannels) {
+					allowedChannels.put(channel.getLongID());
+				}
+
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel "
+						+ StringUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
+						+ " has been added to allowed channels.", context.getChannel());
 			}
 
-			Storage.saveSetting(context.getGuild(), Setting.ALLOWED_CHANNELS, allowedChannelsArray);
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel(s) "
-					+ StringUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
-					+ " have been added to the list of allowed channels.", context.getChannel());
+			Storage.saveSetting(context.getGuild(), Setting.ALLOWED_CHANNELS, allowedChannels);
 
 		} else if(Setting.DEFAULT_VOLUME.toString().equals(name)) {
 			if(args.length != 2) {
@@ -99,14 +120,15 @@ public class SettingsCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.withThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
 				.appendDescription("**Change Shadbot's server settings.**")
+				.appendField("Name: " + Setting.ALLOWED_CHANNELS.toString(),
+						"**Description:** Allow Shadbot to only post messages in the mentioned channels. By default all channels are allowed."
+								+ "\nYou can also remove allowed channel(s) by specifying 'remove'."
+								+ "\n**arg:** #channel(s)"
+								+ "\n**Example:** " + context.getPrefix() + "settings " + Setting.ALLOWED_CHANNELS.toString() + " [remove] #general", false)
 				.appendField("Name: " + Setting.PREFIX.toString(),
 						"**Description:** Change Shadbot's prefix."
 								+ "\n**arg:** prefix (Max length: 5, must not contain spaces)"
 								+ "\n**Example:** " + context.getPrefix() + "settings " + Setting.PREFIX.toString() + " !", false)
-				.appendField("Name: " + Setting.ALLOWED_CHANNELS.toString(),
-						"**Description:** Allow Shadbot to only post messages in the mentioned channels. By default all channels are allowed."
-								+ "\n**arg:** #channel(s)"
-								+ "\n**Example:** " + context.getPrefix() + "settings " + Setting.ALLOWED_CHANNELS.toString() + " #general", false)
 				.appendField("Name: " + Setting.DEFAULT_VOLUME.toString(),
 						"**Description:** Change music default volume."
 								+ "\n**arg:** volume (Min: 1/Max: 50/Default: " + Config.DEFAULT_VOLUME + ")"

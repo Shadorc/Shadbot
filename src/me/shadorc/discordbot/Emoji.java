@@ -9,6 +9,7 @@ public enum Emoji {
 	INFO(":information_source:"),
 	MAGNIFYING_GLASS(":mag:"),
 	STOPWATCH(":stopwatch:"),
+	WARNING(":warning:"),
 	GEAR(":gear:"),
 
 	MONEY_WINGS(":money_with_wings:"),
