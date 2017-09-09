@@ -14,10 +14,12 @@ import me.shadorc.discordbot.events.ShardListener;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
+import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class BotUtils {
 
@@ -26,10 +28,10 @@ public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			List<String> messageList = MESSAGE_QUEUE.get(channel) == null ? new ArrayList<>() : MESSAGE_QUEUE.get(channel);
+			List<String> messageList = MESSAGE_QUEUE.getOrDefault(channel, new ArrayList<>());
 			messageList.add(message);
 			MESSAGE_QUEUE.put(channel, messageList);
-			LogUtils.info("Shard isn't ready, message added to the queue.");
+			LogUtils.info("Shard isn't ready, message added to queue.");
 			return;
 		}
 
@@ -50,30 +52,31 @@ public class BotUtils {
 	}
 
 	// EmbedBuilder doc: https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
-	public static void sendEmbed(EmbedObject embed, IChannel channel) {
+	public static RequestFuture<IMessage> sendEmbed(EmbedObject embed, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			List<EmbedObject> embedList = EMBED_QUEUE.get(channel) == null ? new ArrayList<>() : EMBED_QUEUE.get(channel);
+			List<EmbedObject> embedList = EMBED_QUEUE.getOrDefault(channel, new ArrayList<>());
 			embedList.add(embed);
 			EMBED_QUEUE.put(channel, embedList);
-			LogUtils.info("Shard isn't ready, embed link added to the queue.");
-			return;
+			LogUtils.info("Shard isn't ready, embed link added to queue.");
+			return null;
 		}
 
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS)) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot send embed links due to the lack of permission."
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Send Embed links** is checked.", channel);
 			LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + ")} Shadbot wasn't allowed to send embed link.");
-			return;
+			return null;
 		}
 
-		RequestBuffer.request(() -> {
+		return RequestBuffer.request(() -> {
 			try {
-				channel.sendMessage(embed);
+				return channel.sendMessage(embed);
 			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + ")} Missing permissions.", err);
 			} catch (DiscordException err) {
 				LogUtils.error("Discord exception while sending embed link.", err);
 			}
+			return null;
 		});
 	}
 

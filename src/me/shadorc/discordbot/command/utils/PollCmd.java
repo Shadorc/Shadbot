@@ -18,20 +18,14 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.data.Storage.Setting;
-import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RequestBuffer;
 
 public class PollCmd extends AbstractCommand {
 
@@ -238,7 +232,8 @@ public class PollCmd extends AbstractCommand {
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
 					.withFooterText(timer.isRunning() ? ("Time left: " + StringUtils.formatDuration(remainingTime)) : "Finished");
-			this.sendPoll(embed.build());
+
+			message = BotUtils.sendEmbed(embed.build(), channel).get();
 		}
 
 		protected IUser getCreator() {
@@ -247,30 +242,6 @@ public class PollCmd extends AbstractCommand {
 
 		protected int getNumChoices() {
 			return new ArrayList<String>(choicesMap.keySet()).size();
-		}
-
-		// FIXME: Use BotUtils and not this ugly hack
-		private void sendPoll(EmbedObject embed) {
-			if(!ShardListener.isShardConnected(channel.getShard())) {
-				return;
-			}
-
-			if(!BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS)) {
-				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot send embed links due to the lack of permission."
-						+ "\nPlease, check my permissions and channel-specific ones to verify that **Send Embed links** is checked.", channel);
-				LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + ")} Shadbot wasn't allowed to send embed link.");
-				return;
-			}
-
-			RequestBuffer.request(() -> {
-				try {
-					message = channel.sendMessage(embed);
-				} catch (MissingPermissionsException err) {
-					LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + ")} Missing permissions.", err);
-				} catch (DiscordException err) {
-					LogUtils.error("Discord exception while sending embed link.", err);
-				}
-			});
 		}
 	}
 }
