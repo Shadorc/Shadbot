@@ -53,6 +53,7 @@ import me.shadorc.discordbot.command.utils.TranslateCmd;
 import me.shadorc.discordbot.command.utils.UrbanCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
 import me.shadorc.discordbot.command.utils.WikiCmd;
+import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -145,7 +146,7 @@ public class CommandManager {
 		}
 
 		if(!commandsMap.containsKey(context.getCommand())) {
-			LogUtils.info("{Guild ID: " + context.getGuild().getLongID() + ")} Command not found: \"" + context.getCommand() + "\".");
+			Stats.addUnknownCommand(context.getCommand());
 			return;
 		}
 
@@ -163,6 +164,7 @@ public class CommandManager {
 
 		try {
 			command.execute(context);
+			Stats.increment(context.getCommand());
 		} catch (MissingArgumentException err) {
 			command.showHelp(context);
 		}
