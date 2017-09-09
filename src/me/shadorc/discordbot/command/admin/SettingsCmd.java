@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.json.JSONArray;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.Setting;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.data.Config;
+import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;

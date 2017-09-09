@@ -2,7 +2,8 @@ package me.shadorc.discordbot;
 
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
-import me.shadorc.discordbot.Config.APIKey;
+import me.shadorc.discordbot.data.Config;
+import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.events.ReadyListener;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;

@@ -13,8 +13,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.Setting;
+import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.music.GuildMusicManager;

@@ -3,7 +3,7 @@ package me.shadorc.discordbot.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.shadorc.discordbot.Config;
+import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.api.IShard;

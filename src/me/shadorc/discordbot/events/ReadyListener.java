@@ -13,9 +13,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.Storage.Setting;
+import me.shadorc.discordbot.data.Config;
+import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;

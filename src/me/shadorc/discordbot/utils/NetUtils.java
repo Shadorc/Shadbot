@@ -12,9 +12,9 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import me.shadorc.discordbot.Config;
-import me.shadorc.discordbot.Config.APIKey;
 import me.shadorc.discordbot.Shadbot;
+import me.shadorc.discordbot.data.Config;
+import me.shadorc.discordbot.data.Config.APIKey;
 
 public class NetUtils {
 

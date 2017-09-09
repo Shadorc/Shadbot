@@ -1,4 +1,4 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.data;
 
 import java.awt.Color;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import me.shadorc.discordbot.Version;
 import me.shadorc.discordbot.utils.LogUtils;
 
 public class Config {

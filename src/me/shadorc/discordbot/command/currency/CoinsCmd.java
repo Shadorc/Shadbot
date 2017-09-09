@@ -2,9 +2,9 @@ package me.shadorc.discordbot.command.currency;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.Storage;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IUser;

@@ -9,8 +9,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.Setting;
+import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.obj.IGuild;
 

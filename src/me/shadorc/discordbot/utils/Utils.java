@@ -26,10 +26,10 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import me.shadorc.discordbot.Config;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.data.Config;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class Utils {

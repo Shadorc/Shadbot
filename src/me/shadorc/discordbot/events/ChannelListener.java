@@ -2,8 +2,8 @@ package me.shadorc.discordbot.events;
 
 import org.json.JSONArray;
 
-import me.shadorc.discordbot.Storage;
-import me.shadorc.discordbot.Storage.Setting;
+import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.Storage.Setting;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.ChannelDeleteEvent;
 
