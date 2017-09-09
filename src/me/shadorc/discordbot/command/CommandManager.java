@@ -122,7 +122,7 @@ public class CommandManager {
 				// Admin Commands
 				new SettingsCmd(),
 				new PruneCmd(),
-				// Author Commands
+				// Owner Commands
 				new ShutdownCmd());
 	}
 
@@ -145,12 +145,12 @@ public class CommandManager {
 			return;
 		}
 
-		if(!commandsMap.containsKey(context.getCommand())) {
+		AbstractCommand command = commandsMap.get(context.getCommand());
+
+		if(command == null) {
 			Stats.addUnknownCommand(context.getCommand());
 			return;
 		}
-
-		AbstractCommand command = commandsMap.get(context.getCommand());
 
 		Role authorRole = context.getAuthorRole();
 		if(command.getRole().equals(Role.OWNER) && !authorRole.equals(Role.OWNER)) {
@@ -172,7 +172,7 @@ public class CommandManager {
 	}
 
 	public AbstractCommand getCommand(String name) {
-		return commandsMap.containsKey(name) ? commandsMap.get(name) : null;
+		return commandsMap.get(name);
 	}
 
 	public static CommandManager getInstance() {

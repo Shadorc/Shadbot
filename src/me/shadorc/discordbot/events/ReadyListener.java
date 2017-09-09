@@ -67,7 +67,7 @@ public class ReadyListener {
 
 			for(int guildIndex = 0; guildIndex < cleanedMainObj.names().length(); guildIndex++) {
 				String guildID = cleanedMainObj.names().getString(guildIndex);
-				JSONObject guildObj = (JSONObject) cleanedMainObj.getJSONObject(guildID);
+				JSONObject guildObj = cleanedMainObj.getJSONObject(guildID);
 
 				if(guildObj.has(Setting.ALLOWED_CHANNELS.toString())) {
 					try {
