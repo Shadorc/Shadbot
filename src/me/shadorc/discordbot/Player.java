@@ -40,7 +40,7 @@ public class Player {
 
 	public void addCoins(int gains) {
 		try {
-			this.coins = Math.addExact(coins, gains);
+			this.coins = Math.max(0, Math.addExact(coins, gains));
 		} catch (ArithmeticException err) {
 			this.coins = Integer.MAX_VALUE;
 			LogUtils.warn("User (ID: " + user.getLongID() + ") exceeded the maximum coins value.");

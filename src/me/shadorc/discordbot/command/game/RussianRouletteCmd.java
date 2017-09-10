@@ -64,7 +64,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 		int gains;
 		if(MathUtils.rand(6) == 0) {
-			gains = -Math.min(bet * LOSE_MULTIPLIER, context.getPlayer().getCoins());
+			gains = -bet * LOSE_MULTIPLIER;
 			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
 		} else {
 			gains = bet * WIN_MULTIPLIER;
