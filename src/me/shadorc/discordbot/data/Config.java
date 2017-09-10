@@ -12,7 +12,7 @@ import me.shadorc.discordbot.utils.LogUtils;
 
 public class Config {
 
-	public static final Version VERSION = new Version(1, 6, 1, false);
+	public static final Version VERSION = new Version(1, 6, 2, false);
 
 	public static final long DEBUG_CHANNEL_ID = 342074301840752640L;
 	public static final long SUGGEST_CHANNEL_ID = 345898633805430785L;
