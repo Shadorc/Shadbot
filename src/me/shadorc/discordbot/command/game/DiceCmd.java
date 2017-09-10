@@ -105,7 +105,8 @@ public class DiceCmd extends AbstractCommand {
 						+ "\n**Join a game:** " + context.getPrefix() + "dice <num>", false)
 				.appendField("Restrictions", "**num** - must be between 1 and 6"
 						+ "\nYou can't bet on a number that has already been chosen by another player.", false)
-				.appendField("Gains", "The winner gets " + MULTIPLIER + " times the common bet multiplied by the number of players.", false);
+				.appendField("Gains", "The winner gets the common bet multiplied by " + MULTIPLIER + " plus the number of players "
+						+ "(gains = bet * (" + MULTIPLIER + " + players).", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
@@ -165,7 +166,7 @@ public class DiceCmd extends AbstractCommand {
 
 			if(this.isBet(winningNum)) {
 				IUser winner = numsPlayers.get(winningNum);
-				int gains = bet * numsPlayers.size() * MULTIPLIER;
+				int gains = bet * (numsPlayers.size() + MULTIPLIER);
 				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win " + gains + " coins !", channel);
 				Storage.getPlayer(channel.getGuild(), winner).addCoins(gains);
 				numsPlayers.remove(winningNum);
