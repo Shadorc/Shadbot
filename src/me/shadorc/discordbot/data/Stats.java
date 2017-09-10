@@ -3,8 +3,10 @@ package me.shadorc.discordbot.data;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -12,6 +14,7 @@ import me.shadorc.discordbot.utils.LogUtils;
 
 public class Stats {
 
+	private static final ConcurrentHashMap<Category, JSONObject> STATS_MAP = new ConcurrentHashMap<>();
 	private static final File STATS_FILE = new File("stats.json");
 	private static final int INDENT_FACTOR = 2;
 
@@ -49,24 +52,43 @@ public class Stats {
 		}
 	}
 
-	public static synchronized void increment(Category category, String key) {
+	public static void increment(Category category, String key) {
+		if(!STATS_FILE.exists()) {
+			Stats.init();
+		}
+
+		if(STATS_MAP.isEmpty()) {
+			try {
+				JSONObject mainObj = new JSONObject(new JSONTokener(STATS_FILE.toURI().toURL().openStream()));
+				for(Category cat : Category.values()) {
+					STATS_MAP.put(cat, mainObj.has(cat.toString()) ? mainObj.getJSONObject(cat.toString()) : new JSONObject());
+				}
+			} catch (JSONException | IOException err) {
+				LogUtils.error("Error while initializing stats map.", err);
+			}
+		}
+
+		STATS_MAP.put(category, STATS_MAP.get(category).increment(key));
+	}
+
+	public static void save() {
 		if(!STATS_FILE.exists()) {
 			Stats.init();
 		}
 
 		FileWriter writer = null;
 		try {
-			JSONObject mainObj = new JSONObject(new JSONTokener(STATS_FILE.toURI().toURL().openStream()));
-			JSONObject categObj = mainObj.has(category.toString()) ? mainObj.getJSONObject(category.toString()) : new JSONObject();
-			categObj.increment(key);
-			mainObj.put(category.toString(), categObj);
+			JSONObject mainObj = new JSONObject();
+			for(Category cat : Category.values()) {
+				mainObj.put(cat.toString(), STATS_MAP.get(cat));
+			}
 
 			writer = new FileWriter(STATS_FILE);
 			writer.write(mainObj.toString(INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
-			LogUtils.error("Error while incrementing stat.", err);
+			LogUtils.error("Error while saving stats.", err);
 
 		} finally {
 			IOUtils.closeQuietly(writer);

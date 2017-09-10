@@ -1,12 +1,9 @@
 package me.shadorc.discordbot.events;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
+import me.shadorc.discordbot.SchedulerManager;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.LogUtils;
-import me.shadorc.discordbot.utils.NetUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 
@@ -17,21 +14,12 @@ public class ReadyListener {
 	public void onReadyEvent(ReadyEvent event) {
 		LogUtils.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
 
+		SchedulerManager.start();
+
 		Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
 		Shadbot.getClient().getDispatcher().registerListener(new GuildListener());
 		Shadbot.getClient().getDispatcher().registerListener(new MessageListener());
 		Shadbot.getClient().getDispatcher().registerListener(new ChannelListener());
 		Shadbot.getClient().getDispatcher().registerListener(new VoiceChannelListener());
-
-		// Update Shadbot stats every 3 hours
-		final int period = 1000 * 60 * 60 * 3;
-		Timer timer = new Timer();
-		TimerTask timerTask = new TimerTask() {
-			@Override
-			public void run() {
-				NetUtils.postStats();
-			}
-		};
-		timer.schedule(timerTask, 0, period);
 	}
 }

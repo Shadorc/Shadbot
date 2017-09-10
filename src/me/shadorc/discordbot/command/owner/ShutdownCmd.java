@@ -1,10 +1,11 @@
 package me.shadorc.discordbot.command.owner;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.SchedulerManager;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
@@ -47,22 +48,24 @@ public class ShutdownCmd extends AbstractCommand {
 			}
 		}
 
-		int time = Integer.parseInt(timeStr);
-		TimerTask task = new TimerTask() {
+		Runnable shutdownTask = new Runnable() {
 			@Override
 			public void run() {
 				Shadbot.getClient().logout();
+				SchedulerManager.forceExecution();
 			}
 		};
-		new Timer().schedule(task, time * 1000);
 
-		LogUtils.warn("Shadbot will restart in " + time + " seconds with the message: " + message);
+		int delay = Integer.parseInt(timeStr);
+		Executors.newSingleThreadScheduledExecutor().schedule(shutdownTask, delay, TimeUnit.SECONDS);
+
+		LogUtils.warn("Shadbot will restart in " + delay + " seconds. (Message: " + message + ")");
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Schedules a fixed amount of seconds the bot will wait to be shutted down and send a message to all guilds.**")
+				.appendDescription("**Schedule a shutdown after a fixed amount of seconds and send a message to all guilds playing musics.**")
 				.appendField("Usage", context.getPrefix() + "shutdown <seconds> <message>", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
