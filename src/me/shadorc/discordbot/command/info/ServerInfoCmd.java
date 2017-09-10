@@ -42,7 +42,7 @@ public class ServerInfoCmd extends AbstractCommand {
 				.appendField("Channels", Integer.toString(guild.getChannels().size()), true)
 				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
 				.appendField("Settings",
-						"**Prefix:** " + Storage.getSetting(guild, Setting.PREFIX)
+						"**Prefix:** " + context.getPrefix()
 								+ "\n**Default volume:** " + Storage.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
 								+ "\n**Allowed channels:** " + (allowedChannels.isEmpty() ? "All" : "\n"
 										+ StringUtils.formatList(

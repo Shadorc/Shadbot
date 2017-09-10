@@ -11,7 +11,6 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Storage;
-import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -63,7 +62,7 @@ public class DiceCmd extends AbstractCommand {
 
 			int num = Integer.parseInt(numStr);
 
-			diceManager = new DiceManager(context.getChannel(), context.getAuthor(), bet);
+			diceManager = new DiceManager(context, bet);
 			diceManager.addPlayer(context.getAuthor(), num);
 			diceManager.start();
 			CHANNELS_DICE.putIfAbsent(context.getChannel(), diceManager);
@@ -105,8 +104,8 @@ public class DiceCmd extends AbstractCommand {
 						+ "\n**Join a game:** " + context.getPrefix() + "dice <num>", false)
 				.appendField("Restrictions", "**num** - must be between 1 and 6"
 						+ "\nYou can't bet on a number that has already been chosen by another player.", false)
-				.appendField("Gains", "The winner gets the common bet multiplied by " + MULTIPLIER + " plus the number of players "
-						+ "(gains = bet * (" + MULTIPLIER + " + players).", false);
+				.appendField("Gains", "The winner gets the common bet multiplied by " + MULTIPLIER + " plus the number of players."
+						+ "\ngains = bet * (" + MULTIPLIER + " + players)", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
@@ -115,14 +114,12 @@ public class DiceCmd extends AbstractCommand {
 		private static final int GAME_DURATION = 30;
 
 		private final Map<Integer, IUser> numsPlayers;
-		private final IChannel channel;
-		private final IUser croupier;
+		private final Context context;
 		private final Timer timer;
 		private final int bet;
 
-		protected DiceManager(IChannel channel, IUser croupier, int bet) {
-			this.channel = channel;
-			this.croupier = croupier;
+		protected DiceManager(Context context, int bet) {
+			this.context = context;
 			this.bet = bet;
 			this.numsPlayers = new HashMap<>();
 			this.timer = new Timer(GAME_DURATION * 1000, event -> {
@@ -150,10 +147,10 @@ public class DiceCmd extends AbstractCommand {
 			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Dice Game")
 					.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
-					.appendField(croupier.getName() + " started a dice game.",
-							"Use `" + Storage.getSetting(channel.getGuild(), Setting.PREFIX) + "dice <num>` to join the game with a **" + bet + " coins** putting.", false)
+					.appendField(context.getAuthor().getName() + " started a dice game.",
+							"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + bet + " coins** putting.", false)
 					.withFooterText("You have " + (timer.getDelay() / 1000) + " seconds to make your bets.");
-			BotUtils.sendEmbed(builder.build(), channel);
+			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 			timer.start();
 		}
@@ -162,27 +159,27 @@ public class DiceCmd extends AbstractCommand {
 			timer.stop();
 
 			int winningNum = MathUtils.rand(1, 6);
-			BotUtils.sendMessage(Emoji.DICE + " The dice is rolling... **" + winningNum + "** !", channel);
+			BotUtils.sendMessage(Emoji.DICE + " The dice is rolling... **" + winningNum + "** !", context.getChannel());
 
 			if(this.isBet(winningNum)) {
 				IUser winner = numsPlayers.get(winningNum);
 				int gains = bet * (numsPlayers.size() + MULTIPLIER);
-				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win " + gains + " coins !", channel);
-				Storage.getPlayer(channel.getGuild(), winner).addCoins(gains);
+				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win " + gains + " coins !", context.getChannel());
+				Storage.getPlayer(context.getGuild(), winner).addCoins(gains);
 				numsPlayers.remove(winningNum);
 			}
 
 			if(!numsPlayers.isEmpty()) {
 				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
 				for(int num : numsPlayers.keySet()) {
-					Storage.getPlayer(channel.getGuild(), numsPlayers.get(num)).addCoins(-bet);
+					Storage.getPlayer(context.getGuild(), numsPlayers.get(num)).addCoins(-bet);
 					strBuilder.append(numsPlayers.get(num).mention() + ", ");
 				}
 				strBuilder.append("you have lost " + bet + " coin(s).");
-				BotUtils.sendMessage(strBuilder.toString(), channel);
+				BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 			}
 
-			CHANNELS_DICE.remove(channel);
+			CHANNELS_DICE.remove(context.getChannel());
 		}
 	}
 }

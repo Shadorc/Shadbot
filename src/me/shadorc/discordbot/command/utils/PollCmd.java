@@ -16,8 +16,6 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.data.Storage;
-import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -100,7 +98,7 @@ public class PollCmd extends AbstractCommand {
 				return;
 			}
 
-			pollManager = new PollManager(context.getChannel(), context.getAuthor(), duration, question, choicesList);
+			pollManager = new PollManager(context, duration, question, choicesList);
 			pollManager.start();
 			CHANNELS_POLL.putIfAbsent(context.getChannel(), pollManager);
 			return;
@@ -152,18 +150,16 @@ public class PollCmd extends AbstractCommand {
 
 	protected class PollManager {
 
-		private final IChannel channel;
-		private final IUser creator;
-		private final String question;
 		private final Map<String, List<IUser>> choicesMap;
+		private final Context context;
+		private final String question;
 		private final Timer timer;
 
 		private IMessage message;
 		private long startTime;
 
-		protected PollManager(IChannel channel, IUser creator, int duration, String question, List<String> choicesList) {
-			this.channel = channel;
-			this.creator = creator;
+		protected PollManager(Context context, int duration, String question, List<String> choicesList) {
+			this.context = context;
 			this.question = question;
 			this.choicesMap = new LinkedHashMap<String, List<IUser>>();
 			for(String choice : choicesList) {
@@ -198,11 +194,11 @@ public class PollCmd extends AbstractCommand {
 		protected void stop() {
 			timer.stop();
 			this.show();
-			CHANNELS_POLL.remove(channel);
+			CHANNELS_POLL.remove(context.getChannel());
 		}
 
 		protected void show() {
-			if(message != null && BotUtils.hasPermission(channel, Permissions.MANAGE_MESSAGES)) {
+			if(message != null && BotUtils.hasPermission(context.getChannel(), Permissions.MANAGE_MESSAGES)) {
 				message.delete();
 			}
 
@@ -225,19 +221,19 @@ public class PollCmd extends AbstractCommand {
 
 			long remainingTime = (timer.getDelay() - (System.currentTimeMillis() - startTime));
 			EmbedBuilder embed = Utils.getDefaultEmbed()
-					.withAuthorName("Poll (Created by: " + creator.getName() + ")")
-					.withThumbnail(creator.getAvatarURL())
-					.appendDescription("Vote using: " + Storage.getSetting(channel.getGuild(), Setting.PREFIX) + "poll <choice>"
+					.withAuthorName("Poll (Created by: " + context.getAuthor().getName() + ")")
+					.withThumbnail(context.getAuthor().getAvatarURL())
+					.appendDescription("Vote using: " + context.getPrefix() + "poll <choice>"
 							+ "\n\n__" + question + "__"
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
 					.withFooterText(timer.isRunning() ? ("Time left: " + StringUtils.formatDuration(remainingTime)) : "Finished");
 
-			message = BotUtils.sendEmbed(embed.build(), channel).get();
+			message = BotUtils.sendEmbed(embed.build(), context.getChannel()).get();
 		}
 
 		protected IUser getCreator() {
-			return creator;
+			return context.getAuthor();
 		}
 
 		protected int getNumChoices() {
