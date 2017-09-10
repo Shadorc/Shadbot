@@ -56,7 +56,7 @@ public class DiceCmd extends AbstractCommand {
 			}
 
 			String numStr = splitArgs[1];
-			if(!DiceCmd.isValidDiceNum(numStr)) {
+			if(!StringUtils.isValidDiceNum(numStr)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 				return;
 			}
@@ -80,7 +80,7 @@ public class DiceCmd extends AbstractCommand {
 			}
 
 			String numStr = context.getArg();
-			if(!DiceCmd.isValidDiceNum(numStr)) {
+			if(!StringUtils.isValidDiceNum(numStr)) {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 				return;
 			}
@@ -95,14 +95,6 @@ public class DiceCmd extends AbstractCommand {
 			diceManager.addPlayer(context.getAuthor(), num);
 			BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " bet on " + num + ".", context.getChannel());
 		}
-	}
-
-	private static boolean isValidDiceNum(String str) {
-		if(StringUtils.isPositiveInt(str)) {
-			int num = Integer.parseInt(str);
-			return num >= 1 && num <= 6;
-		}
-		return false;
 	}
 
 	@Override

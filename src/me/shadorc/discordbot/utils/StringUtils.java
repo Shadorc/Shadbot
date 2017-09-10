@@ -30,6 +30,20 @@ public class StringUtils {
 		return StringEscapeUtils.unescapeHtml3(text);
 	}
 
+	/**
+	 * @param list - the list to format
+	 * @param mapper - a non-interfering, stateless function to apply to each element
+	 * @param delimiter - the delimiter to be used between each element
+	 * @return formatted list
+	 */
+	public static <T> String formatList(List<T> list, Function<T, String> mapper, String delimiter) {
+		return list.stream().map(mapper).collect(Collectors.joining(delimiter)).toString();
+	}
+
+	/**
+	 * @param info - the info from the audio track to format
+	 * @return formatted name
+	 */
 	public static String formatTrackName(AudioTrackInfo info) {
 		StringBuilder strBuilder = new StringBuilder();
 		if("Unknown artist".equals(info.author)) {
@@ -80,13 +94,16 @@ public class StringUtils {
 	}
 
 	/**
-	 * @param list - the list to format
-	 * @param mapper - a non-interfering, stateless function to apply to each element
-	 * @param delimiter - the delimiter to be used between each element
-	 * @return formatted list
+	 * @param str - the String to check
+	 * @return true if it can be cast to a number between 1 and 6
 	 */
-	public static <T> String formatList(List<T> list, Function<T, String> mapper, String delimiter) {
-		return list.stream().map(mapper).collect(Collectors.joining(delimiter)).toString();
+	public static boolean isValidDiceNum(String str) {
+		try {
+			int num = Integer.parseInt(str);
+			return num >= 1 && num <= 6;
+		} catch (NumberFormatException err) {
+			return false;
+		}
 	}
 
 	/**
@@ -103,8 +120,8 @@ public class StringUtils {
 	}
 
 	/**
-	 * @param str - String to check
-	 * @param charac - Char to count
+	 * @param str - the String to check
+	 * @param charac - the Char to count
 	 * @return Number of characters occurrences in str
 	 */
 	public static int getCharCount(String str, char charac) {
