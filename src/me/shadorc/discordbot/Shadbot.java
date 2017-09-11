@@ -4,6 +4,8 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
+import me.shadorc.discordbot.data.Stats;
+import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.events.ReadyListener;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -15,6 +17,10 @@ public class Shadbot {
 	private static IDiscordClient client;
 
 	public static void main(String[] args) {
+		Storage.init();
+		Config.load();
+		Stats.init();
+
 		client = new ClientBuilder()
 				.withToken(Config.get(APIKey.DISCORD_TOKEN))
 				.setMaxMessageCacheCount(250)

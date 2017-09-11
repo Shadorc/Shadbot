@@ -3,8 +3,6 @@ package me.shadorc.discordbot.events;
 import me.shadorc.discordbot.SchedulerManager;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.data.Stats;
-import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
@@ -16,9 +14,6 @@ public class ReadyListener {
 	public void onReadyEvent(ReadyEvent event) {
 		LogUtils.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
 
-		Config.load();
-		Stats.init();
-		Storage.init();
 		SchedulerManager.start();
 
 		Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
