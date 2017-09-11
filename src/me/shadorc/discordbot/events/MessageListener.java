@@ -17,6 +17,11 @@ public class MessageListener {
 
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
+		if(Config.VERSION.isBeta() && event.getChannel().getLongID() != Config.DEBUG_CHANNEL_ID
+				|| !Config.VERSION.isBeta() && event.getChannel().getLongID() == Config.DEBUG_CHANNEL_ID) {
+			return;
+		}
+
 		if(event.getAuthor().isBot()) {
 			return;
 		}
@@ -27,8 +32,7 @@ public class MessageListener {
 			return;
 		}
 
-		if(Config.VERSION.isBeta() && event.getChannel().getLongID() != Config.DEBUG_CHANNEL_ID
-				|| !Config.VERSION.isBeta() && event.getChannel().getLongID() == Config.DEBUG_CHANNEL_ID) {
+		if(!BotUtils.isChannelAllowed(event.getGuild(), event.getChannel())) {
 			return;
 		}
 

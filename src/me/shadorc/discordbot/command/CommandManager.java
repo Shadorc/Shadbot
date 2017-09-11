@@ -141,11 +141,6 @@ public class CommandManager {
 
 	public void manage(MessageReceivedEvent event) {
 		Context context = new Context(event);
-
-		if(!BotUtils.isChannelAllowed(context.getGuild(), context.getChannel())) {
-			return;
-		}
-
 		AbstractCommand command = commandsMap.get(context.getCommand());
 
 		if(command == null) {
