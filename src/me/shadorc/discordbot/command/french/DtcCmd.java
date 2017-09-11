@@ -41,7 +41,7 @@ public class DtcCmd extends AbstractCommand {
 
 		try {
 			String url = "http://api.danstonchat.com/0.3/view/random?"
-					+ "key=" + Config.getAPIKey(APIKey.DTC_API_KEY)
+					+ "key=" + Config.get(APIKey.DTC_API_KEY)
 					+ "&format=json";
 			JSONArray arrayObj = new JSONArray(IOUtils.toString(new URL(url), "UTF-8"));
 

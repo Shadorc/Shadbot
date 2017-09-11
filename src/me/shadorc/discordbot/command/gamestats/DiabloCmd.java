@@ -67,7 +67,7 @@ public class DiabloCmd extends AbstractCommand {
 			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://" + region + ".api.battle.net/d3/profile"
 					+ "/" + URLEncoder.encode(battletag, "UTF-8") + "/?"
 					+ "locale=en_GB&"
-					+ "apikey=" + Config.getAPIKey(APIKey.BLIZZARD_API_KEY)), "UTF-8"));
+					+ "apikey=" + Config.get(APIKey.BLIZZARD_API_KEY)), "UTF-8"));
 
 			if(mainObj.has("code") && mainObj.getString("code").equals("NOTFOUND")) {
 				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
@@ -81,7 +81,7 @@ public class DiabloCmd extends AbstractCommand {
 						"https://" + region + ".api.battle.net/d3/profile/" + URLEncoder.encode(battletag, "UTF-8")
 								+ "/hero/" + heroesArray.getJSONObject(i).getLong("id")
 								+ "?locale=en_GB"
-								+ "&apikey=" + Config.getAPIKey(APIKey.BLIZZARD_API_KEY)), "UTF-8"));
+								+ "&apikey=" + Config.get(APIKey.BLIZZARD_API_KEY)), "UTF-8"));
 				heroesList.add(heroObj);
 			}
 

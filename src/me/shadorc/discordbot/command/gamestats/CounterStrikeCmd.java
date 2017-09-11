@@ -54,7 +54,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 				steamid = context.getArg().trim();
 			} else {
 				JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?"
-						+ "key=" + Config.getAPIKey(APIKey.STEAM_API_KEY)
+						+ "key=" + Config.get(APIKey.STEAM_API_KEY)
 						+ "&vanityurl=" + URLEncoder.encode(context.getArg(), "UTF-8")), "UTF-8"));
 				JSONObject responseObj = mainObj.getJSONObject("response");
 				if(responseObj.has("steamid")) {
@@ -64,7 +64,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 			JSONObject mainUserObj = new JSONObject(IOUtils.toString(new URL(
 					"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
-							+ "key=" + Config.getAPIKey(APIKey.STEAM_API_KEY)
+							+ "key=" + Config.get(APIKey.STEAM_API_KEY)
 							+ "&steamids=" + steamid), "UTF-8"));
 
 			JSONArray players = mainUserObj.getJSONObject("response").getJSONArray("players");
@@ -90,7 +90,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			JSONObject mainStatsObj = new JSONObject(IOUtils.toString(new URL(
 					"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
 							+ "appid=730"
-							+ "&key=" + Config.getAPIKey(APIKey.STEAM_API_KEY)
+							+ "&key=" + Config.get(APIKey.STEAM_API_KEY)
 							+ "&steamid=" + steamid), "UTF-8"));
 
 			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");

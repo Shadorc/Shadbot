@@ -61,7 +61,7 @@ public class NetUtils {
 
 			URLConnection urlConn = url.openConnection();
 			urlConn.setRequestProperty("Content-Type", "application/json");
-			urlConn.setRequestProperty("Authorization", Config.getAPIKey(token));
+			urlConn.setRequestProperty("Authorization", Config.get(token));
 			urlConn.setDoOutput(true);
 			urlConn.setDoInput(true);
 			urlConn.setUseCaches(false);

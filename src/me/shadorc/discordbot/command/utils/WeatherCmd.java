@@ -47,7 +47,7 @@ public class WeatherCmd extends AbstractCommand {
 		}
 
 		try {
-			OpenWeatherMap owm = new OpenWeatherMap(Units.METRIC, Config.getAPIKey(APIKey.OPENWEATHERMAP_API_KEY));
+			OpenWeatherMap owm = new OpenWeatherMap(Units.METRIC, Config.get(APIKey.OPENWEATHERMAP_API_KEY));
 			CurrentWeather weather = owm.currentWeatherByCityName(context.getArg());
 
 			if(weather.isValid()) {

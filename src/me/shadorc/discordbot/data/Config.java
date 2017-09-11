@@ -3,7 +3,9 @@ package me.shadorc.discordbot.data;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -24,6 +26,7 @@ public class Config {
 	public static final int DEFAULT_VOLUME = 10;
 
 	private static final File API_KEYS_FILE = new File("api_keys.json");
+	private static final ConcurrentHashMap<APIKey, String> API_KEYS_MAP = new ConcurrentHashMap<>();
 
 	public enum APIKey {
 		GIPHY_API_KEY,
@@ -43,15 +46,18 @@ public class Config {
 		CLEVERBOT_API_KEY;
 	}
 
-	public static synchronized String getAPIKey(APIKey key) {
+	public static void load() {
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(API_KEYS_FILE.toURI().toURL().openStream()));
-			return mainObj.optString(key.toString());
-
-		} catch (IOException err) {
+			for(APIKey key : APIKey.values()) {
+				API_KEYS_MAP.put(key, mainObj.getString(key.toString()));
+			}
+		} catch (JSONException | IOException err) {
 			LogUtils.error("Error while reading API keys file.", err);
 		}
+	}
 
-		return null;
+	public static String get(APIKey key) {
+		return API_KEYS_MAP.get(key);
 	}
 }

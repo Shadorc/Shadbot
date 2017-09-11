@@ -42,7 +42,7 @@ public class GifCmd extends AbstractCommand {
 
 		try {
 			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://api.giphy.com/v1/gifs/random?"
-					+ "api_key=" + Config.getAPIKey(APIKey.GIPHY_API_KEY)
+					+ "api_key=" + Config.get(APIKey.GIPHY_API_KEY)
 					+ (context.hasArg() ? "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8") : "")), "UTF-8"));
 
 			if(mainObj.get("data") instanceof JSONArray) {

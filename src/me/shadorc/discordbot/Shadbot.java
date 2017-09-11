@@ -16,7 +16,7 @@ public class Shadbot {
 
 	public static void main(String[] args) {
 		client = new ClientBuilder()
-				.withToken(Config.getAPIKey(APIKey.DISCORD_TOKEN))
+				.withToken(Config.get(APIKey.DISCORD_TOKEN))
 				.setMaxMessageCacheCount(250)
 				.setMaxReconnectAttempts(100)
 				.login();

@@ -27,7 +27,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class ChatCmd extends AbstractCommand {
 
-	private static final String API_KEY = Config.getAPIKey(APIKey.CLEVERBOT_API_KEY);
+	private static final String API_KEY = Config.get(APIKey.CLEVERBOT_API_KEY);
 	private static final ConcurrentHashMap<IChannel, String> CHANNELS_CONV_ID = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<IChannel, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
 

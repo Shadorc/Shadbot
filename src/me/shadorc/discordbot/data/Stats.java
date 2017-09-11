@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -36,38 +35,32 @@ public class Stats {
 		}
 	}
 
-	private static void init() {
-		FileWriter writer = null;
+	public static void init() {
 		try {
-			STATS_FILE.createNewFile();
-			writer = new FileWriter(STATS_FILE);
-			writer.write(new JSONObject().toString(INDENT_FACTOR));
-			writer.flush();
-
-		} catch (IOException err) {
-			LogUtils.error("An error occured during stats file initialization.", err);
-
-		} finally {
-			IOUtils.closeQuietly(writer);
-		}
-	}
-
-	public static void increment(Category category, String key) {
-		if(!STATS_FILE.exists()) {
-			Stats.init();
-		}
-
-		if(STATS_MAP.isEmpty()) {
-			try {
+			if(STATS_FILE.exists()) {
 				JSONObject mainObj = new JSONObject(new JSONTokener(STATS_FILE.toURI().toURL().openStream()));
 				for(Category cat : Category.values()) {
 					STATS_MAP.put(cat, mainObj.has(cat.toString()) ? mainObj.getJSONObject(cat.toString()) : new JSONObject());
 				}
-			} catch (JSONException | IOException err) {
-				LogUtils.error("Error while initializing stats map.", err);
-			}
-		}
 
+			} else {
+				FileWriter writer = null;
+				try {
+					STATS_FILE.createNewFile();
+					writer = new FileWriter(STATS_FILE);
+					writer.write(new JSONObject().toString(INDENT_FACTOR));
+					writer.flush();
+				} finally {
+					IOUtils.closeQuietly(writer);
+				}
+			}
+
+		} catch (IOException err) {
+			LogUtils.error("An error occured during stats file initialization.", err);
+		}
+	}
+
+	public static void increment(Category category, String key) {
 		STATS_MAP.put(category, STATS_MAP.get(category).increment(key));
 	}
 

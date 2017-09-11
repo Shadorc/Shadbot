@@ -36,7 +36,7 @@ public class Storage {
 		}
 	}
 
-	private static void init() {
+	public static void init() {
 		FileWriter writer = null;
 		try {
 			DATA_FILE.createNewFile();

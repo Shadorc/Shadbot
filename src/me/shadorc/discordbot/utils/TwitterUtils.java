@@ -13,8 +13,8 @@ public class TwitterUtils {
 	public synchronized static void connection() {
 		if(twitter == null) {
 			twitter = TwitterFactory.getSingleton();
-			twitter.setOAuthConsumer(Config.getAPIKey(APIKey.TWITTER_API_KEY), Config.getAPIKey(APIKey.TWITTER_API_SECRET));
-			twitter.setOAuthAccessToken(new AccessToken(Config.getAPIKey(APIKey.TWITTER_TOKEN), Config.getAPIKey(APIKey.TWITTER_TOKEN_SECRET)));
+			twitter.setOAuthConsumer(Config.get(APIKey.TWITTER_API_KEY), Config.get(APIKey.TWITTER_API_SECRET));
+			twitter.setOAuthAccessToken(new AccessToken(Config.get(APIKey.TWITTER_TOKEN), Config.get(APIKey.TWITTER_TOKEN_SECRET)));
 		}
 	}
 

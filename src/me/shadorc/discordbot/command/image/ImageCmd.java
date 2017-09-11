@@ -80,8 +80,8 @@ public class ImageCmd extends AbstractCommand {
 
 	private void generateAccessToken() throws JSONException, IOException {
 		JSONObject oauthObj = new JSONObject(IOUtils.toString(new URL("https://www.deviantart.com/oauth2/token?"
-				+ "client_id=" + Config.getAPIKey(APIKey.DEVIANTART_CLIENT_ID)
-				+ "&client_secret=" + Config.getAPIKey(APIKey.DEVIANTART_API_SECRET)
+				+ "client_id=" + Config.get(APIKey.DEVIANTART_CLIENT_ID)
+				+ "&client_secret=" + Config.get(APIKey.DEVIANTART_API_SECRET)
 				+ "&grant_type=client_credentials"), "UTF-8"));
 		this.deviantArtToken = oauthObj.getString("access_token");
 	}
