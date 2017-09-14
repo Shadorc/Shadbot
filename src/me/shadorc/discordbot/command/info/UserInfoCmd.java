@@ -1,9 +1,11 @@
 package me.shadorc.discordbot.command.info;
 
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -15,14 +17,20 @@ import sx.blah.discord.util.EmbedBuilder;
 public class UserInfoCmd extends AbstractCommand {
 
 	private final DateTimeFormatter dateFormatter;
+	private final RateLimiter rateLimiter;
 
 	public UserInfoCmd() {
 		super(Role.USER, "userinfo", "user_info", "user-info");
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isSpamming(context)) {
+			return;
+		}
+
 		IUser user = context.getMessage().getMentions().isEmpty() ? context.getAuthor() : context.getMessage().getMentions().get(0);
 
 		EmbedBuilder embed = Utils.getDefaultEmbed()

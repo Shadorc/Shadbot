@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command.image;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -12,6 +13,7 @@ import org.json.XML;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -22,12 +24,19 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class Rule34Cmd extends AbstractCommand {
 
+	private final RateLimiter rateLimiter;
+
 	public Rule34Cmd() {
 		super(Role.USER, "rule34", "r34");
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isSpamming(context)) {
+			return;
+		}
+
 		if(!context.getChannel().isNSFW()) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This must be a NSFW-channel.", context.getChannel());
 			return;

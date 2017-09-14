@@ -19,15 +19,13 @@ public class SkipCmd extends AbstractCommand {
 
 	public SkipCmd() {
 		super(Role.USER, "skip", "next");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
-				rateLimiter.warn("Take it easy, don't spam :) You can use " + context.getPrefix() + "skip <num> to skip directly to a music in the playlist.", context);
-			}
+		if(rateLimiter.isSpamming(context)) {
+			BotUtils.sendMessage(Emoji.INFO + " You can use " + context.getPrefix() + "skip <num> to jump to a music in the playlist.", context.getChannel());
 			return;
 		}
 

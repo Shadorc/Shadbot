@@ -13,6 +13,9 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class RateLimiter {
 
+	public static final int COMMON_COOLDOWN = 2;
+	public static final int GAME_COOLDOWN = 5;
+
 	private final ConcurrentHashMap<IGuild, ConcurrentHashMap<IUser, Long>> guildsRateLimiter;
 	private final ConcurrentHashMap<IGuild, ConcurrentHashMap<IUser, Boolean>> warningsRateLimiter;
 	private final long timeout;
@@ -23,7 +26,21 @@ public class RateLimiter {
 		this.warningsRateLimiter = new ConcurrentHashMap<>();
 	}
 
-	public boolean isLimited(IGuild guild, IUser user) {
+	public long getTimeout() {
+		return Duration.of(timeout, ChronoUnit.MILLIS).getSeconds();
+	}
+
+	public boolean isSpamming(Context context) {
+		if(this.isLimited(context.getGuild(), context.getAuthor())) {
+			if(!this.isWarned(context.getGuild(), context.getAuthor())) {
+				this.warn("Take it easy, don't spam :) You can use this command once every " + this.getTimeout() + " sec.", context);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isLimited(IGuild guild, IUser user) {
 		guildsRateLimiter.putIfAbsent(guild, new ConcurrentHashMap<IUser, Long>());
 		warningsRateLimiter.putIfAbsent(guild, new ConcurrentHashMap<IUser, Boolean>());
 
@@ -40,15 +57,11 @@ public class RateLimiter {
 		return true;
 	}
 
-	public boolean isWarned(IGuild guild, IUser user) {
+	private boolean isWarned(IGuild guild, IUser user) {
 		return warningsRateLimiter.get(guild).get(user);
 	}
 
-	public long getTimeout() {
-		return Duration.of(timeout, ChronoUnit.MILLIS).getSeconds();
-	}
-
-	public void warn(String message, Context context) {
+	private void warn(String message, Context context) {
 		BotUtils.sendMessage(Emoji.STOPWATCH + " " + message, context.getChannel());
 		warningsRateLimiter.get(context.getGuild()).put(context.getAuthor(), true);
 		Stats.increment(Category.LIMITED_COMMAND, context.getCommand());

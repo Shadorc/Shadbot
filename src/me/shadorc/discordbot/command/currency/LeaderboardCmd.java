@@ -1,9 +1,11 @@
 package me.shadorc.discordbot.command.currency;
 
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Storage;
@@ -14,12 +16,19 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class LeaderboardCmd extends AbstractCommand {
 
+	private final RateLimiter rateLimiter;
+
 	public LeaderboardCmd() {
 		super(Role.USER, "leaderboard");
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isSpamming(context)) {
+			return;
+		}
+
 		Map<IUser, Integer> usersCoin = new HashMap<>();
 		for(IUser user : context.getGuild().getUsers()) {
 			int userCoin = Storage.getPlayer(context.getGuild(), user).getCoins();

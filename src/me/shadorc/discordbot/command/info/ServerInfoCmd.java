@@ -1,12 +1,14 @@
 package me.shadorc.discordbot.command.info;
 
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Storage;
@@ -20,14 +22,20 @@ import sx.blah.discord.util.EmbedBuilder;
 public class ServerInfoCmd extends AbstractCommand {
 
 	private final DateTimeFormatter dateFormatter;
+	private final RateLimiter rateLimiter;
 
 	public ServerInfoCmd() {
 		super(Role.USER, "serverinfo", "server_info", "server-info");
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isSpamming(context)) {
+			return;
+		}
+
 		IGuild guild = context.getGuild();
 		List<Long> allowedChannels = Utils.convertToLongList((JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS));
 

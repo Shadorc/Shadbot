@@ -17,20 +17,17 @@ public class LeetCmd extends AbstractCommand {
 
 	public LeetCmd() {
 		super(Role.USER, "leet");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
+		if(rateLimiter.isSpamming(context)) {
+			return;
 		}
 
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
-				rateLimiter.warn("Take it easy, don't spam :)", context);
-			}
-			return;
+		if(!context.hasArg()) {
+			throw new MissingArgumentException();
 		}
 
 		String text = context.getArg()

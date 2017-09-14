@@ -2,12 +2,14 @@ package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.time.temporal.ChronoUnit;
 
 import org.json.JSONObject;
 import org.json.XML;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -18,12 +20,19 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class LyricsCmd extends AbstractCommand {
 
+	private final RateLimiter rateLimiter;
+
 	public LyricsCmd() {
 		super(Role.USER, "lyrics");
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isSpamming(context)) {
+			return;
+		}
+
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

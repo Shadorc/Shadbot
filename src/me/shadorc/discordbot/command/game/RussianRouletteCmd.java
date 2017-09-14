@@ -27,20 +27,17 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 	public RussianRouletteCmd() {
 		super(Role.USER, "russian_roulette", "russian-roulette", "russianroulette");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
+		if(rateLimiter.isSpamming(context)) {
+			return;
 		}
 
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
-				rateLimiter.warn("You can use the russian roulette only once every " + rateLimiter.getTimeout() + " seconds.", context);
-			}
-			return;
+		if(!context.hasArg()) {
+			throw new MissingArgumentException();
 		}
 
 		String betStr = context.getArg();

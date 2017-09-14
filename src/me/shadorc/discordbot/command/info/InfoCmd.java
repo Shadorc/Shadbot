@@ -11,6 +11,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
@@ -22,12 +23,19 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class InfoCmd extends AbstractCommand {
 
+	private final RateLimiter rateLimiter;
+
 	public InfoCmd() {
 		super(Role.USER, "info");
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isSpamming(context)) {
+			return;
+		}
+
 		long ping = Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), context.getMessage().getCreationDate()));
 
 		Runtime runtime = Runtime.getRuntime();

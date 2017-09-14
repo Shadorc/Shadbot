@@ -27,11 +27,15 @@ public class OverwatchCmd extends AbstractCommand {
 
 	public OverwatchCmd() {
 		super(Role.USER, "overwatch", "ow");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isSpamming(context)) {
+			return;
+		}
+
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
@@ -39,13 +43,6 @@ public class OverwatchCmd extends AbstractCommand {
 		String[] splitArgs = context.getArg().split(" ", 3);
 		if(splitArgs.length != 3) {
 			throw new MissingArgumentException();
-		}
-
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
-				rateLimiter.warn("Take it easy, don't spam :)", context);
-			}
-			return;
 		}
 
 		String plateform = splitArgs[0].toLowerCase();

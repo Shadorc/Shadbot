@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.game;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Storage;
@@ -32,12 +34,19 @@ public class TriviaCmd extends AbstractCommand {
 
 	protected static final int GAINS = 250;
 
+	private final RateLimiter rateLimiter;
+
 	public TriviaCmd() {
 		super(Role.USER, "trivia", "quizz", "question");
+		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		if(rateLimiter.isSpamming(context)) {
+			return;
+		}
+
 		try {
 			new GuildTriviaManager(context.getChannel()).start();
 		} catch (JSONException | IOException err) {

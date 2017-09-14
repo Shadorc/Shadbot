@@ -58,20 +58,17 @@ public class RpsCmd extends AbstractCommand {
 
 	public RpsCmd() {
 		super(Role.USER, "rps");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
+		if(rateLimiter.isSpamming(context)) {
+			return;
 		}
 
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
-				rateLimiter.warn("You can play Rock-paper-scissors only once every " + rateLimiter.getTimeout() + " seconds.", context);
-			}
-			return;
+		if(!context.hasArg()) {
+			throw new MissingArgumentException();
 		}
 
 		Handsign userHandsign = Handsign.getEnum(context.getArg());

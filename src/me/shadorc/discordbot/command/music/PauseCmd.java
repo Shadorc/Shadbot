@@ -19,15 +19,12 @@ public class PauseCmd extends AbstractCommand {
 
 	public PauseCmd() {
 		super(Role.USER, "pause", "unpause", "resume");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
-				rateLimiter.warn("Take it easy, don't spam :)", context);
-			}
+		if(rateLimiter.isSpamming(context)) {
 			return;
 		}
 

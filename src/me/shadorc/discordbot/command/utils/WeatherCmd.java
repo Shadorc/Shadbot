@@ -29,21 +29,18 @@ public class WeatherCmd extends AbstractCommand {
 
 	public WeatherCmd() {
 		super(Role.USER, "weather");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 		this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy - hh:mm aa", Locale.ENGLISH);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
+		if(rateLimiter.isSpamming(context)) {
+			return;
 		}
 
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
-				rateLimiter.warn("Take it easy, don't spam :)", context);
-			}
-			return;
+		if(!context.hasArg()) {
+			throw new MissingArgumentException();
 		}
 
 		try {

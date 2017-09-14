@@ -39,15 +39,12 @@ public class SlotMachineCmd extends AbstractCommand {
 
 	public SlotMachineCmd() {
 		super(Role.USER, "slot_machine", "slot-machine", "slotmachine");
-		this.rateLimiter = new RateLimiter(5, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
-				rateLimiter.warn("You can use the slot machine only once every " + rateLimiter.getTimeout() + " seconds.", context);
-			}
+		if(rateLimiter.isSpamming(context)) {
 			return;
 		}
 

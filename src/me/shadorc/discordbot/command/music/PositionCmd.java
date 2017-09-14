@@ -19,15 +19,12 @@ public class PositionCmd extends AbstractCommand {
 
 	public PositionCmd() {
 		super(Role.USER, "forward", "backward");
-		this.rateLimiter = new RateLimiter(2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!rateLimiter.isWarned(context.getGuild(), context.getAuthor())) {
-				rateLimiter.warn("Take it easy, don't spam :)", context);
-			}
+		if(rateLimiter.isSpamming(context)) {
 			return;
 		}
 
