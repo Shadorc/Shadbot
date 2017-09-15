@@ -1,9 +1,9 @@
 package me.shadorc.discordbot.command.game;
 
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.swing.Timer;
 
@@ -43,66 +43,77 @@ public class DiceCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel());
-
-		if(diceManager == null) {
-			String[] splitArgs = context.getArg().split(" ");
-			if(splitArgs.length != 2) {
-				throw new MissingArgumentException();
-			}
-
-			String betStr = splitArgs[0];
-			if(!StringUtils.isPositiveInt(betStr)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
-				return;
-			}
-
-			int bet = Integer.parseInt(betStr);
-			if(context.getPlayer().getCoins() < bet) {
-				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
-				return;
-			}
-
-			String numStr = splitArgs[1];
-			if(!StringUtils.isValidDiceNum(numStr)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
-				return;
-			}
-
-			int num = Integer.parseInt(numStr);
-
-			diceManager = new DiceManager(context, bet);
-			diceManager.addPlayer(context.getAuthor(), num);
-			diceManager.start();
-			CHANNELS_DICE.putIfAbsent(context.getChannel(), diceManager);
-
+		if(CHANNELS_DICE.containsKey(context.getChannel())) {
+			this.joinGame(context);
 		} else {
-			if(context.getPlayer().getCoins() < diceManager.getBet()) {
-				BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to join this game.", context.getChannel());
-				return;
-			}
-
-			if(diceManager.isPlaying(context.getAuthor())) {
-				BotUtils.sendMessage(Emoji.INFO + " You're already participating.", context.getChannel());
-				return;
-			}
-
-			String numStr = context.getArg();
-			if(!StringUtils.isValidDiceNum(numStr)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
-				return;
-			}
-
-			int num = Integer.parseInt(numStr);
-
-			if(diceManager.isBet(num)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
-				return;
-			}
-
-			diceManager.addPlayer(context.getAuthor(), num);
-			BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " bet on " + num + ".", context.getChannel());
+			this.createGame(context);
 		}
+	}
+
+	private void createGame(Context context) throws MissingArgumentException {
+		String[] splitArgs = context.getArg().split(" ");
+		if(splitArgs.length != 2) {
+			throw new MissingArgumentException();
+		}
+
+		String betStr = splitArgs[0];
+		if(!StringUtils.isPositiveInt(betStr)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
+			return;
+		}
+
+		int bet = Integer.parseInt(betStr);
+		if(context.getPlayer().getCoins() < bet) {
+			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
+			return;
+		}
+
+		String numStr = splitArgs[1];
+		if(!StringUtils.isValidDiceNum(numStr)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+			return;
+		}
+
+		int num = Integer.parseInt(numStr);
+
+		DiceManager diceManager = new DiceManager(context, bet);
+		diceManager.addPlayer(context.getAuthor(), num);
+		diceManager.start();
+		CHANNELS_DICE.putIfAbsent(context.getChannel(), diceManager);
+	}
+
+	private void joinGame(Context context) {
+		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel());
+		if(context.getPlayer().getCoins() < diceManager.getBet()) {
+			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to join this game.", context.getChannel());
+			return;
+		}
+
+		if(diceManager.isPlaying(context.getAuthor())) {
+			BotUtils.sendMessage(Emoji.INFO + " You're already participating.", context.getChannel());
+			return;
+		}
+
+		if(diceManager.getPlayers() == 6) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry, there are already 6 players.", context.getChannel());
+			return;
+		}
+
+		String numStr = context.getArg();
+		if(!StringUtils.isValidDiceNum(numStr)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+			return;
+		}
+
+		int num = Integer.parseInt(numStr);
+
+		if(diceManager.isBet(num)) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
+			return;
+		}
+
+		diceManager.addPlayer(context.getAuthor(), num);
+		BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " bets on " + num + ".", context.getChannel());
 	}
 
 	@Override
@@ -122,7 +133,7 @@ public class DiceCmd extends AbstractCommand {
 
 		private static final int GAME_DURATION = 30;
 
-		private final Map<Integer, IUser> numsPlayers;
+		private final ConcurrentHashMap<Integer, IUser> numsPlayers;
 		private final Context context;
 		private final Timer timer;
 		private final int bet;
@@ -130,26 +141,10 @@ public class DiceCmd extends AbstractCommand {
 		protected DiceManager(Context context, int bet) {
 			this.context = context;
 			this.bet = bet;
-			this.numsPlayers = new HashMap<>();
+			this.numsPlayers = new ConcurrentHashMap<>();
 			this.timer = new Timer(GAME_DURATION * 1000, event -> {
 				this.stop();
 			});
-		}
-
-		protected void addPlayer(IUser user, int num) {
-			numsPlayers.put(num, user);
-		}
-
-		public int getBet() {
-			return bet;
-		}
-
-		protected boolean isPlaying(IUser user) {
-			return numsPlayers.containsValue(user);
-		}
-
-		protected boolean isBet(int num) {
-			return numsPlayers.containsKey(num);
 		}
 
 		protected void start() {
@@ -173,22 +168,46 @@ public class DiceCmd extends AbstractCommand {
 			if(this.isBet(winningNum)) {
 				IUser winner = numsPlayers.get(winningNum);
 				int gains = bet * (numsPlayers.size() + MULTIPLIER);
-				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win " + gains + " coins !", context.getChannel());
+				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win **" + gains + " coins** !", context.getChannel());
 				Storage.getPlayer(context.getGuild(), winner).addCoins(gains);
-				numsPlayers.remove(winningNum);
 			}
 
-			if(!numsPlayers.isEmpty()) {
+			List<IUser> losersList = numsPlayers.keySet().stream()
+					.filter(num -> num != winningNum) // Remove winning number
+					.map(num -> numsPlayers.get(num)) // Get losers
+					.collect(Collectors.toList());
+
+			if(!losersList.isEmpty()) {
 				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
-				for(int num : numsPlayers.keySet()) {
-					Storage.getPlayer(context.getGuild(), numsPlayers.get(num)).addCoins(-bet);
-					strBuilder.append(numsPlayers.get(num).mention() + ", ");
+				for(IUser loser : losersList) {
+					Storage.getPlayer(context.getGuild(), loser).addCoins(-bet);
+					strBuilder.append(loser.mention() + ", ");
 				}
-				strBuilder.append("you have lost " + bet + " coin(s).");
+				strBuilder.append("you lost " + bet + " coin(s).");
 				BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 			}
 
 			CHANNELS_DICE.remove(context.getChannel());
+		}
+
+		public int getBet() {
+			return bet;
+		}
+
+		public int getPlayers() {
+			return numsPlayers.size();
+		}
+
+		protected void addPlayer(IUser user, int num) {
+			numsPlayers.putIfAbsent(num, user);
+		}
+
+		protected boolean isPlaying(IUser user) {
+			return numsPlayers.containsValue(user);
+		}
+
+		protected boolean isBet(int num) {
+			return numsPlayers.containsKey(num);
 		}
 	}
 }

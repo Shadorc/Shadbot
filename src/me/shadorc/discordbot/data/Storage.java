@@ -17,7 +17,6 @@ import sx.blah.discord.handle.obj.IUser;
 public class Storage {
 
 	private static final File DATA_FILE = new File("data.json");
-	private static final int INDENT_FACTOR = 2;
 
 	public enum Setting {
 		ALLOWED_CHANNELS("allowed_channels"),
@@ -41,7 +40,7 @@ public class Storage {
 		try {
 			DATA_FILE.createNewFile();
 			writer = new FileWriter(DATA_FILE);
-			writer.write(new JSONObject().toString(INDENT_FACTOR));
+			writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
@@ -75,7 +74,7 @@ public class Storage {
 			mainObj.put(guildID, guildObj);
 
 			writer = new FileWriter(DATA_FILE);
-			writer.write(mainObj.toString(INDENT_FACTOR));
+			writer.write(mainObj.toString(Config.INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
@@ -101,7 +100,7 @@ public class Storage {
 			mainObj.put(guildID, guildObj);
 
 			writer = new FileWriter(DATA_FILE);
-			writer.write(mainObj.toString(INDENT_FACTOR));
+			writer.write(mainObj.toString(Config.INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {

@@ -15,7 +15,6 @@ public class Stats {
 
 	private static final ConcurrentHashMap<Category, JSONObject> STATS_MAP = new ConcurrentHashMap<>();
 	private static final File STATS_FILE = new File("stats.json");
-	private static final int INDENT_FACTOR = 2;
 
 	public enum Category {
 		UNKNOWN_COMMAND("unknown_command"),
@@ -48,7 +47,7 @@ public class Stats {
 				try {
 					STATS_FILE.createNewFile();
 					writer = new FileWriter(STATS_FILE);
-					writer.write(new JSONObject().toString(INDENT_FACTOR));
+					writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
 					writer.flush();
 				} finally {
 					IOUtils.closeQuietly(writer);
@@ -77,7 +76,7 @@ public class Stats {
 			}
 
 			writer = new FileWriter(STATS_FILE);
-			writer.write(mainObj.toString(INDENT_FACTOR));
+			writer.write(mainObj.toString(Config.INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {

@@ -60,8 +60,8 @@ public class TransferCoinsCmd extends AbstractCommand {
 		senderPlayer.addCoins(-coins);
 		receiverPlayer.addCoins(coins);
 
-		BotUtils.sendMessage(Emoji.BANK + " " + senderPlayer.getUser().mention() + " has transfered "
-				+ coins + " coins to " + receiverPlayer.getUser().mention(), context.getChannel());
+		BotUtils.sendMessage(Emoji.BANK + " " + senderPlayer.getUser().mention() + " has transfered **"
+				+ coins + " coins** to " + receiverPlayer.getUser().mention(), context.getChannel());
 	}
 
 	@Override

@@ -66,7 +66,7 @@ public class WikiCmd extends AbstractCommand {
 					.withUrl("https://fr.wikipedia.org/wiki/" + resultObj.getString("title").replace(" ", "_"))
 					.withThumbnail("https://s1.qwant.com/thumbr/300x0/2/8/50c4ce83955fe31f8f070e40c10926/b_0_q_0_p_0.jpg?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fd1%2FWikipedia-logo-v2-fr.svg%2F892px-Wikipedia-logo-v2-fr.svg.png&q=0&b=0&p=0&a=0")
 					.withColor(Config.BOT_COLOR)
-					.appendDesc(resultObj.getString("extract"));
+					.appendDescription(resultObj.getString("extract"));
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {

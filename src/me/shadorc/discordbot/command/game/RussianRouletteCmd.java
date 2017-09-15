@@ -53,7 +53,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		}
 
 		if(bet > MAX_BET) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " You can't bet more than " + MAX_BET + " coins.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " You can't bet more than **" + MAX_BET + " coins**.", context.getChannel());
 			return;
 		}
 

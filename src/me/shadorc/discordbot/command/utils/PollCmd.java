@@ -217,7 +217,7 @@ public class PollCmd extends AbstractCommand {
 			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.withAuthorName("Poll (Created by: " + context.getAuthor().getName() + ")")
 					.withThumbnail(context.getAuthor().getAvatarURL())
-					.appendDescription("**Vote using:** " + context.getPrefix() + "poll <choice>"
+					.appendDescription("Vote using: `" + context.getPrefix() + "poll <choice>`"
 							+ "\n\n__**" + question + "**__"
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")

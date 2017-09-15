@@ -25,7 +25,7 @@ public class SkipCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(rateLimiter.isSpamming(context)) {
-			BotUtils.sendMessage(Emoji.INFO + " You can use " + context.getPrefix() + "skip <num> to jump to a music in the playlist.", context.getChannel());
+			BotUtils.sendMessage(Emoji.INFO + " You can use `" + context.getPrefix() + "skip <num>` to jump to a music in the playlist.", context.getChannel());
 			return;
 		}
 

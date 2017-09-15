@@ -20,6 +20,8 @@ public class Config {
 	public static final long SUGGEST_CHANNEL_ID = 345898633805430785L;
 	public static final long LOGS_CHANNEL_ID = 346311941829951489L;
 
+	public static final int INDENT_FACTOR = 2;
+
 	public static final Color BOT_COLOR = new Color(170, 196, 222);
 
 	public static final String DEFAULT_PREFIX = "/";

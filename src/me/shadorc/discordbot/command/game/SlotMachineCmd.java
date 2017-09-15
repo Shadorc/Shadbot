@@ -49,7 +49,7 @@ public class SlotMachineCmd extends AbstractCommand {
 		}
 
 		if(context.getPlayer().getCoins() < PAID_COST) {
-			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to play the slot machine, one game costs " + PAID_COST + " coins.", context.getChannel());
+			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to play the slot machine, one game costs **" + PAID_COST + " coins**.", context.getChannel());
 			return;
 		}
 
@@ -70,7 +70,7 @@ public class SlotMachineCmd extends AbstractCommand {
 
 		StringBuilder message = new StringBuilder(
 				":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":"
-						+ "\nYou " + (gains > 0 ? "win" : "have lost") + " " + Math.abs(gains) + " coins !");
+						+ "\nYou " + (gains > 0 ? "win" : "have lost") + " **" + Math.abs(gains) + " coins** !");
 		BotUtils.sendMessage(message.toString(), context.getChannel());
 	}
 
