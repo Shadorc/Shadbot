@@ -199,29 +199,26 @@ public class PollCmd extends AbstractCommand {
 				message.delete();
 			}
 
-			List<String> choicesList = new ArrayList<String>(choicesMap.keySet());
-
+			int count = 1;
 			StringBuilder choicesStr = new StringBuilder();
-			for(int i = 0; i < choicesList.size(); i++) {
-				List<IUser> usersList = choicesMap.get(choicesList.get(i));
-				String vote = usersList.isEmpty() ? "" : " *(Vote: " + usersList.size() + ")*";
-				choicesStr.append("\n\t**" + (i + 1) + ".** " + choicesList.get(i) + vote);
-				if(!usersList.isEmpty()) {
-					choicesStr.append("\n\t\t");
-					if(usersList.size() > 5) {
-						choicesStr.append(StringUtils.formatList(usersList.subList(0, 5), user -> user.getName(), ", ") + "...");
-					} else {
-						choicesStr.append(StringUtils.formatList(usersList, user -> user.getName(), ", "));
-					}
+
+			for(String choice : choicesMap.keySet()) {
+				List<IUser> votersList = choicesMap.get(choice);
+				String vote = votersList.isEmpty() ? "" : " *(Vote: " + votersList.size() + ")*";
+				choicesStr.append("\n\t**" + count + ".** " + choice + vote);
+				choicesStr.append("\n\t\t" + StringUtils.formatList(votersList.subList(0, Math.min(5, votersList.size())), user -> user.getName(), ", "));
+				if(votersList.size() > 5) {
+					choicesStr.append("...");
 				}
+				count++;
 			}
 
 			long remainingTime = (timer.getDelay() - (System.currentTimeMillis() - startTime));
 			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.withAuthorName("Poll (Created by: " + context.getAuthor().getName() + ")")
 					.withThumbnail(context.getAuthor().getAvatarURL())
-					.appendDescription("Vote using: " + context.getPrefix() + "poll <choice>"
-							+ "\n\n__" + question + "__"
+					.appendDescription("**Vote using:** " + context.getPrefix() + "poll <choice>"
+							+ "\n\n__**" + question + "**__"
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
 					.withFooterText(timer.isRunning() ? ("Time left: " + StringUtils.formatDuration(remainingTime)) : "Finished");

@@ -80,37 +80,6 @@ public class BotUtils {
 		});
 	}
 
-	/**
-	 * @param guild - the channel's guild
-	 * @param channel - the channel to check
-	 * @return true if Shadbot is allowed to send a message in channel, false otherwise
-	 */
-	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
-		JSONArray channelsArray = (JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS);
-
-		// If no permissions were defined, authorize all the channels by default.
-		if(channelsArray.length() == 0) {
-			return true;
-		}
-
-		return Utils.convertToLongList(channelsArray).contains(channel.getLongID());
-	}
-
-	/**
-	 * @param channel - the channel to check
-	 * @param permission - permission to check
-	 * @param permissions - optional permissions
-	 * @return true if Shadbot has all permissions in channel
-	 */
-	public static boolean hasPermission(IChannel channel, Permissions permission, Permissions... permissions) {
-		for(Permissions perm : permissions) {
-			if(!channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(perm)) {
-				return false;
-			}
-		}
-		return channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(permission);
-	}
-
 	public static void sendQueues() {
 		if(!MESSAGE_QUEUE.isEmpty()) {
 			LogUtils.info("Sending pending messages...");
@@ -133,5 +102,51 @@ public class BotUtils {
 			LogUtils.info("Pending embed sent.");
 			EMBED_QUEUE.clear();
 		}
+	}
+
+	/**
+	 * @param channel - the messages' channel
+	 * @param messages - the List of messages to delete
+	 * @return the number of deleted messages
+	 */
+	public static int deleteMessages(IChannel channel, List<IMessage> messages) {
+		if(messages.isEmpty()) {
+			return 0;
+		}
+
+		return RequestBuffer.request(() -> {
+			return channel.bulkDelete(messages).size();
+		}).get();
+	}
+
+	/**
+	 * @param guild - the channel's guild
+	 * @param channel - the channel to check
+	 * @return true if Shadbot is allowed to send a message in channel, false otherwise
+	 */
+	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
+		JSONArray channelsArray = (JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS);
+
+		// If no permissions were defined, authorize all the channels by default.
+		if(channelsArray.length() == 0) {
+			return true;
+		}
+
+		return Utils.convertToLongList(channelsArray).contains(channel.getLongID());
+	}
+
+	/**
+	 * @param channel - the channel to check
+	 * @param permission - the permission to check
+	 * @param permissions - the optional permissions
+	 * @return true if Shadbot has all permissions in channel
+	 */
+	public static boolean hasPermission(IChannel channel, Permissions permission, Permissions... permissions) {
+		for(Permissions perm : permissions) {
+			if(!channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(perm)) {
+				return false;
+			}
+		}
+		return channel.getModifiedPermissions(Shadbot.getClient().getOurUser()).contains(permission);
 	}
 }

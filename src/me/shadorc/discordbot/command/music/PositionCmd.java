@@ -45,16 +45,14 @@ public class PositionCmd extends AbstractCommand {
 			return;
 		}
 
-		int time = (context.getCommand().equals("backward") ? -1 : 1) * Integer.parseInt(numStr) * 1000;
+		int time = (context.getCommand().equals("forward") ? 1 : -1) * Integer.parseInt(numStr) * 1000;
 
 		try {
 			musicManager.getScheduler().changePosition(time);
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(musicManager.getScheduler().getPosition()), context.getChannel());
 		} catch (IllegalArgumentException err) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " New position is negative or superior to the music duration.", context.getChannel());
-			return;
 		}
-
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(musicManager.getScheduler().getPosition()), context.getChannel());
 	}
 
 	@Override

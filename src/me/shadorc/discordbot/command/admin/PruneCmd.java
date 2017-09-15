@@ -17,7 +17,6 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.MessageHistory;
-import sx.blah.discord.util.RequestBuffer;
 
 public class PruneCmd extends AbstractCommand {
 
@@ -67,7 +66,7 @@ public class PruneCmd extends AbstractCommand {
 		List<IUser> usersMentioned = context.getMessage().getMentions();
 
 		MessageHistory historyList = context.getChannel().getMessageHistory(context.getChannel().getMaxInternalCacheCount());
-		List<IMessage> toDeleteList = new ArrayList<IMessage>();
+		List<IMessage> messagesList = new ArrayList<IMessage>();
 
 		int count = 0;
 		for(IMessage message : historyList) {
@@ -80,24 +79,16 @@ public class PruneCmd extends AbstractCommand {
 			if(word != null && !message.getContent().contains(word)) {
 				continue;
 			}
-			toDeleteList.add(message);
+			messagesList.add(message);
 			count++;
 		}
 
-		final List<IMessage> truncDeleteList = new ArrayList<IMessage>(toDeleteList.subList(0, Math.min(100, toDeleteList.size())));
-
-		RequestBuffer.request(() -> {
-			if(truncDeleteList.isEmpty()) {
-				BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
-			} else if(truncDeleteList.size() == 1) {
-				// MessageList#bulkDelete(List<IMessage> messages) cannot delete a single message
-				truncDeleteList.get(0).delete();
-				BotUtils.sendMessage(Emoji.CHECK_MARK + " 1 message deleted.", context.getChannel());
-			} else {
-				context.getChannel().bulkDelete(truncDeleteList);
-				BotUtils.sendMessage(Emoji.CHECK_MARK + " " + truncDeleteList.size() + " messages deleted.", context.getChannel());
-			}
-		});
+		if(messagesList.isEmpty()) {
+			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
+		} else {
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + BotUtils.deleteMessages(context.getChannel(), messagesList)
+			+ " message(s) deleted.", context.getChannel());
+		}
 	}
 
 	@Override

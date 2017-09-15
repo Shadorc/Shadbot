@@ -33,7 +33,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class TriviaCmd extends AbstractCommand {
 
-	protected static final ConcurrentHashMap<IChannel, GuildTriviaManager> CHANNELS_TRIVIA = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<IChannel, TriviaManager> CHANNELS_TRIVIA = new ConcurrentHashMap<>();
 	protected static final int GAINS = 250;
 
 	private final RateLimiter rateLimiter;
@@ -49,11 +49,11 @@ public class TriviaCmd extends AbstractCommand {
 			return;
 		}
 
-		GuildTriviaManager triviaManager = CHANNELS_TRIVIA.get(context.getChannel());
+		TriviaManager triviaManager = CHANNELS_TRIVIA.get(context.getChannel());
 
 		if(triviaManager == null) {
 			try {
-				triviaManager = new GuildTriviaManager(context.getChannel());
+				triviaManager = new TriviaManager(context.getChannel());
 				CHANNELS_TRIVIA.put(context.getChannel(), triviaManager);
 				triviaManager.start();
 
@@ -74,7 +74,7 @@ public class TriviaCmd extends AbstractCommand {
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 
-	public class GuildTriviaManager implements MessageListener {
+	public class TriviaManager implements MessageListener {
 
 		private final IChannel channel;
 		private final List<IUser> alreadyAnswered;
@@ -83,7 +83,7 @@ public class TriviaCmd extends AbstractCommand {
 		private String correctAnswer;
 		private List<String> incorrectAnswers;
 
-		protected GuildTriviaManager(IChannel channel) {
+		protected TriviaManager(IChannel channel) {
 			this.channel = channel;
 			this.alreadyAnswered = new ArrayList<>();
 			this.timer = new Timer(30 * 1000, event -> {
