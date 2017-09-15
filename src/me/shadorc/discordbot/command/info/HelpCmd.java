@@ -96,6 +96,7 @@ public class HelpCmd extends AbstractCommand {
 		if(authorRole.equals(Role.ADMIN) || authorRole.equals(Role.OWNER)) {
 			builder.appendField("Admin Commands:",
 					"`" + prefix + "prune`"
+							+ " `" + prefix + "toggle_nsfw`"
 							+ " `" + prefix + "settings`", false);
 		}
 

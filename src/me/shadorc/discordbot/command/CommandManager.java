@@ -8,6 +8,7 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.AbstractCommand.Role;
 import me.shadorc.discordbot.command.admin.PruneCmd;
 import me.shadorc.discordbot.command.admin.SettingsCmd;
+import me.shadorc.discordbot.command.admin.ToggleNSFWCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
 import me.shadorc.discordbot.command.currency.LeaderboardCmd;
 import me.shadorc.discordbot.command.currency.TransferCoinsCmd;
@@ -123,6 +124,7 @@ public class CommandManager {
 				// Admin Commands
 				new SettingsCmd(),
 				new PruneCmd(),
+				new ToggleNSFWCmd(),
 				// Owner Commands
 				new ShutdownCmd());
 	}
