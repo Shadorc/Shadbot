@@ -11,6 +11,7 @@ import javax.swing.Timer;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
@@ -23,7 +24,6 @@ import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
-import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -93,15 +93,15 @@ public class TriviaCmd extends AbstractCommand {
 
 			this.incorrectAnswers = Utils.convertToStringList(resultObj.getJSONArray("incorrect_answers"));
 
-			StringBuilder strBuilder = new StringBuilder("**" + StringUtils.convertHtmlToUTF8(question) + "**");
+			StringBuilder strBuilder = new StringBuilder("**" + Jsoup.parse(question).text() + "**");
 			if("multiple".equals(type)) {
 				// Place the correct answer randomly in the list
 				int index = MathUtils.rand(incorrectAnswers.size());
 				for(int i = 0; i < incorrectAnswers.size(); i++) {
 					if(i == index) {
-						strBuilder.append("\n\t- " + StringUtils.convertHtmlToUTF8(correctAnswer));
+						strBuilder.append("\n\t- " + Jsoup.parse(correctAnswer).text());
 					}
-					strBuilder.append("\n\t- " + StringUtils.convertHtmlToUTF8(incorrectAnswers.get(i)));
+					strBuilder.append("\n\t- " + Jsoup.parse(incorrectAnswers.get(i)).text());
 				}
 			}
 
@@ -117,7 +117,7 @@ public class TriviaCmd extends AbstractCommand {
 
 			MessageManager.addListener(channel, this);
 
-			this.correctAnswer = StringUtils.convertHtmlToUTF8(correctAnswer);
+			this.correctAnswer = Jsoup.parse(correctAnswer).text();
 			this.timer.start();
 		}
 

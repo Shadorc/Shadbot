@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
@@ -20,14 +19,6 @@ public class StringUtils {
 	 */
 	public static String capitalize(String str) {
 		return str.substring(0, 1).toUpperCase() + str.substring(1);
-	}
-
-	/**
-	 * @param text - the String to convert, may be null
-	 * @return a new converted String, null if null string input
-	 */
-	public static String convertHtmlToUTF8(String text) {
-		return StringEscapeUtils.unescapeHtml3(text);
 	}
 
 	/**
