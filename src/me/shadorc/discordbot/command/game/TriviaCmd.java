@@ -54,8 +54,8 @@ public class TriviaCmd extends AbstractCommand {
 		if(triviaManager == null) {
 			try {
 				triviaManager = new TriviaManager(context.getChannel());
-				CHANNELS_TRIVIA.put(context.getChannel(), triviaManager);
 				triviaManager.start();
+				CHANNELS_TRIVIA.putIfAbsent(context.getChannel(), triviaManager);
 
 			} catch (JSONException | IOException err) {
 				LogUtils.error("Something went wrong while getting a question.... Please, try again later.", err, context);
