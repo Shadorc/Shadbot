@@ -33,11 +33,7 @@ public class LyricsCmd extends AbstractCommand {
 			return;
 		}
 
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
-
-		String[] args = context.getArg().split("-", 2);
+		String[] args = context.getArg().replaceAll("<|>", "").split("-", 2);
 		if(args.length != 2) {
 			throw new MissingArgumentException();
 		}
@@ -64,6 +60,7 @@ public class LyricsCmd extends AbstractCommand {
 					.appendField("Song", resultObj.getString("LyricArtist") + " - " + resultObj.getString("LyricSong"), false)
 					.appendField("Lyrics", resultObj.getString("LyricUrl"), false);
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
+
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while getting lyrics... Please, try again later.", err, context);
 		}
