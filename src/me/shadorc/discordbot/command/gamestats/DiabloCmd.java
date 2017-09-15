@@ -2,7 +2,6 @@ package me.shadorc.discordbot.command.gamestats;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.time.temporal.ChronoUnit;
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +22,7 @@ import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
@@ -61,10 +60,10 @@ public class DiabloCmd extends AbstractCommand {
 
 		String battletag = splitArgs[1].replaceAll("#", "-");
 		try {
-			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://" + region + ".api.battle.net/d3/profile"
+			JSONObject mainObj = new JSONObject(NetUtils.getBody("https://" + region + ".api.battle.net/d3/profile"
 					+ "/" + URLEncoder.encode(battletag, "UTF-8") + "/?"
 					+ "locale=en_GB&"
-					+ "apikey=" + Config.get(APIKey.BLIZZARD_API_KEY)), "UTF-8"));
+					+ "apikey=" + Config.get(APIKey.BLIZZARD_API_KEY)));
 
 			if(mainObj.has("code") && mainObj.getString("code").equals("NOTFOUND")) {
 				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
@@ -74,11 +73,11 @@ public class DiabloCmd extends AbstractCommand {
 			List<JSONObject> heroesList = new ArrayList<>();
 			JSONArray heroesArray = mainObj.getJSONArray("heroes");
 			for(int i = 0; i < heroesArray.length(); i++) {
-				JSONObject heroObj = new JSONObject(IOUtils.toString(new URL(
+				JSONObject heroObj = new JSONObject(NetUtils.getBody(
 						"https://" + region + ".api.battle.net/d3/profile/" + URLEncoder.encode(battletag, "UTF-8")
 								+ "/hero/" + heroesArray.getJSONObject(i).getLong("id")
 								+ "?locale=en_GB"
-								+ "&apikey=" + Config.get(APIKey.BLIZZARD_API_KEY)), "UTF-8"));
+								+ "&apikey=" + Config.get(APIKey.BLIZZARD_API_KEY)));
 				heroesList.add(heroObj);
 			}
 

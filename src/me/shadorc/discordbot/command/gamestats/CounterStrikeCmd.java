@@ -1,11 +1,9 @@
 package me.shadorc.discordbot.command.gamestats;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +17,7 @@ import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
@@ -50,19 +49,18 @@ public class CounterStrikeCmd extends AbstractCommand {
 			} else if(StringUtils.isPositiveLong(context.getArg())) {
 				steamid = context.getArg().trim();
 			} else {
-				JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?"
+				JSONObject mainObj = new JSONObject(NetUtils.getBody("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?"
 						+ "key=" + Config.get(APIKey.STEAM_API_KEY)
-						+ "&vanityurl=" + URLEncoder.encode(context.getArg(), "UTF-8")), "UTF-8"));
+						+ "&vanityurl=" + URLEncoder.encode(context.getArg(), "UTF-8")));
 				JSONObject responseObj = mainObj.getJSONObject("response");
 				if(responseObj.has("steamid")) {
 					steamid = responseObj.getString("steamid");
 				}
 			}
 
-			JSONObject mainUserObj = new JSONObject(IOUtils.toString(new URL(
-					"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
-							+ "key=" + Config.get(APIKey.STEAM_API_KEY)
-							+ "&steamids=" + steamid), "UTF-8"));
+			JSONObject mainUserObj = new JSONObject(NetUtils.getBody("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
+					+ "key=" + Config.get(APIKey.STEAM_API_KEY)
+					+ "&steamids=" + steamid));
 
 			JSONArray players = mainUserObj.getJSONObject("response").getJSONArray("players");
 
@@ -84,11 +82,10 @@ public class CounterStrikeCmd extends AbstractCommand {
 				return;
 			}
 
-			JSONObject mainStatsObj = new JSONObject(IOUtils.toString(new URL(
-					"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
-							+ "appid=730"
-							+ "&key=" + Config.get(APIKey.STEAM_API_KEY)
-							+ "&steamid=" + steamid), "UTF-8"));
+			JSONObject mainStatsObj = new JSONObject(NetUtils.getBody("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?"
+					+ "appid=730"
+					+ "&key=" + Config.get(APIKey.STEAM_API_KEY)
+					+ "&steamid=" + steamid));
 
 			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");
 

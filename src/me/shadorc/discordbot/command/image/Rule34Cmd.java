@@ -1,11 +1,9 @@
 package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +17,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -48,11 +47,11 @@ public class Rule34Cmd extends AbstractCommand {
 		}
 
 		try {
-			JSONObject mainObj = XML.toJSONObject(IOUtils.toString(new URL("https://rule34.xxx/index.php?"
+			JSONObject mainObj = XML.toJSONObject(NetUtils.getBody("https://rule34.xxx/index.php?"
 					+ "page=dapi"
 					+ "&s=post"
 					+ "&q=index"
-					+ "&tags=" + URLEncoder.encode(context.getArg(), "UTF-8")), "UTF-8"));
+					+ "&tags=" + URLEncoder.encode(context.getArg(), "UTF-8")));
 
 			JSONObject postsObj = mainObj.getJSONObject("posts");
 

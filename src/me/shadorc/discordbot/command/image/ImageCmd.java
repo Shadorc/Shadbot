@@ -1,11 +1,9 @@
 package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,6 +18,7 @@ import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -76,21 +75,21 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	private void generateAccessToken() throws JSONException, IOException {
-		JSONObject oauthObj = new JSONObject(IOUtils.toString(new URL("https://www.deviantart.com/oauth2/token?"
+		JSONObject oauthObj = new JSONObject(NetUtils.getBody("https://www.deviantart.com/oauth2/token?"
 				+ "client_id=" + Config.get(APIKey.DEVIANTART_CLIENT_ID)
 				+ "&client_secret=" + Config.get(APIKey.DEVIANTART_API_SECRET)
-				+ "&grant_type=client_credentials"), "UTF-8"));
+				+ "&grant_type=client_credentials"));
 		this.deviantArtToken = oauthObj.getString("access_token");
 	}
 
 	private JSONObject getRandomPopularResult(String encodedSearch) throws JSONException, IOException {
 		try {
-			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
+			JSONObject mainObj = new JSONObject(NetUtils.getBody("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
 					+ "q=" + encodedSearch
 					+ "&timerange=alltime"
 					+ "&limit=25" // The pagination limit (min: 1 max: 50)
 					+ "&offset=" + MathUtils.rand(150) // The pagination offset (min: 0 max: 50000)
-					+ "&access_token=" + this.deviantArtToken), "UTF-8"));
+					+ "&access_token=" + this.deviantArtToken));
 			JSONArray resultsArray = mainObj.getJSONArray("results");
 
 			JSONObject resultObj;

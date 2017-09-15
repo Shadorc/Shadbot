@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.game;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -25,6 +23,7 @@ import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -94,7 +93,7 @@ public class TriviaCmd extends AbstractCommand {
 
 		// Trivia API doc : https://opentdb.com/api_config.php
 		protected void start() throws JSONException, IOException {
-			JSONObject mainObj = new JSONObject(IOUtils.toString(new URL("https://opentdb.com/api.php?amount=1"), "UTF-8"));
+			JSONObject mainObj = new JSONObject(NetUtils.getBody("https://opentdb.com/api.php?amount=1"));
 			JSONObject resultObj = mainObj.getJSONArray("results").getJSONObject(0);
 
 			String category = resultObj.getString("category");

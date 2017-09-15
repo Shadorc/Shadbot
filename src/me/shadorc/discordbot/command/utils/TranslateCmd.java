@@ -82,7 +82,7 @@ public class TranslateCmd extends AbstractCommand {
 		}
 
 		try {
-			JSONArray result = new JSONArray(NetUtils.getJSON("https://translate.googleapis.com/translate_a/single?"
+			JSONArray result = new JSONArray(NetUtils.getBody("https://translate.googleapis.com/translate_a/single?"
 					+ "client=gtx"
 					+ "&sl=" + URLEncoder.encode(langFrom, "UTF-8")
 					+ "&tl=" + URLEncoder.encode(langTo, "UTF-8")

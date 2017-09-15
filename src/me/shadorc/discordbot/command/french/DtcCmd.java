@@ -1,10 +1,8 @@
 package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.temporal.ChronoUnit;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,6 +16,7 @@ import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -37,10 +36,9 @@ public class DtcCmd extends AbstractCommand {
 		}
 
 		try {
-			String url = "http://api.danstonchat.com/0.3/view/random?"
+			JSONArray arrayObj = new JSONArray(NetUtils.getBody("http://api.danstonchat.com/0.3/view/random?"
 					+ "key=" + Config.get(APIKey.DTC_API_KEY)
-					+ "&format=json";
-			JSONArray arrayObj = new JSONArray(IOUtils.toString(new URL(url), "UTF-8"));
+					+ "&format=json"));
 
 			JSONObject quoteObj;
 			String content;
