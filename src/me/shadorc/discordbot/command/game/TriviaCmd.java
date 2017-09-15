@@ -5,6 +5,7 @@ import java.net.URL;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
@@ -32,6 +33,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class TriviaCmd extends AbstractCommand {
 
+	protected static final ConcurrentHashMap<IChannel, GuildTriviaManager> CHANNELS_TRIVIA = new ConcurrentHashMap<>();
 	protected static final int GAINS = 250;
 
 	private final RateLimiter rateLimiter;
@@ -47,10 +49,20 @@ public class TriviaCmd extends AbstractCommand {
 			return;
 		}
 
-		try {
-			new GuildTriviaManager(context.getChannel()).start();
-		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting a question.... Please, try again later.", err, context);
+		GuildTriviaManager triviaManager = CHANNELS_TRIVIA.get(context.getChannel());
+
+		if(triviaManager == null) {
+			try {
+				triviaManager = new GuildTriviaManager(context.getChannel());
+				CHANNELS_TRIVIA.put(context.getChannel(), triviaManager);
+				triviaManager.start();
+
+			} catch (JSONException | IOException err) {
+				LogUtils.error("Something went wrong while getting a question.... Please, try again later.", err, context);
+			}
+
+		} else {
+			BotUtils.sendMessage(Emoji.INFO + " A Trivia game has already been started.", context.getChannel());
 		}
 	}
 
@@ -124,6 +136,7 @@ public class TriviaCmd extends AbstractCommand {
 		private void stop() {
 			MessageManager.removeListener(channel);
 			timer.stop();
+			CHANNELS_TRIVIA.remove(channel);
 		}
 
 		@Override
