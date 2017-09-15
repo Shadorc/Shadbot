@@ -31,6 +31,20 @@ public class NetUtils {
 	}
 
 	/**
+	 * @param url - the String representing URL
+	 * @return the JSON as String from url
+	 * @throws IOException
+	 */
+	public static String getJSON(String url) throws IOException {
+		return Jsoup.connect(url)
+				.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35")
+				.timeout(5000)
+				.ignoreContentType(true)
+				.execute()
+				.body();
+	}
+
+	/**
 	 * @param stringUrl - the String to check
 	 * @return true if stringUrl is a valid URL, false otherwise
 	 */

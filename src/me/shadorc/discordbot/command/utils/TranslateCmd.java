@@ -1,8 +1,13 @@
 package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 
 import me.shadorc.discordbot.Emoji;
@@ -12,10 +17,19 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class TranslateCmd extends AbstractCommand {
+
+	private static final Map<String, String> LANG_ISO_MAP = new HashMap<>();
+
+	static {
+		for(String iso : Locale.getISOLanguages()) {
+			LANG_ISO_MAP.put(new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(), iso);
+		}
+	}
 
 	private final RateLimiter rateLimiter;
 
@@ -35,34 +49,65 @@ public class TranslateCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String lang1 = "";
-		String lang2 = "";
-		String text = "";
+		String langFrom = "";
+		String langTo = "";
+		String sourceText = "";
 
 		if(args.length == 2) {
-			lang1 = "auto";
-			lang2 = args[0].toLowerCase();
-			text = args[1];
+			langFrom = "auto";
+			langTo = args[0].toLowerCase();
+			sourceText = args[1];
 		} else {
-			lang1 = args[0].toLowerCase();
-			lang2 = args[1].toLowerCase();
-			text = args[2];
+			langFrom = args[0].toLowerCase();
+			langTo = args[1].toLowerCase();
+			sourceText = args[2];
 		}
 
-		if(lang1.equals(lang2)) {
+		if(!this.isValidISOLanguage(langFrom)) {
+			langFrom = this.toISO(langFrom);
+		}
+		if(!this.isValidISOLanguage(langTo)) {
+			langTo = this.toISO(langTo);
+		}
+
+		if(langFrom == null || langTo == null) {
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language doesn't exist."
+					+ " Use `" + context.getPrefix() + "help translate` to see a complete list of supported languages.", context.getChannel());
+			return;
+		}
+
+		if(langFrom.equals(langTo)) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " The source language and the targetted language must be different.", context.getChannel());
 			return;
 		}
 
 		try {
-			String translatedText = Utils.translate(lang1, lang2, text);
+			JSONArray result = new JSONArray(NetUtils.getJSON("https://translate.googleapis.com/translate_a/single?"
+					+ "client=gtx"
+					+ "&sl=" + URLEncoder.encode(langFrom, "UTF-8")
+					+ "&tl=" + URLEncoder.encode(langTo, "UTF-8")
+					+ "&dt=t&q=" + URLEncoder.encode(sourceText, "UTF-8")));
+
+			if(!(result.get(0) instanceof JSONArray)) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language isn't supported."
+						+ " Use `" + context.getPrefix() + "help translate` to see a complete list of supported languages.", context.getChannel());
+				return;
+			}
+
+			String translatedText = ((JSONArray) ((JSONArray) result.get(0)).get(0)).get(0).toString();
 			BotUtils.sendMessage(Emoji.MAP + " Translation: " + translatedText, context.getChannel());
-		} catch (IllegalArgumentException argErr) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language isn't supported or doesn't exist."
-					+ " Use `" + context.getPrefix() + "help translate` to see a complete list of supported languages.", context.getChannel());
+
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong during translation... Please, try again later.", err, context);
 		}
+	}
+
+	private boolean isValidISOLanguage(String iso) {
+		return LANG_ISO_MAP.containsValue(iso);
+	}
+
+	private String toISO(String lang) {
+		return LANG_ISO_MAP.get(lang);
 	}
 
 	@Override
@@ -74,5 +119,4 @@ public class TranslateCmd extends AbstractCommand {
 				.appendField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
-
 }
