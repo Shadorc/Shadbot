@@ -80,6 +80,9 @@ public class BotUtils {
 		});
 	}
 
+	/**
+	 * Send pending embeds/messages
+	 */
 	public static void sendQueues() {
 		if(!MESSAGE_QUEUE.isEmpty()) {
 			LogUtils.info("Sending pending messages...");

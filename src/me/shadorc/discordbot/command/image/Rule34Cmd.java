@@ -38,7 +38,8 @@ public class Rule34Cmd extends AbstractCommand {
 		}
 
 		if(!context.getChannel().isNSFW()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " This must be a NSFW-channel.", context.getChannel());
+			BotUtils.sendMessage(Emoji.EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
+					+ context.getPrefix() + "toggle_nsfw", context.getChannel());
 			return;
 		}
 
