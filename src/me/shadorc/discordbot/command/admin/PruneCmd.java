@@ -16,7 +16,6 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.MessageHistory;
 
 public class PruneCmd extends AbstractCommand {
 
@@ -44,33 +43,32 @@ public class PruneCmd extends AbstractCommand {
 
 		String word = null;
 		if(argsList.contains("-c")) {
-			List<String> wordsList = StringUtils.getQuotedWords(context.getArg());
-			if(wordsList.isEmpty()) {
-				throw new MissingArgumentException();
+			if(StringUtils.getCharCount(context.getArg(), '"') != 2) {
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must indicate words in quotation marks after '-c'.", context.getChannel());
+				return;
 			}
-			word = wordsList.get(0);
+			word = StringUtils.getQuotedWords(context.getArg()).get(0);
 		}
 
 		int num = -1;
 		if(argsList.contains("-n")) {
 			if(argsList.indexOf("-n") + 1 >= argsList.size()) {
-				throw new MissingArgumentException();
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must indicate a number after '-n'.", context.getChannel());
+				return;
 			}
 			String numStr = argsList.get(argsList.indexOf("-n") + 1);
 			if(!StringUtils.isPositiveInt(numStr)) {
-				throw new MissingArgumentException();
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number.", context.getChannel());
+				return;
 			}
 			num = Integer.parseInt(numStr);
 		}
 
 		List<IUser> usersMentioned = context.getMessage().getMentions();
 
-		MessageHistory historyList = context.getChannel().getMessageHistory(context.getChannel().getMaxInternalCacheCount());
 		List<IMessage> messagesList = new ArrayList<IMessage>();
-
-		int count = 0;
-		for(IMessage message : historyList) {
-			if(num != -1 && count >= num) {
+		for(IMessage message : context.getChannel().getMessageHistory(context.getChannel().getMaxInternalCacheCount())) {
+			if(num != -1 && messagesList.size() >= num) {
 				break;
 			}
 			if(!usersMentioned.isEmpty() && !usersMentioned.contains(message.getAuthor())) {
@@ -80,14 +78,13 @@ public class PruneCmd extends AbstractCommand {
 				continue;
 			}
 			messagesList.add(message);
-			count++;
 		}
 
 		if(messagesList.isEmpty()) {
 			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
 		} else {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + BotUtils.deleteMessages(context.getChannel(), messagesList)
-			+ " message(s) deleted.", context.getChannel());
+					+ " message(s) deleted.", context.getChannel());
 		}
 	}
 
