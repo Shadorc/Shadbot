@@ -21,7 +21,7 @@ public class Config {
 	public static final long LOGS_CHANNEL_ID = 346311941829951489L;
 
 	public static final int INDENT_FACTOR = 2;
-	public static final int TIMEOUT = 5000;
+	public static final int DEFAULT_TIMEOUT = 5000;
 
 	public static final Color BOT_COLOR = new Color(170, 196, 222);
 
@@ -30,6 +30,24 @@ public class Config {
 
 	private static final File API_KEYS_FILE = new File("api_keys.json");
 	private static final ConcurrentHashMap<APIKey, String> API_KEYS_MAP = new ConcurrentHashMap<>();
+
+	static {
+		if(!API_KEYS_FILE.exists()) {
+			LogUtils.LOGGER.error("API keys file not found ! Exiting.");
+			System.exit(1);
+		}
+
+		try {
+			JSONObject mainObj = new JSONObject(new JSONTokener(API_KEYS_FILE.toURI().toURL().openStream()));
+			for(APIKey key : APIKey.values()) {
+				API_KEYS_MAP.put(key, mainObj.getString(key.toString()));
+			}
+
+		} catch (JSONException | IOException err) {
+			LogUtils.LOGGER.error("Error while reading API keys file. Exiting.", err);
+			System.exit(1);
+		}
+	}
 
 	public enum APIKey {
 		GIPHY_API_KEY,
@@ -47,17 +65,6 @@ public class Config {
 		DISCORD_BOTS_ORG_TOKEN,
 		BLIZZARD_API_KEY,
 		CLEVERBOT_API_KEY;
-	}
-
-	public static void load() {
-		try {
-			JSONObject mainObj = new JSONObject(new JSONTokener(API_KEYS_FILE.toURI().toURL().openStream()));
-			for(APIKey key : APIKey.values()) {
-				API_KEYS_MAP.put(key, mainObj.getString(key.toString()));
-			}
-		} catch (JSONException | IOException err) {
-			LogUtils.error("Error while reading API keys file.", err);
-		}
 	}
 
 	public static String get(APIKey key) {

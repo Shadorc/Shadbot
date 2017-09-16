@@ -10,7 +10,7 @@ import me.shadorc.discordbot.data.Config;
 
 public class LogUtils {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger("Logger");
+	public static final Logger LOGGER = LoggerFactory.getLogger("Logger");
 
 	public static void error(String msg, Exception err, Context context) {
 		LOGGER.error(msg + " (Input: " + context.getMessage().getContent() + ")", err);

@@ -3,9 +3,11 @@ package me.shadorc.discordbot.data;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -17,6 +19,36 @@ import sx.blah.discord.handle.obj.IUser;
 public class Storage {
 
 	private static final File DATA_FILE = new File("data.json");
+	private static final ConcurrentHashMap<String, JSONObject> GUILDS_MAP = new ConcurrentHashMap<>();
+
+	static {
+		if(!DATA_FILE.exists()) {
+			FileWriter writer = null;
+			try {
+				writer = new FileWriter(DATA_FILE);
+				writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
+				writer.flush();
+
+			} catch (IOException err) {
+				LogUtils.LOGGER.error("An error occured during data file initialization. Exiting.", err);
+				System.exit(1);
+
+			} finally {
+				IOUtils.closeQuietly(writer);
+			}
+		}
+
+		try {
+			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
+			for(Object guildID : mainObj.keySet()) {
+				GUILDS_MAP.put(guildID.toString(), mainObj.getJSONObject(guildID.toString()));
+			}
+
+		} catch (JSONException | IOException err) {
+			LogUtils.LOGGER.error("Error while reading data file. Exiting.", err);
+			System.exit(1);
+		}
+	}
 
 	public enum Setting {
 		ALLOWED_CHANNELS("allowed_channels"),
@@ -35,23 +67,11 @@ public class Storage {
 		}
 	}
 
-	public static void init() {
-		FileWriter writer = null;
-		try {
-			DATA_FILE.createNewFile();
-			writer = new FileWriter(DATA_FILE);
-			writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
-			writer.flush();
-
-		} catch (IOException err) {
-			LogUtils.error("An error occured during data file initialization.", err);
-
-		} finally {
-			IOUtils.closeQuietly(writer);
-		}
+	private static JSONObject getGuild(IGuild guild) {
+		return GUILDS_MAP.getOrDefault(guild.getStringID(), Storage.getDefaultGuildObject());
 	}
 
-	private static JSONObject getNewGuildObject() {
+	private static JSONObject getDefaultGuildObject() {
 		JSONObject guildObj = new JSONObject();
 		guildObj.put(Setting.ALLOWED_CHANNELS.toString(), new JSONArray());
 		guildObj.put(Setting.PREFIX.toString(), Config.DEFAULT_PREFIX);
@@ -59,96 +79,39 @@ public class Storage {
 		return guildObj;
 	}
 
-	public static synchronized void saveSetting(IGuild guild, Setting setting, Object value) {
-		if(!DATA_FILE.exists()) {
-			Storage.init();
-		}
+	public static void saveSetting(IGuild guild, Setting setting, Object value) {
+		GUILDS_MAP.put(guild.getStringID(), Storage.getGuild(guild).put(setting.toString(), value));
+	}
 
+	public static void savePlayer(Player player) {
+		GUILDS_MAP.put(player.getGuild().getStringID(), Storage.getGuild(player.getGuild()).put(player.getUser().getStringID(), player.toJSON()));
+	}
+
+	public static Object getSetting(IGuild guild, Setting setting) {
+		return Storage.getGuild(guild).opt(setting.toString());
+	}
+
+	public static Player getPlayer(IGuild guild, IUser user) {
+		return new Player(guild, user, Storage.getGuild(guild).optJSONObject(user.getStringID()));
+	}
+
+	public static void save() {
 		FileWriter writer = null;
 		try {
-			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
-
-			String guildID = guild.getStringID();
-			JSONObject guildObj = mainObj.has(guildID) ? mainObj.getJSONObject(guildID) : Storage.getNewGuildObject();
-			guildObj.put(setting.toString(), value);
-			mainObj.put(guildID, guildObj);
-
-			writer = new FileWriter(DATA_FILE);
-			writer.write(mainObj.toString(Config.INDENT_FACTOR));
-			writer.flush();
-
-		} catch (IOException err) {
-			LogUtils.error("Error while saving setting.", err);
-
-		} finally {
-			IOUtils.closeQuietly(writer);
-		}
-	}
-
-	public static synchronized void savePlayer(Player player) {
-		if(!DATA_FILE.exists()) {
-			Storage.init();
-		}
-
-		FileWriter writer = null;
-		try {
-			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
-
-			String guildID = player.getGuild().getStringID();
-			JSONObject guildObj = mainObj.has(guildID) ? mainObj.getJSONObject(guildID) : Storage.getNewGuildObject();
-			guildObj.put(player.getUser().getStringID(), player.toJSON());
-			mainObj.put(guildID, guildObj);
-
-			writer = new FileWriter(DATA_FILE);
-			writer.write(mainObj.toString(Config.INDENT_FACTOR));
-			writer.flush();
-
-		} catch (IOException err) {
-			LogUtils.error("Error while saving player.", err);
-
-		} finally {
-			IOUtils.closeQuietly(writer);
-		}
-	}
-
-	public static synchronized Object getSetting(IGuild guild, Setting setting) {
-		if(!DATA_FILE.exists()) {
-			Storage.init();
-		}
-
-		try {
-			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
-
-			String guildID = guild.getStringID();
-			JSONObject guildObj = mainObj.has(guildID) ? mainObj.getJSONObject(guildID) : Storage.getNewGuildObject();
-
-			return guildObj.opt(setting.toString());
-
-		} catch (IOException err) {
-			LogUtils.error("Error while reading data file.", err);
-		}
-
-		return null;
-	}
-
-	public static synchronized Player getPlayer(IGuild guild, IUser user) {
-		if(!DATA_FILE.exists()) {
-			Storage.init();
-		}
-
-		try {
-			JSONObject mainObj = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
-			if(mainObj.has(guild.getStringID())) {
-				JSONObject guildObj = mainObj.getJSONObject(guild.getStringID());
-				if(guildObj.has(user.getStringID())) {
-					return new Player(guild, user, guildObj.getJSONObject(user.getStringID()));
-				}
+			JSONObject mainObj = new JSONObject();
+			for(String guildId : GUILDS_MAP.keySet()) {
+				mainObj.put(guildId, GUILDS_MAP.get(guildId));
 			}
 
-		} catch (IOException err) {
-			LogUtils.error("Error while reading data file.", err);
-		}
+			writer = new FileWriter(DATA_FILE);
+			writer.write(mainObj.toString(Config.INDENT_FACTOR));
+			writer.flush();
 
-		return new Player(guild, user);
+		} catch (IOException err) {
+			LogUtils.error("Error while saving data !", err);
+
+		} finally {
+			IOUtils.closeQuietly(writer);
+		}
 	}
 }

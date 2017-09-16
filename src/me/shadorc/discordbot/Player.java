@@ -17,13 +17,7 @@ public class Player {
 	public Player(IGuild guild, IUser user, JSONObject userObj) {
 		this.guild = guild;
 		this.user = user;
-		this.coins = userObj.getInt("coins");
-	}
-
-	public Player(IGuild guild, IUser user) {
-		this.guild = guild;
-		this.user = user;
-		this.coins = 0;
+		this.coins = userObj == null ? 0 : userObj.getInt("coins");
 	}
 
 	public IGuild getGuild() {

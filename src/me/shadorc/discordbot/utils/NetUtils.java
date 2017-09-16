@@ -26,7 +26,7 @@ public class NetUtils {
 	public static Document getDoc(String url) throws IOException {
 		return Jsoup.connect(url)
 				.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35")
-				.timeout(Config.TIMEOUT)
+				.timeout(Config.DEFAULT_TIMEOUT)
 				.get();
 	}
 
@@ -38,7 +38,7 @@ public class NetUtils {
 	public static String getBody(String url) throws IOException {
 		return Jsoup.connect(url)
 				.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35")
-				.timeout(Config.TIMEOUT)
+				.timeout(Config.DEFAULT_TIMEOUT)
 				.ignoreContentType(true)
 				.execute()
 				.body();

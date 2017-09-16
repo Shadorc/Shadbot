@@ -5,13 +5,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.data.Stats;
+import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 
 public class SchedulerManager {
 
-	private static Runnable saveStatsTask;
 	private static Runnable postStatsTask;
+	private static Runnable saveDataTask;
+	private static Runnable saveStatsTask;
 
 	public static void start() {
 		// Update Shadbot stats every 3 hours
@@ -24,6 +26,17 @@ public class SchedulerManager {
 
 		Executors.newSingleThreadScheduledExecutor()
 				.scheduleAtFixedRate(postStatsTask, 0, TimeUnit.HOURS.toMillis(3), TimeUnit.MILLISECONDS);
+
+		// Save data every minute
+		saveDataTask = new Runnable() {
+			@Override
+			public void run() {
+				Storage.save();
+			}
+		};
+
+		Executors.newSingleThreadScheduledExecutor()
+				.scheduleAtFixedRate(saveDataTask, TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS);
 
 		// Save stats every 5 minutes
 		saveStatsTask = new Runnable() {
@@ -39,10 +52,14 @@ public class SchedulerManager {
 
 	public static void forceExecution() {
 		try {
-			Executors.newSingleThreadScheduledExecutor().submit(saveStatsTask).get();
+			if(saveDataTask != null) {
+				Executors.newSingleThreadScheduledExecutor().submit(saveDataTask).get();
+			}
+			if(saveStatsTask != null) {
+				Executors.newSingleThreadScheduledExecutor().submit(saveStatsTask).get();
+			}
 		} catch (InterruptedException | ExecutionException err) {
-			LogUtils.error("An error occured while forcing stats saving.", err);
+			LogUtils.error("An error occured while forcing saves.", err);
 		}
 	}
-
 }
