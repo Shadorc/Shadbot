@@ -2,20 +2,32 @@ package me.shadorc.discordbot;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 
 public class SchedulerManager {
+
+	private static ScheduledFuture<?> sendMessagesSch;
+	private static Runnable sendMessagesTask;
 
 	private static Runnable postStatsTask;
 	private static Runnable saveDataTask;
 	private static Runnable saveStatsTask;
 
 	public static void start() {
+		sendMessagesTask = new Runnable() {
+			@Override
+			public void run() {
+				BotUtils.sendQueues();
+			}
+		};
+
 		// Update Shadbot stats every 3 hours
 		postStatsTask = new Runnable() {
 			@Override
@@ -48,6 +60,13 @@ public class SchedulerManager {
 
 		Executors.newSingleThreadScheduledExecutor()
 				.scheduleAtFixedRate(saveStatsTask, TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
+	}
+
+	public static synchronized void scheduleSendingMessages() {
+		if(sendMessagesSch == null || sendMessagesSch.isDone()) {
+			sendMessagesSch = Executors.newSingleThreadScheduledExecutor()
+					.schedule(sendMessagesTask, TimeUnit.SECONDS.toMillis(3), TimeUnit.MILLISECONDS);
+		}
 	}
 
 	public static void forceExecution() {

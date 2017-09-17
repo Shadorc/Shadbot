@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Emoji;
+import me.shadorc.discordbot.SchedulerManager;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.data.Storage.Setting;
@@ -28,9 +29,8 @@ public class BotUtils {
 
 	public static void sendMessage(String message, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			List<String> messageList = MESSAGE_QUEUE.getOrDefault(channel, new ArrayList<>());
-			messageList.add(message);
-			MESSAGE_QUEUE.put(channel, messageList);
+			MESSAGE_QUEUE.putIfAbsent(channel, new ArrayList<>());
+			MESSAGE_QUEUE.get(channel).add(message);
 			LogUtils.info("Shard isn't ready, message added to queue.");
 			return;
 		}
@@ -46,6 +46,13 @@ public class BotUtils {
 			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + "} Missing permissions.", err);
 			} catch (DiscordException err) {
+				if(err.getErrorMessage().contains("Discord didn't return a response") || err.getErrorMessage().contains("400 Bad Request")) {
+					LogUtils.info(err.getErrorMessage() + "\nAdding message to queue.");
+					MESSAGE_QUEUE.putIfAbsent(channel, new ArrayList<>());
+					MESSAGE_QUEUE.get(channel).add(message);
+					SchedulerManager.scheduleSendingMessages();
+					return;
+				}
 				LogUtils.error("Discord exception while sending message.", err);
 			}
 		});
@@ -54,9 +61,8 @@ public class BotUtils {
 	// EmbedBuilder doc: https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static RequestFuture<IMessage> sendEmbed(EmbedObject embed, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			List<EmbedObject> embedList = EMBED_QUEUE.getOrDefault(channel, new ArrayList<>());
-			embedList.add(embed);
-			EMBED_QUEUE.put(channel, embedList);
+			EMBED_QUEUE.putIfAbsent(channel, new ArrayList<>());
+			EMBED_QUEUE.get(channel).add(embed);
 			LogUtils.info("Shard isn't ready, embed link added to queue.");
 			return null;
 		}
