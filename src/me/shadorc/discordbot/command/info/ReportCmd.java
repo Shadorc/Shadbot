@@ -19,7 +19,7 @@ public class ReportCmd extends AbstractCommand {
 
 	public ReportCmd() {
 		super(Role.USER, "report", "suggest");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(30, ChronoUnit.SECONDS);
 	}
 
 	@Override
