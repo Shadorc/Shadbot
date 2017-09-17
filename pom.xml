@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.shadorc.discordbot</groupId>
 	<artifactId>discordbot</artifactId>
-	<version>1.6.2</version>
+	<version>1.7.0</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -62,7 +62,7 @@
 		<dependency>
 			<groupId>com.github.austinv11</groupId>
 			<artifactId>Discord4J</artifactId>
-			<version>dev-SNAPSHOT</version>
+			<version>2.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
