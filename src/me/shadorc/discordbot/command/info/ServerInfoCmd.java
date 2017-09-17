@@ -41,12 +41,13 @@ public class ServerInfoCmd extends AbstractCommand {
 
 		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.setLenient(true)
-				.withAuthorName("Info about server " + guild.getName())
+				.withAuthorName("Info about \"" + guild.getName() + "\"")
 				.withThumbnail(guild.getIconURL())
 				.appendField("Owner", guild.getOwner().getName(), true)
 				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
-				.appendField("Creation date", guild.getCreationDate().format(dateFormatter), true)
 				.appendField("Region", guild.getRegion().getName(), true)
+				.appendField("Creation date", guild.getCreationDate().format(dateFormatter)
+						+ "\n(" + StringUtils.formateDate(guild.getCreationDate()) + ")", true)
 				.appendField("Channels", Integer.toString(guild.getChannels().size()), true)
 				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
 				.appendField("Settings",

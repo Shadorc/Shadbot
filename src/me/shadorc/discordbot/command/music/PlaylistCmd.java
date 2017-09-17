@@ -57,7 +57,7 @@ public class PlaylistCmd extends AbstractCommand {
 			return "**The playlist is empty.**";
 		}
 
-		StringBuilder playlist = new StringBuilder("**" + queue.size() + " music(s) in the playlist:**\n");
+		StringBuilder playlist = new StringBuilder("**" + StringUtils.pluralOf(queue.size(), "music") + " in the playlist:**\n");
 
 		int count = 1;
 		for(AudioTrack track : queue) {

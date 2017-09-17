@@ -1,5 +1,8 @@
 package me.shadorc.discordbot.utils;
 
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -54,10 +57,36 @@ public class StringUtils {
 
 	/**
 	 * @param duration - the duration to format
-	 * @return the formatted duration
+	 * @return the formatted duration as "m:ss"
 	 */
-	public static String formatDuration(long duration) {
-		return DurationFormatUtils.formatDuration(duration, "m:ss", true);
+	public static String formatDuration(long durationMillis) {
+		return DurationFormatUtils.formatDuration(durationMillis, "m:ss", true);
+	}
+
+	/**
+	 * @param date - the date to format
+	 * @return the formatted date as "d days h hours"
+	 */
+	public static String formateDate(LocalDateTime date) {
+		Period period = Period.between(date.toLocalDate(), LocalDateTime.now().toLocalDate());
+		long years = period.get(ChronoUnit.YEARS);
+		long months = period.get(ChronoUnit.MONTHS);
+		long days = period.get(ChronoUnit.DAYS);
+
+		StringBuilder strBuilder = new StringBuilder();
+		if(years != 0) {
+			strBuilder.append(StringUtils.pluralOf(years, "year") + ", ");
+		}
+		if(months != 0) {
+			strBuilder.append(StringUtils.pluralOf(months, "month") + ", ");
+		}
+		strBuilder.append(StringUtils.pluralOf(days, "day"));
+
+		return strBuilder.toString();
+	}
+
+	public static String pluralOf(long count, String word) {
+		return count + " " + (count > 1 ? word + "s" : word);
 	}
 
 	/**

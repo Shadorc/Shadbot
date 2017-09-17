@@ -183,7 +183,7 @@ public class DiceCmd extends AbstractCommand {
 					Storage.getPlayer(context.getGuild(), loser).addCoins(-bet);
 					strBuilder.append(loser.mention() + ", ");
 				}
-				strBuilder.append("you lost " + bet + " coin(s).");
+				strBuilder.append("you lost " + StringUtils.pluralOf(bet, "coin") + ".");
 				BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 			}
 

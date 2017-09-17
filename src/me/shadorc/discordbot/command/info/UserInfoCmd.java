@@ -39,8 +39,10 @@ public class UserInfoCmd extends AbstractCommand {
 				.withThumbnail(user.getAvatarURL())
 				.appendField("Display name", user.getDisplayName(context.getGuild()), true)
 				.appendField("User ID", Long.toString(user.getLongID()), true)
-				.appendField("Creation date", user.getCreationDate().format(dateFormatter), true)
-				.appendField("Join date", context.getGuild().getJoinTimeForUser(user).format(dateFormatter), true)
+				.appendField("Creation date", user.getCreationDate().format(dateFormatter)
+						+ "\n(" + StringUtils.formateDate(user.getCreationDate()) + ")", true)
+				.appendField("Join date", context.getGuild().getJoinTimeForUser(user).format(dateFormatter)
+						+ "\n(" + StringUtils.formateDate(context.getGuild().getJoinTimeForUser(user)) + ")", true)
 				.appendField("Status", user.getPresence().getStatus().toString(), true)
 				.appendField("Playing text", user.getPresence().getPlayingText().orElse(null), true)
 				.appendField("Roles", StringUtils.formatList(user.getRolesForGuild(context.getGuild()), role -> role.getName(), "\n"), true);

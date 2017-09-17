@@ -83,8 +83,9 @@ public class PruneCmd extends AbstractCommand {
 		if(messagesList.isEmpty()) {
 			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
 		} else {
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " " + BotUtils.deleteMessages(context.getChannel(), messagesList)
-					+ " message(s) deleted.", context.getChannel());
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " "
+					+ StringUtils.pluralOf(BotUtils.deleteMessages(context.getChannel(), messagesList), "message")
+					+ " deleted.", context.getChannel());
 		}
 	}
 
