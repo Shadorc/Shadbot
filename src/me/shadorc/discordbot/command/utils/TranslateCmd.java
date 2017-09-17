@@ -71,13 +71,13 @@ public class TranslateCmd extends AbstractCommand {
 		}
 
 		if(langFrom == null || langTo == null) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language doesn't exist."
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " One of the specified language doesn't exist."
 					+ " Use `" + context.getPrefix() + "help translate` to see a complete list of supported languages.", context.getChannel());
 			return;
 		}
 
 		if(langFrom.equals(langTo)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " The source language and the targetted language must be different.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " The source language and the targetted language must be different.", context.getChannel());
 			return;
 		}
 
@@ -89,7 +89,7 @@ public class TranslateCmd extends AbstractCommand {
 					+ "&dt=t&q=" + URLEncoder.encode(sourceText, "UTF-8")));
 
 			if(!(result.get(0) instanceof JSONArray)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " One of the specified language isn't supported."
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " One of the specified language isn't supported."
 						+ " Use `" + context.getPrefix() + "help translate` to see a complete list of supported languages.", context.getChannel());
 				return;
 			}

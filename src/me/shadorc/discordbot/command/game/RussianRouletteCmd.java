@@ -42,7 +42,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 		String betStr = context.getArg();
 		if(!StringUtils.isPositiveInt(betStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid bet.", context.getChannel());
 			return;
 		}
 
@@ -53,7 +53,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		}
 
 		if(bet > MAX_BET) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " You can't bet more than **" + MAX_BET + " coins**.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You can't bet more than **" + MAX_BET + " coins**.", context.getChannel());
 			return;
 		}
 

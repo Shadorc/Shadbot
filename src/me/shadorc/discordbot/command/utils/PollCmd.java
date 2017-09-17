@@ -64,13 +64,13 @@ public class PollCmd extends AbstractCommand {
 		} else {
 			String numStr = context.getArg();
 			if(!StringUtils.isPositiveInt(numStr)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number.", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
 				return;
 			}
 
 			int num = Integer.parseInt(numStr);
 			if(num < 1 || num > pollManager.getNumChoices()) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and " + pollManager.getNumChoices() + ".", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and " + pollManager.getNumChoices() + ".", context.getChannel());
 				return;
 			}
 
@@ -80,7 +80,7 @@ public class PollCmd extends AbstractCommand {
 
 	private void createPoll(Context context) throws MissingArgumentException {
 		if(context.getArg().length() > EmbedBuilder.DESCRIPTION_CONTENT_LIMIT) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Your message is waaay too long, it must not contain more than "
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Your message is waaay too long, it must not contain more than "
 					+ EmbedBuilder.DESCRIPTION_CONTENT_LIMIT + " characters.", context.getChannel());
 			return;
 		}
@@ -92,19 +92,19 @@ public class PollCmd extends AbstractCommand {
 
 		String durationStr = splitArgs[0];
 		if(!StringUtils.isPositiveInt(durationStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid duration.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid duration.", context.getChannel());
 			return;
 		}
 
 		int duration = Integer.parseInt(durationStr);
 		if(duration < MIN_DURATION || duration > MAX_DURATION) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Duration must be between " + MIN_DURATION + "sec and "
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Duration must be between " + MIN_DURATION + "sec and "
 					+ MAX_DURATION + "sec.", context.getChannel());
 			return;
 		}
 
 		if(StringUtils.getCharCount(splitArgs[1], '"') % 2 != 0) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " You forgot a quotation mark.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You forgot a quotation mark.", context.getChannel());
 			return;
 		}
 
@@ -112,7 +112,7 @@ public class PollCmd extends AbstractCommand {
 
 		String question = substrings.get(0);
 		if(question.isEmpty()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " The question can not be empty.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " The question can not be empty.", context.getChannel());
 			return;
 		}
 
@@ -122,7 +122,7 @@ public class PollCmd extends AbstractCommand {
 		choicesList.removeAll(Collections.singleton(""));
 
 		if(choicesList.size() < MIN_CHOICES_NUM || choicesList.size() > MAX_CHOICES_NUM) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and "
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and "
 					+ MAX_CHOICES_NUM + " different non-empty choices.", context.getChannel());
 			return;
 		}

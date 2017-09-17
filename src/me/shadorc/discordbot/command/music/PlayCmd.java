@@ -39,16 +39,16 @@ public class PlayCmd extends AbstractCommand {
 		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
 		if(userVoiceChannel == null) {
 			if(botVoiceChannel == null) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Join a voice channel before using this command.", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Join a voice channel before using this command.", context.getChannel());
 			} else {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
 						+ ", join me before using this command.", context.getChannel());
 			}
 			return;
 		}
 
 		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
 					+ ", join me before using this command.", context.getChannel());
 			return;
 		}

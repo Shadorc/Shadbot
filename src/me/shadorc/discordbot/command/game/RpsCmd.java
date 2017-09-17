@@ -74,7 +74,7 @@ public class RpsCmd extends AbstractCommand {
 		Handsign userHandsign = Handsign.getEnum(context.getArg());
 
 		if(userHandsign == null) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid handsign, please use \"rock\", \"paper\" or \"scissors\".", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid handsign, please use \"rock\", \"paper\" or \"scissors\".", context.getChannel());
 			return;
 		}
 

@@ -44,7 +44,7 @@ public class PruneCmd extends AbstractCommand {
 		String word = null;
 		if(argsList.contains("-c")) {
 			if(StringUtils.getCharCount(context.getArg(), '"') != 2) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must indicate words in quotation marks after '-c'.", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must indicate words in quotation marks after '-c'.", context.getChannel());
 				return;
 			}
 			word = StringUtils.getQuotedWords(context.getArg()).get(0);
@@ -53,12 +53,12 @@ public class PruneCmd extends AbstractCommand {
 		int num = -1;
 		if(argsList.contains("-n")) {
 			if(argsList.indexOf("-n") + 1 >= argsList.size()) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " You must indicate a number after '-n'.", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must indicate a number after '-n'.", context.getChannel());
 				return;
 			}
 			String numStr = argsList.get(argsList.indexOf("-n") + 1);
 			if(!StringUtils.isPositiveInt(numStr)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number.", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
 				return;
 			}
 			num = Integer.parseInt(numStr);

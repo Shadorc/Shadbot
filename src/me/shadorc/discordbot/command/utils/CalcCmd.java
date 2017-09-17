@@ -38,7 +38,7 @@ public class CalcCmd extends AbstractCommand {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			BotUtils.sendMessage(context.getArg().replace('*', 'x') + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException err) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid expression.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid expression.", context.getChannel());
 		}
 	}
 

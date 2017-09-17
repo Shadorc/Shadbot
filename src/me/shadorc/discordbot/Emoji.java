@@ -4,12 +4,14 @@ public enum Emoji {
 
 	ACCESS_DENIED(":no_entry_sign:"),
 	CHECK_MARK(":white_check_mark:"),
-	EXCLAMATION(":grey_exclamation:"),
+	GREY_EXCLAMATION(":grey_exclamation:"),
+	RED_EXCLAMATION(":exclamation:"),
 	RED_FLAG(":triangular_flag_on_post:"),
 	INFO(":information_source:"),
 	MAGNIFYING_GLASS(":mag:"),
 	STOPWATCH(":stopwatch:"),
 	WARNING(":warning:"),
+	RED_CROSS(":x:"),
 	GEAR(":gear:"),
 
 	MONEY_WINGS(":money_with_wings:"),

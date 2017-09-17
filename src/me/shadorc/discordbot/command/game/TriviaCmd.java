@@ -145,7 +145,7 @@ public class TriviaCmd extends AbstractCommand {
 			IUser author = message.getAuthor();
 
 			if(alreadyAnswered.contains(author) && (wrongAnswer || goodAnswer)) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry " + author.getName() + ", you can only answer once.", message.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Sorry " + author.getName() + ", you can only answer once.", message.getChannel());
 
 			} else if(wrongAnswer) {
 				BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", channel);

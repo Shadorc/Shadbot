@@ -68,7 +68,7 @@ public class AutoMessageSettingCmd implements SettingCmd {
 				break;
 
 			default:
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid command, use `" + context.getPrefix() + "settings "
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid command, use `" + context.getPrefix() + "settings "
 						+ Setting.AUTO_MESSAGE.toString() + " help` to see help.", context.getChannel());
 				return;
 		}

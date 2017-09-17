@@ -38,7 +38,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 		}
 
 		if(!context.getChannel().isNSFW()) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
 					+ "`" + context.getPrefix() + "settings " + Setting.NSFW + " toggle`", context.getChannel());
 			return;
 		}

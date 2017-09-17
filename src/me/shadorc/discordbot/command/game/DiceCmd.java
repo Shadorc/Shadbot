@@ -58,7 +58,7 @@ public class DiceCmd extends AbstractCommand {
 
 		String betStr = splitArgs[0];
 		if(!StringUtils.isPositiveInt(betStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid bet.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid bet.", context.getChannel());
 			return;
 		}
 
@@ -70,7 +70,7 @@ public class DiceCmd extends AbstractCommand {
 
 		String numStr = splitArgs[1];
 		if(!StringUtils.isValidDiceNum(numStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 			return;
 		}
 
@@ -95,20 +95,20 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		if(diceManager.getPlayers() == 6) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Sorry, there are already 6 players.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Sorry, there are already 6 players.", context.getChannel());
 			return;
 		}
 
 		String numStr = context.getArg();
 		if(!StringUtils.isValidDiceNum(numStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 			return;
 		}
 
 		int num = Integer.parseInt(numStr);
 
 		if(diceManager.isBet(num)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
 			return;
 		}
 

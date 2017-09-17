@@ -39,7 +39,7 @@ public class NSFWSettingCmd implements SettingCmd {
 				isNSFW = false;
 				break;
 			default:
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid action. Use toggle, enable or disable.", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid action. Use toggle, enable or disable.", context.getChannel());
 				return;
 		}
 

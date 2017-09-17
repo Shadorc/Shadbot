@@ -41,7 +41,7 @@ public class PositionCmd extends AbstractCommand {
 
 		String numStr = context.getArg().trim();
 		if(!StringUtils.isPositiveInt(numStr)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
 			return;
 		}
 
@@ -51,7 +51,7 @@ public class PositionCmd extends AbstractCommand {
 			musicManager.getScheduler().changePosition(time);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(musicManager.getScheduler().getPosition()), context.getChannel());
 		} catch (IllegalArgumentException err) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " New position is negative or superior to the music duration.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " New position is negative or superior to the music duration.", context.getChannel());
 		}
 	}
 

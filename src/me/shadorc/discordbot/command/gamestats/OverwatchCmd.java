@@ -47,13 +47,13 @@ public class OverwatchCmd extends AbstractCommand {
 
 		String plateform = splitArgs[0].toLowerCase();
 		if(!Arrays.asList("pc", "psn", "xbl").contains(plateform)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Plateform is invalid. Options: pc, psn, xbl.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Plateform is invalid. Options: pc, psn, xbl.", context.getChannel());
 			return;
 		}
 
 		String region = splitArgs[1].toLowerCase();
 		if(!Arrays.asList("eu", "us", "cn", "kr").contains(region)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Region is invalid. Options: eu, us, cn, kr.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Region is invalid. Options: eu, us, cn, kr.", context.getChannel());
 			return;
 		}
 

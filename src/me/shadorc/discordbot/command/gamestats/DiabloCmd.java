@@ -54,7 +54,7 @@ public class DiabloCmd extends AbstractCommand {
 
 		String region = splitArgs[0].toLowerCase();
 		if(!Arrays.asList("eu", "us", "tw", "kr").contains(region)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Region is invalid. Options: eu, us, tw, kr.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Region is invalid. Options: eu, us, tw, kr.", context.getChannel());
 			return;
 		}
 

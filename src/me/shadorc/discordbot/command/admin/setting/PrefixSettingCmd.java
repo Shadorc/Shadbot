@@ -20,12 +20,12 @@ public class PrefixSettingCmd implements SettingCmd {
 		}
 
 		if(arg.contains(" ")) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Prefix cannot contain space.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Prefix cannot contain space.", context.getChannel());
 			return;
 		}
 
 		if(arg.length() > PREFIX_MAX_LENGTH) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Prefix cannot contain more than " + PREFIX_MAX_LENGTH + " characters.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Prefix cannot contain more than " + PREFIX_MAX_LENGTH + " characters.", context.getChannel());
 			return;
 		}
 

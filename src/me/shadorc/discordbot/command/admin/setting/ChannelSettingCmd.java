@@ -60,7 +60,7 @@ public class ChannelSettingCmd implements SettingCmd {
 				break;
 
 			default:
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid action. Use `" + context.getPrefix() + "settings "
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid action. Use `" + context.getPrefix() + "settings "
 						+ Setting.ALLOWED_CHANNELS.toString() + " help` to see help.", context.getChannel());
 				return;
 		}

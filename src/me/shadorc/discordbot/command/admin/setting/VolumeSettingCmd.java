@@ -23,13 +23,13 @@ public class VolumeSettingCmd implements SettingCmd {
 		}
 
 		if(!StringUtils.isPositiveInt(arg)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid number, must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ".", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ".", context.getChannel());
 			return;
 		}
 
 		int vol = Integer.parseInt(arg);
 		if(vol < MIN_VOLUME || vol > MAX_VOLUME) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Default volume must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ". ", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Default volume must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ". ", context.getChannel());
 			return;
 		}
 

@@ -135,7 +135,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			LogUtils.warn("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} "
 					+ "Load failed, Shadbot might be able to continue playing: " + errMessage);
 		} else {
-			BotUtils.sendMessage(Emoji.GEAR + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
 			LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Load failed: " + errMessage);
 		}
 
@@ -203,7 +203,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	private void sendInvalidChoice(String choice, String prefix, IMessage message) {
-		BotUtils.sendMessage(Emoji.EXCLAMATION + " Music selection: \"" + choice + "\" is not a valid number."
+		BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Music selection: \"" + choice + "\" is not a valid number."
 				+ " Enter a number between 1 and " + Math.min(5, resultsTracks.size()) + " or use `" + prefix + "cancel` to cancel the selection.",
 				musicManager.getChannel());
 		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Invalid choice: " + message.getContent());

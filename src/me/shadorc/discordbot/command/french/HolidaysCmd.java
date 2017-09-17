@@ -39,7 +39,7 @@ public class HolidaysCmd extends AbstractCommand {
 
 		String zone = context.getArg().toUpperCase();
 		if(!ZONES.contains(zone)) {
-			BotUtils.sendMessage(Emoji.EXCLAMATION + " Invalid zone. Options: A, B, C", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid zone. Options: A, B, C", context.getChannel());
 			return;
 		}
 
