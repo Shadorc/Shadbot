@@ -7,8 +7,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.AbstractCommand.Role;
 import me.shadorc.discordbot.command.admin.PruneCmd;
-import me.shadorc.discordbot.command.admin.SettingsCmd;
-import me.shadorc.discordbot.command.admin.ToggleNSFWCmd;
+import me.shadorc.discordbot.command.admin.SettingsManagerCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
 import me.shadorc.discordbot.command.currency.LeaderboardCmd;
 import me.shadorc.discordbot.command.currency.TransferCoinsCmd;
@@ -122,9 +121,8 @@ public class CommandManager {
 				new JokeCmd(),
 				new HolidaysCmd(),
 				// Admin Commands
-				new SettingsCmd(),
+				new SettingsManagerCmd(),
 				new PruneCmd(),
-				new ToggleNSFWCmd(),
 				// Owner Commands
 				new ShutdownCmd());
 	}

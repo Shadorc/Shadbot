@@ -14,6 +14,7 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
@@ -38,7 +39,7 @@ public class Rule34Cmd extends AbstractCommand {
 
 		if(!context.getChannel().isNSFW()) {
 			BotUtils.sendMessage(Emoji.EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
-					+ context.getPrefix() + "toggle_nsfw", context.getChannel());
+					+ "`" + context.getPrefix() + "settings " + Setting.NSFW + " toggle`", context.getChannel());
 			return;
 		}
 
@@ -95,7 +96,7 @@ public class Rule34Cmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show a random image corresponding to a tag from Rule34 website.**")
-				.appendField("Usage", context.getPrefix() + "rule34 <tag(s)>", false);
+				.appendField("Usage", "`" + context.getPrefix() + "rule34 <tag(s)>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

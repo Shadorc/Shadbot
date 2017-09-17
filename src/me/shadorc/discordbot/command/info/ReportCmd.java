@@ -42,7 +42,7 @@ public class ReportCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Send a message to my author, this can be a suggestion, a bug report, anything.**")
-				.appendField("Usage", context.getPrefix() + "report <message>", false);
+				.appendField("Usage", "`" + context.getPrefix() + "report <message>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

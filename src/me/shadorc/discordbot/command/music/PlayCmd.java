@@ -39,7 +39,7 @@ public class PlayCmd extends AbstractCommand {
 		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
 		if(userVoiceChannel == null) {
 			if(botVoiceChannel == null) {
-				BotUtils.sendMessage(Emoji.EXCLAMATION + " Join a vocal channel before using this command.", context.getChannel());
+				BotUtils.sendMessage(Emoji.EXCLAMATION + " Join a voice channel before using this command.", context.getChannel());
 			} else {
 				BotUtils.sendMessage(Emoji.EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
 						+ ", join me before using this command.", context.getChannel());
@@ -78,7 +78,7 @@ public class PlayCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play the music(s) from the url, search terms or playlist.\nYou can also search on SoundCloud by using /play soundcloud <search>**")
-				.appendField("Usage", context.getPrefix() + "play <url>", false);
+				.appendField("Usage", "`" + context.getPrefix() + "play <url>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

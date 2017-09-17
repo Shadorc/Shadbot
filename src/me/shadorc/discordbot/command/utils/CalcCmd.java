@@ -46,7 +46,7 @@ public class CalcCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Calculate an expression.**")
-				.appendField("Usage", context.getPrefix() + "calc <expression>", false);
+				.appendField("Usage", "`" + context.getPrefix() + "calc <expression>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

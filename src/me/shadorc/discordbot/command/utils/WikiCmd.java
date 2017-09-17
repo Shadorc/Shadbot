@@ -82,7 +82,7 @@ public class WikiCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show Wikipedia description for a search.**")
-				.appendField("Usage", context.getPrefix() + "wiki <search>", false);
+				.appendField("Usage", "`" + context.getPrefix() + "wiki <search>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

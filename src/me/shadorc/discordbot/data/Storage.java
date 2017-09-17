@@ -53,7 +53,12 @@ public class Storage {
 	public enum Setting {
 		ALLOWED_CHANNELS("allowed_channels"),
 		PREFIX("prefix"),
-		DEFAULT_VOLUME("default_volume");
+		DEFAULT_VOLUME("default_volume"),
+		AUTO_MESSAGE("auto_message"),
+		JOIN_MESSAGE("join_message"),
+		LEAVE_MESSAGE("leave_message"),
+		MESSAGE_CHANNEL_ID("message_channel_id"),
+		NSFW("nsfw");
 
 		private final String key;
 
@@ -93,6 +98,10 @@ public class Storage {
 
 	public static Player getPlayer(IGuild guild, IUser user) {
 		return new Player(guild, user, Storage.getGuild(guild).optJSONObject(user.getStringID()));
+	}
+
+	public static void removeSetting(IGuild guild, Setting setting) {
+		Storage.getGuild(guild).remove(setting.toString());
 	}
 
 	public static void save() {

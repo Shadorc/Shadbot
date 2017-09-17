@@ -119,7 +119,7 @@ public class ImageCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Search for a random image on DeviantArt.**")
-				.appendField("Usage", context.getPrefix() + "image <search>", false);
+				.appendField("Usage", "`" + context.getPrefix() + "image <search>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

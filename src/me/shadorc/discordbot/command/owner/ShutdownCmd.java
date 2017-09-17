@@ -66,7 +66,7 @@ public class ShutdownCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Schedule a shutdown after a fixed amount of seconds and send a message to all guilds playing musics.**")
-				.appendField("Usage", context.getPrefix() + "shutdown <seconds> <message>", false);
+				.appendField("Usage", "`" + context.getPrefix() + "shutdown <seconds> <message>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

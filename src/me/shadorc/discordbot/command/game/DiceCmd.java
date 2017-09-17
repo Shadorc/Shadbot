@@ -120,8 +120,8 @@ public class DiceCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Start a dice game with a common bet or join a game in progress.**")
-				.appendField("Usage", "**Create a game:** " + context.getPrefix() + "dice <bet> <num>"
-						+ "\n**Join a game:** " + context.getPrefix() + "dice <num>", false)
+				.appendField("Usage", "**Create a game:** `" + context.getPrefix() + "dice <bet> <num>`"
+						+ "\n**Join a game:** `" + context.getPrefix() + "dice <num>`", false)
 				.appendField("Restrictions", "**num** - must be between 1 and 6"
 						+ "\nYou can't bet on a number that has already been chosen by another player.", false)
 				.appendField("Gains", "The winner gets the common bet multiplied by " + MULTIPLIER + " plus the number of players."
