@@ -203,8 +203,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	private void sendInvalidChoice(String choice, String prefix, IMessage message) {
-		BotUtils.sendMessage(Emoji.EXCLAMATION + " \"" + choice + "\" is not a valid number. "
-				+ "You can use " + prefix + "cancel to cancel the selection.",
+		BotUtils.sendMessage(Emoji.EXCLAMATION + " Music selection: \"" + choice + "\" is not a valid number."
+				+ " Enter a number between 1 and " + Math.min(5, resultsTracks.size()) + " or use `" + prefix + "cancel` to cancel the selection.",
 				musicManager.getChannel());
 		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Invalid choice: " + message.getContent());
 	}
