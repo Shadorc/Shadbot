@@ -31,6 +31,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	public static final String YT_SEARCH = "ytsearch: ";
 	public static final String SC_SEARCH = "scsearch: ";
 
+	private static final int CHOICE_DURATION = 30;
+
 	private final String identifier;
 	private final IVoiceChannel botVoiceChannel;
 	private final IVoiceChannel userVoiceChannel;
@@ -93,10 +95,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 							+ "\nYou can choose several musics by separating them with a comma."
 							+ "\nExample: 1,3,4"
 							+ "\n" + strBuilder.toString())
-					.withFooterText("This choice will be canceled in 20 seconds.");
+					.withFooterText("This choice will be canceled in " + CHOICE_DURATION + " seconds.");
 			BotUtils.sendEmbed(embed.build(), musicManager.getChannel());
 
-			cancelTimer = new Timer(20 * 1000, event -> {
+			cancelTimer = new Timer(CHOICE_DURATION * 1000, event -> {
 				this.stopWaiting();
 			});
 			cancelTimer.start();
