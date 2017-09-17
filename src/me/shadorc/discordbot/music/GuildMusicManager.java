@@ -80,11 +80,11 @@ public class GuildMusicManager {
 				IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
 				if(voiceChannel != null) {
 					voiceChannel.leave();
+					LogUtils.info("{Guild ID: " + guild.getLongID() + ")} Voice channel leaved.");
 				}
 				GuildMusicManager.this.cancelLeave();
 				audioPlayer.destroy();
 				MUSIC_MANAGERS.remove(guild);
-				LogUtils.info("{Guild ID: " + guild.getLongID() + ")} Voice channel leaved.");
 			}
 		}).start();
 	}
