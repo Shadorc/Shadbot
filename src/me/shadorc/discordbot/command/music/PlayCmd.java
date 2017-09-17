@@ -8,6 +8,7 @@ import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.events.AudioLoadResultListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -63,11 +64,17 @@ public class PlayCmd extends AbstractCommand {
 		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
+
 		if(musicManager == null
 				// FIXME: Should we check this ? Creating a new manager is not problematic ?
 				|| musicManager.getScheduler().isStopped()) {
 			musicManager = GuildMusicManager.createGuildMusicManager(context.getGuild());
+		} else if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You've reached the maximum number of tracks in the playlist (Max: "
+					+ Config.MAX_PLAYLIST_SIZE + ").", context.getChannel());
+			return;
 		}
+
 		musicManager.setChannel(context.getChannel());
 		musicManager.setDj(context.getAuthor());
 		AudioLoadResultListener resultListener = new AudioLoadResultListener(identifier, botVoiceChannel, userVoiceChannel, musicManager);

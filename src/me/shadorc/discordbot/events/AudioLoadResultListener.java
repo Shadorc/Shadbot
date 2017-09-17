@@ -112,7 +112,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		for(int i = 0; i < Math.min(200, tracks.size()); i++) {
+		for(int i = 0; i < Math.min(Config.MAX_PLAYLIST_SIZE, tracks.size()); i++) {
 			musicManager.getScheduler().queue(tracks.get(i));
 		}
 		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
