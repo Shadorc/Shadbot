@@ -31,7 +31,7 @@ public class BotUtils {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
 			MESSAGE_QUEUE.putIfAbsent(channel, new ArrayList<>());
 			MESSAGE_QUEUE.get(channel).add(message);
-			LogUtils.info("Shard isn't ready, message added to queue.");
+			LogUtils.info("Shard isn't ready, adding message to queue.");
 			return;
 		}
 
@@ -47,7 +47,7 @@ public class BotUtils {
 				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + "} Missing permissions.", err);
 			} catch (DiscordException err) {
 				if(err.getErrorMessage().contains("Discord didn't return a response") || err.getErrorMessage().contains("400 Bad Request")) {
-					LogUtils.info(err.getErrorMessage() + "\nAdding message to queue.");
+					LogUtils.info("A message could not be send now, adding it to queue.");
 					MESSAGE_QUEUE.putIfAbsent(channel, new ArrayList<>());
 					MESSAGE_QUEUE.get(channel).add(message);
 					SchedulerManager.scheduleSendingMessages();
@@ -80,6 +80,13 @@ public class BotUtils {
 			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + "} Missing permissions.", err);
 			} catch (DiscordException err) {
+				if(err.getErrorMessage().contains("Discord didn't return a response") || err.getErrorMessage().contains("400 Bad Request")) {
+					LogUtils.info("An embed link could not be send now, added it to queue.");
+					EMBED_QUEUE.putIfAbsent(channel, new ArrayList<>());
+					EMBED_QUEUE.get(channel).add(embed);
+					SchedulerManager.scheduleSendingMessages();
+					return null;
+				}
 				LogUtils.error("Discord exception while sending embed link.", err);
 			}
 			return null;
@@ -91,18 +98,20 @@ public class BotUtils {
 	 */
 	public static void sendQueues() {
 		if(!MESSAGE_QUEUE.isEmpty()) {
-			LogUtils.info("Sending pending messages...");
+			int count = MESSAGE_QUEUE.values().stream().mapToInt(list -> list.size()).sum();
+			LogUtils.info("Sending " + count + " pending message(s)...");
 			for(IChannel channel : MESSAGE_QUEUE.keySet()) {
 				for(String message : MESSAGE_QUEUE.get(channel)) {
 					BotUtils.sendMessage(message, channel);
 				}
 			}
-			LogUtils.info("Pending messages sent.");
+			LogUtils.info("Pending message(s) sent.");
 			MESSAGE_QUEUE.clear();
 		}
 
 		if(!EMBED_QUEUE.isEmpty()) {
-			LogUtils.info("Sending pending embed...");
+			int count = EMBED_QUEUE.values().stream().mapToInt(list -> list.size()).sum();
+			LogUtils.info("Sending " + count + " pending embed...");
 			for(IChannel channel : EMBED_QUEUE.keySet()) {
 				for(EmbedObject embed : EMBED_QUEUE.get(channel)) {
 					BotUtils.sendEmbed(embed, channel);
