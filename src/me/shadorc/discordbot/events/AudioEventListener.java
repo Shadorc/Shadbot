@@ -58,16 +58,20 @@ public class AudioEventListener extends AudioEventAdapter {
 	@Override
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
 		errorCount++;
-		if(errorCount < 3) {
-			String errMessage = Jsoup.parse(err.getMessage().replace("Watch on YouTube", "")).text().trim();
-			BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase() + ". I'll try to play the next available song.", channel);
-			LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + "} Track exception: " + errMessage);
 
-		} else if(errorCount == 3) {
-			BotUtils.sendMessage(Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until finding a music that can be played.", channel);
-			LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + "} Too many errors in a row. "
-					+ "Shadbot will ignore them until finding a music that can be played.", err);
+		String errMessage = Jsoup.parse(err.getMessage().replace("Watch on YouTube", "")).text().trim();
+
+		if(errorCount <= 3) {
+			BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase() + ". I'll try to play the next available song.", channel);
 		}
+
+		if(errorCount == 3) {
+			BotUtils.sendMessage(Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until finding a music that can be played.", channel);
+			LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + "} Too many errors in a row. "
+					+ "Shadbot will ignore them until finding a music that can be played.");
+		}
+
+		LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + "} " + (errorCount > 3 ? "(Ignored) " : "") + "Track exception: " + errMessage);
 
 		if(!scheduler.nextTrack()) {
 			GuildMusicManager.getGuildMusicManager(guild).end();
