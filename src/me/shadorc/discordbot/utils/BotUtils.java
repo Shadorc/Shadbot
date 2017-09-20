@@ -27,22 +27,22 @@ public class BotUtils {
 	private static final ConcurrentHashMap<IChannel, List<String>> MESSAGE_QUEUE = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<IChannel, List<EmbedObject>> EMBED_QUEUE = new ConcurrentHashMap<>();
 
-	public static void sendMessage(String message, IChannel channel) {
+	public static RequestFuture<IMessage> sendMessage(String message, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
 			MESSAGE_QUEUE.putIfAbsent(channel, new ArrayList<>());
 			MESSAGE_QUEUE.get(channel).add(message);
 			LogUtils.info("Shard isn't ready, adding message to queue.");
-			return;
+			return null;
 		}
 
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES)) {
 			LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + "} Shadbot wasn't allowed to send message.");
-			return;
+			return null;
 		}
 
-		RequestBuffer.request(() -> {
+		return RequestBuffer.request(() -> {
 			try {
-				channel.sendMessage(message);
+				return channel.sendMessage(message);
 			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + "} Missing permissions.", err);
 			} catch (DiscordException err) {
@@ -51,10 +51,11 @@ public class BotUtils {
 					MESSAGE_QUEUE.putIfAbsent(channel, new ArrayList<>());
 					MESSAGE_QUEUE.get(channel).add(message);
 					SchedulerManager.scheduleSendingMessages();
-					return;
+					return null;
 				}
 				LogUtils.error("Discord exception while sending message.", err);
 			}
+			return null;
 		});
 	}
 
