@@ -1,13 +1,9 @@
 package me.shadorc.discordbot.command.gamestats;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-
-import org.jsoup.HttpStatusException;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import java.util.List;
 
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
@@ -17,8 +13,13 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
-import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
+import net.shadorc.overwatch4j.HeroDesc;
+import net.shadorc.overwatch4j.OverwatchPlayer;
+import net.shadorc.overwatch4j.enums.Plateform;
+import net.shadorc.overwatch4j.enums.Region;
+import net.shadorc.overwatch4j.enums.TopHeroesStats;
+import net.shadorc.overwatch4j.exceptions.UserNotFoundException;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class OverwatchCmd extends AbstractCommand {
@@ -36,77 +37,72 @@ public class OverwatchCmd extends AbstractCommand {
 			return;
 		}
 
-		if(!context.hasArg()) {
+		String[] splitArgs = context.getArg().split(" ");
+		if(splitArgs.length < 1 || splitArgs.length > 3) {
 			throw new MissingArgumentException();
 		}
-
-		String[] splitArgs = context.getArg().split(" ", 3);
-		if(splitArgs.length != 3) {
-			throw new MissingArgumentException();
-		}
-
-		String plateform = splitArgs[0].toLowerCase();
-		if(!Arrays.asList("pc", "psn", "xbl").contains(plateform)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Plateform is invalid. Options: pc, psn, xbl.", context.getChannel());
-			return;
-		}
-
-		String region = splitArgs[1].toLowerCase();
-		if(!Arrays.asList("eu", "us", "cn", "kr").contains(region)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Region is invalid. Options: eu, us, cn, kr.", context.getChannel());
-			return;
-		}
-
-		String battletag = splitArgs[2];
 
 		try {
-			String url = "https://playoverwatch.com/en-gb/career"
-					+ "/" + plateform
-					+ "/" + region
-					+ "/" + URLEncoder.encode(battletag.replace("#", "-"), "UTF-8");
-			Document doc = NetUtils.getDoc(url);
+			OverwatchPlayer player;
 
-			String icon = doc.getElementsByClass("masthead-player").select("img").first().absUrl("src");
-			String level = doc.getElementsByClass("masthead-player").first().getElementsByClass("u-vertical-center").text();
-			String wins = doc.getElementsByClass("masthead-detail").first().text().split(" ")[0];
-			String topTimePlayed = this.getTopThreeHeroes(doc.getElementsByClass("progress-category").get(0));
-			String topEliminationsPerKill = this.getTopThreeHeroes(doc.getElementsByClass("progress-category").get(3));
-			String timePlayed = doc.getElementsByClass("column xs-12 md-6 xl-4").get(6).select("td").get(1).text();
-			String rank = null;
+			if(splitArgs.length == 1) {
+				String username = splitArgs[0];
+				player = new OverwatchPlayer(username);
 
-			Element rankElem = doc.getElementsByClass("u-align-center h6").first();
-			if(rankElem != null) {
-				rank = rankElem.text();
+			} else if(splitArgs.length == 2) {
+				String plateform = splitArgs[0].toUpperCase();
+				if(!Arrays.stream(Plateform.values()).anyMatch(plateformValue -> plateformValue.toString().equalsIgnoreCase(plateform))) {
+					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid plateform. Options: pc, psn, xbl.", context.getChannel());
+					return;
+				}
+
+				String username = splitArgs[1];
+				player = new OverwatchPlayer(username, Plateform.valueOf(plateform));
+
+			} else {
+				String plateform = splitArgs[0].toUpperCase();
+				if(!Arrays.stream(Plateform.values()).anyMatch(plateformValue -> plateformValue.toString().equalsIgnoreCase(plateform))) {
+					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid plateform. Options: pc, psn, xbl.", context.getChannel());
+					return;
+				}
+
+				String region = splitArgs[1].toUpperCase();
+				if(!Arrays.stream(Region.values()).anyMatch(regionValue -> regionValue.toString().equalsIgnoreCase(region))) {
+					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid region. Options: eu, us, cn, kr.", context.getChannel());
+					return;
+				}
+
+				String username = splitArgs[2];
+				player = new OverwatchPlayer(username, Plateform.valueOf(plateform), Region.valueOf(region));
 			}
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.setLenient(true)
 					.withAuthorName("Overwatch Stats")
 					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
-					.withUrl(url)
-					.withThumbnail(icon)
+					.withUrl(player.getProfileURL())
+					.withThumbnail(player.getIconUrl())
 					.withColor(Config.BOT_COLOR)
-					.appendDescription("Stats for user **" + battletag + "**.")
-					.appendField("Level", level, true)
-					.appendField("Competitive rank", rank, true)
-					.appendField("Wins", wins, true)
-					.appendField("Game time", timePlayed, true)
-					.appendField("Top hero (Time played)", topTimePlayed, true)
-					.appendField("Top hero (Eliminations per life)", topEliminationsPerKill, true);
+					.appendDescription("Stats for user **" + player.getName() + "**" + (player.getRegion() == Region.NONE ? "" : " (Region: " + player.getRegion().toString().toUpperCase() + ")"))
+					.appendField("Level", Integer.toString(player.getLevel()), true)
+					.appendField("Competitive rank", Integer.toString(player.getRank()), true)
+					.appendField("Wins", Integer.toString(player.getWins()), true)
+					.appendField("Game time", player.getTimePlayed(), true)
+					.appendField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
+					.appendField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
-		} catch (HttpStatusException err) {
+
+		} catch (UserNotFoundException e) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Overwatch or doesn't exist.", context.getChannel());
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while getting information from Overwatch profil.... Please, try again later.", err, context);
 		}
 	}
 
-	private String getTopThreeHeroes(Element element) {
+	private String getTopThreeHeroes(List<HeroDesc> heroesList) {
 		StringBuilder strBuilder = new StringBuilder();
-		for(int i = 0; i < Math.min(element.getElementsByClass("bar-text").size(), 3); i++) {
-			String hero = element.getElementsByClass("title").get(i).text();
-			String desc = element.getElementsByClass("description").get(i).text();
-			strBuilder.append("**" + (i + 1) + "**. " + hero + " (" + desc + ")\n");
+		for(int i = 0; i < Math.min(heroesList.size(), 3); i++) {
+			strBuilder.append("**" + (i + 1) + "**. " + heroesList.get(i).getName() + " (" + heroesList.get(i).getDesc() + ")\n");
 		}
 		return strBuilder.toString();
 	}
@@ -115,7 +111,11 @@ public class OverwatchCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show player's stats for Overwatch.**")
-				.appendField("Usage", "`" + context.getPrefix() + "overwatch <pc|psn|xbl> <eu|us|cn|kr> <battletag#0000>`", false);
+				.appendField("Arguments", "**plateform** - optional, automatically detected if nothing is specified."
+						+ "\nOptions: pc, xbl, psn"
+						+ "\n**region** - optional (only needed if the plateform is PC) automatically detected if nothing is specified."
+						+ "\nOptions: us, eu, kr, cn", false)
+				.appendField("Usage", "`" + context.getPrefix() + "overwatch [<plateform> <region>] <battletag#0000>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

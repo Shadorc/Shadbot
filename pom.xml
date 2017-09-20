@@ -99,5 +99,10 @@
 			<artifactId>cleverbotapi</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>net.shadorc</groupId>
+			<artifactId>overwatch4j</artifactId>
+			<version>0.1.2</version>
+		</dependency>
 	</dependencies>
 </project>
