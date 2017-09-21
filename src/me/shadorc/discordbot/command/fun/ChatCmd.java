@@ -62,13 +62,12 @@ public class ChatCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 			return;
 		} catch (JSONException | IOException err) {
-			LogUtils.warn("Something went wrong while discussing with A.L.I.C.E. Using Cleverbot instead."
-					+ "\nError: " + err.getMessage()
+			LogUtils.info("Something went wrong while discussing with A.L.I.C.E. (Error: " + err.getMessage() + "). Using Cleverbot instead."
 					+ (mainObj == null ? "" : "\nJSON: " + mainObj));
 		}
 
 		try {
-			CleverBotQuery bot = new CleverBotQuery(API_KEY, context.getArg());
+			CleverBotQuery bot = new CleverBotQuery(API_KEY, URLEncoder.encode(context.getArg(), "UTF-8"));
 			bot.setConversationID(CHANNELS_CONV_ID.getOrDefault(context.getChannel(), ""));
 			bot.sendRequest();
 			CHANNELS_CONV_ID.put(context.getChannel(), bot.getConversationID());
