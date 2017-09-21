@@ -7,6 +7,8 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.data.Stats;
+import me.shadorc.discordbot.data.Stats.Category;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -66,6 +68,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		} else {
 			gains = bet * WIN_MULTIPLIER;
 			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
+			Stats.increment(Category.MONEY_COMMAND, this.getNames()[0], gains);
 		}
 
 		context.getPlayer().addCoins(gains);

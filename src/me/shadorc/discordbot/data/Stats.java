@@ -49,6 +49,7 @@ public class Stats {
 	public enum Category {
 		UNKNOWN_COMMAND("unknown_command"),
 		LIMITED_COMMAND("limited_command"),
+		MONEY_COMMAND("money_command"),
 		HELP_COMMAND("help_command"),
 		COMMAND("command");
 
@@ -66,6 +67,10 @@ public class Stats {
 
 	public static void increment(Category category, String key) {
 		STATS_MAP.put(category, STATS_MAP.get(category).increment(key));
+	}
+
+	public static void increment(Category category, String key, int value) {
+		STATS_MAP.put(category, STATS_MAP.get(category).put(key, STATS_MAP.get(category).optInt(key) + value));
 	}
 
 	public static void save() {
