@@ -100,11 +100,9 @@
 			<version>1.0.2</version>
 		</dependency>
 		<dependency>
-			<groupId>overwatch4j</groupId>
+			<groupId>shadorc</groupId>
 			<artifactId>overwatch4j</artifactId>
 			<version>0.1.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/net.shadorc/overwatch4j/0.1.2/overwatch4j-0.1.2.jar</systemPath>
 		</dependency>
 	</dependencies>
 </project>
