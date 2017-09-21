@@ -13,6 +13,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import net.shadorc.overwatch4j.HeroDesc;
 import net.shadorc.overwatch4j.OverwatchPlayer;
@@ -37,7 +38,7 @@ public class OverwatchCmd extends AbstractCommand {
 			return;
 		}
 
-		String[] splitArgs = context.getArg().split(" ");
+		String[] splitArgs = StringUtils.getSplittedArg(context.getArg());
 		if(splitArgs.length < 1 || splitArgs.length > 3) {
 			throw new MissingArgumentException();
 		}

@@ -39,7 +39,7 @@ public class PruneCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		List<String> argsList = Arrays.asList(context.getArg().split(" "));
+		List<String> argsList = Arrays.asList(StringUtils.getSplittedArg(context.getArg()));
 
 		String word = null;
 		if(argsList.contains("-c")) {

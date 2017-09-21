@@ -51,7 +51,7 @@ public class DiceCmd extends AbstractCommand {
 	}
 
 	private void createGame(Context context) throws MissingArgumentException {
-		String[] splitArgs = context.getArg().split(" ");
+		String[] splitArgs = StringUtils.getSplittedArg(context.getArg());
 		if(splitArgs.length != 2) {
 			throw new MissingArgumentException();
 		}

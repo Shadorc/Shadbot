@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -87,6 +88,14 @@ public class StringUtils {
 
 	public static String pluralOf(long count, String word) {
 		return count + " " + (count > 1 ? word + "s" : word);
+	}
+
+	/**
+	 * @param arg - arg to split
+	 * @return a String Array without null or empty string splitted by " "
+	 */
+	public static String[] getSplittedArg(String arg) {
+		return Arrays.stream(arg.split(" ")).filter(str -> str != null && !str.isEmpty()).toArray(String[]::new);
 	}
 
 	/**
