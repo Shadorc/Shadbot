@@ -172,7 +172,7 @@ public class DiceCmd extends AbstractCommand {
 				int gains = bet * (numsPlayers.size() + MULTIPLIER);
 				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win **" + gains + " coins** !", context.getChannel());
 				Storage.getPlayer(context.getGuild(), winner).addCoins(gains);
-				Stats.increment(Category.MONEY_COMMAND, DiceCmd.this.getNames()[0], gains);
+				Stats.increment(Category.MONEY_GAINS_COMMAND, DiceCmd.this.getNames()[0], gains);
 			}
 
 			List<IUser> losersList = numsPlayers.keySet().stream()
@@ -184,6 +184,7 @@ public class DiceCmd extends AbstractCommand {
 				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
 				for(IUser loser : losersList) {
 					Storage.getPlayer(context.getGuild(), loser).addCoins(-bet);
+					Stats.increment(Category.MONEY_LOSSES_COMMAND, DiceCmd.this.getNames()[0], bet);
 					strBuilder.append(loser.mention() + ", ");
 				}
 				strBuilder.append("you lost " + StringUtils.pluralOf(bet, "coin") + ".");

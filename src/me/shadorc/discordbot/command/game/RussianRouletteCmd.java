@@ -17,10 +17,6 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends AbstractCommand {
 
-	/*
-	 * Expected value: -1/6*(10*bet) + 5/6*(2*bet) = 0
-	 */
-
 	private static final int MAX_BET = 500;
 	private static final int WIN_MULTIPLIER = 2;
 	private static final int LOSE_MULTIPLIER = 10;
@@ -65,10 +61,11 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(MathUtils.rand(6) == 0) {
 			gains = -bet * LOSE_MULTIPLIER;
 			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
+			Stats.increment(Category.MONEY_LOSSES_COMMAND, this.getNames()[0], Math.abs(gains));
 		} else {
 			gains = bet * WIN_MULTIPLIER;
 			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
-			Stats.increment(Category.MONEY_COMMAND, this.getNames()[0], gains);
+			Stats.increment(Category.MONEY_GAINS_COMMAND, this.getNames()[0], gains);
 		}
 
 		context.getPlayer().addCoins(gains);

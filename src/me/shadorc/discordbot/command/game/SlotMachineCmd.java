@@ -65,9 +65,7 @@ public class SlotMachineCmd extends AbstractCommand {
 			gains = THIRD_GAINS;
 		}
 		context.getPlayer().addCoins(gains);
-		if(gains > 0) {
-			Stats.increment(Category.MONEY_COMMAND, this.getNames()[0], gains);
-		}
+		Stats.increment(gains > 0 ? Category.MONEY_GAINS_COMMAND : Category.MONEY_LOSSES_COMMAND, this.getNames()[0], Math.abs(gains));
 
 		StringBuilder message = new StringBuilder(
 				":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":"

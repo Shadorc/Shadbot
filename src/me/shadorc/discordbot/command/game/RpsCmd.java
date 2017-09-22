@@ -88,7 +88,7 @@ public class RpsCmd extends AbstractCommand {
 				|| userHandsign.equals(Handsign.SCISSORS) && botHandsign.equals(Handsign.PAPER)) {
 			strBuilder.append(context.getAuthorName() + " wins ! Well done, you won **" + GAINS + " coins**.");
 			context.getPlayer().addCoins(GAINS);
-			Stats.increment(Category.MONEY_COMMAND, this.getNames()[0], GAINS);
+			Stats.increment(Category.MONEY_GAINS_COMMAND, this.getNames()[0], GAINS);
 		} else {
 			strBuilder.append(Shadbot.getClient().getOurUser().getName() + " wins !");
 		}

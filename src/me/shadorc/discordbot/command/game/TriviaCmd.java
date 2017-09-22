@@ -156,7 +156,7 @@ public class TriviaCmd extends AbstractCommand {
 			} else if(goodAnswer) {
 				BotUtils.sendMessage(Emoji.CLAP + " Correct ! " + author.getName() + ", you won **" + GAINS + " coins**.", channel);
 				Storage.getPlayer(message.getGuild(), author).addCoins(GAINS);
-				Stats.increment(Category.MONEY_COMMAND, TriviaCmd.this.getNames()[0], GAINS);
+				Stats.increment(Category.MONEY_GAINS_COMMAND, TriviaCmd.this.getNames()[0], GAINS);
 				this.stop();
 			}
 			return true;
