@@ -16,10 +16,6 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class SlotMachineCmd extends AbstractCommand {
 
-	/*
-	 * Expected value: 0.125*50 + 0.053*500 + 0.002*12725 - 0.82*10 = 50 coins
-	 */
-
 	private enum SlotOptions {
 		CHERRIES,
 		BELL,
@@ -28,9 +24,9 @@ public class SlotMachineCmd extends AbstractCommand {
 
 	private static final int PAID_COST = 10;
 
-	private static final int FIRST_GAINS = 50;
-	private static final int SECOND_GAINS = 500;
-	private static final int THIRD_GAINS = 12725;
+	private static final int FIRST_GAINS = 100;
+	private static final int SECOND_GAINS = 1000;
+	private static final int THIRD_GAINS = 20000;
 
 	private static final SlotOptions[] SLOTS_ARRAY = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, // Winning chance : 12.5%
