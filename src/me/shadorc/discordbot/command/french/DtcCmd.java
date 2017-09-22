@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
@@ -25,7 +26,7 @@ public class DtcCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public DtcCmd() {
-		super(Role.USER, "dtc");
+		super(CommandCategory.FRENCH, Role.USER, "dtc");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

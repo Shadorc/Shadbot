@@ -17,6 +17,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
@@ -33,7 +34,7 @@ public class DiabloCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public DiabloCmd() {
-		super(Role.USER, "diablo", "d3");
+		super(CommandCategory.GAMESTATS, Role.USER, "diablo", "d3");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

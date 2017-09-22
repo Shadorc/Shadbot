@@ -7,6 +7,7 @@ import java.util.Locale;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -20,7 +21,7 @@ public class UserInfoCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public UserInfoCmd() {
-		super(Role.USER, "userinfo", "user_info", "user-info");
+		super(CommandCategory.INFO, Role.USER, "userinfo", "user_info", "user-info");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
 	}

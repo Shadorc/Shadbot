@@ -6,6 +6,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Stats.Category;
@@ -36,7 +37,7 @@ public class SlotMachineCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public SlotMachineCmd() {
-		super(Role.USER, "slot_machine", "slot-machine", "slotmachine");
+		super(CommandCategory.GAME, Role.USER, "slot_machine", "slot-machine", "slotmachine");
 		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

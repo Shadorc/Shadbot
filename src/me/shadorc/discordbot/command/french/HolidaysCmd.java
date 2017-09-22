@@ -8,6 +8,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -23,7 +24,7 @@ public class HolidaysCmd extends AbstractCommand {
 	private static final List<String> ZONES = Arrays.asList("A", "B", "C");
 
 	public HolidaysCmd() {
-		super(Role.USER, "vacs", "vacances");
+		super(CommandCategory.FRENCH, Role.USER, "vacs", "vacances");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

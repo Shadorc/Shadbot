@@ -10,15 +10,16 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class ShuffleCmd extends AbstractCommand {
+public class BackwardCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
-	public ShuffleCmd() {
-		super(CommandCategory.MUSIC, Role.USER, "shuffle");
+	public BackwardCmd() {
+		super(CommandCategory.MUSIC, Role.USER, "backward");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
@@ -35,15 +36,30 @@ public class ShuffleCmd extends AbstractCommand {
 			return;
 		}
 
-		musicManager.getScheduler().shufflePlaylist();
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist shuffled.", context.getChannel());
+		if(!context.hasArg()) {
+			throw new MissingArgumentException();
+		}
+
+		String numStr = context.getArg().trim();
+		if(!StringUtils.isPositiveInt(numStr)) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
+			return;
+		}
+
+		try {
+			int time = -Integer.parseInt(numStr) * 1000;
+			musicManager.getScheduler().changePosition(time);
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(musicManager.getScheduler().getPosition()), context.getChannel());
+		} catch (IllegalArgumentException err) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " New position is past the beginning of the song.", context.getChannel());
+		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Shuffle current playlist.**");
+				.appendDescription("**Fast backward current song a specified amount of time (in seconds).**")
+				.appendField("Usage", "`" + context.getPrefix() + "backward <sec>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
-
 }

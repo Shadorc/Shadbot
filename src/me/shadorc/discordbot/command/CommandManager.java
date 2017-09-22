@@ -1,6 +1,6 @@
 package me.shadorc.discordbot.command;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import me.shadorc.discordbot.Emoji;
@@ -24,22 +24,23 @@ import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.gamestats.CounterStrikeCmd;
 import me.shadorc.discordbot.command.gamestats.DiabloCmd;
 import me.shadorc.discordbot.command.gamestats.OverwatchCmd;
+import me.shadorc.discordbot.command.hidden.HelpCmd;
+import me.shadorc.discordbot.command.hidden.ReportCmd;
 import me.shadorc.discordbot.command.image.GifCmd;
 import me.shadorc.discordbot.command.image.ImageCmd;
 import me.shadorc.discordbot.command.image.Rule34Cmd;
 import me.shadorc.discordbot.command.image.SuicideGirlsCmd;
-import me.shadorc.discordbot.command.info.HelpCmd;
 import me.shadorc.discordbot.command.info.InfoCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
-import me.shadorc.discordbot.command.info.ReportCmd;
 import me.shadorc.discordbot.command.info.ServerInfoCmd;
 import me.shadorc.discordbot.command.info.UserInfoCmd;
+import me.shadorc.discordbot.command.music.BackwardCmd;
 import me.shadorc.discordbot.command.music.ClearCmd;
+import me.shadorc.discordbot.command.music.ForwardCmd;
 import me.shadorc.discordbot.command.music.NameCmd;
 import me.shadorc.discordbot.command.music.PauseCmd;
 import me.shadorc.discordbot.command.music.PlayCmd;
 import me.shadorc.discordbot.command.music.PlaylistCmd;
-import me.shadorc.discordbot.command.music.PositionCmd;
 import me.shadorc.discordbot.command.music.RepeatCmd;
 import me.shadorc.discordbot.command.music.ShuffleCmd;
 import me.shadorc.discordbot.command.music.SkipCmd;
@@ -63,11 +64,13 @@ public class CommandManager {
 
 	private final static CommandManager COMMAND_MANAGER = new CommandManager();
 
-	private final Map<String, AbstractCommand> commandsMap = new HashMap<>();
+	private final Map<String, AbstractCommand> commandsMap = new LinkedHashMap<>();
 
 	public CommandManager() {
 		this.register(
+				// Hidden Commands
 				new HelpCmd(),
+				new ReportCmd(),
 				// Utils Commands
 				new TranslateCmd(),
 				new WikiCmd(),
@@ -80,10 +83,10 @@ public class CommandManager {
 				new ChatCmd(),
 				new LeetCmd(),
 				// Image Commands
-				new GifCmd(),
 				new ImageCmd(),
 				new SuicideGirlsCmd(),
 				new Rule34Cmd(),
+				new GifCmd(),
 				// Games Commands
 				new DiceCmd(),
 				new SlotMachineCmd(),
@@ -96,26 +99,26 @@ public class CommandManager {
 				new CoinsCmd(),
 				// Music Commands
 				new PlayCmd(),
-				new VolumeCmd(),
 				new PauseCmd(),
 				new RepeatCmd(),
 				new StopCmd(),
+				new VolumeCmd(),
 				new SkipCmd(),
+				new BackwardCmd(),
+				new ForwardCmd(),
 				new NameCmd(),
 				new PlaylistCmd(),
 				new ClearCmd(),
 				new ShuffleCmd(),
-				new PositionCmd(),
 				// Games Stats Commands
 				new OverwatchCmd(),
-				new CounterStrikeCmd(),
 				new DiabloCmd(),
+				new CounterStrikeCmd(),
 				// Info Commands
 				new InfoCmd(),
-				new PingCmd(),
-				new ReportCmd(),
 				new UserInfoCmd(),
 				new ServerInfoCmd(),
+				new PingCmd(),
 				// French Commands
 				new DtcCmd(),
 				new JokeCmd(),
@@ -169,6 +172,10 @@ public class CommandManager {
 
 	public AbstractCommand getCommand(String name) {
 		return commandsMap.get(name);
+	}
+
+	public Map<String, AbstractCommand> getCommands() {
+		return commandsMap;
 	}
 
 	public static CommandManager getInstance() {

@@ -12,6 +12,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
@@ -27,7 +28,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public CounterStrikeCmd() {
-		super(Role.USER, "cs", "csgo");
+		super(CommandCategory.GAMESTATS, Role.USER, "cs", "csgo");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

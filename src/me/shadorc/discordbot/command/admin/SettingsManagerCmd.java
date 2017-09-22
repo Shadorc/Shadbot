@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.admin.setting.AutoMessageSettingCmd;
 import me.shadorc.discordbot.command.admin.setting.ChannelSettingCmd;
@@ -22,7 +23,7 @@ public class SettingsManagerCmd extends AbstractCommand {
 	private static final ConcurrentHashMap<String, SettingCmd> SUBSETTINGS_MAP = new ConcurrentHashMap<>();
 
 	public SettingsManagerCmd() {
-		super(Role.ADMIN, "settings", "setting", "options", "option");
+		super(CommandCategory.ADMIN, Role.ADMIN, "settings", "setting", "options", "option");
 
 		SUBSETTINGS_MAP.put(Setting.PREFIX.toString(), new PrefixSettingCmd());
 		SUBSETTINGS_MAP.put(Setting.ALLOWED_CHANNELS.toString(), new ChannelSettingCmd());

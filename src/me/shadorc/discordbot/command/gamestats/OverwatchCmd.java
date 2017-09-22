@@ -9,6 +9,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -28,7 +29,7 @@ public class OverwatchCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public OverwatchCmd() {
-		super(Role.USER, "overwatch", "ow");
+		super(CommandCategory.GAMESTATS, Role.USER, "overwatch", "ow");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

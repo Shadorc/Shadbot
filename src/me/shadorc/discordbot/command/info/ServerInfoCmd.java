@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.data.Storage.Setting;
@@ -25,7 +26,7 @@ public class ServerInfoCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public ServerInfoCmd() {
-		super(Role.USER, "serverinfo", "server_info", "server-info");
+		super(CommandCategory.INFO, Role.USER, "serverinfo", "server_info", "server-info");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
 	}

@@ -6,6 +6,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.music.TrackScheduler;
@@ -18,7 +19,7 @@ public class PauseCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public PauseCmd() {
-		super(Role.USER, "pause", "unpause", "resume");
+		super(CommandCategory.MUSIC, Role.USER, "pause", "unpause", "resume");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

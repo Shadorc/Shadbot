@@ -11,6 +11,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -24,7 +25,7 @@ public class WikiCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public WikiCmd() {
-		super(Role.USER, "wiki", "wikipedia");
+		super(CommandCategory.UTILS, Role.USER, "wiki", "wikipedia");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

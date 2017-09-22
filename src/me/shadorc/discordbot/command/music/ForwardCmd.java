@@ -6,6 +6,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -13,12 +14,12 @@ import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class PositionCmd extends AbstractCommand {
+public class ForwardCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 
-	public PositionCmd() {
-		super(Role.USER, "forward", "backward");
+	public ForwardCmd() {
+		super(CommandCategory.MUSIC, Role.USER, "forward");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
@@ -45,23 +46,20 @@ public class PositionCmd extends AbstractCommand {
 			return;
 		}
 
-		int time = (context.getCommand().equals("forward") ? 1 : -1) * Integer.parseInt(numStr) * 1000;
-
 		try {
+			int time = Integer.parseInt(numStr) * 1000;
 			musicManager.getScheduler().changePosition(time);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(musicManager.getScheduler().getPosition()), context.getChannel());
 		} catch (IllegalArgumentException err) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " New position is negative or superior to the music duration.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " New position is past the ending of the song.", context.getChannel());
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Fast forward/fast backward current song a specified amount of time (in seconds).**")
-				.appendField("Usage", "`" + context.getPrefix() + "forward <sec>`"
-						+ "\n`" + context.getPrefix() + "backward <sec>`", false);
+				.appendDescription("**Fast forward current song a specified amount of time (in seconds).**")
+				.appendField("Usage", "`" + context.getPrefix() + "forward <sec>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
-
 }

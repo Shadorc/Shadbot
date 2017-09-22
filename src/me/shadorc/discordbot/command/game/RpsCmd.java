@@ -8,6 +8,7 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Stats.Category;
@@ -55,7 +56,7 @@ public class RpsCmd extends AbstractCommand {
 	}
 
 	public RpsCmd() {
-		super(Role.USER, "rps");
+		super(CommandCategory.GAME, Role.USER, "rps");
 		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

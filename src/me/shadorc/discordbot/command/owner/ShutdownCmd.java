@@ -8,6 +8,7 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.SchedulerManager;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -20,7 +21,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class ShutdownCmd extends AbstractCommand {
 
 	public ShutdownCmd() {
-		super(Role.OWNER, "shutdown");
+		super(CommandCategory.OWNER, Role.OWNER, "shutdown");
 	}
 
 	@Override

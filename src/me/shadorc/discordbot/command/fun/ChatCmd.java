@@ -15,6 +15,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
@@ -34,7 +35,7 @@ public class ChatCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public ChatCmd() {
-		super(Role.USER, "chat");
+		super(CommandCategory.FUN, Role.USER, "chat");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

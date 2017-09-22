@@ -9,6 +9,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
@@ -28,7 +29,7 @@ public class WeatherCmd extends AbstractCommand {
 	private final SimpleDateFormat dateFormatter;
 
 	public WeatherCmd() {
-		super(Role.USER, "weather");
+		super(CommandCategory.UTILS, Role.USER, "weather");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 		this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy - hh:mm aa", Locale.ENGLISH);
 	}

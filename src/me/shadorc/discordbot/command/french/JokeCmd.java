@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -26,7 +27,7 @@ public class JokeCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public JokeCmd() {
-		super(Role.USER, "blague", "joke");
+		super(CommandCategory.FRENCH, Role.USER, "blague", "joke");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

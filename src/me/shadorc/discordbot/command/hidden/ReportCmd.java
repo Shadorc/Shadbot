@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.info;
+package me.shadorc.discordbot.command.hidden;
 
 import java.time.temporal.ChronoUnit;
 
@@ -7,6 +7,7 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -18,7 +19,7 @@ public class ReportCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public ReportCmd() {
-		super(Role.USER, "report", "suggest");
+		super(CommandCategory.HIDDEN, Role.USER, "report", "suggest");
 		this.rateLimiter = new RateLimiter(30, ChronoUnit.SECONDS);
 	}
 

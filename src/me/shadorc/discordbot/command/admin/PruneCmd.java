@@ -7,6 +7,7 @@ import java.util.List;
 import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -20,7 +21,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class PruneCmd extends AbstractCommand {
 
 	public PruneCmd() {
-		super(Role.ADMIN, "prune");
+		super(CommandCategory.ADMIN, Role.ADMIN, "prune");
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
@@ -28,7 +29,7 @@ public class ImageCmd extends AbstractCommand {
 	private String deviantArtToken;
 
 	public ImageCmd() {
-		super(Role.USER, "image");
+		super(CommandCategory.IMAGE, Role.USER, "image");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

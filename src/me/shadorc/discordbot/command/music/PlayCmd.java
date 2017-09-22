@@ -7,6 +7,7 @@ import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.events.AudioLoadResultListener;
@@ -22,7 +23,7 @@ public class PlayCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public PlayCmd() {
-		super(Role.USER, "play", "add", "queue");
+		super(CommandCategory.MUSIC, Role.USER, "play", "add", "queue");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

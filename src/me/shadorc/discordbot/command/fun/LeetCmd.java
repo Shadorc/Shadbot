@@ -6,6 +6,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -16,7 +17,7 @@ public class LeetCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public LeetCmd() {
-		super(Role.USER, "leet");
+		super(CommandCategory.FUN, Role.USER, "leet");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

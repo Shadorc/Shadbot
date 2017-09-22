@@ -15,6 +15,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -37,7 +38,7 @@ public class PollCmd extends AbstractCommand {
 	private static final int MAX_DURATION = 3600;
 
 	public PollCmd() {
-		super(Role.USER, "poll");
+		super(CommandCategory.UTILS, Role.USER, "poll");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

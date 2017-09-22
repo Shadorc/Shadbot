@@ -7,6 +7,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -17,7 +18,7 @@ public class PingCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public PingCmd() {
-		super(Role.USER, "ping");
+		super(CommandCategory.INFO, Role.USER, "ping");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

@@ -11,6 +11,7 @@ import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.command.AbstractCommand;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Storage.Setting;
@@ -27,7 +28,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public SuicideGirlsCmd() {
-		super(Role.USER, "suicide_girls", "suicide-girls", "suicidegirls", "sg");
+		super(CommandCategory.IMAGE, Role.USER, "suicide_girls", "suicide-girls", "suicidegirls", "sg");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
