@@ -76,12 +76,12 @@ public class Rule34Cmd extends AbstractCommand {
 
 			// TODO: Rule34 fail ?
 			String url = postObj.getString("file_url");
-			if(!url.startsWith("http:")) {
+			if(!url.startsWith("http")) {
 				url = "http:" + url;
 			}
 
 			String source = postObj.getString("source");
-			if(!source.startsWith("http:")) {
+			if(!source.startsWith("http")) {
 				source = "http:" + source;
 			}
 			EmbedBuilder embed = Utils.getDefaultEmbed()
