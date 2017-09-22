@@ -46,12 +46,13 @@ public class TrackScheduler {
 		audioPlayer.playTrack(track.makeClone());
 	}
 
-	public void changePosition(long time) {
+	public long changePosition(long time) {
 		long newPosition = audioPlayer.getPlayingTrack().getPosition() + time;
 		if(newPosition < 0 || newPosition > audioPlayer.getPlayingTrack().getDuration()) {
 			throw new IllegalArgumentException();
 		}
 		audioPlayer.getPlayingTrack().setPosition(newPosition);
+		return newPosition;
 	}
 
 	public void clearPlaylist() {
@@ -75,10 +76,6 @@ public class TrackScheduler {
 
 	public int getVolume() {
 		return audioPlayer.getVolume();
-	}
-
-	public long getPosition() {
-		return audioPlayer.getPlayingTrack().getPosition();
 	}
 
 	public void setVolume(int volume) {

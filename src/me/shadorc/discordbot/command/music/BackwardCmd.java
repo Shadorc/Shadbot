@@ -48,8 +48,8 @@ public class BackwardCmd extends AbstractCommand {
 
 		try {
 			int time = -Integer.parseInt(numStr) * 1000;
-			musicManager.getScheduler().changePosition(time);
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(musicManager.getScheduler().getPosition()), context.getChannel());
+			long newPosition = musicManager.getScheduler().changePosition(time);
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(newPosition), context.getChannel());
 		} catch (IllegalArgumentException err) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " New position is past the beginning of the song.", context.getChannel());
 		}
