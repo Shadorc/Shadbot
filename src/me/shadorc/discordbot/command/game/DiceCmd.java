@@ -26,7 +26,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class DiceCmd extends AbstractCommand {
 
 	protected static final ConcurrentHashMap<IChannel, DiceManager> CHANNELS_DICE = new ConcurrentHashMap<>();
-	protected static final int MULTIPLIER = 6;
+	protected static final int MULTIPLIER = 3;
 
 	private final RateLimiter rateLimiter;
 
