@@ -18,11 +18,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RpsCmd extends AbstractCommand {
 
-	/*
-	 * Expected value: 1/3*150 = 50 coins
-	 */
-
-	private static final int GAINS = 150;
+	private static final int GAINS = 200;
 
 	private final RateLimiter rateLimiter;
 
