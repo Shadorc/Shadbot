@@ -1,4 +1,4 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.utils.command;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

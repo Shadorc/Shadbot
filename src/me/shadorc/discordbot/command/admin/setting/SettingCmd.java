@@ -1,7 +1,7 @@
 package me.shadorc.discordbot.command.admin.setting;
 
-import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.utils.command.MissingArgumentException;
 
 public interface SettingCmd {
 

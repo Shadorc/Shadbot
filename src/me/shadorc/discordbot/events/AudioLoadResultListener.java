@@ -12,7 +12,6 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.data.Storage.Setting;
@@ -22,6 +21,7 @@ import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.EmbedBuilder;

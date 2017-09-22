@@ -6,12 +6,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONArray;
 
-import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.SchedulerManager;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.events.ShardListener;
+import me.shadorc.discordbot.utils.command.Emoji;
+import me.shadorc.discordbot.utils.task.SchedulerManager;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;

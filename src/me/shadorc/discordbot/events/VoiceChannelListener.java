@@ -1,9 +1,9 @@
 package me.shadorc.discordbot.events;
 
-import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelJoinEvent;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelLeaveEvent;

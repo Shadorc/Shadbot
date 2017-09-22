@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.events;
 
-import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Storage;
@@ -8,6 +7,7 @@ import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;

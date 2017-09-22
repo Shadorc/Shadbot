@@ -1,8 +1,7 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.data;
 
 import org.json.JSONObject;
 
-import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;

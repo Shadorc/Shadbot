@@ -10,8 +10,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
-import me.shadorc.discordbot.MissingArgumentException;
-import me.shadorc.discordbot.RateLimiter;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
@@ -19,6 +17,8 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.discordbot.utils.command.MissingArgumentException;
+import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.Discord4J;
 import sx.blah.discord.util.EmbedBuilder;
 

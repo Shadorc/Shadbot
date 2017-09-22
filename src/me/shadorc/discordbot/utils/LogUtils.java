@@ -3,10 +3,10 @@ package me.shadorc.discordbot.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
+import me.shadorc.discordbot.utils.command.Emoji;
 
 public class LogUtils {
 

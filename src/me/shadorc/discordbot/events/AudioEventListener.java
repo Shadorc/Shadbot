@@ -8,12 +8,12 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
-import me.shadorc.discordbot.Emoji;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 

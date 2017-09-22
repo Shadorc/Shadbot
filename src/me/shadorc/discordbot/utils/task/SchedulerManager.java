@@ -1,4 +1,4 @@
-package me.shadorc.discordbot;
+package me.shadorc.discordbot.utils.task;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;

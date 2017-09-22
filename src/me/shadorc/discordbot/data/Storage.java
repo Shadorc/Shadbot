@@ -11,7 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import me.shadorc.discordbot.Player;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;

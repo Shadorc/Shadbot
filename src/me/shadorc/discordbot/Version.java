@@ -20,5 +20,4 @@ public class Version {
 	public String toString() {
 		return major + "." + minor + "." + revision + (isBeta ? "-Beta" : "");
 	}
-
 }

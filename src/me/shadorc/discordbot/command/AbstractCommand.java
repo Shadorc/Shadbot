@@ -1,6 +1,6 @@
 package me.shadorc.discordbot.command;
 
-import me.shadorc.discordbot.MissingArgumentException;
+import me.shadorc.discordbot.utils.command.MissingArgumentException;
 
 public abstract class AbstractCommand {
 

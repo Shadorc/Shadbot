@@ -3,8 +3,6 @@ package me.shadorc.discordbot.command;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import me.shadorc.discordbot.Emoji;
-import me.shadorc.discordbot.MissingArgumentException;
 import me.shadorc.discordbot.command.AbstractCommand.Role;
 import me.shadorc.discordbot.command.admin.PruneCmd;
 import me.shadorc.discordbot.command.admin.SettingsManagerCmd;
@@ -58,6 +56,8 @@ import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Stats.Category;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.command.Emoji;
+import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 public class CommandManager {
