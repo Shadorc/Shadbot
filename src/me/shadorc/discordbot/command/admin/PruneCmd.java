@@ -52,7 +52,7 @@ public class PruneCmd extends AbstractCommand {
 			word = StringUtils.getQuotedWords(context.getArg()).get(0);
 		}
 
-		int num = -1;
+		int num = 100;
 		if(argsList.contains("-n")) {
 			if(argsList.indexOf("-n") + 1 >= argsList.size()) {
 				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must indicate a number after '-n'.", context.getChannel());
@@ -63,14 +63,14 @@ public class PruneCmd extends AbstractCommand {
 				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
 				return;
 			}
-			num = Integer.parseInt(numStr);
+			num = Math.min(num, Integer.parseInt(numStr));
 		}
 
 		List<IUser> usersMentioned = context.getMessage().getMentions();
 
 		List<IMessage> messagesList = new ArrayList<IMessage>();
 		for(IMessage message : context.getChannel().getMessageHistory(context.getChannel().getMaxInternalCacheCount())) {
-			if(num != -1 && messagesList.size() >= num) {
+			if(messagesList.size() >= num) {
 				break;
 			}
 			if(!usersMentioned.isEmpty() && !usersMentioned.contains(message.getAuthor())) {
