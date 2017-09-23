@@ -24,7 +24,10 @@ public class MessageManager {
 	public static boolean notify(IMessage message) {
 		boolean isBlocking = false;
 		for(IChannel channel : CHANNELS_LISTENERS.keySet()) {
-			isBlocking = CHANNELS_LISTENERS.get(channel).onMessageReceived(message);
+			MessageListener msgListener = CHANNELS_LISTENERS.get(channel);
+			if(msgListener != null) {
+				isBlocking = msgListener.onMessageReceived(message);
+			}
 		}
 		return isBlocking;
 	}
