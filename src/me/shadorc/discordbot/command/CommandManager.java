@@ -61,12 +61,10 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedE
 
 public class CommandManager {
 
-	private final static CommandManager COMMAND_MANAGER = new CommandManager();
+	private final static Map<String, AbstractCommand> COMMANDS_MAP = new LinkedHashMap<>();
 
-	private final Map<String, AbstractCommand> commandsMap = new LinkedHashMap<>();
-
-	public CommandManager() {
-		this.register(
+	static {
+		CommandManager.register(
 				// Hidden Commands
 				new HelpCmd(),
 				new ReportCmd(),
@@ -129,21 +127,21 @@ public class CommandManager {
 				new ShutdownCmd());
 	}
 
-	private void register(AbstractCommand... cmds) {
+	private static void register(AbstractCommand... cmds) {
 		for(AbstractCommand command : cmds) {
 			for(String name : command.getNames()) {
-				if(commandsMap.containsKey(name)) {
-					LogUtils.error("Command name collision between " + command.getClass() + " and " + commandsMap.get(name).getClass());
+				if(COMMANDS_MAP.containsKey(name)) {
+					LogUtils.error("Command name collision between " + command.getClass() + " and " + COMMANDS_MAP.get(name).getClass());
 					continue;
 				}
-				commandsMap.put(name, command);
+				COMMANDS_MAP.put(name, command);
 			}
 		}
 	}
 
-	public void manage(MessageReceivedEvent event) {
+	public static void manage(MessageReceivedEvent event) {
 		Context context = new Context(event);
-		AbstractCommand command = commandsMap.get(context.getCommand());
+		AbstractCommand command = COMMANDS_MAP.get(context.getCommand());
 
 		if(command == null) {
 			Stats.increment(Category.UNKNOWN_COMMAND, context.getCommand());
@@ -169,15 +167,11 @@ public class CommandManager {
 		}
 	}
 
-	public AbstractCommand getCommand(String name) {
-		return commandsMap.get(name);
+	public static Map<String, AbstractCommand> getCommands() {
+		return COMMANDS_MAP;
 	}
 
-	public Map<String, AbstractCommand> getCommands() {
-		return commandsMap;
-	}
-
-	public static CommandManager getInstance() {
-		return COMMAND_MANAGER;
+	public static AbstractCommand getCommand(String name) {
+		return COMMANDS_MAP.get(name);
 	}
 }

@@ -30,8 +30,8 @@ public class HelpCmd extends AbstractCommand {
 			return;
 		}
 
-		if(context.hasArg() && CommandManager.getInstance().getCommand(context.getArg()) != null) {
-			CommandManager.getInstance().getCommand(context.getArg()).showHelp(context);
+		if(context.hasArg() && CommandManager.getCommand(context.getArg()) != null) {
+			CommandManager.getCommand(context.getArg()).showHelp(context);
 			return;
 		}
 
@@ -48,7 +48,7 @@ public class HelpCmd extends AbstractCommand {
 		Arrays.stream(CommandCategory.values())
 				.filter(cmdCat -> !cmdCat.equals(CommandCategory.HIDDEN))
 				.forEach(category -> builder.appendField(category.toString() + " Commands:",
-						CommandManager.getInstance().getCommands().values().stream()
+						CommandManager.getCommands().values().stream()
 								.filter(cmd -> cmd.getCategory().equals(category) && authorRole.getHierarchy() >= cmd.getRole().getHierarchy())
 								.distinct()
 								.map(cmd -> "`" + prefix + cmd.getNames()[0] + "`")
