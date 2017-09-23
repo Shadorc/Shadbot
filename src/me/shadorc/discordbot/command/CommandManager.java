@@ -3,7 +3,6 @@ package me.shadorc.discordbot.command;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import me.shadorc.discordbot.command.AbstractCommand.Role;
 import me.shadorc.discordbot.command.admin.PruneCmd;
 import me.shadorc.discordbot.command.admin.SettingsManagerCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;

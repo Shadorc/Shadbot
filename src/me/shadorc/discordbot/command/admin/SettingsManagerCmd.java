@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.command.admin.setting.AutoMessageSettingCmd;
 import me.shadorc.discordbot.command.admin.setting.ChannelSettingCmd;
 import me.shadorc.discordbot.command.admin.setting.NSFWSettingCmd;

@@ -8,22 +8,6 @@ public abstract class AbstractCommand {
 	private final Role role;
 	private final String[] names;
 
-	public enum Role {
-		USER(0),
-		ADMIN(1),
-		OWNER(2);
-
-		private final int hierarchy;
-
-		Role(int hierarchy) {
-			this.hierarchy = hierarchy;
-		}
-
-		public int getHierarchy() {
-			return hierarchy;
-		}
-	}
-
 	public AbstractCommand(CommandCategory category, Role role, String name, String... names) {
 		this.category = category;
 		this.role = role;
