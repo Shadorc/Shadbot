@@ -10,6 +10,7 @@ import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.task.SchedulerManager;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.handle.obj.IUser;
 
 public class Shadbot {
 
@@ -37,5 +38,9 @@ public class Shadbot {
 
 	public static IDiscordClient getClient() {
 		return client;
+	}
+
+	public static IUser getOwner() {
+		return client.getApplicationOwner();
 	}
 }

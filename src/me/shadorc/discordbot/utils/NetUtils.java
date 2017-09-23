@@ -50,13 +50,11 @@ public class NetUtils {
 	 */
 	public static boolean isValidURL(String stringUrl) {
 		try {
-			URL url = new URL(stringUrl);
-			URLConnection conn = url.openConnection();
-			conn.connect();
+			new URL(stringUrl).openConnection().connect();
+			return true;
 		} catch (IOException err) {
 			return false;
 		}
-		return true;
 	}
 
 	public static void postStats() {

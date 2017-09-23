@@ -58,7 +58,7 @@ public class InfoCmd extends AbstractCommand {
 						+ "\nLavaPlayer Version: " + PlayerLibrary.VERSION
 						+ "\n\n-= Shadbot Info =-"
 						+ "\nUptime: " + DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true)
-						+ "\nDeveloper: Shadorc#8423"
+						+ "\nDeveloper: " + Shadbot.getOwner().getName() + "#" + Shadbot.getOwner().getDiscriminator()
 						+ "\nVersion: " + Config.VERSION.toString()
 						+ "\nVoice Channels: " + Shadbot.getClient().getConnectedVoiceChannels().size()
 						+ "\nServers: " + Shadbot.getClient().getGuilds().size()

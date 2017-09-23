@@ -45,7 +45,7 @@ public class Context {
 	}
 
 	public Role getAuthorRole() {
-		if(event.getAuthor().getLongID() == Shadbot.getClient().getApplicationOwner().getLongID()) {
+		if(event.getAuthor().getLongID() == Shadbot.getOwner().getLongID()) {
 			return Role.OWNER;
 		} else if(event.getAuthor().getPermissionsForGuild(event.getGuild()).contains(Permissions.ADMINISTRATOR)) {
 			return Role.ADMIN;
