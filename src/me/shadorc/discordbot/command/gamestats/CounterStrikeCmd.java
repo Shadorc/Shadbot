@@ -129,7 +129,8 @@ public class CounterStrikeCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show player's stats for Counter-Strike: Global Offensive.**")
-				.appendField("Usage", "`" + context.getPrefix() + "cs <steamID>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + "cs <steamID>`", false)
+				.appendField("Argument", "**steamID** - steam ID, custom ID or profile URL", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

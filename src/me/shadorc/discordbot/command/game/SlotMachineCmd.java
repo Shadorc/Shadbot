@@ -79,8 +79,8 @@ public class SlotMachineCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play slot machine.**")
-				.appendField("Cost", "A game costs " + PAID_COST + " coins.", false)
-				.appendField("Gains", "You can win " + FIRST_GAINS + ", " + SECOND_GAINS + " or " + THIRD_GAINS + " coins ! Good luck.", false);
+				.appendField("Cost", "A game costs **" + PAID_COST + " coins**.", false)
+				.appendField("Gains", "You can win **" + FIRST_GAINS + "**, **" + SECOND_GAINS + "** or **" + THIRD_GAINS + " coins** ! Good luck.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

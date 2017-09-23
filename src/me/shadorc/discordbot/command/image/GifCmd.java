@@ -61,9 +61,9 @@ public class GifCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Show a random gif or a gif corresponding to a tag.**")
-				.appendField("Usage", "`" + context.getPrefix() + "gif`"
-						+ "\n`" + context.getPrefix() + "gif <tag>`", false);
+				.appendDescription("**Show a random gif.**")
+				.appendField("Usage", "`" + context.getPrefix() + "gif [<tag>]`", false)
+				.appendField("Argument", "**tag** - [OPTIONAL] the tag to search", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

@@ -102,7 +102,7 @@ public class RpsCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play a Rock–paper–scissors game.**")
-				.appendField("Usage", "/rps <handsign>", false)
+				.appendField("Usage", "`" + context.getPrefix() + "rps <handsign>`", false)
 				.appendField("Argument", "**handsign** -  rock, paper or scissors", false)
 				.appendField("Gains", "The winner gets **" + GAINS + " coins**.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

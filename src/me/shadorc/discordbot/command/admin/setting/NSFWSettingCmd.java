@@ -52,8 +52,8 @@ public class NSFWSettingCmd implements SettingCmd {
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.withAuthorName("Help for setting: " + Setting.NSFW.toString())
 				.appendDescription("**" + this.getDescription() + "**")
-				.appendField("Argument", "**action** - toggle/enable/disable", false)
 				.appendField("Usage", "`" + context.getPrefix() + "settings " + Setting.NSFW.toString() + " <action>`", false)
+				.appendField("Argument", "**action** - toggle/enable/disable", false)
 				.appendField("Example", "`" + context.getPrefix() + "settings " + Setting.NSFW.toString() + " toggle`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

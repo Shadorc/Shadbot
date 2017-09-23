@@ -114,11 +114,10 @@ public class OverwatchCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show player's stats for Overwatch.**")
-				.appendField("Arguments", "**plateform** - optional, automatically detected if nothing is specified."
-						+ "\nOptions: pc, xbl, psn"
-						+ "\n**region** - optional (only needed if the plateform is PC) automatically detected if nothing is specified."
-						+ "\nOptions: us, eu, kr, cn", false)
-				.appendField("Usage", "`" + context.getPrefix() + "overwatch [<plateform> <region>] <battletag#0000>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + "overwatch [<plateform> <region>] <battletag#0000>`", false)
+				.appendField("Arguments", "**plateform** - [OPTIONAL] value: pc, xbl, psn"
+						+ "\n**region** - [OPTIONAL] (only needed if the plateform is PC) value: us, eu, kr, cn"
+						+ "\n**plateform** and **region** are automatically detected if nothing is specified.", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 

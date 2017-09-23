@@ -38,8 +38,8 @@ public class PrefixSettingCmd implements SettingCmd {
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.withAuthorName("Help for setting: " + Setting.PREFIX.toString())
 				.appendDescription("**" + this.getDescription() + "**")
-				.appendField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
 				.appendField("Usage", "`" + context.getPrefix() + "settings " + Setting.PREFIX.toString() + " <prefix>`", false)
+				.appendField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
 				.appendField("Example", "`" + context.getPrefix() + "settings " + Setting.PREFIX.toString() + " !`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

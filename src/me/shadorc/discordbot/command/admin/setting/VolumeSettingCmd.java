@@ -42,8 +42,8 @@ public class VolumeSettingCmd implements SettingCmd {
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.withAuthorName("Help for setting: " + Setting.DEFAULT_VOLUME.toString())
 				.appendDescription("**" + this.getDescription() + "**")
-				.appendField("Argument", "**volume** - min: " + MIN_VOLUME + " / max: " + MAX_VOLUME + " / default: " + Config.DEFAULT_VOLUME, false)
 				.appendField("Usage", "`" + context.getPrefix() + "settings " + Setting.DEFAULT_VOLUME.toString() + " <volume>`", false)
+				.appendField("Argument", "**volume** - min: " + MIN_VOLUME + " / max: " + MAX_VOLUME + " / default: " + Config.DEFAULT_VOLUME, false)
 				.appendField("Example", "`" + context.getPrefix() + "settings " + Setting.DEFAULT_VOLUME.toString() + " 42`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

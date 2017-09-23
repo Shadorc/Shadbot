@@ -72,9 +72,9 @@ public class ChannelSettingCmd implements SettingCmd {
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.withAuthorName("Help for setting: " + Setting.ALLOWED_CHANNELS.toString())
 				.appendDescription("**" + this.getDescription() + "**")
+				.appendField("Usage", "`" + context.getPrefix() + "settings " + Setting.ALLOWED_CHANNELS.toString() + " <action> <#channel(s)>`", false)
 				.appendField("Argument", "**action** - add/remove"
 						+ "\n**channel(s)** - the channel(s) to add/remove", false)
-				.appendField("Usage", "`" + context.getPrefix() + "settings " + Setting.ALLOWED_CHANNELS.toString() + " <action> <#channel(s)>`", false)
 				.appendField("Example", "`" + context.getPrefix() + "settings " + Setting.ALLOWED_CHANNELS.toString() + " add #general`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}

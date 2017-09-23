@@ -86,8 +86,9 @@ public class PlayCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Play the music(s) from the url, search terms or playlist.\nYou can also search on SoundCloud by using /play soundcloud <search>**")
-				.appendField("Usage", "`" + context.getPrefix() + "play <url>`", false);
+				.appendDescription("**Play the music(s) from the url, search terms or playlist.**")
+				.appendField("Usage", "`" + context.getPrefix() + "play [soundcloud] <url>`", false)
+				.appendField("Argument", "**soundcloud** - [OPTIONAL] search on SoundCloud instead of YouTube", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

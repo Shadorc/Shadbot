@@ -70,8 +70,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Transfer coins to the mentioned user.**")
-				.appendField("Usage", "`" + context.getPrefix() + "transfer <coins> <@user>`", false)
-				.appendField("Restriction", "**coins** - must be strictly positive", false);
+				.appendField("Usage", "`" + context.getPrefix() + "transfer <coins> <@user>`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }

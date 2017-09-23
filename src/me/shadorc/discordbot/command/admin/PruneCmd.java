@@ -95,10 +95,10 @@ public class PruneCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Delete messages.**")
-				.appendField("Usage", "`" + context.getPrefix() + "prune [*@user(s)*] [-c *\"words\"*] [-n *num*]`", false)
-				.appendField("Options", "**num** - number of messages to delete (max: 100)"
-						+ "\n**user(s)** - from these users"
-						+ "\n**words** - containing these words", false)
+				.appendField("Usage", "`" + context.getPrefix() + "prune [@user(s)] [-c \"words\"] [-n num]`", false)
+				.appendField("Options", "**num** - [OPTIONAL] number of messages to delete (max: 100)"
+						+ "\n**user(s)** - [OPTIONAL] from these users"
+						+ "\n**words** - [OPTIONAL] containing these words", false)
 				.appendField("Example", "Delete **15** messages from user **@Shadbot** containing **hi guys**:"
 						+ "\n`" + context.getPrefix() + "prune @Shadbot -c \"hi guys\" -n 15`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());

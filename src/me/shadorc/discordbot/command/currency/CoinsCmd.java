@@ -43,9 +43,8 @@ public class CoinsCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Show how many coins you have.\nYou can also see how much coins have an user by mentioning him.**")
-				.appendField("Usage", "`" + context.getPrefix() + "coins`"
-						+ "\n`" + context.getPrefix() + "coins <@user>`", false);
+				.appendDescription("**Show how much coins you or another user have.**")
+				.appendField("Usage", "`" + context.getPrefix() + "coins [<@user>]`", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
 }
