@@ -6,6 +6,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
+import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Player;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -56,6 +57,12 @@ public class TransferCoinsCmd extends AbstractCommand {
 		int coins = Integer.parseInt(coinsStr);
 		if(senderPlayer.getCoins() < coins) {
 			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to do this.", context.getChannel());
+			return;
+		}
+
+		if(receiverPlayer.getCoins() + coins >= Config.MAX_COINS) {
+			BotUtils.sendMessage(Emoji.BANK + " This transfer cannot be done because " + receiverPlayer.getUser().getName()
+					+ " would exceed the maximum coins cap.", context.getChannel());
 			return;
 		}
 

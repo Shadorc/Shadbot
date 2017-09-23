@@ -23,6 +23,7 @@ public class Config {
 	public static final int INDENT_FACTOR = 2;
 	public static final int DEFAULT_TIMEOUT = 7500;
 	public static final int MAX_PLAYLIST_SIZE = 150;
+	public static final int MAX_COINS = Integer.MAX_VALUE;
 
 	public static final Color BOT_COLOR = new Color(170, 196, 222);
 

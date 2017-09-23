@@ -2,7 +2,6 @@ package me.shadorc.discordbot.data;
 
 import org.json.JSONObject;
 
-import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -32,12 +31,7 @@ public class Player {
 	}
 
 	public void addCoins(int gains) {
-		try {
-			this.coins = Math.max(0, Math.addExact(coins, gains));
-		} catch (ArithmeticException err) {
-			this.coins = Integer.MAX_VALUE;
-			LogUtils.warn("User (ID: " + user.getLongID() + ") exceeded the maximum coins value.");
-		}
+		this.coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) (this.coins + gains)));
 		this.save();
 	}
 
