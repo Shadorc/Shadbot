@@ -105,6 +105,12 @@ public class PollCmd extends AbstractCommand {
 			return;
 		}
 
+		if(StringUtils.getCharCount(splitArgs[1], '"') == 0) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You need to specify question and choices in quotation marks. "
+					+ "Use `" + context.getPrefix() + "help " + this.getNames()[0] + "` for more information.", context.getChannel());
+			return;
+		}
+
 		if(StringUtils.getCharCount(splitArgs[1], '"') % 2 != 0) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You forgot a quotation mark.", context.getChannel());
 			return;
