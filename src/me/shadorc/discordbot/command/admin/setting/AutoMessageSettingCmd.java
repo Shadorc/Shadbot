@@ -48,7 +48,7 @@ public class AutoMessageSettingCmd implements SettingCmd {
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " The welcome message for this server is now: \"" + arg2 + "\".", context.getChannel());
 					if(Storage.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
 						BotUtils.sendMessage(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
-								+ " channel <#channel(s)>` to define in which channel auto messages are send.", context.getChannel());
+								+ " channel <#channel>` to define in which channel auto messages are send.", context.getChannel());
 					}
 				}
 				break;
@@ -62,7 +62,7 @@ public class AutoMessageSettingCmd implements SettingCmd {
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " The goodbye message for this server is now: \"" + arg2 + "\".", context.getChannel());
 					if(Storage.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
 						BotUtils.sendMessage(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
-								+ " channel <#channel(s)>` to define in which channel auto messages are send.", context.getChannel());
+								+ " channel <#channel>` to define in which channel auto messages are send.", context.getChannel());
 					}
 				}
 				break;
@@ -80,7 +80,7 @@ public class AutoMessageSettingCmd implements SettingCmd {
 				.withAuthorName("Help for setting: " + Setting.AUTO_MESSAGE.toString())
 				.appendDescription("__**Channel**__ (Define in which channel send auto messages)"
 						+ "\n**Usage**"
-						+ "\n`" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE + " channel <#channel(s)>`"
+						+ "\n`" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE + " channel <#channel>`"
 						+ "\n**Argument**"
 						+ "\n`channel(s)` - the channel in which to post auto messages"
 						+ "\n**Example**"
