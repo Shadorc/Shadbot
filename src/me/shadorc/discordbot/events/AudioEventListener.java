@@ -45,6 +45,12 @@ public class AudioEventListener extends AudioEventAdapter {
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 		if(endReason.mayStartNext) {
 			errorCount = 0; // Everything seems to be fine, reset error count.
+
+			if(GuildMusicManager.getGuildMusicManager(guild) == null) {
+				LogUtils.info("{DEBUG} {" + this.getClass().getSimpleName() + "} {Guild ID: " + channel.getGuild().getLongID() + "} "
+						+ "GuildMusicManager was null on track end.");
+			}
+
 			if(scheduler.isRepeating()) {
 				scheduler.queue(track.makeClone());
 			} else if(!scheduler.nextTrack()

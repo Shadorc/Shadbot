@@ -11,6 +11,7 @@ import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.events.AudioLoadResultListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -70,6 +71,10 @@ public class PlayCmd extends AbstractCommand {
 		if(musicManager == null
 				// FIXME: Should we check this ? Creating a new manager is not problematic ?
 				|| musicManager.getScheduler().isStopped()) {
+			if(musicManager != null) {
+				LogUtils.info("{DEBUG} {" + this.getClass().getSimpleName() + "} {Guild ID: " + context.getGuild().getLongID() + "} "
+						+ "Creating new GuildMusicManager because scheduler was stopped.");
+			}
 			musicManager = GuildMusicManager.createGuildMusicManager(context.getGuild());
 		} else if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You've reached the maximum number of tracks in the playlist (Max: "
