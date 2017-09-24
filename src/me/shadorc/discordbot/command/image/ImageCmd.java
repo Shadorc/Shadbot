@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command.image;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +29,9 @@ public class ImageCmd extends AbstractCommand {
 
 	private final RateLimiter rateLimiter;
 	private String deviantArtToken;
+
+	private int expiresIn;
+	private long tokenRequestTime;
 
 	public ImageCmd() {
 		super(CommandCategory.IMAGE, Role.USER, "image");
@@ -76,16 +80,12 @@ public class ImageCmd extends AbstractCommand {
 		}
 	}
 
-	private void generateAccessToken() throws JSONException, IOException {
-		JSONObject oauthObj = new JSONObject(NetUtils.getBody("https://www.deviantart.com/oauth2/token?"
-				+ "client_id=" + Config.get(APIKey.DEVIANTART_CLIENT_ID)
-				+ "&client_secret=" + Config.get(APIKey.DEVIANTART_API_SECRET)
-				+ "&grant_type=client_credentials"));
-		this.deviantArtToken = oauthObj.getString("access_token");
-	}
-
 	private JSONObject getRandomPopularResult(String encodedSearch) throws JSONException, IOException {
 		try {
+			if(this.isTokenExpired()) {
+				this.generateAccessToken();
+			}
+
 			JSONObject mainObj = new JSONObject(NetUtils.getBody("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
 					+ "q=" + encodedSearch
 					+ "&timerange=alltime"
@@ -108,13 +108,22 @@ public class ImageCmd extends AbstractCommand {
 			return resultObj;
 
 		} catch (JSONException | IOException err) {
-			if(err.getMessage().contains("401")) {
-				this.generateAccessToken();
-				return this.getRandomPopularResult(encodedSearch);
-			}
-
 			return null;
 		}
+	}
+
+	private void generateAccessToken() throws JSONException, IOException {
+		JSONObject oauthObj = new JSONObject(NetUtils.getBody("https://www.deviantart.com/oauth2/token?"
+				+ "client_id=" + Config.get(APIKey.DEVIANTART_CLIENT_ID)
+				+ "&client_secret=" + Config.get(APIKey.DEVIANTART_API_SECRET)
+				+ "&grant_type=client_credentials"));
+		this.deviantArtToken = oauthObj.getString("access_token");
+		this.expiresIn = oauthObj.getInt("expires_in");
+		this.tokenRequestTime = System.currentTimeMillis();
+	}
+
+	private boolean isTokenExpired() {
+		return (System.currentTimeMillis() - tokenRequestTime) < TimeUnit.SECONDS.toMillis(expiresIn);
 	}
 
 	@Override
