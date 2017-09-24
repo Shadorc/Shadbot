@@ -76,25 +76,25 @@ public class Rule34Cmd extends AbstractCommand {
 				tags = tags.substring(0, 400) + "...";
 			}
 
-			// TODO: Rule34 fail ?
-			String url = postObj.getString("file_url");
-			if(!url.startsWith("http")) {
-				url = "http:" + url;
+			StringBuilder fileUrl = new StringBuilder(postObj.getString("file_url"));
+			if(!fileUrl.toString().startsWith("http")) {
+				fileUrl.insert(0, "http:");
 			}
 
-			String source = postObj.getString("source");
-			if(!source.startsWith("http")) {
-				source = "http:" + source;
+			StringBuilder sourceUrl = new StringBuilder(postObj.getString("source"));
+			if(!sourceUrl.toString().startsWith("http")) {
+				sourceUrl.insert(0, "http:");
 			}
+
 			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
-					.withUrl(url)
+					.withUrl(fileUrl.toString())
 					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
 					.appendField("Resolution", postObj.getInt("width") + "x" + postObj.getInt("height"), false)
-					.appendField("Source", source, false)
+					.appendField("Source", sourceUrl.toString(), false)
 					.appendField("Tags", tags, false)
-					.withImage(url)
+					.withImage(fileUrl.toString())
 					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
 			BotUtils.sendEmbed(embed.build(), context.getChannel());
 
