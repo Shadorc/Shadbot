@@ -40,6 +40,7 @@ public class NetUtils {
 				.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35")
 				.timeout(Config.DEFAULT_TIMEOUT)
 				.ignoreContentType(true)
+				.ignoreHttpErrors(true)
 				.execute()
 				.body();
 	}
