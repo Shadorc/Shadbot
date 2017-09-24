@@ -48,8 +48,10 @@ public class CounterStrikeCmd extends AbstractCommand {
 			if(context.getArg().contains("/")) {
 				String[] splittedUrl = context.getArg().split("/");
 				steamid = splittedUrl[splittedUrl.length - 1].trim();
+
 			} else if(StringUtils.isPositiveLong(context.getArg())) {
-				steamid = context.getArg().trim();
+				steamid = context.getArg();
+
 			} else {
 				JSONObject mainObj = new JSONObject(NetUtils.getBody("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?"
 						+ "key=" + Config.get(APIKey.STEAM_API_KEY)
@@ -71,7 +73,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 				return;
 			}
 
-			JSONObject userObj = mainUserObj.getJSONObject("response").getJSONArray("players").getJSONObject(0);
+			JSONObject userObj = players.getJSONObject(0);
 
 			/*
 			 * CommunityVisibilityState
@@ -88,6 +90,11 @@ public class CounterStrikeCmd extends AbstractCommand {
 					+ "appid=730"
 					+ "&key=" + Config.get(APIKey.STEAM_API_KEY)
 					+ "&steamid=" + steamid));
+
+			if(!mainStatsObj.has("playerstats")) {
+				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.", context.getChannel());
+				return;
+			}
 
 			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");
 
@@ -107,11 +114,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			if(err.getMessage().contains("400")) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive or doesn't exist.", context.getChannel());
-			} else {
-				LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", err, context);
-			}
+			LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", err, context);
 		}
 	}
 
@@ -133,5 +136,4 @@ public class CounterStrikeCmd extends AbstractCommand {
 				.appendField("Argument", "**steamID** - steam ID, custom ID or profile URL", false);
 		BotUtils.sendEmbed(builder.build(), context.getChannel());
 	}
-
 }
