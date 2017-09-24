@@ -26,9 +26,9 @@ public class SlotMachineCmd extends AbstractCommand {
 
 	private static final int PAID_COST = 10;
 
-	private static final int FIRST_GAINS = 100;
-	private static final int SECOND_GAINS = 1000;
-	private static final int THIRD_GAINS = 20000;
+	private static final int FIRST_GAINS = 50;
+	private static final int SECOND_GAINS = 500;
+	private static final int THIRD_GAINS = 13000;
 
 	private static final SlotOptions[] SLOTS_ARRAY = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, // Winning chance : 12.5%
