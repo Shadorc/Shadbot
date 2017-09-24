@@ -103,7 +103,11 @@ public class BotUtils {
 			LogUtils.info("Sending " + count + " pending message(s)...");
 			for(IChannel channel : MESSAGE_QUEUE.keySet()) {
 				for(String message : MESSAGE_QUEUE.get(channel)) {
+					LogUtils.info("{DEBUG} {BotUtils} {Guild ID: " + channel.getGuild().getLongID() + "} "
+							+ "Sending a message...");
 					BotUtils.sendMessage(message, channel);
+					LogUtils.info("{DEBUG} {BotUtils} {Guild ID: " + channel.getGuild().getLongID() + "} "
+							+ "Message sent.");
 				}
 			}
 			LogUtils.info("Pending message(s) sent.");
@@ -115,7 +119,11 @@ public class BotUtils {
 			LogUtils.info("Sending " + count + " pending embed...");
 			for(IChannel channel : EMBED_QUEUE.keySet()) {
 				for(EmbedObject embed : EMBED_QUEUE.get(channel)) {
+					LogUtils.info("{DEBUG} {BotUtils} {Guild ID: " + channel.getGuild().getLongID() + "} "
+							+ "Sending an embed...");
 					BotUtils.sendEmbed(embed, channel);
+					LogUtils.info("{DEBUG} {BotUtils} {Guild ID: " + channel.getGuild().getLongID() + "} "
+							+ "Embed sent.");
 				}
 			}
 			LogUtils.info("Pending embed sent.");
