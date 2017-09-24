@@ -149,14 +149,14 @@ public class TriviaCmd extends AbstractCommand {
 			IUser author = message.getAuthor();
 
 			if(alreadyAnswered.contains(author) && (wrongAnswer || goodAnswer)) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Sorry " + author.getName() + ", you can only answer once.", message.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Sorry **" + author.getName() + "**, you can only answer once.", message.getChannel());
 
 			} else if(wrongAnswer) {
 				BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", channel);
 				alreadyAnswered.add(author);
 
 			} else if(goodAnswer) {
-				BotUtils.sendMessage(Emoji.CLAP + " Correct ! " + author.getName() + ", you won **" + GAINS + " coins**.", channel);
+				BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + GAINS + " coins**.", channel);
 				Storage.getPlayer(message.getGuild(), author).addCoins(GAINS);
 				Stats.increment(Category.MONEY_GAINS_COMMAND, TriviaCmd.this.getNames()[0], GAINS);
 				this.stop();

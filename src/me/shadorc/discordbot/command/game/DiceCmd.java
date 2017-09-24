@@ -117,7 +117,7 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		diceManager.addPlayer(context.getAuthor(), num);
-		BotUtils.sendMessage(Emoji.DICE + " " + context.getAuthor().mention() + " bets on " + num + ".", context.getChannel());
+		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets on **" + num + "**.", context.getChannel());
 	}
 
 	@Override
@@ -172,7 +172,7 @@ public class DiceCmd extends AbstractCommand {
 			if(this.isBet(winningNum)) {
 				IUser winner = numsPlayers.get(winningNum);
 				int gains = bet * (numsPlayers.size() + MULTIPLIER);
-				BotUtils.sendMessage(Emoji.DICE + " Congratulations " + winner.mention() + ", you win **" + gains + " coins** !", context.getChannel());
+				BotUtils.sendMessage(Emoji.DICE + " Congratulations **" + winner.getName() + "**, you win **" + gains + " coins** !", context.getChannel());
 				Storage.getPlayer(context.getGuild(), winner).addCoins(gains);
 				Stats.increment(Category.MONEY_GAINS_COMMAND, DiceCmd.this.getNames()[0], gains);
 			}
@@ -187,9 +187,9 @@ public class DiceCmd extends AbstractCommand {
 				for(IUser loser : losersList) {
 					Storage.getPlayer(context.getGuild(), loser).addCoins(-bet);
 					Stats.increment(Category.MONEY_LOSSES_COMMAND, DiceCmd.this.getNames()[0], bet);
-					strBuilder.append(loser.mention() + ", ");
+					strBuilder.append("**" + loser.getName() + "**, ");
 				}
-				strBuilder.append("you lost " + StringUtils.pluralOf(bet, "coin") + ".");
+				strBuilder.append("you lost **" + StringUtils.pluralOf(bet, "coin") + "**.");
 				BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 			}
 
