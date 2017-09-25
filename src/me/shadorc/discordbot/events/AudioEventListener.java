@@ -46,16 +46,9 @@ public class AudioEventListener extends AudioEventAdapter {
 		if(endReason.mayStartNext) {
 			errorCount = 0; // Everything seems to be fine, reset error count.
 
-			if(GuildMusicManager.getGuildMusicManager(guild) == null) {
-				LogUtils.info("{DEBUG} {" + this.getClass().getSimpleName() + "} {Guild ID: " + channel.getGuild().getLongID() + "} "
-						+ "GuildMusicManager was null on track end.");
-			}
-
 			if(scheduler.isRepeating()) {
 				scheduler.queue(track.makeClone());
-			} else if(!scheduler.nextTrack()
-					// FIXME: Having to check null is weird
-					&& GuildMusicManager.getGuildMusicManager(guild) != null) {
+			} else if(!scheduler.nextTrack()) {
 				GuildMusicManager.getGuildMusicManager(guild).end();
 			}
 		}
