@@ -75,10 +75,10 @@ public class PlayCmd extends AbstractCommand {
 
 		if(musicManager == null
 				// FIXME: Should we check this ? Creating a new manager is not problematic ?
-				|| musicManager.getScheduler().isStopped()) {
+				|| musicManager.getScheduler().isStopped() && !musicManager.isLoading()) {
 			if(musicManager != null) {
 				LogUtils.info("{DEBUG} {" + this.getClass().getSimpleName() + "} {Guild ID: " + context.getGuild().getLongID() + "} "
-						+ "Creating new GuildMusicManager because scheduler was stopped.");
+						+ "Creating new GuildMusicManager because scheduler was stopped and wasn't loading.");
 			}
 			musicManager = GuildMusicManager.createGuildMusicManager(context.getGuild());
 		}
@@ -91,6 +91,7 @@ public class PlayCmd extends AbstractCommand {
 
 		musicManager.setChannel(context.getChannel());
 		musicManager.setDj(context.getAuthor());
+		musicManager.setLoading(true);
 		AudioLoadResultListener resultListener = new AudioLoadResultListener(musicManager, userVoiceChannel, identifier);
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, resultListener);
 	}

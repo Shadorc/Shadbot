@@ -55,21 +55,20 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					+ StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
 		}
 		musicManager.getScheduler().queue(track);
+		musicManager.setLoading(false);
 	}
 
 	@Override
 	public void playlistLoaded(AudioPlaylist playlist) {
 		// SoundCloud send empty playlist when no result are found
 		if(playlist.getTracks().isEmpty()) {
-			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \""
-					+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+			this.onNoMatches();
 			return;
 		}
 
 		List<AudioTrack> tracks = playlist.getTracks();
 
 		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
-
 			if(MessageManager.isWaitingForMessage(musicManager.getChannel())) {
 				BotUtils.sendMessage(Emoji.HOURGLASS + " Someone is already selecting a music,"
 						+ " please wait for him to finish.", musicManager.getChannel());
@@ -111,17 +110,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
 				+ " musics have been added to the playlist.", musicManager.getChannel());
-	}
 
-	@Override
-	public void noMatches() {
-		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \""
-				+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
-		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} No matches: " + identifier);
-
-		if(musicManager.getScheduler().isStopped()) {
-			musicManager.leaveVoiceChannel();
-		}
+		musicManager.setLoading(false);
 	}
 
 	@Override
@@ -134,6 +124,25 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
 			LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Load failed: " + errMessage);
 		}
+
+		musicManager.setLoading(false);
+
+		if(musicManager.getScheduler().isStopped()) {
+			musicManager.leaveVoiceChannel();
+		}
+	}
+
+	@Override
+	public void noMatches() {
+		this.onNoMatches();
+	}
+
+	private void onNoMatches() {
+		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \""
+				+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} No matches: " + identifier);
+
+		musicManager.setLoading(false);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
@@ -193,6 +202,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private void stopWaiting() {
 		cancelTimer.stop();
 		resultsTracks.clear();
+		musicManager.setLoading(false);
 		MessageManager.removeListener(musicManager.getChannel());
 	}
 

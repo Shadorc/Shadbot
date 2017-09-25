@@ -2,6 +2,7 @@ package me.shadorc.discordbot.music;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.Timer;
 
@@ -31,6 +32,7 @@ public class GuildMusicManager {
 	private final TrackScheduler scheduler;
 	private final AudioEventListener audioEventListener;
 	private final Timer leaveTimer;
+	private final AtomicBoolean isLoading;
 
 	private IChannel channel;
 	private IUser userDj;
@@ -45,6 +47,7 @@ public class GuildMusicManager {
 		this.leaveTimer = new Timer((int) TimeUnit.MINUTES.toMillis(1), event -> {
 			this.leaveVoiceChannel();
 		});
+		this.isLoading = new AtomicBoolean();
 	}
 
 	public void scheduleLeave() {
@@ -85,6 +88,10 @@ public class GuildMusicManager {
 		}).start();
 	}
 
+	public void setLoading(boolean isLoading) {
+		this.isLoading.set(isLoading);
+	}
+
 	public void setChannel(IChannel channel) {
 		this.channel = channel;
 		this.audioEventListener.setChannel(channel);
@@ -112,6 +119,10 @@ public class GuildMusicManager {
 
 	public boolean isLeavingScheduled() {
 		return leaveTimer.isRunning();
+	}
+
+	public boolean isLoading() {
+		return isLoading.get();
 	}
 
 	public static GuildMusicManager createGuildMusicManager(IGuild guild) {
