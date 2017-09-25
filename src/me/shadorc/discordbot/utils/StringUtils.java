@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,9 +59,12 @@ public class StringUtils {
 
 	/**
 	 * @param duration - the duration to format
-	 * @return the formatted duration as "m:ss"
+	 * @return the formatted duration as "m:ss" or "H:mm:ss" if duration is longer than an hour
 	 */
 	public static String formatDuration(long durationMillis) {
+		if(TimeUnit.MILLISECONDS.toHours(durationMillis) > 0) {
+			return DurationFormatUtils.formatDuration(durationMillis, "H:mm:ss", true);
+		}
 		return DurationFormatUtils.formatDuration(durationMillis, "m:ss", true);
 	}
 
