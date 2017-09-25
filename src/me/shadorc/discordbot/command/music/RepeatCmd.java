@@ -38,7 +38,7 @@ public class RepeatCmd extends AbstractCommand {
 		}
 
 		TrackScheduler scheduler = musicManager.getScheduler();
-		scheduler.setRepeatEnabled(!scheduler.isRepeating());
+		scheduler.setRepeat(!scheduler.isRepeating());
 		if(scheduler.isRepeating()) {
 			BotUtils.sendMessage(Emoji.REPEAT + " Repetition enabled.", context.getChannel());
 		} else {

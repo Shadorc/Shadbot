@@ -76,7 +76,9 @@ public class PlayCmd extends AbstractCommand {
 						+ "Creating new GuildMusicManager because scheduler was stopped.");
 			}
 			musicManager = GuildMusicManager.createGuildMusicManager(context.getGuild());
-		} else if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
+		}
+
+		if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You've reached the maximum number of tracks in the playlist (Max: "
 					+ Config.MAX_PLAYLIST_SIZE + ").", context.getChannel());
 			return;

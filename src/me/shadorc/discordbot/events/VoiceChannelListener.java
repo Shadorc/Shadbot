@@ -41,12 +41,12 @@ public class VoiceChannelListener {
 
 			if(this.isAlone(botVoiceChannel) && !gmm.isLeavingScheduled()) {
 				BotUtils.sendMessage(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.", gmm.getChannel());
-				gmm.getScheduler().setPaused(true);
+				gmm.getScheduler().getAudioPlayer().setPaused(true);
 				gmm.scheduleLeave();
 
 			} else if(!this.isAlone(botVoiceChannel) && gmm.isLeavingScheduled()) {
 				BotUtils.sendMessage(Emoji.INFO + " Somebody joined me, music resumed.", gmm.getChannel());
-				gmm.getScheduler().setPaused(false);
+				gmm.getScheduler().getAudioPlayer().setPaused(false);
 				gmm.cancelLeave();
 			}
 		}

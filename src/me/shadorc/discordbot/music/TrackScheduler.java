@@ -55,15 +55,15 @@ public class TrackScheduler {
 		return newPosition;
 	}
 
-	public void clearPlaylist() {
-		queue.clear();
-	}
-
 	public void shufflePlaylist() {
 		List<AudioTrack> tempList = new ArrayList<>(queue);
 		Collections.shuffle(tempList);
 		queue.clear();
 		queue.addAll(tempList);
+	}
+
+	public void clearPlaylist() {
+		queue.clear();
 	}
 
 	public String getPlayingTrackName() {
@@ -74,28 +74,20 @@ public class TrackScheduler {
 		return queue;
 	}
 
-	public int getVolume() {
-		return audioPlayer.getVolume();
+	public AudioPlayer getAudioPlayer() {
+		return audioPlayer;
 	}
 
 	public void setVolume(int volume) {
 		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
 	}
 
-	public void setRepeatEnabled(boolean enabled) {
+	public void setRepeat(boolean enabled) {
 		this.isRepeating = enabled;
-	}
-
-	public void setPaused(boolean isPaused) {
-		audioPlayer.setPaused(isPaused);
 	}
 
 	public boolean isRepeating() {
 		return isRepeating;
-	}
-
-	public boolean isPaused() {
-		return audioPlayer.isPaused();
 	}
 
 	public boolean isPlaying() {

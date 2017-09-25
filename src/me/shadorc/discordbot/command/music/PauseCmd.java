@@ -2,12 +2,13 @@ package me.shadorc.discordbot.command.music;
 
 import java.time.temporal.ChronoUnit;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.music.GuildMusicManager;
-import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -37,9 +38,9 @@ public class PauseCmd extends AbstractCommand {
 			return;
 		}
 
-		TrackScheduler scheduler = musicManager.getScheduler();
-		scheduler.setPaused(!scheduler.isPaused());
-		if(scheduler.isPaused()) {
+		AudioPlayer audioPlayer = musicManager.getScheduler().getAudioPlayer();
+		audioPlayer.setPaused(!audioPlayer.isPaused());
+		if(audioPlayer.isPaused()) {
 			BotUtils.sendMessage(Emoji.PAUSE + " Music paused by " + context.getAuthorName() + ".", context.getChannel());
 		} else {
 			BotUtils.sendMessage(Emoji.PLAY + " Music resumed by " + context.getAuthorName() + ".", context.getChannel());
