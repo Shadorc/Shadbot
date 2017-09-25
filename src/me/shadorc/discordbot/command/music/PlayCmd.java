@@ -18,6 +18,7 @@ import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.handle.obj.IVoiceChannel;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class PlayCmd extends AbstractCommand {
@@ -41,19 +42,23 @@ public class PlayCmd extends AbstractCommand {
 
 		IVoiceChannel botVoiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel();
 		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
-		if(userVoiceChannel == null) {
-			if(botVoiceChannel == null) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Join a voice channel before using this command.", context.getChannel());
-			} else {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
-						+ ", join me before using this command.", context.getChannel());
-			}
+
+		if(botVoiceChannel != null && (userVoiceChannel == null || !userVoiceChannel.equals(botVoiceChannel))) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
+					+ ", join me before using this command.", context.getChannel());
 			return;
 		}
 
-		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
-					+ ", join me before using this command.", context.getChannel());
+		if(userVoiceChannel == null) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Join a voice channel before using this command.", context.getChannel());
+			return;
+		}
+
+		if(botVoiceChannel == null && !BotUtils.hasPermission(userVoiceChannel, Permissions.VOICE_CONNECT, Permissions.VOICE_SPEAK)) {
+			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect/speak in this voice channel due to the lack of permission."
+					+ "\nPlease, check my permissions and channel-specific ones to verify that **Voice connect** and **Voice speak** "
+					+ "are checked.", context.getChannel());
+			LogUtils.info("{Guild ID: " + context.getGuild().getLongID() + "} Shadbot wasn't allowed to connect/speak in a voice channel.");
 			return;
 		}
 
