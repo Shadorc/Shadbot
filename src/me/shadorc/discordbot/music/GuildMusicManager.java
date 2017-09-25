@@ -18,7 +18,6 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
-import sx.blah.discord.handle.obj.Permissions;
 
 public class GuildMusicManager {
 
@@ -28,6 +27,7 @@ public class GuildMusicManager {
 
 	private final IGuild guild;
 	private final AudioPlayer audioPlayer;
+	private final AudioProvider audioProvider;
 	private final TrackScheduler scheduler;
 	private final AudioEventListener audioEventListener;
 	private final Timer leaveTimer;
@@ -38,6 +38,7 @@ public class GuildMusicManager {
 	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
 		this.guild = guild;
 		this.audioPlayer = manager.createPlayer();
+		this.audioProvider = new AudioProvider(audioPlayer);
 		this.scheduler = new TrackScheduler(guild, audioPlayer);
 		this.audioEventListener = new AudioEventListener(guild, scheduler);
 		this.audioPlayer.addListener(audioEventListener);
@@ -97,7 +98,7 @@ public class GuildMusicManager {
 	}
 
 	public AudioProvider getAudioProvider() {
-		return new AudioProvider(audioPlayer);
+		return audioProvider;
 	}
 
 	public TrackScheduler getScheduler() {
