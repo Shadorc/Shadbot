@@ -60,10 +60,11 @@ public class GuildMusicManager {
 		this.leaveVoiceChannel();
 	}
 
-	public boolean joinVoiceChannel(IVoiceChannel voiceChannel) {
-		voiceChannel.join();
-		LogUtils.info("{Guild ID: " + voiceChannel.getGuild().getLongID() + "} Voice channel joined.");
-		return true;
+	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean force) {
+		if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null || force) {
+			voiceChannel.join();
+			LogUtils.info("{Guild ID: " + voiceChannel.getGuild().getLongID() + "} Voice channel joined.");
+		}
 	}
 
 	public void leaveVoiceChannel() {

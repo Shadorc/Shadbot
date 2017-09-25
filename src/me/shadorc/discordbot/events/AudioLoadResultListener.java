@@ -34,27 +34,22 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 	private static final int CHOICE_DURATION = 30;
 
-	private final String identifier;
-	private final IVoiceChannel botVoiceChannel;
-	private final IVoiceChannel userVoiceChannel;
 	private final GuildMusicManager musicManager;
+	private final IVoiceChannel userVoiceChannel;
+	private final String identifier;
 
 	private List<AudioTrack> resultsTracks;
 	private Timer cancelTimer;
 
-	public AudioLoadResultListener(String identifier, IVoiceChannel botVoiceChannel, IVoiceChannel userVoiceChannel, GuildMusicManager musicManager) {
-		this.identifier = identifier;
-		this.botVoiceChannel = botVoiceChannel;
-		this.userVoiceChannel = userVoiceChannel;
+	public AudioLoadResultListener(GuildMusicManager musicManager, IVoiceChannel userVoiceChannel, String identifier) {
 		this.musicManager = musicManager;
+		this.userVoiceChannel = userVoiceChannel;
+		this.identifier = identifier;
 	}
 
 	@Override
 	public void trackLoaded(AudioTrack track) {
-		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
-			return;
-		}
-
+		musicManager.joinVoiceChannel(userVoiceChannel, false);
 		if(musicManager.getScheduler().isPlaying()) {
 			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **"
 					+ StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
@@ -109,9 +104,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
-			return;
-		}
+		musicManager.joinVoiceChannel(userVoiceChannel, false);
 
 		for(int i = 0; i < Math.min(Config.MAX_PLAYLIST_SIZE, tracks.size()); i++) {
 			musicManager.getScheduler().queue(tracks.get(i));
@@ -182,9 +175,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 		}
 
-		if(botVoiceChannel == null && !musicManager.joinVoiceChannel(userVoiceChannel)) {
-			return true;
-		}
+		musicManager.joinVoiceChannel(userVoiceChannel, false);
 
 		for(int choice : choices) {
 			AudioTrack track = resultsTracks.get(choice - 1);
