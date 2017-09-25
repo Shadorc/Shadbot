@@ -2,6 +2,7 @@ package me.shadorc.discordbot.events;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.Timer;
 
@@ -98,7 +99,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					.withFooterText("This choice will be canceled in " + CHOICE_DURATION + " seconds.");
 			BotUtils.sendEmbed(embed.build(), musicManager.getChannel());
 
-			cancelTimer = new Timer(CHOICE_DURATION * 1000, event -> {
+			cancelTimer = new Timer((int) TimeUnit.SECONDS.toMillis(CHOICE_DURATION), event -> {
 				this.stopWaiting();
 			});
 			cancelTimer.start();

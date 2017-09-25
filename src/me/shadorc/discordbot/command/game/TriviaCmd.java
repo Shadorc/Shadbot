@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.Timer;
 
@@ -89,7 +90,7 @@ public class TriviaCmd extends AbstractCommand {
 		protected TriviaManager(IChannel channel) {
 			this.channel = channel;
 			this.alreadyAnswered = new ArrayList<>();
-			this.timer = new Timer(30 * 1000, event -> {
+			this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(30), event -> {
 				BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the good answer was **" + correctAnswer + "**.", channel);
 				this.stop();
 			});
@@ -126,7 +127,7 @@ public class TriviaCmd extends AbstractCommand {
 					.appendField("Category", "`" + category + "`", true)
 					.appendField("Type", "`" + type + "`", true)
 					.appendField("Difficulty", "`" + difficulty + "`", true)
-					.withFooterText("You have " + (timer.getDelay() / 1000) + " seconds to answer.");
+					.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to answer.");
 
 			BotUtils.sendEmbed(builder.build(), channel);
 

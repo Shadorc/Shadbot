@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command.game;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.swing.Timer;
@@ -146,7 +147,7 @@ public class DiceCmd extends AbstractCommand {
 			this.context = context;
 			this.bet = bet;
 			this.numsPlayers = new ConcurrentHashMap<>();
-			this.timer = new Timer(GAME_DURATION * 1000, event -> {
+			this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(GAME_DURATION), event -> {
 				this.stop();
 			});
 		}
@@ -157,7 +158,7 @@ public class DiceCmd extends AbstractCommand {
 					.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 					.appendField(context.getAuthor().getName() + " started a dice game.",
 							"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + bet + " coins** putting.", false)
-					.withFooterText("You have " + (timer.getDelay() / 1000) + " seconds to make your bets.");
+					.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to make your bets.");
 			BotUtils.sendEmbed(builder.build(), context.getChannel());
 
 			timer.start();

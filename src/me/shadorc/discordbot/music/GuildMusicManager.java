@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.music;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.Timer;
 
@@ -40,7 +41,7 @@ public class GuildMusicManager {
 		this.scheduler = new TrackScheduler(guild, audioPlayer);
 		this.audioEventListener = new AudioEventListener(guild, scheduler);
 		this.audioPlayer.addListener(audioEventListener);
-		this.leaveTimer = new Timer(60 * 1000, event -> {
+		this.leaveTimer = new Timer((int) TimeUnit.MINUTES.toMillis(1), event -> {
 			this.leaveVoiceChannel();
 		});
 	}

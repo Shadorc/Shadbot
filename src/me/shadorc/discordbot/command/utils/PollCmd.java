@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.swing.Timer;
@@ -172,7 +173,7 @@ public class PollCmd extends AbstractCommand {
 			for(String choice : choicesList) {
 				choicesMap.put(choice, new ArrayList<>());
 			}
-			this.timer = new Timer(duration * 1000, event -> {
+			this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(duration), event -> {
 				this.stop();
 			});
 		}

@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.music;
 
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
@@ -48,7 +49,7 @@ public class BackwardCmd extends AbstractCommand {
 		}
 
 		try {
-			int time = -Integer.parseInt(numStr) * 1000;
+			long time = -TimeUnit.SECONDS.toMillis(Integer.parseInt(numStr));
 			long newPosition = musicManager.getScheduler().changePosition(time);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(newPosition), context.getChannel());
 		} catch (IllegalArgumentException err) {
