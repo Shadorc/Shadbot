@@ -75,6 +75,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 				return;
 			}
 
+			musicManager.defineLastUserAsDj();
+
 			StringBuilder strBuilder = new StringBuilder();
 			for(int i = 0; i < Math.min(5, tracks.size()); i++) {
 				strBuilder.append("\n\t**" + (i + 1) + ".** " + StringUtils.formatTrackName(tracks.get(i).getInfo()));

@@ -35,6 +35,7 @@ public class GuildMusicManager {
 	private final AtomicBoolean isLoading;
 
 	private IChannel channel;
+	private IUser lastUser;
 	private IUser userDj;
 
 	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
@@ -97,8 +98,12 @@ public class GuildMusicManager {
 		this.audioEventListener.setChannel(channel);
 	}
 
-	public void setDj(IUser userDj) {
-		this.userDj = userDj;
+	public void setLastUser(IUser lastUser) {
+		this.lastUser = lastUser;
+	}
+
+	public IChannel getChannel() {
+		return channel;
 	}
 
 	public IUser getDj() {
@@ -113,16 +118,16 @@ public class GuildMusicManager {
 		return scheduler;
 	}
 
-	public IChannel getChannel() {
-		return channel;
-	}
-
 	public boolean isLeavingScheduled() {
 		return leaveTimer.isRunning();
 	}
 
 	public boolean isLoading() {
 		return isLoading.get();
+	}
+
+	public void defineLastUserAsDj() {
+		this.userDj = this.lastUser;
 	}
 
 	public static GuildMusicManager createGuildMusicManager(IGuild guild) {
