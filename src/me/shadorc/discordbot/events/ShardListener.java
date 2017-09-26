@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.schedule.MessageSchedulerManager;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.shard.DisconnectedEvent;
@@ -46,7 +46,7 @@ public class ShardListener {
 		if(!CONNECTED_SHARD.contains(event.getShard())) {
 			CONNECTED_SHARD.add(event.getShard());
 		}
-		BotUtils.sendQueues();
+		MessageSchedulerManager.sendQueue();
 	}
 
 	public static boolean isShardConnected(IShard shard) {

@@ -1,8 +1,6 @@
 package me.shadorc.discordbot.utils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONArray;
 
@@ -11,6 +9,7 @@ import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.utils.command.Emoji;
+import me.shadorc.discordbot.utils.schedule.MessageSchedulerManager;
 import me.shadorc.discordbot.utils.task.SchedulerManager;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
@@ -24,13 +23,9 @@ import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class BotUtils {
 
-	private static final ConcurrentHashMap<IChannel, List<String>> MESSAGE_QUEUE = new ConcurrentHashMap<>();
-	private static final ConcurrentHashMap<IChannel, List<EmbedObject>> EMBED_QUEUE = new ConcurrentHashMap<>();
-
-	public static RequestFuture<IMessage> sendMessage(String message, IChannel channel) {
+	public static RequestFuture<IMessage> send(String message, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			MESSAGE_QUEUE.putIfAbsent(channel, new ArrayList<>());
-			MESSAGE_QUEUE.get(channel).add(message);
+			MessageSchedulerManager.delay(channel, message);
 			LogUtils.info("Shard isn't ready, adding message to queue.");
 			return null;
 		}
@@ -48,8 +43,7 @@ public class BotUtils {
 			} catch (DiscordException err) {
 				if(err.getErrorMessage().contains("Discord didn't return a response") || err.getErrorMessage().contains("400 Bad Request")) {
 					LogUtils.info("A message could not be send now, adding it to queue.");
-					MESSAGE_QUEUE.putIfAbsent(channel, new ArrayList<>());
-					MESSAGE_QUEUE.get(channel).add(message);
+					MessageSchedulerManager.delay(channel, message);
 					SchedulerManager.scheduleSendingMessages();
 					return null;
 				}
@@ -60,16 +54,15 @@ public class BotUtils {
 	}
 
 	// EmbedBuilder doc: https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
-	public static RequestFuture<IMessage> sendEmbed(EmbedObject embed, IChannel channel) {
+	public static RequestFuture<IMessage> send(EmbedObject embed, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			EMBED_QUEUE.putIfAbsent(channel, new ArrayList<>());
-			EMBED_QUEUE.get(channel).add(embed);
+			MessageSchedulerManager.delay(channel, embed);
 			LogUtils.info("Shard isn't ready, embed link added to queue.");
 			return null;
 		}
 
 		if(!channel.isPrivate() && !BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS)) {
-			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot send embed links due to the lack of permission."
+			BotUtils.send(Emoji.ACCESS_DENIED + " I cannot send embed links due to the lack of permission."
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Send Embed links** is checked.", channel);
 			LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + "} Shadbot wasn't allowed to send embed link.");
 			return null;
@@ -83,8 +76,7 @@ public class BotUtils {
 			} catch (DiscordException err) {
 				if(err.getErrorMessage().contains("Discord didn't return a response") || err.getErrorMessage().contains("400 Bad Request")) {
 					LogUtils.info("An embed link could not be send now, added it to queue.");
-					EMBED_QUEUE.putIfAbsent(channel, new ArrayList<>());
-					EMBED_QUEUE.get(channel).add(embed);
+					MessageSchedulerManager.delay(channel, embed);
 					SchedulerManager.scheduleSendingMessages();
 					return null;
 				}
@@ -92,43 +84,6 @@ public class BotUtils {
 			}
 			return null;
 		});
-	}
-
-	/**
-	 * Send pending embeds/messages
-	 */
-	public static void sendQueues() {
-		if(!MESSAGE_QUEUE.isEmpty()) {
-			int count = MESSAGE_QUEUE.values().stream().mapToInt(list -> list.size()).sum();
-			LogUtils.info("Sending " + count + " pending message(s)...");
-			for(IChannel channel : MESSAGE_QUEUE.keySet()) {
-				for(String message : MESSAGE_QUEUE.get(channel)) {
-					LogUtils.info("{DEBUG} {BotUtils} {Guild ID: " + channel.getGuild().getLongID() + "} "
-							+ "Sending a message...");
-					BotUtils.sendMessage(message, channel);
-					LogUtils.info("{DEBUG} {BotUtils} {Guild ID: " + channel.getGuild().getLongID() + "} "
-							+ "Message sent.");
-				}
-			}
-			LogUtils.info("Pending message(s) sent.");
-			MESSAGE_QUEUE.clear();
-		}
-
-		if(!EMBED_QUEUE.isEmpty()) {
-			int count = EMBED_QUEUE.values().stream().mapToInt(list -> list.size()).sum();
-			LogUtils.info("Sending " + count + " pending embed...");
-			for(IChannel channel : EMBED_QUEUE.keySet()) {
-				for(EmbedObject embed : EMBED_QUEUE.get(channel)) {
-					LogUtils.info("{DEBUG} {BotUtils} {Guild ID: " + channel.getGuild().getLongID() + "} "
-							+ "Sending an embed...");
-					BotUtils.sendEmbed(embed, channel);
-					LogUtils.info("{DEBUG} {BotUtils} {Guild ID: " + channel.getGuild().getLongID() + "} "
-							+ "Embed sent.");
-				}
-			}
-			LogUtils.info("Pending embed sent.");
-			EMBED_QUEUE.clear();
-		}
 	}
 
 	/**

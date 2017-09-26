@@ -7,9 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
-import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.schedule.MessageSchedulerManager;
 
 public class SchedulerManager {
 
@@ -24,7 +24,7 @@ public class SchedulerManager {
 		sendMessagesTask = new Runnable() {
 			@Override
 			public void run() {
-				BotUtils.sendQueues();
+				MessageSchedulerManager.sendQueue();
 			}
 		};
 
