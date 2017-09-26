@@ -32,19 +32,19 @@ public class ShuffleCmd extends AbstractCommand {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.send(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		musicManager.getScheduler().shufflePlaylist();
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist shuffled.", context.getChannel());
+		BotUtils.send(Emoji.CHECK_MARK + " Playlist shuffled.", context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Shuffle current playlist.**");
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

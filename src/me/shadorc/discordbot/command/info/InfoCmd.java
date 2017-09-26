@@ -66,14 +66,14 @@ public class InfoCmd extends AbstractCommand {
 						+ "\nPing: " + ping + "ms"
 						+ "```");
 
-		BotUtils.sendMessage(info, context.getChannel());
+		BotUtils.send(info, context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show Shadbot's info.**");
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

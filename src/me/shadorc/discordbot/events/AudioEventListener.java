@@ -38,7 +38,7 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **" + StringUtils.formatTrackName(track.getInfo()) + "**", channel);
+		BotUtils.send(Emoji.MUSICAL_NOTE + " Currently playing: **" + StringUtils.formatTrackName(track.getInfo()) + "**", channel);
 	}
 
 	@Override
@@ -61,11 +61,11 @@ public class AudioEventListener extends AudioEventAdapter {
 		String errMessage = Jsoup.parse(err.getMessage().replace("Watch on YouTube", "")).text().trim();
 
 		if(errorCount <= 3) {
-			BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase() + ". I'll try to play the next available song.", channel);
+			BotUtils.send(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase() + ". I'll try to play the next available song.", channel);
 		}
 
 		if(errorCount == 3) {
-			BotUtils.sendMessage(Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until finding a music that can be played.", channel);
+			BotUtils.send(Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until finding a music that can be played.", channel);
 			LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + "} Too many errors in a row. "
 					+ "Shadbot will ignore them until finding a music that can be played.");
 		}
@@ -79,7 +79,7 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-		BotUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.", channel);
+		BotUtils.send(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.", channel);
 		LogUtils.warn("{Guild ID: " + channel.getGuild().getLongID() + "} Music stuck, skipping it.");
 
 		if(!scheduler.nextTrack()) {

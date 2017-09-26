@@ -67,13 +67,13 @@ public class PollCmd extends AbstractCommand {
 		} else {
 			String numStr = context.getArg();
 			if(!StringUtils.isPositiveInt(numStr)) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
+				BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
 				return;
 			}
 
 			int num = Integer.parseInt(numStr);
 			if(num < 1 || num > pollManager.getNumChoices()) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and " + pollManager.getNumChoices() + ".", context.getChannel());
+				BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and " + pollManager.getNumChoices() + ".", context.getChannel());
 				return;
 			}
 
@@ -83,7 +83,7 @@ public class PollCmd extends AbstractCommand {
 
 	private void createPoll(Context context) throws MissingArgumentException {
 		if(context.getArg().length() > EmbedBuilder.DESCRIPTION_CONTENT_LIMIT) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Your message is waaay too long, it must not contain more than "
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Your message is waaay too long, it must not contain more than "
 					+ EmbedBuilder.DESCRIPTION_CONTENT_LIMIT + " characters.", context.getChannel());
 			return;
 		}
@@ -95,25 +95,25 @@ public class PollCmd extends AbstractCommand {
 
 		String durationStr = splitArgs[0];
 		if(!StringUtils.isPositiveInt(durationStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid duration.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid duration.", context.getChannel());
 			return;
 		}
 
 		int duration = Integer.parseInt(durationStr);
 		if(duration < MIN_DURATION || duration > MAX_DURATION) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Duration must be between " + MIN_DURATION + "sec and "
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Duration must be between " + MIN_DURATION + "sec and "
 					+ MAX_DURATION + "sec.", context.getChannel());
 			return;
 		}
 
 		if(StringUtils.getCharCount(splitArgs[1], '"') == 0) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You need to specify question and choices in quotation marks. "
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " You need to specify question and choices in quotation marks. "
 					+ "Use `" + context.getPrefix() + "help " + this.getNames()[0] + "` for more information.", context.getChannel());
 			return;
 		}
 
 		if(StringUtils.getCharCount(splitArgs[1], '"') % 2 != 0) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You forgot a quotation mark.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " You forgot a quotation mark.", context.getChannel());
 			return;
 		}
 
@@ -121,7 +121,7 @@ public class PollCmd extends AbstractCommand {
 
 		String question = substrings.get(0);
 		if(question.isEmpty()) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " The question can not be empty.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " The question can not be empty.", context.getChannel());
 			return;
 		}
 
@@ -131,7 +131,7 @@ public class PollCmd extends AbstractCommand {
 		choicesList.removeAll(Collections.singleton(""));
 
 		if(choicesList.size() < MIN_CHOICES_NUM || choicesList.size() > MAX_CHOICES_NUM) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and "
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and "
 					+ MAX_CHOICES_NUM + " different non-empty choices.", context.getChannel());
 			return;
 		}
@@ -153,7 +153,7 @@ public class PollCmd extends AbstractCommand {
 						+ "\n**choices** - min: 2, max: 10", false)
 				.appendField("Example", "`" + context.getPrefix() + "poll 120 \"Where do we eat at noon?\" \"White\" \"53\" \"A dog\"`", false);
 
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 	protected class PollManager {
@@ -234,7 +234,7 @@ public class PollCmd extends AbstractCommand {
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
 					.withFooterText(timer.isRunning() ? ("Time left: " + StringUtils.formatDuration(remainingTime)) : "Finished");
 
-			this.message = BotUtils.sendEmbed(embed.build(), context.getChannel()).get();
+			this.message = BotUtils.send(embed.build(), context.getChannel()).get();
 		}
 
 		protected IUser getCreator() {

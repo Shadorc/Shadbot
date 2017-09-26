@@ -38,7 +38,7 @@ public class ShutdownCmd extends AbstractCommand {
 
 		String timeStr = splitArgs[0];
 		if(!StringUtils.isPositiveInt(timeStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid time.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid time.", context.getChannel());
 			return;
 		}
 
@@ -46,7 +46,7 @@ public class ShutdownCmd extends AbstractCommand {
 		for(IGuild guild : Shadbot.getClient().getGuilds()) {
 			GuildMusicManager gmm = GuildMusicManager.getGuildMusicManager(guild);
 			if(gmm != null && gmm.getChannel() != null) {
-				BotUtils.sendMessage(Emoji.INFO + " " + message, gmm.getChannel());
+				BotUtils.send(Emoji.INFO + " " + message, gmm.getChannel());
 			}
 		}
 
@@ -69,7 +69,7 @@ public class ShutdownCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Schedule a shutdown after a fixed amount of seconds and send a message to all guilds playing musics.**")
 				.appendField("Usage", "`" + context.getPrefix() + "shutdown <seconds> <message>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

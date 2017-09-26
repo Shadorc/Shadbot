@@ -38,9 +38,9 @@ public class CalcCmd extends AbstractCommand {
 
 		try {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
-			BotUtils.sendMessage(context.getArg().replace('*', 'x') + " = " + engine.eval(context.getArg()), context.getChannel());
+			BotUtils.send(context.getArg().replace('*', 'x') + " = " + engine.eval(context.getArg()), context.getChannel());
 		} catch (ScriptException err) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid expression.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid expression.", context.getChannel());
 		}
 	}
 
@@ -49,7 +49,7 @@ public class CalcCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Calculate an expression.**")
 				.appendField("Usage", "`" + context.getPrefix() + "calc <expression>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

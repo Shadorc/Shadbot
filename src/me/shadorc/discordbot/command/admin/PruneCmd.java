@@ -28,7 +28,7 @@ public class PruneCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(!BotUtils.hasPermission(context.getChannel(), Permissions.MANAGE_MESSAGES, Permissions.READ_MESSAGE_HISTORY)) {
-			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I can't execute this command due to the lack of permission."
+			BotUtils.send(Emoji.ACCESS_DENIED + " I can't execute this command due to the lack of permission."
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Manage messages** "
 					+ "and **Read message history** are checked.",
 					context.getChannel());
@@ -46,7 +46,7 @@ public class PruneCmd extends AbstractCommand {
 		String word = null;
 		if(argsList.contains("-c")) {
 			if(StringUtils.getCharCount(context.getArg(), '"') != 2) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must indicate words in quotation marks after '-c'.", context.getChannel());
+				BotUtils.send(Emoji.GREY_EXCLAMATION + " You must indicate words in quotation marks after '-c'.", context.getChannel());
 				return;
 			}
 			word = StringUtils.getQuotedWords(context.getArg()).get(0);
@@ -55,12 +55,12 @@ public class PruneCmd extends AbstractCommand {
 		int num = 100;
 		if(argsList.contains("-n")) {
 			if(argsList.indexOf("-n") + 1 >= argsList.size()) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must indicate a number after '-n'.", context.getChannel());
+				BotUtils.send(Emoji.GREY_EXCLAMATION + " You must indicate a number after '-n'.", context.getChannel());
 				return;
 			}
 			String numStr = argsList.get(argsList.indexOf("-n") + 1);
 			if(!StringUtils.isPositiveInt(numStr)) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
+				BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
 				return;
 			}
 			num = Math.min(num, Integer.parseInt(numStr));
@@ -83,9 +83,9 @@ public class PruneCmd extends AbstractCommand {
 		}
 
 		if(messagesList.isEmpty()) {
-			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
+			BotUtils.send(Emoji.INFO + " There is no message to delete.", context.getChannel());
 		} else {
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " "
+			BotUtils.send(Emoji.CHECK_MARK + " "
 					+ StringUtils.pluralOf(BotUtils.deleteMessages(context.getChannel(), messagesList), "message")
 					+ " deleted.", context.getChannel());
 		}
@@ -101,7 +101,7 @@ public class PruneCmd extends AbstractCommand {
 						+ "\n**words** - [OPTIONAL] containing these words", false)
 				.appendField("Example", "Delete **15** messages from user **@Shadbot** containing **hi guys**:"
 						+ "\n`" + context.getPrefix() + "prune @Shadbot -c \"hi guys\" -n 15`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

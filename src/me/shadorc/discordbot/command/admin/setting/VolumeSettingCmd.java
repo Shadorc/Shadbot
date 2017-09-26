@@ -23,18 +23,18 @@ public class VolumeSettingCmd implements SettingCmd {
 		}
 
 		if(!StringUtils.isPositiveInt(arg)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ".", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid number, must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ".", context.getChannel());
 			return;
 		}
 
 		int vol = Integer.parseInt(arg);
 		if(vol < MIN_VOLUME || vol > MAX_VOLUME) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Default volume must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ". ", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Default volume must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ". ", context.getChannel());
 			return;
 		}
 
 		Storage.saveSetting(context.getGuild(), Setting.DEFAULT_VOLUME, vol);
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " " + vol + "% is now the default volume for this server.", context.getChannel());
+		BotUtils.send(Emoji.CHECK_MARK + " " + vol + "% is now the default volume for this server.", context.getChannel());
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class VolumeSettingCmd implements SettingCmd {
 				.appendField("Usage", "`" + context.getPrefix() + "settings " + Setting.DEFAULT_VOLUME.toString() + " <volume>`", false)
 				.appendField("Argument", "**volume** - min: " + MIN_VOLUME + " / max: " + MAX_VOLUME + " / default: " + Config.DEFAULT_VOLUME, false)
 				.appendField("Example", "`" + context.getPrefix() + "settings " + Setting.DEFAULT_VOLUME.toString() + " 42`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 	@Override

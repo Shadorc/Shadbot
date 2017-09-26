@@ -57,7 +57,7 @@ public class WikiCmd extends AbstractCommand {
 			JSONObject resultObj = pagesObj.getJSONObject(pageId);
 
 			if("-1".equals(pageId) || resultObj.getString("extract").isEmpty()) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + context.getArg() + "\"", context.getChannel());
+				BotUtils.send(Emoji.MAGNIFYING_GLASS + " No result for \"" + context.getArg() + "\"", context.getChannel());
 				return;
 			}
 
@@ -73,7 +73,7 @@ public class WikiCmd extends AbstractCommand {
 					.withColor(Config.BOT_COLOR)
 					.withTitle(resultObj.getString("title"))
 					.appendDescription(extract);
-			BotUtils.sendEmbed(builder.build(), context.getChannel());
+			BotUtils.send(builder.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting Wikipedia information... Please, try again later.", err, context);
@@ -85,7 +85,7 @@ public class WikiCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show Wikipedia description for a search.**")
 				.appendField("Usage", "`" + context.getPrefix() + "wiki <search>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

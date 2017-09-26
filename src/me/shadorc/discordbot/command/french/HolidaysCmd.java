@@ -41,14 +41,14 @@ public class HolidaysCmd extends AbstractCommand {
 
 		String zone = context.getArg().toUpperCase();
 		if(!ZONES.contains(zone)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid zone. Options: A, B, C", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid zone. Options: A, B, C", context.getChannel());
 			return;
 		}
 
 		try {
 			TwitterUtils.connection();
 			String holidays = TwitterUtils.getInstance().getUserTimeline("Vacances_Zone" + zone).get(0).getText().replaceAll("#", "");
-			BotUtils.sendMessage(Emoji.BEACH + " " + holidays, context.getChannel());
+			BotUtils.send(Emoji.BEACH + " " + holidays, context.getChannel());
 		} catch (TwitterException err) {
 			LogUtils.error("Something went wrong while getting holidays information... Please, try again later.", err, context);
 		}
@@ -59,7 +59,7 @@ public class HolidaysCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show the number of remaining days before the next school holidays for the indicated zone.**")
 				.appendField("Usage", "`" + context.getPrefix() + "vacs <A|B|C>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

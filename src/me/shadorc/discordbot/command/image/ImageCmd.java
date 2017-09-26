@@ -57,7 +57,7 @@ public class ImageCmd extends AbstractCommand {
 			JSONObject resultObj = this.getRandomPopularResult(encodedSearch);
 
 			if(resultObj == null) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No results for \"" + context.getArg() + "\"", context.getChannel());
+				BotUtils.send(Emoji.MAGNIFYING_GLASS + " No results for \"" + context.getArg() + "\"", context.getChannel());
 				return;
 			}
 
@@ -73,7 +73,7 @@ public class ImageCmd extends AbstractCommand {
 					.appendField("Category", resultObj.getString("category_path"), false)
 					.withImage(contentObj.getString("src"));
 
-			BotUtils.sendEmbed(builder.build(), context.getChannel());
+			BotUtils.send(builder.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting an image... Please, try again later.", err, context);
@@ -131,6 +131,6 @@ public class ImageCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Search for a random image on DeviantArt.**")
 				.appendField("Usage", "`" + context.getPrefix() + "image <search>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 }

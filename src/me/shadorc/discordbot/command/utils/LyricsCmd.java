@@ -50,7 +50,7 @@ public class LyricsCmd extends AbstractCommand {
 			JSONObject resultObj = XML.toJSONObject(xmlString).getJSONObject("GetLyricResult");
 
 			if(resultObj.getInt("LyricId") == 0) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No lyrics found for \"" + context.getArg() + "\"", context.getChannel());
+				BotUtils.send(Emoji.MAGNIFYING_GLASS + " No lyrics found for \"" + context.getArg() + "\"", context.getChannel());
 				return;
 			}
 
@@ -61,7 +61,7 @@ public class LyricsCmd extends AbstractCommand {
 					.withThumbnail(resultObj.getString("LyricCovertArtUrl"))
 					.appendField("Song", resultObj.getString("LyricArtist") + " - " + resultObj.getString("LyricSong"), false)
 					.appendField("Lyrics", resultObj.getString("LyricUrl"), false);
-			BotUtils.sendEmbed(embed.build(), context.getChannel());
+			BotUtils.send(embed.build(), context.getChannel());
 
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while getting lyrics... Please, try again later.", err, context);
@@ -73,6 +73,6 @@ public class LyricsCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show lyrics for a song.**")
 				.appendField("Usage", "`" + context.getPrefix() + "lyrics <artist> - <title>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 }

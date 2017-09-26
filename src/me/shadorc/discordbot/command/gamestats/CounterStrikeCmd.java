@@ -69,7 +69,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			JSONArray players = mainUserObj.getJSONObject("response").getJSONArray("players");
 
 			if(players.length() == 0) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " User not found.", context.getChannel());
+				BotUtils.send(Emoji.MAGNIFYING_GLASS + " User not found.", context.getChannel());
 				return;
 			}
 
@@ -82,7 +82,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			 * 3: Public
 			 */
 			if(userObj.getInt("communityvisibilitystate") != 3) {
-				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " This profile is private.", context.getChannel());
+				BotUtils.send(Emoji.ACCESS_DENIED + " This profile is private.", context.getChannel());
 				return;
 			}
 
@@ -92,7 +92,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 					+ "&steamid=" + steamid));
 
 			if(!mainStatsObj.has("playerstats")) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.", context.getChannel());
+				BotUtils.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.", context.getChannel());
 				return;
 			}
 
@@ -111,7 +111,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills") / this.getValue(statsArray, "total_deaths")), true)
 					.appendField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
 					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
-			BotUtils.sendEmbed(builder.build(), context.getChannel());
+			BotUtils.send(builder.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting Counter-Strike: Global Offensive stats.... Please, try again later.", err, context);
@@ -134,6 +134,6 @@ public class CounterStrikeCmd extends AbstractCommand {
 				.appendDescription("**Show player's stats for Counter-Strike: Global Offensive.**")
 				.appendField("Usage", "`" + context.getPrefix() + "cs <steamID>`", false)
 				.appendField("Argument", "**steamID** - steam ID, custom ID or profile URL", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 }

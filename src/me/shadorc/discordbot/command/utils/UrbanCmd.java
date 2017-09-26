@@ -44,7 +44,7 @@ public class UrbanCmd extends AbstractCommand {
 					+ "term=" + URLEncoder.encode(context.getArg(), "UTF-8")));
 
 			if(mainObj.getString("result_type").equals("no_results")) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No results for \"" + context.getArg() + "\"", context.getChannel());
+				BotUtils.send(Emoji.MAGNIFYING_GLASS + " No results for \"" + context.getArg() + "\"", context.getChannel());
 				return;
 			}
 
@@ -65,7 +65,7 @@ public class UrbanCmd extends AbstractCommand {
 				builder.appendField("Example", resultObj.getString("example"), false);
 			}
 
-			BotUtils.sendEmbed(builder.build(), context.getChannel());
+			BotUtils.send(builder.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting Urban Dictionary definition... Please, try again later.", err, context);
@@ -77,7 +77,7 @@ public class UrbanCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show Urban Dictionary definition for a search.**")
 				.appendField("Usage", "`" + context.getPrefix() + "urban <search>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

@@ -34,7 +34,7 @@ public class ForwardCmd extends AbstractCommand {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.send(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
@@ -44,16 +44,16 @@ public class ForwardCmd extends AbstractCommand {
 
 		String numStr = context.getArg().trim();
 		if(!StringUtils.isPositiveInt(numStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
 			return;
 		}
 
 		try {
 			long time = TimeUnit.SECONDS.toMillis(Integer.parseInt(numStr));
 			long newPosition = musicManager.getScheduler().changePosition(time);
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(newPosition), context.getChannel());
+			BotUtils.send(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(newPosition), context.getChannel());
 		} catch (IllegalArgumentException err) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " New position is past the ending of the song.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " New position is past the ending of the song.", context.getChannel());
 		}
 	}
 
@@ -62,6 +62,6 @@ public class ForwardCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Fast forward current song a specified amount of time (in seconds).**")
 				.appendField("Usage", "`" + context.getPrefix() + "forward <sec>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 }

@@ -36,7 +36,7 @@ public class PlaylistCmd extends AbstractCommand {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.send(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
@@ -44,14 +44,14 @@ public class PlaylistCmd extends AbstractCommand {
 				.withAuthorName("Playlist")
 				.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 				.appendDescription(this.formatPlaylist(musicManager.getScheduler().getPlaylist()));
-		BotUtils.sendEmbed(embed.build(), context.getChannel());
+		BotUtils.send(embed.build(), context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show current playlist.**");
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 	private String formatPlaylist(BlockingQueue<AudioTrack> queue) {

@@ -45,7 +45,7 @@ public class SettingsManagerCmd extends AbstractCommand {
 
 		SettingCmd cmd = SUBSETTINGS_MAP.get(name);
 		if(cmd == null) {
-			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This setting does not exist."
+			BotUtils.send(Emoji.MAGNIFYING_GLASS + " This setting does not exist."
 					+ " Use `" + context.getPrefix() + "help settings` to see all available settings.", context.getChannel());
 			return;
 		}
@@ -76,6 +76,6 @@ public class SettingsManagerCmd extends AbstractCommand {
 
 		builder.appendField("Additional help", "`" + context.getPrefix() + "settings <name> help`", false);
 
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 }

@@ -73,13 +73,13 @@ public class TranslateCmd extends AbstractCommand {
 		}
 
 		if(langFrom == null || langTo == null) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " One of the specified language doesn't exist."
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " One of the specified language doesn't exist."
 					+ " Use `" + context.getPrefix() + "help translate` to see a complete list of supported languages.", context.getChannel());
 			return;
 		}
 
 		if(langFrom.equals(langTo)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " The source language and the targetted language must be different.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " The source language and the targetted language must be different.", context.getChannel());
 			return;
 		}
 
@@ -91,13 +91,13 @@ public class TranslateCmd extends AbstractCommand {
 					+ "&dt=t&q=" + URLEncoder.encode(sourceText, "UTF-8")));
 
 			if(!(result.get(0) instanceof JSONArray)) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " One of the specified language isn't supported."
+				BotUtils.send(Emoji.GREY_EXCLAMATION + " One of the specified language isn't supported."
 						+ " Use `" + context.getPrefix() + "help translate` to see a complete list of supported languages.", context.getChannel());
 				return;
 			}
 
 			String translatedText = ((JSONArray) ((JSONArray) result.get(0)).get(0)).get(0).toString();
-			BotUtils.sendMessage(Emoji.MAP + " Translation: " + translatedText, context.getChannel());
+			BotUtils.send(Emoji.MAP + " Translation: " + translatedText, context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong during translation... Please, try again later.", err, context);
@@ -120,6 +120,6 @@ public class TranslateCmd extends AbstractCommand {
 				.appendField("Arguments", "**lang1** - [OPTIONAL] source language, by leaving it blank the language will be automatically detected"
 						+ "\n**lang2** - destination language", false)
 				.appendField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 }

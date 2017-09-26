@@ -43,7 +43,7 @@ public class LeetCmd extends AbstractCommand {
 				.replace("S", "5")
 				.replace("T", "7");
 
-		BotUtils.sendMessage(Emoji.KEYBOARD + " " + text, context.getChannel());
+		BotUtils.send(Emoji.KEYBOARD + " " + text, context.getChannel());
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class LeetCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Leetify a text.**")
 				.appendField("Usage", "`" + context.getPrefix() + "leet <text>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

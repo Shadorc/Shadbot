@@ -44,24 +44,24 @@ public class TransferCoinsCmd extends AbstractCommand {
 		Player receiverPlayer = Storage.getPlayer(context.getGuild(), context.getMessage().getMentions().get(0));
 		Player senderPlayer = context.getPlayer();
 		if(senderPlayer.equals(receiverPlayer)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You cannot transfer coins to yourself.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " You cannot transfer coins to yourself.", context.getChannel());
 			return;
 		}
 
 		String coinsStr = splitCmd[0];
 		if(!StringUtils.isPositiveInt(coinsStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid amount.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid amount.", context.getChannel());
 			return;
 		}
 
 		int coins = Integer.parseInt(coinsStr);
 		if(senderPlayer.getCoins() < coins) {
-			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to do this.", context.getChannel());
+			BotUtils.send(Emoji.BANK + " You don't have enough coins to do this.", context.getChannel());
 			return;
 		}
 
 		if(receiverPlayer.getCoins() + coins >= Config.MAX_COINS) {
-			BotUtils.sendMessage(Emoji.BANK + " This transfer cannot be done because " + receiverPlayer.getUser().getName()
+			BotUtils.send(Emoji.BANK + " This transfer cannot be done because " + receiverPlayer.getUser().getName()
 					+ " would exceed the maximum coins cap.", context.getChannel());
 			return;
 		}
@@ -69,7 +69,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 		senderPlayer.addCoins(-coins);
 		receiverPlayer.addCoins(coins);
 
-		BotUtils.sendMessage(Emoji.BANK + " " + senderPlayer.getUser().mention() + " has transfered **"
+		BotUtils.send(Emoji.BANK + " " + senderPlayer.getUser().mention() + " has transfered **"
 				+ coins + " coins** to " + receiverPlayer.getUser().mention(), context.getChannel());
 	}
 
@@ -78,6 +78,6 @@ public class TransferCoinsCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Transfer coins to the mentioned user.**")
 				.appendField("Usage", "`" + context.getPrefix() + "transfer <coins> <@user>`", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 }

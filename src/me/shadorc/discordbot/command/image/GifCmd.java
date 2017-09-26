@@ -44,14 +44,14 @@ public class GifCmd extends AbstractCommand {
 					+ (context.hasArg() ? "&tag=" + URLEncoder.encode(context.getArg(), "UTF-8") : "")));
 
 			if(mainObj.get("data") instanceof JSONArray) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + context.getArg() + "\"", context.getChannel());
+				BotUtils.send(Emoji.MAGNIFYING_GLASS + " No result for \"" + context.getArg() + "\"", context.getChannel());
 				return;
 			}
 
 			EmbedBuilder embed = new EmbedBuilder()
 					.withColor(Config.BOT_COLOR)
 					.withImage(mainObj.getJSONObject("data").getString("image_url"));
-			BotUtils.sendEmbed(embed.build(), context.getChannel());
+			BotUtils.send(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting a gif from Giphy.... Please, try again later.", err, context);
@@ -64,7 +64,7 @@ public class GifCmd extends AbstractCommand {
 				.appendDescription("**Show a random gif.**")
 				.appendField("Usage", "`" + context.getPrefix() + "gif [<tag>]`", false)
 				.appendField("Argument", "**tag** - [OPTIONAL] the tag to search", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

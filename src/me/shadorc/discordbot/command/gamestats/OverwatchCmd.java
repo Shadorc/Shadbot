@@ -55,7 +55,7 @@ public class OverwatchCmd extends AbstractCommand {
 			} else if(splitArgs.length == 2) {
 				String plateform = splitArgs[0].toUpperCase();
 				if(!Arrays.stream(Plateform.values()).anyMatch(plateformValue -> plateformValue.toString().equalsIgnoreCase(plateform))) {
-					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid plateform. Options: pc, psn, xbl.", context.getChannel());
+					BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid plateform. Options: pc, psn, xbl.", context.getChannel());
 					return;
 				}
 
@@ -65,13 +65,13 @@ public class OverwatchCmd extends AbstractCommand {
 			} else {
 				String plateform = splitArgs[0].toUpperCase();
 				if(!Arrays.stream(Plateform.values()).anyMatch(plateformValue -> plateformValue.toString().equalsIgnoreCase(plateform))) {
-					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid plateform. Options: pc, psn, xbl.", context.getChannel());
+					BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid plateform. Options: pc, psn, xbl.", context.getChannel());
 					return;
 				}
 
 				String region = splitArgs[1].toUpperCase();
 				if(!Arrays.stream(Region.values()).anyMatch(regionValue -> regionValue.toString().equalsIgnoreCase(region))) {
-					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid region. Options: eu, us, cn, kr.", context.getChannel());
+					BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid region. Options: eu, us, cn, kr.", context.getChannel());
 					return;
 				}
 
@@ -93,10 +93,10 @@ public class OverwatchCmd extends AbstractCommand {
 					.appendField("Game time", player.getTimePlayed(), true)
 					.appendField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
 					.appendField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
-			BotUtils.sendEmbed(builder.build(), context.getChannel());
+			BotUtils.send(builder.build(), context.getChannel());
 
 		} catch (UserNotFoundException e) {
-			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Overwatch or doesn't exist.", context.getChannel());
+			BotUtils.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Overwatch or doesn't exist.", context.getChannel());
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while getting information from Overwatch profil.... Please, try again later.", err, context);
 		}
@@ -118,7 +118,7 @@ public class OverwatchCmd extends AbstractCommand {
 				.appendField("Arguments", "**plateform** - [OPTIONAL] value: pc, xbl, psn"
 						+ "\n**region** - [OPTIONAL] (only needed if the plateform is PC) value: us, eu, kr, cn"
 						+ "\n**plateform** and **region** are automatically detected if nothing is specified.", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 }

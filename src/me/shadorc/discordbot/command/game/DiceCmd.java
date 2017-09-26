@@ -63,19 +63,19 @@ public class DiceCmd extends AbstractCommand {
 
 		String betStr = splitArgs[0];
 		if(!StringUtils.isPositiveInt(betStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid bet.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid bet.", context.getChannel());
 			return;
 		}
 
 		int bet = Integer.parseInt(betStr);
 		if(context.getPlayer().getCoins() < bet) {
-			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
+			BotUtils.send(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
 			return;
 		}
 
 		String numStr = splitArgs[1];
 		if(!StringUtils.isValidDiceNum(numStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 			return;
 		}
 
@@ -90,35 +90,35 @@ public class DiceCmd extends AbstractCommand {
 	private void joinGame(Context context) {
 		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel());
 		if(context.getPlayer().getCoins() < diceManager.getBet()) {
-			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to join this game.", context.getChannel());
+			BotUtils.send(Emoji.BANK + " You don't have enough coins to join this game.", context.getChannel());
 			return;
 		}
 
 		if(diceManager.isPlaying(context.getAuthor())) {
-			BotUtils.sendMessage(Emoji.INFO + " You're already participating.", context.getChannel());
+			BotUtils.send(Emoji.INFO + " You're already participating.", context.getChannel());
 			return;
 		}
 
 		if(diceManager.getPlayers() == 6) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Sorry, there are already 6 players.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Sorry, there are already 6 players.", context.getChannel());
 			return;
 		}
 
 		String numStr = context.getArg();
 		if(!StringUtils.isValidDiceNum(numStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 			return;
 		}
 
 		int num = Integer.parseInt(numStr);
 
 		if(diceManager.isBet(num)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
+			BotUtils.send(Emoji.GREY_EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
 			return;
 		}
 
 		diceManager.addPlayer(context.getAuthor(), num);
-		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets on **" + num + "**.", context.getChannel());
+		BotUtils.send(Emoji.DICE + " **" + context.getAuthorName() + "** bets on **" + num + "**.", context.getChannel());
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class DiceCmd extends AbstractCommand {
 						+ "\nYou can't bet on a number that has already been chosen by another player.", false)
 				.appendField("Gains", "The winner gets the common bet multiplied by " + MULTIPLIER + " plus the number of players."
 						+ "\ngains = bet * (" + MULTIPLIER + " + players)", false);
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 
 	protected class DiceManager {
@@ -159,7 +159,7 @@ public class DiceCmd extends AbstractCommand {
 					.appendField(context.getAuthor().getName() + " started a dice game.",
 							"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + bet + " coins** putting.", false)
 					.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to make your bets.");
-			BotUtils.sendEmbed(builder.build(), context.getChannel());
+			BotUtils.send(builder.build(), context.getChannel());
 
 			timer.start();
 		}
@@ -168,12 +168,12 @@ public class DiceCmd extends AbstractCommand {
 			timer.stop();
 
 			int winningNum = MathUtils.rand(1, 6);
-			BotUtils.sendMessage(Emoji.DICE + " The dice is rolling... **" + winningNum + "** !", context.getChannel());
+			BotUtils.send(Emoji.DICE + " The dice is rolling... **" + winningNum + "** !", context.getChannel());
 
 			if(this.isBet(winningNum)) {
 				IUser winner = numsPlayers.get(winningNum);
 				int gains = bet * (numsPlayers.size() + MULTIPLIER);
-				BotUtils.sendMessage(Emoji.DICE + " Congratulations **" + winner.getName() + "**, you win **" + gains + " coins** !", context.getChannel());
+				BotUtils.send(Emoji.DICE + " Congratulations **" + winner.getName() + "**, you win **" + gains + " coins** !", context.getChannel());
 				Storage.getPlayer(context.getGuild(), winner).addCoins(gains);
 				Stats.increment(Category.MONEY_GAINS_COMMAND, DiceCmd.this.getNames()[0], gains);
 			}
@@ -191,7 +191,7 @@ public class DiceCmd extends AbstractCommand {
 					strBuilder.append("**" + loser.getName() + "**, ");
 				}
 				strBuilder.append("you lost **" + StringUtils.pluralOf(bet, "coin") + "**.");
-				BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
+				BotUtils.send(strBuilder.toString(), context.getChannel());
 			}
 
 			CHANNELS_DICE.remove(context.getChannel());

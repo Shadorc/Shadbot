@@ -34,16 +34,16 @@ public class PauseCmd extends AbstractCommand {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.send(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		AudioPlayer audioPlayer = musicManager.getScheduler().getAudioPlayer();
 		audioPlayer.setPaused(!audioPlayer.isPaused());
 		if(audioPlayer.isPaused()) {
-			BotUtils.sendMessage(Emoji.PAUSE + " Music paused by " + context.getAuthorName() + ".", context.getChannel());
+			BotUtils.send(Emoji.PAUSE + " Music paused by " + context.getAuthorName() + ".", context.getChannel());
 		} else {
-			BotUtils.sendMessage(Emoji.PLAY + " Music resumed by " + context.getAuthorName() + ".", context.getChannel());
+			BotUtils.send(Emoji.PLAY + " Music resumed by " + context.getAuthorName() + ".", context.getChannel());
 		}
 	}
 
@@ -51,6 +51,6 @@ public class PauseCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Pause current music. Use this command again to resume.**");
-		BotUtils.sendEmbed(builder.build(), context.getChannel());
+		BotUtils.send(builder.build(), context.getChannel());
 	}
 }
