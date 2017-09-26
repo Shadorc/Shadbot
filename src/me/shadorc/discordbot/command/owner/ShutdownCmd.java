@@ -15,7 +15,7 @@ import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
-import me.shadorc.discordbot.utils.task.SchedulerManager;
+import me.shadorc.discordbot.utils.schedule.SchedulerManager;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.EmbedBuilder;
 

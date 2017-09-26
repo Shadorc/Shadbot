@@ -7,7 +7,7 @@ import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.events.ReadyListener;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
-import me.shadorc.discordbot.utils.task.SchedulerManager;
+import me.shadorc.discordbot.utils.schedule.SchedulerManager;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IUser;

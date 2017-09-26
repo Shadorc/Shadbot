@@ -10,7 +10,7 @@ import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.schedule.MessageSchedulerManager;
-import me.shadorc.discordbot.utils.task.SchedulerManager;
+import me.shadorc.discordbot.utils.schedule.SchedulerManager;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;

@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.utils.task;
+package me.shadorc.discordbot.utils.schedule;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -9,7 +9,6 @@ import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
-import me.shadorc.discordbot.utils.schedule.MessageSchedulerManager;
 
 public class SchedulerManager {
 

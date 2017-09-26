@@ -75,6 +75,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 				return;
 			}
 
+			// FIXME: This can go wrong if two person run the command exactly at the same time; this will be the first choice with the second person
 			musicManager.defineLastUserAsDj();
 
 			StringBuilder strBuilder = new StringBuilder();
