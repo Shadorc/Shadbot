@@ -33,21 +33,21 @@ public class VolumeCmd extends AbstractCommand {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.send(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		TrackScheduler scheduler = musicManager.getScheduler();
 		if(!context.hasArg()) {
-			BotUtils.send(Emoji.SPEAKER + " Current volume level: " + scheduler.getAudioPlayer().getVolume() + "%", context.getChannel());
+			BotUtils.sendMessage(Emoji.SPEAKER + " Current volume level: " + scheduler.getAudioPlayer().getVolume() + "%", context.getChannel());
 			return;
 		}
 
 		try {
 			scheduler.setVolume(Integer.parseInt(context.getArg()));
-			BotUtils.send(Emoji.SPEAKER + " Volume level set to " + scheduler.getAudioPlayer().getVolume() + "%", context.getChannel());
+			BotUtils.sendMessage(Emoji.SPEAKER + " Volume level set to " + scheduler.getAudioPlayer().getVolume() + "%", context.getChannel());
 		} catch (NumberFormatException err) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " Please use a value between 0 and 100.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Please use a value between 0 and 100.", context.getChannel());
 		}
 	}
 
@@ -59,6 +59,6 @@ public class VolumeCmd extends AbstractCommand {
 						+ "\n`" + context.getPrefix() + "volume <volume>`", false)
 				.appendField("Restriction", "**volume** - must be between 0 and 100", false);
 
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

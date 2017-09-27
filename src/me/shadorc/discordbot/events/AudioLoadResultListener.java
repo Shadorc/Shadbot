@@ -51,7 +51,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	public void trackLoaded(AudioTrack track) {
 		musicManager.joinVoiceChannel(userVoiceChannel, false);
 		if(musicManager.getScheduler().isPlaying()) {
-			BotUtils.send(Emoji.MUSICAL_NOTE + " **"
+			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **"
 					+ StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
 		}
 		musicManager.getScheduler().queue(track);
@@ -70,7 +70,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
 			if(MessageManager.isWaitingForMessage(musicManager.getChannel())) {
-				BotUtils.send(Emoji.HOURGLASS + " Someone is already selecting a music,"
+				BotUtils.sendMessage(Emoji.HOURGLASS + " Someone is already selecting a music,"
 						+ " please wait for him to finish.", musicManager.getChannel());
 				return;
 			}
@@ -94,7 +94,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 							+ "\nExample: 1,3,4"
 							+ "\n" + strBuilder.toString())
 					.withFooterText("This choice will be canceled in " + CHOICE_DURATION + " seconds.");
-			BotUtils.send(embed.build(), musicManager.getChannel());
+			BotUtils.sendMessage(embed.build(), musicManager.getChannel());
 
 			cancelTimer = new Timer((int) TimeUnit.SECONDS.toMillis(CHOICE_DURATION), event -> {
 				this.stopWaiting();
@@ -111,7 +111,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		for(int i = 0; i < Math.min(Config.MAX_PLAYLIST_SIZE, tracks.size()); i++) {
 			musicManager.getScheduler().queue(tracks.get(i));
 		}
-		BotUtils.send(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
 				+ " musics have been added to the playlist.", musicManager.getChannel());
 
 		musicManager.setLoading(false);
@@ -124,7 +124,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			LogUtils.warn("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} "
 					+ "Load failed, Shadbot might be able to continue playing: " + errMessage);
 		} else {
-			BotUtils.send(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
 			LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Load failed: " + errMessage);
 		}
 
@@ -141,7 +141,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	private void onNoMatches() {
-		BotUtils.send(Emoji.MAGNIFYING_GLASS + " No result for \""
+		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \""
 				+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
 		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} No matches: " + identifier);
 
@@ -160,7 +160,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		String prefix = Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX).toString();
 		if(message.getContent().equalsIgnoreCase(prefix + "cancel")) {
-			BotUtils.send(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
 			this.stopWaiting();
 			return true;
 		}
@@ -192,7 +192,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		for(int choice : choices) {
 			AudioTrack track = resultsTracks.get(choice - 1);
 			if(musicManager.getScheduler().isPlaying()) {
-				BotUtils.send(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo())
+				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo())
 						+ "** has been added to the playlist.", musicManager.getChannel());
 			}
 			musicManager.getScheduler().queue(track);
@@ -210,7 +210,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	private void sendInvalidChoice(String choice, String prefix, IMessage message) {
-		BotUtils.send(Emoji.GREY_EXCLAMATION + " Music selection: \"" + choice + "\" is not a valid number."
+		BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Music selection: \"" + choice + "\" is not a valid number."
 				+ " Enter a number between 1 and " + Math.min(5, resultsTracks.size()) + " or use `" + prefix + "cancel` to cancel the selection.",
 				musicManager.getChannel());
 		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Invalid choice: " + message.getContent());

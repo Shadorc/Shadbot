@@ -27,27 +27,27 @@ public class SkipCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(rateLimiter.isSpamming(context)) {
-			BotUtils.send(Emoji.INFO + " You can use `" + context.getPrefix() + "skip <num>` to jump to a music in the playlist.", context.getChannel());
+			BotUtils.sendMessage(Emoji.INFO + " You can use `" + context.getPrefix() + "skip <num>` to jump to a music in the playlist.", context.getChannel());
 			return;
 		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.send(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		if(context.hasArg()) {
 			String numStr = context.getArg();
 			if(!StringUtils.isPositiveInt(numStr)) {
-				BotUtils.send(Emoji.GREY_EXCLAMATION + " Number must be between 1 and " + musicManager.getScheduler().getPlaylist().size() + ".", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Number must be between 1 and " + musicManager.getScheduler().getPlaylist().size() + ".", context.getChannel());
 				return;
 			}
 
 			int num = Integer.parseInt(numStr);
 			if(num < 1 || num > musicManager.getScheduler().getPlaylist().size()) {
-				BotUtils.send(Emoji.GREY_EXCLAMATION + " Number must be between 1 and " + musicManager.getScheduler().getPlaylist().size() + ".", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Number must be between 1 and " + musicManager.getScheduler().getPlaylist().size() + ".", context.getChannel());
 				return;
 			}
 			musicManager.getScheduler().skipTo(num);
@@ -66,6 +66,6 @@ public class SkipCmd extends AbstractCommand {
 						+ "\nYou can also directly skip to a music in the playlist by specifying its number.**")
 				.appendField("Usage", "`" + context.getPrefix() + "skip [<num>]`", false)
 				.appendField("Argument", "**num** - [OPTIONAL] the number in the playlist of the music to play", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

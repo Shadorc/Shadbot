@@ -42,18 +42,18 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 		String betStr = context.getArg();
 		if(!StringUtils.isPositiveInt(betStr)) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid bet.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid bet.", context.getChannel());
 			return;
 		}
 
 		int bet = Integer.parseInt(betStr);
 		if(context.getPlayer().getCoins() < bet) {
-			BotUtils.send(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
+			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
 			return;
 		}
 
 		if(bet > MAX_BET) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " You can't bet more than **" + MAX_BET + " coins**.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You can't bet more than **" + MAX_BET + " coins**.", context.getChannel());
 			return;
 		}
 
@@ -71,7 +71,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		}
 
 		context.getPlayer().addCoins(gains);
-		BotUtils.send(strBuilder.toString(), context.getChannel());
+		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 	}
 
 	@Override
@@ -82,6 +82,6 @@ public class RussianRouletteCmd extends AbstractCommand {
 				.appendField("Restriction", "**bet** - You can not bet more than **" + MAX_BET + " coins**.", false)
 				.appendField("Gains", "You have a **5-in-6** chance to win **" + WIN_MULTIPLIER + " times** your bet and "
 						+ "a **1-in-6** chance to lose **" + LOSE_MULTIPLIER + " times** your bet.", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

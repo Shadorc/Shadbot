@@ -38,9 +38,9 @@ public class ScheduledMessage {
 
 	public IMessage send() {
 		if(message instanceof String) {
-			return BotUtils.send((String) message, channel).get();
+			return BotUtils.sendMessage((String) message, channel).get();
 		} else {
-			return BotUtils.send((EmbedObject) message, channel).get();
+			return BotUtils.sendMessage((EmbedObject) message, channel).get();
 		}
 	}
 

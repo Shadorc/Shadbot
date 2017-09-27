@@ -20,17 +20,17 @@ public class PrefixSettingCmd implements SettingCmd {
 		}
 
 		if(arg.contains(" ")) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " Prefix cannot contain space.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Prefix cannot contain space.", context.getChannel());
 			return;
 		}
 
 		if(arg.length() > PREFIX_MAX_LENGTH) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " Prefix cannot contain more than " + PREFIX_MAX_LENGTH + " characters.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Prefix cannot contain more than " + PREFIX_MAX_LENGTH + " characters.", context.getChannel());
 			return;
 		}
 
 		Storage.saveSetting(context.getGuild(), Setting.PREFIX, arg);
-		BotUtils.send(Emoji.CHECK_MARK + " '" + arg + "' is now the prefix for this server.", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " '" + arg + "' is now the prefix for this server.", context.getChannel());
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class PrefixSettingCmd implements SettingCmd {
 				.appendField("Usage", "`" + context.getPrefix() + "settings " + Setting.PREFIX.toString() + " <prefix>`", false)
 				.appendField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
 				.appendField("Example", "`" + context.getPrefix() + "settings " + Setting.PREFIX.toString() + " !`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 	@Override

@@ -154,7 +154,7 @@ public class CommandManager {
 		}
 
 		if(command.getRole().equals(Role.ADMIN) && !authorRole.equals(Role.ADMIN) && !authorRole.equals(Role.OWNER)) {
-			BotUtils.send(Emoji.ACCESS_DENIED + " You have to be an administrator to execute this command.", event.getChannel());
+			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You have to be an administrator to execute this command.", event.getChannel());
 			return;
 		}
 

@@ -14,7 +14,7 @@ public class LogUtils {
 
 	public static void error(String msg, Exception err, Context context) {
 		LOGGER.error(msg + " (Input: " + context.getMessage().getContent() + ")", err);
-		BotUtils.send(Emoji.RED_FLAG + " " + msg, context.getChannel());
+		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, context.getChannel());
 		LogUtils.sendLogs("**[ERROR]** {User warned} " + msg
 				+ "\nError message: " + err.getMessage()
 				+ "\nInput: " + context.getMessage().getContent());
@@ -41,6 +41,6 @@ public class LogUtils {
 	}
 
 	private static void sendLogs(String msg) {
-		BotUtils.send(msg, Shadbot.getClient().getChannelByID(Config.LOGS_CHANNEL_ID));
+		BotUtils.sendMessage(msg, Shadbot.getClient().getChannelByID(Config.LOGS_CHANNEL_ID));
 	}
 }

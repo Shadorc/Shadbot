@@ -15,7 +15,7 @@ public class NSFWSettingCmd implements SettingCmd {
 	@Override
 	public void execute(Context context, String arg) throws MissingArgumentException {
 		if(!BotUtils.hasPermission(context.getChannel(), Permissions.MANAGE_CHANNELS)) {
-			BotUtils.send(Emoji.ACCESS_DENIED + " I can't execute this command due to the lack of permission."
+			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I can't execute this command due to the lack of permission."
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Manage channels** is checked.",
 					context.getChannel());
 			LogUtils.info("{Guild ID: " + context.getChannel().getGuild().getLongID() + "} "
@@ -39,12 +39,12 @@ public class NSFWSettingCmd implements SettingCmd {
 				isNSFW = false;
 				break;
 			default:
-				BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid action. Use toggle, enable or disable.", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid action. Use toggle, enable or disable.", context.getChannel());
 				return;
 		}
 
 		context.getChannel().changeNSFW(isNSFW);
-		BotUtils.send(Emoji.CHECK_MARK + " This channel is now " + (isNSFW ? "N" : "") + "SFW.", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " This channel is now " + (isNSFW ? "N" : "") + "SFW.", context.getChannel());
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class NSFWSettingCmd implements SettingCmd {
 				.appendField("Usage", "`" + context.getPrefix() + "settings " + Setting.NSFW.toString() + " <action>`", false)
 				.appendField("Argument", "**action** - toggle/enable/disable", false)
 				.appendField("Example", "`" + context.getPrefix() + "settings " + Setting.NSFW.toString() + " toggle`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 	@Override

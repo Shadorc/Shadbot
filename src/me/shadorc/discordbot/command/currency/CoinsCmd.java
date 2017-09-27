@@ -32,11 +32,11 @@ public class CoinsCmd extends AbstractCommand {
 		}
 
 		if(context.getMessage().getMentions().isEmpty()) {
-			BotUtils.send(Emoji.PURSE + " You have **" + StringUtils.pluralOf(context.getPlayer().getCoins(), "coin") + "**.", context.getChannel());
+			BotUtils.sendMessage(Emoji.PURSE + " You have **" + StringUtils.pluralOf(context.getPlayer().getCoins(), "coin") + "**.", context.getChannel());
 		} else {
 			IUser user = context.getMessage().getMentions().get(0);
 			int coins = Storage.getPlayer(context.getGuild(), user).getCoins();
-			BotUtils.send(Emoji.PURSE + " " + user.getName() + " has **" + StringUtils.pluralOf(coins, "coin") + "**.", context.getChannel());
+			BotUtils.sendMessage(Emoji.PURSE + " " + user.getName() + " has **" + StringUtils.pluralOf(coins, "coin") + "**.", context.getChannel());
 		}
 	}
 
@@ -45,6 +45,6 @@ public class CoinsCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show how much coins you or another user have.**")
 				.appendField("Usage", "`" + context.getPrefix() + "coins [<@user>]`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

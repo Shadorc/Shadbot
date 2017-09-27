@@ -40,7 +40,7 @@ public class Rule34Cmd extends AbstractCommand {
 		}
 
 		if(!context.getChannel().isNSFW()) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
 					+ "`" + context.getPrefix() + "settings " + Setting.NSFW + " toggle`", context.getChannel());
 			return;
 		}
@@ -59,7 +59,7 @@ public class Rule34Cmd extends AbstractCommand {
 			JSONObject postsObj = mainObj.getJSONObject("posts");
 
 			if(postsObj.getInt("count") == 0) {
-				BotUtils.send(Emoji.MAGNIFYING_GLASS + " No result for \"" + context.getArg() + "\".", context.getChannel());
+				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + context.getArg() + "\".", context.getChannel());
 				return;
 			}
 
@@ -96,7 +96,7 @@ public class Rule34Cmd extends AbstractCommand {
 					.appendField("Tags", tags, false)
 					.withImage(fileUrl.toString())
 					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
-			BotUtils.send(embed.build(), context.getChannel());
+			BotUtils.sendMessage(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting an image from Rule34... Please, try again later.", err, context);
@@ -109,7 +109,7 @@ public class Rule34Cmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show a random image corresponding to a tag from Rule34 website.**")
 				.appendField("Usage", "`" + context.getPrefix() + "rule34 <tag(s)>`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 }

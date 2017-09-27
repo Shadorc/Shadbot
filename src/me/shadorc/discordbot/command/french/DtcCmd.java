@@ -65,7 +65,7 @@ public class DtcCmd extends AbstractCommand {
 					.withUrl("https://danstonchat.com/" + quoteObj.getString("id") + ".html")
 					.withThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
 					.appendDescription(strBuilder.toString());
-			BotUtils.send(embed.build(), context.getChannel());
+			BotUtils.sendMessage(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting a quote from DansTonChat.com... Please, try again later.", err, context);
@@ -76,6 +76,6 @@ public class DtcCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show a random quote from DansTonChat.com**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

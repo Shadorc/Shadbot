@@ -54,13 +54,13 @@ public class HelpCmd extends AbstractCommand {
 								.map(cmd -> "`" + prefix + cmd.getNames()[0] + "`")
 								.collect(Collectors.joining(" ")), false));
 
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show help for commands.**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

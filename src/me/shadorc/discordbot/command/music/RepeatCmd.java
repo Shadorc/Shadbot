@@ -33,16 +33,16 @@ public class RepeatCmd extends AbstractCommand {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.send(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
 		TrackScheduler scheduler = musicManager.getScheduler();
 		scheduler.setRepeat(!scheduler.isRepeating());
 		if(scheduler.isRepeating()) {
-			BotUtils.send(Emoji.REPEAT + " Repetition enabled.", context.getChannel());
+			BotUtils.sendMessage(Emoji.REPEAT + " Repetition enabled.", context.getChannel());
 		} else {
-			BotUtils.send(Emoji.PLAY + " Repetition disabled.", context.getChannel());
+			BotUtils.sendMessage(Emoji.PLAY + " Repetition disabled.", context.getChannel());
 		}
 	}
 
@@ -50,7 +50,7 @@ public class RepeatCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Enable/disable music repetition.**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 }

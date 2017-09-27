@@ -66,7 +66,7 @@ public class TriviaCmd extends AbstractCommand {
 			}
 
 		} else {
-			BotUtils.send(Emoji.INFO + " A Trivia game has already been started.", context.getChannel());
+			BotUtils.sendMessage(Emoji.INFO + " A Trivia game has already been started.", context.getChannel());
 		}
 	}
 
@@ -75,7 +75,7 @@ public class TriviaCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Start a Trivia game in which everyone can participate.**")
 				.appendField("Gains", "The winner gets **" + GAINS + " coins**.", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 	public class TriviaManager implements MessageListener {
@@ -91,7 +91,7 @@ public class TriviaCmd extends AbstractCommand {
 			this.channel = channel;
 			this.alreadyAnswered = new ArrayList<>();
 			this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(30), event -> {
-				BotUtils.send(Emoji.HOURGLASS + " Time elapsed, the good answer was **" + correctAnswer + "**.", channel);
+				BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the good answer was **" + correctAnswer + "**.", channel);
 				this.stop();
 			});
 		}
@@ -129,7 +129,7 @@ public class TriviaCmd extends AbstractCommand {
 					.appendField("Difficulty", "`" + difficulty + "`", true)
 					.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to answer.");
 
-			BotUtils.send(builder.build(), channel);
+			BotUtils.sendMessage(builder.build(), channel);
 
 			MessageManager.addListener(channel, this);
 
@@ -150,14 +150,14 @@ public class TriviaCmd extends AbstractCommand {
 			IUser author = message.getAuthor();
 
 			if(alreadyAnswered.contains(author) && (wrongAnswer || goodAnswer)) {
-				BotUtils.send(Emoji.GREY_EXCLAMATION + " Sorry **" + author.getName() + "**, you can only answer once.", message.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Sorry **" + author.getName() + "**, you can only answer once.", message.getChannel());
 
 			} else if(wrongAnswer) {
-				BotUtils.send(Emoji.THUMBSDOWN + " Wrong answer.", channel);
+				BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", channel);
 				alreadyAnswered.add(author);
 
 			} else if(goodAnswer) {
-				BotUtils.send(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + GAINS + " coins**.", channel);
+				BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + GAINS + " coins**.", channel);
 				Storage.getPlayer(message.getGuild(), author).addCoins(GAINS);
 				Stats.increment(Category.MONEY_GAINS_COMMAND, TriviaCmd.this.getNames()[0], GAINS);
 				this.stop();

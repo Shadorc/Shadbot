@@ -74,7 +74,7 @@ public class RpsCmd extends AbstractCommand {
 		Handsign userHandsign = Handsign.getEnum(context.getArg());
 
 		if(userHandsign == null) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid handsign, please use \"rock\", \"paper\" or \"scissors\".", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid handsign, please use \"rock\", \"paper\" or \"scissors\".", context.getChannel());
 			return;
 		}
 
@@ -95,7 +95,7 @@ public class RpsCmd extends AbstractCommand {
 			strBuilder.append(Shadbot.getClient().getOurUser().getName() + " wins !");
 		}
 
-		BotUtils.send(strBuilder.toString(), context.getChannel());
+		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class RpsCmd extends AbstractCommand {
 				.appendField("Usage", "`" + context.getPrefix() + "rps <handsign>`", false)
 				.appendField("Argument", "**handsign** -  rock, paper or scissors", false)
 				.appendField("Gains", "The winner gets **" + GAINS + " coins**.", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 }

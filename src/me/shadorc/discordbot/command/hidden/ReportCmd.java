@@ -34,10 +34,10 @@ public class ReportCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		BotUtils.send("{Guild ID: " + context.getGuild().getLongID() + "} "
+		BotUtils.sendMessage("{Guild ID: " + context.getGuild().getLongID() + "} "
 				+ context.getAuthorName() + " (ID: " + context.getAuthor().getLongID() + ") say: " + context.getArg(),
 				Shadbot.getClient().getChannelByID(Config.SUGGEST_CHANNEL_ID));
-		BotUtils.send(Emoji.CHECK_MARK + " Report sent, thank you !", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " Report sent, thank you !", context.getChannel());
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class ReportCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Send a message to my owner, this can be a suggestion, a bug report, anything.**")
 				.appendField("Usage", "`" + context.getPrefix() + "report <message>`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 }

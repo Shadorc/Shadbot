@@ -58,13 +58,13 @@ public class LeaderboardCmd extends AbstractCommand {
 				.withAuthorName("Leaderboard")
 				.appendDescription(strBuilder.toString());
 
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show coins leaderboard for this server.**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

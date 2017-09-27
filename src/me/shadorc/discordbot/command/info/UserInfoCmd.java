@@ -48,7 +48,7 @@ public class UserInfoCmd extends AbstractCommand {
 				.appendField("Status", user.getPresence().getStatus().toString(), true)
 				.appendField("Playing text", user.getPresence().getPlayingText().orElse(null), true)
 				.appendField("Roles", StringUtils.formatList(user.getRolesForGuild(context.getGuild()), role -> role.getName(), "\n"), true);
-		BotUtils.send(embed.build(), context.getChannel());
+		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class UserInfoCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show info about an user.**")
 				.appendField("Usage", "`" + context.getPrefix() + "userinfo <@user>`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 }

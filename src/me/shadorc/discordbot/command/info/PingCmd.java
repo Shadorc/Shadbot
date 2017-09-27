@@ -30,14 +30,14 @@ public class PingCmd extends AbstractCommand {
 		}
 
 		long ping = Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), context.getMessage().getCreationDate()));
-		BotUtils.send(Emoji.GEAR + " Ping: " + ping + "ms", context.getChannel());
+		BotUtils.sendMessage(Emoji.GEAR + " Ping: " + ping + "ms", context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show Shadbot's ping.**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 }

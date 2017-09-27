@@ -51,7 +51,7 @@ public class JokeCmd extends AbstractCommand {
 					.withAuthorName("Blague")
 					.withUrl("http://www.une-blague.com/")
 					.appendDescription(joke);
-			BotUtils.send(embed.build(), context.getChannel());
+			BotUtils.sendMessage(embed.build(), context.getChannel());
 
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while getting a joke... Please, try again later.", err, context);
@@ -62,6 +62,6 @@ public class JokeCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show a random french joke.**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

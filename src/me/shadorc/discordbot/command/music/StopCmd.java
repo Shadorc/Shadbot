@@ -36,17 +36,17 @@ public class StopCmd extends AbstractCommand {
 		}
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.send(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
-		BotUtils.send(Emoji.INFO + " Music stopped by " + context.getAuthorName() + ".", context.getChannel());
+		BotUtils.sendMessage(Emoji.INFO + " Music stopped by " + context.getAuthorName() + ".", context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Stop all musics.**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

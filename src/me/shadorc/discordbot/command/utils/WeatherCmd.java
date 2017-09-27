@@ -68,9 +68,9 @@ public class WeatherCmd extends AbstractCommand {
 						.appendField(Emoji.DROPLET + " Humidity", humidity + "%", true)
 						.appendField(Emoji.THERMOMETER + " Temperature", String.format("%.1f", temperature) + "°C", true);
 
-				BotUtils.send(builder.build(), context.getChannel());
+				BotUtils.sendMessage(builder.build(), context.getChannel());
 			} else {
-				BotUtils.send(Emoji.MAGNIFYING_GLASS + " City not found.", context.getChannel());
+				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " City not found.", context.getChannel());
 			}
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while getting weather information... Please, try again later.", err, context);
@@ -114,6 +114,6 @@ public class WeatherCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show weather report for a city.**")
 				.appendField("Usage", "`" + context.getPrefix() + "weather <city>`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

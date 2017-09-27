@@ -32,17 +32,17 @@ public class NameCmd extends AbstractCommand {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.send(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
-		BotUtils.send(Emoji.MUSICAL_NOTE + " Currently playing: **" + musicManager.getScheduler().getPlayingTrackName() + "**", context.getChannel());
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **" + musicManager.getScheduler().getPlayingTrackName() + "**", context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show current music name.**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

@@ -35,19 +35,19 @@ public class AutoMessageSettingCmd implements SettingCmd {
 				}
 
 				Storage.saveSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID, channelsMentioned.get(0).getLongID());
-				BotUtils.send(Emoji.CHECK_MARK + " " + channelsMentioned.get(0).mention()
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " " + channelsMentioned.get(0).mention()
 						+ " is now the channel for join/leave messages.", context.getChannel());
 				break;
 
 			case "join":
 				if("disable".equals(arg2)) {
 					Storage.removeSetting(context.getGuild(), Setting.JOIN_MESSAGE);
-					BotUtils.send(Emoji.CHECK_MARK + " Join message disable.", context.getChannel());
+					BotUtils.sendMessage(Emoji.CHECK_MARK + " Join message disable.", context.getChannel());
 				} else {
 					Storage.saveSetting(context.getGuild(), Setting.JOIN_MESSAGE, arg2);
-					BotUtils.send(Emoji.CHECK_MARK + " The welcome message for this server is now: \"" + arg2 + "\".", context.getChannel());
+					BotUtils.sendMessage(Emoji.CHECK_MARK + " The welcome message for this server is now: \"" + arg2 + "\".", context.getChannel());
 					if(Storage.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
-						BotUtils.send(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
+						BotUtils.sendMessage(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
 								+ " channel <#channel>` to define in which channel auto messages are send.", context.getChannel());
 					}
 				}
@@ -56,19 +56,19 @@ public class AutoMessageSettingCmd implements SettingCmd {
 			case "leave":
 				if("disable".equals(arg2)) {
 					Storage.removeSetting(context.getGuild(), Setting.LEAVE_MESSAGE);
-					BotUtils.send(Emoji.CHECK_MARK + " Leave message disable.", context.getChannel());
+					BotUtils.sendMessage(Emoji.CHECK_MARK + " Leave message disable.", context.getChannel());
 				} else {
 					Storage.saveSetting(context.getGuild(), Setting.LEAVE_MESSAGE, arg2);
-					BotUtils.send(Emoji.CHECK_MARK + " The goodbye message for this server is now: \"" + arg2 + "\".", context.getChannel());
+					BotUtils.sendMessage(Emoji.CHECK_MARK + " The goodbye message for this server is now: \"" + arg2 + "\".", context.getChannel());
 					if(Storage.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
-						BotUtils.send(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
+						BotUtils.sendMessage(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
 								+ " channel <#channel>` to define in which channel auto messages are send.", context.getChannel());
 					}
 				}
 				break;
 
 			default:
-				BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid command, use `" + context.getPrefix() + "settings "
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid command, use `" + context.getPrefix() + "settings "
 						+ Setting.AUTO_MESSAGE.toString() + " help` to see help.", context.getChannel());
 				return;
 		}
@@ -103,7 +103,7 @@ public class AutoMessageSettingCmd implements SettingCmd {
 						+ "\n**Example**"
 						+ "\n`" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE.toString() + " leave disable`");
 
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 	@Override

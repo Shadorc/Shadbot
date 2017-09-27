@@ -40,7 +40,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 		}
 
 		if(!context.getChannel().isNSFW()) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
 					+ "`" + context.getPrefix() + "settings " + Setting.NSFW + " toggle`", context.getChannel());
 			return;
 		}
@@ -63,7 +63,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 					.appendDescription("Girl: **" + StringUtils.capitalize(name) + "**")
 					.withImage(imageUrl);
 
-			BotUtils.send(embed.build(), context.getChannel());
+			BotUtils.sendMessage(embed.build(), context.getChannel());
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while getting SuicideGirls image... Please, try again later.", err, context);
 		}
@@ -73,7 +73,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show a random image from SuicideGirls website.**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 }

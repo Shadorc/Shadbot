@@ -34,7 +34,7 @@ public class ChannelSettingCmd implements SettingCmd {
 			case "add":
 				if(allowedChannels.length() == 0
 						&& mentionedChannels.stream().filter(channel -> channel.getLongID() == context.getChannel().getLongID()).count() == 0) {
-					BotUtils.send(Emoji.WARNING + " You did not mentioned this channel. "
+					BotUtils.sendMessage(Emoji.WARNING + " You did not mentioned this channel. "
 							+ "I will not reply until it's added to the list of allowed channels.", context.getChannel());
 				}
 
@@ -42,7 +42,7 @@ public class ChannelSettingCmd implements SettingCmd {
 					allowedChannels.put(channel.getLongID());
 				}
 
-				BotUtils.send(Emoji.CHECK_MARK + " Channel "
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel "
 						+ StringUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
 						+ " has been added to allowed channels.", context.getChannel());
 				break;
@@ -54,13 +54,13 @@ public class ChannelSettingCmd implements SettingCmd {
 				}
 				allowedChannels = new JSONArray(newAllowedChannels);
 
-				BotUtils.send(Emoji.CHECK_MARK + " Channel "
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel "
 						+ StringUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
 						+ " has been removed from allowed channels.", context.getChannel());
 				break;
 
 			default:
-				BotUtils.send(Emoji.GREY_EXCLAMATION + " Invalid action. Use `" + context.getPrefix() + "settings "
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid action. Use `" + context.getPrefix() + "settings "
 						+ Setting.ALLOWED_CHANNELS.toString() + " help` to see help.", context.getChannel());
 				return;
 		}
@@ -76,7 +76,7 @@ public class ChannelSettingCmd implements SettingCmd {
 				.appendField("Argument", "**action** - add/remove"
 						+ "\n**channel(s)** - the channel(s) to add/remove", false)
 				.appendField("Example", "`" + context.getPrefix() + "settings " + Setting.ALLOWED_CHANNELS.toString() + " add #general`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 	@Override

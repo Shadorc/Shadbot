@@ -44,18 +44,18 @@ public class PlayCmd extends AbstractCommand {
 		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
 
 		if(botVoiceChannel != null && (userVoiceChannel == null || !userVoiceChannel.equals(botVoiceChannel))) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
 					+ ", join me before using this command.", context.getChannel());
 			return;
 		}
 
 		if(userVoiceChannel == null) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " Join a voice channel before using this command.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Join a voice channel before using this command.", context.getChannel());
 			return;
 		}
 
 		if(botVoiceChannel == null && !BotUtils.hasPermission(userVoiceChannel, Permissions.VOICE_CONNECT, Permissions.VOICE_SPEAK)) {
-			BotUtils.send(Emoji.ACCESS_DENIED + " I cannot connect/speak in this voice channel due to the lack of permission."
+			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " I cannot connect/speak in this voice channel due to the lack of permission."
 					+ "\nPlease, check my permissions and channel-specific ones to verify that **Voice connect** and **Voice speak** "
 					+ "are checked.", context.getChannel());
 			LogUtils.info("{Guild ID: " + context.getGuild().getLongID() + "} Shadbot wasn't allowed to connect/speak in a voice channel.");
@@ -85,7 +85,7 @@ public class PlayCmd extends AbstractCommand {
 		}
 
 		if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " You've reached the maximum number of tracks in the playlist (Max: "
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You've reached the maximum number of tracks in the playlist (Max: "
 					+ Config.MAX_PLAYLIST_SIZE + ").", context.getChannel());
 			return;
 		}
@@ -103,6 +103,6 @@ public class PlayCmd extends AbstractCommand {
 				.appendDescription("**Play the music(s) from the url, search terms or playlist.**")
 				.appendField("Usage", "`" + context.getPrefix() + "play [soundcloud] <url>`", false)
 				.appendField("Argument", "**soundcloud** - [OPTIONAL] search on SoundCloud instead of YouTube", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

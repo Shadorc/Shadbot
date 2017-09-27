@@ -60,7 +60,7 @@ public class GuildMusicManager {
 	}
 
 	public void end() {
-		BotUtils.send(Emoji.INFO + " End of the playlist.", channel);
+		BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
 		this.leaveVoiceChannel();
 	}
 

@@ -62,7 +62,7 @@ public class RateLimiter {
 	}
 
 	private void warn(String message, Context context) {
-		BotUtils.send(Emoji.STOPWATCH + " " + message, context.getChannel());
+		BotUtils.sendMessage(Emoji.STOPWATCH + " " + message, context.getChannel());
 		warningsRateLimiter.get(context.getGuild()).put(context.getAuthor(), true);
 		Stats.increment(Category.LIMITED_COMMAND, context.getCommand());
 	}

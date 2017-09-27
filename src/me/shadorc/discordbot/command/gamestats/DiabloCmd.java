@@ -56,7 +56,7 @@ public class DiabloCmd extends AbstractCommand {
 
 		String region = splitArgs[0].toLowerCase();
 		if(!Arrays.asList("eu", "us", "tw", "kr").contains(region)) {
-			BotUtils.send(Emoji.GREY_EXCLAMATION + " Region is invalid. Options: eu, us, tw, kr.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Region is invalid. Options: eu, us, tw, kr.", context.getChannel());
 			return;
 		}
 
@@ -68,7 +68,7 @@ public class DiabloCmd extends AbstractCommand {
 					+ "apikey=" + Config.get(APIKey.BLIZZARD_API_KEY)));
 
 			if(mainObj.has("code") && mainObj.getString("code").equals("NOTFOUND")) {
-				BotUtils.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
+				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
 				return;
 			}
 
@@ -101,10 +101,10 @@ public class DiabloCmd extends AbstractCommand {
 					.appendField("__Damage__",
 							StringUtils.formatList(heroesList,
 									heroObj -> formatter.format(heroObj.getJSONObject("stats").getDouble("damage")) + " DPS", "\n"), true);
-			BotUtils.send(builder.build(), context.getChannel());
+			BotUtils.sendMessage(builder.build(), context.getChannel());
 
 		} catch (FileNotFoundException err) {
-			BotUtils.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
+			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting Diablo 3 stats.... Please, try again later.", err, context);
 		}
@@ -115,7 +115,7 @@ public class DiabloCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show player's stats for Diablo 3.**")
 				.appendField("Usage", "`" + context.getPrefix() + "diablo <eu|us|tw|kr> <battletag#0000>`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 }

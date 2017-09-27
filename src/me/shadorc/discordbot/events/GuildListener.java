@@ -40,7 +40,7 @@ public class GuildListener {
 			return;
 		}
 
-		BotUtils.send(joinMessage, messageChannel);
+		BotUtils.sendMessage(joinMessage, messageChannel);
 	}
 
 	@EventSubscriber
@@ -57,6 +57,6 @@ public class GuildListener {
 			return;
 		}
 
-		BotUtils.send(leaveMessage, messageChannel);
+		BotUtils.sendMessage(leaveMessage, messageChannel);
 	}
 }

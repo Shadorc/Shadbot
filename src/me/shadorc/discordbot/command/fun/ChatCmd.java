@@ -61,7 +61,7 @@ public class ChatCmd extends AbstractCommand {
 			JSONObject resultObj = mainObj.getJSONObject("result");
 			String response = resultObj.getString("that").replace("<br>", "\n").replace("  ", " ").trim();
 			CHANNELS_CUSTID.put(context.getChannel(), resultObj.getString("custid"));
-			BotUtils.send(Emoji.SPEECH + " " + response, context.getChannel());
+			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 			return;
 		} catch (JSONException | IOException err) {
 			LogUtils.info("Something went wrong while discussing with A.L.I.C.E. (Error: " + err.getMessage() + "). Using Cleverbot instead."
@@ -73,7 +73,7 @@ public class ChatCmd extends AbstractCommand {
 			bot.setConversationID(CHANNELS_CONV_ID.getOrDefault(context.getChannel(), ""));
 			bot.sendRequest();
 			CHANNELS_CONV_ID.put(context.getChannel(), bot.getConversationID());
-			BotUtils.send(Emoji.SPEECH + " " + bot.getResponse(), context.getChannel());
+			BotUtils.sendMessage(Emoji.SPEECH + " " + bot.getResponse(), context.getChannel());
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while discussing with Cleverbot... Please, try again later.", err, context);
 		}
@@ -84,6 +84,6 @@ public class ChatCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Chat with the artificial intelligence A.L.I.C.E.**")
 				.appendField("Usage", "`" + context.getPrefix() + "chat <message>`", false);
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

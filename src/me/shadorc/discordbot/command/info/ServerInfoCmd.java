@@ -61,14 +61,14 @@ public class ServerInfoCmd extends AbstractCommand {
 												channelID -> "\t" + guild.getChannelByID(channelID).getName(),
 												"\n")), true)
 				.appendField("Server ID", Long.toString(guild.getLongID()), true);
-		BotUtils.send(embed.build(), context.getChannel());
+		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show info about this server.**");
-		BotUtils.send(builder.build(), context.getChannel());
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
 }
