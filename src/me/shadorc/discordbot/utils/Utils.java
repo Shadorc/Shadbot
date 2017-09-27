@@ -104,6 +104,13 @@ public class Utils {
 		return true;
 	}
 
+	public static void sleep(long duration) {
+		try {
+			Thread.sleep(duration);
+		} catch (InterruptedException ignored) {
+		}
+	}
+
 	/**
 	 * @return the default embed builder (with author icon and color)
 	 */

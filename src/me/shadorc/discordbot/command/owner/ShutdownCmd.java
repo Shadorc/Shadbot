@@ -15,7 +15,7 @@ import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
-import me.shadorc.discordbot.utils.schedule.SchedulerManager;
+import me.shadorc.discordbot.utils.schedule.Scheduler;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -54,7 +54,7 @@ public class ShutdownCmd extends AbstractCommand {
 			@Override
 			public void run() {
 				Shadbot.getClient().logout();
-				SchedulerManager.forceExecution();
+				Scheduler.forceExecution();
 			}
 		};
 
