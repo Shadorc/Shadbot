@@ -24,6 +24,7 @@ import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -35,14 +36,16 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private static final int CHOICE_DURATION = 30;
 
 	private final GuildMusicManager musicManager;
+	private final IUser userDj;
 	private final IVoiceChannel userVoiceChannel;
 	private final String identifier;
 
 	private List<AudioTrack> resultsTracks;
 	private Timer cancelTimer;
 
-	public AudioLoadResultListener(GuildMusicManager musicManager, IVoiceChannel userVoiceChannel, String identifier) {
+	public AudioLoadResultListener(GuildMusicManager musicManager, IUser userDj, IVoiceChannel userVoiceChannel, String identifier) {
 		this.musicManager = musicManager;
+		this.userDj = userDj;
 		this.userVoiceChannel = userVoiceChannel;
 		this.identifier = identifier;
 	}
@@ -74,8 +77,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 				return;
 			}
 
-			// FIXME: This can go wrong if two person run the command exactly at the same time; this will be the first choice with the second person
-			musicManager.defineLastUserAsDj();
+			musicManager.setDj(userDj);
 
 			StringBuilder strBuilder = new StringBuilder();
 			for(int i = 0; i < Math.min(5, tracks.size()); i++) {

@@ -34,7 +34,6 @@ public class GuildMusicManager {
 	private final Timer leaveTimer;
 
 	private IChannel channel;
-	private IUser lastUser;
 	private IUser userDj;
 
 	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
@@ -86,8 +85,8 @@ public class GuildMusicManager {
 		this.channel = channel;
 	}
 
-	public void setLastUser(IUser lastUser) {
-		this.lastUser = lastUser;
+	public void setDj(IUser userDj) {
+		this.userDj = userDj;
 	}
 
 	public IChannel getChannel() {
@@ -108,10 +107,6 @@ public class GuildMusicManager {
 
 	public boolean isLeavingScheduled() {
 		return leaveTimer.isRunning();
-	}
-
-	public void defineLastUserAsDj() {
-		this.userDj = this.lastUser;
 	}
 
 	public static GuildMusicManager createGuildMusicManager(IGuild guild) {
