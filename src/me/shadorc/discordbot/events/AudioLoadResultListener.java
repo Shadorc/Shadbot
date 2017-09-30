@@ -210,6 +210,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		resultsTracks.clear();
 		musicManager.removeLoadingListener(this);
 		MessageManager.removeListener(musicManager.getChannel());
+
+		if(musicManager.getScheduler().isStopped()) {
+			musicManager.leaveVoiceChannel();
+		}
 	}
 
 	private void sendInvalidChoice(String choice, String prefix, IMessage message) {
