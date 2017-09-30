@@ -188,7 +188,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 		}
 
-		// FIXME: If someone is choosing a music, the music end and he makes his choice, what happened ?
+		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel
+		GuildMusicManager.putGuildMusicManagerIfAbsent(message.getGuild(), musicManager);
 		musicManager.joinVoiceChannel(userVoiceChannel, false);
 
 		for(int choice : choices) {

@@ -146,6 +146,10 @@ public class GuildMusicManager {
 		return musicManager;
 	}
 
+	public static void putGuildMusicManagerIfAbsent(IGuild guild, GuildMusicManager musicManager) {
+		MUSIC_MANAGERS.putIfAbsent(guild, musicManager);
+	}
+
 	public static GuildMusicManager getGuildMusicManager(IGuild guild) {
 		return MUSIC_MANAGERS.get(guild);
 	}
