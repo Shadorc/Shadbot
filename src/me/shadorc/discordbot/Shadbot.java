@@ -15,6 +15,7 @@ import sx.blah.discord.handle.obj.IUser;
 public class Shadbot {
 
 	private static IDiscordClient client;
+	private static IUser owner;
 
 	public static void main(String[] args) {
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -33,6 +34,8 @@ public class Shadbot {
 		client.getDispatcher().registerListener(new ReadyListener());
 		client.getDispatcher().registerListener(new ShardListener());
 
+		owner = client.getApplicationOwner();
+
 		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
 	}
 
@@ -41,6 +44,6 @@ public class Shadbot {
 	}
 
 	public static IUser getOwner() {
-		return client.getApplicationOwner();
+		return owner;
 	}
 }
