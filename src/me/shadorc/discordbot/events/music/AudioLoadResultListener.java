@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.events;
+package me.shadorc.discordbot.events.music;
 
 import java.util.ArrayList;
 import java.util.List;

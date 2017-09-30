@@ -10,7 +10,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.events.AudioEventListener;
+import me.shadorc.discordbot.events.music.AudioEventListener;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;

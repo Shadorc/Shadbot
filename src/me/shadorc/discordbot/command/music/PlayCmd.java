@@ -8,7 +8,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.events.AudioLoadResultListener;
+import me.shadorc.discordbot.events.music.AudioLoadResultListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;

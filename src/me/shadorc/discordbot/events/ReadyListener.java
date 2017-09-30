@@ -2,6 +2,7 @@ package me.shadorc.discordbot.events;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Config;
+import me.shadorc.discordbot.events.music.VoiceChannelListener;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.schedule.Scheduler;
 import sx.blah.discord.api.events.EventSubscriber;

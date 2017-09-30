@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.events;
+package me.shadorc.discordbot.events.music;
 
 import org.jsoup.Jsoup;
 
