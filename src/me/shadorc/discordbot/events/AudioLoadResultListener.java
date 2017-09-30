@@ -45,8 +45,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		this.musicManager = musicManager;
 		this.userVoiceChannel = userVoiceChannel;
 		this.identifier = identifier;
-
-		this.musicManager.addLoadingListener(this);
 	}
 
 	@Override
@@ -57,7 +55,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					+ StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
 		}
 		musicManager.getScheduler().queue(track);
-		musicManager.removeLoadingListener(this);
 	}
 
 	@Override
@@ -114,8 +111,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
 				+ " musics have been added to the playlist.", musicManager.getChannel());
-
-		musicManager.removeLoadingListener(this);
 	}
 
 	@Override
@@ -128,8 +123,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
 			LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Load failed: " + errMessage);
 		}
-
-		musicManager.removeLoadingListener(this);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
@@ -145,8 +138,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \""
 				+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
 		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} No matches: " + identifier);
-
-		musicManager.removeLoadingListener(this);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
@@ -208,7 +199,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private void stopWaiting() {
 		cancelTimer.stop();
 		resultsTracks.clear();
-		musicManager.removeLoadingListener(this);
 		MessageManager.removeListener(musicManager.getChannel());
 
 		if(musicManager.getScheduler().isStopped()) {
