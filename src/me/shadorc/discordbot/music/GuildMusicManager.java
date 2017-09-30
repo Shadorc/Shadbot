@@ -10,6 +10,8 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 
 import me.shadorc.discordbot.Shadbot;
+import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.events.music.AudioEventListener;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -29,7 +31,6 @@ public class GuildMusicManager {
 	private final AudioPlayer audioPlayer;
 	private final AudioProvider audioProvider;
 	private final TrackScheduler scheduler;
-	private final AudioEventListener audioEventListener;
 	private final Timer leaveTimer;
 
 	private IChannel channel;
@@ -40,9 +41,8 @@ public class GuildMusicManager {
 		this.guild = guild;
 		this.audioPlayer = manager.createPlayer();
 		this.audioProvider = new AudioProvider(audioPlayer);
-		this.scheduler = new TrackScheduler(guild, audioPlayer);
-		this.audioEventListener = new AudioEventListener(guild, scheduler);
-		this.audioPlayer.addListener(audioEventListener);
+		this.scheduler = new TrackScheduler(audioPlayer, Integer.parseInt(Storage.getSetting(guild, Setting.DEFAULT_VOLUME).toString()));
+		this.audioPlayer.addListener(new AudioEventListener(this));
 		this.leaveTimer = new Timer((int) TimeUnit.MINUTES.toMillis(1), event -> {
 			this.leaveVoiceChannel();
 		});
@@ -56,19 +56,19 @@ public class GuildMusicManager {
 		leaveTimer.stop();
 	}
 
+	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean force) {
+		if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null || force) {
+			voiceChannel.join();
+			LogUtils.info("{Guild ID: " + voiceChannel.getGuild().getLongID() + "} Voice channel joined.");
+		}
+	}
+
 	public void end() {
 		// Do not block the lavaplayer thread to allow the socket to be closed in time, avoiding a SocketClosed exception
 		new Thread(() -> {
 			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
 			this.leaveVoiceChannel();
 		}).start();
-	}
-
-	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean force) {
-		if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null || force) {
-			voiceChannel.join();
-			LogUtils.info("{Guild ID: " + voiceChannel.getGuild().getLongID() + "} Voice channel joined.");
-		}
 	}
 
 	public void leaveVoiceChannel() {
@@ -84,7 +84,6 @@ public class GuildMusicManager {
 
 	public void setChannel(IChannel channel) {
 		this.channel = channel;
-		this.audioEventListener.setChannel(channel);
 	}
 
 	public void setLastUser(IUser lastUser) {
