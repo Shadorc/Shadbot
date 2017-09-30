@@ -1,8 +1,10 @@
 package me.shadorc.discordbot.music;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.Timer;
 
@@ -12,6 +14,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.events.AudioEventListener;
+import me.shadorc.discordbot.events.AudioLoadResultListener;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -32,7 +35,7 @@ public class GuildMusicManager {
 	private final TrackScheduler scheduler;
 	private final AudioEventListener audioEventListener;
 	private final Timer leaveTimer;
-	private final AtomicBoolean isLoading;
+	private final List<AudioLoadResultListener> loadingList;
 
 	private IChannel channel;
 	private IUser lastUser;
@@ -48,7 +51,7 @@ public class GuildMusicManager {
 		this.leaveTimer = new Timer((int) TimeUnit.MINUTES.toMillis(1), event -> {
 			this.leaveVoiceChannel();
 		});
-		this.isLoading = new AtomicBoolean();
+		this.loadingList = Collections.synchronizedList(new ArrayList<>());
 	}
 
 	public void scheduleLeave() {
@@ -89,8 +92,12 @@ public class GuildMusicManager {
 		}).start();
 	}
 
-	public void setLoading(boolean isLoading) {
-		this.isLoading.set(isLoading);
+	public void addLoadingListener(AudioLoadResultListener listener) {
+		this.loadingList.add(listener);
+	}
+
+	public void removeLoadingListener(AudioLoadResultListener listener) {
+		this.loadingList.remove(listener);
 	}
 
 	public void setChannel(IChannel channel) {
@@ -123,7 +130,7 @@ public class GuildMusicManager {
 	}
 
 	public boolean isLoading() {
-		return isLoading.get();
+		return loadingList.isEmpty();
 	}
 
 	public void defineLastUserAsDj() {

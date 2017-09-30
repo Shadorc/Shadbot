@@ -45,6 +45,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		this.musicManager = musicManager;
 		this.userVoiceChannel = userVoiceChannel;
 		this.identifier = identifier;
+
+		this.musicManager.addLoadingListener(this);
 	}
 
 	@Override
@@ -55,7 +57,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					+ StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
 		}
 		musicManager.getScheduler().queue(track);
-		musicManager.setLoading(false);
+		musicManager.removeLoadingListener(this);
 	}
 
 	@Override
@@ -114,7 +116,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
 				+ " musics have been added to the playlist.", musicManager.getChannel());
 
-		musicManager.setLoading(false);
+		musicManager.removeLoadingListener(this);
 	}
 
 	@Override
@@ -128,7 +130,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Load failed: " + errMessage);
 		}
 
-		musicManager.setLoading(false);
+		musicManager.removeLoadingListener(this);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
@@ -145,7 +147,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 				+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
 		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} No matches: " + identifier);
 
-		musicManager.setLoading(false);
+		musicManager.removeLoadingListener(this);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
@@ -187,6 +189,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 		}
 
+		// FIXME: If someone is choosing a music, the music end and he makes his choice, what happened ?
 		musicManager.joinVoiceChannel(userVoiceChannel, false);
 
 		for(int choice : choices) {
@@ -205,7 +208,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private void stopWaiting() {
 		cancelTimer.stop();
 		resultsTracks.clear();
-		musicManager.setLoading(false);
+		musicManager.removeLoadingListener(this);
 		MessageManager.removeListener(musicManager.getChannel());
 	}
 

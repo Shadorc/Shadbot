@@ -92,7 +92,7 @@ public class PlayCmd extends AbstractCommand {
 
 		musicManager.setChannel(context.getChannel());
 		musicManager.setLastUser(context.getAuthor());
-		musicManager.setLoading(true);
+
 		AudioLoadResultListener resultListener = new AudioLoadResultListener(musicManager, userVoiceChannel, identifier);
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, resultListener);
 	}
