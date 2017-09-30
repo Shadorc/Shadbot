@@ -57,8 +57,11 @@ public class GuildMusicManager {
 	}
 
 	public void end() {
-		BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
-		this.leaveVoiceChannel();
+		// Do not block the lavaplayer thread to allow the socket to be closed in time, avoiding a SocketClosed exception
+		new Thread(() -> {
+			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
+			this.leaveVoiceChannel();
+		}).start();
 	}
 
 	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean force) {
@@ -69,21 +72,14 @@ public class GuildMusicManager {
 	}
 
 	public void leaveVoiceChannel() {
-		// FIXME: Temporary fix to avoid SocketClosed exception
-		new Thread(new Runnable() {
-			@Override
-			@SuppressWarnings("PMD.AccessorMethodGeneration")
-			public void run() {
-				IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
-				if(voiceChannel != null) {
-					voiceChannel.leave();
-					LogUtils.info("{Guild ID: " + guild.getLongID() + ")} Voice channel leaved.");
-				}
-				GuildMusicManager.this.cancelLeave();
-				audioPlayer.destroy();
-				MUSIC_MANAGERS.remove(guild);
-			}
-		}).start();
+		IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
+		if(voiceChannel != null) {
+			voiceChannel.leave();
+			LogUtils.info("{Guild ID: " + guild.getLongID() + ")} Voice channel leaved.");
+		}
+		this.cancelLeave();
+		audioPlayer.destroy();
+		MUSIC_MANAGERS.remove(guild);
 	}
 
 	public void setChannel(IChannel channel) {
