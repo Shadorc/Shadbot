@@ -1,10 +1,12 @@
 package me.shadorc.discordbot.utils.schedule;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.data.Config;
@@ -76,14 +78,39 @@ public class Scheduler {
 			return;
 		}
 
-		Executors.newSingleThreadScheduledExecutor().submit(() -> Scheduler.waitAndSend(scheduledMsg));
+		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+		executor.submit(() -> {
+			Scheduler.waitAndSend(scheduledMsg);
+			MESSAGE_QUEUE.get(channel).remove(message);
+			if(MESSAGE_QUEUE.get(channel).isEmpty()) {
+				MESSAGE_QUEUE.remove(channel);
+			}
+			executor.shutdown();
+		});
 	}
 
 	public static void sendMsgWaitingForShard() {
-		Executors.newSingleThreadScheduledExecutor().submit(() -> MESSAGE_QUEUE.keySet().stream()
-				.forEach(channel -> MESSAGE_QUEUE.get(channel).stream()
-						.filter(msg -> msg.getReason().equals(Reason.SHARD_NOT_READY))
-						.forEach(msg -> Scheduler.waitAndSend(msg))));
+		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+		executor.submit(() -> {
+			Iterator<IChannel> channelItr = MESSAGE_QUEUE.keySet().iterator();
+			while(channelItr.hasNext()) {
+				IChannel channel = channelItr.next();
+				Iterator<ScheduledMessage> msgItr = MESSAGE_QUEUE.get(channel).iterator();
+
+				while(msgItr.hasNext()) {
+					ScheduledMessage message = msgItr.next();
+					if(message.getReason().equals(Reason.SHARD_NOT_READY)) {
+						Scheduler.waitAndSend(message);
+						msgItr.remove();
+					}
+				}
+
+				if(MESSAGE_QUEUE.get(channel).isEmpty()) {
+					channelItr.remove();
+				}
+			}
+			executor.shutdown();
+		});
 	}
 
 	protected static void waitAndSend(ScheduledMessage message) {
@@ -100,11 +127,6 @@ public class Scheduler {
 			LogUtils.warn("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Pending message sent.");
 		} else {
 			LogUtils.warn("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Too many try, abort attempt to send message.");
-		}
-
-		MESSAGE_QUEUE.get(message.getChannel()).remove(message);
-		if(MESSAGE_QUEUE.get(message.getChannel()).isEmpty()) {
-			MESSAGE_QUEUE.remove(message.getChannel());
 		}
 	}
 
