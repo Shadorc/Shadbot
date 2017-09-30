@@ -130,7 +130,7 @@ public class GuildMusicManager {
 	}
 
 	public boolean isLoading() {
-		return loadingList.isEmpty();
+		return !loadingList.isEmpty();
 	}
 
 	public void defineLastUserAsDj() {
