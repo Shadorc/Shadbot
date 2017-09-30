@@ -31,15 +31,12 @@ public class StopCmd extends AbstractCommand {
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
-		if(musicManager != null) {
-			musicManager.leaveVoiceChannel();
-		}
-
-		if(musicManager == null || musicManager.getScheduler().isStopped()) {
+		if(musicManager == null) {
 			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 			return;
 		}
 
+		musicManager.leaveVoiceChannel();
 		BotUtils.sendMessage(Emoji.INFO + " Music stopped by " + context.getAuthorName() + ".", context.getChannel());
 	}
 
