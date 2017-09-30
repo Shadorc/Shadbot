@@ -22,43 +22,15 @@ public class Scheduler {
 
 	protected static final ConcurrentHashMap<IChannel, List<ScheduledMessage>> MESSAGE_QUEUE = new ConcurrentHashMap<>();
 
-	private static Runnable postStatsTask;
-	private static Runnable saveDataTask;
-	private static Runnable saveStatsTask;
-
 	public static void start() {
-		// Update Shadbot stats every 3 hours
-		postStatsTask = new Runnable() {
-			@Override
-			public void run() {
-				NetUtils.postStats();
-			}
-		};
+		Executors.newSingleThreadScheduledExecutor()
+				.scheduleAtFixedRate(() -> NetUtils.postStats(), 0, TimeUnit.HOURS.toMillis(3), TimeUnit.MILLISECONDS);
 
 		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(postStatsTask, 0, TimeUnit.HOURS.toMillis(3), TimeUnit.MILLISECONDS);
-
-		// Save data every minute
-		saveDataTask = new Runnable() {
-			@Override
-			public void run() {
-				Storage.save();
-			}
-		};
+				.scheduleAtFixedRate(() -> Storage.save(), TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS);
 
 		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(saveDataTask, TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS);
-
-		// Save stats every 5 minutes
-		saveStatsTask = new Runnable() {
-			@Override
-			public void run() {
-				Stats.save();
-			}
-		};
-
-		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(saveStatsTask, TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
+				.scheduleAtFixedRate(() -> Stats.save(), TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
 	}
 
 	public static void scheduleMessages(Object message, IChannel channel, Reason reason) {
@@ -132,12 +104,12 @@ public class Scheduler {
 
 	public static void forceExecution() {
 		try {
-			if(saveDataTask != null) {
-				Executors.newSingleThreadScheduledExecutor().submit(saveDataTask).get();
-			}
-			if(saveStatsTask != null) {
-				Executors.newSingleThreadScheduledExecutor().submit(saveStatsTask).get();
-			}
+			ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+			executor.submit(() -> {
+				Storage.save();
+				Stats.save();
+				executor.shutdown();
+			}).get();
 		} catch (InterruptedException | ExecutionException err) {
 			LogUtils.error("An error occured while forcing saves.", err);
 		}
