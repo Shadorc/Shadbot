@@ -110,9 +110,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		musicManager.joinVoiceChannel(userVoiceChannel, false);
 
-		for(int i = 0; i < Math.min(Config.MAX_PLAYLIST_SIZE, tracks.size()); i++) {
-			musicManager.getScheduler().queue(tracks.get(i));
-		}
+		tracks.stream().limit(Config.MAX_PLAYLIST_SIZE).forEach(track -> musicManager.getScheduler().queue(track));
+
 		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
 				+ " musics have been added to the playlist.", musicManager.getChannel());
 

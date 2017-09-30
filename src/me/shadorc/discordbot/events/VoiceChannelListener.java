@@ -33,21 +33,21 @@ public class VoiceChannelListener {
 		IVoiceChannel botVoiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
 		if(botVoiceChannel != null) {
 
-			GuildMusicManager gmm = GuildMusicManager.getGuildMusicManager(guild);
+			GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(guild);
 
-			if(gmm == null) {
+			if(musicManager == null) {
 				return;
 			}
 
-			if(this.isAlone(botVoiceChannel) && !gmm.isLeavingScheduled()) {
-				BotUtils.sendMessage(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.", gmm.getChannel());
-				gmm.getScheduler().getAudioPlayer().setPaused(true);
-				gmm.scheduleLeave();
+			if(this.isAlone(botVoiceChannel) && !musicManager.isLeavingScheduled()) {
+				BotUtils.sendMessage(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.", musicManager.getChannel());
+				musicManager.getScheduler().getAudioPlayer().setPaused(true);
+				musicManager.scheduleLeave();
 
-			} else if(!this.isAlone(botVoiceChannel) && gmm.isLeavingScheduled()) {
-				BotUtils.sendMessage(Emoji.INFO + " Somebody joined me, music resumed.", gmm.getChannel());
-				gmm.getScheduler().getAudioPlayer().setPaused(false);
-				gmm.cancelLeave();
+			} else if(!this.isAlone(botVoiceChannel) && musicManager.isLeavingScheduled()) {
+				BotUtils.sendMessage(Emoji.INFO + " Somebody joined me, music resumed.", musicManager.getChannel());
+				musicManager.getScheduler().getAudioPlayer().setPaused(false);
+				musicManager.cancelLeave();
 			}
 		}
 	}
