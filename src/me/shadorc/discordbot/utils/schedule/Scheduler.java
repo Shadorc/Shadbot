@@ -102,7 +102,7 @@ public class Scheduler {
 		}
 	}
 
-	public static void forceExecution() {
+	public static void forceAndWaitExecution() {
 		try {
 			ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 			executor.submit(() -> {
