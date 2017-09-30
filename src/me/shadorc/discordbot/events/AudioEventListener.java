@@ -48,13 +48,8 @@ public class AudioEventListener extends AudioEventAdapter {
 
 			if(scheduler.isRepeating()) {
 				scheduler.queue(track.makeClone());
-			} else if(!scheduler.nextTrack() && GuildMusicManager.getGuildMusicManager(guild) != null) {
+			} else if(!scheduler.nextTrack()) {
 				GuildMusicManager.getGuildMusicManager(guild).end();
-			}
-			// FIXME
-			else if(GuildMusicManager.getGuildMusicManager(guild) == null) {
-				LogUtils.info("{DEBUG} {" + this.getClass().getSimpleName() + "} {Guild ID: " + guild.getLongID() + "} "
-						+ "GuildMusicManager was null on track end.");
 			}
 		}
 	}
