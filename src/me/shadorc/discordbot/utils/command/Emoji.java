@@ -32,7 +32,7 @@ public enum Emoji {
 	PLAY(":arrow_forward:"),
 	PAUSE(":pause_button:"),
 	REPEAT(":repeat:"),
-	SPEAKER(":speaker:"),
+	SOUND(":sound:"),
 	MUTE(":mute:"),
 
 	THUMBSDOWN(":thumbsdown:"),
