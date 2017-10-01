@@ -15,6 +15,12 @@ import sx.blah.discord.handle.obj.IVoiceChannel;
 public class VoiceChannelListener {
 
 	@EventSubscriber
+	public void onVoiceDisconnectedEvent(VoiceDisconnectedEvent event) {
+		LogUtils.info("{Guild ID: " + event.getGuild().getLongID() + ")} Voice channel leaved.");
+		GuildMusicManager.getGuildMusicManager(event.getGuild()).delete();
+	}
+
+	@EventSubscriber
 	public void onUserVoiceChannelJoinEvent(UserVoiceChannelJoinEvent event) {
 		this.check(event.getGuild());
 	}
