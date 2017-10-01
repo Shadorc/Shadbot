@@ -3,8 +3,10 @@ package me.shadorc.discordbot.events.music;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.handle.impl.events.guild.voice.VoiceDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelJoinEvent;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelLeaveEvent;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelMoveEvent;
@@ -42,6 +44,7 @@ public class VoiceChannelListener {
 			GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(guild);
 
 			if(musicManager == null) {
+				LogUtils.debug(this.getClass(), guild, "MusicManager was null while Shadbot was in a voice channel.");
 				return;
 			}
 
