@@ -90,15 +90,15 @@ public class Scheduler {
 		boolean success = false;
 		while(!success && count < 3) {
 			Utils.sleep(TimeUnit.SECONDS.toMillis(Config.DEFAULT_RETRY_TIME));
-			LogUtils.warn("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Sending pending message...");
+			LogUtils.info("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Sending pending message...");
 			success = message.send() != null;
 			count++;
 		}
 
 		if(success) {
-			LogUtils.warn("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Pending message sent.");
+			LogUtils.info("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Pending message sent.");
 		} else {
-			LogUtils.warn("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Too many try, abort attempt to send message.");
+			LogUtils.info("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Too many try, abort attempt to send message.");
 		}
 	}
 
