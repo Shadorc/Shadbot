@@ -65,7 +65,7 @@ public class ImageCmd extends AbstractCommand {
 			JSONObject contentObj = resultObj.getJSONObject("content");
 
 			EmbedBuilder builder = Utils.getDefaultEmbed()
-					.withAuthorName("DeviantArt Search (" + context.getArg() + ")")
+					.withAuthorName("DeviantArt (Search: " + context.getArg() + ")")
 					.withUrl(resultObj.getString("url"))
 					.withThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
 					.appendField("Title", resultObj.getString("title"), false)
@@ -123,7 +123,7 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	private boolean isTokenExpired() {
-		return (System.currentTimeMillis() - tokenRequestTime) < TimeUnit.SECONDS.toMillis(expiresIn);
+		return (System.currentTimeMillis() - tokenRequestTime) > TimeUnit.SECONDS.toMillis(expiresIn);
 	}
 
 	@Override
