@@ -89,9 +89,14 @@ public class Rule34Cmd extends AbstractCommand {
 				fileUrl.insert(0, "http:");
 			}
 
-			StringBuilder sourceUrl = new StringBuilder(postObj.getString("source"));
-			if(!sourceUrl.toString().isEmpty() && !sourceUrl.toString().startsWith("http")) {
-				sourceUrl.insert(0, "http:");
+			// This can be a number for some obscure reasons
+			StringBuilder sourceUrl = new StringBuilder();
+			Object source = postObj.get("source");
+			if(source instanceof String && !((String) source).isEmpty()) {
+				sourceUrl.append((String) source);
+				if(!sourceUrl.toString().startsWith("http")) {
+					sourceUrl.insert(0, "http:");
+				}
 			}
 
 			EmbedBuilder embed = Utils.getDefaultEmbed()
