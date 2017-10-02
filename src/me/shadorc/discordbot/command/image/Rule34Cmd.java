@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command.image;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,7 +55,7 @@ public class Rule34Cmd extends AbstractCommand {
 					+ "page=dapi"
 					+ "&s=post"
 					+ "&q=index"
-					+ "&tags=" + URLEncoder.encode(context.getArg(), "UTF-8")));
+					+ "&tags=" + URLEncoder.encode(context.getArg().replace(" ", "_"), "UTF-8")));
 
 			JSONObject postsObj = mainObj.getJSONObject("posts");
 
@@ -72,17 +73,24 @@ public class Rule34Cmd extends AbstractCommand {
 			}
 
 			String tags = postObj.getString("tags").trim().replace(" ", ", ");
+
+			if(postObj.getBoolean("has_children") || this.isLegal(tags)) {
+				BotUtils.sendMessage(Emoji.WARNING + " Sorry, I don't display images that contain children or that are tagged with `loli` or `shota`.", context.getChannel());
+				return;
+			}
+
 			if(tags.length() > 400) {
 				tags = tags.substring(0, 400) + "...";
 			}
+			tags = tags.replace("_", "\\_");
 
 			StringBuilder fileUrl = new StringBuilder(postObj.getString("file_url"));
-			if(!fileUrl.toString().startsWith("http")) {
+			if(!fileUrl.toString().isEmpty() && !fileUrl.toString().startsWith("http")) {
 				fileUrl.insert(0, "http:");
 			}
 
 			StringBuilder sourceUrl = new StringBuilder(postObj.getString("source"));
-			if(!sourceUrl.toString().startsWith("http")) {
+			if(!sourceUrl.toString().isEmpty() && !sourceUrl.toString().startsWith("http")) {
 				sourceUrl.insert(0, "http:");
 			}
 
@@ -101,14 +109,17 @@ public class Rule34Cmd extends AbstractCommand {
 		} catch (JSONException | IOException err) {
 			LogUtils.error("Something went wrong while getting an image from Rule34... Please, try again later.", err, context);
 		}
+	}
 
+	private boolean isLegal(String tags) {
+		return Arrays.stream(tags.split(", ")).anyMatch(tag -> tag.contains("loli") || tag.contains("shota"));
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show a random image corresponding to a tag from Rule34 website.**")
-				.appendField("Usage", "`" + context.getPrefix() + "rule34 <tag(s)>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + "rule34 <tag>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
