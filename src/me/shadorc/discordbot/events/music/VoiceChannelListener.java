@@ -18,8 +18,11 @@ public class VoiceChannelListener {
 
 	@EventSubscriber
 	public void onVoiceDisconnectedEvent(VoiceDisconnectedEvent event) {
-		LogUtils.info("{Guild ID: " + event.getGuild().getLongID() + ")} Voice channel leaved.");
-		GuildMusicManager.getGuildMusicManager(event.getGuild()).delete();
+		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(event.getGuild());
+		if(musicManager != null) {
+			musicManager.delete();
+			LogUtils.info("{Guild ID: " + event.getGuild().getLongID() + ")} Voice channel leaved.");
+		}
 	}
 
 	@EventSubscriber
