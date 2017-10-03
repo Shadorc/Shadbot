@@ -73,12 +73,7 @@ public class PlayCmd extends AbstractCommand {
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
-		if(musicManager == null
-				// TODO: Remove, this should be fixed now
-				|| musicManager.getScheduler().isStopped()) {
-			if(musicManager != null) {
-				LogUtils.debug(this.getClass(), context.getGuild(), "Creating new GuildMusicManager because scheduler was stopped.");
-			}
+		if(musicManager == null) {
 			musicManager = GuildMusicManager.createGuildMusicManager(context.getGuild());
 		}
 
