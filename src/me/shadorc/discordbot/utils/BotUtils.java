@@ -9,8 +9,6 @@ import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.utils.command.Emoji;
-import me.shadorc.discordbot.utils.schedule.ScheduledMessage.Reason;
-import me.shadorc.discordbot.utils.schedule.Scheduler;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -25,8 +23,7 @@ public class BotUtils {
 
 	public static RequestFuture<IMessage> sendMessage(String message, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			LogUtils.info("Shard isn't ready, adding message to queue.");
-			Scheduler.scheduleMessages(message, channel, Reason.SHARD_NOT_READY);
+			ExceptionUtils.manageMessageException(message, channel, new DiscordException("Attempt to send message before shard is ready!"));
 			return null;
 		}
 
@@ -41,12 +38,7 @@ public class BotUtils {
 			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + "} Missing permissions.", err);
 			} catch (DiscordException err) {
-				if(err.getErrorMessage().contains("Discord didn't return a response") || err.getErrorMessage().contains("400 Bad Request")) {
-					LogUtils.info("A message could not be send now, adding it to queue.");
-					Scheduler.scheduleMessages(message, channel, Reason.API_ERROR);
-					return null;
-				}
-				LogUtils.error("Discord exception while sending message.", err);
+				ExceptionUtils.manageMessageException(message, channel, err);
 			}
 			return null;
 		});
@@ -55,8 +47,7 @@ public class BotUtils {
 	// EmbedBuilder doc: https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static RequestFuture<IMessage> sendMessage(EmbedObject embed, IChannel channel) {
 		if(!ShardListener.isShardConnected(channel.getShard())) {
-			LogUtils.info("Shard isn't ready, adding embed link to queue.");
-			Scheduler.scheduleMessages(embed, channel, Reason.SHARD_NOT_READY);
+			ExceptionUtils.manageMessageException(embed, channel, new DiscordException("Attempt to send message before shard is ready!"));
 			return null;
 		}
 
@@ -73,12 +64,7 @@ public class BotUtils {
 			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + "} Missing permissions.", err);
 			} catch (DiscordException err) {
-				if(err.getErrorMessage().contains("Discord didn't return a response") || err.getErrorMessage().contains("400 Bad Request")) {
-					LogUtils.info("An embed link could not be send now, adding it to queue.");
-					Scheduler.scheduleMessages(embed, channel, Reason.API_ERROR);
-					return null;
-				}
-				LogUtils.error("Discord exception while sending embed link.", err);
+				ExceptionUtils.manageMessageException(embed, channel, err);
 			}
 			return null;
 		});
