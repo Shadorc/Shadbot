@@ -37,6 +37,16 @@ public class StringUtils {
 	}
 
 	/**
+	 * @param array - the array to format
+	 * @param mapper - a non-interfering, stateless function to apply to each element
+	 * @param delimiter - the delimiter to be used between each element
+	 * @return formatted array
+	 */
+	public static String formatArray(Object[] array, Function<Object, String> mapper, String delimiter) {
+		return StringUtils.formatList(Arrays.asList(array), mapper, delimiter);
+	}
+
+	/**
 	 * @param info - the info from the audio track to format
 	 * @return formatted name
 	 */
