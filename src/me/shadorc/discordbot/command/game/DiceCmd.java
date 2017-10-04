@@ -13,7 +13,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Stats;
-import me.shadorc.discordbot.data.Stats.Category;
+import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
@@ -175,7 +175,7 @@ public class DiceCmd extends AbstractCommand {
 				int gains = bet * (numsPlayers.size() + MULTIPLIER);
 				BotUtils.sendMessage(Emoji.DICE + " Congratulations **" + winner.getName() + "**, you win **" + gains + " coins** !", context.getChannel());
 				Storage.getPlayer(context.getGuild(), winner).addCoins(gains);
-				Stats.increment(Category.MONEY_GAINS_COMMAND, DiceCmd.this.getNames()[0], gains);
+				Stats.increment(StatCategory.MONEY_GAINS_COMMAND, DiceCmd.this.getNames()[0], gains);
 			}
 
 			List<IUser> losersList = numsPlayers.keySet().stream()
@@ -187,7 +187,7 @@ public class DiceCmd extends AbstractCommand {
 				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
 				for(IUser loser : losersList) {
 					Storage.getPlayer(context.getGuild(), loser).addCoins(-bet);
-					Stats.increment(Category.MONEY_LOSSES_COMMAND, DiceCmd.this.getNames()[0], bet);
+					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, DiceCmd.this.getNames()[0], bet);
 					strBuilder.append("**" + loser.getName() + "**, ");
 				}
 				strBuilder.append("you lost **" + StringUtils.pluralOf(bet, "coin") + "**.");

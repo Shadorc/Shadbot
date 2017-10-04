@@ -7,7 +7,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Stats;
-import me.shadorc.discordbot.data.Stats.Category;
+import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -67,7 +67,7 @@ public class SlotMachineCmd extends AbstractCommand {
 			gains = THIRD_GAINS;
 		}
 		context.getPlayer().addCoins(gains);
-		Stats.increment(gains > 0 ? Category.MONEY_GAINS_COMMAND : Category.MONEY_LOSSES_COMMAND, this.getNames()[0], Math.abs(gains));
+		Stats.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getNames()[0], Math.abs(gains));
 
 		StringBuilder message = new StringBuilder(
 				":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":"

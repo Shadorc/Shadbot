@@ -61,20 +61,20 @@ public class Storage {
 		return guildObj;
 	}
 
-	public static void saveSetting(IGuild guild, Setting setting, Object value) {
-		GUILDS_MAP.put(guild.getStringID(), Storage.getGuild(guild).put(setting.toString(), value));
-	}
-
-	public static void savePlayer(Player player) {
-		GUILDS_MAP.put(player.getGuild().getStringID(), Storage.getGuild(player.getGuild()).put(player.getUser().getStringID(), player.toJSON()));
-	}
-
 	public static Object getSetting(IGuild guild, Setting setting) {
 		return Storage.getGuild(guild).opt(setting.toString());
 	}
 
 	public static Player getPlayer(IGuild guild, IUser user) {
 		return new Player(guild, user, Storage.getGuild(guild).optJSONObject(user.getStringID()));
+	}
+
+	public static void saveSetting(IGuild guild, Setting setting, Object value) {
+		GUILDS_MAP.put(guild.getStringID(), Storage.getGuild(guild).put(setting.toString(), value));
+	}
+
+	public static void savePlayer(Player player) {
+		GUILDS_MAP.put(player.getGuild().getStringID(), Storage.getGuild(player.getGuild()).put(player.getUser().getStringID(), player.toJSON()));
 	}
 
 	public static void removeSetting(IGuild guild, Setting setting) {

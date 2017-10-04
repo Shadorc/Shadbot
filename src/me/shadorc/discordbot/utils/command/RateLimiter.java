@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Stats;
-import me.shadorc.discordbot.data.Stats.Category;
+import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.utils.BotUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
@@ -64,6 +64,6 @@ public class RateLimiter {
 	private void warn(String message, Context context) {
 		BotUtils.sendMessage(Emoji.STOPWATCH + " " + message, context.getChannel());
 		warningsRateLimiter.get(context.getGuild()).put(context.getAuthor(), true);
-		Stats.increment(Category.LIMITED_COMMAND, context.getCommand());
+		Stats.increment(StatCategory.LIMITED_COMMAND, context.getCommand());
 	}
 }

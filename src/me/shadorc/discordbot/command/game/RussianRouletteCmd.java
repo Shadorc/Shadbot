@@ -7,7 +7,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Stats;
-import me.shadorc.discordbot.data.Stats.Category;
+import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -63,11 +63,11 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(MathUtils.rand(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
-			Stats.increment(Category.MONEY_LOSSES_COMMAND, this.getNames()[0], Math.abs(gains));
+			Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, this.getNames()[0], Math.abs(gains));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
 			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
-			Stats.increment(Category.MONEY_GAINS_COMMAND, this.getNames()[0], gains);
+			Stats.increment(StatCategory.MONEY_GAINS_COMMAND, this.getNames()[0], gains);
 		}
 
 		context.getPlayer().addCoins(gains);

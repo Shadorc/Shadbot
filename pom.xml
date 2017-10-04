@@ -99,5 +99,10 @@
 			<artifactId>overwatch4j</artifactId>
 			<version>0.1.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.ivkos</groupId>
+			<artifactId>wallhaven4j</artifactId>
+			<version>1.3.0</version>
+		</dependency>
 	</dependencies>
 </project>

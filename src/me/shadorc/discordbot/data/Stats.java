@@ -15,7 +15,7 @@ import me.shadorc.discordbot.utils.LogUtils;
 public class Stats {
 
 	private static final File STATS_FILE = new File("stats.json");
-	private static final ConcurrentHashMap<Category, JSONObject> STATS_MAP = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<StatCategory, JSONObject> STATS_MAP = new ConcurrentHashMap<>();
 
 	static {
 		if(!STATS_FILE.exists()) {
@@ -36,7 +36,7 @@ public class Stats {
 
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(STATS_FILE.toURI().toURL().openStream()));
-			for(Category cat : Category.values()) {
+			for(StatCategory cat : StatCategory.values()) {
 				STATS_MAP.put(cat, mainObj.has(cat.toString()) ? mainObj.getJSONObject(cat.toString()) : new JSONObject());
 			}
 
@@ -46,31 +46,11 @@ public class Stats {
 		}
 	}
 
-	public enum Category {
-		UNKNOWN_COMMAND("unknown_command"),
-		LIMITED_COMMAND("limited_command"),
-		MONEY_GAINS_COMMAND("money_gains_command"),
-		MONEY_LOSSES_COMMAND("money_losses_command"),
-		HELP_COMMAND("help_command"),
-		COMMAND("command");
-
-		private final String key;
-
-		Category(String key) {
-			this.key = key;
-		}
-
-		@Override
-		public String toString() {
-			return key;
-		}
-	}
-
-	public static void increment(Category category, String key) {
+	public static void increment(StatCategory category, String key) {
 		STATS_MAP.put(category, STATS_MAP.get(category).increment(key));
 	}
 
-	public static void increment(Category category, String key, int value) {
+	public static void increment(StatCategory category, String key, int value) {
 		STATS_MAP.put(category, STATS_MAP.get(category).put(key, STATS_MAP.get(category).optInt(key) + value));
 	}
 
@@ -78,7 +58,7 @@ public class Stats {
 		FileWriter writer = null;
 		try {
 			JSONObject mainObj = new JSONObject();
-			for(Category cat : Category.values()) {
+			for(StatCategory cat : StatCategory.values()) {
 				mainObj.put(cat.toString(), STATS_MAP.get(cat));
 			}
 
