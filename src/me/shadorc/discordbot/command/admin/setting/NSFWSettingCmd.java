@@ -1,7 +1,7 @@
 package me.shadorc.discordbot.command.admin.setting;
 
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.data.Storage.Setting;
+import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.Utils;

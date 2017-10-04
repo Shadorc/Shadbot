@@ -2,8 +2,8 @@ package me.shadorc.discordbot.command;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Player;
+import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.Storage;
-import me.shadorc.discordbot.data.Storage.Setting;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;

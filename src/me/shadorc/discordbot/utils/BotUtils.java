@@ -5,8 +5,8 @@ import java.util.List;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Shadbot;
+import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.Storage;
-import me.shadorc.discordbot.data.Storage.Setting;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;

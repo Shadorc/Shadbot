@@ -12,7 +12,7 @@ import me.shadorc.discordbot.command.admin.setting.NSFWSettingCmd;
 import me.shadorc.discordbot.command.admin.setting.PrefixSettingCmd;
 import me.shadorc.discordbot.command.admin.setting.SettingCmd;
 import me.shadorc.discordbot.command.admin.setting.VolumeSettingCmd;
-import me.shadorc.discordbot.data.Storage.Setting;
+import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
