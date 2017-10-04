@@ -27,6 +27,7 @@ import me.shadorc.discordbot.command.image.GifCmd;
 import me.shadorc.discordbot.command.image.ImageCmd;
 import me.shadorc.discordbot.command.image.Rule34Cmd;
 import me.shadorc.discordbot.command.image.SuicideGirlsCmd;
+import me.shadorc.discordbot.command.image.WallpaperCmd;
 import me.shadorc.discordbot.command.info.InfoCmd;
 import me.shadorc.discordbot.command.info.PingCmd;
 import me.shadorc.discordbot.command.info.ServerInfoCmd;
@@ -84,6 +85,7 @@ public class CommandManager {
 				new SuicideGirlsCmd(),
 				new Rule34Cmd(),
 				new GifCmd(),
+				new WallpaperCmd(),
 				// Games Commands
 				new DiceCmd(),
 				new SlotMachineCmd(),

@@ -69,7 +69,9 @@ public class Config {
 		BOTS_DISCORD_PW_TOKEN,
 		DISCORD_BOTS_ORG_TOKEN,
 		BLIZZARD_API_KEY,
-		CLEVERBOT_API_KEY;
+		CLEVERBOT_API_KEY,
+		WALLHAVEN_LOGIN,
+		WALLHAVEN_PASSWORD;
 	}
 
 	public static String get(APIKey key) {
