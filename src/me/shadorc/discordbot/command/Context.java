@@ -1,7 +1,7 @@
 package me.shadorc.discordbot.command;
 
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.data.Player;
+import me.shadorc.discordbot.data.DBUser;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.Storage;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -18,7 +18,7 @@ public class Context {
 	private final String command;
 	private final String arg;
 
-	private Player player;
+	private DBUser player;
 
 	public Context(MessageReceivedEvent event) {
 		this.event = event;
@@ -29,7 +29,7 @@ public class Context {
 		this.arg = splitMessage.length > 1 ? splitMessage[1].trim() : "";
 	}
 
-	public Player getPlayer() {
+	public DBUser getPlayer() {
 		if(player == null) {
 			player = Storage.getPlayer(this.getGuild(), this.getAuthor());
 		}

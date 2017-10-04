@@ -5,14 +5,14 @@ import org.json.JSONObject;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
-public class Player {
+public class DBUser {
 
 	private final IGuild guild;
 	private final IUser user;
 
 	private int coins;
 
-	public Player(IGuild guild, IUser user, JSONObject userObj) {
+	public DBUser(IGuild guild, IUser user, JSONObject userObj) {
 		this.guild = guild;
 		this.user = user;
 		this.coins = userObj == null ? 0 : userObj.getInt("coins");

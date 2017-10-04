@@ -65,7 +65,7 @@ public class Storage {
 		}
 	}
 
-	private static JSONObject getGuild(IGuild guild) {
+	private static JSONObject getGuildObject(IGuild guild) {
 		return GUILDS_MAP.getOrDefault(guild.getStringID(), Storage.getDefaultGuildObject());
 	}
 
@@ -80,19 +80,19 @@ public class Storage {
 	}
 
 	public static JSONObject getSettings(IGuild guild) {
-		return Storage.getGuild(guild).getJSONObject(DataCategory.SETTINGS.toString());
+		return Storage.getGuildObject(guild).getJSONObject(DataCategory.SETTINGS.toString());
 	}
 
 	public static JSONArray getPlayers(IGuild guild) {
-		return Storage.getGuild(guild).getJSONArray(DataCategory.USERS.toString());
+		return Storage.getGuildObject(guild).getJSONArray(DataCategory.USERS.toString());
 	}
 
 	public static Object getSetting(IGuild guild, Setting setting) {
 		return Storage.getSettings(guild).opt(setting.toString());
 	}
 
-	public static Player getPlayer(IGuild guild, IUser user) {
-		return new Player(guild, user, Storage.getUserObject(guild, user));
+	public static DBUser getPlayer(IGuild guild, IUser user) {
+		return new DBUser(guild, user, Storage.getUserObject(guild, user));
 	}
 
 	private static JSONObject getUserObject(IGuild guild, IUser user) {
@@ -108,12 +108,12 @@ public class Storage {
 
 	public static void saveSetting(IGuild guild, Setting setting, Object value) {
 		JSONObject settingsObj = Storage.getSettings(guild).put(setting.toString(), value);
-		GUILDS_MAP.put(guild.getStringID(), Storage.getGuild(guild).put(DataCategory.SETTINGS.toString(), settingsObj));
+		GUILDS_MAP.put(guild.getStringID(), Storage.getGuildObject(guild).put(DataCategory.SETTINGS.toString(), settingsObj));
 	}
 
-	public static void savePlayer(Player player) {
-		JSONArray usersArray = Storage.getGuild(player.getGuild()).getJSONArray(DataCategory.USERS.toString()).put(player.toJSON());
-		GUILDS_MAP.put(player.getGuild().getStringID(), Storage.getGuild(player.getGuild()).put(DataCategory.USERS.toString(), usersArray));
+	public static void savePlayer(DBUser player) {
+		JSONArray usersArray = Storage.getGuildObject(player.getGuild()).getJSONArray(DataCategory.USERS.toString()).put(player.toJSON());
+		GUILDS_MAP.put(player.getGuild().getStringID(), Storage.getGuildObject(player.getGuild()).put(DataCategory.USERS.toString(), usersArray));
 	}
 
 	public static void removeSetting(IGuild guild, Setting setting) {

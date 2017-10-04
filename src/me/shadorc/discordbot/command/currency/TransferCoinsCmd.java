@@ -7,7 +7,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.data.Player;
+import me.shadorc.discordbot.data.DBUser;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -41,8 +41,8 @@ public class TransferCoinsCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Player receiverPlayer = Storage.getPlayer(context.getGuild(), context.getMessage().getMentions().get(0));
-		Player senderPlayer = context.getPlayer();
+		DBUser receiverPlayer = Storage.getPlayer(context.getGuild(), context.getMessage().getMentions().get(0));
+		DBUser senderPlayer = context.getPlayer();
 		if(senderPlayer.equals(receiverPlayer)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You cannot transfer coins to yourself.", context.getChannel());
 			return;
