@@ -37,6 +37,7 @@ public class Player {
 
 	public JSONObject toJSON() {
 		JSONObject userJson = new JSONObject();
+		userJson.put("userID", user.getLongID());
 		userJson.put("coins", coins);
 		return userJson;
 	}
