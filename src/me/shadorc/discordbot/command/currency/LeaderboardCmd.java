@@ -4,6 +4,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -32,9 +35,14 @@ public class LeaderboardCmd extends AbstractCommand {
 		}
 
 		Map<IUser, Integer> usersCoin = new HashMap<>();
-		for(IUser user : context.getGuild().getUsers()) {
-			int userCoin = Storage.getPlayer(context.getGuild(), user).getCoins();
-			if(userCoin > 0) {
+
+		JSONArray playersArray = Storage.getPlayers(context.getGuild());
+		for(int i = 0; i < playersArray.length(); i++) {
+			JSONObject playerObj = playersArray.getJSONObject(i);
+			int userCoin = playerObj.getInt("coins");
+
+			IUser user = context.getGuild().getUserByID(playerObj.getLong("userID"));
+			if(user != null && userCoin > 0) {
 				usersCoin.put(user, userCoin);
 			}
 		}

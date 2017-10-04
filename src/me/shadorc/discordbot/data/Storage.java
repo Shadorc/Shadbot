@@ -20,8 +20,21 @@ public class Storage {
 	private static final File DATA_FILE = new File("data.json");
 	private static final ConcurrentHashMap<String, JSONObject> GUILDS_MAP = new ConcurrentHashMap<>();
 
-	private static final String SETTINGS = "settings";
-	private static final String USERS = "users";
+	public enum DataCategory {
+		SETTINGS("settings"),
+		USERS("users");
+
+		private final String name;
+
+		DataCategory(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
+	}
 
 	static {
 		if(!DATA_FILE.exists()) {
@@ -58,16 +71,24 @@ public class Storage {
 
 	private static JSONObject getDefaultGuildObject() {
 		JSONObject guildObj = new JSONObject();
-		guildObj.put(SETTINGS, new JSONObject()
+		guildObj.put(DataCategory.SETTINGS.toString(), new JSONObject()
 				.put(Setting.ALLOWED_CHANNELS.toString(), new JSONArray())
 				.put(Setting.PREFIX.toString(), Config.DEFAULT_PREFIX)
 				.put(Setting.DEFAULT_VOLUME.toString(), Config.DEFAULT_VOLUME));
-		guildObj.put(USERS, new JSONArray());
+		guildObj.put(DataCategory.USERS.toString(), new JSONArray());
 		return guildObj;
 	}
 
+	public static JSONObject getSettings(IGuild guild) {
+		return Storage.getGuild(guild).getJSONObject(DataCategory.SETTINGS.toString());
+	}
+
+	public static JSONArray getPlayers(IGuild guild) {
+		return Storage.getGuild(guild).getJSONArray(DataCategory.USERS.toString());
+	}
+
 	public static Object getSetting(IGuild guild, Setting setting) {
-		return Storage.getGuild(guild).getJSONObject(SETTINGS).opt(setting.toString());
+		return Storage.getSettings(guild).opt(setting.toString());
 	}
 
 	public static Player getPlayer(IGuild guild, IUser user) {
@@ -75,7 +96,7 @@ public class Storage {
 	}
 
 	private static JSONObject getUserObject(IGuild guild, IUser user) {
-		JSONArray array = Storage.getGuild(guild).getJSONArray(USERS);
+		JSONArray array = Storage.getPlayers(guild);
 		for(int i = 0; i < array.length(); i++) {
 			JSONObject obj = array.getJSONObject(i);
 			if(obj.getLong("userID") == user.getLongID()) {
@@ -86,17 +107,17 @@ public class Storage {
 	}
 
 	public static void saveSetting(IGuild guild, Setting setting, Object value) {
-		JSONObject settingsObj = Storage.getGuild(guild).getJSONObject(SETTINGS).put(setting.toString(), value);
-		GUILDS_MAP.put(guild.getStringID(), Storage.getGuild(guild).put(SETTINGS, settingsObj));
+		JSONObject settingsObj = Storage.getSettings(guild).put(setting.toString(), value);
+		GUILDS_MAP.put(guild.getStringID(), Storage.getGuild(guild).put(DataCategory.SETTINGS.toString(), settingsObj));
 	}
 
 	public static void savePlayer(Player player) {
-		JSONArray usersArray = Storage.getGuild(player.getGuild()).getJSONArray(USERS).put(player.toJSON());
-		GUILDS_MAP.put(player.getGuild().getStringID(), Storage.getGuild(player.getGuild()).put(USERS, usersArray));
+		JSONArray usersArray = Storage.getGuild(player.getGuild()).getJSONArray(DataCategory.USERS.toString()).put(player.toJSON());
+		GUILDS_MAP.put(player.getGuild().getStringID(), Storage.getGuild(player.getGuild()).put(DataCategory.USERS.toString(), usersArray));
 	}
 
 	public static void removeSetting(IGuild guild, Setting setting) {
-		Storage.getGuild(guild).getJSONObject(SETTINGS).remove(setting.toString());
+		Storage.getSettings(guild).remove(setting.toString());
 	}
 
 	public static void save() {
