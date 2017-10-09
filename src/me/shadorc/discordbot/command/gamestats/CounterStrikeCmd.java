@@ -91,7 +91,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 					+ "&key=" + Config.get(APIKey.STEAM_API_KEY)
 					+ "&steamid=" + steamid));
 
-			if(!mainStatsObj.has("playerstats")) {
+			if(!mainStatsObj.has("playerstats") || !mainStatsObj.getJSONObject("playerstats").has("stats")) {
 				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.", context.getChannel());
 				return;
 			}
