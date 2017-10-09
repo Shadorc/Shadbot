@@ -33,7 +33,7 @@ public class VolumeSettingCmd implements SettingCmd {
 			return;
 		}
 
-		Storage.saveSetting(context.getGuild(), Setting.DEFAULT_VOLUME, vol);
+		Storage.getGuild(context.getGuild()).setSetting(Setting.DEFAULT_VOLUME, vol);
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " " + vol + "% is now the default volume for this server.", context.getChannel());
 	}
 

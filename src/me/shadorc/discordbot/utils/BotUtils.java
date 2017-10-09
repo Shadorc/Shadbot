@@ -91,7 +91,7 @@ public class BotUtils {
 	 * @return true if Shadbot is allowed to send a message in channel, false otherwise
 	 */
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
-		JSONArray channelsArray = (JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS);
+		JSONArray channelsArray = (JSONArray) Storage.getGuild(guild).getSetting(Setting.ALLOWED_CHANNELS);
 
 		// If no permissions were defined, authorize all the channels by default.
 		if(channelsArray.length() == 0) {

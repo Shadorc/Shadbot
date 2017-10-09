@@ -47,7 +47,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		}
 
 		int bet = Integer.parseInt(betStr);
-		if(context.getPlayer().getCoins() < bet) {
+		if(context.getUser().getCoins() < bet) {
 			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
 			return;
 		}
@@ -70,7 +70,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 			Stats.increment(StatCategory.MONEY_GAINS_COMMAND, this.getNames()[0], gains);
 		}
 
-		context.getPlayer().addCoins(gains);
+		context.getUser().addCoins(gains);
 		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 	}
 

@@ -85,7 +85,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 
 			EmbedBuilder embed = new EmbedBuilder()
-					.withAuthorName("Results (Use " + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel "
+					.withAuthorName("Results (Use " + Storage.getGuild(musicManager.getChannel().getGuild()).getSetting(Setting.PREFIX) + "cancel "
 							+ "to cancel the selection)")
 					.withAuthorIcon(musicManager.getDj().getAvatarURL())
 					.withColor(Config.BOT_COLOR)
@@ -152,7 +152,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return false;
 		}
 
-		String prefix = Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX).toString();
+		String prefix = (String) Storage.getGuild(musicManager.getChannel().getGuild()).getSetting(Setting.PREFIX);
 		if(message.getContent().equalsIgnoreCase(prefix + "cancel")) {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
 			this.stopWaiting();

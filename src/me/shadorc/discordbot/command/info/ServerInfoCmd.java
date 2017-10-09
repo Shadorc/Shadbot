@@ -39,7 +39,7 @@ public class ServerInfoCmd extends AbstractCommand {
 		}
 
 		IGuild guild = context.getGuild();
-		List<Long> allowedChannels = Utils.convertToLongList((JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS));
+		List<Long> allowedChannels = Utils.convertToLongList((JSONArray) Storage.getGuild(guild).getSetting(Setting.ALLOWED_CHANNELS));
 
 		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.setLenient(true)
@@ -54,8 +54,8 @@ public class ServerInfoCmd extends AbstractCommand {
 				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
 				.appendField("Settings",
 						"**Prefix:** " + context.getPrefix()
-								+ "\n**Default volume:** " + Storage.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
-								+ "\n**Allowed channels:** " + (allowedChannels.isEmpty() ? "All" : "\n"
+								+ "\n**Default volume:** " + Storage.getGuild(guild).getSetting(Setting.DEFAULT_VOLUME) + "%"
+								+ "\n**Allowed channels:** " + (allowedChannels == null ? "All" : "\n"
 										+ StringUtils.formatList(
 												allowedChannels,
 												channelID -> "\t" + guild.getChannelByID(channelID).getName(),

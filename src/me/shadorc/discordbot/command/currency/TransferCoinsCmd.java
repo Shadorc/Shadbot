@@ -41,8 +41,8 @@ public class TransferCoinsCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		DBUser receiverPlayer = Storage.getPlayer(context.getGuild(), context.getMessage().getMentions().get(0));
-		DBUser senderPlayer = context.getPlayer();
+		DBUser receiverPlayer = Storage.getUser(context.getGuild(), context.getMessage().getMentions().get(0));
+		DBUser senderPlayer = context.getUser();
 		if(senderPlayer.equals(receiverPlayer)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You cannot transfer coins to yourself.", context.getChannel());
 			return;

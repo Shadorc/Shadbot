@@ -32,10 +32,10 @@ public class CoinsCmd extends AbstractCommand {
 		}
 
 		if(context.getMessage().getMentions().isEmpty()) {
-			BotUtils.sendMessage(Emoji.PURSE + " You have **" + StringUtils.pluralOf(context.getPlayer().getCoins(), "coin") + "**.", context.getChannel());
+			BotUtils.sendMessage(Emoji.PURSE + " You have **" + StringUtils.pluralOf(context.getUser().getCoins(), "coin") + "**.", context.getChannel());
 		} else {
 			IUser user = context.getMessage().getMentions().get(0);
-			int coins = Storage.getPlayer(context.getGuild(), user).getCoins();
+			int coins = Storage.getUser(context.getGuild(), user).getCoins();
 			BotUtils.sendMessage(Emoji.PURSE + " " + user.getName() + " has **" + StringUtils.pluralOf(coins, "coin") + "**.", context.getChannel());
 		}
 	}

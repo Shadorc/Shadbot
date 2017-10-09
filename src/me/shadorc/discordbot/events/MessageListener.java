@@ -41,7 +41,7 @@ public class MessageListener {
 			return;
 		}
 
-		String prefix = Storage.getSetting(event.getGuild(), Setting.PREFIX).toString();
+		String prefix = (String) Storage.getGuild(event.getGuild()).getSetting(Setting.PREFIX);
 		if(message.getContent().startsWith(prefix)) {
 			CommandManager.manage(event);
 		}

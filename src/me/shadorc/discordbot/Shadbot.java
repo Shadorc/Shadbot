@@ -16,6 +16,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
+import me.shadorc.discordbot.data.DBGuild;
 import me.shadorc.discordbot.events.ReadyListener;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -67,6 +68,11 @@ public class Shadbot {
 	@SuppressWarnings("PMD.AvoidPrintStackTrace")
 	private static void convertData() {
 		File dataFile = new File("data.json");
+
+		if(!dataFile.exists()) {
+			return;
+		}
+
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(dataFile.toURI().toURL().openStream()));
 			JSONObject newMainObj = new JSONObject();
@@ -74,19 +80,19 @@ public class Shadbot {
 			for(Object key : mainObj.keySet()) {
 				String guildID = key.toString();
 				JSONObject newGuildObj = new JSONObject();
-				newGuildObj.put("users", new JSONArray());
-				newGuildObj.put("settings", new JSONObject());
+				newGuildObj.put(DBGuild.USERS, new JSONArray());
+				newGuildObj.put(DBGuild.SETTINGS, new JSONObject());
 				JSONObject guildObj = mainObj.getJSONObject(guildID);
 				for(Object obj : guildObj.keySet()) {
 					// User
 					if(StringUtils.isPositiveLong(obj.toString())) {
-						newGuildObj.getJSONArray("users").put(new JSONObject()
+						newGuildObj.getJSONArray(DBGuild.USERS).put(new JSONObject()
 								.put("userID", obj)
 								.put("coins", guildObj.getJSONObject(obj.toString()).getInt("coins")));
 					}
 					// Setting
 					else {
-						newGuildObj.getJSONObject("settings").put(obj.toString(), guildObj.get(obj.toString()));
+						newGuildObj.getJSONObject(DBGuild.SETTINGS).put(obj.toString(), guildObj.get(obj.toString()));
 					}
 				}
 				newMainObj.put(guildID, newGuildObj);
@@ -109,14 +115,19 @@ public class Shadbot {
 	@SuppressWarnings({ "PMD.AvoidPrintStackTrace", "PMD.SystemPrintln" })
 	private static void cleanData() {
 		File dataFile = new File("data.json");
+
+		if(!dataFile.exists()) {
+			return;
+		}
+
 		try {
 			JSONObject mainObj = new JSONObject(new JSONTokener(dataFile.toURI().toURL().openStream()));
 
 			List<String> toDeleteList = new ArrayList<>();
 			for(Object key : mainObj.keySet()) {
 				JSONObject guildObj = mainObj.getJSONObject(key.toString());
-				JSONObject settingsObj = guildObj.getJSONObject("settings");
-				JSONArray usersArray = guildObj.getJSONArray("users");
+				JSONObject settingsObj = guildObj.getJSONObject(DBGuild.SETTINGS);
+				JSONArray usersArray = guildObj.getJSONArray(DBGuild.USERS);
 				if(usersArray.length() != 0 || settingsObj.keySet().size() != 3) {
 					continue;
 				}

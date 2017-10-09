@@ -29,7 +29,7 @@ public class PrefixSettingCmd implements SettingCmd {
 			return;
 		}
 
-		Storage.saveSetting(context.getGuild(), Setting.PREFIX, arg);
+		Storage.getGuild(context.getGuild()).setSetting(Setting.PREFIX, arg);
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " '" + arg + "' is now the prefix for this server.", context.getChannel());
 	}
 

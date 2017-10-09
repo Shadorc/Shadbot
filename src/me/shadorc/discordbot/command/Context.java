@@ -18,22 +18,17 @@ public class Context {
 	private final String command;
 	private final String arg;
 
-	private DBUser player;
-
 	public Context(MessageReceivedEvent event) {
 		this.event = event;
-		this.prefix = Storage.getSetting(event.getGuild(), Setting.PREFIX).toString();
+		this.prefix = (String) Storage.getGuild(event.getGuild()).getSetting(Setting.PREFIX);
 
 		String[] splitMessage = event.getMessage().getContent().split(" ", 2);
 		this.command = splitMessage[0].replaceFirst(prefix, "").toLowerCase().trim();
 		this.arg = splitMessage.length > 1 ? splitMessage[1].trim() : "";
 	}
 
-	public DBUser getPlayer() {
-		if(player == null) {
-			player = Storage.getPlayer(this.getGuild(), this.getAuthor());
-		}
-		return player;
+	public DBUser getUser() {
+		return Storage.getUser(this.getGuild(), this.getAuthor());
 	}
 
 	public IUser getAuthor() {

@@ -12,10 +12,16 @@ public class DBUser {
 
 	private int coins;
 
-	public DBUser(IGuild guild, IUser user, JSONObject userObj) {
+	public DBUser(IGuild guild, JSONObject userObj) {
 		this.guild = guild;
-		this.user = user;
-		this.coins = userObj == null ? 0 : userObj.getInt("coins");
+		this.user = guild.getUserByID(userObj.getLong("userID"));
+		this.coins = userObj.getInt("coins");
+	}
+
+	public DBUser(IGuild guild, long userID) {
+		this.guild = guild;
+		this.user = guild.getUserByID(userID);
+		this.coins = 0;
 	}
 
 	public IGuild getGuild() {
@@ -32,7 +38,7 @@ public class DBUser {
 
 	public void addCoins(int gains) {
 		this.coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) (this.coins + gains)));
-		this.save();
+		Storage.saveUser(this);
 	}
 
 	public JSONObject toJSON() {
@@ -40,9 +46,5 @@ public class DBUser {
 		userJson.put("userID", user.getLongID());
 		userJson.put("coins", coins);
 		return userJson;
-	}
-
-	private void save() {
-		Storage.savePlayer(this);
 	}
 }
