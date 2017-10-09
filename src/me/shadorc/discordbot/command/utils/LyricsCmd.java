@@ -41,7 +41,16 @@ public class LyricsCmd extends AbstractCommand {
 		}
 
 		String artist = args[0].trim();
+		if(artist.isEmpty()) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must specify an artist.", context.getChannel());
+			return;
+		}
+
 		String title = args[1].trim();
+		if(title.isEmpty()) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must specify a title.", context.getChannel());
+			return;
+		}
 
 		try {
 			String xmlString = NetUtils.getDoc("http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?"
