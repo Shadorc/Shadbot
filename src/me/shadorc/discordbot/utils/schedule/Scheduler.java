@@ -88,7 +88,7 @@ public class Scheduler {
 	protected static void waitAndSend(ScheduledMessage message) {
 		int count = 0;
 		boolean success = false;
-		while(!success && count < 3) {
+		while(!success && count < 2) {
 			Utils.sleep(TimeUnit.SECONDS.toMillis(Config.DEFAULT_RETRY_TIME));
 			LogUtils.info("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Sending pending message...");
 			success = message.send() != null;
