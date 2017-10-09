@@ -118,13 +118,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	@Override
 	public void loadFailed(FriendlyException err) {
 		String errMessage = Jsoup.parse(err.getMessage().replace("Watch on YouTube", "")).text().trim();
-		if(err.severity.equals(FriendlyException.Severity.FAULT)) {
-			LogUtils.warn("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} "
-					+ "Load failed, Shadbot might be able to continue playing: " + errMessage);
-		} else {
-			BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
-			LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Load failed: " + errMessage);
-		}
+		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
+		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Load failed: " + errMessage);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
