@@ -1,5 +1,7 @@
 package me.shadorc.discordbot.command;
 
+import java.util.regex.Pattern;
+
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.DBUser;
 import me.shadorc.discordbot.data.Setting;
@@ -23,7 +25,7 @@ public class Context {
 		this.prefix = (String) Storage.getGuild(event.getGuild()).getSetting(Setting.PREFIX);
 
 		String[] splitMessage = event.getMessage().getContent().split(" ", 2);
-		this.command = splitMessage[0].replaceFirst(prefix, "").toLowerCase().trim();
+		this.command = splitMessage[0].replaceFirst(Pattern.quote(prefix), "").toLowerCase().trim();
 		this.arg = splitMessage.length > 1 ? splitMessage[1].trim() : "";
 	}
 
