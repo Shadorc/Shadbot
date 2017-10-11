@@ -16,23 +16,40 @@ public class TrackScheduler {
 	private final AudioPlayer audioPlayer;
 	private final BlockingQueue<AudioTrack> queue;
 
-	private boolean isRepeating;
+	private RepeatMode repeatMode;
+	private AudioTrack currentTrack;
+
+	public enum RepeatMode {
+		NONE, SONG, PLAYLIST;
+	}
 
 	public TrackScheduler(AudioPlayer audioPlayer, int defaultVolume) {
 		this.audioPlayer = audioPlayer;
 		this.queue = new LinkedBlockingQueue<>();
-		this.isRepeating = false;
+		this.repeatMode = RepeatMode.NONE;
 		this.setVolume(defaultVolume);
 	}
 
 	public void queue(AudioTrack track) {
-		if(!audioPlayer.startTrack(track, true)) {
+		if(audioPlayer.startTrack(track, true)) {
+			this.currentTrack = track;
+		} else {
 			queue.offer(track);
 		}
 	}
 
 	public boolean nextTrack() {
-		return audioPlayer.startTrack(queue.poll(), false);
+		switch (repeatMode) {
+			case PLAYLIST:
+				queue.offer(currentTrack.makeClone());
+			case NONE:
+				this.currentTrack = queue.poll();
+				return audioPlayer.startTrack(currentTrack, false);
+			case SONG:
+				audioPlayer.playTrack(currentTrack.makeClone());
+				break;
+		}
+		return true;
 	}
 
 	public void skipTo(int num) {
@@ -41,6 +58,7 @@ public class TrackScheduler {
 			track = queue.poll();
 		}
 		audioPlayer.playTrack(track.makeClone());
+		this.currentTrack = track;
 	}
 
 	public long changePosition(long time) {
@@ -77,14 +95,14 @@ public class TrackScheduler {
 
 	public void setVolume(int volume) {
 		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
+	public RepeatMode getRepeatMode() {
+		return repeatMode;
 	}
 
-	public void setRepeat(boolean enabled) {
-		this.isRepeating = enabled;
 	}
 
-	public boolean isRepeating() {
-		return isRepeating;
+	public void setRepeatMode(RepeatMode repeatMode) {
+		this.repeatMode = repeatMode;
 	}
 
 	public boolean isPlaying() {

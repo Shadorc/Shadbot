@@ -8,6 +8,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.music.TrackScheduler;
+import me.shadorc.discordbot.music.TrackScheduler.RepeatMode;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -37,19 +38,41 @@ public class RepeatCmd extends AbstractCommand {
 			return;
 		}
 
+		if(context.hasArg() && !context.getArg().equalsIgnoreCase(RepeatMode.PLAYLIST.toString())) {
+			throw new MissingArgumentException();
+		}
+
 		TrackScheduler scheduler = musicManager.getScheduler();
-		scheduler.setRepeat(!scheduler.isRepeating());
-		if(scheduler.isRepeating()) {
-			BotUtils.sendMessage(Emoji.REPEAT + " Repetition enabled.", context.getChannel());
-		} else {
-			BotUtils.sendMessage(Emoji.PLAY + " Repetition disabled.", context.getChannel());
+
+		if(!context.hasArg()) {
+			if(scheduler.getRepeatMode() == RepeatMode.SONG) {
+				scheduler.setRepeatMode(RepeatMode.NONE);
+				BotUtils.sendMessage(Emoji.PLAY + " Repetition disabled.", context.getChannel());
+			} else {
+				scheduler.setRepeatMode(RepeatMode.SONG);
+				BotUtils.sendMessage(Emoji.REPEAT + " Repetition enabled.", context.getChannel());
+			}
+			return;
+		}
+
+		if(context.getArg().equalsIgnoreCase(RepeatMode.PLAYLIST.toString())) {
+			if(scheduler.getRepeatMode() == RepeatMode.PLAYLIST) {
+				scheduler.setRepeatMode(RepeatMode.NONE);
+				BotUtils.sendMessage(Emoji.PLAY + " Playlist repetition disabled.", context.getChannel());
+			} else {
+				scheduler.setRepeatMode(RepeatMode.PLAYLIST);
+				BotUtils.sendMessage(Emoji.REPEAT + " Playlist repetition enabled.", context.getChannel());
+			}
 		}
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Enable/disable music repetition.**");
+				.appendDescription("**Enable/disable song/playlist repetition.**")
+				.appendField("Usage", "`" + context.getPrefix() + "repeat [playlist]`", false)
+				.appendField("Argument", "**playlist** - [OPTIONAL] repeat the current playlist", false)
+				.appendField("Info", "Reuse this command to toggle repetition", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

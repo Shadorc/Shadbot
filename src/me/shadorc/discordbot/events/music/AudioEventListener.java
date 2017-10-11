@@ -35,10 +35,7 @@ public class AudioEventListener extends AudioEventAdapter {
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 		if(endReason.mayStartNext) {
 			errorCount = 0; // Everything seems to be fine, reset error count.
-
-			if(musicManager.getScheduler().isRepeating()) {
-				musicManager.getScheduler().queue(track.makeClone());
-			} else if(!musicManager.getScheduler().nextTrack()) {
+			if(!musicManager.getScheduler().nextTrack()) {
 				musicManager.end();
 			}
 		}
