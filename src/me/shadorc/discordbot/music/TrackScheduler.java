@@ -9,8 +9,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.discordbot.utils.StringUtils;
-
 public class TrackScheduler {
 
 	private final AudioPlayer audioPlayer;
@@ -81,10 +79,6 @@ public class TrackScheduler {
 		queue.clear();
 	}
 
-	public String getPlayingTrackName() {
-		return StringUtils.formatTrackName(audioPlayer.getPlayingTrack().getInfo());
-	}
-
 	public BlockingQueue<AudioTrack> getPlaylist() {
 		return queue;
 	}
@@ -93,12 +87,12 @@ public class TrackScheduler {
 		return audioPlayer;
 	}
 
-	public void setVolume(int volume) {
-		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
 	public RepeatMode getRepeatMode() {
 		return repeatMode;
 	}
 
+	public void setVolume(int volume) {
+		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
 	}
 
 	public void setRepeatMode(RepeatMode repeatMode) {

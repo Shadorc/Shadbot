@@ -8,6 +8,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -36,7 +37,9 @@ public class NameCmd extends AbstractCommand {
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **" + musicManager.getScheduler().getPlayingTrackName() + "**", context.getChannel());
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **"
+				+ StringUtils.formatTrackName(musicManager.getScheduler().getAudioPlayer().getPlayingTrack().getInfo())
+				+ "**", context.getChannel());
 	}
 
 	@Override
