@@ -3,8 +3,9 @@ package me.shadorc.discordbot.music;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -12,7 +13,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 public class TrackScheduler {
 
 	private final AudioPlayer audioPlayer;
-	private final BlockingQueue<AudioTrack> queue;
+	private final BlockingDeque<AudioTrack> queue;
 
 	private RepeatMode repeatMode;
 	private AudioTrack currentTrack;
@@ -23,16 +24,18 @@ public class TrackScheduler {
 
 	public TrackScheduler(AudioPlayer audioPlayer, int defaultVolume) {
 		this.audioPlayer = audioPlayer;
-		this.queue = new LinkedBlockingQueue<>();
+		this.queue = new LinkedBlockingDeque<>();
 		this.repeatMode = RepeatMode.NONE;
 		this.setVolume(defaultVolume);
 	}
 
-	public void queue(AudioTrack track) {
+	public void queue(AudioTrack track, boolean first) {
 		if(audioPlayer.startTrack(track, true)) {
 			this.currentTrack = track;
+		} else if(first) {
+			queue.offerFirst(track);
 		} else {
-			queue.offer(track);
+			queue.offerLast(track);
 		}
 	}
 

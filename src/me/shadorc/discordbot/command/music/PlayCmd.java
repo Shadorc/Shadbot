@@ -26,7 +26,7 @@ public class PlayCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public PlayCmd() {
-		super(CommandCategory.MUSIC, Role.USER, "play", "add", "queue");
+		super(CommandCategory.MUSIC, Role.USER, "play", "add", "queue", "playfirst", "addfirst", "queuefirst");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
@@ -85,7 +85,7 @@ public class PlayCmd extends AbstractCommand {
 
 		musicManager.setChannel(context.getChannel());
 
-		AudioLoadResultListener resultListener = new AudioLoadResultListener(musicManager, context.getAuthor(), userVoiceChannel, identifier);
+		AudioLoadResultListener resultListener = new AudioLoadResultListener(musicManager, context.getAuthor(), userVoiceChannel, identifier, context.getCommand().endsWith("first"));
 		GuildMusicManager.PLAYER_MANAGER.loadItemOrdered(musicManager, identifier, resultListener);
 	}
 
@@ -93,8 +93,11 @@ public class PlayCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play the music(s) from the url, search terms or playlist.**")
-				.appendField("Usage", "`" + context.getPrefix() + "play [soundcloud] <url>`", false)
-				.appendField("Argument", "**soundcloud** - [OPTIONAL] search on SoundCloud instead of YouTube", false);
+				.appendField("Usage", "`" + context.getPrefix() + "play[first] [soundcloud] <url>`", false)
+				.appendField("Argument", "**soundcloud** - [OPTIONAL] search on SoundCloud instead of YouTube"
+						+ "\n**first** - [OPTIONAL] add the song at the top of the playlist", false)
+				.appendField("Example", "`" + context.getPrefix() + "playfirst soundcloud At Doom's gate`"
+						+ "\n`" + context.getPrefix() + "play E1M8`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

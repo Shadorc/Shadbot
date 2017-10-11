@@ -39,15 +39,17 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private final IUser userDj;
 	private final IVoiceChannel userVoiceChannel;
 	private final String identifier;
+	private final boolean putFirst;
 
 	private List<AudioTrack> resultsTracks;
 	private Timer cancelTimer;
 
-	public AudioLoadResultListener(GuildMusicManager musicManager, IUser userDj, IVoiceChannel userVoiceChannel, String identifier) {
+	public AudioLoadResultListener(GuildMusicManager musicManager, IUser userDj, IVoiceChannel userVoiceChannel, String identifier, boolean putFirst) {
 		this.musicManager = musicManager;
 		this.userDj = userDj;
 		this.userVoiceChannel = userVoiceChannel;
 		this.identifier = identifier;
+		this.putFirst = putFirst;
 	}
 
 	@Override
@@ -57,7 +59,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **"
 					+ StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
 		}
-		musicManager.getScheduler().queue(track);
+		musicManager.getScheduler().queue(track, putFirst);
 	}
 
 	@Override
@@ -109,7 +111,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		musicManager.joinVoiceChannel(userVoiceChannel, false);
 
-		tracks.stream().limit(Config.MAX_PLAYLIST_SIZE).forEach(track -> musicManager.getScheduler().queue(track));
+		tracks.stream().limit(Config.MAX_PLAYLIST_SIZE).forEach(track -> musicManager.getScheduler().queue(track, putFirst));
 
 		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
 				+ " musics have been added to the playlist.", musicManager.getChannel());
@@ -186,7 +188,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo())
 						+ "** has been added to the playlist.", musicManager.getChannel());
 			}
-			musicManager.getScheduler().queue(track);
+			musicManager.getScheduler().queue(track, putFirst);
 		}
 
 		this.stopWaiting();
