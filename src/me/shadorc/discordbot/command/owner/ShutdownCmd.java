@@ -31,7 +31,7 @@ public class ShutdownCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String[] splitArgs = context.getArg().split(" ", 2);
+		String[] splitArgs = StringUtils.getSplittedArg(context.getArg());
 		if(splitArgs.length != 2) {
 			throw new MissingArgumentException();
 		}
