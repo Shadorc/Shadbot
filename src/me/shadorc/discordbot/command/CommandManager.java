@@ -148,7 +148,6 @@ public class CommandManager {
 		AbstractCommand command = COMMANDS_MAP.get(context.getCommand());
 
 		if(command == null) {
-			Stats.increment(StatCategory.UNKNOWN_COMMAND, context.getCommand());
 			return;
 		}
 

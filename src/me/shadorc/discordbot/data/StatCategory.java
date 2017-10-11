@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.data;
 
 public enum StatCategory {
-	UNKNOWN_COMMAND("unknown_command"),
 	LIMITED_COMMAND("limited_command"),
 	MONEY_GAINS_COMMAND("money_gains_command"),
 	MONEY_LOSSES_COMMAND("money_losses_command"),
