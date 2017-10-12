@@ -13,6 +13,7 @@ import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -78,8 +79,7 @@ public class PlayCmd extends AbstractCommand {
 		}
 
 		if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You've reached the maximum number of tracks in the playlist (Max: "
-					+ Config.MAX_PLAYLIST_SIZE + ").", context.getChannel());
+			BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, context.getChannel());
 			return;
 		}
 

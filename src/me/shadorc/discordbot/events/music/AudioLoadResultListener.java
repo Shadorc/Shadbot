@@ -22,6 +22,7 @@ import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
@@ -111,10 +112,17 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		musicManager.joinVoiceChannel(userVoiceChannel, false);
 
-		tracks.stream().limit(Config.MAX_PLAYLIST_SIZE).forEach(track -> musicManager.getScheduler().queue(track, putFirst));
+		int count = 0;
+		for(AudioTrack track : tracks) {
+			musicManager.getScheduler().queue(track, putFirst);
+			count++;
+			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
+				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, musicManager.getChannel());
+				break;
+			}
+		}
 
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + musicManager.getScheduler().getPlaylist().size()
-				+ " musics have been added to the playlist.", musicManager.getChannel());
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + count + " musics have been added to the playlist.", musicManager.getChannel());
 	}
 
 	@Override
@@ -189,6 +197,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 						+ "** has been added to the playlist.", musicManager.getChannel());
 			}
 			musicManager.getScheduler().queue(track, putFirst);
+			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
+				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, musicManager.getChannel());
+				break;
+			}
 		}
 
 		this.stopWaiting();
