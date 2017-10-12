@@ -9,6 +9,7 @@ import java.net.URLConnection;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -32,17 +33,25 @@ public class NetUtils {
 
 	/**
 	 * @param url - the String representing URL
-	 * @return the body as a String from url
+	 * @return the response from url
 	 * @throws IOException
 	 */
-	public static String getBody(String url) throws IOException {
+	public static Response getResponse(String url) throws IOException {
 		return Jsoup.connect(url)
 				.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.91 Safari/537.36 Vivaldi/1.92.917.35")
 				.timeout(Config.DEFAULT_TIMEOUT)
 				.ignoreContentType(true)
 				.ignoreHttpErrors(true)
-				.execute()
-				.body();
+				.execute();
+	}
+
+	/**
+	 * @param url - the String representing URL
+	 * @return the body as a String from url
+	 * @throws IOException
+	 */
+	public static String getBody(String url) throws IOException {
+		return NetUtils.getResponse(url).body();
 	}
 
 	/**
