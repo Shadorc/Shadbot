@@ -22,7 +22,7 @@ public class Config {
 
 	public static final int INDENT_FACTOR = 2;
 
-	public static final int MAX_PLAYLIST_SIZE = 150;
+	public static final int MAX_PLAYLIST_SIZE = 200;
 	public static final int MAX_COINS = Integer.MAX_VALUE;
 
 	public static final int DEFAULT_TIMEOUT = 7500;
