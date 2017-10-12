@@ -10,6 +10,7 @@ import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.music.TrackScheduler;
 import me.shadorc.discordbot.music.TrackScheduler.RepeatMode;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -34,7 +35,7 @@ public class RepeatCmd extends AbstractCommand {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {
-			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
 			return;
 		}
 

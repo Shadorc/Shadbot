@@ -8,6 +8,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -32,7 +33,7 @@ public class StopCmd extends AbstractCommand {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null) {
-			BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
+			BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
 			return;
 		}
 
