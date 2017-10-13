@@ -83,8 +83,7 @@ public class ChannelSettingCmd implements SettingCmd {
 
 	@Override
 	public String getDescription() {
-		return "Allow Shadbot to only post messages in the mentioned channels."
-				+ "\nBy default all channels are allowed.";
+		return "Allow Shadbot to post messages only in the mentioned channels.";
 	}
 
 }

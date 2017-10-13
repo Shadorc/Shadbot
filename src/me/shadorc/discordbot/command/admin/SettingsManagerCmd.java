@@ -68,13 +68,13 @@ public class SettingsManagerCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.withThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
-				.appendDescription("**Change Shadbot's settings for this server.**");
+				.appendDescription("**Change Shadbot's settings for this server.**"
+						+ "\n\n__**Usage:**__ `" + context.getPrefix() + "settings <name> <args>`"
+						+ "\n__**Additional help:**__ `" + context.getPrefix() + "settings <name> help`");
 
 		for(String subCmd : SUBSETTINGS_MAP.keySet()) {
 			builder.appendField("Name: " + subCmd, SUBSETTINGS_MAP.get(subCmd).getDescription(), false);
 		}
-
-		builder.appendField("Additional help", "`" + context.getPrefix() + "settings <name> help`", false);
 
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
