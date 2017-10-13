@@ -11,4 +11,7 @@ public class TextUtils {
 	public static final String NO_PLAYING_MUSIC =
 			Emoji.MUTE + " No currently playing music.";
 
+	public static final String NOT_ENOUGH_COINS =
+			Emoji.BANK + " You don't have enough coins. You can get some by playing RPS or Trivia.";
+
 }

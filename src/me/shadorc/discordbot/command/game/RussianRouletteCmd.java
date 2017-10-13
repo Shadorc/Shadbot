@@ -11,6 +11,7 @@ import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -48,7 +49,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 		int bet = Integer.parseInt(betStr);
 		if(context.getUser().getCoins() < bet) {
-			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
+			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
 			return;
 		}
 

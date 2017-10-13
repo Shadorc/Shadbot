@@ -18,6 +18,7 @@ import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -69,7 +70,7 @@ public class DiceCmd extends AbstractCommand {
 
 		int bet = Integer.parseInt(betStr);
 		if(context.getUser().getCoins() < bet) {
-			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins for this.", context.getChannel());
+			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
 			return;
 		}
 
@@ -90,7 +91,7 @@ public class DiceCmd extends AbstractCommand {
 	private void joinGame(Context context) {
 		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel());
 		if(context.getUser().getCoins() < diceManager.getBet()) {
-			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to join this game.", context.getChannel());
+			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
 			return;
 		}
 

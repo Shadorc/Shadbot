@@ -11,6 +11,7 @@ import me.shadorc.discordbot.data.DBUser;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -56,7 +57,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 
 		int coins = Integer.parseInt(coinsStr);
 		if(senderPlayer.getCoins() < coins) {
-			BotUtils.sendMessage(Emoji.BANK + " You don't have enough coins to do this.", context.getChannel());
+			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
 			return;
 		}
 
