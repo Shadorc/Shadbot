@@ -161,7 +161,7 @@ public class TriviaCmd extends AbstractCommand {
 				alreadyAnswered.add(author);
 
 			} else if(goodAnswer) {
-				int gains = MIN_GAINS + (int) Math.ceil((LIMITED_TIME - (System.currentTimeMillis() - startTime) / 1000) * (MAX_BONUS / LIMITED_TIME));
+				int gains = MIN_GAINS + (int) Math.ceil((LIMITED_TIME - (System.currentTimeMillis() - startTime) / 1000) * (float) (MAX_BONUS / LIMITED_TIME));
 				BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + gains + " coins**.", channel);
 				Storage.getUser(message.getGuild(), author).addCoins(gains);
 				Stats.increment(StatCategory.MONEY_GAINS_COMMAND, TriviaCmd.this.getNames()[0], gains);
