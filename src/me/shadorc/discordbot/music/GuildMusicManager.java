@@ -107,6 +107,7 @@ public class GuildMusicManager {
 
 	public void delete() {
 		this.cancelLeave();
+		scheduler.clearPlaylist();
 		audioPlayer.destroy();
 		MUSIC_MANAGERS.remove(guild);
 	}
