@@ -38,6 +38,9 @@ public class ThisDayCmd extends AbstractCommand {
 
 		try {
 			Document doc = NetUtils.getDoc(HOME_URL);
+
+			String date = doc.getElementsByClass("date-large").first().attr("datetime");
+
 			Elements eventsEl = doc.getElementsByClass("event-list event-list--with-advert").first().getElementsByClass("event-list__item");
 			StringBuilder strBuilder = new StringBuilder();
 			for(Element eventEl : eventsEl) {
@@ -50,7 +53,7 @@ public class ThisDayCmd extends AbstractCommand {
 			}
 
 			EmbedBuilder embed = Utils.getDefaultEmbed()
-					.withAuthorName("On This Day")
+					.withAuthorName("On This Day (" + date + ")")
 					.withUrl(HOME_URL)
 					.withThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
 					.appendDescription(strBuilder.toString());
