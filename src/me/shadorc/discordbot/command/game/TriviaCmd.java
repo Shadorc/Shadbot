@@ -17,8 +17,8 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
-import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.StatCategory;
+import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
@@ -38,7 +38,9 @@ import sx.blah.discord.util.EmbedBuilder;
 public class TriviaCmd extends AbstractCommand {
 
 	protected static final ConcurrentHashMap<IChannel, TriviaManager> CHANNELS_TRIVIA = new ConcurrentHashMap<>();
-	protected static final int GAINS = 250;
+	protected static final int MIN_GAINS = 100;
+	protected static final int MAX_BONUS = 200;
+	protected static final int LIMITED_TIME = 30;
 
 	private final RateLimiter rateLimiter;
 
@@ -74,7 +76,7 @@ public class TriviaCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Start a Trivia game in which everyone can participate.**")
-				.appendField("Gains", "The winner gets **" + GAINS + " coins**.", false);
+				.appendField("Gains", "The winner gets **" + MIN_GAINS + " coins** plus a bonus depending on his speed to answer.", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
@@ -84,13 +86,14 @@ public class TriviaCmd extends AbstractCommand {
 		private final List<IUser> alreadyAnswered;
 		private final Timer timer;
 
+		private long startTime;
 		private String correctAnswer;
 		private List<String> incorrectAnswers;
 
 		protected TriviaManager(IChannel channel) {
 			this.channel = channel;
 			this.alreadyAnswered = new ArrayList<>();
-			this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(30), event -> {
+			this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(LIMITED_TIME), event -> {
 				BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the good answer was **" + correctAnswer + "**.", channel);
 				this.stop();
 			});
@@ -127,13 +130,14 @@ public class TriviaCmd extends AbstractCommand {
 					.appendField("Category", "`" + category + "`", true)
 					.appendField("Type", "`" + type + "`", true)
 					.appendField("Difficulty", "`" + difficulty + "`", true)
-					.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to answer.");
+					.withFooterText("You have " + LIMITED_TIME + " seconds to answer.");
 
 			BotUtils.sendMessage(builder.build(), channel);
 
 			MessageManager.addListener(channel, this);
 
 			this.correctAnswer = Jsoup.parse(correctAnswer).text();
+			this.startTime = System.currentTimeMillis();
 			this.timer.start();
 		}
 
@@ -157,9 +161,10 @@ public class TriviaCmd extends AbstractCommand {
 				alreadyAnswered.add(author);
 
 			} else if(goodAnswer) {
-				BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + GAINS + " coins**.", channel);
-				Storage.getUser(message.getGuild(), author).addCoins(GAINS);
-				Stats.increment(StatCategory.MONEY_GAINS_COMMAND, TriviaCmd.this.getNames()[0], GAINS);
+				int gains = MIN_GAINS + (int) Math.ceil((LIMITED_TIME - (System.currentTimeMillis() - startTime) / 1000) * (MAX_BONUS / LIMITED_TIME));
+				BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + gains + " coins**.", channel);
+				Storage.getUser(message.getGuild(), author).addCoins(gains);
+				Stats.increment(StatCategory.MONEY_GAINS_COMMAND, TriviaCmd.this.getNames()[0], gains);
 				this.stop();
 			}
 			return true;
