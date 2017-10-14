@@ -30,18 +30,20 @@ public class ChannelSettingCmd implements SettingCmd {
 		}
 
 		DBGuild guild = Storage.getGuild(context.getGuild());
-		JSONArray allowedChannels = (JSONArray) guild.getSetting(Setting.ALLOWED_CHANNELS);
+		List<Long> allowedChannelsList = Utils.convertToLongList((JSONArray) guild.getSetting(Setting.ALLOWED_CHANNELS));
 
 		switch (arg.split(" ")[0]) {
 			case "add":
-				if(allowedChannels.length() == 0
+				if(allowedChannelsList.isEmpty()
 						&& mentionedChannels.stream().filter(channel -> channel.getLongID() == context.getChannel().getLongID()).count() == 0) {
 					BotUtils.sendMessage(Emoji.WARNING + " You did not mentioned this channel. "
 							+ "I will not reply until it's added to the list of allowed channels.", context.getChannel());
 				}
 
 				for(IChannel channel : mentionedChannels) {
-					allowedChannels.put(channel.getLongID());
+					if(!allowedChannelsList.contains(channel.getLongID())) {
+						allowedChannelsList.add(channel.getLongID());
+					}
 				}
 
 				BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel "
@@ -50,11 +52,9 @@ public class ChannelSettingCmd implements SettingCmd {
 				break;
 
 			case "remove":
-				List<Long> newAllowedChannels = Utils.convertToLongList(allowedChannels);
 				for(IChannel channel : mentionedChannels) {
-					newAllowedChannels.remove(channel.getLongID());
+					allowedChannelsList.remove(channel.getLongID());
 				}
-				allowedChannels = new JSONArray(newAllowedChannels);
 
 				BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel "
 						+ StringUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
@@ -66,7 +66,7 @@ public class ChannelSettingCmd implements SettingCmd {
 						+ Setting.ALLOWED_CHANNELS.toString() + " help` to see help.", context.getChannel());
 				return;
 		}
-		guild.setSetting(Setting.ALLOWED_CHANNELS, allowedChannels);
+		guild.setSetting(Setting.ALLOWED_CHANNELS, new JSONArray(allowedChannelsList));
 	}
 
 	@Override
