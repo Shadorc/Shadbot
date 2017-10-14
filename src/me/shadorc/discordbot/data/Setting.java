@@ -1,14 +1,15 @@
 package me.shadorc.discordbot.data;
 
 public enum Setting {
+	AUTO_MESSAGE("auto_message", false),
+	NSFW("nsfw", false),
 	ALLOWED_CHANNELS("allowed_channels", true),
 	PREFIX("prefix", true),
 	DEFAULT_VOLUME("default_volume", true),
-	AUTO_MESSAGE("auto_message", false),
 	JOIN_MESSAGE("join_message", true),
 	LEAVE_MESSAGE("leave_message", true),
 	MESSAGE_CHANNEL_ID("message_channel_id", true),
-	NSFW("nsfw", false);
+	BLACKLIST("blacklist", true);
 
 	private final String key;
 	private final boolean isSaveable;

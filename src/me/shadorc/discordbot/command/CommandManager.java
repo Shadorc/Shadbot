@@ -153,6 +153,10 @@ public class CommandManager {
 			return;
 		}
 
+		if(!BotUtils.isCommandAllowed(context.getGuild(), command)) {
+			return;
+		}
+
 		Role authorRole = context.getAuthorRole();
 		if(command.getRole().equals(Role.OWNER) && !authorRole.equals(Role.OWNER)) {
 			return;

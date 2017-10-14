@@ -49,7 +49,9 @@ public class HelpCmd extends AbstractCommand {
 				.filter(cmdCat -> !cmdCat.equals(CommandCategory.HIDDEN))
 				.forEach(category -> builder.appendField(category.toString() + " Commands:",
 						CommandManager.getCommands().values().stream()
-								.filter(cmd -> cmd.getCategory().equals(category) && authorRole.getHierarchy() >= cmd.getRole().getHierarchy())
+								.filter(cmd -> cmd.getCategory().equals(category)
+										&& authorRole.getHierarchy() >= cmd.getRole().getHierarchy()
+										&& BotUtils.isCommandAllowed(context.getGuild(), cmd))
 								.distinct()
 								.map(cmd -> "`" + prefix + cmd.getNames()[0] + "`")
 								.collect(Collectors.joining(" ")), false));

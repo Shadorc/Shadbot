@@ -5,6 +5,7 @@ import java.util.List;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.Shadbot;
+import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.events.ShardListener;
@@ -99,6 +100,28 @@ public class BotUtils {
 		}
 
 		return Utils.convertToLongList(channelsArray).contains(channel.getLongID());
+	}
+
+	/**
+	 * @param guild - the guild
+	 * @param cmd - the command to check
+	 * @return true if Shadbot is allowed to use this command, false otherwise
+	 */
+	public static boolean isCommandAllowed(IGuild guild, AbstractCommand cmd) {
+		JSONArray blacklistArray = (JSONArray) Storage.getGuild(guild).getSetting(Setting.BLACKLIST);
+
+		if(blacklistArray.length() == 0) {
+			return true;
+		}
+
+		for(String blacklistName : Utils.convertToStringList(blacklistArray)) {
+			for(String cmdName : cmd.getNames()) {
+				if(blacklistName.equalsIgnoreCase(cmdName)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	/**

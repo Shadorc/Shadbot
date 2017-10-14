@@ -61,6 +61,7 @@ public class DBGuild {
 		if(settingObj == null) {
 			switch (setting) {
 				case ALLOWED_CHANNELS:
+				case BLACKLIST:
 					return new JSONArray();
 				case DEFAULT_VOLUME:
 					return Config.DEFAULT_VOLUME;
