@@ -1,9 +1,11 @@
 package me.shadorc.discordbot.command.admin.setting;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 
+import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DBGuild;
 import me.shadorc.discordbot.data.Setting;
@@ -35,14 +37,23 @@ public class BlacklistSettingCmd implements SettingCmd {
 		String arg2 = splitArgs[1];
 		switch (arg1) {
 			case "add":
+				List<String> commandsAdded = new ArrayList<>();
 				for(String cmdName : arg2.split(",")) {
+					if(CommandManager.getCommand(cmdName) == null) {
+						BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " \"" + cmdName + "\" doesn't exist.", context.getChannel());
+						continue;
+					}
 					if(!blacklist.contains(cmdName)) {
 						blacklist.add(cmdName);
+						commandsAdded.add(cmdName);
 					}
 				}
-				BotUtils.sendMessage(Emoji.CHECK_MARK + " \""
-						+ StringUtils.formatArray(arg2.split(","), cmd -> cmd.toString(), ", ")
-						+ "\" has been added to blacklist.", context.getChannel());
+
+				if(!commandsAdded.isEmpty()) {
+					BotUtils.sendMessage(Emoji.CHECK_MARK + " \""
+							+ StringUtils.formatList(commandsAdded, cmd -> cmd, ", ")
+							+ "\" has been added to blacklist.", context.getChannel());
+				}
 				break;
 
 			case "remove":
