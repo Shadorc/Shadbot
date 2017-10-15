@@ -31,9 +31,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class WallpaperCmd extends AbstractCommand {
 
-	private final static Wallhaven WALLHAVEN = new Wallhaven(Config.get(APIKey.WALLHAVEN_LOGIN), Config.get(APIKey.WALLHAVEN_PASSWORD));
-
 	private final RateLimiter rateLimiter;
+	private Wallhaven wallhaven;
 
 	public WallpaperCmd() {
 		super(CommandCategory.IMAGE, Role.USER, "wallpaper", "wp");
@@ -44,6 +43,10 @@ public class WallpaperCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		if(rateLimiter.isSpamming(context)) {
 			return;
+		}
+
+		if(wallhaven == null) {
+			wallhaven = new Wallhaven(Config.get(APIKey.WALLHAVEN_LOGIN), Config.get(APIKey.WALLHAVEN_PASSWORD));
 		}
 
 		SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
@@ -123,7 +126,7 @@ public class WallpaperCmd extends AbstractCommand {
 			queryBuilder.purity(Purity.SFW);
 		}
 
-		List<Wallpaper> wallpapers = WALLHAVEN.search(queryBuilder.pages(1).build());
+		List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
 		if(wallpapers.isEmpty()) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result found.", context.getChannel());
 			return;
