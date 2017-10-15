@@ -24,7 +24,7 @@ public class Scheduler {
 
 	public static void start() {
 		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(() -> NetUtils.postStats(), 0, TimeUnit.HOURS.toMillis(3), TimeUnit.MILLISECONDS);
+				.scheduleAtFixedRate(() -> NetUtils.postStats(), TimeUnit.MINUTES.toMillis(5), TimeUnit.HOURS.toMillis(3), TimeUnit.MILLISECONDS);
 
 		Executors.newSingleThreadScheduledExecutor()
 				.scheduleAtFixedRate(() -> Storage.save(), TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS);
