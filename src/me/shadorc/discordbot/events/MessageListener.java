@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.events;
 
 import me.shadorc.discordbot.command.CommandManager;
-import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.message.MessageManager;
@@ -17,11 +16,6 @@ public class MessageListener {
 
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
-		if(Config.VERSION.isBeta() && event.getChannel().getLongID() != Config.DEBUG_CHANNEL_ID
-				|| !Config.VERSION.isBeta() && event.getChannel().getLongID() == Config.DEBUG_CHANNEL_ID) {
-			return;
-		}
-
 		if(event.getAuthor().isBot()) {
 			return;
 		}

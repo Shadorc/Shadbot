@@ -68,9 +68,6 @@ public class NetUtils {
 	}
 
 	public static void postStats() {
-		if(Config.VERSION.isBeta()) {
-			return;
-		}
 		NetUtils.postStatsOn("https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN);
 		NetUtils.postStatsOn("https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN);
 	}
