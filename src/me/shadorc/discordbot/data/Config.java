@@ -3,7 +3,8 @@ package me.shadorc.discordbot.data;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +34,7 @@ public class Config {
 	public static final int DEFAULT_VOLUME = 10;
 
 	private static final File API_KEYS_FILE = new File("api_keys.json");
-	private static final ConcurrentHashMap<APIKey, String> API_KEYS_MAP = new ConcurrentHashMap<>();
+	private static final Map<APIKey, String> API_KEYS_MAP = new HashMap<>();
 
 	static {
 		if(!API_KEYS_FILE.exists()) {
