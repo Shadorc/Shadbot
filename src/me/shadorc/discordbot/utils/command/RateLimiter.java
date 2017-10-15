@@ -5,9 +5,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ConcurrentHashMap;
 
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.StatCategory;
+import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -33,7 +34,7 @@ public class RateLimiter {
 	public boolean isSpamming(Context context) {
 		if(this.isLimited(context.getGuild(), context.getAuthor())) {
 			if(!this.isWarned(context.getGuild(), context.getAuthor())) {
-				this.warn("Take it easy, don't spam :) You can use this command once every " + this.getTimeout() + " sec.", context);
+				this.warn(TextUtils.getSpamMessage() + " You can use this command once every " + this.getTimeout() + " sec.", context);
 			}
 			return true;
 		}
