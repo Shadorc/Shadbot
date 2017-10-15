@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.image;
 
+import java.awt.Dimension;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,21 +88,17 @@ public class WallpaperCmd extends AbstractCommand {
 					break;
 
 				case "ratio":
-					String[] ratioArray = value.split(value.contains("x") ? "x" : "\\*");
-					if(ratioArray.length != 2 || !StringUtils.isPositiveInt(ratioArray[0]) || !StringUtils.isPositiveInt(ratioArray[1])) {
-						invalidArgs.add(pair);
-						continue;
-					}
-					queryBuilder.ratios(new Ratio(Integer.parseInt(ratioArray[0]), Integer.parseInt(ratioArray[1])));
-					break;
-
 				case "resolution":
-					String[] resArray = value.split(value.contains("x") ? "x" : "\\*");
-					if(resArray.length != 2 || !StringUtils.isPositiveInt(resArray[0]) || !StringUtils.isPositiveInt(resArray[1])) {
+					Dimension dim = this.parseDimension(value);
+					if(dim == null) {
 						invalidArgs.add(pair);
 						continue;
 					}
-					queryBuilder.resolutions(new Resolution(Integer.parseInt(resArray[0]), Integer.parseInt(resArray[1])));
+					if("ratio".equals(name)) {
+						queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
+					} else {
+						queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
+					}
 					break;
 
 				case "keyword":
@@ -142,6 +139,14 @@ public class WallpaperCmd extends AbstractCommand {
 				.appendField("Tags", StringUtils.formatList(wallpaper.getTags(), tag -> "`" + tag.toString().replace("#", "") + "`", " "), false);
 
 		BotUtils.sendMessage(embed.build(), context.getChannel());
+	}
+
+	private Dimension parseDimension(String arg) {
+		String[] ratioArray = arg.split(arg.contains("x") ? "x" : "\\*");
+		if(ratioArray.length != 2 || !StringUtils.isPositiveInt(ratioArray[0]) || !StringUtils.isPositiveInt(ratioArray[1])) {
+			return null;
+		}
+		return new Dimension(Integer.parseInt(ratioArray[0]), Integer.parseInt(ratioArray[1]));
 	}
 
 	@Override
