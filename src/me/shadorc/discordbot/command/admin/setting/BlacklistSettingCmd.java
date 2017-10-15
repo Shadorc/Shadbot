@@ -7,7 +7,6 @@ import org.json.JSONArray;
 
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.data.DBGuild;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -30,8 +29,7 @@ public class BlacklistSettingCmd implements SettingCmd {
 			throw new MissingArgumentException();
 		}
 
-		DBGuild guild = Storage.getGuild(context.getGuild());
-		List<String> blacklist = Utils.convertToStringList((JSONArray) guild.getSetting(Setting.BLACKLIST));
+		List<String> blacklist = Utils.convertToStringList((JSONArray) Storage.getSetting(context.getGuild(), Setting.BLACKLIST));
 
 		String arg1 = splitArgs[0];
 		String arg2 = splitArgs[1];
@@ -71,7 +69,7 @@ public class BlacklistSettingCmd implements SettingCmd {
 						+ Setting.BLACKLIST.toString() + " help` to see help.", context.getChannel());
 				return;
 		}
-		guild.setSetting(Setting.BLACKLIST, new JSONArray(blacklist));
+		Storage.setSetting(context.getGuild(), Setting.BLACKLIST, new JSONArray(blacklist));
 	}
 
 	@Override

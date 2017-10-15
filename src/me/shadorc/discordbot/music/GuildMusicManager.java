@@ -40,7 +40,7 @@ public class GuildMusicManager {
 		this.guild = guild;
 		this.audioPlayer = manager.createPlayer();
 		this.audioProvider = new AudioProvider(audioPlayer);
-		this.scheduler = new TrackScheduler(audioPlayer, (int) Storage.getGuild(guild).getSetting(Setting.DEFAULT_VOLUME));
+		this.scheduler = new TrackScheduler(audioPlayer, (int) Storage.getSetting(guild, Setting.DEFAULT_VOLUME));
 		this.audioPlayer.addListener(new AudioEventListener(this));
 		this.leaveTimer = new Timer((int) TimeUnit.MINUTES.toMillis(1), event -> {
 			this.leaveVoiceChannel();

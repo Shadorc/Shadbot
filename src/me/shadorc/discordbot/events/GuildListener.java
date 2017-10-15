@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.events;
 
-import me.shadorc.discordbot.data.DBGuild;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -29,9 +28,8 @@ public class GuildListener {
 
 	@EventSubscriber
 	public void onUserJoinEvent(UserJoinEvent event) {
-		DBGuild guild = Storage.getGuild(event.getGuild());
-		Long messageChannelID = (Long) guild.getSetting(Setting.MESSAGE_CHANNEL_ID);
-		String joinMessage = (String) guild.getSetting(Setting.JOIN_MESSAGE);
+		Long messageChannelID = (Long) Storage.getSetting(event.getGuild(), Setting.MESSAGE_CHANNEL_ID);
+		String joinMessage = (String) Storage.getSetting(event.getGuild(), Setting.JOIN_MESSAGE);
 
 		if(messageChannelID == null || joinMessage == null) {
 			return;
@@ -47,9 +45,8 @@ public class GuildListener {
 
 	@EventSubscriber
 	public void onUserLeaveEvent(UserLeaveEvent event) {
-		DBGuild guild = Storage.getGuild(event.getGuild());
-		Long messageChannelID = (Long) guild.getSetting(Setting.MESSAGE_CHANNEL_ID);
-		String leaveMessage = (String) guild.getSetting(Setting.LEAVE_MESSAGE);
+		Long messageChannelID = (Long) Storage.getSetting(event.getGuild(), Setting.MESSAGE_CHANNEL_ID);
+		String leaveMessage = (String) Storage.getSetting(event.getGuild(), Setting.LEAVE_MESSAGE);
 
 		if(messageChannelID == null || leaveMessage == null) {
 			return;

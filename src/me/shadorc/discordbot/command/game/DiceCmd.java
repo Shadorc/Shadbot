@@ -12,8 +12,8 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
-import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.StatCategory;
+import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
@@ -69,7 +69,7 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		int bet = Integer.parseInt(betStr);
-		if(context.getUser().getCoins() < bet) {
+		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < bet) {
 			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
 			return;
 		}
@@ -90,7 +90,7 @@ public class DiceCmd extends AbstractCommand {
 
 	private void joinGame(Context context) {
 		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel());
-		if(context.getUser().getCoins() < diceManager.getBet()) {
+		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < diceManager.getBet()) {
 			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
 			return;
 		}
@@ -175,7 +175,7 @@ public class DiceCmd extends AbstractCommand {
 				IUser winner = numsPlayers.get(winningNum);
 				int gains = bet * (numsPlayers.size() + MULTIPLIER);
 				BotUtils.sendMessage(Emoji.DICE + " Congratulations **" + winner.getName() + "**, you win **" + gains + " coins** !", context.getChannel());
-				Storage.getUser(context.getGuild(), winner).addCoins(gains);
+				Storage.addCoins(context.getGuild(), winner, gains);
 				Stats.increment(StatCategory.MONEY_GAINS_COMMAND, DiceCmd.this.getNames()[0], gains);
 			}
 
@@ -187,7 +187,7 @@ public class DiceCmd extends AbstractCommand {
 			if(!losersList.isEmpty()) {
 				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
 				for(IUser loser : losersList) {
-					Storage.getUser(context.getGuild(), loser).addCoins(-bet);
+					Storage.addCoins(context.getGuild(), loser, -bet);
 					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, DiceCmd.this.getNames()[0], bet);
 					strBuilder.append("**" + loser.getName() + "**, ");
 				}

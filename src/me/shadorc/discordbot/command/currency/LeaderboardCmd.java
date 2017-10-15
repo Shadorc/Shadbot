@@ -4,11 +4,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
-import me.shadorc.discordbot.data.DBUser;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -32,23 +33,27 @@ public class LeaderboardCmd extends AbstractCommand {
 			return;
 		}
 
-		Map<IUser, Integer> usersCoin = new HashMap<>();
-		for(DBUser user : Storage.getGuild(context.getGuild()).getUsers()) {
-			int userCoin = user.getCoins();
+		Map<String, Integer> usersCoin = new HashMap<>();
+		JSONObject usersObj = Storage.getUsers(context.getGuild());
+		for(Object userID : usersObj.keySet()) {
+			int userCoin = usersObj.getJSONObject(userID.toString()).getInt(Storage.COINS);
 			if(userCoin > 0) {
-				usersCoin.put(user.getUser(), userCoin);
+				IUser user = context.getGuild().getUserByID(Long.parseLong(userID.toString()));
+				if(user != null) {
+					usersCoin.put(user.getName(), userCoin);
+				}
 			}
 		}
 		usersCoin = Utils.sortByValue(usersCoin);
 
 		int count = 0;
 		StringBuilder strBuilder = new StringBuilder();
-		for(IUser user : usersCoin.keySet()) {
+		for(String user : usersCoin.keySet()) {
 			if(count > 10) {
 				break;
 			}
 			count++;
-			strBuilder.append("\n" + count + ". **" + user.getName() + "** - " + usersCoin.get(user) + " coins");
+			strBuilder.append("\n" + count + ". **" + user + "** - " + usersCoin.get(user) + " coins");
 		}
 
 		if(count == 0) {

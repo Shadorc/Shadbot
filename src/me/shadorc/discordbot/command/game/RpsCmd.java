@@ -10,6 +10,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.Stats;
+import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -89,7 +90,7 @@ public class RpsCmd extends AbstractCommand {
 				|| userHandsign.equals(Handsign.PAPER) && botHandsign.equals(Handsign.ROCK)
 				|| userHandsign.equals(Handsign.SCISSORS) && botHandsign.equals(Handsign.PAPER)) {
 			strBuilder.append(context.getAuthorName() + " wins ! Well done, you won **" + GAINS + " coins**.");
-			context.getUser().addCoins(GAINS);
+			Storage.addCoins(context.getGuild(), context.getAuthor(), GAINS);
 			Stats.increment(StatCategory.MONEY_GAINS_COMMAND, this.getNames()[0], GAINS);
 		} else {
 			strBuilder.append(Shadbot.getClient().getOurUser().getName() + " wins !");

@@ -5,7 +5,6 @@ import java.util.List;
 import org.json.JSONArray;
 
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.data.DBGuild;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -29,8 +28,7 @@ public class ChannelSettingCmd implements SettingCmd {
 			throw new MissingArgumentException();
 		}
 
-		DBGuild guild = Storage.getGuild(context.getGuild());
-		List<Long> allowedChannelsList = Utils.convertToLongList((JSONArray) guild.getSetting(Setting.ALLOWED_CHANNELS));
+		List<Long> allowedChannelsList = Utils.convertToLongList((JSONArray) Storage.getSetting(context.getGuild(), Setting.ALLOWED_CHANNELS));
 
 		switch (arg.split(" ")[0]) {
 			case "add":
@@ -66,7 +64,7 @@ public class ChannelSettingCmd implements SettingCmd {
 						+ Setting.ALLOWED_CHANNELS.toString() + " help` to see help.", context.getChannel());
 				return;
 		}
-		guild.setSetting(Setting.ALLOWED_CHANNELS, new JSONArray(allowedChannelsList));
+		Storage.setSetting(context.getGuild(), Setting.ALLOWED_CHANNELS, new JSONArray(allowedChannelsList));
 	}
 
 	@Override
