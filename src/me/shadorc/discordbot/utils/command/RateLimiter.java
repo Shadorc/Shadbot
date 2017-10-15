@@ -17,14 +17,38 @@ public class RateLimiter {
 	public static final int COMMON_COOLDOWN = 2;
 	public static final int GAME_COOLDOWN = 5;
 
-	private final ConcurrentHashMap<IGuild, ConcurrentHashMap<IUser, Long>> guildsRateLimiter;
-	private final ConcurrentHashMap<IGuild, ConcurrentHashMap<IUser, Boolean>> warningsRateLimiter;
+	private final ConcurrentHashMap<IGuild, ConcurrentHashMap<IUser, LimitedUser>> guildsLimitedUsers;
 	private final long timeout;
+
+	private class LimitedUser {
+		private long lastTime;
+		private boolean isWarned;
+
+		protected LimitedUser() {
+			this.lastTime = 0;
+			this.isWarned = false;
+		}
+
+		public long getLastTime() {
+			return lastTime;
+		}
+
+		public void setLastTime(long lastTime) {
+			this.lastTime = lastTime;
+		}
+
+		public void setWarned(boolean isWarned) {
+			this.isWarned = isWarned;
+		}
+
+		public boolean isWarned() {
+			return isWarned;
+		}
+	}
 
 	public RateLimiter(int timeout, ChronoUnit unit) {
 		this.timeout = Duration.of(timeout, unit).toMillis();
-		this.guildsRateLimiter = new ConcurrentHashMap<>();
-		this.warningsRateLimiter = new ConcurrentHashMap<>();
+		this.guildsLimitedUsers = new ConcurrentHashMap<>();
 	}
 
 	public long getTimeout() {
@@ -34,7 +58,7 @@ public class RateLimiter {
 	public boolean isSpamming(Context context) {
 		if(this.isLimited(context.getGuild(), context.getAuthor())) {
 			if(!this.isWarned(context.getGuild(), context.getAuthor())) {
-				this.warn(TextUtils.getSpamMessage() + " You can use this command once every " + this.getTimeout() + " sec.", context);
+				this.warn(context);
 			}
 			return true;
 		}
@@ -42,29 +66,27 @@ public class RateLimiter {
 	}
 
 	private boolean isLimited(IGuild guild, IUser user) {
-		guildsRateLimiter.putIfAbsent(guild, new ConcurrentHashMap<IUser, Long>());
-		warningsRateLimiter.putIfAbsent(guild, new ConcurrentHashMap<IUser, Boolean>());
+		guildsLimitedUsers.putIfAbsent(guild, new ConcurrentHashMap<>());
+		LimitedUser limitedUser = guildsLimitedUsers.get(guild).getOrDefault(user, new LimitedUser());
 
-		long currentTime = System.currentTimeMillis();
-		long lastTime = guildsRateLimiter.get(guild).containsKey(user) ? guildsRateLimiter.get(guild).get(user) : 0;
-		long diff = currentTime - lastTime;
-
+		long diff = System.currentTimeMillis() - limitedUser.getLastTime();
 		if(diff > timeout) {
-			guildsRateLimiter.get(guild).put(user, currentTime);
-			warningsRateLimiter.get(guild).put(user, false);
+			limitedUser.setLastTime(System.currentTimeMillis());
+			limitedUser.setWarned(false);
+			guildsLimitedUsers.get(guild).put(user, limitedUser);
 			return false;
 		}
-
 		return true;
 	}
 
 	private boolean isWarned(IGuild guild, IUser user) {
-		return warningsRateLimiter.get(guild).get(user);
+		return guildsLimitedUsers.get(guild).get(user).isWarned();
 	}
 
-	private void warn(String message, Context context) {
-		BotUtils.sendMessage(Emoji.STOPWATCH + " " + message, context.getChannel());
-		warningsRateLimiter.get(context.getGuild()).put(context.getAuthor(), true);
+	private void warn(Context context) {
+		BotUtils.sendMessage(Emoji.STOPWATCH + " " + TextUtils.getSpamMessage() + " You can use this command once every "
+				+ this.getTimeout() + " sec.", context.getChannel());
+		guildsLimitedUsers.get(context.getGuild()).get(context.getAuthor()).setWarned(true);
 		Stats.increment(StatCategory.LIMITED_COMMAND, context.getCommand());
 	}
 }
