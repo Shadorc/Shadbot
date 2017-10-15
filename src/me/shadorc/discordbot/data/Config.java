@@ -24,7 +24,7 @@ public class Config {
 	public static final int MAX_PLAYLIST_SIZE = 200;
 	public static final int MAX_COINS = Integer.MAX_VALUE;
 
-	public static final int DEFAULT_TIMEOUT = 7500;
+	public static final int DEFAULT_TIMEOUT = 5000;
 	public static final int DEFAULT_RETRY_TIME = 3;
 
 	public static final Color BOT_COLOR = new Color(170, 196, 222);
