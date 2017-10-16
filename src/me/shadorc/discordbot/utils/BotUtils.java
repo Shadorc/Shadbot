@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.utils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 
@@ -77,7 +78,13 @@ public class BotUtils {
 	 * @return the number of deleted messages
 	 */
 	public static int deleteMessages(IChannel channel, List<IMessage> messages) {
-		if(messages.isEmpty()) {
+		// Only keeps messages that are at most 2 weeks old
+		List<IMessage> toDelete = messages.stream()
+				.filter(msg -> msg.getLongID() >= (((System.currentTimeMillis() - 14 * 24 * 60 * 60 * 1000) - 1420070400000L) << 22))
+				.distinct()
+				.collect(Collectors.toList());
+
+		if(toDelete.isEmpty()) {
 			return 0;
 		}
 
