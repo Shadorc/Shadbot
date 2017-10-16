@@ -17,6 +17,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -46,7 +47,7 @@ public class TranslateCmd extends AbstractCommand {
 			return;
 		}
 
-		String[] args = context.getArg().split(" ", 3);
+		String[] args = StringUtils.getSplittedArg(context.getArg(), 3);
 		if(args.length < 2) {
 			throw new MissingArgumentException();
 		}

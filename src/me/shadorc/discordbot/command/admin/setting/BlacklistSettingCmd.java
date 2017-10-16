@@ -24,7 +24,7 @@ public class BlacklistSettingCmd implements SettingCmd {
 			throw new MissingArgumentException();
 		}
 
-		String[] splitArgs = arg.split(" ", 2);
+		String[] splitArgs = StringUtils.getSplittedArg(arg, 2);
 		if(splitArgs.length != 2) {
 			throw new MissingArgumentException();
 		}

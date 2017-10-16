@@ -49,7 +49,7 @@ public class DiabloCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String[] splitArgs = context.getArg().split(" ", 2);
+		String[] splitArgs = StringUtils.getSplittedArg(context.getArg(), 2);
 		if(splitArgs.length != 2) {
 			throw new MissingArgumentException();
 		}

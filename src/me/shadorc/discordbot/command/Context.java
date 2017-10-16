@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -23,7 +24,7 @@ public class Context {
 		this.event = event;
 		this.prefix = (String) Storage.getSetting(event.getGuild(), Setting.PREFIX);
 
-		String[] splitMessage = event.getMessage().getContent().split(" ", 2);
+		String[] splitMessage = StringUtils.getSplittedArg(event.getMessage().getContent(), 2);
 		this.command = splitMessage[0].replaceFirst(Pattern.quote(prefix), "").toLowerCase().trim();
 		this.arg = splitMessage.length > 1 ? splitMessage[1].trim() : "";
 	}

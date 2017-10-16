@@ -15,6 +15,7 @@ import me.shadorc.discordbot.command.admin.setting.SettingCmd;
 import me.shadorc.discordbot.command.admin.setting.VolumeSettingCmd;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -37,7 +38,7 @@ public class SettingsManagerCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		String[] splitArgs = context.getArg().split(" ", 2);
+		String[] splitArgs = StringUtils.getSplittedArg(context.getArg(), 2);
 
 		String name = splitArgs[0];
 

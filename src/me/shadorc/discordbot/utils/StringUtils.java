@@ -106,10 +106,19 @@ public class StringUtils {
 
 	/**
 	 * @param arg - arg to split
+	 * @param limit - the limit
+	 * @return a String Array without null or empty string splitted by " "
+	 */
+	public static String[] getSplittedArg(String arg, int limit) {
+		return Arrays.stream(arg.split(" ", limit)).filter(str -> str != null && !str.isEmpty()).toArray(String[]::new);
+	}
+
+	/**
+	 * @param arg - arg to split
 	 * @return a String Array without null or empty string splitted by " "
 	 */
 	public static String[] getSplittedArg(String arg) {
-		return Arrays.stream(arg.split(" ")).filter(str -> str != null && !str.isEmpty()).toArray(String[]::new);
+		return StringUtils.getSplittedArg(arg, 0);
 	}
 
 	/**
