@@ -40,13 +40,11 @@ public class SettingsManagerCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		String[] splitArgs = StringUtils.getSplittedArg(context.getArg(), 2);
 
-		String name = splitArgs[0];
-
-		if(name.isEmpty()) {
+		if(splitArgs.length == 0) {
 			throw new MissingArgumentException();
 		}
 
-		SettingCmd cmd = SUBSETTINGS_MAP.get(name);
+		SettingCmd cmd = SUBSETTINGS_MAP.get(splitArgs[0]);
 		if(cmd == null) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This setting does not exist."
 					+ " Use `" + context.getPrefix() + "help settings` to see all available settings.", context.getChannel());
@@ -54,7 +52,6 @@ public class SettingsManagerCmd extends AbstractCommand {
 		}
 
 		String arg = splitArgs.length > 1 ? splitArgs[1] : null;
-
 		if("help".equals(arg)) {
 			cmd.showHelp(context);
 			return;
