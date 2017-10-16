@@ -7,7 +7,6 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.command.Emoji;
-import sx.blah.discord.handle.obj.IGuild;
 
 public class LogUtils {
 
@@ -39,10 +38,6 @@ public class LogUtils {
 
 	public static void info(String msg) {
 		LOGGER.info(msg);
-	}
-
-	public static void debug(Class<?> underlyingClass, IGuild guild, String msg) {
-		LogUtils.info("{DEBUG} {" + underlyingClass.getSimpleName() + "} {Guild ID: " + guild.getLongID() + "} " + msg);
 	}
 
 	private static void sendLogs(String msg) {

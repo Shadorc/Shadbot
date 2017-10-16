@@ -51,7 +51,6 @@ public class VoiceChannelListener {
 			GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(guild);
 
 			if(musicManager == null) {
-				LogUtils.debug(this.getClass(), guild, "MusicManager was null while Shadbot was in a voice channel.");
 				return;
 			}
 
