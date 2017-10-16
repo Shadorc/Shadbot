@@ -25,7 +25,9 @@ public class VoiceChannelListener {
 
 			// If Shadbot is disconnected with status code 1008 and reason "NullPointerException", it will still be in the voice channel
 			// If not, this line will do nothing
-			event.getVoiceChannel().leave();
+			if(event.getVoiceChannel() != null) {
+				event.getVoiceChannel().leave();
+			}
 		}
 	}
 
