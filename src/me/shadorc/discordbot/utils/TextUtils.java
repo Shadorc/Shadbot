@@ -12,7 +12,7 @@ public class TextUtils {
 			Emoji.MUTE + " No currently playing music.";
 
 	public static final String NOT_ENOUGH_COINS =
-			Emoji.BANK + " You don't have enough coins. You can get some by playing RPS or Trivia.";
+			Emoji.BANK + " You don't have enough coins. You can get some by playing **RPS** or **Trivia**.";
 
 	public static final String[] SPAM_MESSAGES = { "Take it easy, we are not in a hurry !",
 			"Phew.. give me time to rest, you're too fast for me.",
