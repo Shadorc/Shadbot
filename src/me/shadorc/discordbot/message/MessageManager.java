@@ -7,24 +7,24 @@ import sx.blah.discord.handle.obj.IMessage;
 
 public class MessageManager {
 
-	private final static ConcurrentHashMap<IChannel, MessageListener> CHANNELS_LISTENERS = new ConcurrentHashMap<>();
+	private final static ConcurrentHashMap<Long, MessageListener> CHANNELS_LISTENERS = new ConcurrentHashMap<>();
 
 	public static void addListener(IChannel channel, MessageListener listener) {
-		CHANNELS_LISTENERS.put(channel, listener);
+		CHANNELS_LISTENERS.put(channel.getLongID(), listener);
 	}
 
 	public static void removeListener(IChannel channel) {
-		CHANNELS_LISTENERS.remove(channel);
+		CHANNELS_LISTENERS.remove(channel.getLongID());
 	}
 
 	public static boolean isWaitingForMessage(IChannel channel) {
-		return CHANNELS_LISTENERS.containsKey(channel);
+		return CHANNELS_LISTENERS.containsKey(channel.getLongID());
 	}
 
 	public static boolean notify(IMessage message) {
 		boolean isBlocking = false;
-		for(IChannel channel : CHANNELS_LISTENERS.keySet()) {
-			MessageListener msgListener = CHANNELS_LISTENERS.get(channel);
+		for(Long channelID : CHANNELS_LISTENERS.keySet()) {
+			MessageListener msgListener = CHANNELS_LISTENERS.get(channelID);
 			if(msgListener != null) {
 				isBlocking = msgListener.onMessageReceived(message);
 			}

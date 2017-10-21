@@ -17,7 +17,7 @@ public class RateLimiter {
 	public static final int COMMON_COOLDOWN = 2;
 	public static final int GAME_COOLDOWN = 5;
 
-	private final ConcurrentHashMap<IGuild, ConcurrentHashMap<IUser, LimitedUser>> guildsLimitedUsers;
+	private final ConcurrentHashMap<Long, ConcurrentHashMap<Long, LimitedUser>> guildsLimitedUsers;
 	private final long timeout;
 
 	private class LimitedUser {
@@ -51,10 +51,6 @@ public class RateLimiter {
 		this.guildsLimitedUsers = new ConcurrentHashMap<>();
 	}
 
-	public long getTimeout() {
-		return Duration.of(timeout, ChronoUnit.MILLIS).getSeconds();
-	}
-
 	public boolean isSpamming(Context context) {
 		if(this.isLimited(context.getGuild(), context.getAuthor())) {
 			if(!this.isWarned(context.getGuild(), context.getAuthor())) {
@@ -66,27 +62,27 @@ public class RateLimiter {
 	}
 
 	private boolean isLimited(IGuild guild, IUser user) {
-		guildsLimitedUsers.putIfAbsent(guild, new ConcurrentHashMap<>());
-		LimitedUser limitedUser = guildsLimitedUsers.get(guild).getOrDefault(user, new LimitedUser());
+		guildsLimitedUsers.putIfAbsent(guild.getLongID(), new ConcurrentHashMap<>());
+		LimitedUser limitedUser = guildsLimitedUsers.get(guild.getLongID()).getOrDefault(user.getLongID(), new LimitedUser());
 
 		long diff = System.currentTimeMillis() - limitedUser.getLastTime();
 		if(diff > timeout) {
 			limitedUser.setLastTime(System.currentTimeMillis());
 			limitedUser.setWarned(false);
-			guildsLimitedUsers.get(guild).put(user, limitedUser);
+			guildsLimitedUsers.get(guild.getLongID()).put(user.getLongID(), limitedUser);
 			return false;
 		}
 		return true;
 	}
 
 	private boolean isWarned(IGuild guild, IUser user) {
-		return guildsLimitedUsers.get(guild).get(user).isWarned();
+		return guildsLimitedUsers.get(guild.getLongID()).get(user.getLongID()).isWarned();
 	}
 
 	private void warn(Context context) {
 		BotUtils.sendMessage(Emoji.STOPWATCH + " " + TextUtils.getSpamMessage() + " You can use this command once every "
-				+ this.getTimeout() + " sec.", context.getChannel());
-		guildsLimitedUsers.get(context.getGuild()).get(context.getAuthor()).setWarned(true);
+				+ Duration.of(timeout, ChronoUnit.MILLIS).getSeconds() + " sec.", context.getChannel());
+		guildsLimitedUsers.get(context.getGuild().getLongID()).get(context.getAuthor().getLongID()).setWarned(true);
 		Stats.increment(StatCategory.LIMITED_COMMAND, context.getCommand());
 	}
 }

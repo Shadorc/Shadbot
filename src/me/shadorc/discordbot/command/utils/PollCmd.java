@@ -22,7 +22,6 @@ import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
@@ -30,7 +29,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class PollCmd extends AbstractCommand {
 
-	protected static final ConcurrentHashMap<IChannel, PollManager> CHANNELS_POLL = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<Long, PollManager> CHANNELS_POLL = new ConcurrentHashMap<>();
 
 	private final RateLimiter rateLimiter;
 
@@ -54,7 +53,7 @@ public class PollCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		PollManager pollManager = CHANNELS_POLL.get(context.getChannel());
+		PollManager pollManager = CHANNELS_POLL.get(context.getChannel().getLongID());
 
 		if(pollManager == null) {
 			this.createPoll(context);
@@ -138,7 +137,7 @@ public class PollCmd extends AbstractCommand {
 
 		PollManager pollManager = new PollManager(context, duration, question, choicesList);
 		pollManager.start();
-		CHANNELS_POLL.putIfAbsent(context.getChannel(), pollManager);
+		CHANNELS_POLL.putIfAbsent(context.getChannel().getLongID(), pollManager);
 	}
 
 	@Override
@@ -185,7 +184,7 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		protected void stop() {
-			CHANNELS_POLL.remove(context.getChannel());
+			CHANNELS_POLL.remove(context.getChannel().getLongID());
 			timer.stop();
 			this.show();
 		}

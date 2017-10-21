@@ -25,7 +25,7 @@ public class GuildMusicManager {
 
 	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
 
-	private final static ConcurrentHashMap<IGuild, GuildMusicManager> MUSIC_MANAGERS = new ConcurrentHashMap<>();
+	private final static ConcurrentHashMap<Long, GuildMusicManager> MUSIC_MANAGERS = new ConcurrentHashMap<>();
 
 	private final IGuild guild;
 	private final AudioPlayer audioPlayer;
@@ -109,12 +109,12 @@ public class GuildMusicManager {
 		this.cancelLeave();
 		scheduler.clearPlaylist();
 		audioPlayer.destroy();
-		MUSIC_MANAGERS.remove(guild);
+		MUSIC_MANAGERS.remove(guild.getLongID());
 	}
 
 	public static GuildMusicManager createGuildMusicManager(IGuild guild) {
 		GuildMusicManager musicManager = new GuildMusicManager(guild, PLAYER_MANAGER);
-		MUSIC_MANAGERS.put(guild, musicManager);
+		MUSIC_MANAGERS.put(guild.getLongID(), musicManager);
 
 		guild.getAudioManager().setAudioProvider(musicManager.getAudioProvider());
 
@@ -122,10 +122,10 @@ public class GuildMusicManager {
 	}
 
 	public static void putGuildMusicManagerIfAbsent(IGuild guild, GuildMusicManager musicManager) {
-		MUSIC_MANAGERS.putIfAbsent(guild, musicManager);
+		MUSIC_MANAGERS.putIfAbsent(guild.getLongID(), musicManager);
 	}
 
 	public static GuildMusicManager getGuildMusicManager(IGuild guild) {
-		return MUSIC_MANAGERS.get(guild);
+		return MUSIC_MANAGERS.get(guild.getLongID());
 	}
 }

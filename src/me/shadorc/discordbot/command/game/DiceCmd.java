@@ -23,13 +23,12 @@ import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class DiceCmd extends AbstractCommand {
 
-	protected static final ConcurrentHashMap<IChannel, DiceManager> CHANNELS_DICE = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<Long, DiceManager> CHANNELS_DICE = new ConcurrentHashMap<>();
 	protected static final int MULTIPLIER = 6;
 
 	private final RateLimiter rateLimiter;
@@ -49,7 +48,7 @@ public class DiceCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		if(CHANNELS_DICE.containsKey(context.getChannel())) {
+		if(CHANNELS_DICE.containsKey(context.getChannel().getLongID())) {
 			this.joinGame(context);
 		} else {
 			this.createGame(context);
@@ -85,11 +84,11 @@ public class DiceCmd extends AbstractCommand {
 		DiceManager diceManager = new DiceManager(context, bet);
 		diceManager.addPlayer(context.getAuthor(), num);
 		diceManager.start();
-		CHANNELS_DICE.putIfAbsent(context.getChannel(), diceManager);
+		CHANNELS_DICE.putIfAbsent(context.getChannel().getLongID(), diceManager);
 	}
 
 	private void joinGame(Context context) {
-		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel());
+		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel().getLongID());
 		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < diceManager.getBet()) {
 			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
 			return;
@@ -195,7 +194,7 @@ public class DiceCmd extends AbstractCommand {
 				BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 			}
 
-			CHANNELS_DICE.remove(context.getChannel());
+			CHANNELS_DICE.remove(context.getChannel().getLongID());
 		}
 
 		public int getBet() {

@@ -24,14 +24,13 @@ import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class ChatCmd extends AbstractCommand {
 
 	private static final String API_KEY = Config.get(APIKey.CLEVERBOT_API_KEY);
-	private static final ConcurrentHashMap<IChannel, String> CHANNELS_CONV_ID = new ConcurrentHashMap<>();
-	private static final ConcurrentHashMap<IChannel, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<Long, String> CHANNELS_CONV_ID = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<Long, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
 
 	private final RateLimiter rateLimiter;
 
@@ -52,15 +51,16 @@ public class ChatCmd extends AbstractCommand {
 
 		JSONObject mainObj = null;
 		try {
+			String custid = CHANNELS_CUSTID.get(context.getChannel().getLongID());
 			String xmlString = NetUtils.getDoc("http://sheepridge.pandorabots.com/pandora/talk-xml?"
 					+ "botid=b69b8d517e345aba"
 					+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
-					+ (CHANNELS_CUSTID.get(context.getChannel()) == null ? "" : "&custid=" + CHANNELS_CUSTID.get(context.getChannel())))
+					+ (custid == null ? "" : "&custid=" + custid))
 					.toString();
 			mainObj = XML.toJSONObject(xmlString);
 			JSONObject resultObj = mainObj.getJSONObject("result");
 			String response = resultObj.getString("that").replace("<br>", "\n").replace("  ", " ").trim();
-			CHANNELS_CUSTID.put(context.getChannel(), resultObj.getString("custid"));
+			CHANNELS_CUSTID.put(context.getChannel().getLongID(), resultObj.getString("custid"));
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 			return;
 		} catch (JSONException | IOException err) {
@@ -70,9 +70,9 @@ public class ChatCmd extends AbstractCommand {
 
 		try {
 			CleverBotQuery bot = new CleverBotQuery(API_KEY, URLEncoder.encode(context.getArg(), "UTF-8"));
-			bot.setConversationID(CHANNELS_CONV_ID.getOrDefault(context.getChannel(), ""));
+			bot.setConversationID(CHANNELS_CONV_ID.getOrDefault(context.getChannel().getLongID(), ""));
 			bot.sendRequest();
-			CHANNELS_CONV_ID.put(context.getChannel(), bot.getConversationID());
+			CHANNELS_CONV_ID.put(context.getChannel().getLongID(), bot.getConversationID());
 			BotUtils.sendMessage(Emoji.SPEECH + " " + bot.getResponse(), context.getChannel());
 		} catch (IOException err) {
 			LogUtils.error("Something went wrong while discussing with Cleverbot... Please, try again later.", err, context);

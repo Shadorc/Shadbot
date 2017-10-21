@@ -20,7 +20,7 @@ import sx.blah.discord.handle.obj.IChannel;
 
 public class Scheduler {
 
-	protected static final ConcurrentHashMap<IChannel, List<ScheduledMessage>> MESSAGE_QUEUE = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<Long, List<ScheduledMessage>> MESSAGE_QUEUE = new ConcurrentHashMap<>();
 
 	public static void start() {
 		Executors.newSingleThreadScheduledExecutor()
@@ -34,9 +34,9 @@ public class Scheduler {
 	}
 
 	public static void scheduleMessages(Object message, IChannel channel, Reason reason) {
-		MESSAGE_QUEUE.putIfAbsent(channel, new ArrayList<>());
+		MESSAGE_QUEUE.putIfAbsent(channel.getLongID(), new ArrayList<>());
 
-		List<ScheduledMessage> channelQueue = MESSAGE_QUEUE.get(channel);
+		List<ScheduledMessage> channelQueue = MESSAGE_QUEUE.get(channel.getLongID());
 		ScheduledMessage scheduledMsg = new ScheduledMessage(message, channel, reason);
 
 		if(channelQueue.contains(scheduledMsg)) {
@@ -53,9 +53,9 @@ public class Scheduler {
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 		executor.submit(() -> {
 			Scheduler.waitAndSend(scheduledMsg);
-			MESSAGE_QUEUE.get(channel).remove(message);
-			if(MESSAGE_QUEUE.get(channel).isEmpty()) {
-				MESSAGE_QUEUE.remove(channel);
+			MESSAGE_QUEUE.get(channel.getLongID()).remove(message);
+			if(MESSAGE_QUEUE.get(channel.getLongID()).isEmpty()) {
+				MESSAGE_QUEUE.remove(channel.getLongID());
 			}
 			executor.shutdown();
 		});
@@ -64,10 +64,10 @@ public class Scheduler {
 	public static void sendMsgWaitingForShard() {
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 		executor.submit(() -> {
-			Iterator<IChannel> channelItr = MESSAGE_QUEUE.keySet().iterator();
+			Iterator<Long> channelItr = MESSAGE_QUEUE.keySet().iterator();
 			while(channelItr.hasNext()) {
-				IChannel channel = channelItr.next();
-				Iterator<ScheduledMessage> msgItr = MESSAGE_QUEUE.get(channel).iterator();
+				Long channelID = channelItr.next();
+				Iterator<ScheduledMessage> msgItr = MESSAGE_QUEUE.get(channelID).iterator();
 
 				while(msgItr.hasNext()) {
 					ScheduledMessage message = msgItr.next();
@@ -77,7 +77,7 @@ public class Scheduler {
 					}
 				}
 
-				if(MESSAGE_QUEUE.get(channel).isEmpty()) {
+				if(MESSAGE_QUEUE.get(channelID).isEmpty()) {
 					channelItr.remove();
 				}
 			}

@@ -37,7 +37,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class TriviaCmd extends AbstractCommand {
 
-	protected static final ConcurrentHashMap<IChannel, TriviaManager> CHANNELS_TRIVIA = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<Long, TriviaManager> CHANNELS_TRIVIA = new ConcurrentHashMap<>();
 	protected static final int MIN_GAINS = 100;
 	protected static final int MAX_BONUS = 200;
 	protected static final int LIMITED_TIME = 30;
@@ -55,13 +55,13 @@ public class TriviaCmd extends AbstractCommand {
 			return;
 		}
 
-		TriviaManager triviaManager = CHANNELS_TRIVIA.get(context.getChannel());
+		TriviaManager triviaManager = CHANNELS_TRIVIA.get(context.getChannel().getLongID());
 
 		if(triviaManager == null) {
 			try {
 				triviaManager = new TriviaManager(context.getChannel());
 				triviaManager.start();
-				CHANNELS_TRIVIA.putIfAbsent(context.getChannel(), triviaManager);
+				CHANNELS_TRIVIA.putIfAbsent(context.getChannel().getLongID(), triviaManager);
 
 			} catch (JSONException | IOException err) {
 				LogUtils.error("Something went wrong while getting a question.... Please, try again later.", err, context);
@@ -144,7 +144,7 @@ public class TriviaCmd extends AbstractCommand {
 		private void stop() {
 			MessageManager.removeListener(channel);
 			timer.stop();
-			CHANNELS_TRIVIA.remove(channel);
+			CHANNELS_TRIVIA.remove(channel.getLongID());
 		}
 
 		@Override
