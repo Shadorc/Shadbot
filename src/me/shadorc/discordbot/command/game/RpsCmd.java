@@ -21,7 +21,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RpsCmd extends AbstractCommand {
 
-	private static final int GAINS = 200;
+	private static final int GAINS = 170;
 
 	private final RateLimiter rateLimiter;
 
