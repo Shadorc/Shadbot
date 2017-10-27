@@ -171,13 +171,13 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			// Remove all non numeric characters
 			String numStr = str.replaceAll("[^\\d]", "");
 			if(!StringUtils.isPositiveInt(numStr)) {
-				this.sendInvalidChoice(str.trim(), prefix, message);
+				this.sendInvalidChoice(str.trim(), prefix);
 				return true;
 			}
 
 			int num = Integer.parseInt(numStr);
 			if(num < 1 || num > Math.min(5, resultsTracks.size())) {
-				this.sendInvalidChoice(str.trim(), prefix, message);
+				this.sendInvalidChoice(str.trim(), prefix);
 				return true;
 			}
 
@@ -217,10 +217,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 	}
 
-	private void sendInvalidChoice(String choice, String prefix, IMessage message) {
+	private void sendInvalidChoice(String choice, String prefix) {
 		BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Music selection: \"" + choice + "\" is not a valid number."
 				+ " Enter a number between 1 and " + Math.min(5, resultsTracks.size()) + " or use `" + prefix + "cancel` to cancel the selection.",
 				musicManager.getChannel());
-		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} Invalid choice: " + message.getContent());
 	}
 }
