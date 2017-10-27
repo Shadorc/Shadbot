@@ -15,7 +15,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -54,7 +54,7 @@ public class GifCmd extends AbstractCommand {
 			BotUtils.sendMessage(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting a gif from Giphy.... Please, try again later.", err, context);
+			ExceptionUtils.manageException("getting a gif", context, err);
 		}
 	}
 

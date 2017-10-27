@@ -16,7 +16,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -76,7 +76,7 @@ public class ImageCmd extends AbstractCommand {
 			BotUtils.sendMessage(builder.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting an image... Please, try again later.", err, context);
+			ExceptionUtils.manageException("getting an image", context, err);
 		}
 	}
 

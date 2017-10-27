@@ -20,7 +20,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -106,7 +106,7 @@ public class DiabloCmd extends AbstractCommand {
 		} catch (FileNotFoundException err) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting Diablo 3 stats.... Please, try again later.", err, context);
+			ExceptionUtils.manageException("getting Diablo 3 stats", context, err);
 		}
 	}
 

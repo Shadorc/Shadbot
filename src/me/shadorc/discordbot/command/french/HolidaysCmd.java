@@ -9,7 +9,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.TwitterUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -50,7 +50,7 @@ public class HolidaysCmd extends AbstractCommand {
 			String holidays = TwitterUtils.getInstance().getUserTimeline("Vacances_Zone" + zone).get(0).getText().replaceAll("#", "");
 			BotUtils.sendMessage(Emoji.BEACH + " " + holidays, context.getChannel());
 		} catch (TwitterException err) {
-			LogUtils.error("Something went wrong while getting holidays information... Please, try again later.", err, context);
+			ExceptionUtils.manageException("getting holidays information", context, err);
 		}
 	}
 

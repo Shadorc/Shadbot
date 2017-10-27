@@ -23,7 +23,7 @@ import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -64,7 +64,7 @@ public class TriviaCmd extends AbstractCommand {
 				CHANNELS_TRIVIA.putIfAbsent(context.getChannel().getLongID(), triviaManager);
 
 			} catch (JSONException | IOException err) {
-				LogUtils.error("Something went wrong while getting a question.... Please, try again later.", err, context);
+				ExceptionUtils.manageException("getting a question", context, err);
 			}
 
 		} else {

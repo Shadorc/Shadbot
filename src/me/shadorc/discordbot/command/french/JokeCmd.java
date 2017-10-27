@@ -13,7 +13,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -53,7 +53,7 @@ public class JokeCmd extends AbstractCommand {
 			BotUtils.sendMessage(embed.build(), context.getChannel());
 
 		} catch (IOException err) {
-			LogUtils.error("Something went wrong while getting a joke... Please, try again later.", err, context);
+			ExceptionUtils.manageException("getting a joke", context, err);
 		}
 	}
 

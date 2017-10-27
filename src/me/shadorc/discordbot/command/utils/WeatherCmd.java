@@ -12,7 +12,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -73,7 +73,7 @@ public class WeatherCmd extends AbstractCommand {
 				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " City not found.", context.getChannel());
 			}
 		} catch (IOException err) {
-			LogUtils.error("Something went wrong while getting weather information... Please, try again later.", err, context);
+			ExceptionUtils.manageException("getting weather information", context, err);
 		}
 	}
 

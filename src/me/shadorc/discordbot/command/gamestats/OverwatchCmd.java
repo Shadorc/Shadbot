@@ -11,7 +11,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -98,7 +98,7 @@ public class OverwatchCmd extends AbstractCommand {
 		} catch (UserNotFoundException e) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Overwatch or doesn't exist.", context.getChannel());
 		} catch (IOException err) {
-			LogUtils.error("Something went wrong while getting information from Overwatch profil.... Please, try again later.", err, context);
+			ExceptionUtils.manageException("getting information from Overwatch profil", context, err);
 		}
 	}
 

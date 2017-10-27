@@ -1,5 +1,8 @@
 package me.shadorc.discordbot.utils;
 
+import java.net.SocketTimeoutException;
+
+import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.schedule.ScheduledMessage.Reason;
 import me.shadorc.discordbot.utils.schedule.Scheduler;
 import sx.blah.discord.handle.obj.IChannel;
@@ -18,6 +21,14 @@ public class ExceptionUtils {
 
 		} else {
 			LogUtils.error("Discord exception while sending message.", err);
+		}
+	}
+
+	public static void manageException(String action, Context context, Exception err) {
+		if(err instanceof SocketTimeoutException) {
+			LogUtils.error("Mmmh... " + StringUtils.capitalize(action) + " takes too long... This is not my fault, I promise ! Try again later.", err, context);
+		} else {
+			LogUtils.error("Sorry, something went wrong while " + action + "... I will try to fix this as soon as possible.", err, context);
 		}
 	}
 }

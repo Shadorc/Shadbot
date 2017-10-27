@@ -13,7 +13,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -76,7 +76,7 @@ public class WikiCmd extends AbstractCommand {
 			BotUtils.sendMessage(builder.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while getting Wikipedia information... Please, try again later.", err, context);
+			ExceptionUtils.manageException("getting Wikipedia information", context, err);
 		}
 	}
 
