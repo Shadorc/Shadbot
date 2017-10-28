@@ -1,10 +1,10 @@
 package me.shadorc.discordbot.command.game;
 
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.swing.Timer;
 
@@ -75,10 +75,17 @@ public class DiceCmd extends AbstractCommand {
 
 		int num = Integer.parseInt(numStr);
 
-		DiceManager diceManager = new DiceManager(context, bet);
+		DiceManager diceManager = CHANNELS_DICE.getOrDefault(context.getChannel().getLongID(), new DiceManager(context, bet));
+
+		DiceManager currentManager = CHANNELS_DICE.putIfAbsent(context.getChannel().getLongID(), diceManager);
+		if(currentManager == null) {
+			diceManager.start();
+		} else {
+			diceManager = currentManager;
+		}
+
 		diceManager.addPlayer(context.getAuthor(), num);
-		diceManager.start();
-		CHANNELS_DICE.putIfAbsent(context.getChannel().getLongID(), diceManager);
+		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets on **" + num + "**.", context.getChannel());
 	}
 
 	private void joinGame(Context context) {
@@ -153,7 +160,7 @@ public class DiceCmd extends AbstractCommand {
 					.appendField(context.getAuthor().getName() + " started a dice game.",
 							"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + bet + " coins** putting.", false)
 					.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to make your bets.");
-			BotUtils.sendMessage(builder.build(), context.getChannel());
+			BotUtils.sendMessage(builder.build(), context.getChannel()).get();
 
 			timer.start();
 		}
@@ -162,32 +169,37 @@ public class DiceCmd extends AbstractCommand {
 			timer.stop();
 
 			int winningNum = MathUtils.rand(1, 6);
-			BotUtils.sendMessage(Emoji.DICE + " The dice is rolling... **" + winningNum + "** !", context.getChannel());
 
-			if(this.isBet(winningNum)) {
-				IUser winner = numsPlayers.get(winningNum);
-				int gains = bet * (numsPlayers.size() + MULTIPLIER);
-				BotUtils.sendMessage(Emoji.DICE + " Congratulations **" + winner.getName() + "**, you win **" + gains + " coins** !", context.getChannel());
-				Storage.addCoins(context.getGuild(), winner, gains);
-				Stats.increment(StatCategory.MONEY_GAINS_COMMAND, DiceCmd.this.getNames()[0], gains);
-			}
+			List<String> winningList = new ArrayList<>();
+			List<String> loserList = new ArrayList<>();
 
-			List<IUser> losersList = numsPlayers.keySet().stream()
-					.filter(num -> num != winningNum) // Remove winning number
-					.map(num -> numsPlayers.get(num)) // Get losers
-					.collect(Collectors.toList());
-
-			if(!losersList.isEmpty()) {
-				StringBuilder strBuilder = new StringBuilder(Emoji.MONEY_WINGS + " Sorry, ");
-				for(IUser loser : losersList) {
-					Storage.addCoins(context.getGuild(), loser, -bet);
-					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, DiceCmd.this.getNames()[0], bet);
-					strBuilder.append("**" + loser.getName() + "**, ");
+			for(int num : numsPlayers.keySet()) {
+				IUser user = numsPlayers.get(num);
+				int gains = bet;
+				if(num == winningNum) {
+					gains *= numsPlayers.size() + MULTIPLIER;
+					winningList.add("**" + user.getName() + "**, you win **" + StringUtils.pluralOf(gains, "coin") + "**");
+					Storage.addCoins(context.getGuild(), user, gains);
+					Stats.increment(StatCategory.MONEY_GAINS_COMMAND, DiceCmd.this.getNames()[0], gains);
+				} else {
+					loserList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
+					Storage.addCoins(context.getGuild(), user, -gains);
+					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, DiceCmd.this.getNames()[0], gains);
 				}
-				strBuilder.append("you lost **" + StringUtils.pluralOf(bet, "coin") + "**.");
-				BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 			}
 
+			StringBuilder strBuilder = new StringBuilder();
+
+			strBuilder.append(Emoji.DICE + " The dice is rolling... **" + winningNum + "** !");
+			if(!winningList.isEmpty()) {
+				strBuilder.append("\n" + Emoji.MONEY_BAG + " Congratulations " + StringUtils.formatList(winningList, str -> str, ", ") + " !");
+			}
+			if(!loserList.isEmpty()) {
+				strBuilder.append("\n" + Emoji.MONEY_WINGS + " Sorry, " + StringUtils.formatList(loserList, str -> str, ", ") + ".");
+			}
+			BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
+
+			numsPlayers.clear();
 			CHANNELS_DICE.remove(context.getChannel().getLongID());
 		}
 

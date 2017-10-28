@@ -22,6 +22,7 @@ public class Storage {
 
 	private static final File DATA_FILE = new File("data.json");
 
+	@SuppressWarnings("ucd")
 	private static JSONObject saveObject;
 
 	static {
