@@ -13,6 +13,8 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
+import me.shadorc.discordbot.data.StatCategory;
+import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.GameUtils;
@@ -132,13 +134,13 @@ public class RouletteCmd extends AbstractCommand {
 			List<String> loserList = new ArrayList<>();
 
 			for(IUser user : playersPlace.keySet()) {
-				int bet = playersPlace.get(user).getLeft();
+				int gains = playersPlace.get(user).getLeft();
 				String place = playersPlace.get(user).getRight();
 
 				if(StringUtils.isPositiveInt(place) && Integer.parseInt(place) == winningPlace) {
-					bet *= 36;
-					Storage.addCoins(context.getGuild(), user, bet);
-					winningList.add("**" + user.getName() + "** (Gains: **" + StringUtils.pluralOf(bet, "coin") + "**)");
+					gains *= 36;
+					Storage.addCoins(context.getGuild(), user, gains);
+					winningList.add("**" + user.getName() + "** (Gains: **" + StringUtils.pluralOf(gains, "coin") + "**)");
 
 				} else if(StringUtils.isPositiveInt(place) && this.isRed(winningPlace) && this.isRed(Integer.parseInt(place))
 						|| StringUtils.isPositiveInt(place) && !this.isRed(winningPlace) && !this.isRed(Integer.parseInt(place))
@@ -146,13 +148,15 @@ public class RouletteCmd extends AbstractCommand {
 						|| MathUtils.inRange(winningPlace, 19, 37) && "high".equals(place)
 						|| winningPlace % 2 == 0 && "even".equals(place)
 						|| winningPlace % 2 != 0 && "odd".equals(place)) {
-					bet *= 2;
-					Storage.addCoins(context.getGuild(), user, bet);
-					winningList.add("**" + user.getName() + "** (Gains: **" + StringUtils.pluralOf(bet, "coin") + "**)");
+					gains *= 2;
+					Storage.addCoins(context.getGuild(), user, gains);
+					winningList.add("**" + user.getName() + "** (Gains: **" + StringUtils.pluralOf(gains, "coin") + "**)");
+					Stats.increment(StatCategory.MONEY_GAINS_COMMAND, RouletteCmd.this.getNames()[0], gains);
 
 				} else {
-					Storage.addCoins(context.getGuild(), user, -bet);
-					loserList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(bet, "coin") + ")**");
+					Storage.addCoins(context.getGuild(), user, -gains);
+					loserList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
+					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, RouletteCmd.this.getNames()[0], gains);
 				}
 			}
 
