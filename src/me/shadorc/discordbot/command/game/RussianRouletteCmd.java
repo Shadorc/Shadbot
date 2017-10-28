@@ -10,9 +10,8 @@ import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.GameUtils;
 import me.shadorc.discordbot.utils.MathUtils;
-import me.shadorc.discordbot.utils.StringUtils;
-import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -42,15 +41,8 @@ public class RussianRouletteCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String betStr = context.getArg();
-		if(!StringUtils.isPositiveInt(betStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid bet.", context.getChannel());
-			return;
-		}
-
-		int bet = Integer.parseInt(betStr);
-		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < bet) {
-			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
+		Integer bet = GameUtils.parseBetOrWarn(context.getArg(), context);
+		if(bet == null) {
 			return;
 		}
 

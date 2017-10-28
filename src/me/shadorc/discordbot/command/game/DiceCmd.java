@@ -16,6 +16,7 @@ import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.GameUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
@@ -61,15 +62,8 @@ public class DiceCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String betStr = splitArgs[0];
-		if(!StringUtils.isPositiveInt(betStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid bet.", context.getChannel());
-			return;
-		}
-
-		int bet = Integer.parseInt(betStr);
-		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < bet) {
-			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
+		Integer bet = GameUtils.parseBetOrWarn(splitArgs[0], context);
+		if(bet == null) {
 			return;
 		}
 
