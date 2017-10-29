@@ -46,6 +46,7 @@ import me.shadorc.discordbot.command.music.ShuffleCmd;
 import me.shadorc.discordbot.command.music.SkipCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
+import me.shadorc.discordbot.command.owner.AddCoinsCmd;
 import me.shadorc.discordbot.command.owner.SendMessageCmd;
 import me.shadorc.discordbot.command.owner.ShutdownCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
@@ -133,6 +134,7 @@ public class CommandManager {
 				// Owner Commands
 				new SendMessageCmd(),
 				new ShutdownCmd());
+				new AddCoinsCmd());
 	}
 
 	private static void register(AbstractCommand... cmds) {
