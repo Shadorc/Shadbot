@@ -21,6 +21,11 @@ public enum Emoji {
 	BANK(":bank:"),
 	DICE(":game_die:"),
 
+	SPADES(":spades:"),
+	CLUBS(":clubs:"),
+	HEARTS(":hearts:"),
+	DIAMONDS(":diamonds:"),
+
 	THERMOMETER(":thermometer:"),
 	BEACH(":beach_umbrella:"),
 	CLOUD(":cloud:"),

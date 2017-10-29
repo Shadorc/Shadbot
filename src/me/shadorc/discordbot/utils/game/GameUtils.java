@@ -1,7 +1,10 @@
-package me.shadorc.discordbot.utils;
+package me.shadorc.discordbot.utils.game;
 
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
 
 public class GameUtils {

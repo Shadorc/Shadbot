@@ -10,12 +10,12 @@ import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.GameUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
+import me.shadorc.discordbot.utils.game.GameUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends AbstractCommand {

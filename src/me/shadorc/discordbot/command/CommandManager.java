@@ -20,6 +20,7 @@ import me.shadorc.discordbot.command.game.RpsCmd;
 import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
 import me.shadorc.discordbot.command.game.TriviaCmd;
+import me.shadorc.discordbot.command.game.blackjack.BlackjackCmd;
 import me.shadorc.discordbot.command.gamestats.CounterStrikeCmd;
 import me.shadorc.discordbot.command.gamestats.DiabloCmd;
 import me.shadorc.discordbot.command.gamestats.OverwatchCmd;
@@ -98,6 +99,7 @@ public class CommandManager {
 				new TriviaCmd(),
 				new RpsCmd(),
 				new RouletteCmd(),
+				new BlackjackCmd(),
 				// Currency Commands
 				new TransferCoinsCmd(),
 				new LeaderboardCmd(),
@@ -133,7 +135,7 @@ public class CommandManager {
 				new PruneCmd(),
 				// Owner Commands
 				new SendMessageCmd(),
-				new ShutdownCmd());
+				new ShutdownCmd(),
 				new AddCoinsCmd());
 	}
 
@@ -141,7 +143,8 @@ public class CommandManager {
 		for(AbstractCommand command : cmds) {
 			for(String name : command.getNames()) {
 				if(COMMANDS_MAP.containsKey(name)) {
-					LogUtils.error("Command name collision between " + command.getClass() + " and " + COMMANDS_MAP.get(name).getClass());
+					LogUtils.error("Command name collision between " + command.getClass().getSimpleName()
+							+ " and " + COMMANDS_MAP.get(name).getClass().getSimpleName());
 					continue;
 				}
 				COMMANDS_MAP.put(name, command);

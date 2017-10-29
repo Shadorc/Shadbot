@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.utils;
+package me.shadorc.discordbot.utils.game;
 
 public class Pair<L, R> {
 	private L left;
