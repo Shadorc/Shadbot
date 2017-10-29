@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import javax.swing.Timer;
 
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.data.StatCategory;
+import me.shadorc.discordbot.data.Stats;
 import me.shadorc.discordbot.data.Storage;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
@@ -139,6 +141,7 @@ public class BlackjackManager implements MessageListener {
 				case 0:
 					strBuilder.append("(Gains: " + StringUtils.pluralOf(player.getBet(), "coin") + ")");
 					Storage.addCoins(context.getGuild(), player.getUser(), player.getBet());
+					Stats.increment(StatCategory.MONEY_GAINS_COMMAND, "blackjack", player.getBet());
 					break;
 				case 1:
 					strBuilder.append("(Draw)");
@@ -146,6 +149,7 @@ public class BlackjackManager implements MessageListener {
 				case 2:
 					strBuilder.append("(Losses: " + StringUtils.pluralOf(player.getBet(), "coin") + ")");
 					Storage.addCoins(context.getGuild(), player.getUser(), -player.getBet());
+					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, "blackjack", player.getBet());
 					break;
 			}
 			results.add(strBuilder.toString());
