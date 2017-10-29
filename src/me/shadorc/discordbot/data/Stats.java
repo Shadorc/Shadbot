@@ -46,6 +46,10 @@ public class Stats {
 		}
 	}
 
+	public static JSONObject getCategory(StatCategory category) {
+		return STATS_MAP.get(category);
+	}
+
 	public static void increment(StatCategory category, String key) {
 		STATS_MAP.put(category, STATS_MAP.get(category).increment(key));
 	}

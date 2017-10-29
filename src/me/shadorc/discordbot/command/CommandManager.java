@@ -50,6 +50,7 @@ import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.owner.AddCoinsCmd;
 import me.shadorc.discordbot.command.owner.SendMessageCmd;
 import me.shadorc.discordbot.command.owner.ShutdownCmd;
+import me.shadorc.discordbot.command.owner.StatsCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
 import me.shadorc.discordbot.command.utils.LyricsCmd;
 import me.shadorc.discordbot.command.utils.PollCmd;
@@ -136,7 +137,8 @@ public class CommandManager {
 				// Owner Commands
 				new SendMessageCmd(),
 				new ShutdownCmd(),
-				new AddCoinsCmd());
+				new AddCoinsCmd(),
+				new StatsCmd());
 	}
 
 	private static void register(AbstractCommand... cmds) {
