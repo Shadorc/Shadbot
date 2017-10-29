@@ -113,7 +113,7 @@ public class WeatherCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show weather report for a city.**")
-				.appendField("Usage", "`" + context.getPrefix() + "weather <city>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <city>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

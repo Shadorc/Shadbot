@@ -39,7 +39,7 @@ public class AddCoinsCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Add coins to your wallet.**")
-				.appendField("Usage", "`" + context.getPrefix() + "add_coins <coins>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <coins>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

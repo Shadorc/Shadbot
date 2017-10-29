@@ -58,7 +58,7 @@ public class HolidaysCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show the number of remaining days before the next school holidays for the indicated zone.**")
-				.appendField("Usage", "`" + context.getPrefix() + "vacs <A|B|C>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <A|B|C>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

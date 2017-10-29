@@ -65,7 +65,7 @@ public class SkipCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Skip current music and play the next one if it exists."
 						+ "\nYou can also directly skip to a music in the playlist by specifying its number.**")
-				.appendField("Usage", "`" + context.getPrefix() + "skip [<num>]`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " [<num>]`", false)
 				.appendField("Argument", "**num** - [OPTIONAL] the number in the playlist of the music to play", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}

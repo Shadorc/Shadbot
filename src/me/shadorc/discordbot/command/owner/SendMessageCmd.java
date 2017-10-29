@@ -50,7 +50,7 @@ public class SendMessageCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Send a private message to an user.**")
-				.appendField("Usage", "`" + context.getPrefix() + "send <userID> <message>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <userID> <message>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

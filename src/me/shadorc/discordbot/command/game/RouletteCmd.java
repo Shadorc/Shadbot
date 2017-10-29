@@ -89,7 +89,7 @@ public class RouletteCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play a roulette game in which everyone can participate.**")
-				.appendField("Usage", "`" + context.getPrefix() + "roulette <bet> <place>`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <bet> <place>`", false)
 				.appendField("Restrictions", "**place** - must be a number between 1 and 36, red, black, even, odd, low or high", false)
 				.appendField("Info", "**low** - numbers between 1 and 18"
 						+ "\n**high** - numbers between 19 and 36", false);

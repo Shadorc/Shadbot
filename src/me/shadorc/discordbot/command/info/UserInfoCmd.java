@@ -55,7 +55,7 @@ public class UserInfoCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show info about an user.**")
-				.appendField("Usage", "`" + context.getPrefix() + "userinfo <@user>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <@user>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

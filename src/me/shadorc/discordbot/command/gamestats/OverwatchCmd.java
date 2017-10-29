@@ -114,7 +114,7 @@ public class OverwatchCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show player's stats for Overwatch.**")
-				.appendField("Usage", "`" + context.getPrefix() + "overwatch [<plateform> <region>] <battletag#0000>`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " [<plateform> <region>] <battletag#0000>`", false)
 				.appendField("Arguments", "**plateform** - [OPTIONAL] value: pc, xbl, psn"
 						+ "\n**region** - [OPTIONAL] (only needed if the plateform is PC) value: us, eu, kr, cn"
 						+ "\n**plateform** and **region** are automatically detected if nothing is specified.", false);

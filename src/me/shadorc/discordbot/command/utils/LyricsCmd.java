@@ -97,7 +97,7 @@ public class LyricsCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show lyrics for a song.**")
-				.appendField("Usage", "`" + context.getPrefix() + "lyrics <artist> - <title>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <artist> - <title>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }
