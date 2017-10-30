@@ -35,6 +35,32 @@ public class StatsCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
+		if(context.getArg().equals("average")) {
+			JSONObject moneyGainsCommand = Stats.getCategory(StatCategory.MONEY_GAINS_COMMAND);
+			JSONObject moneyLossesCommand = Stats.getCategory(StatCategory.MONEY_LOSSES_COMMAND);
+			JSONObject command = Stats.getCategory(StatCategory.COMMAND);
+
+			StringBuilder strBuilder = new StringBuilder("```prolog\nAverage:");
+			for(Object key : moneyGainsCommand.keySet()) {
+				int gain = moneyGainsCommand.optInt(key.toString());
+				int loss = moneyLossesCommand.optInt(key.toString());
+				int count = command.optInt(key.toString());
+
+				if(gain == 0 || count == 0) {
+					continue;
+				}
+
+				if(key.toString().contains("_")) {
+					count += command.optInt(key.toString().replace("_", "-")) + command.optInt(key.toString().replace("_", ""));
+				}
+				strBuilder.append("\n" + key.toString() + ": " + (float) (gain - loss) / count);
+			}
+			strBuilder.append("```");
+
+			BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
+			return;
+		}
+
 		if(!Arrays.stream(StatCategory.values()).anyMatch(category -> category.toString().equals(context.getArg()))) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Category unknown. (Options: "
 					+ Arrays.stream(StatCategory.values()).map(cat -> cat.toString()).collect(Collectors.toList()) + ")", context.getChannel());
@@ -75,8 +101,9 @@ public class StatsCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Show stats for the specified category.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <category>`", false)
+				.appendDescription("**Show stats for the specified category or average amount of coins gained with minigames.**")
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <category>`"
+						+ "\n`" + context.getPrefix() + this.getNames()[0] + " average`", false)
 				.appendField("Argument", "**category** - " + StringUtils.formatArray(StatCategory.values(), cat -> cat.toString(), ", "), false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 
