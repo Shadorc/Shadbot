@@ -53,7 +53,7 @@ public class HelpCmd extends AbstractCommand {
 										&& authorRole.getHierarchy() >= cmd.getRole().getHierarchy()
 										&& BotUtils.isCommandAllowed(context.getGuild(), cmd))
 								.distinct()
-								.map(cmd -> "`" + prefix + cmd.getNames()[0] + "`")
+								.map(cmd -> "`" + prefix + cmd.getFirstName() + "`")
 								.collect(Collectors.joining(" ")), false));
 
 		BotUtils.sendMessage(builder.build(), context.getChannel());

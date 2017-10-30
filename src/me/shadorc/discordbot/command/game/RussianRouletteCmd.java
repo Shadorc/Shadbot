@@ -57,11 +57,11 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(MathUtils.rand(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
-			Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, this.getNames()[0], Math.abs(gains));
+			Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
 			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
-			Stats.increment(StatCategory.MONEY_GAINS_COMMAND, this.getNames()[0], gains);
+			Stats.increment(StatCategory.MONEY_GAINS_COMMAND, this.getFirstName(), gains);
 		}
 
 		Storage.addCoins(context.getGuild(), context.getAuthor(), gains);
@@ -72,7 +72,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play russian roulette.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <bet>`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <bet>`", false)
 				.appendField("Restriction", "**bet** - You can not bet more than **" + MAX_BET + " coins**.", false)
 				.appendField("Gains", "You have a **5-in-6** chance to win **" + WIN_MULTIPLIER + " times** your bet and "
 						+ "a **1-in-6** chance to lose **" + LOSE_MULTIPLIER + " times** your bet.", false);

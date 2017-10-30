@@ -114,7 +114,7 @@ public class WallpaperCmd extends AbstractCommand {
 		if(!invalidArgs.isEmpty()) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + StringUtils.formatList(invalidArgs, str -> "`" + str + "`", ", ")
 					+ (invalidArgs.size() == 1 ? " is an invalid argument" : " are invalid arguments") + ". "
-					+ "Use `" + context.getPrefix() + "help " + this.getNames()[0] + "` for more information.", context.getChannel());
+					+ "Use `" + context.getPrefix() + "help " + this.getFirstName() + "` for more information.", context.getChannel());
 			return;
 		}
 
@@ -153,7 +153,7 @@ public class WallpaperCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.withDescription("**Search for a wallpaper.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " [arguments]`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " [arguments]`", false)
 				.appendField("Arguments", "**[OPTIONAL]** You can add them to refine your search, just put `<name>=<value>` after the command.", false)
 				.appendField("Name - value", "**purity** - " + StringUtils.formatArray(Purity.values(), purity -> purity.toString().toLowerCase(), ", ")
 						+ "\n**category** - " + StringUtils.formatArray(Category.values(), cat -> cat.toString().toLowerCase(), ", ")
@@ -161,7 +161,7 @@ public class WallpaperCmd extends AbstractCommand {
 						+ "\n**resolution** - Image resolution (Ex: 1920x1080)"
 						+ "\n**keyword** - Keyword (Ex: doom)", true)
 				.appendField("Example", "Search a *SFW* wallpaper in category *Anime*, with a *16x9* ratio :"
-						+ "\n`" + context.getPrefix() + this.getNames()[0] + " purity=sfw category=anime ratio=16x9`", false);
+						+ "\n`" + context.getPrefix() + this.getFirstName() + " purity=sfw category=anime ratio=16x9`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

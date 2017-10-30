@@ -114,7 +114,7 @@ public class DiabloCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show player's stats for Diablo 3.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <eu|us|tw|kr> <battletag#0000>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <eu|us|tw|kr> <battletag#0000>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

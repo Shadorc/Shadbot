@@ -1,19 +1,23 @@
 package me.shadorc.discordbot.command;
 
+import java.util.Arrays;
+import java.util.List;
+
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 
 public abstract class AbstractCommand {
 
 	private final CommandCategory category;
 	private final Role role;
-	private final String[] names;
+	private final List<String> names;
+
+	private String alias;
 
 	public AbstractCommand(CommandCategory category, Role role, String name, String... names) {
 		this.category = category;
 		this.role = role;
-		this.names = new String[names.length + 1];
-		this.names[0] = name;
-		System.arraycopy(names, 0, this.names, 1, names.length);
+		this.names = Arrays.asList(names);
+		this.names.add(name);
 	}
 
 	public abstract void execute(Context context) throws MissingArgumentException;
@@ -28,7 +32,20 @@ public abstract class AbstractCommand {
 		return role;
 	}
 
-	public String[] getNames() {
-		return names.clone();
+	public List<String> getNames() {
+		return names;
+	}
+
+	public String getFirstName() {
+		return names.get(0);
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+		this.names.add(alias);
 	}
 }

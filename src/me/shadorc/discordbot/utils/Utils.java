@@ -25,17 +25,6 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class Utils {
 
-	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
-		return map.entrySet()
-				.stream()
-				.sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
-				.collect(Collectors.toMap(
-						Map.Entry::getKey,
-						Map.Entry::getValue,
-						(value1, value2) -> value1,
-						LinkedHashMap::new));
-	}
-
 	/**
 	 * @return double representing process CPU load percentage value, Double.NaN if not available
 	 */
@@ -63,6 +52,35 @@ public class Utils {
 		}
 
 		return cpuLoad;
+	}
+
+	/**
+	 * @return the default embed builder (with author icon and color)
+	 */
+	public static EmbedBuilder getDefaultEmbed() {
+		return new EmbedBuilder()
+				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
+				.withColor(Config.BOT_COLOR);
+	}
+
+	/**
+	 * @param command - the command
+	 * @return the default command embed builder (with author name, author icon and color)
+	 */
+	public static EmbedBuilder getDefaultEmbed(AbstractCommand command) {
+		return Utils.getDefaultEmbed()
+				.withAuthorName("Help for " + command.getFirstName() + " command");
+	}
+
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+		return map.entrySet()
+				.stream()
+				.sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
+				.collect(Collectors.toMap(
+						Map.Entry::getKey,
+						Map.Entry::getValue,
+						(value1, value2) -> value1,
+						LinkedHashMap::new));
 	}
 
 	/**
@@ -109,23 +127,5 @@ public class Utils {
 			Thread.sleep(duration);
 		} catch (InterruptedException ignored) {
 		}
-	}
-
-	/**
-	 * @return the default embed builder (with author icon and color)
-	 */
-	public static EmbedBuilder getDefaultEmbed() {
-		return new EmbedBuilder()
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withColor(Config.BOT_COLOR);
-	}
-
-	/**
-	 * @param command - the command
-	 * @return the default command embed builder (with author name, author icon and color)
-	 */
-	public static EmbedBuilder getDefaultEmbed(AbstractCommand command) {
-		return Utils.getDefaultEmbed()
-				.withAuthorName("Help for " + command.getNames()[0] + " command");
 	}
 }

@@ -89,7 +89,7 @@ public class RouletteCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play a roulette game in which everyone can participate.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <bet> <place>`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <bet> <place>`", false)
 				.appendField("Restrictions", "**place** - must be a number between 1 and 36, red, black, even, odd, low or high", false)
 				.appendField("Info", "**low** - numbers between 1 and 18"
 						+ "\n**high** - numbers between 19 and 36", false);
@@ -151,12 +151,12 @@ public class RouletteCmd extends AbstractCommand {
 					gains *= 2;
 					Storage.addCoins(context.getGuild(), user, gains);
 					winningList.add("**" + user.getName() + "** (Gains: **" + StringUtils.pluralOf(gains, "coin") + "**)");
-					Stats.increment(StatCategory.MONEY_GAINS_COMMAND, RouletteCmd.this.getNames()[0], gains);
+					Stats.increment(StatCategory.MONEY_GAINS_COMMAND, RouletteCmd.this.getFirstName(), gains);
 
 				} else {
 					Storage.addCoins(context.getGuild(), user, -gains);
 					loserList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
-					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, RouletteCmd.this.getNames()[0], gains);
+					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, RouletteCmd.this.getFirstName(), gains);
 				}
 			}
 

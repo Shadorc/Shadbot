@@ -58,7 +58,7 @@ public class BlackjackCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Start or join a blackjack game.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <bet>`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <bet>`", false)
 				.appendField("Info", "**double down** -  increase the initial bet by 100% in exchange for committing to stand"
 						+ " after receiving exactly one more card", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());

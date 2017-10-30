@@ -102,8 +102,8 @@ public class StatsCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show stats for the specified category or average amount of coins gained with minigames.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <category>`"
-						+ "\n`" + context.getPrefix() + this.getNames()[0] + " average`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <category>`"
+						+ "\n`" + context.getPrefix() + this.getFirstName() + " average`", false)
 				.appendField("Argument", "**category** - " + StringUtils.formatArray(StatCategory.values(), cat -> cat.toString(), ", "), false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 

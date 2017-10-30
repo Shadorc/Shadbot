@@ -50,7 +50,7 @@ public class LeetCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Leetify a text.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <text>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <text>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

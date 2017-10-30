@@ -68,7 +68,7 @@ public class SlotMachineCmd extends AbstractCommand {
 			gains = THIRD_GAINS;
 		}
 		Storage.addCoins(context.getGuild(), context.getAuthor(), gains);
-		Stats.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getNames()[0], Math.abs(gains));
+		Stats.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
 
 		StringBuilder message = new StringBuilder(
 				":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":"

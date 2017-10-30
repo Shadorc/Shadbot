@@ -69,7 +69,7 @@ public class SettingsManagerCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.withThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
 				.appendDescription("**Change Shadbot's settings for this server.**"
-						+ "\n\n__**Usage:**__ `" + context.getPrefix() + this.getNames()[0] + " <name> <args>`"
+						+ "\n\n__**Usage:**__ `" + context.getPrefix() + this.getFirstName() + " <name> <args>`"
 						+ "\n__**Additional help:**__ `" + context.getPrefix() + "settings <name> help`");
 
 		for(String subCmd : SUBSETTINGS_MAP.keySet()) {

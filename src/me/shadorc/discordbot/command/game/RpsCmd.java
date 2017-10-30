@@ -91,7 +91,7 @@ public class RpsCmd extends AbstractCommand {
 				|| userHandsign.equals(Handsign.SCISSORS) && botHandsign.equals(Handsign.PAPER)) {
 			strBuilder.append(context.getAuthorName() + " wins ! Well done, you won **" + GAINS + " coins**.");
 			Storage.addCoins(context.getGuild(), context.getAuthor(), GAINS);
-			Stats.increment(StatCategory.MONEY_GAINS_COMMAND, this.getNames()[0], GAINS);
+			Stats.increment(StatCategory.MONEY_GAINS_COMMAND, this.getFirstName(), GAINS);
 		} else {
 			strBuilder.append(Shadbot.getClient().getOurUser().getName() + " wins !");
 		}
@@ -103,7 +103,7 @@ public class RpsCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play a Rock–paper–scissors game.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <handsign>`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <handsign>`", false)
 				.appendField("Argument", "**handsign** -  rock, paper or scissors", false)
 				.appendField("Gains", "The winner gets **" + GAINS + " coins**.", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());

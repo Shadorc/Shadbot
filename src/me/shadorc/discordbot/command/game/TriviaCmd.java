@@ -164,7 +164,7 @@ public class TriviaCmd extends AbstractCommand {
 				int gains = MIN_GAINS + (int) Math.ceil((LIMITED_TIME - (System.currentTimeMillis() - startTime) / 1000) * (float) (MAX_BONUS / LIMITED_TIME));
 				BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + gains + " coins**.", channel);
 				Storage.addCoins(message.getGuild(), author, gains);
-				Stats.increment(StatCategory.MONEY_GAINS_COMMAND, TriviaCmd.this.getNames()[0], gains);
+				Stats.increment(StatCategory.MONEY_GAINS_COMMAND, TriviaCmd.this.getFirstName(), gains);
 				this.stop();
 			}
 			return true;

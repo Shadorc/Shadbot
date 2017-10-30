@@ -124,7 +124,7 @@ public class Rule34Cmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show a random image corresponding to a tag from Rule34 website.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <tag>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <tag>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

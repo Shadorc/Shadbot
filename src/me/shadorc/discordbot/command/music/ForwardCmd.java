@@ -62,7 +62,7 @@ public class ForwardCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Fast forward current song a specified amount of time (in seconds).**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <sec>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <sec>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

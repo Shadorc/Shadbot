@@ -93,7 +93,7 @@ public class PlayCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play the music(s) from the url, search terms or playlist.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + "[first] [soundcloud] <url>`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + "[first] [soundcloud] <url>`", false)
 				.appendField("Argument", "**soundcloud** - [OPTIONAL] search on SoundCloud instead of YouTube"
 						+ "\n**first** - [OPTIONAL] add the song at the top of the playlist", false)
 				.appendField("Example", "`" + context.getPrefix() + "playfirst soundcloud At Doom's gate`"

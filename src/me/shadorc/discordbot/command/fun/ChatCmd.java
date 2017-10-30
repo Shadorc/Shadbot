@@ -84,7 +84,7 @@ public class ChatCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Chat with the artificial intelligence A.L.I.C.E.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <message>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <message>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

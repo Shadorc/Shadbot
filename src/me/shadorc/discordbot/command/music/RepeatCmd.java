@@ -71,7 +71,7 @@ public class RepeatCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Enable/disable song/playlist repetition.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " [playlist]`", false)
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " [playlist]`", false)
 				.appendField("Argument", "**playlist** - [OPTIONAL] repeat the current playlist", false)
 				.appendField("Info", "Reuse this command to toggle repetition", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());

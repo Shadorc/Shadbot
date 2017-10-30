@@ -107,7 +107,7 @@ public class PollCmd extends AbstractCommand {
 
 		if(StringUtils.getCharCount(splitArgs[1], '"') == 0) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You need to specify question and choices in quotation marks. "
-					+ "Use `" + context.getPrefix() + "help " + this.getNames()[0] + "` for more information.", context.getChannel());
+					+ "Use `" + context.getPrefix() + "help " + this.getFirstName() + "` for more information.", context.getChannel());
 			return;
 		}
 
@@ -144,13 +144,13 @@ public class PollCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Create a poll.**")
-				.appendField("Usage", "**Create a poll:** `" + context.getPrefix() + this.getNames()[0] + " <duration> \"question\" \"choice1\" \"choice2\"...`"
-						+ "\n**Vote:** `" + context.getPrefix() + this.getNames()[0] + " <choice>`"
-						+ "\n**Stop (author/admin):** `" + context.getPrefix() + this.getNames()[0] + " stop`", false)
+				.appendField("Usage", "**Create a poll:** `" + context.getPrefix() + this.getFirstName() + " <duration> \"question\" \"choice1\" \"choice2\"...`"
+						+ "\n**Vote:** `" + context.getPrefix() + this.getFirstName() + " <choice>`"
+						+ "\n**Stop (author/admin):** `" + context.getPrefix() + this.getFirstName() + " stop`", false)
 				.appendField("Restrictions", "**duration** - in seconds, must be between 10s and 3600s (1 hour)"
 						+ "\n**question and choices** - in quotation marks"
 						+ "\n**choices** - min: 2, max: 10", false)
-				.appendField("Example", "`" + context.getPrefix() + this.getNames()[0] + " 120 \"Where do we eat at noon?\" \"White\" \"53\" \"A dog\"`", false);
+				.appendField("Example", "`" + context.getPrefix() + this.getFirstName() + " 120 \"Where do we eat at noon?\" \"White\" \"53\" \"A dog\"`", false);
 
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
