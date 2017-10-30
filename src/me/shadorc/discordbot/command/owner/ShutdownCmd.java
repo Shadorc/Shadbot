@@ -27,8 +27,18 @@ public class ShutdownCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		Runnable shutdownTask = new Runnable() {
+			@Override
+			public void run() {
+				Shadbot.getClient().logout();
+				Scheduler.forceAndWaitExecution();
+				System.exit(0);
+			}
+		};
+
 		if(!context.hasArg()) {
-			throw new MissingArgumentException();
+			Executors.newSingleThreadScheduledExecutor().submit(shutdownTask);
+			return;
 		}
 
 		String[] splitArgs = StringUtils.getSplittedArg(context.getArg(), 2);
@@ -50,15 +60,6 @@ public class ShutdownCmd extends AbstractCommand {
 			}
 		}
 
-		Runnable shutdownTask = new Runnable() {
-			@Override
-			public void run() {
-				Shadbot.getClient().logout();
-				Scheduler.forceAndWaitExecution();
-				System.exit(0);
-			}
-		};
-
 		int delay = Integer.parseInt(timeStr);
 		Executors.newSingleThreadScheduledExecutor().schedule(shutdownTask, delay, TimeUnit.SECONDS);
 
@@ -69,7 +70,7 @@ public class ShutdownCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Schedule a shutdown after a fixed amount of seconds and send a message to all guilds playing musics.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " <seconds> <message>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getNames()[0] + " [<seconds> <message>]`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
