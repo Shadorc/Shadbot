@@ -38,7 +38,7 @@ public class BlacklistSettingCmd implements SettingCmd {
 				List<String> commandsAdded = new ArrayList<>();
 				for(String cmdName : arg2.split(",")) {
 					if(CommandManager.getCommand(cmdName) == null) {
-						BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " \"" + cmdName + "\" doesn't exist.", context.getChannel());
+						BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " `" + cmdName + "` doesn't exist.", context.getChannel());
 						continue;
 					}
 					if(!blacklist.contains(cmdName)) {
@@ -48,9 +48,9 @@ public class BlacklistSettingCmd implements SettingCmd {
 				}
 
 				if(!commandsAdded.isEmpty()) {
-					BotUtils.sendMessage(Emoji.CHECK_MARK + " \""
+					BotUtils.sendMessage(Emoji.CHECK_MARK + " Command `"
 							+ StringUtils.formatList(commandsAdded, cmd -> cmd, ", ")
-							+ "\" has been added to blacklist.", context.getChannel());
+							+ "` has been added to the blacklist.", context.getChannel());
 				}
 				break;
 
@@ -59,9 +59,9 @@ public class BlacklistSettingCmd implements SettingCmd {
 					blacklist.remove(name);
 				}
 
-				BotUtils.sendMessage(Emoji.CHECK_MARK + " Command \""
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " Command `"
 						+ StringUtils.formatArray(arg2.split(","), cmd -> cmd.toString(), ", ")
-						+ "\" has been removed from blacklist.", context.getChannel());
+						+ "` has been removed from the blacklist.", context.getChannel());
 				break;
 
 			default:
