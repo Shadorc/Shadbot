@@ -80,7 +80,12 @@ public class Storage {
 	}
 
 	public static void setSetting(IGuild guild, Setting setting, Object value) {
-		Storage.setOrInit(guild, SETTINGS, setting.toString(), value);
+		// If new value equals the default one, remove setting from data file
+		if(Storage.getDefaultSetting(setting) != null && value.toString().equals(Storage.getDefaultSetting(setting).toString())) {
+			Storage.removeSetting(guild, setting);
+		} else {
+			Storage.setOrInit(guild, SETTINGS, setting.toString(), value);
+		}
 	}
 
 	public synchronized static void removeSetting(IGuild guild, Setting setting) {
@@ -88,8 +93,20 @@ public class Storage {
 		if(guildObj == null || !guildObj.has(SETTINGS)) {
 			return;
 		}
+
 		guildObj.getJSONObject(SETTINGS).remove(setting.toString());
-		saveObject.put(guild.getStringID(), guildObj);
+
+		// If there is no more settings saved, remove it
+		if(guildObj.getJSONObject(SETTINGS).length() == 0) {
+			guildObj.remove(SETTINGS);
+		}
+
+		// If guild contains no more data, remove it
+		if(guildObj.length() == 0) {
+			saveObject.remove(guild.getStringID());
+		} else {
+			saveObject.put(guild.getStringID(), guildObj);
+		}
 	}
 
 	private static Object getDefaultSetting(Setting setting) {
