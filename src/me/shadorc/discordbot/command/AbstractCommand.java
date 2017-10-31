@@ -17,7 +17,7 @@ public abstract class AbstractCommand {
 		this.category = category;
 		this.role = role;
 		this.names = new ArrayList<>(Arrays.asList(names));
-		this.names.add(name);
+		this.names.add(0, name);
 	}
 
 	public abstract void execute(Context context) throws MissingArgumentException;
