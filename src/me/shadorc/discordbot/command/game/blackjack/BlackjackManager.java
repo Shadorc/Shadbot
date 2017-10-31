@@ -79,6 +79,7 @@ public class BlackjackManager implements MessageListener {
 		BlackjackPlayer player = new BlackjackPlayer(user, bet);
 		player.addCards(BlackjackUtils.pickCards(2));
 		players.add(player);
+		this.stopOrShow();
 	}
 
 	public boolean isPlaying(IUser user) {
