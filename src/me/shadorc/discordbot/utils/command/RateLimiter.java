@@ -2,6 +2,9 @@ package me.shadorc.discordbot.utils.command;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import me.shadorc.discordbot.command.Context;
@@ -17,37 +20,13 @@ public class RateLimiter {
 	public static final int COMMON_COOLDOWN = 2;
 	public static final int GAME_COOLDOWN = 5;
 
-	private final ConcurrentHashMap<Long, ConcurrentHashMap<Long, LimitedUser>> guildsLimitedUsers;
+	protected final ConcurrentHashMap<Long, ConcurrentHashMap<Long, Boolean>> guildsLimitedUsers;
+	private final Timer timer;
 	private final long timeout;
-
-	private class LimitedUser {
-		private long lastTime;
-		private boolean isWarned;
-
-		protected LimitedUser() {
-			this.lastTime = 0;
-			this.isWarned = false;
-		}
-
-		public long getLastTime() {
-			return lastTime;
-		}
-
-		public void setLastTime(long lastTime) {
-			this.lastTime = lastTime;
-		}
-
-		public void setWarned(boolean isWarned) {
-			this.isWarned = isWarned;
-		}
-
-		public boolean isWarned() {
-			return isWarned;
-		}
-	}
 
 	public RateLimiter(int timeout, ChronoUnit unit) {
 		this.timeout = Duration.of(timeout, unit).toMillis();
+		this.timer = new Timer();
 		this.guildsLimitedUsers = new ConcurrentHashMap<>();
 	}
 
@@ -63,26 +42,34 @@ public class RateLimiter {
 
 	private boolean isLimited(IGuild guild, IUser user) {
 		guildsLimitedUsers.putIfAbsent(guild.getLongID(), new ConcurrentHashMap<>());
-		LimitedUser limitedUser = guildsLimitedUsers.get(guild.getLongID()).getOrDefault(user.getLongID(), new LimitedUser());
 
-		long diff = System.currentTimeMillis() - limitedUser.getLastTime();
-		if(diff > timeout) {
-			limitedUser.setLastTime(System.currentTimeMillis());
-			limitedUser.setWarned(false);
-			guildsLimitedUsers.get(guild.getLongID()).put(user.getLongID(), limitedUser);
-			return false;
+		Map<Long, Boolean> guildMap = guildsLimitedUsers.get(guild.getLongID());
+
+		if(guildMap.containsKey(user.getLongID())) {
+			return true;
 		}
-		return true;
+
+		guildMap.put(user.getLongID(), false);
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				guildMap.remove(user.getLongID());
+				if(guildMap.isEmpty()) {
+					guildsLimitedUsers.remove(guild.getLongID());
+				}
+			}
+		}, timeout);
+		return false;
 	}
 
 	private boolean isWarned(IGuild guild, IUser user) {
-		return guildsLimitedUsers.get(guild.getLongID()).get(user.getLongID()).isWarned();
+		return guildsLimitedUsers.get(guild.getLongID()).get(user.getLongID());
 	}
 
 	private void warn(Context context) {
 		BotUtils.sendMessage(Emoji.STOPWATCH + " " + TextUtils.getSpamMessage() + " You can use this command once every **"
 				+ Duration.of(timeout, ChronoUnit.MILLIS).getSeconds() + " sec**.", context.getChannel());
-		guildsLimitedUsers.get(context.getGuild().getLongID()).get(context.getAuthor().getLongID()).setWarned(true);
+		guildsLimitedUsers.get(context.getGuild().getLongID()).put(context.getAuthor().getLongID(), true);
 		Stats.increment(StatCategory.LIMITED_COMMAND, context.getCommand());
 	}
 }
