@@ -16,7 +16,7 @@ public abstract class AbstractCommand {
 	public AbstractCommand(CommandCategory category, Role role, String name, String... names) {
 		this.category = category;
 		this.role = role;
-		this.names = Arrays.asList(names);
+		this.names = new ArrayList<>(Arrays.asList(names));
 		this.names.add(name);
 	}
 
