@@ -67,8 +67,8 @@ public class RateLimiter {
 	}
 
 	private void warn(Context context) {
-		BotUtils.sendMessage(Emoji.STOPWATCH + " " + TextUtils.getSpamMessage() + " You can use this command once every **"
-				+ Duration.of(timeout, ChronoUnit.MILLIS).getSeconds() + " sec**.", context.getChannel());
+		BotUtils.sendMessage(Emoji.STOPWATCH + " (**" + context.getAuthorName() + "**) " + TextUtils.getSpamMessage() + " You can use this"
+				+ " command once every *" + Duration.of(timeout, ChronoUnit.MILLIS).getSeconds() + " sec*.", context.getChannel());
 		guildsLimitedUsers.get(context.getGuild().getLongID()).put(context.getAuthor().getLongID(), true);
 		Stats.increment(StatCategory.LIMITED_COMMAND, context.getCommand());
 	}
