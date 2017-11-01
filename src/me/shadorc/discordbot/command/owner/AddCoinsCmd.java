@@ -10,6 +10,7 @@ import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class AddCoinsCmd extends AbstractCommand {
@@ -24,22 +25,33 @@ public class AddCoinsCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String coinsStr = context.getArg();
+		String coinsStr = StringUtils.getSplittedArg(context.getArg())[0];
 		if(!StringUtils.isPositiveInt(coinsStr)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid amount.", context.getChannel());
 			return;
 		}
 
 		int coins = Integer.parseInt(coinsStr);
-		Storage.addCoins(context.getGuild(), context.getAuthor(), coins);
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " You received **" + StringUtils.pluralOf(coins, "coin") + "**.", context.getChannel());
+
+		StringBuilder strBuilder = new StringBuilder();
+		if(context.getMessage().getMentions().isEmpty()) {
+			Storage.addCoins(context.getGuild(), context.getAuthor(), coins);
+			strBuilder.append("You");
+
+		} else {
+			for(IUser user : context.getMessage().getMentions()) {
+				Storage.addCoins(context.getGuild(), user, coins);
+			}
+			strBuilder.append(StringUtils.formatList(context.getMessage().getMentions(), user -> user.getName(), ", "));
+		}
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " **" + strBuilder.toString() + "** received *" + StringUtils.pluralOf(coins, "coin") + "*.", context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Add coins to your wallet.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <coins>`", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <coins> [<@user(s)>]`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
