@@ -57,7 +57,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 
 		int coins = Integer.parseInt(coinsStr);
 		if(Storage.getCoins(context.getGuild(), senderUser) < coins) {
-			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
+			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;
 		}
 

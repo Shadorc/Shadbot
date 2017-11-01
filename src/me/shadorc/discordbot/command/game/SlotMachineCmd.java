@@ -50,7 +50,7 @@ public class SlotMachineCmd extends AbstractCommand {
 		}
 
 		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < PAID_COST) {
-			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
+			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;
 		}
 

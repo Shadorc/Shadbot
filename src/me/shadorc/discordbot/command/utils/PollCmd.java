@@ -66,7 +66,7 @@ public class PollCmd extends AbstractCommand {
 		} else {
 			String numStr = context.getArg();
 			if(!StringUtils.isPositiveInt(numStr)) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and " + pollManager.getNumChoices() + ".", context.getChannel());
 				return;
 			}
 

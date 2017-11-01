@@ -20,7 +20,7 @@ public class HelpCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public HelpCmd() {
-		super(CommandCategory.HIDDEN, Role.USER, "help", "aide");
+		super(CommandCategory.HIDDEN, Role.USER, "help");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
@@ -41,7 +41,7 @@ public class HelpCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName("Shadbot Help")
-				.appendDescription("Get more information by using " + prefix + "help <command>.")
+				.appendDescription("Get more information by using `" + prefix + "help <command>`.")
 				.withFooterIcon("http://www.urbanleagueneb.org/wp-content/uploads/2016/10/E-mail-Icon.png")
 				.withFooterText("You can send me a suggestion, a bug report, anything by using: " + prefix + "report <message>");
 

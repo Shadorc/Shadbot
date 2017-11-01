@@ -22,7 +22,7 @@ public class GameUtils {
 
 		int bet = Integer.parseInt(betStr);
 		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < bet) {
-			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
+			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return null;
 		}
 

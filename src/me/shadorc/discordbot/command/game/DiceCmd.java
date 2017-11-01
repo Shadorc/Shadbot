@@ -91,7 +91,7 @@ public class DiceCmd extends AbstractCommand {
 	private void joinGame(Context context) {
 		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel().getLongID());
 		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < diceManager.getBet()) {
-			BotUtils.sendMessage(TextUtils.NOT_ENOUGH_COINS, context.getChannel());
+			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;
 		}
 
