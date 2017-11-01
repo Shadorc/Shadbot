@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.game.blackjack;
 
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.ConcurrentHashMap;
 
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
@@ -16,8 +15,6 @@ import me.shadorc.discordbot.utils.game.GameUtils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class BlackjackCmd extends AbstractCommand {
-
-	protected static final ConcurrentHashMap<Long, BlackjackManager> CHANNELS_BLACKJACK = new ConcurrentHashMap<>();
 
 	private final RateLimiter rateLimiter;
 
@@ -41,7 +38,13 @@ public class BlackjackCmd extends AbstractCommand {
 			return;
 		}
 
-		BlackjackManager blackjackManager = CHANNELS_BLACKJACK.getOrDefault(context.getChannel().getLongID(), new BlackjackManager(context));
+		BlackjackManager blackjackManager;
+		if(BlackjackManager.CHANNELS_BLACKJACK.containsKey(context.getChannel().getLongID())) {
+			blackjackManager = BlackjackManager.CHANNELS_BLACKJACK.get(context.getChannel().getLongID());
+		} else {
+			blackjackManager = new BlackjackManager(context);
+			blackjackManager.start();
+		}
 
 		if(blackjackManager.isPlaying(context.getAuthor())) {
 			BotUtils.sendMessage(Emoji.INFO + " You're already participating.", context.getChannel());
@@ -49,9 +52,6 @@ public class BlackjackCmd extends AbstractCommand {
 		}
 
 		blackjackManager.addPlayer(context.getAuthor(), bet);
-		blackjackManager.startIfNecessary();
-
-		CHANNELS_BLACKJACK.putIfAbsent(context.getChannel().getLongID(), blackjackManager);
 	}
 
 	@Override

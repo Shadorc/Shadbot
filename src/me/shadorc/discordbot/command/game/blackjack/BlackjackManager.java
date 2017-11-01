@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command.game.blackjack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class BlackjackManager implements MessageListener {
 
+	protected static final ConcurrentHashMap<Long, BlackjackManager> CHANNELS_BLACKJACK = new ConcurrentHashMap<>();
+
 	private static final int GAME_DURATION = 60;
 
 	private final List<BlackjackPlayer> players;
@@ -45,28 +48,23 @@ public class BlackjackManager implements MessageListener {
 		});
 	}
 
-	public void startIfNecessary() {
-		if(!dealerCards.isEmpty()) {
-			return;
-		}
-
-		dealerCards.addAll(BlackjackUtils.pickCards(2));
-		while(BlackjackUtils.getValue(dealerCards) <= 16) {
-			dealerCards.addAll(BlackjackUtils.pickCards(1));
+	public void start() {
+		this.dealerCards.addAll(BlackjackUtils.pickCards(2));
+		while(BlackjackUtils.getValue(this.dealerCards) <= 16) {
+			this.dealerCards.addAll(BlackjackUtils.pickCards(1));
 		}
 
 		MessageManager.addListener(context.getChannel(), this);
 		timer.start();
 		startTime = System.currentTimeMillis();
-
-		this.stopOrShow();
+		CHANNELS_BLACKJACK.putIfAbsent(context.getChannel().getLongID(), this);
 	}
 
 	public void stop() {
 		timer.stop();
 
 		MessageManager.removeListener(context.getChannel());
-		BlackjackCmd.CHANNELS_BLACKJACK.remove(context.getChannel().getLongID());
+		CHANNELS_BLACKJACK.remove(context.getChannel().getLongID());
 
 		this.show(true);
 		this.computeResults();
@@ -100,7 +98,9 @@ public class BlackjackManager implements MessageListener {
 				.withFooterText(isFinished ? "Finished" : "This game will end automatically in " + StringUtils.formatDuration(timer.getDelay() - System.currentTimeMillis() + startTime));
 
 		for(BlackjackPlayer player : players) {
-			builder.appendField(player.getUser().getName() + "'s hand" + (player.hasDoubleDown() ? " (Double down)" : ""),
+			builder.appendField(player.getUser().getName() + "'s hand"
+					+ (player.isStanding() ? " (Stand)" : "")
+					+ (player.hasDoubleDown() ? " (Double down)" : ""),
 					BlackjackUtils.formatCards(player.getCards()), true);
 		}
 
@@ -140,7 +140,7 @@ public class BlackjackManager implements MessageListener {
 			StringBuilder strBuilder = new StringBuilder("**" + player.getUser().getName() + "** ");
 			switch (result) {
 				case 0:
-					strBuilder.append("(Gains: " + StringUtils.pluralOf(player.getBet(), "coin") + ")");
+					strBuilder.append("(Gains: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
 					Storage.addCoins(context.getGuild(), player.getUser(), player.getBet());
 					Stats.increment(StatCategory.MONEY_GAINS_COMMAND, "blackjack", player.getBet());
 					break;
@@ -148,7 +148,7 @@ public class BlackjackManager implements MessageListener {
 					strBuilder.append("(Draw)");
 					break;
 				case 2:
-					strBuilder.append("(Losses: " + StringUtils.pluralOf(player.getBet(), "coin") + ")");
+					strBuilder.append("(Losses: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
 					Storage.addCoins(context.getGuild(), player.getUser(), -player.getBet());
 					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, "blackjack", player.getBet());
 					break;
@@ -167,6 +167,10 @@ public class BlackjackManager implements MessageListener {
 		}
 
 		BlackjackPlayer player = matchingPlayers.get(0);
+
+		if(player.isStanding()) {
+			return false;
+		}
 
 		switch (message.getContent().trim()) {
 			case "hit":
