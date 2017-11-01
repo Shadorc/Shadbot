@@ -152,16 +152,16 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	@Override
-	public boolean onMessageReceived(IMessage message) {
+	public void onMessageReceived(IMessage message) {
 		if(!message.getAuthor().equals(musicManager.getDj())) {
-			return false;
+			return;
 		}
 
 		String prefix = (String) Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX);
 		if(message.getContent().equalsIgnoreCase(prefix + "cancel")) {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
 			this.stopWaiting();
-			return true;
+			return;
 		}
 
 		String content = message.getContent();
@@ -172,13 +172,13 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			String numStr = str.replaceAll("[^\\d]", "");
 			if(!StringUtils.isPositiveInt(numStr)) {
 				this.sendInvalidChoice(str.trim(), prefix);
-				return true;
+				return;
 			}
 
 			int num = Integer.parseInt(numStr);
 			if(num < 1 || num > Math.min(5, resultsTracks.size())) {
 				this.sendInvalidChoice(str.trim(), prefix);
-				return true;
+				return;
 			}
 
 			if(!choices.contains(num)) {
@@ -204,7 +204,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		this.stopWaiting();
-		return true;
 	}
 
 	private void stopWaiting() {

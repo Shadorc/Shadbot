@@ -31,8 +31,8 @@ public class MessageListener {
 		}
 
 		IMessage message = event.getMessage();
-		if(MessageManager.isWaitingForMessage(event.getChannel()) && MessageManager.notify(message)) {
-			return;
+		if(MessageManager.isWaitingForMessage(event.getChannel())) {
+			MessageManager.notify(message);
 		}
 
 		String prefix = (String) Storage.getSetting(event.getGuild(), Setting.PREFIX);
