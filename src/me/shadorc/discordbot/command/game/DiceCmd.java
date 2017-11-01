@@ -157,7 +157,7 @@ public class DiceCmd extends AbstractCommand {
 			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Dice Game")
 					.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
-					.appendField(context.getAuthor().getName() + " started a dice game.",
+					.appendField(context.getAuthorName() + " started a dice game.",
 							"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + bet + " coins** putting.", false)
 					.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to make your bets.");
 			BotUtils.sendMessage(builder.build(), context.getChannel()).get();

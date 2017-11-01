@@ -169,6 +169,7 @@ public class BlackjackManager implements MessageListener {
 		BlackjackPlayer player = matchingPlayers.get(0);
 
 		if(player.isStanding()) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " (**" + context.getAuthorName() + "**) You're standing, you can't play anymore.", context.getChannel());
 			return;
 		}
 

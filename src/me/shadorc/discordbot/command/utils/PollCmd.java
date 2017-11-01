@@ -225,9 +225,9 @@ public class PollCmd extends AbstractCommand {
 
 			long remainingTime = (timer.getDelay() - (System.currentTimeMillis() - startTime));
 			EmbedBuilder embed = Utils.getDefaultEmbed()
-					.withAuthorName("Poll (Created by: " + context.getAuthor().getName() + ")")
+					.withAuthorName("Poll (Created by: " + context.getAuthorName() + ")")
 					.withThumbnail(context.getAuthor().getAvatarURL())
-					.appendDescription("Vote using: `" + context.getPrefix() + "poll <choice>`"
+					.appendDescription("Vote using: `" + context.getPrefix() + PollCmd.this.getFirstName() + " <choice>`"
 							+ "\n\n__**" + question + "**__"
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")

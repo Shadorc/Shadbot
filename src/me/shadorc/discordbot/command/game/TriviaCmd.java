@@ -94,7 +94,7 @@ public class TriviaCmd extends AbstractCommand {
 			this.channel = channel;
 			this.alreadyAnswered = new ArrayList<>();
 			this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(LIMITED_TIME), event -> {
-				BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the good answer was **" + correctAnswer + "**.", channel);
+				BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the correct answer was **" + correctAnswer + "**.", channel);
 				this.stop();
 			});
 		}

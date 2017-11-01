@@ -116,7 +116,7 @@ public class RouletteCmd extends AbstractCommand {
 			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Roulette Game")
 					.withThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
-					.appendField(context.getAuthor().getName() + " started a Roulette game.",
+					.appendField(context.getAuthorName() + " started a Roulette game.",
 							"Use `" + context.getPrefix() + "roulette <bet> <place>` to join the game."
 									+ "\n\n**place** - must be a number between 1 and 36, red, black, even, odd, low or high", false)
 					.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to make your bets.");
