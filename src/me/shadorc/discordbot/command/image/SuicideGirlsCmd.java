@@ -29,7 +29,8 @@ public class SuicideGirlsCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public SuicideGirlsCmd() {
-		super(CommandCategory.IMAGE, Role.USER, "suicide_girls", "suicide-girls", "suicidegirls", "sg");
+		super(CommandCategory.IMAGE, Role.USER, "suicide_girls", "suicide-girls", "suicidegirls");
+		this.setAlias("sg");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

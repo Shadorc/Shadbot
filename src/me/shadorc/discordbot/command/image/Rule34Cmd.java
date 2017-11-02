@@ -30,7 +30,8 @@ public class Rule34Cmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public Rule34Cmd() {
-		super(CommandCategory.IMAGE, Role.USER, "rule34", "r34");
+		super(CommandCategory.IMAGE, Role.USER, "rule34");
+		this.setAlias("r34");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

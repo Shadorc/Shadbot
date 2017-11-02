@@ -68,8 +68,12 @@ public class Utils {
 	 * @return the default command embed builder (with author name, author icon and color)
 	 */
 	public static EmbedBuilder getDefaultEmbed(AbstractCommand command) {
-		return Utils.getDefaultEmbed()
+		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.withAuthorName("Help for " + command.getFirstName() + " command");
+		if(command.getAlias() != null) {
+			builder.withFooterText("Alias: " + command.getAlias());
+		}
+		return builder;
 	}
 
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {

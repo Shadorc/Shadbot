@@ -27,6 +27,7 @@ public class ThisDayCmd extends AbstractCommand {
 
 	public ThisDayCmd() {
 		super(CommandCategory.FUN, Role.USER, "this_day", "this-day", "thisday");
+		this.setAlias("td");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

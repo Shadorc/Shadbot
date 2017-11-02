@@ -35,7 +35,8 @@ public class DiabloCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public DiabloCmd() {
-		super(CommandCategory.GAMESTATS, Role.USER, "diablo", "d3");
+		super(CommandCategory.GAMESTATS, Role.USER, "diablo");
+		this.setAlias("d3");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

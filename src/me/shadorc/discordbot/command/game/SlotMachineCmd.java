@@ -40,6 +40,7 @@ public class SlotMachineCmd extends AbstractCommand {
 
 	public SlotMachineCmd() {
 		super(CommandCategory.GAME, Role.USER, "slot_machine", "slot-machine", "slotmachine");
+		this.setAlias("sm");
 		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

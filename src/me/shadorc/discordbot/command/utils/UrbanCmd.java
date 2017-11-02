@@ -25,7 +25,8 @@ public class UrbanCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public UrbanCmd() {
-		super(CommandCategory.UTILS, Role.USER, "urban", "ud");
+		super(CommandCategory.UTILS, Role.USER, "urban");
+		this.setAlias("ud");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

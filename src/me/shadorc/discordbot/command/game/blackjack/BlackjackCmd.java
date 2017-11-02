@@ -19,7 +19,8 @@ public class BlackjackCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public BlackjackCmd() {
-		super(CommandCategory.GAME, Role.USER, "blackjack", "bj");
+		super(CommandCategory.GAME, Role.USER, "blackjack");
+		this.setAlias("bj");
 		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

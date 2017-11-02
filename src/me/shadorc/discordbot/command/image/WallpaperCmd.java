@@ -36,7 +36,8 @@ public class WallpaperCmd extends AbstractCommand {
 	private Wallhaven wallhaven;
 
 	public WallpaperCmd() {
-		super(CommandCategory.IMAGE, Role.USER, "wallpaper", "wp");
+		super(CommandCategory.IMAGE, Role.USER, "wallpaper");
+		this.setAlias("wp");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 

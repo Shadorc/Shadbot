@@ -21,7 +21,8 @@ public class VolumeCmd extends AbstractCommand {
 	private final RateLimiter rateLimiter;
 
 	public VolumeCmd() {
-		super(CommandCategory.MUSIC, Role.USER, "volume", "vol");
+		super(CommandCategory.MUSIC, Role.USER, "volume");
+		this.setAlias("vol");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
