@@ -2,7 +2,7 @@ package me.shadorc.discordbot.events;
 
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -35,7 +35,7 @@ public class MessageListener {
 			MessageManager.notify(message);
 		}
 
-		String prefix = (String) Storage.getSetting(event.getGuild(), Setting.PREFIX);
+		String prefix = (String) StorageManager.getSetting(event.getGuild(), Setting.PREFIX);
 		if(message.getContent().startsWith(prefix)) {
 			try {
 				CommandManager.manage(event);

@@ -7,8 +7,8 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.StatCategory;
-import me.shadorc.discordbot.data.Stats;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StatsManager;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.TextUtils;
@@ -50,7 +50,7 @@ public class SlotMachineCmd extends AbstractCommand {
 			return;
 		}
 
-		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < PAID_COST) {
+		if(StorageManager.getCoins(context.getGuild(), context.getAuthor()) < PAID_COST) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;
 		}
@@ -68,8 +68,8 @@ public class SlotMachineCmd extends AbstractCommand {
 		} else if(Utils.allEqual(SlotOptions.GIFT, slot1, slot2, slot3)) {
 			gains = THIRD_GAINS;
 		}
-		Storage.addCoins(context.getGuild(), context.getAuthor(), gains);
-		Stats.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
+		StorageManager.addCoins(context.getGuild(), context.getAuthor(), gains);
+		StatsManager.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
 
 		StringBuilder message = new StringBuilder(
 				":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":"

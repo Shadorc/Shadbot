@@ -59,7 +59,7 @@ import me.shadorc.discordbot.command.utils.UrbanCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
 import me.shadorc.discordbot.command.utils.WikiCmd;
 import me.shadorc.discordbot.data.StatCategory;
-import me.shadorc.discordbot.data.Stats;
+import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -178,10 +178,10 @@ public class CommandManager {
 
 		try {
 			command.execute(context);
-			Stats.increment(StatCategory.COMMAND, context.getCommand());
+			StatsManager.increment(StatCategory.COMMAND, context.getCommand());
 		} catch (MissingArgumentException err) {
 			command.showHelp(context);
-			Stats.increment(StatCategory.HELP_COMMAND, context.getCommand());
+			StatsManager.increment(StatCategory.HELP_COMMAND, context.getCommand());
 		}
 	}
 

@@ -12,7 +12,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -39,8 +39,8 @@ public class ServerInfoCmd extends AbstractCommand {
 		}
 
 		IGuild guild = context.getGuild();
-		List<Long> allowedChannels = Utils.convertToLongList((JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS));
-		List<String> blacklistedCmd = Utils.convertToStringList((JSONArray) Storage.getSetting(guild, Setting.BLACKLIST));
+		List<Long> allowedChannels = Utils.convertToLongList((JSONArray) StorageManager.getSetting(guild, Setting.ALLOWED_CHANNELS));
+		List<String> blacklistedCmd = Utils.convertToStringList((JSONArray) StorageManager.getSetting(guild, Setting.BLACKLIST));
 
 		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.setLenient(true)
@@ -54,7 +54,7 @@ public class ServerInfoCmd extends AbstractCommand {
 				.appendField("Channels", Integer.toString(guild.getChannels().size()), true)
 				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
 				.appendField("Settings", "**Prefix:** " + context.getPrefix()
-						+ "\n**Default volume:** " + Storage.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
+						+ "\n**Default volume:** " + StorageManager.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
 						+ "\n**Allowed channels:** " + (allowedChannels.isEmpty() ? "All" : "\n"
 								+ StringUtils.formatList(
 										allowedChannels,

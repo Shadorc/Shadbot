@@ -10,8 +10,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.data.Stats;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StatsManager;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -27,10 +27,10 @@ public class Scheduler {
 				.scheduleAtFixedRate(() -> NetUtils.postStats(), TimeUnit.MINUTES.toMillis(5), TimeUnit.HOURS.toMillis(3), TimeUnit.MILLISECONDS);
 
 		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(() -> Storage.save(), TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS);
+				.scheduleAtFixedRate(() -> StorageManager.save(), TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS);
 
 		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(() -> Stats.save(), TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
+				.scheduleAtFixedRate(() -> StatsManager.save(), TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
 	}
 
 	public static void scheduleMessages(Object message, IChannel channel, Reason reason) {
@@ -106,8 +106,8 @@ public class Scheduler {
 		try {
 			ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 			executor.submit(() -> {
-				Storage.save();
-				Stats.save();
+				StorageManager.save();
+				StatsManager.save();
 				executor.shutdown();
 			}).get();
 		} catch (InterruptedException | ExecutionException err) {

@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -99,7 +99,7 @@ public class BotUtils {
 	 * @return true if Shadbot is allowed to send a message in channel, false otherwise
 	 */
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
-		JSONArray channelsArray = (JSONArray) Storage.getSetting(guild, Setting.ALLOWED_CHANNELS);
+		JSONArray channelsArray = (JSONArray) StorageManager.getSetting(guild, Setting.ALLOWED_CHANNELS);
 
 		// If no permissions were defined, authorize all the channels by default.
 		if(channelsArray.length() == 0) {
@@ -115,7 +115,7 @@ public class BotUtils {
 	 * @return true if Shadbot is allowed to use this command, false otherwise
 	 */
 	public static boolean isCommandAllowed(IGuild guild, AbstractCommand cmd) {
-		JSONArray blacklistArray = (JSONArray) Storage.getSetting(guild, Setting.BLACKLIST);
+		JSONArray blacklistArray = (JSONArray) StorageManager.getSetting(guild, Setting.BLACKLIST);
 
 		if(blacklistArray.length() == 0) {
 			return true;

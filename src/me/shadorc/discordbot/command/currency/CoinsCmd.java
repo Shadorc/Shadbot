@@ -6,7 +6,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -33,11 +33,11 @@ public class CoinsCmd extends AbstractCommand {
 
 		if(context.getMessage().getMentions().isEmpty()) {
 			BotUtils.sendMessage(Emoji.PURSE + " You have **"
-					+ StringUtils.pluralOf(Storage.getCoins(context.getGuild(), context.getAuthor()), "coin")
+					+ StringUtils.pluralOf(StorageManager.getCoins(context.getGuild(), context.getAuthor()), "coin")
 					+ "**.", context.getChannel());
 		} else {
 			IUser user = context.getMessage().getMentions().get(0);
-			int coins = Storage.getUser(context.getGuild(), user).getInt(Storage.COINS);
+			int coins = StorageManager.getUser(context.getGuild(), user).getInt(StorageManager.COINS);
 			BotUtils.sendMessage(Emoji.PURSE + " " + user.getName() + " has **" + StringUtils.pluralOf(coins, "coin") + "**.", context.getChannel());
 		}
 	}

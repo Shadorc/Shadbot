@@ -13,7 +13,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.StatCategory;
-import me.shadorc.discordbot.data.Stats;
+import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -36,9 +36,9 @@ public class StatsCmd extends AbstractCommand {
 		}
 
 		if(context.getArg().equals("average")) {
-			JSONObject moneyGainsCommand = Stats.getCategory(StatCategory.MONEY_GAINS_COMMAND);
-			JSONObject moneyLossesCommand = Stats.getCategory(StatCategory.MONEY_LOSSES_COMMAND);
-			JSONObject command = Stats.getCategory(StatCategory.COMMAND);
+			JSONObject moneyGainsCommand = StatsManager.getCategory(StatCategory.MONEY_GAINS_COMMAND);
+			JSONObject moneyLossesCommand = StatsManager.getCategory(StatCategory.MONEY_LOSSES_COMMAND);
+			JSONObject command = StatsManager.getCategory(StatCategory.COMMAND);
 
 			StringBuilder strBuilder = new StringBuilder("```prolog\nAverage:");
 			for(Object key : moneyGainsCommand.keySet()) {
@@ -69,7 +69,7 @@ public class StatsCmd extends AbstractCommand {
 
 		StatCategory category = StatCategory.valueOf(context.getArg().toUpperCase());
 
-		JSONObject statsObj = Stats.getCategory(category);
+		JSONObject statsObj = StatsManager.getCategory(category);
 		if(statsObj.length() == 0) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This category is empty.", context.getChannel());
 			return;

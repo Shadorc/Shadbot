@@ -14,22 +14,22 @@ import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
-public class Storage {
+public class StorageManager {
 
 	public static final String USERS = "users";
 	public static final String SETTINGS = "settings";
 	public static final String COINS = "coins";
 
-	private static final File DATA_FILE = new File("data.json");
+	private static final File USER_DATA_FILE = new File("user_data.json");
 
 	@SuppressWarnings("ucd")
-	private static JSONObject saveObject;
+	private static JSONObject userDataObj;
 
 	static {
-		if(!DATA_FILE.exists()) {
+		if(!USER_DATA_FILE.exists()) {
 			FileWriter writer = null;
 			try {
-				writer = new FileWriter(DATA_FILE);
+				writer = new FileWriter(USER_DATA_FILE);
 				writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
 				writer.flush();
 
@@ -43,7 +43,7 @@ public class Storage {
 		}
 
 		try {
-			saveObject = new JSONObject(new JSONTokener(DATA_FILE.toURI().toURL().openStream()));
+			userDataObj = new JSONObject(new JSONTokener(USER_DATA_FILE.toURI().toURL().openStream()));
 		} catch (JSONException | IOException err) {
 			LogUtils.LOGGER.error("An error occured during data file initialization. Exiting.", err);
 			System.exit(1);
@@ -51,11 +51,11 @@ public class Storage {
 	}
 
 	public static JSONObject getUsers(IGuild guild) {
-		return Storage.getOrInit(guild, USERS);
+		return StorageManager.getOrInit(guild, USERS);
 	}
 
 	public static JSONObject getUser(IGuild guild, IUser user) {
-		JSONObject userObj = Storage.getUsers(guild).optJSONObject(user.getStringID());
+		JSONObject userObj = StorageManager.getUsers(guild).optJSONObject(user.getStringID());
 		if(userObj == null) {
 			return new JSONObject().put(COINS, 0);
 		}
@@ -63,33 +63,33 @@ public class Storage {
 	}
 
 	public static Object getSetting(IGuild guild, Setting setting) {
-		Object value = Storage.getOrInit(guild, SETTINGS).opt(setting.toString());
+		Object value = StorageManager.getOrInit(guild, SETTINGS).opt(setting.toString());
 		if(value == null) {
-			return Storage.getDefaultSetting(setting);
+			return StorageManager.getDefaultSetting(setting);
 		}
 		return value;
 	}
 
 	public static int getCoins(IGuild guild, IUser user) {
-		return Storage.getUser(guild, user).getInt(COINS);
+		return StorageManager.getUser(guild, user).getInt(COINS);
 	}
 
 	public static void addCoins(IGuild guild, IUser user, int gains) {
-		int coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) (Storage.getCoins(guild, user) + gains)));
-		Storage.setOrInit(guild, USERS, user.getStringID(), Storage.getUser(guild, user).put(COINS, coins));
+		int coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) (StorageManager.getCoins(guild, user) + gains)));
+		StorageManager.setOrInit(guild, USERS, user.getStringID(), StorageManager.getUser(guild, user).put(COINS, coins));
 	}
 
 	public static void setSetting(IGuild guild, Setting setting, Object value) {
 		// If new value equals the default one, remove setting from data file
-		if(Storage.getDefaultSetting(setting) != null && value.toString().equals(Storage.getDefaultSetting(setting).toString())) {
-			Storage.removeSetting(guild, setting);
+		if(StorageManager.getDefaultSetting(setting) != null && value.toString().equals(StorageManager.getDefaultSetting(setting).toString())) {
+			StorageManager.removeSetting(guild, setting);
 		} else {
-			Storage.setOrInit(guild, SETTINGS, setting.toString(), value);
+			StorageManager.setOrInit(guild, SETTINGS, setting.toString(), value);
 		}
 	}
 
 	public synchronized static void removeSetting(IGuild guild, Setting setting) {
-		JSONObject guildObj = saveObject.optJSONObject(guild.getStringID());
+		JSONObject guildObj = userDataObj.optJSONObject(guild.getStringID());
 		if(guildObj == null || !guildObj.has(SETTINGS)) {
 			return;
 		}
@@ -106,9 +106,9 @@ public class Storage {
 
 		// If guild contains no more data, remove it
 		if(guildObj.length() == 0) {
-			saveObject.remove(guild.getStringID());
+			userDataObj.remove(guild.getStringID());
 		} else {
-			saveObject.put(guild.getStringID(), guildObj);
+			userDataObj.put(guild.getStringID(), guildObj);
 		}
 	}
 
@@ -127,7 +127,7 @@ public class Storage {
 	}
 
 	private synchronized static JSONObject getOrInit(IGuild guild, String setting) {
-		JSONObject guildObj = saveObject.optJSONObject(guild.getStringID());
+		JSONObject guildObj = userDataObj.optJSONObject(guild.getStringID());
 		if(guildObj == null) {
 			guildObj = new JSONObject();
 		}
@@ -140,7 +140,7 @@ public class Storage {
 	}
 
 	private synchronized static void setOrInit(IGuild guild, String setting, String key, Object value) {
-		JSONObject guildObj = saveObject.optJSONObject(guild.getStringID());
+		JSONObject guildObj = userDataObj.optJSONObject(guild.getStringID());
 		if(guildObj == null) {
 			guildObj = new JSONObject();
 		}
@@ -152,14 +152,14 @@ public class Storage {
 
 		jsonObj.put(key, value);
 		guildObj.put(setting, jsonObj);
-		saveObject.put(guild.getStringID(), guildObj);
+		userDataObj.put(guild.getStringID(), guildObj);
 	}
 
 	public synchronized static void save() {
 		FileWriter writer = null;
 		try {
-			writer = new FileWriter(DATA_FILE);
-			writer.write(saveObject.toString(Config.INDENT_FACTOR));
+			writer = new FileWriter(USER_DATA_FILE);
+			writer.write(userDataObj.toString(Config.INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {

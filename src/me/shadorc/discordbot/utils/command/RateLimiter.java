@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.StatCategory;
-import me.shadorc.discordbot.data.Stats;
+import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import sx.blah.discord.handle.obj.IGuild;
@@ -70,6 +70,6 @@ public class RateLimiter {
 		BotUtils.sendMessage(Emoji.STOPWATCH + " (**" + context.getAuthorName() + "**) " + TextUtils.getSpamMessage() + " You can use this"
 				+ " command once every *" + Duration.of(timeout, ChronoUnit.MILLIS).getSeconds() + " sec*.", context.getChannel());
 		guildsLimitedUsers.get(context.getGuild().getLongID()).put(context.getAuthor().getLongID(), true);
-		Stats.increment(StatCategory.LIMITED_COMMAND, context.getCommand());
+		StatsManager.increment(StatCategory.LIMITED_COMMAND, context.getCommand());
 	}
 }

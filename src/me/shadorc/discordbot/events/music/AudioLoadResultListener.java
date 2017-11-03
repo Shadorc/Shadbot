@@ -15,7 +15,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
@@ -88,7 +88,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 
 			EmbedBuilder embed = new EmbedBuilder()
-					.withAuthorName("Results (Use " + Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel "
+					.withAuthorName("Results (Use " + StorageManager.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX) + "cancel "
 							+ "to cancel the selection)")
 					.withAuthorIcon(musicManager.getDj().getAvatarURL())
 					.withColor(Config.BOT_COLOR)
@@ -157,7 +157,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		String prefix = (String) Storage.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX);
+		String prefix = (String) StorageManager.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX);
 		if(message.getContent().equalsIgnoreCase(prefix + "cancel")) {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
 			this.stopWaiting();

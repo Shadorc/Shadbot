@@ -13,8 +13,8 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.StatCategory;
-import me.shadorc.discordbot.data.Stats;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StatsManager;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -90,7 +90,7 @@ public class DiceCmd extends AbstractCommand {
 
 	private void joinGame(Context context) {
 		DiceManager diceManager = CHANNELS_DICE.get(context.getChannel().getLongID());
-		if(Storage.getCoins(context.getGuild(), context.getAuthor()) < diceManager.getBet()) {
+		if(StorageManager.getCoins(context.getGuild(), context.getAuthor()) < diceManager.getBet()) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;
 		}
@@ -179,12 +179,12 @@ public class DiceCmd extends AbstractCommand {
 				if(num == winningNum) {
 					gains *= numsPlayers.size() + MULTIPLIER;
 					winningList.add("**" + user.getName() + "**, you win **" + StringUtils.pluralOf(gains, "coin") + "**");
-					Storage.addCoins(context.getGuild(), user, gains);
-					Stats.increment(StatCategory.MONEY_GAINS_COMMAND, DiceCmd.this.getFirstName(), gains);
+					StorageManager.addCoins(context.getGuild(), user, gains);
+					StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, DiceCmd.this.getFirstName(), gains);
 				} else {
 					loserList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
-					Storage.addCoins(context.getGuild(), user, -gains);
-					Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, DiceCmd.this.getFirstName(), gains);
+					StorageManager.addCoins(context.getGuild(), user, -gains);
+					StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, DiceCmd.this.getFirstName(), gains);
 				}
 			}
 

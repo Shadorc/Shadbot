@@ -2,7 +2,7 @@ package me.shadorc.discordbot.command.admin.setting;
 
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -29,7 +29,7 @@ public class PrefixSettingCmd implements SettingCmd {
 			return;
 		}
 
-		Storage.setSetting(context.getGuild(), Setting.PREFIX, arg);
+		StorageManager.setSetting(context.getGuild(), Setting.PREFIX, arg);
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " '" + arg + "' is now the prefix for this server.", context.getChannel());
 	}
 

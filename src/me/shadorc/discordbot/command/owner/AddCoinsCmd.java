@@ -4,7 +4,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -35,12 +35,12 @@ public class AddCoinsCmd extends AbstractCommand {
 
 		StringBuilder strBuilder = new StringBuilder();
 		if(context.getMessage().getMentions().isEmpty()) {
-			Storage.addCoins(context.getGuild(), context.getAuthor(), coins);
+			StorageManager.addCoins(context.getGuild(), context.getAuthor(), coins);
 			strBuilder.append("You");
 
 		} else {
 			for(IUser user : context.getMessage().getMentions()) {
-				Storage.addCoins(context.getGuild(), user, coins);
+				StorageManager.addCoins(context.getGuild(), user, coins);
 			}
 			strBuilder.append(StringUtils.formatList(context.getMessage().getMentions(), user -> user.getName(), ", "));
 		}

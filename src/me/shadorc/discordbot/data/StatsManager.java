@@ -12,7 +12,7 @@ import org.json.JSONTokener;
 
 import me.shadorc.discordbot.utils.LogUtils;
 
-public class Stats {
+public class StatsManager {
 
 	private static final File STATS_FILE = new File("stats.json");
 	private static final ConcurrentHashMap<StatCategory, JSONObject> STATS_MAP = new ConcurrentHashMap<>();

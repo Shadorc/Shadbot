@@ -7,8 +7,8 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.StatCategory;
-import me.shadorc.discordbot.data.Stats;
-import me.shadorc.discordbot.data.Storage;
+import me.shadorc.discordbot.data.StatsManager;
+import me.shadorc.discordbot.data.StorageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -58,14 +58,14 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(MathUtils.rand(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
-			Stats.increment(StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
+			StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
 			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
-			Stats.increment(StatCategory.MONEY_GAINS_COMMAND, this.getFirstName(), gains);
+			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, this.getFirstName(), gains);
 		}
 
-		Storage.addCoins(context.getGuild(), context.getAuthor(), gains);
+		StorageManager.addCoins(context.getGuild(), context.getAuthor(), gains);
 		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 	}
 
