@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import javax.swing.Timer;
 
 import me.shadorc.discordbot.command.Context;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
-import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;

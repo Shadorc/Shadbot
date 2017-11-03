@@ -34,7 +34,7 @@ public class DatabaseManager {
 				writer.flush();
 
 			} catch (IOException err) {
-				LogUtils.LOGGER.error("An error occured during data file initialization. Exiting.", err);
+				LogUtils.LOGGER.error("An error occured during database file initialization. Exiting.", err);
 				System.exit(1);
 
 			} finally {
@@ -45,7 +45,7 @@ public class DatabaseManager {
 		try {
 			userDataObj = new JSONObject(new JSONTokener(USER_DATA_FILE.toURI().toURL().openStream()));
 		} catch (JSONException | IOException err) {
-			LogUtils.LOGGER.error("An error occured during data file initialization. Exiting.", err);
+			LogUtils.LOGGER.error("An error occured during database file initialization. Exiting.", err);
 			System.exit(1);
 		}
 	}
@@ -163,7 +163,7 @@ public class DatabaseManager {
 			writer.flush();
 
 		} catch (IOException err) {
-			LogUtils.error("Error while saving data !", err);
+			LogUtils.error("Error while saving database !", err);
 
 		} finally {
 			IOUtils.closeQuietly(writer);

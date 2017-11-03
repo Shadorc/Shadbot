@@ -7,8 +7,8 @@ import org.json.JSONArray;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
-import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;

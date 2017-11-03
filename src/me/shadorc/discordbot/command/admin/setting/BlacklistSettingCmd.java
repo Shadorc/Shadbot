@@ -7,8 +7,8 @@ import org.json.JSONArray;
 
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;

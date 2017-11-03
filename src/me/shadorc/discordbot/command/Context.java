@@ -3,8 +3,8 @@ package me.shadorc.discordbot.command;
 import java.util.regex.Pattern;
 
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;

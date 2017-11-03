@@ -1,7 +1,7 @@
 package me.shadorc.discordbot.events;
 
-import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.api.events.EventSubscriber;
