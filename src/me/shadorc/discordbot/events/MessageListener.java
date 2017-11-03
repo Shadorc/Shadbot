@@ -37,7 +37,11 @@ public class MessageListener {
 
 		String prefix = (String) Storage.getSetting(event.getGuild(), Setting.PREFIX);
 		if(message.getContent().startsWith(prefix)) {
-			CommandManager.manage(event);
+			try {
+				CommandManager.manage(event);
+			} catch (Exception err) {
+				LogUtils.error("An unknown error occurred while executing a command.", err);
+			}
 		}
 	}
 }
