@@ -7,7 +7,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.data.StorageManager;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
@@ -56,19 +56,19 @@ public class TransferCoinsCmd extends AbstractCommand {
 		}
 
 		int coins = Integer.parseInt(coinsStr);
-		if(StorageManager.getCoins(context.getGuild(), senderUser) < coins) {
+		if(DatabaseManager.getCoins(context.getGuild(), senderUser) < coins) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;
 		}
 
-		if(StorageManager.getCoins(context.getGuild(), receiverUser) + coins >= Config.MAX_COINS) {
+		if(DatabaseManager.getCoins(context.getGuild(), receiverUser) + coins >= Config.MAX_COINS) {
 			BotUtils.sendMessage(Emoji.BANK + " This transfer cannot be done because " + receiverUser.getName()
 					+ " would exceed the maximum coins cap.", context.getChannel());
 			return;
 		}
 
-		StorageManager.addCoins(context.getGuild(), senderUser, -coins);
-		StorageManager.addCoins(context.getGuild(), receiverUser, coins);
+		DatabaseManager.addCoins(context.getGuild(), senderUser, -coins);
+		DatabaseManager.addCoins(context.getGuild(), receiverUser, coins);
 
 		BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " has transfered **"
 				+ coins + " coins** to " + receiverUser.mention(), context.getChannel());

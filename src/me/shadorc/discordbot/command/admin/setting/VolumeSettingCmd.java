@@ -3,7 +3,7 @@ package me.shadorc.discordbot.command.admin.setting;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.data.StorageManager;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -33,7 +33,7 @@ public class VolumeSettingCmd implements SettingCmd {
 			return;
 		}
 
-		StorageManager.setSetting(context.getGuild(), Setting.DEFAULT_VOLUME, vol);
+		DatabaseManager.setSetting(context.getGuild(), Setting.DEFAULT_VOLUME, vol);
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " Default volume set to **" + vol + "%**", context.getChannel());
 	}
 

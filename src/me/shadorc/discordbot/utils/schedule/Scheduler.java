@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.StatsManager;
-import me.shadorc.discordbot.data.StorageManager;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -27,7 +27,7 @@ public class Scheduler {
 				.scheduleAtFixedRate(() -> NetUtils.postStats(), TimeUnit.MINUTES.toMillis(5), TimeUnit.HOURS.toMillis(3), TimeUnit.MILLISECONDS);
 
 		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(() -> StorageManager.save(), TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS);
+				.scheduleAtFixedRate(() -> DatabaseManager.save(), TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS);
 
 		Executors.newSingleThreadScheduledExecutor()
 				.scheduleAtFixedRate(() -> StatsManager.save(), TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
@@ -106,7 +106,7 @@ public class Scheduler {
 		try {
 			ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 			executor.submit(() -> {
-				StorageManager.save();
+				DatabaseManager.save();
 				StatsManager.save();
 				executor.shutdown();
 			}).get();

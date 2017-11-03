@@ -19,7 +19,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
-import me.shadorc.discordbot.data.StorageManager;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -163,7 +163,7 @@ public class TriviaCmd extends AbstractCommand {
 			} else if(goodAnswer) {
 				int gains = MIN_GAINS + (int) Math.ceil((LIMITED_TIME - (System.currentTimeMillis() - startTime) / 1000) * (float) (MAX_BONUS / LIMITED_TIME));
 				BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + gains + " coins**.", channel);
-				StorageManager.addCoins(message.getGuild(), author, gains);
+				DatabaseManager.addCoins(message.getGuild(), author, gains);
 				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, TriviaCmd.this.getFirstName(), gains);
 				this.stop();
 			}

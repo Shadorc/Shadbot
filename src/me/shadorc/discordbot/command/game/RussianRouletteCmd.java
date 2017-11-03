@@ -8,7 +8,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
-import me.shadorc.discordbot.data.StorageManager;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -65,7 +65,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, this.getFirstName(), gains);
 		}
 
-		StorageManager.addCoins(context.getGuild(), context.getAuthor(), gains);
+		DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), gains);
 		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 	}
 

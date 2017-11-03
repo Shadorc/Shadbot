@@ -4,7 +4,7 @@ import java.util.List;
 
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.data.StorageManager;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -35,19 +35,19 @@ public class AutoMessageSettingCmd implements SettingCmd {
 					throw new MissingArgumentException();
 				}
 
-				StorageManager.setSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID, channelsMentioned.get(0).getLongID());
+				DatabaseManager.setSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID, channelsMentioned.get(0).getLongID());
 				BotUtils.sendMessage(Emoji.CHECK_MARK + " " + channelsMentioned.get(0).mention()
 						+ " is now the channel for join/leave messages.", context.getChannel());
 				break;
 
 			case "join":
 				if("disable".equals(arg2)) {
-					StorageManager.removeSetting(context.getGuild(), Setting.JOIN_MESSAGE);
+					DatabaseManager.removeSetting(context.getGuild(), Setting.JOIN_MESSAGE);
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " Join message disable.", context.getChannel());
 				} else {
-					StorageManager.setSetting(context.getGuild(), Setting.JOIN_MESSAGE, arg2);
+					DatabaseManager.setSetting(context.getGuild(), Setting.JOIN_MESSAGE, arg2);
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " The welcome message for this server is now: \"" + arg2 + "\".", context.getChannel());
-					if(StorageManager.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
+					if(DatabaseManager.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
 						BotUtils.sendMessage(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
 								+ " channel <#channel>` to define in which channel auto messages are send.", context.getChannel());
 					}
@@ -56,12 +56,12 @@ public class AutoMessageSettingCmd implements SettingCmd {
 
 			case "leave":
 				if("disable".equals(arg2)) {
-					StorageManager.removeSetting(context.getGuild(), Setting.LEAVE_MESSAGE);
+					DatabaseManager.removeSetting(context.getGuild(), Setting.LEAVE_MESSAGE);
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " Leave message disable.", context.getChannel());
 				} else {
-					StorageManager.setSetting(context.getGuild(), Setting.LEAVE_MESSAGE, arg2);
+					DatabaseManager.setSetting(context.getGuild(), Setting.LEAVE_MESSAGE, arg2);
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " The goodbye message for this server is now: \"" + arg2 + "\".", context.getChannel());
-					if(StorageManager.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
+					if(DatabaseManager.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
 						BotUtils.sendMessage(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
 								+ " channel <#channel>` to define in which channel auto messages are send.", context.getChannel());
 					}

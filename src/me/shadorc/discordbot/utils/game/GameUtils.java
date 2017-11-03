@@ -1,7 +1,7 @@
 package me.shadorc.discordbot.utils.game;
 
 import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.data.StorageManager;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
@@ -21,7 +21,7 @@ public class GameUtils {
 		}
 
 		int bet = Integer.parseInt(betStr);
-		if(StorageManager.getCoins(context.getGuild(), context.getAuthor()) < bet) {
+		if(DatabaseManager.getCoins(context.getGuild(), context.getAuthor()) < bet) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return null;
 		}

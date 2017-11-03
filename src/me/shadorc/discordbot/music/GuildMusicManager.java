@@ -11,7 +11,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.data.StorageManager;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.events.music.AudioEventListener;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -40,7 +40,7 @@ public class GuildMusicManager {
 		this.guild = guild;
 		this.audioPlayer = manager.createPlayer();
 		this.audioProvider = new AudioProvider(audioPlayer);
-		this.scheduler = new TrackScheduler(audioPlayer, (int) StorageManager.getSetting(guild, Setting.DEFAULT_VOLUME));
+		this.scheduler = new TrackScheduler(audioPlayer, (int) DatabaseManager.getSetting(guild, Setting.DEFAULT_VOLUME));
 		this.audioPlayer.addListener(new AudioEventListener(this));
 		this.leaveTimer = new Timer((int) TimeUnit.MINUTES.toMillis(1), event -> {
 			this.leaveVoiceChannel();

@@ -10,7 +10,7 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
-import me.shadorc.discordbot.data.StorageManager;
+import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -34,9 +34,9 @@ public class LeaderboardCmd extends AbstractCommand {
 		}
 
 		Map<String, Integer> usersCoin = new HashMap<>();
-		JSONObject usersObj = StorageManager.getUsers(context.getGuild());
+		JSONObject usersObj = DatabaseManager.getUsers(context.getGuild());
 		for(Object userID : usersObj.keySet()) {
-			int userCoin = usersObj.getJSONObject(userID.toString()).getInt(StorageManager.COINS);
+			int userCoin = usersObj.getJSONObject(userID.toString()).getInt(DatabaseManager.COINS);
 			if(userCoin > 0) {
 				IUser user = context.getGuild().getUserByID(Long.parseLong(userID.toString()));
 				if(user != null) {

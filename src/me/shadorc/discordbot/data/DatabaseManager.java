@@ -14,7 +14,7 @@ import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
-public class StorageManager {
+public class DatabaseManager {
 
 	public static final String USERS = "users";
 	public static final String SETTINGS = "settings";
@@ -51,11 +51,11 @@ public class StorageManager {
 	}
 
 	public static JSONObject getUsers(IGuild guild) {
-		return StorageManager.getOrInit(guild, USERS);
+		return DatabaseManager.getOrInit(guild, USERS);
 	}
 
 	public static JSONObject getUser(IGuild guild, IUser user) {
-		JSONObject userObj = StorageManager.getUsers(guild).optJSONObject(user.getStringID());
+		JSONObject userObj = DatabaseManager.getUsers(guild).optJSONObject(user.getStringID());
 		if(userObj == null) {
 			return new JSONObject().put(COINS, 0);
 		}
@@ -63,28 +63,28 @@ public class StorageManager {
 	}
 
 	public static Object getSetting(IGuild guild, Setting setting) {
-		Object value = StorageManager.getOrInit(guild, SETTINGS).opt(setting.toString());
+		Object value = DatabaseManager.getOrInit(guild, SETTINGS).opt(setting.toString());
 		if(value == null) {
-			return StorageManager.getDefaultSetting(setting);
+			return DatabaseManager.getDefaultSetting(setting);
 		}
 		return value;
 	}
 
 	public static int getCoins(IGuild guild, IUser user) {
-		return StorageManager.getUser(guild, user).getInt(COINS);
+		return DatabaseManager.getUser(guild, user).getInt(COINS);
 	}
 
 	public static void addCoins(IGuild guild, IUser user, int gains) {
-		int coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) (StorageManager.getCoins(guild, user) + gains)));
-		StorageManager.setOrInit(guild, USERS, user.getStringID(), StorageManager.getUser(guild, user).put(COINS, coins));
+		int coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) (DatabaseManager.getCoins(guild, user) + gains)));
+		DatabaseManager.setOrInit(guild, USERS, user.getStringID(), DatabaseManager.getUser(guild, user).put(COINS, coins));
 	}
 
 	public static void setSetting(IGuild guild, Setting setting, Object value) {
 		// If new value equals the default one, remove setting from data file
-		if(StorageManager.getDefaultSetting(setting) != null && value.toString().equals(StorageManager.getDefaultSetting(setting).toString())) {
-			StorageManager.removeSetting(guild, setting);
+		if(DatabaseManager.getDefaultSetting(setting) != null && value.toString().equals(DatabaseManager.getDefaultSetting(setting).toString())) {
+			DatabaseManager.removeSetting(guild, setting);
 		} else {
-			StorageManager.setOrInit(guild, SETTINGS, setting.toString(), value);
+			DatabaseManager.setOrInit(guild, SETTINGS, setting.toString(), value);
 		}
 	}
 
