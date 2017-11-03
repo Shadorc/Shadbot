@@ -62,7 +62,7 @@ public class NetUtils {
 		try {
 			new URL(stringUrl).openConnection().connect();
 			return true;
-		} catch (IOException err) {
+		} catch (IllegalArgumentException | IOException err) {
 			return false;
 		}
 	}
