@@ -94,11 +94,14 @@ public class Storage {
 			return;
 		}
 
-		guildObj.getJSONObject(SETTINGS).remove(setting.toString());
+		JSONObject settingsObj = guildObj.getJSONObject(SETTINGS);
+		settingsObj.remove(setting.toString());
 
 		// If there is no more settings saved, remove it
-		if(guildObj.getJSONObject(SETTINGS).length() == 0) {
+		if(settingsObj.length() == 0) {
 			guildObj.remove(SETTINGS);
+		} else {
+			guildObj.put(SETTINGS, settingsObj);
 		}
 
 		// If guild contains no more data, remove it
