@@ -7,6 +7,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -58,13 +59,13 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(MathUtils.rand(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
-			StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
+			LottoDataManager.addToPool(gains);
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
 			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
-			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, this.getFirstName(), gains);
 		}
 
+		StatsManager.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
 		DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), gains);
 		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 	}

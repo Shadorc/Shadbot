@@ -11,6 +11,7 @@ import javax.swing.Timer;
 
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.message.MessageListener;
@@ -151,6 +152,7 @@ public class BlackjackManager implements MessageListener {
 					strBuilder.append("(Losses: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
 					DatabaseManager.addCoins(context.getGuild(), player.getUser(), -player.getBet());
 					StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, "blackjack", player.getBet());
+					LottoDataManager.addToPool(player.getBet());
 					break;
 			}
 			results.add(strBuilder.toString());

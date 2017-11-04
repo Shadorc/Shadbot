@@ -13,6 +13,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -185,6 +186,7 @@ public class DiceCmd extends AbstractCommand {
 					loserList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
 					DatabaseManager.addCoins(context.getGuild(), user, -gains);
 					StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, DiceCmd.this.getFirstName(), gains);
+					LottoDataManager.addToPool(gains);
 				}
 			}
 
