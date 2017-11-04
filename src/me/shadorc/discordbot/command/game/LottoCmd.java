@@ -59,7 +59,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 		if(!context.hasArg()) {
 			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Lotto")
-					.withThumbnail("http://fastraxpos.com/wp-content/uploads/2016/01/lottery.png")
+					.withThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 					.appendField("Number of participants", Integer.toString(LottoDataManager.getPlayers().length()), false)
 					.appendField("Prize pool", Integer.toString(LottoDataManager.getPool()), false);
 
