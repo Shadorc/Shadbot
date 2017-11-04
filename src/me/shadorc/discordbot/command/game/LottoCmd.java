@@ -62,6 +62,28 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 					.withThumbnail("http://fastraxpos.com/wp-content/uploads/2016/01/lottery.png")
 					.appendField("Number of participants", Integer.toString(LottoDataManager.getPlayers().length()), false)
 					.appendField("Prize pool", Integer.toString(LottoDataManager.getPool()), false);
+
+			JSONObject historicObj = LottoDataManager.getHistoric();
+			if(historicObj != null) {
+				StringBuilder strBuilder = new StringBuilder("Last week, the prize pool contained **"
+						+ LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_POOL)
+						+ " coins**, the winning number was **"
+						+ LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_NUM)
+						+ "** and **");
+
+				int winnerCount = LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_WINNERS_COUNT);
+				if(winnerCount == 0) {
+					strBuilder.append("nobody");
+				} else if(winnerCount == 1) {
+					strBuilder.append("one person");
+				} else {
+					strBuilder.append(winnerCount + " people");
+				}
+				strBuilder.append(" won**.");
+
+				builder.appendField("Historic", strBuilder.toString(), false);
+			}
+
 			BotUtils.sendMessage(builder.build(), context.getChannel());
 			return;
 		}
@@ -131,29 +153,31 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		int rand = MathUtils.rand(1, 100);
+		int winningNum = MathUtils.rand(1, 100);
 
-		List<JSONObject> winnerList = new ArrayList<>();
+		List<JSONObject> winnersList = new ArrayList<>();
 
 		JSONArray players = LottoDataManager.getPlayers();
 		for(int i = 0; i < players.length(); i++) {
 			JSONObject playerObj = players.getJSONObject(i);
-			if(playerObj.getInt(LottoDataManager.NUM) == rand
+			if(playerObj.getInt(LottoDataManager.NUM) == winningNum
 					&& Shadbot.getClient().getGuildByID(playerObj.getLong(LottoDataManager.GUILD_ID)) != null
 					&& Shadbot.getClient().getUserByID(playerObj.getLong(LottoDataManager.USER_ID)) != null) {
-				winnerList.add(playerObj);
+				winnersList.add(playerObj);
 			}
 		}
 
-		for(JSONObject winnerObj : winnerList) {
+		for(JSONObject winnerObj : winnersList) {
 			IGuild guild = Shadbot.getClient().getGuildByID(winnerObj.getLong(LottoDataManager.GUILD_ID));
 			IUser user = Shadbot.getClient().getUserByID(winnerObj.getLong(LottoDataManager.USER_ID));
-			int coins = (int) Math.ceil((double) LottoDataManager.getPool() / winnerList.size());
+			int coins = (int) Math.ceil((double) LottoDataManager.getPool() / winnersList.size());
 			DatabaseManager.addCoins(guild, user, coins);
 			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, this.getFirstName(), coins);
 		}
 
-		if(!winnerList.isEmpty()) {
+		LottoDataManager.setHistoric(winnersList.size(), LottoDataManager.getPool(), winningNum);
+
+		if(!winnersList.isEmpty()) {
 			LottoDataManager.resetPool();
 		}
 

@@ -17,10 +17,16 @@ import sx.blah.discord.handle.obj.IUser;
 public class LottoDataManager {
 
 	public static final String POOL = "pool";
+
 	public static final String USERS = "users";
 	public static final String USER_ID = "userID";
 	public static final String GUILD_ID = "guildID";
 	public static final String NUM = "num";
+
+	public static final String HISTORIC = "historic";
+	public static final String HISTORIC_POOL = "historicPool";
+	public static final String HISTORIC_WINNERS_COUNT = "historicWinnerCount";
+	public static final String HISTORIC_NUM = "historicNum";
 
 	private static final File LOTTERY_DATA_FILE = new File("lotto_data.json");
 
@@ -49,7 +55,6 @@ public class LottoDataManager {
 
 		try {
 			dataObj = new JSONObject(new JSONTokener(LOTTERY_DATA_FILE.toURI().toURL().openStream()));
-
 		} catch (JSONException | IOException err) {
 			LogUtils.LOGGER.error("An error occured during lotto data file initialization. Exiting.", err);
 			System.exit(1);
@@ -75,6 +80,16 @@ public class LottoDataManager {
 
 	public static JSONArray getPlayers() {
 		return dataObj.getJSONArray(USERS);
+	}
+
+	public static JSONObject getHistoric() {
+		return dataObj.optJSONObject(HISTORIC);
+	}
+
+	public static void setHistoric(int winnersCount, int pool, int num) {
+		dataObj.put(HISTORIC, new JSONObject().put(HISTORIC_WINNERS_COUNT, winnersCount)
+				.put(HISTORIC_POOL, pool)
+				.put(HISTORIC_NUM, num));
 	}
 
 	public static void resetPool() {
