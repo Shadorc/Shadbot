@@ -57,7 +57,8 @@ public class LottoDataManager {
 	}
 
 	public static void addToPool(int coins) {
-		dataObj.put(POOL, dataObj.optInt(POOL) + coins);
+		int pool = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) (dataObj.optInt(POOL) + coins)));
+		dataObj.put(POOL, pool);
 	}
 
 	public static void addPlayer(IGuild guild, IUser user, int num) {
