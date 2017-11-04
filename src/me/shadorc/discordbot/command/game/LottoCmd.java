@@ -63,6 +63,11 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 					.appendField("Number of participants", Integer.toString(LottoDataManager.getPlayers().length()), false)
 					.appendField("Prize pool", Integer.toString(LottoDataManager.getPool()), false);
 
+			if(this.getNum(context.getAuthor()) != -1) {
+				builder.withFooterIcon("https://images.emojiterra.com/twitter/512px/1f39f.png");
+				builder.withFooterText(context.getAuthorName() + ", you bet on number " + this.getNum(context.getAuthor()) + ".");
+			}
+
 			JSONObject historicObj = LottoDataManager.getHistoric();
 			if(historicObj != null) {
 				StringBuilder strBuilder = new StringBuilder("Last week, the prize pool contained **"
@@ -104,7 +109,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			return;
 		}
 
-		if(this.isPlaying(context.getAuthor())) {
+		if(this.getNum(context.getAuthor()) != -1) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You're already participating.", context.getChannel());
 			return;
 		}
@@ -115,17 +120,25 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 
 		LottoDataManager.addPlayer(context.getGuild(), context.getAuthor(), num);
 
-		BotUtils.sendMessage(Emoji.TICKET + " You bought a lottery ticket and bet on number **" + num + "**. Good luck !", context.getChannel());
+		int minutes = this.getDelayBeforeNextCheck() / 1000 / 60;
+		int hours = minutes / 60;
+		int days = hours / 24;
+		BotUtils.sendMessage(Emoji.TICKET + " You bought a lottery ticket and bet on number **" + num + "**. "
+				+ "The next draw will take place in "
+				+ (days > 0 ? StringUtils.pluralOf(days, "day") + " " : "")
+				+ (hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "")
+				+ StringUtils.pluralOf(minutes % 60, "minute") + ". "
+				+ "Good luck !", context.getChannel());
 	}
 
-	private boolean isPlaying(IUser user) {
+	private int getNum(IUser user) {
 		JSONArray players = LottoDataManager.getPlayers();
 		for(int i = 0; i < players.length(); i++) {
 			if(players.getJSONObject(i).getLong(LottoDataManager.USER_ID) == user.getLongID()) {
-				return true;
+				return players.getJSONObject(i).getInt(LottoDataManager.NUM);
 			}
 		}
-		return false;
+		return -1;
 	}
 
 	private int getDelayBeforeNextCheck() {
