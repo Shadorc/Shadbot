@@ -59,7 +59,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(MathUtils.rand(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			strBuilder.append("**PAN** ... Sorry, you died. You lose **" + Math.abs(gains) + " coins**.");
-			LottoDataManager.addToPool(gains);
+			LottoDataManager.addToPool(Math.abs(gains));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
 			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + gains + " coins**.");
