@@ -10,8 +10,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.LottoDataManager;
+import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -31,6 +32,9 @@ public class Scheduler {
 
 		Executors.newSingleThreadScheduledExecutor()
 				.scheduleAtFixedRate(() -> StatsManager.save(), TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
+
+		Executors.newSingleThreadScheduledExecutor()
+				.scheduleAtFixedRate(() -> LottoDataManager.save(), TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
 	}
 
 	public static void scheduleMessages(Object message, IChannel channel, Reason reason) {
@@ -108,6 +112,7 @@ public class Scheduler {
 			executor.submit(() -> {
 				DatabaseManager.save();
 				StatsManager.save();
+				LottoDataManager.save();
 				executor.shutdown();
 			}).get();
 		} catch (InterruptedException | ExecutionException err) {

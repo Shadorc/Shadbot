@@ -20,6 +20,7 @@ public enum Emoji {
 	MONEY_BAG(":moneybag:"),
 	BANK(":bank:"),
 	DICE(":game_die:"),
+	TICKET(":tickets:"),
 
 	SPADES(":spades:"),
 	CLUBS(":clubs:"),
