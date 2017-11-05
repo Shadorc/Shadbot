@@ -9,6 +9,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.events.music.AudioLoadResultListener;
+import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -70,6 +71,13 @@ public class PlayCmd extends AbstractCommand {
 			identifier = context.getArg();
 		} else {
 			identifier = AudioLoadResultListener.YT_SEARCH + context.getArg();
+		}
+
+		if((identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH))
+				&& MessageManager.isWaitingForMessage(context.getChannel())) {
+			BotUtils.sendMessage(Emoji.HOURGLASS + " Someone is already selecting a music,"
+					+ " please wait for him to finish.", context.getChannel());
+			return;
 		}
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());

@@ -74,12 +74,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		List<AudioTrack> tracks = playlist.getTracks();
 
 		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
-			if(MessageManager.isWaitingForMessage(musicManager.getChannel())) {
-				BotUtils.sendMessage(Emoji.HOURGLASS + " Someone is already selecting a music,"
-						+ " please wait for him to finish.", musicManager.getChannel());
-				return;
-			}
-
 			musicManager.setDj(userDj);
 
 			StringBuilder strBuilder = new StringBuilder();
@@ -171,7 +165,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			// Remove all non numeric characters
 			String numStr = str.replaceAll("[^\\d]", "");
 			if(!StringUtils.isIntBetween(numStr, 1, Math.min(5, resultsTracks.size()))) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Music selection: \"" + str.trim() + "\" is not a valid number."
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Music selection: `" + str.trim() + "` is not a valid number."
 						+ " Enter a number between 1 and " + Math.min(5, resultsTracks.size()) + " or use `" + prefix + "cancel` to "
 						+ "cancel the selection.", musicManager.getChannel());
 				return;
