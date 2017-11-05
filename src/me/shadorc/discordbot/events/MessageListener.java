@@ -40,7 +40,7 @@ public class MessageListener {
 			try {
 				CommandManager.manage(event);
 			} catch (Exception err) {
-				LogUtils.error("An unknown error occurred while executing a command.", err);
+				LogUtils.error("An unknown error occurred while executing a command.", err, message.getContent());
 			}
 		}
 	}

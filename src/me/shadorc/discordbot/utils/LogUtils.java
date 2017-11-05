@@ -26,6 +26,13 @@ public class LogUtils {
 				+ "\nError message: " + err.getMessage());
 	}
 
+	public static void error(String msg, Exception err, String input) {
+		LOGGER.error(msg + " (Input: " + input + ")", err);
+		LogUtils.sendLogs("**[ERROR]** " + msg
+				+ "\nError message: " + err.getMessage()
+				+ "\nInput: " + input);
+	}
+
 	public static void error(String msg) {
 		LOGGER.error(msg);
 		LogUtils.sendLogs("**[ERROR]** " + msg);
