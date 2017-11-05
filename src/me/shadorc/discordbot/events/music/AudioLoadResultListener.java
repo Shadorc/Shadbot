@@ -165,9 +165,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			// Remove all non numeric characters
 			String numStr = str.replaceAll("[^\\d]", "");
 			if(!StringUtils.isIntBetween(numStr, 1, Math.min(5, resultsTracks.size()))) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Music selection: `" + str.trim() + "` is not a valid number."
-						+ " Enter a number between 1 and " + Math.min(5, resultsTracks.size()) + " or use `" + prefix + "cancel` to "
-						+ "cancel the selection.", musicManager.getChannel());
 				return;
 			}
 
