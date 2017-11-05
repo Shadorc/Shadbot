@@ -15,8 +15,8 @@ import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
-import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.util.EmbedBuilder;
@@ -57,7 +57,7 @@ public class WikiCmd extends AbstractCommand {
 			JSONObject resultObj = pagesObj.getJSONObject(pageId);
 
 			if("-1".equals(pageId) || resultObj.getString("extract").isEmpty()) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + context.getArg() + "\"", context.getChannel());
+				BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
 				return;
 			}
 

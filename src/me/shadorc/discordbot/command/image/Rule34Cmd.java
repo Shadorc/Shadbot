@@ -19,6 +19,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -61,7 +62,7 @@ public class Rule34Cmd extends AbstractCommand {
 			JSONObject postsObj = mainObj.getJSONObject("posts");
 
 			if(postsObj.getInt("count") == 0) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \"" + context.getArg() + "\".", context.getChannel());
+				BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
 				return;
 			}
 

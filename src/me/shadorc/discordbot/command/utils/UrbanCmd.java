@@ -14,8 +14,8 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
-import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.util.EmbedBuilder;
@@ -45,7 +45,7 @@ public class UrbanCmd extends AbstractCommand {
 					+ "term=" + URLEncoder.encode(context.getArg(), "UTF-8")));
 
 			if(mainObj.getString("result_type").equals("no_results")) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No results for \"" + context.getArg() + "\"", context.getChannel());
+				BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
 				return;
 			}
 

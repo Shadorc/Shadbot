@@ -136,8 +136,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	private void onNoMatches() {
-		BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No result for \""
-				+ identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "") + "\"", musicManager.getChannel());
+		BotUtils.sendMessage(TextUtils.noResult(identifier.replaceAll(YT_SEARCH + "|" + SC_SEARCH, "")), musicManager.getChannel());
 		LogUtils.info("{Guild ID: " + musicManager.getChannel().getGuild().getLongID() + "} No matches: " + identifier);
 
 		if(musicManager.getScheduler().isStopped()) {

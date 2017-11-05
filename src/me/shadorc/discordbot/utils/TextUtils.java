@@ -25,4 +25,7 @@ public class TextUtils {
 		return Emoji.BANK + " (**" + user.getName() + "**) You don't have enough coins. You can get some by playing **RPS** or **Trivia**.";
 	}
 
+	public static String noResult(String search) {
+		return Emoji.MAGNIFYING_GLASS + " No results for `" + search + "`.";
+	}
 }
