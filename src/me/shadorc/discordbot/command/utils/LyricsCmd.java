@@ -13,6 +13,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -63,7 +64,7 @@ public class LyricsCmd extends AbstractCommand {
 			if(NetUtils.getResponse(url).statusCode() == 404) {
 				Document searchDoc = NetUtils.getDoc(HOME_URL + "/search/" + artistSrch + "-" + titleSrch + "/tracks");
 				if(!searchDoc.getElementsByClass("empty").isEmpty()) {
-					BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " No lyrics found for \"" + context.getArg() + "\"", context.getChannel());
+					BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
 					return;
 				}
 				url = HOME_URL + searchDoc.getElementsByClass("title").attr("href");

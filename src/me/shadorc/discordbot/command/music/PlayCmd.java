@@ -75,19 +75,18 @@ public class PlayCmd extends AbstractCommand {
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
-		if(musicManager != null
-				&& (identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH))
-				&& MessageManager.isWaitingForMessage(context.getChannel())) {
-
-			if(musicManager.getDj().equals(context.getAuthor())) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + context.getAuthorName() + ", you're already selecting a music. "
+		if(MessageManager.isWaitingForMessage(context.getChannel())) {
+			if(musicManager != null && musicManager.getDj().equals(context.getAuthor())) {
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " (**" + context.getAuthorName() + "**) You're already selecting a music. "
 						+ "Enter a number or use `" + context.getPrefix() + "cancel` to cancel the selection.", musicManager.getChannel());
-			} else {
-				BotUtils.sendMessage(Emoji.HOURGLASS + " " + musicManager.getDj().getName() + " is already selecting a music, "
-						+ "please wait for him to finish.", context.getChannel());
+				return;
 			}
 
-			return;
+			if(identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH)) {
+				BotUtils.sendMessage(Emoji.HOURGLASS + " **" + musicManager.getDj().getName() + "** is already selecting a music, "
+						+ "please wait for him to finish.", context.getChannel());
+				return;
+			}
 		}
 
 		if(musicManager == null) {

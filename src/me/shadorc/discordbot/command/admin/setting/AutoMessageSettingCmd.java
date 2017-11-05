@@ -46,7 +46,7 @@ public class AutoMessageSettingCmd implements SettingCmd {
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " Join message disable.", context.getChannel());
 				} else {
 					DatabaseManager.setSetting(context.getGuild(), Setting.JOIN_MESSAGE, arg2);
-					BotUtils.sendMessage(Emoji.CHECK_MARK + " The welcome message for this server is now: \"" + arg2 + "\".", context.getChannel());
+					BotUtils.sendMessage(Emoji.CHECK_MARK + " The welcome message for this server is now: `" + arg2 + "`.", context.getChannel());
 					if(DatabaseManager.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
 						BotUtils.sendMessage(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
 								+ " channel <#channel>` to define in which channel auto messages are send.", context.getChannel());
@@ -60,7 +60,7 @@ public class AutoMessageSettingCmd implements SettingCmd {
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " Leave message disable.", context.getChannel());
 				} else {
 					DatabaseManager.setSetting(context.getGuild(), Setting.LEAVE_MESSAGE, arg2);
-					BotUtils.sendMessage(Emoji.CHECK_MARK + " The goodbye message for this server is now: \"" + arg2 + "\".", context.getChannel());
+					BotUtils.sendMessage(Emoji.CHECK_MARK + " The goodbye message for this server is now: `" + arg2 + "`.", context.getChannel());
 					if(DatabaseManager.getSetting(context.getGuild(), Setting.MESSAGE_CHANNEL_ID) == null) {
 						BotUtils.sendMessage(Emoji.INFO + " Use `" + context.getPrefix() + "settings " + Setting.AUTO_MESSAGE
 								+ " channel <#channel>` to define in which channel auto messages are send.", context.getChannel());
