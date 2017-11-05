@@ -22,17 +22,12 @@ public class VolumeSettingCmd implements SettingCmd {
 			throw new MissingArgumentException();
 		}
 
-		if(!StringUtils.isPositiveInt(arg)) {
+		if(!StringUtils.isIntBetween(arg, MIN_VOLUME, MAX_VOLUME)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ".", context.getChannel());
 			return;
 		}
 
 		int vol = Integer.parseInt(arg);
-		if(vol < MIN_VOLUME || vol > MAX_VOLUME) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Default volume must be between " + MIN_VOLUME + " and " + MAX_VOLUME + ". ", context.getChannel());
-			return;
-		}
-
 		DatabaseManager.setSetting(context.getGuild(), Setting.DEFAULT_VOLUME, vol);
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " Default volume set to **" + vol + "%**", context.getChannel());
 	}
@@ -52,5 +47,4 @@ public class VolumeSettingCmd implements SettingCmd {
 	public String getDescription() {
 		return "Change music default volume.";
 	}
-
 }

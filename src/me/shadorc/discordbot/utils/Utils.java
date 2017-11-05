@@ -65,7 +65,7 @@ public class Utils {
 
 	/**
 	 * @param command - the command
-	 * @return the default command embed builder (with author name, author icon and color)
+	 * @return the default command embed builder (with author name, footer text, author icon and color)
 	 */
 	public static EmbedBuilder getDefaultEmbed(AbstractCommand command) {
 		EmbedBuilder builder = Utils.getDefaultEmbed()
@@ -89,30 +89,19 @@ public class Utils {
 
 	/**
 	 * @param array - JSONArray to convert
-	 * @return List<String> containing array elements
+	 * @return List<T> containing array elements
 	 */
-	public static List<String> convertToStringList(JSONArray array) {
+	public static <T> List<T> convertToList(JSONArray array, Class<T> listClass) {
 		if(array == null) {
 			return null;
 		}
-		List<String> list = new ArrayList<>();
+		List<T> list = new ArrayList<>();
 		for(int i = 0; i < array.length(); i++) {
-			list.add(array.getString(i));
-		}
-		return list;
-	}
-
-	/**
-	 * @param array - JSONArray to convert
-	 * @return List<Long> containing array elements
-	 */
-	public static List<Long> convertToLongList(JSONArray array) {
-		if(array == null) {
-			return null;
-		}
-		List<Long> list = new ArrayList<>();
-		for(int i = 0; i < array.length(); i++) {
-			list.add(array.getLong(i));
+			if(listClass.isInstance(array.get(i))) {
+				list.add(listClass.cast(array.get(i)));
+			} else {
+				throw new IllegalArgumentException("Array's elements cannot be casted to " + listClass.getSimpleName() + ".");
+			}
 		}
 		return list;
 	}

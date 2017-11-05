@@ -80,7 +80,7 @@ public class StringUtils {
 
 	/**
 	 * @param date - the date to format
-	 * @return the formatted date as "d days h hours"
+	 * @return the formatted date as "y years m months d days"
 	 */
 	public static String formateDate(LocalDateTime date) {
 		Period period = Period.between(date.toLocalDate(), LocalDateTime.now().toLocalDate());
@@ -100,6 +100,11 @@ public class StringUtils {
 		return strBuilder.toString();
 	}
 
+	/**
+	 * @param count - the number
+	 * @param word - the word to get plural from
+	 * @return the plural of the word if necessary
+	 */
 	public static String pluralOf(long count, String word) {
 		return count + " " + (count > 1 ? word + "s" : word);
 	}
@@ -119,43 +124,6 @@ public class StringUtils {
 	 */
 	public static String[] getSplittedArg(String arg) {
 		return StringUtils.getSplittedArg(arg, 0);
-	}
-
-	/**
-	 * @param str - the String to check
-	 * @return true if it can be cast as a strictly positive Integer, false otherwise
-	 */
-	public static boolean isPositiveInt(String str) {
-		try {
-			return Integer.parseInt(str) > 0;
-		} catch (NumberFormatException err) {
-			return false;
-		}
-	}
-
-	/**
-	 * @param str - the String to check
-	 * @return true if it can be cast as a strictly positive Long, false otherwise
-	 */
-	public static boolean isPositiveLong(String str) {
-		try {
-			return Long.parseLong(str) > 0;
-		} catch (NumberFormatException err) {
-			return false;
-		}
-	}
-
-	/**
-	 * @param str - the String to check
-	 * @return true if it can be cast to a number between 1 and 6
-	 */
-	public static boolean isValidDiceNum(String str) {
-		try {
-			int num = Integer.parseInt(str);
-			return num >= 1 && num <= 6;
-		} catch (NumberFormatException err) {
-			return false;
-		}
 	}
 
 	/**
@@ -184,5 +152,44 @@ public class StringUtils {
 			}
 		}
 		return counter;
+	}
+
+	/**
+	 * @param str - the String to check
+	 * @return true if it can be cast as a strictly positive Integer, false otherwise
+	 */
+	public static boolean isPositiveInt(String str) {
+		try {
+			return Integer.parseInt(str) > 0;
+		} catch (NumberFormatException err) {
+			return false;
+		}
+	}
+
+	/**
+	 * @param str - the String to check
+	 * @return true if it can be cast as a strictly positive Long, false otherwise
+	 */
+	public static boolean isPositiveLong(String str) {
+		try {
+			return Long.parseLong(str) > 0;
+		} catch (NumberFormatException err) {
+			return false;
+		}
+	}
+
+	/**
+	 * @param str - the String to check
+	 * @param min - the minimum
+	 * @param max - the maximum
+	 * @return true if str can be cast into a number between min (inclusive) and max (inclusive), false otherwise
+	 */
+	public static boolean isIntBetween(String str, int min, int max) {
+		try {
+			int num = Integer.parseInt(str);
+			return num >= min && num <= max;
+		} catch (NumberFormatException err) {
+			return false;
+		}
 	}
 }

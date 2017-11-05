@@ -65,17 +65,12 @@ public class PollCmd extends AbstractCommand {
 
 		} else {
 			String numStr = context.getArg();
-			if(!StringUtils.isPositiveInt(numStr)) {
+			if(!StringUtils.isIntBetween(numStr, 1, pollManager.getNumChoices())) {
 				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and " + pollManager.getNumChoices() + ".", context.getChannel());
 				return;
 			}
 
 			int num = Integer.parseInt(numStr);
-			if(num < 1 || num > pollManager.getNumChoices()) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and " + pollManager.getNumChoices() + ".", context.getChannel());
-				return;
-			}
-
 			pollManager.vote(context.getAuthor(), num);
 		}
 	}
@@ -93,14 +88,8 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		String durationStr = splitArgs[0];
-		if(!StringUtils.isPositiveInt(durationStr)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid duration.", context.getChannel());
-			return;
-		}
-
-		int duration = Integer.parseInt(durationStr);
-		if(duration < MIN_DURATION || duration > MAX_DURATION) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Duration must be between " + MIN_DURATION + "sec and "
+		if(!StringUtils.isIntBetween(durationStr, MIN_DURATION, MAX_DURATION)) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid duration, must be between " + MIN_DURATION + "sec and "
 					+ MAX_DURATION + "sec.", context.getChannel());
 			return;
 		}
@@ -135,6 +124,7 @@ public class PollCmd extends AbstractCommand {
 			return;
 		}
 
+		int duration = Integer.parseInt(durationStr);
 		PollManager pollManager = new PollManager(context, duration, question, choicesList);
 		pollManager.start();
 		CHANNELS_POLL.putIfAbsent(context.getChannel().getLongID(), pollManager);

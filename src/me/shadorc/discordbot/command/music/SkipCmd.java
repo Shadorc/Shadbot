@@ -41,16 +41,12 @@ public class SkipCmd extends AbstractCommand {
 
 		if(context.hasArg()) {
 			String numStr = context.getArg();
-			if(!StringUtils.isPositiveInt(numStr)) {
+			if(!StringUtils.isIntBetween(numStr, 1, musicManager.getScheduler().getPlaylist().size())) {
 				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Number must be between 1 and " + musicManager.getScheduler().getPlaylist().size() + ".", context.getChannel());
 				return;
 			}
 
 			int num = Integer.parseInt(numStr);
-			if(num < 1 || num > musicManager.getScheduler().getPlaylist().size()) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Number must be between 1 and " + musicManager.getScheduler().getPlaylist().size() + ".", context.getChannel());
-				return;
-			}
 			musicManager.getScheduler().skipTo(num);
 			return;
 		}

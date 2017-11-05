@@ -28,7 +28,7 @@ public class ChannelSettingCmd implements SettingCmd {
 			throw new MissingArgumentException();
 		}
 
-		List<Long> allowedChannelsList = Utils.convertToLongList((JSONArray) DatabaseManager.getSetting(context.getGuild(), Setting.ALLOWED_CHANNELS));
+		List<Long> allowedChannelsList = Utils.convertToList((JSONArray) DatabaseManager.getSetting(context.getGuild(), Setting.ALLOWED_CHANNELS), Long.class);
 
 		switch (arg.split(" ")[0]) {
 			case "add":

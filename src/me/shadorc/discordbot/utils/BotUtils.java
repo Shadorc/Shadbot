@@ -106,7 +106,7 @@ public class BotUtils {
 			return true;
 		}
 
-		return Utils.convertToLongList(channelsArray).contains(channel.getLongID());
+		return Utils.convertToList(channelsArray, Long.class).contains(channel.getLongID());
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class BotUtils {
 			return true;
 		}
 
-		for(String blacklistName : Utils.convertToStringList(blacklistArray)) {
+		for(String blacklistName : Utils.convertToList(blacklistArray, String.class)) {
 			for(String cmdName : cmd.getNames()) {
 				if(blacklistName.equalsIgnoreCase(cmdName)) {
 					return false;

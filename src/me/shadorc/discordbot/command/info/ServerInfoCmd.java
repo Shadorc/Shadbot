@@ -39,8 +39,8 @@ public class ServerInfoCmd extends AbstractCommand {
 		}
 
 		IGuild guild = context.getGuild();
-		List<Long> allowedChannels = Utils.convertToLongList((JSONArray) DatabaseManager.getSetting(guild, Setting.ALLOWED_CHANNELS));
-		List<String> blacklistedCmd = Utils.convertToStringList((JSONArray) DatabaseManager.getSetting(guild, Setting.BLACKLIST));
+		List<Long> allowedChannels = Utils.convertToList((JSONArray) DatabaseManager.getSetting(guild, Setting.ALLOWED_CHANNELS), Long.class);
+		List<String> blacklistedCmd = Utils.convertToList((JSONArray) DatabaseManager.getSetting(guild, Setting.BLACKLIST), String.class);
 
 		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.setLenient(true)

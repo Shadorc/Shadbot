@@ -69,7 +69,7 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		String numStr = splitArgs[1];
-		if(!StringUtils.isValidDiceNum(numStr)) {
+		if(!StringUtils.isIntBetween(numStr, 1, 6)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 			return;
 		}
@@ -107,7 +107,7 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		String numStr = context.getArg();
-		if(!StringUtils.isValidDiceNum(numStr)) {
+		if(!StringUtils.isIntBetween(numStr, 1, 6)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 6.", context.getChannel());
 			return;
 		}

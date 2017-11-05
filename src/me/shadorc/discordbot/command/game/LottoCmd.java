@@ -6,8 +6,8 @@ import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.Timer;
 
@@ -98,21 +98,17 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			return;
 		}
 
-		if(!StringUtils.isPositiveInt(context.getArg())) {
+		if(this.getNum(context.getAuthor()) != -1) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You're already participating.", context.getChannel());
+			return;
+		}
+
+		if(!StringUtils.isIntBetween(context.getArg(), 1, 100)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 100.", context.getChannel());
 			return;
 		}
 
 		int num = Integer.parseInt(context.getArg());
-		if(num < 1 || num > 100) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 100.", context.getChannel());
-			return;
-		}
-
-		if(this.getNum(context.getAuthor()) != -1) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You're already participating.", context.getChannel());
-			return;
-		}
 
 		DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), -PAID_COST);
 		StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), PAID_COST);
@@ -168,17 +164,12 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		int winningNum = MathUtils.rand(1, 100);
 
-		List<JSONObject> winnersList = new ArrayList<>();
-
-		JSONArray players = LottoDataManager.getPlayers();
-		for(int i = 0; i < players.length(); i++) {
-			JSONObject playerObj = players.getJSONObject(i);
-			if(playerObj.getInt(LottoDataManager.NUM) == winningNum
-					&& Shadbot.getClient().getGuildByID(playerObj.getLong(LottoDataManager.GUILD_ID)) != null
-					&& Shadbot.getClient().getUserByID(playerObj.getLong(LottoDataManager.USER_ID)) != null) {
-				winnersList.add(playerObj);
-			}
-		}
+		List<JSONObject> winnersList = Utils.convertToList(LottoDataManager.getPlayers(), JSONObject.class);
+		winnersList = winnersList.stream().filter(
+				playerObj -> playerObj.getInt(LottoDataManager.NUM) == winningNum
+						&& Shadbot.getClient().getGuildByID(playerObj.getLong(LottoDataManager.GUILD_ID)) != null
+						&& Shadbot.getClient().getUserByID(playerObj.getLong(LottoDataManager.USER_ID)) != null)
+				.collect(Collectors.toList());
 
 		for(JSONObject winnerObj : winnersList) {
 			IGuild guild = Shadbot.getClient().getGuildByID(winnerObj.getLong(LottoDataManager.GUILD_ID));

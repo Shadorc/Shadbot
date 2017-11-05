@@ -29,7 +29,7 @@ public class BlacklistSettingCmd implements SettingCmd {
 			throw new MissingArgumentException();
 		}
 
-		List<String> blacklist = Utils.convertToStringList((JSONArray) DatabaseManager.getSetting(context.getGuild(), Setting.BLACKLIST));
+		List<String> blacklist = Utils.convertToList((JSONArray) DatabaseManager.getSetting(context.getGuild(), Setting.BLACKLIST), String.class);
 
 		String arg1 = splitArgs[0];
 		String arg2 = splitArgs[1];
