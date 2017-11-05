@@ -46,7 +46,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 	public LottoCmd() {
 		super(CommandCategory.GAME, Role.USER, "lotto");
 		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
-		this.timer = new Timer(this.getDelayBeforeNextCheck(), this);
+		this.timer = new Timer(this.getDelayBeforeNextDraw(), this);
 		this.timer.start();
 	}
 
@@ -60,6 +60,8 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Lotto")
 					.withThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
+					.withDescription(this.getDelaySentance()
+							+ "\nTo participate, type: " + context.getPrefix() + this.getFirstName() + "1-100")
 					.appendField("Number of participants", Integer.toString(LottoDataManager.getPlayers().length()), false)
 					.appendField("Prize pool", Integer.toString(LottoDataManager.getPool()), false);
 
@@ -116,14 +118,8 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 
 		LottoDataManager.addPlayer(context.getGuild(), context.getAuthor(), num);
 
-		int minutes = this.getDelayBeforeNextCheck() / 1000 / 60;
-		int hours = minutes / 60;
-		int days = hours / 24;
 		BotUtils.sendMessage(Emoji.TICKET + " You bought a lottery ticket and bet on number **" + num + "**. "
-				+ "The next draw will take place in "
-				+ (days > 0 ? StringUtils.pluralOf(days, "day") + " " : "")
-				+ (hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "")
-				+ StringUtils.pluralOf(minutes % 60, "minute") + ". "
+				+ this.getDelaySentance()
 				+ "Good luck !", context.getChannel());
 	}
 
@@ -137,7 +133,17 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 		return -1;
 	}
 
-	private int getDelayBeforeNextCheck() {
+	private String getDelaySentance() {
+		int minutes = this.getDelayBeforeNextDraw() / 1000 / 60;
+		int hours = minutes / 60;
+		int days = hours / 24;
+		return "The next draw will take place in "
+				+ (days > 0 ? StringUtils.pluralOf(days, "day") + " " : "")
+				+ (hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "")
+				+ StringUtils.pluralOf(minutes % 60, "minute") + ". ";
+	}
+
+	private int getDelayBeforeNextDraw() {
 		ZonedDateTime nextDate = ZonedDateTime.now()
 				.with(TemporalAdjusters.next(DayOfWeek.SUNDAY))
 				.withHour(12)
@@ -185,6 +191,6 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			LottoDataManager.reset();
 		}
 
-		this.timer = new Timer(this.getDelayBeforeNextCheck(), this);
+		this.timer = new Timer(this.getDelayBeforeNextDraw(), this);
 	}
 }
