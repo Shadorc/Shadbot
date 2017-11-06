@@ -64,7 +64,7 @@ public class StatsCmd extends AbstractCommand {
 
 		if(!Arrays.stream(StatCategory.values()).anyMatch(category -> category.toString().equals(context.getArg()))) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Category unknown. (Options: "
-					+ Arrays.stream(StatCategory.values()).map(cat -> cat.toString()).collect(Collectors.toList()) + ")", context.getChannel());
+					+ StringUtils.formatArray(StatCategory.values(), cat -> "**" + cat.toString() + "**", ", ") + ")", context.getChannel());
 			return;
 		}
 
@@ -88,6 +88,10 @@ public class StatsCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName(StringUtils.capitalize(category.toString()) + "'s Stats");
+
+		if(statsList.isEmpty()) {
+			builder.appendDescription("There is nothing here.");
+		}
 
 		for(int i = 0; i < Math.ceil((float) statsMap.keySet().size() / ROW_SIZE); i++) {
 			int index = i * ROW_SIZE;
