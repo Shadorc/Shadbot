@@ -162,37 +162,39 @@ public class BlackjackManager implements MessageListener {
 	}
 
 	@Override
-	public void onMessageReceived(IMessage message) {
+	public boolean onMessageReceived(IMessage message) {
 		List<BlackjackPlayer> matchingPlayers = players.stream().filter(playerItr -> playerItr.getUser().equals(message.getAuthor())).collect(Collectors.toList());
 		if(matchingPlayers.isEmpty()) {
-			return;
+			return false;
 		}
 
 		BlackjackPlayer player = matchingPlayers.get(0);
 
 		if(player.isStanding()) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " (**" + context.getAuthorName() + "**) You're standing, you can't play anymore.", context.getChannel());
-			return;
+			return false;
 		}
 
 		switch (message.getContent().trim()) {
 			case "hit":
 				player.hit();
 				this.stopOrShow();
-				break;
+				return true;
 			case "stand":
 				player.stand();
 				this.stopOrShow();
-				break;
+				return true;
 			case "double down":
 				if(player.getCards().size() != 2) {
 					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + player.getUser().getName()
 							+ ", you must have a maximum of 2 cards to use `double down`.", context.getChannel());
-					return;
+					return true;
 				}
 				player.doubleDown();
 				this.stopOrShow();
-				break;
+				return true;
 		}
+
+		return false;
 	}
 }

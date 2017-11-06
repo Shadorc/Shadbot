@@ -148,17 +148,19 @@ public class TriviaCmd extends AbstractCommand {
 		}
 
 		@Override
-		public void onMessageReceived(IMessage message) {
+		public boolean onMessageReceived(IMessage message) {
 			boolean wrongAnswer = incorrectAnswers.stream().anyMatch(message.getContent()::equalsIgnoreCase);
 			boolean goodAnswer = message.getContent().equalsIgnoreCase(this.correctAnswer);
 			IUser author = message.getAuthor();
 
 			if(alreadyAnswered.contains(author) && (wrongAnswer || goodAnswer)) {
 				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Sorry **" + author.getName() + "**, you can only answer once.", message.getChannel());
+				return true;
 
 			} else if(wrongAnswer) {
 				BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", channel);
 				alreadyAnswered.add(author);
+				return true;
 
 			} else if(goodAnswer) {
 				int gains = MIN_GAINS + (int) Math.ceil((LIMITED_TIME - (System.currentTimeMillis() - startTime) / 1000) * (float) (MAX_BONUS / LIMITED_TIME));
@@ -166,7 +168,9 @@ public class TriviaCmd extends AbstractCommand {
 				DatabaseManager.addCoins(message.getGuild(), author, gains);
 				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, TriviaCmd.this.getFirstName(), gains);
 				this.stop();
+				return true;
 			}
+			return false;
 		}
 	}
 }

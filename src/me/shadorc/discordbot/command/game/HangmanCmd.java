@@ -236,27 +236,28 @@ public class HangmanCmd extends AbstractCommand {
 		}
 
 		@Override
-		public void onMessageReceived(IMessage message) {
+		public boolean onMessageReceived(IMessage message) {
 			if(message.getAuthor().equals(context.getAuthor())) {
-
 				String content = message.getContent();
 
 				String prefix = (String) DatabaseManager.getSetting(message.getGuild(), Setting.PREFIX);
 				if(content.equalsIgnoreCase(prefix + "cancel")) {
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " Game canceled.", message.getChannel());
 					this.stop();
-					return;
+					return true;
 				}
 
-				if(content.length() == 1) {
-					this.checkLetter(content.toLowerCase());
-					return;
+				// Check only if content is an unique word
+				if(content.matches("[a-zA-Z]+")) {
+					if(content.length() == 1) {
+						this.checkLetter(content.toLowerCase());
+					} else if(content.length() >= MIN_WORD_LENGTH) {
+						this.checkWord(content);
+					}
 				}
 
-				if(!content.contains(" ") && content.length() >= MIN_WORD_LENGTH) {
-					this.checkWord(content);
-				}
 			}
+			return false;
 		}
 	}
 }

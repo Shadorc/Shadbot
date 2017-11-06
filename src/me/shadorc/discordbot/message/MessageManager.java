@@ -21,12 +21,14 @@ public class MessageManager {
 		return CHANNELS_LISTENERS.containsKey(channel.getLongID());
 	}
 
-	public static void notify(IMessage message) {
+	public static boolean notify(IMessage message) {
+		boolean isBlocked = false;
 		for(Long channelID : CHANNELS_LISTENERS.keySet()) {
 			MessageListener msgListener = CHANNELS_LISTENERS.get(channelID);
-			if(msgListener != null) {
-				msgListener.onMessageReceived(message);
+			if(msgListener != null && msgListener.onMessageReceived(message)) {
+				isBlocked = true;
 			}
 		}
+		return isBlocked;
 	}
 }
