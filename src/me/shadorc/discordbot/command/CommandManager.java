@@ -15,6 +15,7 @@ import me.shadorc.discordbot.command.fun.ChatCmd;
 import me.shadorc.discordbot.command.fun.LeetCmd;
 import me.shadorc.discordbot.command.fun.ThisDayCmd;
 import me.shadorc.discordbot.command.game.DiceCmd;
+import me.shadorc.discordbot.command.game.HangmanCmd;
 import me.shadorc.discordbot.command.game.LottoCmd;
 import me.shadorc.discordbot.command.game.RouletteCmd;
 import me.shadorc.discordbot.command.game.RpsCmd;
@@ -103,6 +104,7 @@ public class CommandManager {
 				new RouletteCmd(),
 				new BlackjackCmd(),
 				new LottoCmd(),
+				new HangmanCmd(),
 				// Currency Commands
 				new TransferCoinsCmd(),
 				new LeaderboardCmd(),
