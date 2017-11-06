@@ -61,7 +61,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 					.withAuthorName("Lotto")
 					.withThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 					.withDescription(this.getDelaySentance()
-							+ "\nTo participate, type: " + context.getPrefix() + this.getFirstName() + "1-100")
+							+ "\nTo participate, type: `" + context.getPrefix() + this.getFirstName() + " 1-100`")
 					.appendField("Number of participants", Integer.toString(LottoDataManager.getPlayers().length()), false)
 					.appendField("Prize pool", Integer.toString(LottoDataManager.getPool()), false);
 
@@ -118,9 +118,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 
 		LottoDataManager.addPlayer(context.getGuild(), context.getAuthor(), num);
 
-		BotUtils.sendMessage(Emoji.TICKET + " You bought a lottery ticket and bet on number **" + num + "**. "
-				+ this.getDelaySentance()
-				+ "Good luck !", context.getChannel());
+		BotUtils.sendMessage(Emoji.TICKET + " You bought a lottery ticket and bet on number **" + num + "**. Good luck !", context.getChannel());
 	}
 
 	private int getNum(IUser user) {
