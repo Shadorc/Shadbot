@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
+import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.StatCategory;
@@ -50,8 +51,8 @@ public class StatsCmd extends AbstractCommand {
 					continue;
 				}
 
-				if(key.toString().contains("_")) {
-					count += command.optInt(key.toString().replace("_", "-")) + command.optInt(key.toString().replace("_", ""));
+				for(String name : CommandManager.getCommand(key.toString()).getNames()) {
+					count += command.optInt(name);
 				}
 				strBuilder.append("\n" + key.toString() + ": " + (float) (gain - loss) / count);
 			}
