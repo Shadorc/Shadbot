@@ -40,7 +40,7 @@ public class MessageListener {
 			try {
 				CommandManager.manage(event);
 			} catch (Exception err) {
-				LogUtils.error("An unknown error occurred while executing a command.", err, message.getContent());
+				LogUtils.error("{Guild ID: " + event.getGuild().getLongID() + "} An unknown error occurred while executing a command.", err, message.getContent());
 			}
 		}
 	}
