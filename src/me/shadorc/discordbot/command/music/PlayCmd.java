@@ -75,8 +75,8 @@ public class PlayCmd extends AbstractCommand {
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
-		if(MessageManager.isWaitingForMessage(context.getChannel())) {
-			if(musicManager != null && musicManager.getDj().equals(context.getAuthor())) {
+		if(musicManager != null && MessageManager.isWaitingForMessage(context.getChannel())) {
+			if(musicManager.getDj().equals(context.getAuthor())) {
 				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " (**" + context.getAuthorName() + "**) You're already selecting a music. "
 						+ "Enter a number or use `" + context.getPrefix() + "cancel` to cancel the selection.", musicManager.getChannel());
 				return;
