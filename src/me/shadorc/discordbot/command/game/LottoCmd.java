@@ -63,7 +63,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 					.withDescription(this.getDelaySentance()
 							+ "\nTo participate, type: `" + context.getPrefix() + this.getFirstName() + " 1-100`")
 					.appendField("Number of participants", Integer.toString(LottoDataManager.getPlayers().length()), false)
-					.appendField("Prize pool", Integer.toString(LottoDataManager.getPool()), false);
+					.appendField("Prize pool", StringUtils.formatNum(LottoDataManager.getPool()) + " coins", false);
 
 			if(this.getNum(context.getAuthor()) != -1) {
 				builder.withFooterIcon("https://images.emojiterra.com/twitter/512px/1f39f.png");
@@ -73,7 +73,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			JSONObject historicObj = LottoDataManager.getHistoric();
 			if(historicObj != null) {
 				StringBuilder strBuilder = new StringBuilder("Last week, the prize pool contained **"
-						+ LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_POOL)
+						+ StringUtils.formatNum(LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_POOL))
 						+ " coins**, the winning number was **"
 						+ LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_NUM)
 						+ "** and **");

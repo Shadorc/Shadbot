@@ -1,11 +1,13 @@
 package me.shadorc.discordbot.utils;
 
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -98,6 +100,10 @@ public class StringUtils {
 		strBuilder.append(StringUtils.pluralOf(days, "day"));
 
 		return strBuilder.toString();
+	}
+
+	public static String formatNum(double num) {
+		return NumberFormat.getNumberInstance(Locale.ENGLISH).format(num);
 	}
 
 	/**
