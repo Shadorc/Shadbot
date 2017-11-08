@@ -131,7 +131,7 @@ public class HangmanCmd extends AbstractCommand {
 		}
 
 		protected void stop() {
-			MessageManager.removeListener(context.getChannel());
+			MessageManager.removeListener(context.getChannel(), this);
 			idleTimer.stop();
 			CHANNELS_HANGMAN.remove(context.getChannel().getLongID());
 		}

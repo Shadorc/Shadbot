@@ -142,7 +142,7 @@ public class TriviaCmd extends AbstractCommand {
 		}
 
 		private void stop() {
-			MessageManager.removeListener(channel);
+			MessageManager.removeListener(channel, this);
 			timer.stop();
 			CHANNELS_TRIVIA.remove(channel.getLongID());
 		}

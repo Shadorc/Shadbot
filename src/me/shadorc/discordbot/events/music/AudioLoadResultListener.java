@@ -197,7 +197,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private void stopWaiting() {
 		cancelTimer.stop();
 		resultsTracks.clear();
-		MessageManager.removeListener(musicManager.getChannel());
+		MessageManager.removeListener(musicManager.getChannel(), this);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
