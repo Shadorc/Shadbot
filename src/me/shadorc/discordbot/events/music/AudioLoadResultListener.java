@@ -75,6 +75,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
 			musicManager.setDj(userDj);
+			musicManager.setWaiting(true);
 
 			StringBuilder strBuilder = new StringBuilder();
 			for(int i = 0; i < Math.min(5, tracks.size()); i++) {
@@ -198,6 +199,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		cancelTimer.stop();
 		resultsTracks.clear();
 		MessageManager.removeListener(musicManager.getChannel(), this);
+		musicManager.setWaiting(false);
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();

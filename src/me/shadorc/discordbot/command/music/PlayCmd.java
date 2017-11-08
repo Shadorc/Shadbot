@@ -9,7 +9,6 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.events.music.AudioLoadResultListener;
-import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -75,7 +74,7 @@ public class PlayCmd extends AbstractCommand {
 
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
-		if(musicManager != null && MessageManager.isWaitingForMessage(context.getChannel())) {
+		if(musicManager != null && musicManager.isWaiting()) {
 			if(musicManager.getDj().equals(context.getAuthor())) {
 				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " (**" + context.getAuthorName() + "**) You're already selecting a music. "
 						+ "Enter a number or use `" + context.getPrefix() + "cancel` to cancel the selection.", musicManager.getChannel());

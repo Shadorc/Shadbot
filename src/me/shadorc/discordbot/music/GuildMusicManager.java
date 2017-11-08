@@ -35,6 +35,7 @@ public class GuildMusicManager {
 
 	private IChannel channel;
 	private IUser userDj;
+	private boolean isWaiting;
 
 	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
 		this.guild = guild;
@@ -85,6 +86,10 @@ public class GuildMusicManager {
 		this.userDj = userDj;
 	}
 
+	public void setWaiting(boolean isWaiting) {
+		this.isWaiting = isWaiting;
+	}
+
 	public IChannel getChannel() {
 		return channel;
 	}
@@ -103,6 +108,10 @@ public class GuildMusicManager {
 
 	public boolean isLeavingScheduled() {
 		return leaveTimer.isRunning();
+	}
+
+	public boolean isWaiting() {
+		return isWaiting;
 	}
 
 	public void delete() {
