@@ -53,8 +53,8 @@ public class ChatCmd extends AbstractCommand {
 		JSONObject mainObj = null;
 		try {
 			String custid = CHANNELS_CUSTID.get(context.getChannel().getLongID());
-			String xmlString = NetUtils.getDoc("http://sheepridge.pandorabots.com/pandora/talk-xml?"
-					+ "botid=b69b8d517e345aba"
+			String xmlString = NetUtils.getDoc("https://www.pandorabots.com/pandora/talk-xml?"
+					+ "botid=b0dafd24ee35a477"
 					+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
 					+ (custid == null ? "" : "&custid=" + custid))
 					.toString();
@@ -65,8 +65,7 @@ public class ChatCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 			return;
 		} catch (JSONException | IOException err) {
-			LogUtils.info("Something went wrong while discussing with A.L.I.C.E. (Error: " + err.getMessage() + "). Using Cleverbot instead."
-					+ (mainObj == null ? "" : "\nJSON: " + mainObj));
+			LogUtils.error("Something went wrong while discussing with Chomsky. Using Cleverbot instead.", err);
 		}
 
 		try {
