@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.utils;
 
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -31,24 +30,17 @@ public class PollCmd extends AbstractCommand {
 
 	protected static final ConcurrentHashMap<Long, PollManager> CHANNELS_POLL = new ConcurrentHashMap<>();
 
-	private final RateLimiter rateLimiter;
-
 	private static final int MIN_CHOICES_NUM = 2;
 	private static final int MAX_CHOICES_NUM = 10;
 	private static final int MIN_DURATION = 10;
 	private static final int MAX_DURATION = 3600;
 
 	public PollCmd() {
-		super(CommandCategory.UTILS, Role.USER, "poll");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.UTILS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "poll");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

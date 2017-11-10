@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.gamestats;
 
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,20 +26,13 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class OverwatchCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public OverwatchCmd() {
-		super(CommandCategory.GAMESTATS, Role.USER, "overwatch");
+		super(CommandCategory.GAMESTATS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "overwatch");
 		this.setAlias("ow");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		String[] splitArgs = StringUtils.getSplittedArg(context.getArg());
 		if(splitArgs.length < 1 || splitArgs.length > 3) {
 			throw new MissingArgumentException();

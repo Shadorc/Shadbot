@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.currency;
 
-import java.time.temporal.ChronoUnit;
-
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -20,19 +18,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class TransferCoinsCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public TransferCoinsCmd() {
-		super(CommandCategory.CURRENCY, Role.USER, "transfer");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.CURRENCY, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "transfer");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

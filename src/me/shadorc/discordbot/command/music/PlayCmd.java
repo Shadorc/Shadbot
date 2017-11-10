@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.music;
 
-import java.time.temporal.ChronoUnit;
-
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
@@ -24,19 +22,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class PlayCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public PlayCmd() {
-		super(CommandCategory.MUSIC, Role.USER, "play", "add", "queue", "playfirst", "addfirst", "queuefirst");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.MUSIC, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "play", "add", "queue", "playfirst", "addfirst", "queuefirst");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

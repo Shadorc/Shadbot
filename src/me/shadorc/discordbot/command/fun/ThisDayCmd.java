@@ -1,8 +1,6 @@
 package me.shadorc.discordbot.command.fun;
 
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,20 +21,14 @@ import sx.blah.discord.util.EmbedBuilder;
 public class ThisDayCmd extends AbstractCommand {
 
 	private static final String HOME_URL = "http://www.onthisday.com/";
-	private final RateLimiter rateLimiter;
 
 	public ThisDayCmd() {
-		super(CommandCategory.FUN, Role.USER, "this_day", "this-day", "thisday");
+		super(CommandCategory.FUN, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "this_day", "this-day", "thisday");
 		this.setAlias("td");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		try {
 			Document doc = NetUtils.getDoc(HOME_URL);
 

@@ -1,8 +1,6 @@
 package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,19 +22,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class DtcCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public DtcCmd() {
-		super(CommandCategory.FRENCH, Role.USER, "dtc");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.FRENCH, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "dtc");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		try {
 			JSONArray arrayObj = new JSONArray(NetUtils.getBody("http://api.danstonchat.com/0.3/view/random?"
 					+ "key=" + Config.get(APIKey.DTC_API_KEY)

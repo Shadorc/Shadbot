@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.image;
 
 import java.awt.Dimension;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,21 +31,15 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class WallpaperCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
 	private Wallhaven wallhaven;
 
 	public WallpaperCmd() {
-		super(CommandCategory.IMAGE, Role.USER, "wallpaper");
+		super(CommandCategory.IMAGE, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "wallpaper");
 		this.setAlias("wp");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(wallhaven == null) {
 			wallhaven = new Wallhaven(Config.get(APIKey.WALLHAVEN_LOGIN), Config.get(APIKey.WALLHAVEN_PASSWORD));
 		}

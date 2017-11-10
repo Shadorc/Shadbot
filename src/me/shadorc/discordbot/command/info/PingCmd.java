@@ -16,19 +16,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class PingCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public PingCmd() {
-		super(CommandCategory.INFO, Role.USER, "ping");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.INFO, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "ping");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		long ping = Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), context.getMessage().getCreationDate()));
 		BotUtils.sendMessage(Emoji.GEAR + " Ping: " + ping + "ms", context.getChannel());
 	}

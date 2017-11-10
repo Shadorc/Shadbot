@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.game;
 
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,19 +41,12 @@ public class TriviaCmd extends AbstractCommand {
 	protected static final int MAX_BONUS = 100;
 	protected static final int LIMITED_TIME = 30;
 
-	private final RateLimiter rateLimiter;
-
 	public TriviaCmd() {
-		super(CommandCategory.GAME, Role.USER, "trivia", "quizz", "question");
-		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "trivia", "quizz", "question");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		TriviaManager triviaManager = CHANNELS_TRIVIA.get(context.getChannel().getLongID());
 
 		if(triviaManager == null) {

@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.hidden;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -17,19 +16,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class HelpCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public HelpCmd() {
-		super(CommandCategory.HIDDEN, Role.USER, "help");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.HIDDEN, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "help");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(context.hasArg() && CommandManager.getCommand(context.getArg()) != null) {
 			CommandManager.getCommand(context.getArg()).showHelp(context);
 			return;

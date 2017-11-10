@@ -2,8 +2,6 @@ package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.time.temporal.ChronoUnit;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,19 +23,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class GifCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public GifCmd() {
-		super(CommandCategory.IMAGE, Role.USER, "gif");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.IMAGE, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "gif");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		try {
 			JSONObject mainObj = new JSONObject(NetUtils.getBody("https://api.giphy.com/v1/gifs/random?"
 					+ "api_key=" + Config.get(APIKey.GIPHY_API_KEY)

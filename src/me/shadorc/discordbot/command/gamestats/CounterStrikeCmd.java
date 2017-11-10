@@ -2,8 +2,6 @@ package me.shadorc.discordbot.command.gamestats;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.time.temporal.ChronoUnit;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,19 +24,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class CounterStrikeCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public CounterStrikeCmd() {
-		super(CommandCategory.GAMESTATS, Role.USER, "cs", "csgo");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.GAMESTATS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "cs", "csgo");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

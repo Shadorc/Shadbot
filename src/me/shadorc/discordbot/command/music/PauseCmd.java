@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.music;
 
-import java.time.temporal.ChronoUnit;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -19,19 +17,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class PauseCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public PauseCmd() {
-		super(CommandCategory.MUSIC, Role.USER, "pause", "unpause", "resume");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.MUSIC, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "pause", "unpause", "resume");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {

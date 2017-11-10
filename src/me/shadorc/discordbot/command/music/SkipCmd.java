@@ -22,7 +22,7 @@ public class SkipCmd extends AbstractCommand {
 
 	public SkipCmd() {
 		super(CommandCategory.MUSIC, Role.USER, "skip", "next");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(RateLimiter.DEFAULT_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override

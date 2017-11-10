@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.french;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,21 +19,14 @@ import twitter4j.TwitterException;
 
 public class HolidaysCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	private static final List<String> ZONES = Arrays.asList("A", "B", "C");
 
 	public HolidaysCmd() {
-		super(CommandCategory.FRENCH, Role.USER, "vacs", "vacances");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.FRENCH, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "vacs", "vacances");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.currency;
 
-import java.time.temporal.ChronoUnit;
-
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -18,19 +16,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class CoinsCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public CoinsCmd() {
-		super(CommandCategory.CURRENCY, Role.USER, "coins", "coin");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.CURRENCY, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "coins", "coin");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(context.getMessage().getMentions().isEmpty()) {
 			BotUtils.sendMessage(Emoji.PURSE + " You have **"
 					+ StringUtils.pluralOf(DatabaseManager.getCoins(context.getGuild(), context.getAuthor()), "coin")

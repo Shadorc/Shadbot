@@ -10,13 +10,14 @@ import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
+import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class AddCoinsCmd extends AbstractCommand {
 
 	public AddCoinsCmd() {
-		super(CommandCategory.OWNER, Role.OWNER, "add_coins");
+		super(CommandCategory.OWNER, Role.OWNER, RateLimiter.DEFAULT_COOLDOWN, "add_coins");
 	}
 
 	@Override

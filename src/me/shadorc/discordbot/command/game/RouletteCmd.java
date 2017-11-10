@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.game;
 
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,19 +33,12 @@ public class RouletteCmd extends AbstractCommand {
 	protected static final List<Integer> RED_NUMS = Arrays.asList(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36);
 	protected static final ConcurrentHashMap<Long, RouletteManager> CHANNELS_ROULETTE = new ConcurrentHashMap<>();
 
-	private final RateLimiter rateLimiter;
-
 	public RouletteCmd() {
-		super(CommandCategory.GAME, Role.USER, "roulette");
-		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "roulette");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

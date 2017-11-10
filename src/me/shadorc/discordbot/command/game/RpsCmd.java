@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.game;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 import me.shadorc.discordbot.Shadbot;
@@ -22,8 +21,6 @@ import sx.blah.discord.util.EmbedBuilder;
 public class RpsCmd extends AbstractCommand {
 
 	private static final int GAINS = 170;
-
-	private final RateLimiter rateLimiter;
 
 	private enum Handsign {
 		ROCK("Rock", Emoji.GEM),
@@ -58,16 +55,11 @@ public class RpsCmd extends AbstractCommand {
 	}
 
 	public RpsCmd() {
-		super(CommandCategory.GAME, Role.USER, "rps");
-		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "rps");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

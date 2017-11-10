@@ -25,19 +25,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class InfoCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public InfoCmd() {
-		super(CommandCategory.INFO, Role.USER, "info");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.INFO, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "info");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		long ping = Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), context.getMessage().getCreationDate()));
 
 		Runtime runtime = Runtime.getRuntime();

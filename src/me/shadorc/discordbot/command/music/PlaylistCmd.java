@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.music;
 
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.BlockingQueue;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -20,19 +19,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class PlaylistCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public PlaylistCmd() {
-		super(CommandCategory.MUSIC, Role.USER, "playlist");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.MUSIC, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "playlist");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {

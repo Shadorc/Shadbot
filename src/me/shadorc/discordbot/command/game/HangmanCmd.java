@@ -3,7 +3,6 @@ package me.shadorc.discordbot.command.game;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,19 +47,12 @@ public class HangmanCmd extends AbstractCommand {
 
 	protected static final ConcurrentHashMap<Long, HangmanManager> CHANNELS_HANGMAN = new ConcurrentHashMap<>();
 
-	private final RateLimiter rateLimiter;
-
 	public HangmanCmd() {
-		super(CommandCategory.GAME, Role.USER, "hangman");
-		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "hangman");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		HangmanManager hangmanManager = CHANNELS_HANGMAN.get(context.getChannel().getLongID());
 
 		if(hangmanManager == null) {

@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.fun;
 
-import java.time.temporal.ChronoUnit;
-
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -15,19 +13,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class LeetCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public LeetCmd() {
-		super(CommandCategory.FUN, Role.USER, "leet");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.FUN, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "leet");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

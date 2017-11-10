@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,20 +31,14 @@ import sx.blah.discord.util.EmbedBuilder;
 public class DiabloCmd extends AbstractCommand {
 
 	private final DecimalFormat formatter = new DecimalFormat("#,###");
-	private final RateLimiter rateLimiter;
 
 	public DiabloCmd() {
-		super(CommandCategory.GAMESTATS, Role.USER, "diablo");
+		super(CommandCategory.GAMESTATS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "diablo");
 		this.setAlias("d3");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

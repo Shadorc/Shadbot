@@ -2,7 +2,6 @@ package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
@@ -27,23 +26,17 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class ImageCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
 	private String deviantArtToken;
 
 	private int expiresIn;
 	private long tokenRequestTime;
 
 	public ImageCmd() {
-		super(CommandCategory.IMAGE, Role.USER, "image");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.IMAGE, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "image");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

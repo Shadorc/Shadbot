@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.utils;
 
-import java.time.temporal.ChronoUnit;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -19,19 +17,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class CalcCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public CalcCmd() {
-		super(CommandCategory.UTILS, Role.USER, "calc");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.UTILS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "calc");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

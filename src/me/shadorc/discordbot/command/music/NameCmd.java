@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.music;
 
-import java.time.temporal.ChronoUnit;
-
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -18,19 +16,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class NameCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public NameCmd() {
-		super(CommandCategory.MUSIC, Role.USER, "name", "current");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.MUSIC, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "name", "current");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {

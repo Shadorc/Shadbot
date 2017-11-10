@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.game.blackjack;
 
-import java.time.temporal.ChronoUnit;
-
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -16,20 +14,13 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class BlackjackCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public BlackjackCmd() {
-		super(CommandCategory.GAME, Role.USER, "blackjack");
+		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "blackjack");
 		this.setAlias("bj");
-		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

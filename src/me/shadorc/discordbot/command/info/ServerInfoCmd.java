@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.info;
 
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,20 +23,14 @@ import sx.blah.discord.util.EmbedBuilder;
 public class ServerInfoCmd extends AbstractCommand {
 
 	private final DateTimeFormatter dateFormatter;
-	private final RateLimiter rateLimiter;
 
 	public ServerInfoCmd() {
-		super(CommandCategory.INFO, Role.USER, "serverinfo", "server_info", "server-info");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.INFO, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "serverinfo", "server_info", "server-info");
 		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		IGuild guild = context.getGuild();
 		List<Long> allowedChannels = Utils.convertToList((JSONArray) DatabaseManager.getSetting(guild, Setting.ALLOWED_CHANNELS), Long.class);
 		List<String> blacklistedCmd = Utils.convertToList((JSONArray) DatabaseManager.getSetting(guild, Setting.BLACKLIST), String.class);

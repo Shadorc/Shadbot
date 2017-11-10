@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.game;
 
-import java.time.temporal.ChronoUnit;
-
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -25,20 +23,13 @@ public class RussianRouletteCmd extends AbstractCommand {
 	private static final float WIN_MULTIPLIER = 2.25f;
 	private static final float LOSE_MULTIPLIER = 10f;
 
-	private final RateLimiter rateLimiter;
-
 	public RussianRouletteCmd() {
-		super(CommandCategory.GAME, Role.USER, "russian_roulette", "russian-roulette", "russianroulette");
+		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "russian_roulette", "russian-roulette", "russianroulette");
 		this.setAlias("rr");
-		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

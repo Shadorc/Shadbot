@@ -2,8 +2,6 @@ package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.time.temporal.ChronoUnit;
-
 import org.jsoup.nodes.Document;
 
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -25,19 +23,12 @@ public class LyricsCmd extends AbstractCommand {
 	private static final String HOME_URL = "https://www.musixmatch.com";
 	private static final int MAX_LYRICS_LENGTH = EmbedBuilder.DESCRIPTION_CONTENT_LIMIT / 4;
 
-	private final RateLimiter rateLimiter;
-
 	public LyricsCmd() {
-		super(CommandCategory.UTILS, Role.USER, "lyrics");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.UTILS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "lyrics");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		String[] args = context.getArg().replaceAll("<|>", "").split("-", 2);
 		if(args.length != 2) {
 			throw new MissingArgumentException();

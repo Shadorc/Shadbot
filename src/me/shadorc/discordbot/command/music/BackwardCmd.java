@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.music;
 
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -19,19 +18,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class BackwardCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public BackwardCmd() {
-		super(CommandCategory.MUSIC, Role.USER, "backward");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.MUSIC, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "backward");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(context.getGuild());
 
 		if(musicManager == null || musicManager.getScheduler().isStopped()) {

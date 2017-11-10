@@ -2,7 +2,6 @@ package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -26,21 +25,15 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class WeatherCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
 	private final SimpleDateFormat dateFormatter;
 
 	public WeatherCmd() {
-		super(CommandCategory.UTILS, Role.USER, "weather");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.UTILS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "weather");
 		this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy - hh:mm aa", Locale.ENGLISH);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

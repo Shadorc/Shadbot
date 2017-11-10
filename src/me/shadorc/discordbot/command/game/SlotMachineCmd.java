@@ -1,7 +1,5 @@
 package me.shadorc.discordbot.command.game;
 
-import java.time.temporal.ChronoUnit;
-
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -37,20 +35,13 @@ public class SlotMachineCmd extends AbstractCommand {
 			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, // Winning chance : 5.3%
 			SlotOptions.GIFT }; // Winning chance : 0.2%
 
-	private final RateLimiter rateLimiter;
-
 	public SlotMachineCmd() {
-		super(CommandCategory.GAME, Role.USER, "slot_machine", "slot-machine", "slotmachine");
+		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "slot_machine", "slot-machine", "slotmachine");
 		this.setAlias("sm");
-		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(DatabaseManager.getCoins(context.getGuild(), context.getAuthor()) < PAID_COST) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;

@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,22 +39,16 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 
 	private static final int PAID_COST = 100;
 
-	private final RateLimiter rateLimiter;
 	private Timer timer;
 
 	public LottoCmd() {
-		super(CommandCategory.GAME, Role.USER, "lotto");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.GAME, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "lotto");
 		this.timer = new Timer(this.getDelayBeforeNextDraw(), this);
 		this.timer.start();
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Lotto")

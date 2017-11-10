@@ -2,7 +2,6 @@ package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 import org.json.JSONArray;
@@ -28,20 +27,13 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class Rule34Cmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public Rule34Cmd() {
-		super(CommandCategory.IMAGE, Role.USER, "rule34");
+		super(CommandCategory.IMAGE, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "rule34");
 		this.setAlias("r34");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.getChannel().isNSFW()) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
 					+ "`" + context.getPrefix() + "settings " + Setting.NSFW + " toggle`", context.getChannel());

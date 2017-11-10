@@ -2,7 +2,6 @@ package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -34,19 +33,12 @@ public class TranslateCmd extends AbstractCommand {
 		}
 	}
 
-	private final RateLimiter rateLimiter;
-
 	public TranslateCmd() {
-		super(CommandCategory.UTILS, Role.USER, "translate", "translation", "trans");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.UTILS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "translate", "translation", "trans");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		String[] args = StringUtils.getSplittedArg(context.getArg(), 3);
 		if(args.length < 2) {
 			throw new MissingArgumentException();

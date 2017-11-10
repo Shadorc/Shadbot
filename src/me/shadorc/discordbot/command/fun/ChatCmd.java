@@ -2,7 +2,6 @@ package me.shadorc.discordbot.command.fun;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONException;
@@ -33,19 +32,12 @@ public class ChatCmd extends AbstractCommand {
 	private static final ConcurrentHashMap<Long, String> CHANNELS_CONV_ID = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<Long, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
 
-	private final RateLimiter rateLimiter;
-
 	public ChatCmd() {
-		super(CommandCategory.FUN, Role.USER, "chat");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.FUN, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "chat");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

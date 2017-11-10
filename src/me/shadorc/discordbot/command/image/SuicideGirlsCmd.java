@@ -1,8 +1,6 @@
 package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
-
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -26,20 +24,13 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class SuicideGirlsCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public SuicideGirlsCmd() {
-		super(CommandCategory.IMAGE, Role.USER, "suicide_girls", "suicide-girls", "suicidegirls");
+		super(CommandCategory.IMAGE, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "suicide_girls", "suicide-girls", "suicidegirls");
 		this.setAlias("sg");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.getChannel().isNSFW()) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
 					+ "`" + context.getPrefix() + "settings " + Setting.NSFW + " toggle`", context.getChannel());

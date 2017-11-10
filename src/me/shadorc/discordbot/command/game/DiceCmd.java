@@ -1,6 +1,5 @@
 package me.shadorc.discordbot.command.game;
 
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,19 +32,12 @@ public class DiceCmd extends AbstractCommand {
 	protected static final ConcurrentHashMap<Long, DiceManager> CHANNELS_DICE = new ConcurrentHashMap<>();
 	protected static final int MULTIPLIER = 6;
 
-	private final RateLimiter rateLimiter;
-
 	public DiceCmd() {
-		super(CommandCategory.GAME, Role.USER, "dice");
-		this.rateLimiter = new RateLimiter(RateLimiter.GAME_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "dice");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

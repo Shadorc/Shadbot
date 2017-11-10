@@ -1,8 +1,6 @@
 package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,19 +22,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class JokeCmd extends AbstractCommand {
 
-	private final RateLimiter rateLimiter;
-
 	public JokeCmd() {
-		super(CommandCategory.FRENCH, Role.USER, "blague", "joke");
-		this.rateLimiter = new RateLimiter(RateLimiter.COMMON_COOLDOWN, ChronoUnit.SECONDS);
+		super(CommandCategory.FRENCH, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "blague", "joke");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
-			return;
-		}
-
 		try {
 			Document doc = NetUtils.getDoc("http://www.une-blague.com/blagues-courtes.html?&p=" + MathUtils.rand(1, 5));
 			Elements jokesElements = doc.getElementsByClass("texte ");

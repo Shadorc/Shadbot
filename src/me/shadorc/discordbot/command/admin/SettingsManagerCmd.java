@@ -19,6 +19,7 @@ import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
+import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class SettingsManagerCmd extends AbstractCommand {
@@ -26,7 +27,7 @@ public class SettingsManagerCmd extends AbstractCommand {
 	private static final ConcurrentHashMap<String, SettingCmd> SUBSETTINGS_MAP = new ConcurrentHashMap<>();
 
 	public SettingsManagerCmd() {
-		super(CommandCategory.ADMIN, Role.ADMIN, "settings", "setting", "options", "option");
+		super(CommandCategory.ADMIN, Role.ADMIN, RateLimiter.DEFAULT_COOLDOWN, "settings", "setting", "options", "option");
 
 		SUBSETTINGS_MAP.put(Setting.PREFIX.toString(), new PrefixSettingCmd());
 		SUBSETTINGS_MAP.put(Setting.ALLOWED_CHANNELS.toString(), new ChannelSettingCmd());

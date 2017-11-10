@@ -20,6 +20,7 @@ import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
+import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class StatsCmd extends AbstractCommand {
@@ -27,7 +28,7 @@ public class StatsCmd extends AbstractCommand {
 	private static final int ROW_SIZE = 25;
 
 	public StatsCmd() {
-		super(CommandCategory.OWNER, Role.OWNER, "stats");
+		super(CommandCategory.OWNER, Role.OWNER, RateLimiter.DEFAULT_COOLDOWN, "stats");
 	}
 
 	@Override
