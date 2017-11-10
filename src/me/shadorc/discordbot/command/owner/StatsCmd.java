@@ -78,7 +78,8 @@ public class StatsCmd extends AbstractCommand {
 
 		final Map<String, Integer> statsMap = new HashMap<>();
 		for(Object key : statsObj.keySet()) {
-			statsMap.put(key.toString(), statsObj.getInt(key.toString()));
+			String firstName = CommandManager.getCommand(key.toString()).getFirstName();
+			statsMap.put(firstName, statsMap.getOrDefault(firstName, 0) + statsObj.getInt(key.toString()));
 		}
 
 		List<String> statsList = Utils.sortByValue(statsMap).keySet().stream()
