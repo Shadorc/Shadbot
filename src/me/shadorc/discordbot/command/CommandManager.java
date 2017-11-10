@@ -181,7 +181,7 @@ public class CommandManager {
 		}
 
 		try {
-			command.execute(context);
+			command.checkSpamAndExecute(context);
 			StatsManager.increment(StatCategory.COMMAND, context.getCommand());
 		} catch (MissingArgumentException err) {
 			command.showHelp(context);

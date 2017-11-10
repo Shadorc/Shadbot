@@ -37,34 +37,34 @@ public abstract class AbstractCommand {
 
 	public abstract void showHelp(Context context);
 
-	public void checkSpamAndExecute(Context context) throws MissingArgumentException {
+	public final void checkSpamAndExecute(Context context) throws MissingArgumentException {
 		if(rateLimiter != null && rateLimiter.isSpamming(context)) {
 			return;
 		}
 		this.execute(context);
 	}
 
-	public CommandCategory getCategory() {
+	public final CommandCategory getCategory() {
 		return category;
 	}
 
-	public Role getRole() {
+	public final Role getRole() {
 		return role;
 	}
 
-	public List<String> getNames() {
+	public final List<String> getNames() {
 		return names;
 	}
 
-	public String getFirstName() {
+	public final String getFirstName() {
 		return names.get(0);
 	}
 
-	public String getAlias() {
+	public final String getAlias() {
 		return alias;
 	}
 
-	public void setAlias(String alias) {
+	public final void setAlias(String alias) {
 		this.alias = alias;
 		this.names.add(alias);
 	}
