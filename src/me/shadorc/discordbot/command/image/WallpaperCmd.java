@@ -73,9 +73,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 		String purity = cmd.getOptionValue("purity", Purity.SFW.toString());
 		if(purity != null) {
-			if(Arrays.stream(Purity.values()).anyMatch(purityValue -> purityValue.toString().equalsIgnoreCase(purity))) {
-				queryBuilder.purity(Purity.valueOf(purity.toUpperCase()));
-			} else {
+			if(!Arrays.stream(Purity.values()).anyMatch(purityValue -> purityValue.toString().equalsIgnoreCase(purity))) {
 				this.sendInvalidArg("purity", context);
 				return;
 			}
@@ -85,16 +83,17 @@ public class WallpaperCmd extends AbstractCommand {
 						+ "`" + context.getPrefix() + "settings " + Setting.NSFW + " toggle`", context.getChannel());
 				return;
 			}
+
+			queryBuilder.purity(Purity.valueOf(purity.toUpperCase()));
 		}
 
 		String category = cmd.getOptionValue("category");
 		if(category != null) {
-			if(Arrays.stream(Category.values()).anyMatch(catValue -> catValue.toString().equalsIgnoreCase(category))) {
-				queryBuilder.categories(Category.valueOf(category.toUpperCase()));
-			} else {
+			if(!Arrays.stream(Category.values()).anyMatch(catValue -> catValue.toString().equalsIgnoreCase(category))) {
 				this.sendInvalidArg("category", context);
 				return;
 			}
+			queryBuilder.categories(Category.valueOf(category.toUpperCase()));
 		}
 
 		String ratio = cmd.getOptionValue("ratio");
@@ -103,9 +102,8 @@ public class WallpaperCmd extends AbstractCommand {
 			if(dim == null) {
 				this.sendInvalidArg("ratio", context);
 				return;
-			} else {
-				queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
 			}
+			queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
 		}
 
 		String resolution = cmd.getOptionValue("resolution");
@@ -114,9 +112,8 @@ public class WallpaperCmd extends AbstractCommand {
 			if(dim == null) {
 				this.sendInvalidArg("resolution", context);
 				return;
-			} else {
-				queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
 			}
+			queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
 		}
 
 		String keyword = cmd.getOptionValue("keyword");

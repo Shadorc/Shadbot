@@ -72,7 +72,7 @@ public class Rule34Cmd extends AbstractCommand {
 			String[] tags = postObj.getString("tags").trim().split(" ");
 
 			if(postObj.getBoolean("has_children") || this.isLegal(tags)) {
-				BotUtils.sendMessage(Emoji.WARNING + " Sorry, I don't display images that contain children or that are tagged with `loli` or `shota`.", context.getChannel());
+				BotUtils.sendMessage(Emoji.WARNING + " Sorry, I don't display images containing children or tagged with `loli` or `shota`.", context.getChannel());
 				return;
 			}
 
@@ -81,36 +81,31 @@ public class Rule34Cmd extends AbstractCommand {
 				formattedtags = formattedtags.substring(0, MAX_TAGS_LENGTH - 3) + "...";
 			}
 
-			StringBuilder fileUrl = new StringBuilder(postObj.getString("file_url"));
-			if(!fileUrl.toString().isEmpty() && !fileUrl.toString().startsWith("http")) {
-				fileUrl.insert(0, "http:");
-			}
-
-			// This can be a number for some obscure reasons
-			StringBuilder sourceUrl = new StringBuilder();
-			Object source = postObj.get("source");
-			if(source instanceof String && !source.toString().isEmpty()) {
-				sourceUrl.append(source.toString());
-				if(!sourceUrl.toString().startsWith("http") && sourceUrl.toString().startsWith("//")) {
-					sourceUrl.insert(0, "http:");
-				}
-			}
+			String fileUrl = this.getValidURL(postObj.getString("file_url"));
+			String sourceUrl = this.getValidURL(postObj.get("source").toString());
 
 			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
-					.withUrl(fileUrl.toString())
+					.withUrl(fileUrl)
 					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
 					.appendField("Resolution", postObj.getInt("width") + "x" + postObj.getInt("height"), false)
-					.appendField("Source", sourceUrl.toString(), false)
+					.appendField("Source", sourceUrl, false)
 					.appendField("Tags", formattedtags, false)
-					.withImage(fileUrl.toString())
+					.withImage(fileUrl)
 					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
 			BotUtils.sendMessage(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.manageException("getting an image from Rule34", context, err);
 		}
+	}
+
+	private String getValidURL(String url) {
+		if(url == null || !url.startsWith("//")) {
+			return url;
+		}
+		return "http:" + url;
 	}
 
 	private boolean isLegal(String... tags) {

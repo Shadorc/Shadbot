@@ -21,10 +21,6 @@ public class RouletteCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
-
 		String[] splitArgs = StringUtils.getSplittedArg(context.getArg());
 		if(splitArgs.length != 2) {
 			throw new MissingArgumentException();
@@ -38,11 +34,13 @@ public class RouletteCmd extends AbstractCommand {
 		String place = splitArgs[1].toLowerCase();
 		// Match [1-36], red, black, odd, even, high or low
 		if(!place.matches("^([1-9]|1[0-9]|2[0-9]|3[0-6])$|red|black|odd|even|high|low")) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid place, must be a number between 1 and 36, red, black, odd, even, low or high.", context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid place, must be a number between 1 and 36, red, black, odd, even, "
+					+ "low or high.", context.getChannel());
 			return;
 		}
 
-		RouletteManager rouletteManager = RouletteManager.CHANNELS_ROULETTE.getOrDefault(context.getChannel().getLongID(), new RouletteManager(context));
+		RouletteManager rouletteManager = RouletteManager.CHANNELS_ROULETTE.getOrDefault(context.getChannel().getLongID(),
+				new RouletteManager(context));
 
 		RouletteManager currentManager = RouletteManager.CHANNELS_ROULETTE.putIfAbsent(context.getChannel().getLongID(), rouletteManager);
 		if(currentManager == null) {
@@ -56,7 +54,8 @@ public class RouletteCmd extends AbstractCommand {
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets **" + StringUtils.pluralOf(bet, "coin") + "** on **" + place + "**.", context.getChannel());
+		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets **" + StringUtils.pluralOf(bet, "coin")
+				+ "** on **" + place + "**.", context.getChannel());
 		rouletteManager.addPlayer(context.getAuthor(), bet, place);
 	}
 

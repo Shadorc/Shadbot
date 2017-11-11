@@ -2,7 +2,9 @@ package me.shadorc.discordbot.command.game.roulette;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -60,49 +62,42 @@ class RouletteManager {
 
 		int winningPlace = MathUtils.rand(1, 36);
 
-		List<String> winningList = new ArrayList<>();
-		List<String> loserList = new ArrayList<>();
-
+		List<String> list = new ArrayList<>();
 		for(IUser user : playersPlace.keySet()) {
 			int gains = playersPlace.get(user).getLeft();
 			String place = playersPlace.get(user).getRight();
 
-			if(StringUtils.isPositiveInt(place) && Integer.parseInt(place) == winningPlace) {
-				gains *= 36;
-				winningList.add("**" + user.getName() + "** (Gains: **" + StringUtils.pluralOf(gains, "coin") + "**)");
-				DatabaseManager.addCoins(context.getGuild(), user, gains);
-				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
+			Map<String, Boolean> testsMap = new HashMap<>();
+			testsMap.put("red", RED_NUMS.contains(winningPlace));
+			testsMap.put("black", !RED_NUMS.contains(winningPlace));
+			testsMap.put("low", MathUtils.inRange(winningPlace, 1, 19));
+			testsMap.put("high", MathUtils.inRange(winningPlace, 19, 37));
+			testsMap.put("even", winningPlace % 2 == 0);
+			testsMap.put("odd", winningPlace % 2 != 0);
 
-			} else if(StringUtils.isPositiveInt(place) && this.isRed(winningPlace) && this.isRed(Integer.parseInt(place))
-					|| StringUtils.isPositiveInt(place) && !this.isRed(winningPlace) && !this.isRed(Integer.parseInt(place))
-					|| MathUtils.inRange(winningPlace, 1, 19) && "low".equals(place)
-					|| MathUtils.inRange(winningPlace, 19, 37) && "high".equals(place)
-					|| winningPlace % 2 == 0 && "even".equals(place)
-					|| winningPlace % 2 != 0 && "odd".equals(place)) {
-				gains *= 2;
-				winningList.add("**" + user.getName() + "** (Gains: **" + StringUtils.pluralOf(gains, "coin") + "**)");
-				DatabaseManager.addCoins(context.getGuild(), user, gains);
-				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
-
+			int multiplier = 0;
+			if(place.equals(Integer.toString(winningPlace))) {
+				multiplier = 36;
+			} else if(testsMap.get(place)) {
+				multiplier = 2;
 			} else {
-				loserList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
-				DatabaseManager.addCoins(context.getGuild(), user, -gains);
-				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
-				LottoDataManager.addToPool(gains);
+				multiplier = -1;
 			}
+
+			if(multiplier > 0) {
+				list.add(0, "**" + user.getName() + "** (Gains: **" + StringUtils.pluralOf(gains, "coin") + ")**");
+				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), multiplier * gains);
+				LottoDataManager.addToPool(gains);
+			} else {
+				list.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
+				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
+			}
+			DatabaseManager.addCoins(context.getGuild(), user, multiplier * gains);
 		}
 
-		StringBuilder strBuilder = new StringBuilder();
-		strBuilder.append(Emoji.DICE + " No more bets. *The wheel is spinning...* **" + winningPlace
-				+ " (" + (isRed(winningPlace) ? "Red" : "Black") + ")** !");
-
-		if(!winningList.isEmpty()) {
-			strBuilder.append("\n" + Emoji.MONEY_BAG + " Congratulations to " + StringUtils.formatList(winningList, str -> str, ", ") + ".");
-		}
-		if(!loserList.isEmpty()) {
-			strBuilder.append("\n" + Emoji.MONEY_WINGS + " Sorry, " + StringUtils.formatList(loserList, str -> str, ", ") + ".");
-		}
-		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
+		BotUtils.sendMessage(Emoji.DICE + " No more bets. *The wheel is spinning...* **" + winningPlace
+				+ " (" + (RED_NUMS.contains(winningPlace) ? "Red" : "Black") + ")** !"
+				+ "\n" + Emoji.BANK + " Results: " + StringUtils.formatList(list, str -> str.toString(), ", ") + ".", context.getChannel());
 
 		playersPlace.clear();
 		CHANNELS_ROULETTE.remove(context.getChannel().getLongID());
@@ -114,9 +109,5 @@ class RouletteManager {
 
 	protected boolean isPlaying(IUser user) {
 		return playersPlace.containsKey(user);
-	}
-
-	private boolean isRed(Integer num) {
-		return RED_NUMS.contains(num);
 	}
 }

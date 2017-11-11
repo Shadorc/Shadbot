@@ -2,7 +2,10 @@ package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -14,7 +17,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -39,43 +42,25 @@ public class TranslateCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		String[] args = StringUtils.getSplittedArg(context.getArg(), 3);
-		if(args.length < 2) {
+		List<String> args = new ArrayList<>(Arrays.asList(StringUtils.getSplittedArg(context.getArg(), 3)));
+		if(args.size() < 2) {
 			throw new MissingArgumentException();
 		}
 
-		String langFrom = "";
-		String langTo = "";
-		String sourceText = "";
-
-		if(args.length == 2) {
-			langFrom = "auto";
-			langTo = args[0].toLowerCase();
-			sourceText = args[1];
-		} else {
-			langFrom = args[0].toLowerCase();
-			langTo = args[1].toLowerCase();
-			sourceText = args[2];
+		if(args.size() == 2) {
+			args.add(0, "auto");
 		}
 
-		if(!this.isValidISOLanguage(langFrom)) {
-			langFrom = this.toISO(langFrom);
-		}
-		if(!this.isValidISOLanguage(langTo)) {
-			langTo = this.toISO(langTo);
-		}
+		String langFrom = this.toISO(args.get(0).toLowerCase());
+		String langTo = this.toISO(args.get(1).toLowerCase());
 
 		if(langFrom == null || langTo == null) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " One of the specified language doesn't exist."
-					+ " Use `" + context.getPrefix() + "help translate` to see a complete list of supported languages.", context.getChannel());
+					+ " Use `" + context.getPrefix() + "help " + this.getFirstName() + "` to see a complete list of supported languages.", context.getChannel());
 			return;
 		}
 
-		if(langFrom.equals(langTo)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " The source language and the targetted language must be different.", context.getChannel());
-			return;
-		}
-
+		String sourceText = args.get(2);
 		try {
 			JSONArray result = new JSONArray(NetUtils.getBody("https://translate.googleapis.com/translate_a/single?"
 					+ "client=gtx"
@@ -85,7 +70,7 @@ public class TranslateCmd extends AbstractCommand {
 
 			if(!(result.get(0) instanceof JSONArray)) {
 				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " One of the specified language isn't supported."
-						+ " Use `" + context.getPrefix() + "help translate` to see a complete list of supported languages.", context.getChannel());
+						+ " Use `" + context.getPrefix() + "help " + this.getFirstName() + "` to see a complete list of supported languages.", context.getChannel());
 				return;
 			}
 
@@ -93,16 +78,16 @@ public class TranslateCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.MAP + " Translation: " + translatedText, context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong during translation... Please, try again later.", err, context);
+			ExceptionUtils.manageException("getting translatiion", context, err);
 		}
 	}
 
-	private boolean isValidISOLanguage(String iso) {
-		return LANG_ISO_MAP.containsValue(iso);
-	}
-
 	private String toISO(String lang) {
-		return LANG_ISO_MAP.get(lang);
+		if("auto".equals(lang) || LANG_ISO_MAP.containsValue(lang)) {
+			return lang;
+		} else {
+			return LANG_ISO_MAP.get(lang);
+		}
 	}
 
 	@Override

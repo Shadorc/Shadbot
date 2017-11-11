@@ -19,16 +19,22 @@ import sx.blah.discord.util.EmbedBuilder;
 public class SlotMachineCmd extends AbstractCommand {
 
 	private enum SlotOptions {
-		CHERRIES,
-		BELL,
-		GIFT
+		CHERRIES(50),
+		BELL(600),
+		GIFT(10000);
+
+		private final int gain;
+
+		SlotOptions(int gain) {
+			this.gain = gain;
+		}
+
+		public int getGain() {
+			return gain;
+		}
 	}
 
 	private static final int PAID_COST = 10;
-
-	private static final int FIRST_GAINS = 50;
-	private static final int SECOND_GAINS = 600;
-	private static final int THIRD_GAINS = 10000;
 
 	private static final SlotOptions[] SLOTS_ARRAY = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, // Winning chance : 12.5%
@@ -52,14 +58,10 @@ public class SlotMachineCmd extends AbstractCommand {
 		SlotOptions slot3 = SLOTS_ARRAY[MathUtils.rand(SLOTS_ARRAY.length)];
 
 		int gains = -PAID_COST;
-
-		if(Utils.allEqual(SlotOptions.CHERRIES, slot1, slot2, slot3)) {
-			gains = FIRST_GAINS;
-		} else if(Utils.allEqual(SlotOptions.BELL, slot1, slot2, slot3)) {
-			gains = SECOND_GAINS;
-		} else if(Utils.allEqual(SlotOptions.GIFT, slot1, slot2, slot3)) {
-			gains = THIRD_GAINS;
+		if(Utils.allEqual(slot1, slot2, slot3)) {
+			gains = slot1.getGain();
 		}
+
 		DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), gains);
 		StatsManager.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
 		LottoDataManager.addToPool(Math.abs(gains));
@@ -75,7 +77,8 @@ public class SlotMachineCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play slot machine.**")
 				.appendField("Cost", "A game costs **" + PAID_COST + " coins**.", false)
-				.appendField("Gains", "You can win **" + FIRST_GAINS + "**, **" + SECOND_GAINS + "** or **" + THIRD_GAINS + " coins** ! Good luck.", false);
+				.appendField("Gains", "You can win **" + SlotOptions.CHERRIES.getGain() + "**, **" + SlotOptions.BELL.getGain() + "** or **"
+						+ SlotOptions.GIFT.getGain() + " coins** ! Good luck.", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }
