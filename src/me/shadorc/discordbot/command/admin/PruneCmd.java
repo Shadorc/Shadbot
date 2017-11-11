@@ -1,14 +1,22 @@
 package me.shadorc.discordbot.command.admin;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
+import com.google.common.primitives.UnsignedInteger;
 
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -42,31 +50,34 @@ public class PruneCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		List<String> argsList = Arrays.asList(StringUtils.getSplittedArg(context.getArg()));
+		Options options = new Options();
+		options.addOption("c", "containing", true, "containing these words");
 
-		String word = null;
-		if(argsList.contains("-c")) {
-			if(StringUtils.getCharCount(context.getArg(), '"') != 2) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must indicate words in quotation marks after '-c'.", context.getChannel());
-				return;
-			}
-			word = StringUtils.getQuotedWords(context.getArg()).get(0);
+		Option numOpt = new Option("n", "number", true, "number of messages to delete");
+		numOpt.setType(UnsignedInteger.class);
+		options.addOption(numOpt);
+
+		CommandLine cmd;
+		try {
+			cmd = new DefaultParser().parse(options, StringUtils.getSplittedArg(context.getArg()));
+		} catch (ParseException err) {
+			ExceptionUtils.manageException("deleting messages", context, err);
+			return;
 		}
 
-		int num = 100;
-		if(argsList.contains("-n")) {
-			if(argsList.indexOf("-n") + 1 >= argsList.size()) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must indicate a number after '-n'.", context.getChannel());
-				return;
-			}
-			String numStr = argsList.get(argsList.indexOf("-n") + 1);
-			if(!StringUtils.isPositiveInt(numStr)) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
-				return;
-			}
-			num = Math.min(num, Integer.parseInt(numStr));
+		String numStr = cmd.getOptionValue("number", "100");
+		if(!StringUtils.isPositiveInt(numStr)) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
+			return;
 		}
 
+		String words = cmd.getOptionValue("containing");
+		if(words != null && StringUtils.getCharCount(context.getArg(), '"') != 2) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must indicate words in quotation marks after '-c'.", context.getChannel());
+			return;
+		}
+
+		int num = Math.min(100, Integer.parseInt(numStr));
 		List<IUser> usersMentioned = context.getMessage().getMentions();
 
 		List<IMessage> messagesList = new ArrayList<IMessage>();
@@ -74,13 +85,11 @@ public class PruneCmd extends AbstractCommand {
 			if(messagesList.size() >= num) {
 				break;
 			}
-			if(!usersMentioned.isEmpty() && !usersMentioned.contains(message.getAuthor())) {
-				continue;
+
+			if(!usersMentioned.isEmpty() && usersMentioned.contains(message.getAuthor())
+					|| words != null && message.getContent().contains(words)) {
+				messagesList.add(message);
 			}
-			if(word != null && !message.getContent().contains(word)) {
-				continue;
-			}
-			messagesList.add(message);
 		}
 
 		if(messagesList.isEmpty()) {
