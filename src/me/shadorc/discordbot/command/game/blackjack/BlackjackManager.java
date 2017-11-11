@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.Timer;
 
+import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.LottoDataManager;
@@ -93,7 +94,8 @@ public class BlackjackManager implements MessageListener {
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.withAuthorName("Blackjack")
 				.withThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
-				.appendDescription("**Use `" + context.getPrefix() + "blackjack <bet>` to join the game.**"
+				.appendDescription("**Use `" + context.getPrefix() + CommandManager.getCommand(context.getCommand()).getFirstName()
+						+ " <bet>` to join the game.**"
 						+ "\n\nType `hit` to take another card, `stand` to pass or `double down` to double down.")
 				.appendField("Dealer's hand", BlackjackUtils.formatCards(isFinished ? dealerCards : dealerCards.subList(0, 1)), true)
 				.withFooterText(isFinished ? "Finished" : "This game will end automatically in " + StringUtils.formatDuration(timer.getDelay() - System.currentTimeMillis() + startTime));
@@ -143,7 +145,7 @@ public class BlackjackManager implements MessageListener {
 				case 0:
 					strBuilder.append("(Gains: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
 					DatabaseManager.addCoins(context.getGuild(), player.getUser(), player.getBet());
-					StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, "blackjack", player.getBet());
+					StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getCommand(context.getCommand()).getFirstName(), player.getBet());
 					break;
 				case 1:
 					strBuilder.append("(Draw)");
@@ -151,7 +153,7 @@ public class BlackjackManager implements MessageListener {
 				case 2:
 					strBuilder.append("(Losses: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
 					DatabaseManager.addCoins(context.getGuild(), player.getUser(), -player.getBet());
-					StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, "blackjack", player.getBet());
+					StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getCommand(context.getCommand()).getFirstName(), player.getBet());
 					LottoDataManager.addToPool(player.getBet());
 					break;
 			}

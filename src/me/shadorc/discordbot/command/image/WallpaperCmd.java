@@ -79,12 +79,12 @@ public class WallpaperCmd extends AbstractCommand {
 				this.sendInvalidArg("purity", context);
 				return;
 			}
-		}
 
-		if(purity.matches("nsfw|sketchy") && !context.getChannel().isNSFW()) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
-					+ "`" + context.getPrefix() + "settings " + Setting.NSFW + " toggle`", context.getChannel());
-			return;
+			if(purity.matches("nsfw|sketchy") && !context.getChannel().isNSFW()) {
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use "
+						+ "`" + context.getPrefix() + "settings " + Setting.NSFW + " toggle`", context.getChannel());
+				return;
+			}
 		}
 
 		String category = cmd.getOptionValue("category");
