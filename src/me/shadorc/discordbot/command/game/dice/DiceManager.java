@@ -58,33 +58,33 @@ class DiceManager {
 
 		int winningNum = MathUtils.rand(1, 6);
 
-		List<String> winningList = new ArrayList<>();
-		List<String> loserList = new ArrayList<>();
+		List<String> winnersList = new ArrayList<>();
+		List<String> losersList = new ArrayList<>();
 
 		for(int num : numsPlayers.keySet()) {
 			IUser user = numsPlayers.get(num);
 			int gains = bet;
-			boolean hasWon = num == winningNum;
-			if(hasWon) {
+			if(num == winningNum) {
 				gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
-				winningList.add("**" + user.getName() + "**, you win **" + StringUtils.pluralOf(gains, "coin") + "**");
+				winnersList.add("**" + user.getName() + "**, you win **" + StringUtils.pluralOf(gains, "coin") + "**");
+				DatabaseManager.addCoins(context.getGuild(), user, gains);
+				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), Math.abs(gains));
 			} else {
-				loserList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
+				losersList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
+				DatabaseManager.addCoins(context.getGuild(), user, -gains);
+				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 				LottoDataManager.addToPool(gains);
 			}
-			DatabaseManager.addCoins(context.getGuild(), user, (hasWon ? 1 : -1) * gains);
-			StatsManager.increment(hasWon ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND,
-					CommandManager.getFirstName(context.getCommand()), Math.abs(gains));
 		}
 
 		StringBuilder strBuilder = new StringBuilder();
 
 		strBuilder.append(Emoji.DICE + " The dice is rolling... **" + winningNum + "** !");
-		if(!winningList.isEmpty()) {
-			strBuilder.append("\n" + Emoji.MONEY_BAG + " Congratulations " + StringUtils.formatList(winningList, str -> str, ", ") + " !");
+		if(!winnersList.isEmpty()) {
+			strBuilder.append("\n" + Emoji.MONEY_BAG + " Congratulations " + StringUtils.formatList(winnersList, str -> str, ", ") + " !");
 		}
-		if(!loserList.isEmpty()) {
-			strBuilder.append("\n" + Emoji.MONEY_WINGS + " Sorry, " + StringUtils.formatList(loserList, str -> str, ", ") + ".");
+		if(!losersList.isEmpty()) {
+			strBuilder.append("\n" + Emoji.MONEY_WINGS + " Sorry, " + StringUtils.formatList(losersList, str -> str, ", ") + ".");
 		}
 		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 

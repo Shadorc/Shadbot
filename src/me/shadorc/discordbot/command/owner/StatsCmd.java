@@ -38,28 +38,7 @@ public class StatsCmd extends AbstractCommand {
 		}
 
 		if(context.getArg().equals("average")) {
-			JSONObject moneyGainsCommand = StatsManager.getCategory(StatCategory.MONEY_GAINS_COMMAND);
-			JSONObject moneyLossesCommand = StatsManager.getCategory(StatCategory.MONEY_LOSSES_COMMAND);
-			JSONObject command = StatsManager.getCategory(StatCategory.COMMAND);
-
-			StringBuilder strBuilder = new StringBuilder("```prolog\nAverage:");
-			for(Object key : moneyGainsCommand.keySet()) {
-				int gain = moneyGainsCommand.optInt(key.toString());
-				int loss = moneyLossesCommand.optInt(key.toString());
-				int count = command.optInt(key.toString());
-
-				if(gain == 0 || count == 0) {
-					continue;
-				}
-
-				for(String name : CommandManager.getCommand(key.toString()).getNames()) {
-					count += command.optInt(name);
-				}
-				strBuilder.append("\n" + key.toString() + ": " + (float) (gain - loss) / count);
-			}
-			strBuilder.append("```");
-
-			BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
+			BotUtils.sendMessage(this.getAverage(), context.getChannel());
 			return;
 		}
 
@@ -83,26 +62,51 @@ public class StatsCmd extends AbstractCommand {
 			statsMap.put(firstName, statsMap.getOrDefault(firstName, 0) + statsObj.getInt(key.toString()));
 		}
 
-		List<String> statsList = Utils.sortByValue(statsMap).keySet().stream()
-				.map(key -> "**" + key + "**: " + statsMap.get(key))
-				.collect(Collectors.toList());
-
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName(StringUtils.capitalize(category.toString()) + "'s Stats");
 
-		if(statsList.isEmpty()) {
+		if(statsMap.isEmpty()) {
 			builder.appendDescription("There is nothing here.");
 		}
 
+		List<String> statsList = Utils.sortByValue(statsMap).keySet().stream()
+				.map(key -> "**" + key + "**: " + statsMap.get(key))
+				.collect(Collectors.toList());
+
 		for(int i = 0; i < Math.ceil((float) statsMap.keySet().size() / ROW_SIZE); i++) {
-			int index = i * ROW_SIZE;
+			int minIndex = i * ROW_SIZE;
+			int size = Math.min(ROW_SIZE, statsList.size() - minIndex);
 			builder.appendField("Row N°" + (i + 1),
-					StringUtils.formatList(
-							statsList.subList(index, index + Math.min(ROW_SIZE, statsList.size() - index)), str -> str, "\n"), true);
+					StringUtils.formatList(statsList.subList(minIndex, minIndex + size), str -> str, "\n"), true);
 		}
 
 		BotUtils.sendMessage(builder.build(), context.getChannel());
+	}
+
+	private String getAverage() {
+		JSONObject moneyGainsCommand = StatsManager.getCategory(StatCategory.MONEY_GAINS_COMMAND);
+		JSONObject moneyLossesCommand = StatsManager.getCategory(StatCategory.MONEY_LOSSES_COMMAND);
+		JSONObject command = StatsManager.getCategory(StatCategory.COMMAND);
+
+		StringBuilder strBuilder = new StringBuilder("```prolog\nAverage:");
+		for(Object key : moneyGainsCommand.keySet()) {
+			int gain = moneyGainsCommand.optInt(key.toString());
+			int loss = moneyLossesCommand.optInt(key.toString());
+			int count = command.optInt(key.toString());
+
+			if(gain == 0 || count == 0) {
+				continue;
+			}
+
+			for(String name : CommandManager.getCommand(key.toString()).getNames()) {
+				count += command.optInt(name);
+			}
+			strBuilder.append("\n" + key.toString() + ": " + (float) (gain - loss) / count);
+		}
+		strBuilder.append("```");
+
+		return strBuilder.toString();
 	}
 
 	@Override
