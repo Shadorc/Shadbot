@@ -18,6 +18,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -26,6 +27,8 @@ import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class Rule34Cmd extends AbstractCommand {
+
+	private static final int MAX_TAGS_LENGTH = 400;
 
 	public Rule34Cmd() {
 		super(CommandCategory.IMAGE, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "rule34");
@@ -66,17 +69,17 @@ public class Rule34Cmd extends AbstractCommand {
 				postObj = postsObj.getJSONObject("post");
 			}
 
-			String tags = postObj.getString("tags").trim().replace(" ", ", ");
+			String[] tags = postObj.getString("tags").trim().split(" ");
 
 			if(postObj.getBoolean("has_children") || this.isLegal(tags)) {
 				BotUtils.sendMessage(Emoji.WARNING + " Sorry, I don't display images that contain children or that are tagged with `loli` or `shota`.", context.getChannel());
 				return;
 			}
 
-			if(tags.length() > 400) {
-				tags = tags.substring(0, 400) + "...";
+			String formattedtags = StringUtils.formatArray(tags, tag -> "`" + tag.toString().trim() + "`", " ");
+			if(formattedtags.length() > MAX_TAGS_LENGTH) {
+				formattedtags = formattedtags.substring(0, MAX_TAGS_LENGTH - 3) + "...";
 			}
-			tags = tags.replace("_", "\\_");
 
 			StringBuilder fileUrl = new StringBuilder(postObj.getString("file_url"));
 			if(!fileUrl.toString().isEmpty() && !fileUrl.toString().startsWith("http")) {
@@ -86,9 +89,9 @@ public class Rule34Cmd extends AbstractCommand {
 			// This can be a number for some obscure reasons
 			StringBuilder sourceUrl = new StringBuilder();
 			Object source = postObj.get("source");
-			if(source instanceof String && !((String) source).isEmpty()) {
-				sourceUrl.append((String) source);
-				if(!sourceUrl.toString().startsWith("http")) {
+			if(source instanceof String && !source.toString().isEmpty()) {
+				sourceUrl.append(source.toString());
+				if(!sourceUrl.toString().startsWith("http") && sourceUrl.toString().startsWith("//")) {
 					sourceUrl.insert(0, "http:");
 				}
 			}
@@ -100,7 +103,7 @@ public class Rule34Cmd extends AbstractCommand {
 					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
 					.appendField("Resolution", postObj.getInt("width") + "x" + postObj.getInt("height"), false)
 					.appendField("Source", sourceUrl.toString(), false)
-					.appendField("Tags", tags, false)
+					.appendField("Tags", formattedtags, false)
 					.withImage(fileUrl.toString())
 					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
 			BotUtils.sendMessage(embed.build(), context.getChannel());
@@ -110,8 +113,8 @@ public class Rule34Cmd extends AbstractCommand {
 		}
 	}
 
-	private boolean isLegal(String tags) {
-		return Arrays.stream(tags.split(", ")).anyMatch(tag -> tag.contains("loli") || tag.contains("shota"));
+	private boolean isLegal(String... tags) {
+		return Arrays.asList(tags).stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"));
 	}
 
 	@Override
@@ -121,5 +124,4 @@ public class Rule34Cmd extends AbstractCommand {
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <tag>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
-
 }
