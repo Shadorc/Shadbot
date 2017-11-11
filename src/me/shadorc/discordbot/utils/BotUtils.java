@@ -94,6 +94,16 @@ public class BotUtils {
 	}
 
 	/**
+	 * @param channel - the messages' channel
+	 * @param messages - the messages to delete if possible
+	 */
+	public static void deleteIfPossible(IChannel channel, IMessage message) {
+		if(message != null && BotUtils.hasPermission(channel, Permissions.MANAGE_MESSAGES)) {
+			message.delete();
+		}
+	}
+
+	/**
 	 * @param guild - the channel's guild
 	 * @param channel - the channel to check
 	 * @return true if Shadbot is allowed to send a message in channel, false otherwise

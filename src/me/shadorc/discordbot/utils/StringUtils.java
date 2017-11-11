@@ -6,6 +6,7 @@ import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -138,7 +139,7 @@ public class StringUtils {
 
 	/**
 	 * @param text - the text to extract quoted words from
-	 * @return List containing all quoted words
+	 * @return List containing all non empty quoted words
 	 */
 	public static List<String> getQuotedWords(String text) {
 		List<String> matches = new ArrayList<>();
@@ -146,6 +147,7 @@ public class StringUtils {
 		while(matcher.find()) {
 			matches.add(matcher.group(1));
 		}
+		matches.removeAll(Collections.singleton(""));
 		return matches;
 	}
 

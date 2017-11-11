@@ -2,7 +2,9 @@ package me.shadorc.discordbot.command.game.blackjack;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -24,7 +26,6 @@ import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.game.Card;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class BlackjackManager implements MessageListener {
@@ -87,9 +88,7 @@ public class BlackjackManager implements MessageListener {
 	}
 
 	private void show(boolean isFinished) {
-		if(message != null && BotUtils.hasPermission(context.getChannel(), Permissions.MANAGE_MESSAGES)) {
-			message.delete();
-		}
+		BotUtils.deleteIfPossible(context.getChannel(), message);
 
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.withAuthorName("Blackjack")
@@ -125,38 +124,32 @@ public class BlackjackManager implements MessageListener {
 		for(BlackjackPlayer player : players) {
 			int playerValue = BlackjackUtils.getValue(player.getCards());
 
-			int result = -1; // 0 = Win | 1 = Draw | 2 = Lose
+			int result; // -1 = Lose | 0 = Draw | 1 = Win
 			if(playerValue > 21) {
-				result = 2;
+				result = -1;
 			} else if(dealerValue <= 21) {
-				if(playerValue > dealerValue) {
-					result = 0;
-				} else if(playerValue == dealerValue) {
-					result = 1;
-				} else if(playerValue < dealerValue) {
-					result = 2;
-				}
+				result = Integer.valueOf(playerValue).compareTo(dealerValue);
 			} else {
-				result = 0;
+				result = 1;
 			}
 
 			StringBuilder strBuilder = new StringBuilder("**" + player.getUser().getName() + "** ");
 			switch (result) {
-				case 0:
-					strBuilder.append("(Gains: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
-					DatabaseManager.addCoins(context.getGuild(), player.getUser(), player.getBet());
-					StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), player.getBet());
-					break;
-				case 1:
-					strBuilder.append("(Draw)");
-					break;
-				case 2:
+				case -1:
 					strBuilder.append("(Losses: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
-					DatabaseManager.addCoins(context.getGuild(), player.getUser(), -player.getBet());
 					StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), player.getBet());
 					LottoDataManager.addToPool(player.getBet());
 					break;
+				case 0:
+					strBuilder.append("(Draw)");
+					break;
+				case 1:
+					strBuilder.append("(Gains: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
+					StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), player.getBet());
+					break;
 			}
+
+			DatabaseManager.addCoins(context.getGuild(), player.getUser(), result * player.getBet());
 			results.add(strBuilder.toString());
 		}
 
@@ -177,24 +170,22 @@ public class BlackjackManager implements MessageListener {
 			return false;
 		}
 
-		switch (message.getContent().trim()) {
-			case "hit":
-				player.hit();
-				this.stopOrShow();
-				return true;
-			case "stand":
-				player.stand();
-				this.stopOrShow();
-				return true;
-			case "double down":
-				if(player.getCards().size() != 2) {
-					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + player.getUser().getName()
-							+ ", you must have a maximum of 2 cards to use `double down`.", context.getChannel());
-					return true;
-				}
-				player.doubleDown();
-				this.stopOrShow();
-				return true;
+		if(message.getContent().trim().equals("double down") && player.getCards().size() != 2) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " (**" + player.getUser().getName()
+					+ "**) You must have a maximum of 2 cards to use `double down`.", context.getChannel());
+			return true;
+		}
+
+		Map<String, Runnable> actionsMap = new HashMap<>();
+		actionsMap.put("hit", () -> player.hit());
+		actionsMap.put("stand", () -> player.stand());
+		actionsMap.put("double down", () -> player.doubleDown());
+
+		Runnable action = actionsMap.get(message.getContent().trim());
+		if(action != null) {
+			action.run();
+			this.stopOrShow();
+			return true;
 		}
 
 		return false;

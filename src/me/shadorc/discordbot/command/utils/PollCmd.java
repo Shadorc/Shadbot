@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.command.utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,6 @@ import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class PollCmd extends AbstractCommand {
@@ -50,10 +48,9 @@ public class PollCmd extends AbstractCommand {
 		if(pollManager == null) {
 			this.createPoll(context);
 
-		} else if(context.getArg().equals("stop") || context.getArg().equals("cancel")) {
-			if(context.getAuthor().equals(pollManager.getCreator()) || context.getAuthorRole().equals(Role.ADMIN)) {
-				pollManager.stop();
-			}
+		} else if(context.getArg().matches("stop|cancel")
+				&& (context.getAuthor().equals(pollManager.getCreator()) || context.getAuthorRole().equals(Role.ADMIN))) {
+			pollManager.stop();
 
 		} else {
 			String numStr = context.getArg();
@@ -62,18 +59,11 @@ public class PollCmd extends AbstractCommand {
 				return;
 			}
 
-			int num = Integer.parseInt(numStr);
-			pollManager.vote(context.getAuthor(), num);
+			pollManager.vote(context.getAuthor(), Integer.parseInt(numStr));
 		}
 	}
 
 	private void createPoll(Context context) throws MissingArgumentException {
-		if(context.getArg().length() > EmbedBuilder.DESCRIPTION_CONTENT_LIMIT) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Your message is waaay too long, it must not contain more than "
-					+ EmbedBuilder.DESCRIPTION_CONTENT_LIMIT + " characters.", context.getChannel());
-			return;
-		}
-
 		String[] splitArgs = StringUtils.getSplittedArg(context.getArg(), 2);
 		if(splitArgs.length != 2) {
 			throw new MissingArgumentException();
@@ -86,29 +76,14 @@ public class PollCmd extends AbstractCommand {
 			return;
 		}
 
-		if(StringUtils.getCharCount(splitArgs[1], '"') == 0) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You need to specify question and choices in quotation marks. "
-					+ "Use `" + context.getPrefix() + "help " + this.getFirstName() + "` for more information.", context.getChannel());
-			return;
-		}
-
-		if(StringUtils.getCharCount(splitArgs[1], '"') % 2 != 0) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You forgot a quotation mark.", context.getChannel());
-			return;
-		}
-
 		List<String> substrings = StringUtils.getQuotedWords(splitArgs[1]);
-
-		String question = substrings.get(0);
-		if(question.isEmpty()) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " The question can not be empty.", context.getChannel());
+		if(substrings.isEmpty() || StringUtils.getCharCount(splitArgs[1], '"') % 2 != 0) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Question and choices cannot be empty and must be enclosed in quotation marks.", context.getChannel());
 			return;
 		}
 
 		// Remove duplicate choices
 		List<String> choicesList = new ArrayList<>(substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList()));
-		// Remove empty choices
-		choicesList.removeAll(Collections.singleton(""));
 
 		if(choicesList.size() < MIN_CHOICES_NUM || choicesList.size() > MAX_CHOICES_NUM) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You must specify between " + MIN_CHOICES_NUM + " and "
@@ -117,6 +92,8 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		int duration = Integer.parseInt(durationStr);
+		String question = substrings.get(0);
+
 		PollManager pollManager = new PollManager(context, duration, question, choicesList);
 		pollManager.start();
 		CHANNELS_POLL.putIfAbsent(context.getChannel().getLongID(), pollManager);
@@ -187,9 +164,7 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		protected void show() {
-			if(message != null && BotUtils.hasPermission(context.getChannel(), Permissions.MANAGE_MESSAGES)) {
-				message.delete();
-			}
+			BotUtils.deleteIfPossible(context.getChannel(), message);
 
 			int count = 1;
 			StringBuilder choicesStr = new StringBuilder();

@@ -97,7 +97,7 @@ class RouletteManager {
 
 		BotUtils.sendMessage(Emoji.DICE + " No more bets. *The wheel is spinning...* **" + winningPlace
 				+ " (" + (RED_NUMS.contains(winningPlace) ? "Red" : "Black") + ")** !"
-				+ "\n" + Emoji.BANK + " Results: " + StringUtils.formatList(list, str -> str.toString(), ", ") + ".", context.getChannel());
+				+ "\n" + Emoji.BANK + " __Results:__ " + StringUtils.formatList(list, str -> str.toString(), ", ") + ".", context.getChannel());
 
 		playersPlace.clear();
 		CHANNELS_ROULETTE.remove(context.getChannel().getLongID());

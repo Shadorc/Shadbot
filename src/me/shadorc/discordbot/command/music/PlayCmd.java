@@ -35,7 +35,7 @@ public class PlayCmd extends AbstractCommand {
 		IVoiceChannel botVoiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel();
 		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
 
-		if(botVoiceChannel != null && (userVoiceChannel == null || !userVoiceChannel.equals(botVoiceChannel))) {
+		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " I'm currently playing music in voice channel " + botVoiceChannel.mention()
 					+ ", join me before using this command.", context.getChannel());
 			return;

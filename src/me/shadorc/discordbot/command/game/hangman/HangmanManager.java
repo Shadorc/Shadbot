@@ -25,7 +25,6 @@ import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 
 class HangmanManager implements MessageListener {
@@ -134,9 +133,7 @@ class HangmanManager implements MessageListener {
 	}
 
 	private void show() {
-		if(message != null && BotUtils.hasPermission(context.getChannel(), Permissions.MANAGE_MESSAGES)) {
-			message.delete();
-		}
+		BotUtils.deleteIfPossible(context.getChannel(), message);
 
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.setLenient(true)
