@@ -102,6 +102,10 @@ public class StringUtils {
 		return strBuilder.toString();
 	}
 
+	/**
+	 * @param num - the double number to format
+	 * @return the formatted String using enlgish locale
+	 */
 	public static String formatNum(double num) {
 		return NumberFormat.getNumberInstance(Locale.ENGLISH).format(num);
 	}

@@ -10,8 +10,8 @@ import me.shadorc.discordbot.utils.command.Emoji;
 public class GameUtils {
 
 	/**
-	 * @param betStr - The bet to check
-	 * @param context - The context
+	 * @param betStr - the bet to check
+	 * @param context - the context
 	 * @return betStr has an Integer if it's a valid bet, null otherwise
 	 */
 	public static Integer parseBetOrWarn(String betStr, Context context) {

@@ -65,13 +65,13 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 	@Override
 	public void playlistLoaded(AudioPlaylist playlist) {
+		List<AudioTrack> tracks = playlist.getTracks();
+
 		// SoundCloud send empty playlist when no result are found
-		if(playlist.getTracks().isEmpty()) {
+		if(tracks.isEmpty()) {
 			this.onNoMatches();
 			return;
 		}
-
-		List<AudioTrack> tracks = playlist.getTracks();
 
 		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
 			musicManager.setDj(userDj);

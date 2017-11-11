@@ -106,6 +106,11 @@ public class Utils {
 		return list;
 	}
 
+	/**
+	 * @param key - first object to compare
+	 * @param objs - other objects to compare
+	 * @return true if key is equal to all the objs, false otherwise
+	 */
 	public static boolean allEqual(Object key, Object... objs) {
 		for(Object obj : objs) {
 			if(!obj.equals(key)) {
@@ -115,6 +120,9 @@ public class Utils {
 		return true;
 	}
 
+	/**
+	 * @param duration - the duration in ms to sleep
+	 */
 	public static void sleep(long duration) {
 		try {
 			Thread.sleep(duration);
