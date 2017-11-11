@@ -15,14 +15,14 @@ import me.shadorc.discordbot.command.fun.ChatCmd;
 import me.shadorc.discordbot.command.fun.LeetCmd;
 import me.shadorc.discordbot.command.fun.ThisDayCmd;
 import me.shadorc.discordbot.command.game.LottoCmd;
-import me.shadorc.discordbot.command.game.RouletteCmd;
 import me.shadorc.discordbot.command.game.RpsCmd;
 import me.shadorc.discordbot.command.game.RussianRouletteCmd;
 import me.shadorc.discordbot.command.game.SlotMachineCmd;
-import me.shadorc.discordbot.command.game.TriviaCmd;
 import me.shadorc.discordbot.command.game.blackjack.BlackjackCmd;
 import me.shadorc.discordbot.command.game.dice.DiceCmd;
 import me.shadorc.discordbot.command.game.hangman.HangmanCmd;
+import me.shadorc.discordbot.command.game.roulette.RouletteCmd;
+import me.shadorc.discordbot.command.game.trivia.TriviaCmd;
 import me.shadorc.discordbot.command.gamestats.CounterStrikeCmd;
 import me.shadorc.discordbot.command.gamestats.DiabloCmd;
 import me.shadorc.discordbot.command.gamestats.OverwatchCmd;
@@ -195,5 +195,9 @@ public class CommandManager {
 
 	public static AbstractCommand getCommand(String name) {
 		return COMMANDS_MAP.get(name);
+	}
+
+	public static String getFirstName(String name) {
+		return COMMANDS_MAP.get(name).getFirstName();
 	}
 }

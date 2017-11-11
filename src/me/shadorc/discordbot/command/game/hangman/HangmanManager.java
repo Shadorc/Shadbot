@@ -86,7 +86,7 @@ class HangmanManager implements MessageListener {
 			BotUtils.sendMessage(Emoji.PURSE + " Well played **" + context.getAuthorName() + "**, you found the word ! "
 					+ "You won **" + StringUtils.pluralOf(gains, "coin") + "**.", context.getChannel());
 			DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), gains);
-			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getCommand(context.getCommand()).getFirstName(), gains);
+			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 		} else {
 			BotUtils.sendMessage(Emoji.THUMBSDOWN + " You lose, the word to guess was **" + word + "** !", context.getChannel());
 		}

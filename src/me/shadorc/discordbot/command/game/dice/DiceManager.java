@@ -74,7 +74,7 @@ class DiceManager {
 			}
 			DatabaseManager.addCoins(context.getGuild(), user, (hasWon ? 1 : -1) * gains);
 			StatsManager.increment(hasWon ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND,
-					CommandManager.getCommand(context.getCommand()).getFirstName(), Math.abs(gains));
+					CommandManager.getFirstName(context.getCommand()), Math.abs(gains));
 		}
 
 		StringBuilder strBuilder = new StringBuilder();
