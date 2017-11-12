@@ -97,7 +97,7 @@ class HangmanManager implements MessageListener {
 
 		if(!word.contains(chr)) {
 			failsCount++;
-			if(failsCount >= IMG_LIST.size()) {
+			if(failsCount == IMG_LIST.size()) {
 				this.showResultAndStop(false);
 				return;
 			}
@@ -120,7 +120,7 @@ class HangmanManager implements MessageListener {
 
 		if(!this.word.equals(word)) {
 			failsCount++;
-			if(failsCount >= IMG_LIST.size()) {
+			if(failsCount == IMG_LIST.size()) {
 				this.showResultAndStop(false);
 				return;
 			}
