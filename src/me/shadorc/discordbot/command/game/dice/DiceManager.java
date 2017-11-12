@@ -46,7 +46,8 @@ class DiceManager {
 				.withAuthorName("Dice Game")
 				.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 				.appendField(context.getAuthorName() + " started a dice game.",
-						"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + bet + " coins** putting.", false)
+						"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + StringUtils.formatCoins(bet)
+								+ "** putting.", false)
 				.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to make your bets.");
 		BotUtils.sendMessage(builder.build(), context.getChannel()).get();
 
@@ -66,11 +67,11 @@ class DiceManager {
 			int gains = bet;
 			if(num == winningNum) {
 				gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
-				winnersList.add("**" + user.getName() + "**, you win **" + StringUtils.pluralOf(gains, "coin") + "**");
+				winnersList.add("**" + user.getName() + "**, you win **" + StringUtils.formatCoins(gains) + "**");
 				DatabaseManager.addCoins(context.getGuild(), user, gains);
 				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), Math.abs(gains));
 			} else {
-				losersList.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
+				losersList.add("**" + user.getName() + "** (Losses: **" + StringUtils.formatCoins(gains) + ")**");
 				DatabaseManager.addCoins(context.getGuild(), user, -gains);
 				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 				LottoDataManager.addToPool(gains);

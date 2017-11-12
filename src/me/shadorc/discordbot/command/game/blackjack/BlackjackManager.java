@@ -136,7 +136,7 @@ public class BlackjackManager implements MessageListener {
 			StringBuilder strBuilder = new StringBuilder("**" + player.getUser().getName() + "** ");
 			switch (result) {
 				case -1:
-					strBuilder.append("(Losses: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
+					strBuilder.append("(Losses: *" + StringUtils.formatCoins(player.getBet()) + "*)");
 					StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), player.getBet());
 					LottoDataManager.addToPool(player.getBet());
 					break;
@@ -144,7 +144,7 @@ public class BlackjackManager implements MessageListener {
 					strBuilder.append("(Draw)");
 					break;
 				case 1:
-					strBuilder.append("(Gains: *" + StringUtils.pluralOf(player.getBet(), "coin") + "*)");
+					strBuilder.append("(Gains: *" + StringUtils.formatCoins(player.getBet()) + "*)");
 					StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), player.getBet());
 					break;
 			}

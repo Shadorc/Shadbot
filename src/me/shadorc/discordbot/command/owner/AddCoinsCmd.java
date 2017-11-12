@@ -45,7 +45,7 @@ public class AddCoinsCmd extends AbstractCommand {
 			}
 			strBuilder.append(StringUtils.formatList(context.getMessage().getMentions(), user -> user.getName(), ", "));
 		}
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " **" + strBuilder.toString() + "** received *" + StringUtils.pluralOf(coins, "coin") + "*.", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " **" + strBuilder.toString() + "** received *" + StringUtils.formatCoins(coins) + "*.", context.getChannel());
 	}
 
 	@Override

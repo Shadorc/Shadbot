@@ -10,6 +10,7 @@ import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.MathUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -68,7 +69,7 @@ public class SlotMachineCmd extends AbstractCommand {
 
 		StringBuilder message = new StringBuilder(
 				":" + slot1.toString().toLowerCase() + ": :" + slot2.toString().toLowerCase() + ": :" + slot3.toString().toLowerCase() + ":"
-						+ "\nYou " + (gains > 0 ? "win" : "have lost") + " **" + Math.abs(gains) + " coins** !");
+						+ "\nYou " + (gains > 0 ? "win" : "have lost") + " **" + StringUtils.formatCoins(Math.abs(gains)) + "** !");
 		BotUtils.sendMessage(message.toString(), context.getChannel());
 	}
 
@@ -78,7 +79,7 @@ public class SlotMachineCmd extends AbstractCommand {
 				.appendDescription("**Play slot machine.**")
 				.appendField("Cost", "A game costs **" + PAID_COST + " coins**.", false)
 				.appendField("Gains", "You can win **" + SlotOptions.CHERRIES.getGain() + "**, **" + SlotOptions.BELL.getGain() + "** or **"
-						+ SlotOptions.GIFT.getGain() + " coins** ! Good luck.", false);
+						+ StringUtils.formatCoins(SlotOptions.GIFT.getGain()) + "** ! Good luck.", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

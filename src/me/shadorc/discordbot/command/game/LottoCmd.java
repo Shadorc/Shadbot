@@ -66,8 +66,8 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			JSONObject historicObj = LottoDataManager.getHistoric();
 			if(historicObj != null) {
 				StringBuilder strBuilder = new StringBuilder("Last week, the prize pool contained **"
-						+ StringUtils.formatNum(LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_POOL))
-						+ " coins**, the winning number was **"
+						+ StringUtils.formatCoins(LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_POOL))
+						+ "**, the winning number was **"
 						+ LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_NUM)
 						+ "** and **");
 

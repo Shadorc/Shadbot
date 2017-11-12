@@ -83,7 +83,7 @@ class HangmanManager implements MessageListener {
 		if(win) {
 			int gains = (int) Math.ceil(MIN_GAINS + ((float) MAX_BONUS / IMG_LIST.size()) * ((float) IMG_LIST.size() - failsCount));
 			BotUtils.sendMessage(Emoji.PURSE + " Well played **" + context.getAuthorName() + "**, you found the word ! "
-					+ "You won **" + StringUtils.pluralOf(gains, "coin") + "**.", context.getChannel());
+					+ "You won **" + StringUtils.formatCoins(gains) + "**.", context.getChannel());
 			DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), gains);
 			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 		} else {

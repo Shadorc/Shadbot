@@ -54,7 +54,7 @@ public class RouletteCmd extends AbstractCommand {
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets **" + StringUtils.pluralOf(bet, "coin")
+		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets **" + StringUtils.formatCoins(bet)
 				+ "** on **" + place + "**.", context.getChannel());
 		rouletteManager.addPlayer(context.getAuthor(), bet, place);
 	}

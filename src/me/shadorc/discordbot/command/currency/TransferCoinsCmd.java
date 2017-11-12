@@ -62,7 +62,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 		DatabaseManager.addCoins(context.getGuild(), receiverUser, coins);
 
 		BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " has transfered **"
-				+ coins + " coins** to " + receiverUser.mention(), context.getChannel());
+				+ StringUtils.formatCoins(coins) + "** to " + receiverUser.mention(), context.getChannel());
 	}
 
 	@Override

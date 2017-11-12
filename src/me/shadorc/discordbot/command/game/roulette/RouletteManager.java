@@ -85,11 +85,11 @@ class RouletteManager {
 			}
 
 			if(multiplier > 0) {
-				list.add(0, "**" + user.getName() + "** (Gains: **" + StringUtils.pluralOf(gains, "coin") + ")**");
+				list.add(0, "**" + user.getName() + "** (Gains: **" + StringUtils.formatCoins(gains) + ")**");
 				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), multiplier * gains);
 				LottoDataManager.addToPool(gains);
 			} else {
-				list.add("**" + user.getName() + "** (Losses: **" + StringUtils.pluralOf(gains, "coin") + ")**");
+				list.add("**" + user.getName() + "** (Losses: **" + StringUtils.formatCoins(gains) + ")**");
 				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 			}
 			DatabaseManager.addCoins(context.getGuild(), user, multiplier * gains);

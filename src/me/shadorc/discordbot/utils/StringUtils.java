@@ -121,6 +121,14 @@ public class StringUtils {
 	}
 
 	/**
+	 * @param coins - number of coins to format
+	 * @return coins formatted + "coin(s)"
+	 */
+	public static String formatCoins(int coins) {
+		return StringUtils.formatNum(coins) + " " + StringUtils.pluralOf(coins, "coin");
+	}
+
+	/**
 	 * @param arg - arg to split
 	 * @param limit - the limit
 	 * @return a String Array without null or empty string splitted by " "
