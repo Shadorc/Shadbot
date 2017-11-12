@@ -11,6 +11,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;
 
@@ -20,8 +21,10 @@ public class MessageListener {
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 
 	@EventSubscriber
-	public void onMessageReceivedEvent(MessageReceivedEvent event) {
-		executor.execute(() -> this.onMessage(event));
+	public void onMessageEvent(MessageEvent event) {
+		if(event instanceof MessageReceivedEvent) {
+			executor.execute(() -> this.onMessage((MessageReceivedEvent) event));
+		}
 	}
 
 	private void onMessage(MessageReceivedEvent event) {
