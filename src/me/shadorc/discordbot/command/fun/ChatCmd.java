@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.fun;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,6 +25,7 @@ import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class ChatCmd extends AbstractCommand {
@@ -42,22 +44,20 @@ public class ChatCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		JSONObject mainObj = null;
+		String response;
+
 		try {
-			String custid = CHANNELS_CUSTID.get(context.getChannel().getLongID());
-			String xmlString = NetUtils.getDoc("https://www.pandorabots.com/pandora/talk-xml?"
-					+ "botid=b0dafd24ee35a477"
-					+ "&input=" + URLEncoder.encode(context.getArg(), "UTF-8")
-					+ (custid == null ? "" : "&custid=" + custid))
-					.toString();
-			mainObj = XML.toJSONObject(xmlString);
-			JSONObject resultObj = mainObj.getJSONObject("result");
-			String response = resultObj.getString("that").replace("<br>", "\n").replace("  ", " ").trim();
-			CHANNELS_CUSTID.put(context.getChannel().getLongID(), resultObj.getString("custid"));
+			response = this.talk(context.getChannel(), "b0dafd24ee35a477", context.getArg());
 			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
-			return;
 		} catch (JSONException | IOException err) {
-			LogUtils.error("Something went wrong while discussing with Chomsky. Using Cleverbot instead.", err);
+			LogUtils.info("Chomsky is not reachable, using Marvin instead.");
+		}
+
+		try {
+			response = this.talk(context.getChannel(), "efc39100ce34d038", context.getArg());
+			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
+		} catch (JSONException | IOException err) {
+			LogUtils.info("Marvin is not reachable, using Cleverbot instead.");
 		}
 
 		try {
@@ -71,10 +71,23 @@ public class ChatCmd extends AbstractCommand {
 		}
 	}
 
+	private String talk(IChannel channel, String botID, String input) throws UnsupportedEncodingException, IOException {
+		String custid = CHANNELS_CUSTID.get(channel.getLongID());
+		String xmlString = NetUtils.getDoc("https://www.pandorabots.com/pandora/talk-xml?"
+				+ "botid=" + botID
+				+ "&input=" + URLEncoder.encode(input, "UTF-8")
+				+ (custid == null ? "" : "&custid=" + custid))
+				.toString();
+		JSONObject mainObj = XML.toJSONObject(xmlString);
+		JSONObject resultObj = mainObj.getJSONObject("result");
+		CHANNELS_CUSTID.put(channel.getLongID(), resultObj.getString("custid"));
+		return resultObj.getString("that").replace("<br>", "\n").replace("  ", " ").trim();
+	}
+
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Chat with the artificial intelligence A.L.I.C.E.**")
+				.appendDescription("**Chat with an artificial intelligence.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <message>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
