@@ -179,8 +179,9 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 		LottoDataManager.setHistoric(winnersList.size(), LottoDataManager.getPool(), winningNum);
 
 		if(!winnersList.isEmpty()) {
-			LottoDataManager.reset();
+			LottoDataManager.resetPool();
 		}
+		LottoDataManager.resetUsers();
 
 		this.timer = new Timer(this.getDelayBeforeNextDraw(), this);
 	}

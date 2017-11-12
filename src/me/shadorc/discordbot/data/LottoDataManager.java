@@ -92,8 +92,11 @@ public class LottoDataManager {
 				.put(HISTORIC_NUM, num));
 	}
 
-	public static void reset() {
+	public static void resetUsers() {
 		dataObj.put(USERS, new JSONArray());
+	}
+
+	public static void resetPool() {
 		dataObj.put(POOL, 0);
 	}
 
