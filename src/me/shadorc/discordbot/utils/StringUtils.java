@@ -125,7 +125,7 @@ public class StringUtils {
 	 * @return coins formatted + "coin(s)"
 	 */
 	public static String formatCoins(int coins) {
-		return StringUtils.formatNum(coins) + " " + StringUtils.pluralOf(coins, "coin");
+		return StringUtils.formatNum(coins) + " " + (coins > 1 ? "coins" : "coin");
 	}
 
 	/**
