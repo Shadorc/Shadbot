@@ -15,6 +15,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RouletteCmd extends AbstractCommand {
 
+	private static final int MAX_BET = 50_000_000;
+
 	public RouletteCmd() {
 		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "roulette");
 	}
@@ -26,7 +28,7 @@ public class RouletteCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Integer bet = GameUtils.parseBetOrWarn(splitArgs[0], context);
+		Integer bet = GameUtils.parseBetOrWarn(splitArgs[0], MAX_BET, context);
 		if(bet == null) {
 			return;
 		}

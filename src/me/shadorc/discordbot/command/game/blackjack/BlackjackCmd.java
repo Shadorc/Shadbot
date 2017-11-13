@@ -14,6 +14,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class BlackjackCmd extends AbstractCommand {
 
+	private static final int MAX_BET = 500_000;
+
 	public BlackjackCmd() {
 		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "blackjack");
 		this.setAlias("bj");
@@ -25,7 +27,7 @@ public class BlackjackCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Integer bet = GameUtils.parseBetOrWarn(context.getArg(), context);
+		Integer bet = GameUtils.parseBetOrWarn(context.getArg(), MAX_BET, context);
 		if(bet == null) {
 			return;
 		}

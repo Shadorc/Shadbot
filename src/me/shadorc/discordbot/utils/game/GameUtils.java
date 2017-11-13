@@ -14,7 +14,7 @@ public class GameUtils {
 	 * @param context - the context
 	 * @return betStr has an Integer if it's a valid bet, null otherwise
 	 */
-	public static Integer parseBetOrWarn(String betStr, Context context) {
+	public static Integer parseBetOrWarn(String betStr, int maxValue, Context context) {
 		if(!StringUtils.isPositiveInt(betStr)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid bet.", context.getChannel());
 			return null;
@@ -23,6 +23,11 @@ public class GameUtils {
 		int bet = Integer.parseInt(betStr);
 		if(DatabaseManager.getCoins(context.getGuild(), context.getAuthor()) < bet) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
+			return null;
+		}
+
+		if(bet > maxValue) {
+			BotUtils.sendMessage(Emoji.BANK + " Sorry, you can't bet more than **" + StringUtils.formatCoins(maxValue) + "**.", context.getChannel());
 			return null;
 		}
 

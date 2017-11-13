@@ -20,7 +20,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends AbstractCommand {
 
-	private static final int MAX_BET = 500;
+	private static final int MAX_BET = 300_000_000;
 	private static final float WIN_MULTIPLIER = 2.25f;
 	private static final float LOSE_MULTIPLIER = 10f;
 
@@ -35,13 +35,8 @@ public class RussianRouletteCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Integer bet = GameUtils.parseBetOrWarn(context.getArg(), context);
+		Integer bet = GameUtils.parseBetOrWarn(context.getArg(), MAX_BET, context);
 		if(bet == null) {
-			return;
-		}
-
-		if(bet > MAX_BET) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " You can't bet more than **" + MAX_BET + " coins**.", context.getChannel());
 			return;
 		}
 

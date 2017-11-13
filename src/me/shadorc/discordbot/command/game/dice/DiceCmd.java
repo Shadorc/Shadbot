@@ -18,6 +18,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class DiceCmd extends AbstractCommand {
 
 	protected static final int MULTIPLIER = 6;
+	private static final int MAX_BET = 100_000;
 
 	public DiceCmd() {
 		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "dice");
@@ -42,7 +43,7 @@ public class DiceCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Integer bet = GameUtils.parseBetOrWarn(splitArgs[0], context);
+		Integer bet = GameUtils.parseBetOrWarn(splitArgs[0], MAX_BET, context);
 		if(bet == null) {
 			return;
 		}
