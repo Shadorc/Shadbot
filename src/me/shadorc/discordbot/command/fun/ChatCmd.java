@@ -3,22 +3,19 @@ package me.shadorc.discordbot.command.fun;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 
-import com.michaelwflaherty.cleverbotapi.CleverBotQuery;
-
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
-import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -30,9 +27,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class ChatCmd extends AbstractCommand {
 
-	private static final String API_KEY = Config.get(APIKey.CLEVERBOT_API_KEY);
-	private static final ConcurrentHashMap<Long, String> CHANNELS_CONV_ID = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<Long, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
+	private static final List<String> BOTS_ID = Arrays.asList("efc39100ce34d038", "b0dafd24ee35a477", "ea373c261e3458c6", "b0a6a41a5e345c23");
 
 	public ChatCmd() {
 		super(CommandCategory.FUN, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "chat");
@@ -44,30 +40,20 @@ public class ChatCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String response;
-
-		try {
-			response = this.talk(context.getChannel(), "b0dafd24ee35a477", context.getArg());
-			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
-		} catch (JSONException | IOException err) {
-			LogUtils.info("Chomsky is not reachable, using Marvin instead.");
+		String response = null;
+		for(String botID : BOTS_ID) {
+			try {
+				response = this.talk(context.getChannel(), botID, context.getArg());
+				BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
+				break;
+			} catch (JSONException | IOException err) {
+				LogUtils.info("{" + this.getClass().getSimpleName() + "} " + botID + " is not reachable, trying another one.");
+			}
 		}
 
-		try {
-			response = this.talk(context.getChannel(), "efc39100ce34d038", context.getArg());
-			BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
-		} catch (JSONException | IOException err) {
-			LogUtils.info("Marvin is not reachable, using Cleverbot instead.");
-		}
-
-		try {
-			CleverBotQuery bot = new CleverBotQuery(API_KEY, URLEncoder.encode(context.getArg(), "UTF-8"));
-			bot.setConversationID(CHANNELS_CONV_ID.getOrDefault(context.getChannel().getLongID(), ""));
-			bot.sendRequest();
-			CHANNELS_CONV_ID.put(context.getChannel().getLongID(), bot.getConversationID());
-			BotUtils.sendMessage(Emoji.SPEECH + " " + bot.getResponse(), context.getChannel());
-		} catch (IOException err) {
-			ExceptionUtils.manageException("discussing with Cleverbot", context, err);
+		if(response == null) {
+			BotUtils.sendMessage(Emoji.SLEEPING + " Sorry, A.L.I.C.E. seems to be AFK, she'll probably come back later.", context.getChannel());
+			LogUtils.error("No artificial intelligence is responding.");
 		}
 	}
 
