@@ -7,6 +7,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -62,7 +63,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 		DatabaseManager.addCoins(context.getGuild(), receiverUser, coins);
 
 		BotUtils.sendMessage(Emoji.BANK + " " + senderUser.mention() + " has transfered **"
-				+ StringUtils.formatCoins(coins) + "** to " + receiverUser.mention(), context.getChannel());
+				+ FormatUtils.formatCoins(coins) + "** to " + receiverUser.mention(), context.getChannel());
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -173,7 +174,7 @@ public class PollCmd extends AbstractCommand {
 				List<IUser> votersList = choicesMap.get(choice);
 				String vote = votersList.isEmpty() ? "" : " *(Vote: " + votersList.size() + ")*";
 				choicesStr.append("\n\t**" + count + ".** " + choice + vote);
-				choicesStr.append("\n\t\t" + StringUtils.formatList(votersList.subList(0, Math.min(5, votersList.size())), user -> user.getName(), ", "));
+				choicesStr.append("\n\t\t" + FormatUtils.formatList(votersList.subList(0, Math.min(5, votersList.size())), user -> user.getName(), ", "));
 				if(votersList.size() > 5) {
 					choicesStr.append("...");
 				}
@@ -188,7 +189,7 @@ public class PollCmd extends AbstractCommand {
 							+ "\n\n__**" + question + "**__"
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
-					.withFooterText(timer.isRunning() ? ("Time left: " + StringUtils.formatDuration(remainingTime)) : "Finished");
+					.withFooterText(timer.isRunning() ? ("Time left: " + FormatUtils.formatDuration(remainingTime)) : "Finished");
 
 			this.message = BotUtils.sendMessage(embed.build(), context.getChannel()).get();
 		}

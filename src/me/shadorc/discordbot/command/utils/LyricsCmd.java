@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.utils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+
 import org.jsoup.nodes.Document;
 
 import me.shadorc.discordbot.command.AbstractCommand;

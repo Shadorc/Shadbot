@@ -10,6 +10,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -49,7 +50,7 @@ public class BlacklistSettingCmd implements SettingCmd {
 
 				if(!commandsAdded.isEmpty()) {
 					BotUtils.sendMessage(Emoji.CHECK_MARK + " Command `"
-							+ StringUtils.formatList(commandsAdded, cmd -> cmd, ", ")
+							+ FormatUtils.formatList(commandsAdded, cmd -> cmd, ", ")
 							+ "` has been added to the blacklist.", context.getChannel());
 				}
 				break;
@@ -60,7 +61,7 @@ public class BlacklistSettingCmd implements SettingCmd {
 				}
 
 				BotUtils.sendMessage(Emoji.CHECK_MARK + " Command `"
-						+ StringUtils.formatArray(arg2.split(","), cmd -> cmd.toString(), ", ")
+						+ FormatUtils.formatArray(arg2.split(","), cmd -> cmd.toString(), ", ")
 						+ "` has been removed from the blacklist.", context.getChannel());
 				break;
 

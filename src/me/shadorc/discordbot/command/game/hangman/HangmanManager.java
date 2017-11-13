@@ -20,7 +20,7 @@ import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IMessage;
@@ -83,7 +83,7 @@ class HangmanManager implements MessageListener {
 		if(win) {
 			int gains = (int) Math.ceil(MIN_GAINS + ((float) MAX_BONUS / IMG_LIST.size()) * ((float) IMG_LIST.size() - failsCount));
 			BotUtils.sendMessage(Emoji.PURSE + " Well played **" + context.getAuthorName() + "**, you found the word ! "
-					+ "You won **" + StringUtils.formatCoins(gains) + "**.", context.getChannel());
+					+ "You won **" + FormatUtils.formatCoins(gains) + "**.", context.getChannel());
 			DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), gains);
 			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 		} else {
@@ -143,7 +143,7 @@ class HangmanManager implements MessageListener {
 				.withDescription("Type letters or enter a word if you think you've guessed it."
 						+ "\nUse `" + context.getPrefix() + "cancel` to cancel this game.")
 				.appendField("Word", HangmanUtils.getRepresentation(word, charsTested), false)
-				.appendField("Letters tested", StringUtils.formatList(charsTested, chr -> chr.toString().toUpperCase(), ", "), false);
+				.appendField("Letters tested", FormatUtils.formatList(charsTested, chr -> chr.toString().toUpperCase(), ", "), false);
 
 		if(idleTimer.isRunning()) {
 			builder.withFooterText("This game will be cancelled in " + TimeUnit.MILLISECONDS.toMinutes(idleTimer.getDelay())

@@ -2,6 +2,7 @@ package me.shadorc.discordbot.command.image;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

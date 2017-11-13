@@ -17,8 +17,8 @@ import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
-import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.game.Pair;
@@ -85,11 +85,11 @@ class RouletteManager {
 			}
 
 			if(multiplier > 0) {
-				list.add(0, "**" + user.getName() + "** (Gains: **" + StringUtils.formatCoins(gains) + ")**");
+				list.add(0, "**" + user.getName() + "** (Gains: **" + FormatUtils.formatCoins(gains) + ")**");
 				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), multiplier * gains);
 				LottoDataManager.addToPool(gains);
 			} else {
-				list.add("**" + user.getName() + "** (Losses: **" + StringUtils.formatCoins(gains) + ")**");
+				list.add("**" + user.getName() + "** (Losses: **" + FormatUtils.formatCoins(gains) + ")**");
 				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 			}
 			DatabaseManager.addCoins(context.getGuild(), user, multiplier * gains);
@@ -97,7 +97,7 @@ class RouletteManager {
 
 		BotUtils.sendMessage(Emoji.DICE + " No more bets. *The wheel is spinning...* **" + winningPlace
 				+ " (" + (RED_NUMS.contains(winningPlace) ? "Red" : "Black") + ")** !"
-				+ "\n" + Emoji.BANK + " __Results:__ " + StringUtils.formatList(list, str -> str.toString(), ", ") + ".", context.getChannel());
+				+ "\n" + Emoji.BANK + " __Results:__ " + FormatUtils.formatList(list, str -> str.toString(), ", ") + ".", context.getChannel());
 
 		playersPlace.clear();
 		CHANNELS_ROULETTE.remove(context.getChannel().getLongID());

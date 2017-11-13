@@ -20,6 +20,7 @@ import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
@@ -58,7 +59,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		musicManager.joinVoiceChannel(userVoiceChannel, false);
 		if(musicManager.getScheduler().isPlaying()) {
 			BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **"
-					+ StringUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
+					+ FormatUtils.formatTrackName(track.getInfo()) + "** has been added to the playlist.", musicManager.getChannel());
 		}
 		musicManager.getScheduler().queue(track, putFirst);
 	}
@@ -79,7 +80,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 			StringBuilder strBuilder = new StringBuilder();
 			for(int i = 0; i < Math.min(5, tracks.size()); i++) {
-				strBuilder.append("\n\t**" + (i + 1) + ".** " + StringUtils.formatTrackName(tracks.get(i).getInfo()));
+				strBuilder.append("\n\t**" + (i + 1) + ".** " + FormatUtils.formatTrackName(tracks.get(i).getInfo()));
 			}
 
 			EmbedBuilder embed = new EmbedBuilder()
@@ -181,7 +182,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		for(int choice : choices) {
 			AudioTrack track = resultsTracks.get(choice - 1);
 			if(musicManager.getScheduler().isPlaying()) {
-				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + StringUtils.formatTrackName(track.getInfo())
+				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + FormatUtils.formatTrackName(track.getInfo())
 						+ "** has been added to the playlist.", musicManager.getChannel());
 			}
 			musicManager.getScheduler().queue(track, putFirst);

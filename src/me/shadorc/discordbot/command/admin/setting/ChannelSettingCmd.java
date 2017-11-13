@@ -8,7 +8,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -45,7 +45,7 @@ public class ChannelSettingCmd implements SettingCmd {
 				}
 
 				BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel "
-						+ StringUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
+						+ FormatUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
 						+ " has been added to allowed channels.", context.getChannel());
 				break;
 
@@ -55,7 +55,7 @@ public class ChannelSettingCmd implements SettingCmd {
 				}
 
 				BotUtils.sendMessage(Emoji.CHECK_MARK + " Channel "
-						+ StringUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
+						+ FormatUtils.formatList(mentionedChannels, channel -> channel.mention(), ", ")
 						+ " has been removed from allowed channels.", context.getChannel());
 				break;
 

@@ -10,8 +10,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.LogUtils;
-import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
 
 public class AudioEventListener extends AudioEventAdapter {
@@ -28,7 +28,7 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **" + StringUtils.formatTrackName(track.getInfo()) + "**", musicManager.getChannel());
+		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " Currently playing: **" + FormatUtils.formatTrackName(track.getInfo()) + "**", musicManager.getChannel());
 	}
 
 	@Override

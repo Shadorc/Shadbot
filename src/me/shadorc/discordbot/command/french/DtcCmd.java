@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

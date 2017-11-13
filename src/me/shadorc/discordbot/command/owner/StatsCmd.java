@@ -16,6 +16,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -45,7 +46,7 @@ public class StatsCmd extends AbstractCommand {
 
 		if(!Arrays.stream(StatCategory.values()).anyMatch(category -> category.toString().equals(context.getArg()))) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Category unknown. (Options: "
-					+ StringUtils.formatArray(StatCategory.values(), cat -> "**" + cat.toString() + "**", ", ") + ")", context.getChannel());
+					+ FormatUtils.formatArray(StatCategory.values(), cat -> "**" + cat.toString() + "**", ", ") + ")", context.getChannel());
 			return;
 		}
 
@@ -79,7 +80,7 @@ public class StatsCmd extends AbstractCommand {
 			int minIndex = i * ROW_SIZE;
 			int size = Math.min(ROW_SIZE, statsList.size() - minIndex);
 			builder.appendField("Row N°" + (i + 1),
-					StringUtils.formatList(statsList.subList(minIndex, minIndex + size), str -> str, "\n"), true);
+					FormatUtils.formatList(statsList.subList(minIndex, minIndex + size), str -> str, "\n"), true);
 		}
 
 		BotUtils.sendMessage(builder.build(), context.getChannel());
@@ -107,8 +108,8 @@ public class StatsCmd extends AbstractCommand {
 
 			float average = (float) (gains - losses) / count;
 			nameStr.append(key.toString() + "\n");
-			averageStr.append(StringUtils.formatNum(Math.ceil(average)) + "\n");
-			countStr.append(StringUtils.formatNum(count) + "\n");
+			averageStr.append(FormatUtils.formatNum(Math.ceil(average)) + "\n");
+			countStr.append(FormatUtils.formatNum(count) + "\n");
 		}
 
 		builder.appendField("__Name__", nameStr.toString(), true);
@@ -124,7 +125,7 @@ public class StatsCmd extends AbstractCommand {
 				.appendDescription("**Show stats for the specified category or average amount of coins gained with minigames.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <category>`"
 						+ "\n`" + context.getPrefix() + this.getFirstName() + " average`", false)
-				.appendField("Argument", "**category** - " + StringUtils.formatArray(StatCategory.values(), cat -> cat.toString(), ", "), false);
+				.appendField("Argument", "**category** - " + FormatUtils.formatArray(StatCategory.values(), cat -> cat.toString(), ", "), false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 
 	}

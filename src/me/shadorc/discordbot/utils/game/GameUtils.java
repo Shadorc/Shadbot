@@ -3,6 +3,7 @@ package me.shadorc.discordbot.utils.game;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -27,7 +28,8 @@ public class GameUtils {
 		}
 
 		if(bet > maxValue) {
-			BotUtils.sendMessage(Emoji.BANK + " Sorry, you can't bet more than **" + StringUtils.formatCoins(maxValue) + "**.", context.getChannel());
+			BotUtils.sendMessage(Emoji.BANK + " Sorry, you can't bet more than **"
+					+ FormatUtils.formatCoins(maxValue) + "**.", context.getChannel());
 			return null;
 		}
 

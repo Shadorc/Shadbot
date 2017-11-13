@@ -13,7 +13,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
@@ -43,18 +43,18 @@ public class ServerInfoCmd extends AbstractCommand {
 				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
 				.appendField("Region", guild.getRegion().getName(), true)
 				.appendField("Creation date", guild.getCreationDate().format(dateFormatter)
-						+ "\n(" + StringUtils.formateDate(guild.getCreationDate()) + ")", true)
+						+ "\n(" + FormatUtils.formateDate(guild.getCreationDate()) + ")", true)
 				.appendField("Channels", Integer.toString(guild.getChannels().size()), true)
 				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
 				.appendField("Settings", "**Prefix:** " + context.getPrefix()
 						+ "\n**Default volume:** " + DatabaseManager.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
 						+ "\n**Allowed channels:** " + (allowedChannels.isEmpty() ? "All" : "\n"
-								+ StringUtils.formatList(
+								+ FormatUtils.formatList(
 										allowedChannels,
 										channelID -> "\t" + guild.getChannelByID(channelID).getName(),
 										"\n"))
 						+ "\n**Blacklisted command:** " + (blacklistedCmd.isEmpty() ? "None" : "\n"
-								+ StringUtils.formatList(blacklistedCmd, cmdName -> "\t" + cmdName, "\n")), true)
+								+ FormatUtils.formatList(blacklistedCmd, cmdName -> "\t" + cmdName, "\n")), true)
 				.appendField("Server ID", Long.toString(guild.getLongID()), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}

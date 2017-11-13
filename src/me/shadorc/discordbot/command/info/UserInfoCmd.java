@@ -8,7 +8,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
@@ -35,12 +35,12 @@ public class UserInfoCmd extends AbstractCommand {
 				.appendField("Display name", user.getDisplayName(context.getGuild()), true)
 				.appendField("User ID", Long.toString(user.getLongID()), true)
 				.appendField("Creation date", user.getCreationDate().format(dateFormatter)
-						+ "\n(" + StringUtils.formateDate(user.getCreationDate()) + ")", true)
+						+ "\n(" + FormatUtils.formateDate(user.getCreationDate()) + ")", true)
 				.appendField("Join date", context.getGuild().getJoinTimeForUser(user).format(dateFormatter)
-						+ "\n(" + StringUtils.formateDate(context.getGuild().getJoinTimeForUser(user)) + ")", true)
+						+ "\n(" + FormatUtils.formateDate(context.getGuild().getJoinTimeForUser(user)) + ")", true)
 				.appendField("Status", user.getPresence().getStatus().toString(), true)
 				.appendField("Playing text", user.getPresence().getPlayingText().orElse(null), true)
-				.appendField("Roles", StringUtils.formatList(user.getRolesForGuild(context.getGuild()), role -> role.getName(), "\n"), true);
+				.appendField("Roles", FormatUtils.formatList(user.getRolesForGuild(context.getGuild()), role -> role.getName(), "\n"), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 

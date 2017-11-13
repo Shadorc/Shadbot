@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.french;
 
 import java.io.IOException;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,9 +13,9 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.NetUtils;
-import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
@@ -34,7 +35,7 @@ public class JokeCmd extends AbstractCommand {
 			String joke;
 			do {
 				Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
-				joke = StringUtils.formatArray(element.html().split("<br>"), line -> Jsoup.parse((String) line).text().trim(), "\n");
+				joke = FormatUtils.formatArray(element.html().split("<br>"), line -> Jsoup.parse((String) line).text().trim(), "\n");
 			} while(joke.length() > 1000);
 
 			EmbedBuilder embed = Utils.getDefaultEmbed()

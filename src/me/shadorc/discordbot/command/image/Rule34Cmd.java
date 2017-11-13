@@ -16,9 +16,9 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.NetUtils;
-import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -76,7 +76,7 @@ public class Rule34Cmd extends AbstractCommand {
 				return;
 			}
 
-			String formattedtags = StringUtils.formatArray(tags, tag -> "`" + tag.toString().trim() + "`", " ");
+			String formattedtags = FormatUtils.formatArray(tags, tag -> "`" + tag.toString().trim() + "`", " ");
 			if(formattedtags.length() > MAX_TAGS_LENGTH) {
 				formattedtags = formattedtags.substring(0, MAX_TAGS_LENGTH - 3) + "...";
 			}

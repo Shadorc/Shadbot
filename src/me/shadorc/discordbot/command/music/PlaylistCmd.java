@@ -10,6 +10,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -55,7 +56,7 @@ public class PlaylistCmd extends AbstractCommand {
 
 		int count = 1;
 		for(AudioTrack track : queue) {
-			String name = "\n\t**" + count + ".** " + StringUtils.formatTrackName(track.getInfo());
+			String name = "\n\t**" + count + ".** " + FormatUtils.formatTrackName(track.getInfo());
 			if(playlist.length() + name.length() < 1800) {
 				playlist.append(name);
 				count++;

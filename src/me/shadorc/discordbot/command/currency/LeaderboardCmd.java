@@ -11,7 +11,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
@@ -46,7 +46,7 @@ public class LeaderboardCmd extends AbstractCommand {
 				break;
 			}
 			count++;
-			strBuilder.append("\n" + count + ". **" + user + "** - " + StringUtils.formatCoins(usersCoin.get(user)));
+			strBuilder.append("\n" + count + ". **" + user + "** - " + FormatUtils.formatCoins(usersCoin.get(user)));
 		}
 
 		if(count == 0) {

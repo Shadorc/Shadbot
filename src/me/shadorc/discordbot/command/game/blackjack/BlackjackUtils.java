@@ -3,8 +3,8 @@ package me.shadorc.discordbot.command.game.blackjack;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
-import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.game.Card;
 import me.shadorc.discordbot.utils.game.Card.Sign;
 
@@ -19,7 +19,7 @@ public class BlackjackUtils {
 	}
 
 	public static String formatCards(List<Card> cards) {
-		return StringUtils.formatList(cards, card -> "`" + card.getName() + "` " + card.getSign().getEmoji(), " | ")
+		return FormatUtils.formatList(cards, card -> "`" + card.getName() + "` " + card.getSign().getEmoji(), " | ")
 				+ "\nValue: " + BlackjackUtils.getValue(cards);
 	}
 

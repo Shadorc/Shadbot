@@ -6,7 +6,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
@@ -24,12 +24,12 @@ public class CoinsCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		if(context.getMessage().getMentions().isEmpty()) {
 			BotUtils.sendMessage(Emoji.PURSE + " You have **"
-					+ StringUtils.formatCoins(DatabaseManager.getCoins(context.getGuild(), context.getAuthor()))
+					+ FormatUtils.formatCoins(DatabaseManager.getCoins(context.getGuild(), context.getAuthor()))
 					+ "**.", context.getChannel());
 		} else {
 			IUser user = context.getMessage().getMentions().get(0);
 			int coins = DatabaseManager.getUser(context.getGuild(), user).getInt(DatabaseManager.COINS);
-			BotUtils.sendMessage(Emoji.PURSE + " " + user.getName() + " has **" + StringUtils.formatCoins(coins) + "**.", context.getChannel());
+			BotUtils.sendMessage(Emoji.PURSE + " " + user.getName() + " has **" + FormatUtils.formatCoins(coins) + "**.", context.getChannel());
 		}
 	}
 

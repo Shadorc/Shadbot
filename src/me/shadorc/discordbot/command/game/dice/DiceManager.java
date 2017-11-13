@@ -14,8 +14,8 @@ import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
-import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IUser;
@@ -46,7 +46,7 @@ class DiceManager {
 				.withAuthorName("Dice Game")
 				.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 				.appendField(context.getAuthorName() + " started a dice game.",
-						"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + StringUtils.formatCoins(bet)
+						"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + FormatUtils.formatCoins(bet)
 								+ "** putting.", false)
 				.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to make your bets.");
 		BotUtils.sendMessage(builder.build(), context.getChannel()).get();
@@ -67,11 +67,11 @@ class DiceManager {
 			int gains = bet;
 			if(num == winningNum) {
 				gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
-				winnersList.add("**" + user.getName() + "**, you win **" + StringUtils.formatCoins(gains) + "**");
+				winnersList.add("**" + user.getName() + "**, you win **" + FormatUtils.formatCoins(gains) + "**");
 				DatabaseManager.addCoins(context.getGuild(), user, gains);
 				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), Math.abs(gains));
 			} else {
-				losersList.add("**" + user.getName() + "** (Losses: **" + StringUtils.formatCoins(gains) + ")**");
+				losersList.add("**" + user.getName() + "** (Losses: **" + FormatUtils.formatCoins(gains) + ")**");
 				DatabaseManager.addCoins(context.getGuild(), user, -gains);
 				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 				LottoDataManager.addToPool(gains);
@@ -82,10 +82,10 @@ class DiceManager {
 
 		strBuilder.append(Emoji.DICE + " The dice is rolling... **" + winningNum + "** !");
 		if(!winnersList.isEmpty()) {
-			strBuilder.append("\n" + Emoji.MONEY_BAG + " Congratulations " + StringUtils.formatList(winnersList, str -> str, ", ") + " !");
+			strBuilder.append("\n" + Emoji.MONEY_BAG + " Congratulations " + FormatUtils.formatList(winnersList, str -> str, ", ") + " !");
 		}
 		if(!losersList.isEmpty()) {
-			strBuilder.append("\n" + Emoji.MONEY_WINGS + " Sorry, " + StringUtils.formatList(losersList, str -> str, ", ") + ".");
+			strBuilder.append("\n" + Emoji.MONEY_WINGS + " Sorry, " + FormatUtils.formatList(losersList, str -> str, ", ") + ".");
 		}
 		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 

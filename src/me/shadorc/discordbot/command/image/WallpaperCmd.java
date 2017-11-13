@@ -27,6 +27,7 @@ import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
@@ -134,7 +135,7 @@ public class WallpaperCmd extends AbstractCommand {
 				.withUrl(wallpaper.getUrl())
 				.withImage(wallpaper.getImageUrl())
 				.appendField("Resolution", wallpaper.getResolution().toString(), false)
-				.appendField("Tags", StringUtils.formatList(wallpaper.getTags(), tag -> "`" + tag.toString().replace("#", "") + "`", " "), false);
+				.appendField("Tags", FormatUtils.formatList(wallpaper.getTags(), tag -> "`" + tag.toString().replace("#", "") + "`", " "), false);
 
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
@@ -157,8 +158,8 @@ public class WallpaperCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.withDescription("**Search for a wallpaper.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " [-p purity] [-c category] [-rat ratio] [-res resolution] [-k keywords]`", false)
-				.appendField("Arguments", "**purity** - " + StringUtils.formatArray(Purity.values(), purity -> purity.toString().toLowerCase(), ", ")
-						+ "\n**category** - " + StringUtils.formatArray(Category.values(), cat -> cat.toString().toLowerCase(), ", ")
+				.appendField("Arguments", "**purity** - " + FormatUtils.formatArray(Purity.values(), purity -> purity.toString().toLowerCase(), ", ")
+						+ "\n**category** - " + FormatUtils.formatArray(Category.values(), cat -> cat.toString().toLowerCase(), ", ")
 						+ "\n**ratio** - image ratio (e.g. 16x9)"
 						+ "\n**resolution** - image resolution (e.g. 1920x1080)"
 						+ "\n**keyword** - keywords (e.g. doom,game)", true)

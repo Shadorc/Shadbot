@@ -8,6 +8,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -44,7 +45,7 @@ public class ForwardCmd extends AbstractCommand {
 		try {
 			long time = TimeUnit.SECONDS.toMillis(Integer.parseInt(numStr));
 			long newPosition = musicManager.getScheduler().changePosition(time);
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + StringUtils.formatDuration(newPosition), context.getChannel());
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " New position: " + FormatUtils.formatDuration(newPosition), context.getChannel());
 		} catch (IllegalArgumentException err) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " New position is past the ending of the song.", context.getChannel());
 		}

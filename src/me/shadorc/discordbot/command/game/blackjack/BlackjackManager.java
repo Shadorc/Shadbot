@@ -20,7 +20,7 @@ import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.game.Card;
@@ -97,7 +97,7 @@ public class BlackjackManager implements MessageListener {
 						+ " <bet>` to join the game.**"
 						+ "\n\nType `hit` to take another card, `stand` to pass or `double down` to double down.")
 				.appendField("Dealer's hand", BlackjackUtils.formatCards(isFinished ? dealerCards : dealerCards.subList(0, 1)), true)
-				.withFooterText(isFinished ? "Finished" : "This game will end automatically in " + StringUtils.formatDuration(timer.getDelay() - System.currentTimeMillis() + startTime));
+				.withFooterText(isFinished ? "Finished" : "This game will end automatically in " + FormatUtils.formatDuration(timer.getDelay() - System.currentTimeMillis() + startTime));
 
 		for(BlackjackPlayer player : players) {
 			builder.appendField(player.getUser().getName() + "'s hand"
@@ -136,7 +136,7 @@ public class BlackjackManager implements MessageListener {
 			StringBuilder strBuilder = new StringBuilder("**" + player.getUser().getName() + "** ");
 			switch (result) {
 				case -1:
-					strBuilder.append("(Losses: *" + StringUtils.formatCoins(player.getBet()) + "*)");
+					strBuilder.append("(Losses: *" + FormatUtils.formatCoins(player.getBet()) + "*)");
 					StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), player.getBet());
 					LottoDataManager.addToPool(player.getBet());
 					break;
@@ -144,7 +144,7 @@ public class BlackjackManager implements MessageListener {
 					strBuilder.append("(Draw)");
 					break;
 				case 1:
-					strBuilder.append("(Gains: *" + StringUtils.formatCoins(player.getBet()) + "*)");
+					strBuilder.append("(Gains: *" + FormatUtils.formatCoins(player.getBet()) + "*)");
 					StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), player.getBet());
 					break;
 			}
@@ -153,7 +153,7 @@ public class BlackjackManager implements MessageListener {
 			results.add(strBuilder.toString());
 		}
 
-		BotUtils.sendMessage(Emoji.DICE + " __Results:__ " + StringUtils.formatList(results, str -> str, ", "), context.getChannel());
+		BotUtils.sendMessage(Emoji.DICE + " __Results:__ " + FormatUtils.formatList(results, str -> str, ", "), context.getChannel());
 	}
 
 	@Override

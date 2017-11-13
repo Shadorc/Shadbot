@@ -5,6 +5,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -56,7 +57,7 @@ public class RouletteCmd extends AbstractCommand {
 			return;
 		}
 
-		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets **" + StringUtils.formatCoins(bet)
+		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets **" + FormatUtils.formatCoins(bet)
 				+ "** on **" + place + "**.", context.getChannel());
 		rouletteManager.addPlayer(context.getAuthor(), bet, place);
 	}

@@ -24,6 +24,7 @@ import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
@@ -56,7 +57,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 					.withDescription(this.getDelaySentance()
 							+ "\nTo participate, type: `" + context.getPrefix() + this.getFirstName() + " 1-100`")
 					.appendField("Number of participants", Integer.toString(LottoDataManager.getPlayers().length()), false)
-					.appendField("Prize pool", StringUtils.formatNum(LottoDataManager.getPool()) + " coins", false);
+					.appendField("Prize pool", FormatUtils.formatNum(LottoDataManager.getPool()) + " coins", false);
 
 			if(this.getNum(context.getAuthor()) != -1) {
 				builder.withFooterIcon("https://images.emojiterra.com/twitter/512px/1f39f.png");
@@ -66,7 +67,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			JSONObject historicObj = LottoDataManager.getHistoric();
 			if(historicObj != null) {
 				StringBuilder strBuilder = new StringBuilder("Last week, the prize pool contained **"
-						+ StringUtils.formatCoins(LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_POOL))
+						+ FormatUtils.formatCoins(LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_POOL))
 						+ "**, the winning number was **"
 						+ LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_NUM)
 						+ "** and **");

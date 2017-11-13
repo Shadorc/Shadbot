@@ -20,6 +20,7 @@ import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
+import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -89,11 +90,11 @@ public class DiabloCmd extends AbstractCommand {
 							"**Normal:** " + mainObj.getInt("paragonLevelSeason")
 									+ "\n**Hardcore:** " + mainObj.getInt("paragonLevelSeasonHardcore"), true)
 					.appendField("__Heroes__",
-							StringUtils.formatList(heroesList,
+							FormatUtils.formatList(heroesList,
 									heroObj -> "**" + heroObj.getString("name") + "** "
 											+ "(*" + StringUtils.capitalize(heroObj.getString("class").replace("-", " ")) + "*)", "\n"), true)
 					.appendField("__Damage__",
-							StringUtils.formatList(heroesList,
+							FormatUtils.formatList(heroesList,
 									heroObj -> formatter.format(heroObj.getJSONObject("stats").getDouble("damage")) + " DPS", "\n"), true);
 			BotUtils.sendMessage(builder.build(), context.getChannel());
 
