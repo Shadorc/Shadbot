@@ -30,6 +30,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class PruneCmd extends AbstractCommand {
 
+	private static final int MESSAGE_COUNT = 300;
+
 	public PruneCmd() {
 		super(CommandCategory.ADMIN, Role.ADMIN, RateLimiter.DEFAULT_COOLDOWN, "prune");
 	}
@@ -81,15 +83,18 @@ public class PruneCmd extends AbstractCommand {
 		List<IUser> usersMentioned = context.getMessage().getMentions();
 
 		List<IMessage> messagesList = new ArrayList<IMessage>();
-		for(IMessage message : context.getChannel().getMessageHistory(context.getChannel().getMaxInternalCacheCount())) {
+		for(IMessage message : context.getChannel().getMessageHistory(MESSAGE_COUNT)) {
 			if(messagesList.size() >= num) {
 				break;
 			}
 
-			if(!usersMentioned.isEmpty() && usersMentioned.contains(message.getAuthor())
-					|| words != null && message.getContent().contains(words)) {
-				messagesList.add(message);
+			if(!usersMentioned.isEmpty() && !usersMentioned.contains(message.getAuthor())) {
+				continue;
 			}
+			if(words != null && !message.getContent().contains(words)) {
+				continue;
+			}
+			messagesList.add(message);
 		}
 
 		if(messagesList.isEmpty()) {
