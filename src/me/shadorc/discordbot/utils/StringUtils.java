@@ -105,7 +105,7 @@ public class StringUtils {
 
 	/**
 	 * @param num - the double number to format
-	 * @return the formatted String using enlgish locale
+	 * @return the formatted String using English locale
 	 */
 	public static String formatNum(double num) {
 		return NumberFormat.getNumberInstance(Locale.ENGLISH).format(num);

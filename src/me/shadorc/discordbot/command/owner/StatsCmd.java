@@ -21,6 +21,7 @@ import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class StatsCmd extends AbstractCommand {
@@ -84,29 +85,37 @@ public class StatsCmd extends AbstractCommand {
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
-	private String getAverage() {
-		JSONObject moneyGainsCommand = StatsManager.getCategory(StatCategory.MONEY_GAINS_COMMAND);
-		JSONObject moneyLossesCommand = StatsManager.getCategory(StatCategory.MONEY_LOSSES_COMMAND);
-		JSONObject command = StatsManager.getCategory(StatCategory.COMMAND);
+	private EmbedObject getAverage() {
+		JSONObject moneyGainsCommandObj = StatsManager.getCategory(StatCategory.MONEY_GAINS_COMMAND);
+		JSONObject moneyLossesCommandObj = StatsManager.getCategory(StatCategory.MONEY_LOSSES_COMMAND);
+		JSONObject commandObj = StatsManager.getCategory(StatCategory.COMMAND);
 
-		StringBuilder strBuilder = new StringBuilder("```prolog\nAverage:");
-		for(Object key : moneyGainsCommand.keySet()) {
-			int gain = moneyGainsCommand.optInt(key.toString());
-			int loss = moneyLossesCommand.optInt(key.toString());
-			int count = command.optInt(key.toString());
+		EmbedBuilder builder = Utils.getDefaultEmbed()
+				.withAuthorName("Stats average");
 
-			if(gain == 0 || count == 0) {
+		StringBuilder nameStr = new StringBuilder();
+		StringBuilder averageStr = new StringBuilder();
+		StringBuilder countStr = new StringBuilder();
+		for(Object key : moneyGainsCommandObj.keySet()) {
+			int gains = moneyGainsCommandObj.optInt(key.toString());
+			int losses = moneyLossesCommandObj.optInt(key.toString());
+			int count = CommandManager.getCommand(key.toString()).getNames().stream().mapToInt(name -> commandObj.optInt(name)).sum();
+
+			if(gains == 0 || count == 0) {
 				continue;
 			}
 
-			for(String name : CommandManager.getCommand(key.toString()).getNames()) {
-				count += command.optInt(name);
-			}
-			strBuilder.append("\n" + key.toString() + ": " + (float) (gain - loss) / count);
+			float average = (float) (gains - losses) / count;
+			nameStr.append(key.toString() + "\n");
+			averageStr.append(StringUtils.formatNum(Math.ceil(average)) + "\n");
+			countStr.append(StringUtils.formatNum(count) + "\n");
 		}
-		strBuilder.append("```");
 
-		return strBuilder.toString();
+		builder.appendField("__Name__", nameStr.toString(), true);
+		builder.appendField("__Average__", averageStr.toString(), true);
+		builder.appendField("__Count__", countStr.toString(), true);
+
+		return builder.build();
 	}
 
 	@Override
