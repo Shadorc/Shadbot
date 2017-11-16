@@ -12,10 +12,12 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
+import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.events.music.AudioEventListener;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
+import sx.blah.discord.handle.impl.events.shard.ResumedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
@@ -74,7 +76,20 @@ public class GuildMusicManager {
 	public void leaveVoiceChannel() {
 		IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
 		if(voiceChannel != null) {
-			voiceChannel.leave();
+			if(ShardListener.isShardConnected(voiceChannel.getShard())) {
+				voiceChannel.leave();
+			} else {
+				Shadbot.getDefaultThreadPool().execute(() -> {
+					try {
+						LogUtils.info("{Guild ID: " + channel.getGuild().getLongID() + "} A voice channel could not be left "
+								+ "because shard isn't ready, waiting for ResumedEvent...");
+						Shadbot.getClient().getDispatcher().waitFor(ResumedEvent.class);
+						this.leaveVoiceChannel();
+					} catch (InterruptedException err) {
+						LogUtils.error("An error occured while leaving voice channel.", err);
+					}
+				});
+			}
 		}
 	}
 

@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.LottoDataManager;
@@ -24,7 +24,6 @@ public class Scheduler {
 
 	private static final List<ScheduledMessage> MESSAGE_QUEUE = Collections.synchronizedList(new ArrayList<>());
 	private static final ScheduledExecutorService SCHEDULED_EXECUTOR = Executors.newScheduledThreadPool(2);
-	private static final ExecutorService MSG_EXECUTOR = Executors.newCachedThreadPool();
 
 	public static void start() {
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 1, 1, TimeUnit.MINUTES);
@@ -47,7 +46,7 @@ public class Scheduler {
 			return;
 		}
 
-		MSG_EXECUTOR.submit(() -> {
+		Shadbot.getDefaultThreadPool().submit(() -> {
 			Scheduler.waitAndSend(scheduledMsg);
 			MESSAGE_QUEUE.remove(scheduledMsg);
 		});
@@ -58,7 +57,7 @@ public class Scheduler {
 		while(msgItr.hasNext()) {
 			ScheduledMessage message = msgItr.next();
 			if(message.getReason().equals(Reason.SHARD_NOT_READY)) {
-				MSG_EXECUTOR.submit(() -> {
+				Shadbot.getDefaultThreadPool().submit(() -> {
 					Scheduler.waitAndSend(message);
 					msgItr.remove();
 				});
@@ -91,7 +90,6 @@ public class Scheduler {
 				LottoDataManager.save();
 			}).get();
 			SCHEDULED_EXECUTOR.shutdown();
-			MSG_EXECUTOR.shutdown();
 		} catch (InterruptedException | ExecutionException err) {
 			LogUtils.error("An error occured while stopping scheduler.", err);
 		}

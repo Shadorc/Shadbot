@@ -1,5 +1,8 @@
 package me.shadorc.discordbot;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
 import me.shadorc.discordbot.data.Config;
@@ -14,6 +17,8 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class Shadbot {
 
+	private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
+
 	private static IDiscordClient client;
 	private static IUser owner;
 
@@ -22,6 +27,7 @@ public class Shadbot {
 			@Override
 			public void run() {
 				Scheduler.stop();
+				Shadbot.getDefaultThreadPool().shutdown();
 			}
 		}));
 
@@ -37,6 +43,10 @@ public class Shadbot {
 		owner = client.getApplicationOwner();
 
 		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
+	}
+
+	public static ExecutorService getDefaultThreadPool() {
+		return THREAD_POOL;
 	}
 
 	public static IDiscordClient getClient() {
