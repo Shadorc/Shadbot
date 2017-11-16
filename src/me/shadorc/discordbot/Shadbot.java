@@ -37,8 +37,8 @@ public class Shadbot {
 				.setMaxReconnectAttempts(100)
 				.login();
 
-		client.getDispatcher().registerListener(new ReadyListener());
-		client.getDispatcher().registerListener(new ShardListener());
+		client.getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new ReadyListener());
+		client.getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new ShardListener());
 
 		owner = client.getApplicationOwner();
 
