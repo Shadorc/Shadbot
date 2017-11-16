@@ -1,8 +1,5 @@
 package me.shadorc.discordbot.events;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
@@ -11,23 +8,14 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;
 
 @SuppressWarnings("ucd")
 public class MessageListener {
 
-	private final ExecutorService executor = Executors.newCachedThreadPool();
-
 	@EventSubscriber
-	public void onMessageEvent(MessageEvent event) {
-		if(event instanceof MessageReceivedEvent) {
-			executor.execute(() -> this.onMessage((MessageReceivedEvent) event));
-		}
-	}
-
-	private void onMessage(MessageReceivedEvent event) {
+	public void onMessageReceivedEvent(MessageReceivedEvent event) {
 		if(event.getAuthor().isBot()) {
 			return;
 		}
