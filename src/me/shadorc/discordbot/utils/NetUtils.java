@@ -100,7 +100,7 @@ public class NetUtils {
 			}
 			LogUtils.info("Stats posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
 
-		} catch (IOException err) {
+		} catch (Exception err) {
 			LogUtils.info("An error occured while posting stats. (" + err.getClass().getSimpleName() + ": " + err.getMessage() + ")");
 
 		} finally {

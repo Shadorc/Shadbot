@@ -22,19 +22,13 @@ import sx.blah.discord.handle.obj.IChannel;
 public class Scheduler {
 
 	protected static final ConcurrentHashMap<Long, List<ScheduledMessage>> MESSAGE_QUEUE = new ConcurrentHashMap<>();
+	protected static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(2);
 
 	public static void start() {
-		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(() -> NetUtils.postStats(), TimeUnit.MINUTES.toMillis(5), TimeUnit.HOURS.toMillis(3), TimeUnit.MILLISECONDS);
-
-		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(() -> DatabaseManager.save(), TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS);
-
-		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(() -> StatsManager.save(), TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
-
-		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(() -> LottoDataManager.save(), TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5), TimeUnit.MILLISECONDS);
+		EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 1, 1, TimeUnit.MINUTES);
+		EXECUTOR.scheduleAtFixedRate(() -> StatsManager.save(), 5, 5, TimeUnit.MINUTES);
+		EXECUTOR.scheduleAtFixedRate(() -> LottoDataManager.save(), 5, 5, TimeUnit.MINUTES);
+		EXECUTOR.scheduleAtFixedRate(() -> NetUtils.postStats(), 2, 2, TimeUnit.HOURS);
 	}
 
 	public static void scheduleMessages(Object message, IChannel channel, Reason reason) {
@@ -108,13 +102,12 @@ public class Scheduler {
 
 	public static void forceAndWaitExecution() {
 		try {
-			ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-			executor.submit(() -> {
+			EXECUTOR.submit(() -> {
 				DatabaseManager.save();
 				StatsManager.save();
 				LottoDataManager.save();
-				executor.shutdown();
 			}).get();
+			EXECUTOR.shutdown();
 		} catch (InterruptedException | ExecutionException err) {
 			LogUtils.error("An error occured while forcing saves.", err);
 		}
