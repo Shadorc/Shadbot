@@ -21,7 +21,7 @@ public class Shadbot {
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Scheduler.forceAndWaitExecution();
+				Scheduler.stop();
 			}
 		}));
 

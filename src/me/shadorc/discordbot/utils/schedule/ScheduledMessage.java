@@ -28,8 +28,8 @@ public class ScheduledMessage {
 		return message;
 	}
 
-	public IChannel getChannel() {
-		return channel;
+	public long getGuildID() {
+		return channel.getGuild().getLongID();
 	}
 
 	public Reason getReason() {

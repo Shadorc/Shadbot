@@ -32,7 +32,7 @@ public class ShutdownCmd extends AbstractCommand {
 			@Override
 			public void run() {
 				Shadbot.getClient().logout();
-				Scheduler.forceAndWaitExecution();
+				Scheduler.stop();
 				System.exit(0);
 			}
 		};

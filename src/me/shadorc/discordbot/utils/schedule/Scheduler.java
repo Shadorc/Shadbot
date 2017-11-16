@@ -1,10 +1,11 @@
 package me.shadorc.discordbot.utils.schedule;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -21,95 +22,78 @@ import sx.blah.discord.handle.obj.IChannel;
 
 public class Scheduler {
 
-	protected static final ConcurrentHashMap<Long, List<ScheduledMessage>> MESSAGE_QUEUE = new ConcurrentHashMap<>();
-	protected static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(2);
+	private static final List<ScheduledMessage> MESSAGE_QUEUE = Collections.synchronizedList(new ArrayList<>());
+	private static final ScheduledExecutorService SCHEDULED_EXECUTOR = Executors.newScheduledThreadPool(2);
+	private static final ExecutorService MSG_EXECUTOR = Executors.newCachedThreadPool();
 
 	public static void start() {
-		EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 1, 1, TimeUnit.MINUTES);
-		EXECUTOR.scheduleAtFixedRate(() -> StatsManager.save(), 5, 5, TimeUnit.MINUTES);
-		EXECUTOR.scheduleAtFixedRate(() -> LottoDataManager.save(), 5, 5, TimeUnit.MINUTES);
-		EXECUTOR.scheduleAtFixedRate(() -> NetUtils.postStats(), 2, 2, TimeUnit.HOURS);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 1, 1, TimeUnit.MINUTES);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> StatsManager.save(), 5, 5, TimeUnit.MINUTES);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoDataManager.save(), 5, 5, TimeUnit.MINUTES);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> NetUtils.postStats(), 2, 2, TimeUnit.HOURS);
 	}
 
-	public static void scheduleMessages(Object message, IChannel channel, Reason reason) {
-		MESSAGE_QUEUE.putIfAbsent(channel.getLongID(), new ArrayList<>());
-
-		List<ScheduledMessage> channelQueue = MESSAGE_QUEUE.get(channel.getLongID());
+	public static void scheduleMessage(Object message, IChannel channel, Reason reason) {
 		ScheduledMessage scheduledMsg = new ScheduledMessage(message, channel, reason);
 
-		if(channelQueue.contains(scheduledMsg)) {
+		if(MESSAGE_QUEUE.contains(scheduledMsg)) {
 			return;
 		}
 
-		channelQueue.add(scheduledMsg);
+		MESSAGE_QUEUE.add(scheduledMsg);
 
 		// Wait for shard to be ready to send them
 		if(reason.equals(Reason.SHARD_NOT_READY)) {
 			return;
 		}
 
-		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		executor.submit(() -> {
+		MSG_EXECUTOR.submit(() -> {
 			Scheduler.waitAndSend(scheduledMsg);
-			MESSAGE_QUEUE.get(channel.getLongID()).remove(message);
-			if(MESSAGE_QUEUE.get(channel.getLongID()).isEmpty()) {
-				MESSAGE_QUEUE.remove(channel.getLongID());
-			}
-			executor.shutdown();
+			MESSAGE_QUEUE.remove(scheduledMsg);
 		});
 	}
 
 	public static void sendMsgWaitingForShard() {
-		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		executor.submit(() -> {
-			Iterator<Long> channelItr = MESSAGE_QUEUE.keySet().iterator();
-			while(channelItr.hasNext()) {
-				Long channelID = channelItr.next();
-				Iterator<ScheduledMessage> msgItr = MESSAGE_QUEUE.get(channelID).iterator();
-
-				while(msgItr.hasNext()) {
-					ScheduledMessage message = msgItr.next();
-					if(message.getReason().equals(Reason.SHARD_NOT_READY)) {
-						Scheduler.waitAndSend(message);
-						msgItr.remove();
-					}
-				}
-
-				if(MESSAGE_QUEUE.get(channelID).isEmpty()) {
-					channelItr.remove();
-				}
+		Iterator<ScheduledMessage> msgItr = MESSAGE_QUEUE.iterator();
+		while(msgItr.hasNext()) {
+			ScheduledMessage message = msgItr.next();
+			if(message.getReason().equals(Reason.SHARD_NOT_READY)) {
+				MSG_EXECUTOR.submit(() -> {
+					Scheduler.waitAndSend(message);
+					msgItr.remove();
+				});
 			}
-			executor.shutdown();
-		});
+		}
 	}
 
-	protected static void waitAndSend(ScheduledMessage message) {
+	private static void waitAndSend(ScheduledMessage message) {
 		int count = 0;
 		boolean success = false;
 		while(!success && count < 2) {
 			Utils.sleep(TimeUnit.SECONDS.toMillis(Config.DEFAULT_RETRY_TIME));
-			LogUtils.info("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Sending pending message...");
+			LogUtils.info("{Guild ID: " + message.getGuildID() + "} Sending pending message...");
 			success = message.send() != null;
 			count++;
 		}
 
 		if(success) {
-			LogUtils.info("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Pending message sent.");
+			LogUtils.info("{Guild ID: " + message.getGuildID() + "} Pending message sent.");
 		} else {
-			LogUtils.info("{Guild ID: " + message.getChannel().getGuild().getLongID() + "} Too many try, abort attempt to send message.");
+			LogUtils.info("{Guild ID: " + message.getGuildID() + "} Too many try, abort attempt to send message.");
 		}
 	}
 
-	public static void forceAndWaitExecution() {
+	public static void stop() {
 		try {
-			EXECUTOR.submit(() -> {
+			SCHEDULED_EXECUTOR.submit(() -> {
 				DatabaseManager.save();
 				StatsManager.save();
 				LottoDataManager.save();
 			}).get();
-			EXECUTOR.shutdown();
+			SCHEDULED_EXECUTOR.shutdown();
+			MSG_EXECUTOR.shutdown();
 		} catch (InterruptedException | ExecutionException err) {
-			LogUtils.error("An error occured while forcing saves.", err);
+			LogUtils.error("An error occured while stopping scheduler.", err);
 		}
 	}
 }
