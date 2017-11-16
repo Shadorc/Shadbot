@@ -62,6 +62,10 @@ public class PruneCmd extends AbstractCommand {
 		CommandLine cmd;
 		try {
 			cmd = new DefaultParser().parse(options, StringUtils.getSplittedArg(context.getArg()));
+		} catch (org.apache.commons.cli.MissingArgumentException err) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + err.getMessage() + ". Use `" + context.getPrefix() + "help "
+					+ this.getFirstName() + "` for more information.", context.getChannel());
+			return;
 		} catch (ParseException err) {
 			ExceptionUtils.manageException("deleting messages", context, err);
 			return;
