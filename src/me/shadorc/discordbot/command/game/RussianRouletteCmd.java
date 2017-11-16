@@ -20,7 +20,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RussianRouletteCmd extends AbstractCommand {
 
-	private static final int MAX_BET = 300_000_000;
+	private static final int MAX_BET = 200_000_000;
 	private static final float WIN_MULTIPLIER = 2.25f;
 	private static final float LOSE_MULTIPLIER = 10f;
 
@@ -49,7 +49,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 			LottoDataManager.addToPool(Math.abs(gains));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
-			strBuilder.append("**click** ... Phew, you are still alive ! You gets **" + FormatUtils.formatCoins(gains) + "**.");
+			strBuilder.append("**click** ... Phew, you are still alive ! You get **" + FormatUtils.formatCoins(gains) + "**.");
 		}
 
 		StatsManager.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
