@@ -75,7 +75,7 @@ public class DatabaseManager {
 	}
 
 	public static void addCoins(IGuild guild, IUser user, int gains) {
-		int coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) (DatabaseManager.getCoins(guild, user) + gains)));
+		int coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) DatabaseManager.getCoins(guild, user) + gains));
 		DatabaseManager.setOrInit(guild, USERS, user.getStringID(), DatabaseManager.getUser(guild, user).put(COINS, coins));
 	}
 
