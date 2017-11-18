@@ -86,7 +86,7 @@ public class GuildMusicManager {
 						Shadbot.getClient().getDispatcher().waitFor(ResumedEvent.class);
 						this.leaveVoiceChannel();
 					} catch (InterruptedException err) {
-						LogUtils.error("An error occured while leaving voice channel.", err);
+						LogUtils.error("An error occurred while leaving voice channel.", err);
 					}
 				});
 			}

@@ -101,7 +101,7 @@ public class NetUtils {
 			LogUtils.info("Stats posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
 
 		} catch (Exception err) {
-			LogUtils.info("An error occured while posting stats. (" + err.getClass().getSimpleName() + ": " + err.getMessage() + ")");
+			LogUtils.info("An error occurred while posting stats. (" + err.getClass().getSimpleName() + ": " + err.getMessage() + ")");
 
 		} finally {
 			IOUtils.closeQuietly(out);

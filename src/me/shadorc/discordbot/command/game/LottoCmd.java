@@ -54,7 +54,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Lotto")
 					.withThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
-					.withDescription(this.getDelaySentance()
+					.withDescription(this.getDelaySentence()
 							+ "\nTo participate, type: `" + context.getPrefix() + this.getFirstName() + " 1-100`")
 					.appendField("Number of participants", Integer.toString(LottoDataManager.getPlayers().length()), false)
 					.appendField("Prize pool", FormatUtils.formatNum(LottoDataManager.getPool()) + " coins", false);
@@ -125,7 +125,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 		return -1;
 	}
 
-	private String getDelaySentance() {
+	private String getDelaySentence() {
 		int minutes = this.getDelayBeforeNextDraw() / 1000 / 60;
 		int hours = minutes / 60;
 		int days = hours / 24;

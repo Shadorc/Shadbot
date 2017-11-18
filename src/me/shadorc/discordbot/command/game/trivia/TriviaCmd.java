@@ -19,7 +19,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class TriviaCmd extends AbstractCommand {
 
 	public TriviaCmd() {
-		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "trivia", "quizz", "question");
+		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "trivia");
 	}
 
 	@Override

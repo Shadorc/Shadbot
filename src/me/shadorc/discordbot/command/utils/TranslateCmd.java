@@ -78,7 +78,7 @@ public class TranslateCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.MAP + " Translation: " + translatedText, context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			ExceptionUtils.manageException("getting translatiion", context, err);
+			ExceptionUtils.manageException("getting translation", context, err);
 		}
 	}
 

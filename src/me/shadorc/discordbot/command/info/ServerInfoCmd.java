@@ -43,7 +43,7 @@ public class ServerInfoCmd extends AbstractCommand {
 				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
 				.appendField("Region", guild.getRegion().getName(), true)
 				.appendField("Creation date", guild.getCreationDate().format(dateFormatter)
-						+ "\n(" + FormatUtils.formateDate(guild.getCreationDate()) + ")", true)
+						+ "\n(" + FormatUtils.formatDate(guild.getCreationDate()) + ")", true)
 				.appendField("Channels", Integer.toString(guild.getChannels().size()), true)
 				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
 				.appendField("Settings", "**Prefix:** " + context.getPrefix()

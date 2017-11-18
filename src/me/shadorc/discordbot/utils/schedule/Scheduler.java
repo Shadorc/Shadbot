@@ -91,7 +91,7 @@ public class Scheduler {
 			}).get();
 			SCHEDULED_EXECUTOR.shutdown();
 		} catch (InterruptedException | ExecutionException err) {
-			LogUtils.error("An error occured while stopping scheduler.", err);
+			LogUtils.error("An error occurred while stopping scheduler.", err);
 		}
 	}
 }

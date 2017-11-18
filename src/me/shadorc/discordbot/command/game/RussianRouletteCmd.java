@@ -60,7 +60,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Play russian roulette.**")
+				.appendDescription("**Play Russian roulette.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <bet>`", false)
 				.appendField("Restriction", "**bet** - You can not bet more than **" + MAX_BET + " coins**.", false)
 				.appendField("Gains", "You have a **5-in-6** chance to win **" + WIN_MULTIPLIER + " times** your bet and "

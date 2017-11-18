@@ -26,7 +26,7 @@ public class StatsManager {
 				writer.flush();
 
 			} catch (IOException err) {
-				LogUtils.LOGGER.error("An error occured during stats file creation. Exiting.", err);
+				LogUtils.LOGGER.error("An error occurred during stats file creation. Exiting.", err);
 				System.exit(1);
 
 			} finally {
@@ -41,7 +41,7 @@ public class StatsManager {
 			}
 
 		} catch (JSONException | IOException err) {
-			LogUtils.LOGGER.error("An error occured during stats file initialization. Exiting.", err);
+			LogUtils.LOGGER.error("An error occurred during stats file initialization. Exiting.", err);
 			System.exit(1);
 		}
 	}

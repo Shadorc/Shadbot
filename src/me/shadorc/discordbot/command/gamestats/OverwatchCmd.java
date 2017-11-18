@@ -46,19 +46,19 @@ public class OverwatchCmd extends AbstractCommand {
 				player = new OverwatchPlayer(username);
 
 			} else if(splitArgs.length == 2) {
-				String plateform = splitArgs[0].toUpperCase();
-				if(!Arrays.stream(Plateform.values()).anyMatch(plateformValue -> plateformValue.toString().equalsIgnoreCase(plateform))) {
-					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid plateform. Options: pc, psn, xbl.", context.getChannel());
+				String platform = splitArgs[0].toUpperCase();
+				if(!Arrays.stream(Plateform.values()).anyMatch(platformValue -> platformValue.toString().equalsIgnoreCase(platform))) {
+					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid platform. Options: pc, psn, xbl.", context.getChannel());
 					return;
 				}
 
 				String username = splitArgs[1];
-				player = new OverwatchPlayer(username, Plateform.valueOf(plateform));
+				player = new OverwatchPlayer(username, Plateform.valueOf(platform));
 
 			} else {
-				String plateform = splitArgs[0].toUpperCase();
-				if(!Arrays.stream(Plateform.values()).anyMatch(plateformValue -> plateformValue.toString().equalsIgnoreCase(plateform))) {
-					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid plateform. Options: pc, psn, xbl.", context.getChannel());
+				String platform = splitArgs[0].toUpperCase();
+				if(!Arrays.stream(Plateform.values()).anyMatch(platformValue -> platformValue.toString().equalsIgnoreCase(platform))) {
+					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid platform. Options: pc, psn, xbl.", context.getChannel());
 					return;
 				}
 
@@ -69,7 +69,7 @@ public class OverwatchCmd extends AbstractCommand {
 				}
 
 				String username = splitArgs[2];
-				player = new OverwatchPlayer(username, Plateform.valueOf(plateform), Region.valueOf(region));
+				player = new OverwatchPlayer(username, Plateform.valueOf(platform), Region.valueOf(region));
 			}
 
 			EmbedBuilder builder = new EmbedBuilder()
@@ -107,10 +107,10 @@ public class OverwatchCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Show player's stats for Overwatch.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " [<plateform> <region>] <battletag#0000>`", false)
-				.appendField("Arguments", "**plateform** - [OPTIONAL] value: pc, xbl, psn"
-						+ "\n**region** - [OPTIONAL] (only needed if the plateform is PC) value: us, eu, kr, cn"
-						+ "\n**plateform** and **region** are automatically detected if nothing is specified.", false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " [<platform> <region>] <battletag#0000>`", false)
+				.appendField("Arguments", "**platform** - [OPTIONAL] value: pc, xbl, psn"
+						+ "\n**region** - [OPTIONAL] (only needed if the platform is PC) value: us, eu, kr, cn"
+						+ "\n**platform** and **region** are automatically detected if nothing is specified.", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 

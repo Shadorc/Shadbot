@@ -170,7 +170,7 @@ class HangmanManager implements MessageListener {
 
 			String prefix = (String) DatabaseManager.getSetting(message.getGuild(), Setting.PREFIX);
 			if(content.equalsIgnoreCase(prefix + "cancel")) {
-				BotUtils.sendMessage(Emoji.CHECK_MARK + " Game canceled.", message.getChannel());
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " Game cancelled.", message.getChannel());
 				this.stop();
 				return true;
 			}

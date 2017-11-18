@@ -52,7 +52,7 @@ public class JokeCmd extends AbstractCommand {
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Show a random french joke.**");
+				.appendDescription("**Show a random French joke.**");
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }

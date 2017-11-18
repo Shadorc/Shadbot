@@ -73,7 +73,7 @@ public class FormatUtils {
 	 * @param date - the date to format
 	 * @return the formatted date as "y years m months d days"
 	 */
-	public static String formateDate(LocalDateTime date) {
+	public static String formatDate(LocalDateTime date) {
 		Period period = Period.between(date.toLocalDate(), LocalDateTime.now().toLocalDate());
 		long years = period.get(ChronoUnit.YEARS);
 		long months = period.get(ChronoUnit.MONTHS);

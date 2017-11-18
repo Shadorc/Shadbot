@@ -45,7 +45,7 @@ public class LottoDataManager {
 				writer.flush();
 
 			} catch (IOException err) {
-				LogUtils.LOGGER.error("An error occured during lotto data file creation. Exiting.", err);
+				LogUtils.LOGGER.error("An error occurred during lotto data file creation. Exiting.", err);
 				System.exit(1);
 
 			} finally {
@@ -56,7 +56,7 @@ public class LottoDataManager {
 		try {
 			dataObj = new JSONObject(new JSONTokener(LOTTERY_DATA_FILE.toURI().toURL().openStream()));
 		} catch (JSONException | IOException err) {
-			LogUtils.LOGGER.error("An error occured during lotto data file initialization. Exiting.", err);
+			LogUtils.LOGGER.error("An error occurred during lotto data file initialization. Exiting.", err);
 			System.exit(1);
 		}
 	}

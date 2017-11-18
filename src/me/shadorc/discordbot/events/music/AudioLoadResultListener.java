@@ -93,7 +93,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 							+ "\nYou can choose several musics by separating them with a comma."
 							+ "\nExample: 1,3,4"
 							+ "\n" + strBuilder.toString())
-					.withFooterText("This choice will be canceled in " + CHOICE_DURATION + " seconds.");
+					.withFooterText("This choice will be cancelled in " + CHOICE_DURATION + " seconds.");
 			BotUtils.sendMessage(embed.build(), musicManager.getChannel());
 
 			cancelTimer = new Timer((int) TimeUnit.SECONDS.toMillis(CHOICE_DURATION), event -> {
@@ -154,7 +154,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		String prefix = (String) DatabaseManager.getSetting(musicManager.getChannel().getGuild(), Setting.PREFIX);
 		if(message.getContent().equalsIgnoreCase(prefix + "cancel")) {
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice canceled.", musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice cancelled.", musicManager.getChannel());
 			this.stopWaiting();
 			return true;
 		}
