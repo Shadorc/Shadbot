@@ -1,13 +1,11 @@
 package me.shadorc.discordbot.command.game;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import javax.swing.Timer;
 
 import org.joda.time.Instant;
 import org.json.JSONArray;
@@ -35,16 +33,14 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class LottoCmd extends AbstractCommand implements ActionListener {
+public class LottoCmd extends AbstractCommand {
 
 	private static final int PAID_COST = 100;
 
-	private Timer timer;
-
 	public LottoCmd() {
 		super(CommandCategory.GAME, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "lotto");
-		this.timer = new Timer(this.getDelayBeforeNextDraw(), this);
-		this.timer.start();
+		Executors.newSingleThreadScheduledExecutor()
+				.scheduleAtFixedRate(() -> this.lotteryDraw(), this.getDelayBeforeNextDraw(), TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -159,8 +155,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent event) {
+	private void lotteryDraw() {
 		int winningNum = MathUtils.rand(1, 100);
 
 		List<JSONObject> winnersList = Utils.convertToList(LottoDataManager.getPlayers(), JSONObject.class);
@@ -184,7 +179,5 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			LottoDataManager.resetPool();
 		}
 		LottoDataManager.resetUsers();
-
-		this.timer = new Timer(this.getDelayBeforeNextDraw(), this);
 	}
 }
