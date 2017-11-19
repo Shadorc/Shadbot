@@ -16,10 +16,6 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class DatabaseManager {
 
-	public static final String USERS = "users";
-	public static final String SETTINGS = "settings";
-	public static final String COINS = "coins";
-
 	private static final File USER_DATA_FILE = new File("user_data.json");
 
 	@SuppressWarnings("ucd")
@@ -51,19 +47,19 @@ public class DatabaseManager {
 	}
 
 	public static JSONObject getUsers(IGuild guild) {
-		return DatabaseManager.getOrInit(guild, USERS);
+		return DatabaseManager.getOrInit(guild, JSONKey.USERS);
 	}
 
 	public static JSONObject getUser(IGuild guild, IUser user) {
 		JSONObject userObj = DatabaseManager.getUsers(guild).optJSONObject(user.getStringID());
 		if(userObj == null) {
-			return new JSONObject().put(COINS, 0);
+			return new JSONObject().put(JSONKey.COINS.toString(), 0);
 		}
 		return userObj;
 	}
 
 	public static Object getSetting(IGuild guild, Setting setting) {
-		Object value = DatabaseManager.getOrInit(guild, SETTINGS).opt(setting.toString());
+		Object value = DatabaseManager.getOrInit(guild, JSONKey.SETTINGS).opt(setting.toString());
 		if(value == null) {
 			return DatabaseManager.getDefaultSetting(setting);
 		}
@@ -71,12 +67,12 @@ public class DatabaseManager {
 	}
 
 	public static int getCoins(IGuild guild, IUser user) {
-		return DatabaseManager.getUser(guild, user).getInt(COINS);
+		return DatabaseManager.getUser(guild, user).getInt(JSONKey.COINS.toString());
 	}
 
 	public static void addCoins(IGuild guild, IUser user, int gains) {
 		int coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) DatabaseManager.getCoins(guild, user) + gains));
-		DatabaseManager.setOrInit(guild, USERS, user.getStringID(), DatabaseManager.getUser(guild, user).put(COINS, coins));
+		DatabaseManager.setOrInit(guild, JSONKey.USERS, user.getStringID(), DatabaseManager.getUser(guild, user).put(JSONKey.COINS.toString(), coins));
 	}
 
 	public static void setSetting(IGuild guild, Setting setting, Object value) {
@@ -84,24 +80,24 @@ public class DatabaseManager {
 		if(DatabaseManager.getDefaultSetting(setting) != null && value.toString().equals(DatabaseManager.getDefaultSetting(setting).toString())) {
 			DatabaseManager.removeSetting(guild, setting);
 		} else {
-			DatabaseManager.setOrInit(guild, SETTINGS, setting.toString(), value);
+			DatabaseManager.setOrInit(guild, JSONKey.SETTINGS, setting.toString(), value);
 		}
 	}
 
 	public synchronized static void removeSetting(IGuild guild, Setting setting) {
 		JSONObject guildObj = userDataObj.optJSONObject(guild.getStringID());
-		if(guildObj == null || !guildObj.has(SETTINGS)) {
+		if(guildObj == null || !guildObj.has(JSONKey.SETTINGS.toString())) {
 			return;
 		}
 
-		JSONObject settingsObj = guildObj.getJSONObject(SETTINGS);
+		JSONObject settingsObj = guildObj.getJSONObject(JSONKey.SETTINGS.toString());
 		settingsObj.remove(setting.toString());
 
 		// If there is no more settings saved, remove it
 		if(settingsObj.length() == 0) {
-			guildObj.remove(SETTINGS);
+			guildObj.remove(JSONKey.SETTINGS.toString());
 		} else {
-			guildObj.put(SETTINGS, settingsObj);
+			guildObj.put(JSONKey.SETTINGS.toString(), settingsObj);
 		}
 
 		// If guild contains no more data, remove it
@@ -126,32 +122,32 @@ public class DatabaseManager {
 		}
 	}
 
-	private synchronized static JSONObject getOrInit(IGuild guild, String setting) {
+	private synchronized static JSONObject getOrInit(IGuild guild, JSONKey category) {
 		JSONObject guildObj = userDataObj.optJSONObject(guild.getStringID());
 		if(guildObj == null) {
 			guildObj = new JSONObject();
 		}
 
-		JSONObject jsonObj = guildObj.optJSONObject(setting);
+		JSONObject jsonObj = guildObj.optJSONObject(category.toString());
 		if(jsonObj == null) {
 			jsonObj = new JSONObject();
 		}
 		return jsonObj;
 	}
 
-	private synchronized static void setOrInit(IGuild guild, String setting, String key, Object value) {
+	private synchronized static void setOrInit(IGuild guild, JSONKey category, String key, Object value) {
 		JSONObject guildObj = userDataObj.optJSONObject(guild.getStringID());
 		if(guildObj == null) {
 			guildObj = new JSONObject();
 		}
 
-		JSONObject jsonObj = guildObj.optJSONObject(setting);
+		JSONObject jsonObj = guildObj.optJSONObject(category.toString());
 		if(jsonObj == null) {
 			jsonObj = new JSONObject();
 		}
 
 		jsonObj.put(key, value);
-		guildObj.put(setting, jsonObj);
+		guildObj.put(category.toString(), jsonObj);
 		userDataObj.put(guild.getStringID(), guildObj);
 	}
 

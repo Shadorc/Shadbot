@@ -16,18 +16,6 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class LottoDataManager {
 
-	public static final String POOL = "pool";
-
-	public static final String USERS = "users";
-	public static final String USER_ID = "userID";
-	public static final String GUILD_ID = "guildID";
-	public static final String NUM = "num";
-
-	public static final String HISTORIC = "historic";
-	public static final String HISTORIC_POOL = "historicPool";
-	public static final String HISTORIC_WINNERS_COUNT = "historicWinnerCount";
-	public static final String HISTORIC_NUM = "historicNum";
-
 	private static final File LOTTERY_DATA_FILE = new File("lotto_data.json");
 
 	@SuppressWarnings("ucd")
@@ -39,8 +27,8 @@ public class LottoDataManager {
 			try {
 				writer = new FileWriter(LOTTERY_DATA_FILE);
 				JSONObject defaultObj = new JSONObject();
-				defaultObj.put(USERS, new JSONArray());
-				defaultObj.put(POOL, 0);
+				defaultObj.put(JSONKey.USERS.toString(), new JSONArray());
+				defaultObj.put(JSONKey.POOL.toString(), 0);
 				writer.write(defaultObj.toString(Config.INDENT_FACTOR));
 				writer.flush();
 
@@ -62,42 +50,42 @@ public class LottoDataManager {
 	}
 
 	public static void addToPool(int coins) {
-		int pool = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) dataObj.optInt(POOL) + coins));
-		dataObj.put(POOL, pool);
+		int pool = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) dataObj.optInt(JSONKey.POOL.toString()) + coins));
+		dataObj.put(JSONKey.POOL.toString(), pool);
 	}
 
 	public static void addPlayer(IGuild guild, IUser user, int num) {
 		JSONObject playerObj = new JSONObject()
-				.put(GUILD_ID, guild.getLongID())
-				.put(USER_ID, user.getLongID())
-				.put(NUM, num);
-		dataObj.getJSONArray(USERS).put(playerObj);
+				.put(JSONKey.GUILD_ID.toString(), guild.getLongID())
+				.put(JSONKey.USER_ID.toString(), user.getLongID())
+				.put(JSONKey.NUM.toString(), num);
+		dataObj.getJSONArray(JSONKey.USERS.toString()).put(playerObj);
 	}
 
 	public static int getPool() {
-		return dataObj.getInt(POOL);
+		return dataObj.getInt(JSONKey.POOL.toString());
 	}
 
 	public static JSONArray getPlayers() {
-		return dataObj.getJSONArray(USERS);
+		return dataObj.getJSONArray(JSONKey.USERS.toString());
 	}
 
 	public static JSONObject getHistoric() {
-		return dataObj.optJSONObject(HISTORIC);
+		return dataObj.optJSONObject(JSONKey.HISTORIC.toString());
 	}
 
 	public static void setHistoric(int winnersCount, int pool, int num) {
-		dataObj.put(HISTORIC, new JSONObject().put(HISTORIC_WINNERS_COUNT, winnersCount)
-				.put(HISTORIC_POOL, pool)
-				.put(HISTORIC_NUM, num));
+		dataObj.put(JSONKey.HISTORIC.toString(), new JSONObject().put(JSONKey.HISTORIC_WINNERS_COUNT.toString(), winnersCount)
+				.put(JSONKey.HISTORIC_POOL.toString(), pool)
+				.put(JSONKey.HISTORIC_NUM.toString(), num));
 	}
 
 	public static void resetUsers() {
-		dataObj.put(USERS, new JSONArray());
+		dataObj.put(JSONKey.USERS.toString(), new JSONArray());
 	}
 
 	public static void resetPool() {
-		dataObj.put(POOL, 0);
+		dataObj.put(JSONKey.POOL.toString(), 0);
 	}
 
 	public static void save() {

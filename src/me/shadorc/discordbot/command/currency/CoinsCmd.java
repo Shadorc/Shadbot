@@ -5,6 +5,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.JSONKey;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -28,7 +29,7 @@ public class CoinsCmd extends AbstractCommand {
 					+ "**.", context.getChannel());
 		} else {
 			IUser user = context.getMessage().getMentions().get(0);
-			int coins = DatabaseManager.getUser(context.getGuild(), user).getInt(DatabaseManager.COINS);
+			int coins = DatabaseManager.getUser(context.getGuild(), user).getInt(JSONKey.COINS.toString());
 			BotUtils.sendMessage(Emoji.PURSE + " " + user.getName() + " has **" + FormatUtils.formatCoins(coins) + "**.", context.getChannel());
 		}
 	}

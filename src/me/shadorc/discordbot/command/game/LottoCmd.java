@@ -19,6 +19,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.JSONKey;
 import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
@@ -66,12 +67,12 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 			JSONObject historicObj = LottoDataManager.getHistoric();
 			if(historicObj != null) {
 				StringBuilder strBuilder = new StringBuilder("Last week, the prize pool contained **"
-						+ FormatUtils.formatCoins(LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_POOL))
+						+ FormatUtils.formatCoins(LottoDataManager.getHistoric().getInt(JSONKey.HISTORIC_POOL.toString()))
 						+ "**, the winning number was **"
-						+ LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_NUM)
+						+ LottoDataManager.getHistoric().getInt(JSONKey.HISTORIC_NUM.toString())
 						+ "** and **");
 
-				int winnerCount = LottoDataManager.getHistoric().getInt(LottoDataManager.HISTORIC_WINNERS_COUNT);
+				int winnerCount = LottoDataManager.getHistoric().getInt(JSONKey.HISTORIC_WINNERS_COUNT.toString());
 				if(winnerCount == 0) {
 					strBuilder.append("nobody");
 				} else if(winnerCount == 1) {
@@ -117,8 +118,8 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 	private int getNum(IUser user) {
 		JSONArray players = LottoDataManager.getPlayers();
 		for(int i = 0; i < players.length(); i++) {
-			if(players.getJSONObject(i).getLong(LottoDataManager.USER_ID) == user.getLongID()) {
-				return players.getJSONObject(i).getInt(LottoDataManager.NUM);
+			if(players.getJSONObject(i).getLong(JSONKey.USER_ID.toString()) == user.getLongID()) {
+				return players.getJSONObject(i).getInt(JSONKey.NUM.toString());
 			}
 		}
 		return -1;
@@ -140,7 +141,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 				.withHour(12)
 				.withMinute(0)
 				.withSecond(0);
-		if(nextDate.toInstant().toEpochMilli() < ZonedDateTime.now().toInstant().toEpochMilli()) {
+		if(nextDate.isBefore(ZonedDateTime.now())) {
 			nextDate = nextDate.plusWeeks(1);
 		}
 		return (int) (nextDate.toInstant().toEpochMilli() - Instant.now().getMillis());
@@ -166,14 +167,14 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 
 		List<JSONObject> winnersList = Utils.convertToList(LottoDataManager.getPlayers(), JSONObject.class);
 		winnersList = winnersList.stream().filter(
-				playerObj -> playerObj.getInt(LottoDataManager.NUM) == winningNum
-						&& Shadbot.getClient().getGuildByID(playerObj.getLong(LottoDataManager.GUILD_ID)) != null
-						&& Shadbot.getClient().getUserByID(playerObj.getLong(LottoDataManager.USER_ID)) != null)
+				playerObj -> playerObj.getInt(JSONKey.NUM.toString()) == winningNum
+						&& Shadbot.getClient().getGuildByID(playerObj.getLong(JSONKey.GUILD_ID.toString())) != null
+						&& Shadbot.getClient().getUserByID(playerObj.getLong(JSONKey.USER_ID.toString())) != null)
 				.collect(Collectors.toList());
 
 		for(JSONObject winnerObj : winnersList) {
-			IGuild guild = Shadbot.getClient().getGuildByID(winnerObj.getLong(LottoDataManager.GUILD_ID));
-			IUser user = Shadbot.getClient().getUserByID(winnerObj.getLong(LottoDataManager.USER_ID));
+			IGuild guild = Shadbot.getClient().getGuildByID(winnerObj.getLong(JSONKey.GUILD_ID.toString()));
+			IUser user = Shadbot.getClient().getUserByID(winnerObj.getLong(JSONKey.USER_ID.toString()));
 			int coins = (int) Math.ceil((double) LottoDataManager.getPool() / winnersList.size());
 			DatabaseManager.addCoins(guild, user, coins);
 			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, this.getFirstName(), coins);
