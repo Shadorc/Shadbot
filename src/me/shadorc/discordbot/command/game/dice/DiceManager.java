@@ -68,11 +68,11 @@ class DiceManager {
 			if(num == winningNum) {
 				gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
 				winnersList.add("**" + user.getName() + "**, you win **" + FormatUtils.formatCoins(gains) + "**");
-				DatabaseManager.addCoins(context.getGuild(), user, gains);
+				DatabaseManager.addCoins(context.getChannel(), user, gains);
 				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), Math.abs(gains));
 			} else {
 				losersList.add("**" + user.getName() + "** (Losses: **" + FormatUtils.formatCoins(gains) + ")**");
-				DatabaseManager.addCoins(context.getGuild(), user, -gains);
+				DatabaseManager.addCoins(context.getChannel(), user, -gains);
 				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 				LottoDataManager.addToPool(gains);
 			}

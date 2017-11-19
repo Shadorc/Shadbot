@@ -119,7 +119,7 @@ class TriviaManager implements MessageListener {
 		} else if(goodAnswer) {
 			int gains = MIN_GAINS + (int) Math.ceil((LIMITED_TIME - (System.currentTimeMillis() - startTime) / 1000) * (float) (MAX_BONUS / LIMITED_TIME));
 			BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + gains + " coins**.", context.getChannel());
-			DatabaseManager.addCoins(message.getGuild(), author, gains);
+			DatabaseManager.addCoins(message.getChannel(), author, gains);
 			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 			this.stop();
 			return true;

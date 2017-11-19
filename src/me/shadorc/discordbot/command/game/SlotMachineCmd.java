@@ -63,7 +63,7 @@ public class SlotMachineCmd extends AbstractCommand {
 			gains = slot1.getGain();
 		}
 
-		DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), gains);
+		DatabaseManager.addCoins(context.getChannel(), context.getAuthor(), gains);
 		StatsManager.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
 		LottoDataManager.addToPool(Math.abs(gains));
 

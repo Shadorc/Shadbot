@@ -37,12 +37,12 @@ public class AddCoinsCmd extends AbstractCommand {
 
 		StringBuilder strBuilder = new StringBuilder();
 		if(context.getMessage().getMentions().isEmpty()) {
-			DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), coins);
+			DatabaseManager.addCoins(context.getChannel(), context.getAuthor(), coins);
 			strBuilder.append("You");
 
 		} else {
 			for(IUser user : context.getMessage().getMentions()) {
-				DatabaseManager.addCoins(context.getGuild(), user, coins);
+				DatabaseManager.addCoins(context.getChannel(), user, coins);
 			}
 			strBuilder.append(FormatUtils.formatList(context.getMessage().getMentions(), user -> user.getName(), ", "));
 		}

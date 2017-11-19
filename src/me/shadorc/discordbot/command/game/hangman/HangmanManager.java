@@ -84,7 +84,7 @@ class HangmanManager implements MessageListener {
 			int gains = (int) Math.ceil(MIN_GAINS + ((float) MAX_BONUS / IMG_LIST.size()) * ((float) IMG_LIST.size() - failsCount));
 			BotUtils.sendMessage(Emoji.PURSE + " Well played **" + context.getAuthorName() + "**, you found the word ! "
 					+ "You won **" + FormatUtils.formatCoins(gains) + "**.", context.getChannel());
-			DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), gains);
+			DatabaseManager.addCoins(context.getChannel(), context.getAuthor(), gains);
 			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 		} else {
 			BotUtils.sendMessage(Emoji.THUMBSDOWN + " You lose, the word to guess was **" + word + "** !", context.getChannel());

@@ -149,7 +149,7 @@ public class BlackjackManager implements MessageListener {
 					break;
 			}
 
-			DatabaseManager.addCoins(context.getGuild(), player.getUser(), result * player.getBet());
+			DatabaseManager.addCoins(context.getChannel(), player.getUser(), result * player.getBet());
 			results.add(strBuilder.toString());
 		}
 

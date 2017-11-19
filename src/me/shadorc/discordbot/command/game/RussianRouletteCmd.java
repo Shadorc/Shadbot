@@ -53,7 +53,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		}
 
 		StatsManager.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
-		DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), gains);
+		DatabaseManager.addCoins(context.getChannel(), context.getAuthor(), gains);
 		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 	}
 

@@ -106,7 +106,7 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 
 		int num = Integer.parseInt(context.getArg());
 
-		DatabaseManager.addCoins(context.getGuild(), context.getAuthor(), -PAID_COST);
+		DatabaseManager.addCoins(context.getChannel(), context.getAuthor(), -PAID_COST);
 		StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), PAID_COST);
 		LottoDataManager.addToPool(PAID_COST);
 

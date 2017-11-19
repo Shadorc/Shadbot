@@ -92,7 +92,7 @@ class RouletteManager {
 				list.add("**" + user.getName() + "** (Losses: **" + FormatUtils.formatCoins(gains) + ")**");
 				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
 			}
-			DatabaseManager.addCoins(context.getGuild(), user, multiplier * gains);
+			DatabaseManager.addCoins(context.getChannel(), user, multiplier * gains);
 		}
 
 		BotUtils.sendMessage(Emoji.DICE + " No more bets. *The wheel is spinning...* **" + winningPlace

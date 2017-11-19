@@ -10,7 +10,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.command.Emoji;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -72,12 +75,22 @@ public class DatabaseManager {
 
 	public static void addCoins(IGuild guild, IUser user, int gains) {
 		int coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) DatabaseManager.getCoins(guild, user) + gains));
-		DatabaseManager.setOrInit(guild, JSONKey.USERS, user.getStringID(), DatabaseManager.getUser(guild, user).put(JSONKey.COINS.toString(), coins));
+		DatabaseManager.setOrInit(guild, JSONKey.USERS, user.getStringID(),
+				DatabaseManager.getUser(guild, user).put(JSONKey.COINS.toString(), coins));
+	}
+
+	public static void addCoins(IChannel channel, IUser user, int gains) {
+		long coins = (long) DatabaseManager.getCoins(channel.getGuild(), user) + gains;
+		if(coins > Config.MAX_COINS) {
+			BotUtils.sendMessage(Emoji.BANK + " Congratulations, you've reached the maximum number of coins allowed.", channel);
+		}
+		DatabaseManager.addCoins(channel.getGuild(), user, gains);
 	}
 
 	public static void setSetting(IGuild guild, Setting setting, Object value) {
 		// If new value equals the default one, remove setting from data file
-		if(DatabaseManager.getDefaultSetting(setting) != null && value.toString().equals(DatabaseManager.getDefaultSetting(setting).toString())) {
+		if(DatabaseManager.getDefaultSetting(setting) != null
+				&& value.toString().equals(DatabaseManager.getDefaultSetting(setting).toString())) {
 			DatabaseManager.removeSetting(guild, setting);
 		} else {
 			DatabaseManager.setOrInit(guild, JSONKey.SETTINGS, setting.toString(), value);
