@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,10 +136,13 @@ public class LottoCmd extends AbstractCommand implements ActionListener {
 
 	private int getDelayBeforeNextDraw() {
 		ZonedDateTime nextDate = ZonedDateTime.now()
-				.with(TemporalAdjusters.next(DayOfWeek.SUNDAY))
+				.with(DayOfWeek.SUNDAY)
 				.withHour(12)
 				.withMinute(0)
 				.withSecond(0);
+		if(nextDate.toInstant().toEpochMilli() < ZonedDateTime.now().toInstant().toEpochMilli()) {
+			nextDate = nextDate.plusWeeks(1);
+		}
 		return (int) (nextDate.toInstant().toEpochMilli() - Instant.now().getMillis());
 	}
 
