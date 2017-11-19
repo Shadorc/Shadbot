@@ -112,9 +112,13 @@ public class StatsCmd extends AbstractCommand {
 			countStr.append(FormatUtils.formatNum(count) + "\n");
 		}
 
-		builder.appendField("__Name__", nameStr.toString(), true);
-		builder.appendField("__Average__", averageStr.toString(), true);
-		builder.appendField("__Count__", countStr.toString(), true);
+		if(nameStr.length() == 0 || averageStr.length() == 0 || countStr.length() == 0) {
+			builder.appendDescription("There is nothing here.");
+		} else {
+			builder.appendField("__Name__", nameStr.toString(), true);
+			builder.appendField("__Average__", averageStr.toString(), true);
+			builder.appendField("__Count__", countStr.toString(), true);
+		}
 
 		return builder.build();
 	}
