@@ -15,7 +15,6 @@ import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
@@ -85,7 +84,7 @@ class HangmanManager implements MessageListener {
 			BotUtils.sendMessage(Emoji.PURSE + " Well played **" + context.getAuthorName() + "**, you found the word ! "
 					+ "You won **" + FormatUtils.formatCoins(gains) + "**.", context.getChannel());
 			DatabaseManager.addCoins(context.getChannel(), context.getAuthor(), gains);
-			StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
+			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
 		} else {
 			BotUtils.sendMessage(Emoji.THUMBSDOWN + " You lose, the word to guess was **" + word + "** !", context.getChannel());
 		}

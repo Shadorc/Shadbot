@@ -14,7 +14,6 @@ import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.LottoDataManager;
-import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
@@ -84,14 +83,14 @@ class RouletteManager {
 				multiplier = -1;
 			}
 
-			if(multiplier > 0) {
+			gains *= multiplier;
+			if(gains > 0) {
 				list.add(0, "**" + user.getName() + "** (Gains: **" + FormatUtils.formatCoins(gains) + ")**");
-				StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), multiplier * gains);
-				LottoDataManager.addToPool(gains);
 			} else {
 				list.add("**" + user.getName() + "** (Losses: **" + FormatUtils.formatCoins(gains) + ")**");
-				StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), gains);
+				LottoDataManager.addToPool(gains);
 			}
+			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
 			DatabaseManager.addCoins(context.getChannel(), user, multiplier * gains);
 		}
 

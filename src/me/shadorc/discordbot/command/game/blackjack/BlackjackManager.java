@@ -15,7 +15,6 @@ import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.LottoDataManager;
-import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
@@ -137,7 +136,6 @@ public class BlackjackManager implements MessageListener {
 			switch (result) {
 				case -1:
 					strBuilder.append("(Losses: *" + FormatUtils.formatCoins(player.getBet()) + "*)");
-					StatsManager.increment(StatCategory.MONEY_LOSSES_COMMAND, CommandManager.getFirstName(context.getCommand()), player.getBet());
 					LottoDataManager.addToPool(player.getBet());
 					break;
 				case 0:
@@ -145,10 +143,10 @@ public class BlackjackManager implements MessageListener {
 					break;
 				case 1:
 					strBuilder.append("(Gains: *" + FormatUtils.formatCoins(player.getBet()) + "*)");
-					StatsManager.increment(StatCategory.MONEY_GAINS_COMMAND, CommandManager.getFirstName(context.getCommand()), player.getBet());
 					break;
 			}
 
+			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), player.getBet());
 			DatabaseManager.addCoins(context.getChannel(), player.getUser(), result * player.getBet());
 			results.add(strBuilder.toString());
 		}

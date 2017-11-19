@@ -54,8 +54,9 @@ public class StatsManager {
 		STATS_MAP.put(category, STATS_MAP.get(category).increment(key));
 	}
 
-	public static void increment(StatCategory category, String key, int value) {
-		STATS_MAP.put(category, STATS_MAP.get(category).put(key, STATS_MAP.get(category).optInt(key) + value));
+	public static void updateGameStats(String key, int coins) {
+		StatCategory category = coins > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND;
+		STATS_MAP.put(category, STATS_MAP.get(category).put(key, STATS_MAP.get(category).optInt(key) + Math.abs(coins)));
 	}
 
 	public static void save() {

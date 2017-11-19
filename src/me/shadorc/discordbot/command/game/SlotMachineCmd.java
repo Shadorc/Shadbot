@@ -6,7 +6,6 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.LottoDataManager;
-import me.shadorc.discordbot.data.StatCategory;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
@@ -64,7 +63,7 @@ public class SlotMachineCmd extends AbstractCommand {
 		}
 
 		DatabaseManager.addCoins(context.getChannel(), context.getAuthor(), gains);
-		StatsManager.increment(gains > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND, this.getFirstName(), Math.abs(gains));
+		StatsManager.updateGameStats(this.getFirstName(), gains);
 		LottoDataManager.addToPool(Math.abs(gains));
 
 		StringBuilder message = new StringBuilder(
