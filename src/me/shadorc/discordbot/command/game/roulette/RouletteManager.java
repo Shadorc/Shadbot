@@ -88,7 +88,7 @@ class RouletteManager {
 			} else {
 				list.add("**" + user.getName() + "** (Losses: **" + FormatUtils.formatCoins(gains) + ")**");
 			}
-			DatabaseManager.addCoins(context.getChannel(), user, multiplier * gains);
+			DatabaseManager.addCoins(context.getChannel(), user, gains);
 			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 
