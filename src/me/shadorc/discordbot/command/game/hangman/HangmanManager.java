@@ -39,8 +39,8 @@ class HangmanManager implements MessageListener {
 			"https://upload.wikimedia.org/wikipedia/commons/6/6b/Hangman-5.png",
 			"https://upload.wikimedia.org/wikipedia/commons/d/d6/Hangman-6.png");
 
-	protected static final int MIN_GAINS = 150;
-	private static final int MAX_BONUS = 100;
+	protected static final int MIN_GAINS = 200;
+	private static final int MAX_BONUS = 200;
 	private static final int MAX_WORD_LENGTH = 10;
 	private static final int MIN_WORD_LENGTH = 5;
 
