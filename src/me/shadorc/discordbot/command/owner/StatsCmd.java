@@ -98,8 +98,8 @@ public class StatsCmd extends AbstractCommand {
 		StringBuilder averageStr = new StringBuilder();
 		StringBuilder countStr = new StringBuilder();
 		for(Object key : moneyGainsCommandObj.keySet()) {
-			int gains = moneyGainsCommandObj.optInt(key.toString());
-			int losses = moneyLossesCommandObj.optInt(key.toString());
+			long gains = moneyGainsCommandObj.optLong(key.toString());
+			long losses = moneyLossesCommandObj.optLong(key.toString());
 			int count = CommandManager.getCommand(key.toString()).getNames().stream().mapToInt(name -> commandObj.optInt(name)).sum();
 
 			if(gains == 0 || count == 0) {

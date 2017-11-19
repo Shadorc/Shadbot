@@ -59,7 +59,7 @@ public class StatsManager {
 			LottoDataManager.addToPool(Math.abs(coins));
 		}
 		StatCategory category = coins > 0 ? StatCategory.MONEY_GAINS_COMMAND : StatCategory.MONEY_LOSSES_COMMAND;
-		STATS_MAP.put(category, STATS_MAP.get(category).put(key, STATS_MAP.get(category).optInt(key) + Math.abs(coins)));
+		STATS_MAP.put(category, STATS_MAP.get(category).put(key, STATS_MAP.get(category).optLong(key) + Math.abs(coins)));
 	}
 
 	public static void save() {
