@@ -10,7 +10,6 @@ import javax.swing.Timer;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
-import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
@@ -67,12 +66,11 @@ class DiceManager {
 			if(num == winningNum) {
 				gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
 				winnersList.add("**" + user.getName() + "**, you win **" + FormatUtils.formatCoins(gains) + "**");
-				DatabaseManager.addCoins(context.getChannel(), user, gains);
 			} else {
+				gains *= -1;
 				losersList.add("**" + user.getName() + "** (Losses: **" + FormatUtils.formatCoins(gains) + ")**");
-				DatabaseManager.addCoins(context.getChannel(), user, -gains);
-				LottoDataManager.addToPool(gains);
 			}
+			DatabaseManager.addCoins(context.getChannel(), user, gains);
 			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 

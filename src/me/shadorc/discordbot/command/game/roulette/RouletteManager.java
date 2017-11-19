@@ -13,7 +13,6 @@ import javax.swing.Timer;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
-import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
@@ -88,10 +87,9 @@ class RouletteManager {
 				list.add(0, "**" + user.getName() + "** (Gains: **" + FormatUtils.formatCoins(gains) + ")**");
 			} else {
 				list.add("**" + user.getName() + "** (Losses: **" + FormatUtils.formatCoins(gains) + ")**");
-				LottoDataManager.addToPool(gains);
 			}
-			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
 			DatabaseManager.addCoins(context.getChannel(), user, multiplier * gains);
+			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 
 		BotUtils.sendMessage(Emoji.DICE + " No more bets. *The wheel is spinning...* **" + winningPlace

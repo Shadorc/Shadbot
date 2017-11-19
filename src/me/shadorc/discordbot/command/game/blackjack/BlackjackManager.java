@@ -14,7 +14,6 @@ import javax.swing.Timer;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
-import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
@@ -132,22 +131,24 @@ public class BlackjackManager implements MessageListener {
 				result = 1;
 			}
 
+			int gains = player.getBet();
 			StringBuilder strBuilder = new StringBuilder("**" + player.getUser().getName() + "** ");
 			switch (result) {
 				case -1:
-					strBuilder.append("(Losses: *" + FormatUtils.formatCoins(player.getBet()) + "*)");
-					LottoDataManager.addToPool(player.getBet());
+					gains *= -1;
+					strBuilder.append("(Losses: *" + FormatUtils.formatCoins(gains) + "*)");
 					break;
 				case 0:
+					gains *= 0;
 					strBuilder.append("(Draw)");
 					break;
 				case 1:
-					strBuilder.append("(Gains: *" + FormatUtils.formatCoins(player.getBet()) + "*)");
+					strBuilder.append("(Gains: *" + FormatUtils.formatCoins(gains) + "*)");
 					break;
 			}
 
-			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), player.getBet());
-			DatabaseManager.addCoins(context.getChannel(), player.getUser(), result * player.getBet());
+			DatabaseManager.addCoins(context.getChannel(), player.getUser(), gains);
+			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
 			results.add(strBuilder.toString());
 		}
 
