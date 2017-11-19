@@ -143,6 +143,7 @@ public class BlackjackManager implements MessageListener {
 					strBuilder.append("(Draw)");
 					break;
 				case 1:
+					gains *= 2;
 					strBuilder.append("(Gains: *" + FormatUtils.formatCoins(gains) + "*)");
 					break;
 			}
