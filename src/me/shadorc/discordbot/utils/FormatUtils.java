@@ -104,6 +104,6 @@ public class FormatUtils {
 	 * @return coins formatted + "coin(s)"
 	 */
 	public static String formatCoins(int coins) {
-		return FormatUtils.formatNum(Math.abs(coins)) + " " + (Math.abs(coins) == 1 ? "coin" : "coins");
+		return FormatUtils.formatNum(Math.abs(coins)) + " " + (Math.abs(coins) > 1 ? "coins" : "coin");
 	}
 }
