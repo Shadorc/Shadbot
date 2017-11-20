@@ -55,7 +55,13 @@ public class DiabloCmd extends AbstractCommand {
 			return;
 		}
 
-		String battletag = splitArgs[1].replaceAll("#", "-");
+		String battletag = splitArgs[1];
+		if(!battletag.matches("(\\p{L}*)#[0-9]*")) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid Battletag.", context.getChannel());
+			return;
+		}
+		battletag = battletag.replaceAll("#", "-");
+
 		try {
 			JSONObject mainObj = new JSONObject(NetUtils.getBody("https://" + region + ".api.battle.net/d3/profile"
 					+ "/" + URLEncoder.encode(battletag, "UTF-8") + "/?"
