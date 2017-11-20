@@ -32,4 +32,13 @@ public class MathUtils {
 	public static boolean inRange(float num, int min, int max) {
 		return min <= num && num < max;
 	}
+
+	/**
+	 * @param start - the starting time in ms
+	 * @param duration - the total duration in ms
+	 * @return the time remaining before the duration has elapsed in ms
+	 */
+	public static int remainingTime(long start, long duration) {
+		return (int) (duration - (System.currentTimeMillis() - start));
+	}
 }

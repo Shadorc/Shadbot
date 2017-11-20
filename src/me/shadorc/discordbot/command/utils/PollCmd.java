@@ -16,6 +16,7 @@ import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
+import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -181,7 +182,6 @@ public class PollCmd extends AbstractCommand {
 				count++;
 			}
 
-			long remainingTime = (duration - (System.currentTimeMillis() - startTime));
 			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.withAuthorName("Poll (Created by: " + context.getAuthorName() + ")")
 					.withThumbnail(context.getAuthor().getAvatarURL())
@@ -189,7 +189,8 @@ public class PollCmd extends AbstractCommand {
 							+ "\n\n__**" + question + "**__"
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
-					.withFooterText(executor.isShutdown() ? ("Time left: " + FormatUtils.formatDuration(remainingTime)) : "Finished");
+					.withFooterText(executor.isShutdown() ? ("Time left: "
+							+ FormatUtils.formatDuration(MathUtils.remainingTime(startTime, TimeUnit.SECONDS.toMillis(duration)))) : "Finished");
 
 			this.message = BotUtils.sendMessage(embed.build(), context.getChannel()).get();
 		}

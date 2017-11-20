@@ -19,6 +19,7 @@ import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
+import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.game.Card;
@@ -94,7 +95,7 @@ public class BlackjackManager implements MessageListener {
 						+ "\n\nType `hit` to take another card, `stand` to pass or `double down` to double down.")
 				.appendField("Dealer's hand", BlackjackUtils.formatCards(isFinished ? dealerCards : dealerCards.subList(0, 1)), true)
 				.withFooterText(isFinished ? "Finished" : "This game will end automatically in "
-						+ FormatUtils.formatDuration(TimeUnit.SECONDS.toMillis(GAME_DURATION) - System.currentTimeMillis() + startTime));
+						+ FormatUtils.formatDuration(MathUtils.remainingTime(startTime, TimeUnit.SECONDS.toMillis(GAME_DURATION))));
 
 		for(BlackjackPlayer player : players) {
 			builder.appendField(player.getUser().getName() + "'s hand"
