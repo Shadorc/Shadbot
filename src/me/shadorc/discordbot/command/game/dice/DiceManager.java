@@ -51,7 +51,7 @@ class DiceManager {
 	}
 
 	protected void stop() {
-		executor.shutdown();
+		executor.shutdownNow();
 
 		int winningNum = MathUtils.rand(1, 6);
 

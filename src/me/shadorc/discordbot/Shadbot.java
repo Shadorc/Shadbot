@@ -28,7 +28,7 @@ public class Shadbot {
 			public void run() {
 				Shadbot.getClient().logout();
 				Scheduler.stop();
-				Shadbot.getDefaultThreadPool().shutdown();
+				Shadbot.getDefaultThreadPool().shutdownNow();
 			}
 		}));
 

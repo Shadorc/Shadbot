@@ -60,7 +60,7 @@ public class BlackjackManager implements MessageListener {
 	}
 
 	public void stop() {
-		executor.shutdown();
+		executor.shutdownNow();
 
 		MessageManager.removeListener(context.getChannel(), this);
 		CHANNELS_BLACKJACK.remove(context.getChannel().getLongID());

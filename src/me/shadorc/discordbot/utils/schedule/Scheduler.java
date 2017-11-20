@@ -95,7 +95,7 @@ public class Scheduler {
 				StatsManager.save();
 				LottoDataManager.save();
 			}).get();
-			SCHEDULED_EXECUTOR.shutdown();
+			SCHEDULED_EXECUTOR.shutdownNow();
 		} catch (InterruptedException | ExecutionException err) {
 			LogUtils.error("An error occurred while stopping scheduler.", err);
 		}

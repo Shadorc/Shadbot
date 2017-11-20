@@ -145,7 +145,7 @@ public class PollCmd extends AbstractCommand {
 
 		protected void stop() {
 			CHANNELS_POLL.remove(context.getChannel().getLongID());
-			executor.shutdown();
+			executor.shutdownNow();
 			this.show();
 		}
 

@@ -36,8 +36,8 @@ public class ShutdownCmd extends AbstractCommand {
 			public void run() {
 				Shadbot.getClient().logout();
 				Scheduler.stop();
-				Shadbot.getDefaultThreadPool().shutdown();
-				executor.shutdown();
+				Shadbot.getDefaultThreadPool().shutdownNow();
+				executor.shutdownNow();
 				System.exit(0);
 			}
 		};

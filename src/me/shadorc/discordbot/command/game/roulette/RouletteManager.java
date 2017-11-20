@@ -54,7 +54,7 @@ class RouletteManager {
 	}
 
 	protected void stop() {
-		executor.shutdown();
+		executor.shutdownNow();
 
 		int winningPlace = MathUtils.rand(1, 36);
 
