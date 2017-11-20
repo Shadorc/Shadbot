@@ -189,8 +189,7 @@ public class PollCmd extends AbstractCommand {
 							+ "\n\n__**" + question + "**__"
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
-					.withFooterText(executor.isShutdown() ? ("Time left: "
-							+ FormatUtils.formatDuration(MathUtils.remainingTime(startTime, TimeUnit.SECONDS.toMillis(duration)))) : "Finished");
+					.withFooterText(executor.isShutdown() ? "Finished" : "Time left: " + FormatUtils.formatDuration(MathUtils.remainingTime(startTime, TimeUnit.SECONDS.toMillis(duration))));
 
 			this.message = BotUtils.sendMessage(embed.build(), context.getChannel()).get();
 		}
