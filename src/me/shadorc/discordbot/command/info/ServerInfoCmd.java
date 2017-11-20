@@ -40,11 +40,11 @@ public class ServerInfoCmd extends AbstractCommand {
 				.withAuthorName("Info about \"" + guild.getName() + "\"")
 				.withThumbnail(guild.getIconURL())
 				.appendField("Owner", guild.getOwner().getName(), true)
-				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
 				.appendField("Region", guild.getRegion().getName(), true)
 				.appendField("Creation date", guild.getCreationDate().format(dateFormatter)
 						+ "\n(" + FormatUtils.formatDate(guild.getCreationDate()) + ")", true)
-				.appendField("Channels", Integer.toString(guild.getChannels().size()), true)
+				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
+				.appendField("Text channels", Integer.toString(guild.getChannels().size()), true)
 				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
 				.appendField("Settings", "**Prefix:** " + context.getPrefix()
 						+ "\n**Default volume:** " + DatabaseManager.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"

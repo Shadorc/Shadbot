@@ -30,7 +30,7 @@ public class UserInfoCmd extends AbstractCommand {
 
 		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.setLenient(true)
-				.withAuthorName("Info about " + user.getName() + (user.isBot() ? " (Bot)" : ""))
+				.withAuthorName("Info about user \"" + user.getName() + (user.isBot() ? " (Bot)" : "") + "\"")
 				.withThumbnail(user.getAvatarURL())
 				.appendField("Display name", user.getDisplayName(context.getGuild()), true)
 				.appendField("User ID", Long.toString(user.getLongID()), true)

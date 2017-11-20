@@ -22,7 +22,8 @@ public class TextUtils {
 	}
 
 	public static String notEnoughCoins(IUser user) {
-		return Emoji.BANK + " (**" + user.getName() + "**) You don't have enough coins. You can get some by playing **RPS** or **Trivia**.";
+		return Emoji.BANK + " (**" + user.getName() + "**) You don't have enough coins. You can get some by playing **RPS**, **Hangman** "
+				+ "or **Trivia**.";
 	}
 
 	public static String noResult(String search) {
