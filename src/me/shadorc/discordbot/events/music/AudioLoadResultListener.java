@@ -2,9 +2,9 @@ package me.shadorc.discordbot.events.music;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.swing.Timer;
 
 import org.jsoup.Jsoup;
 
@@ -37,6 +37,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 	private static final int CHOICE_DURATION = 30;
 
+	private final ScheduledExecutorService executor;
 	private final GuildMusicManager musicManager;
 	private final IUser userDj;
 	private final IVoiceChannel userVoiceChannel;
@@ -44,7 +45,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private final boolean putFirst;
 
 	private List<AudioTrack> resultsTracks;
-	private Timer cancelTimer;
 
 	public AudioLoadResultListener(GuildMusicManager musicManager, IUser userDj, IVoiceChannel userVoiceChannel, String identifier, boolean putFirst) {
 		this.musicManager = musicManager;
@@ -52,6 +52,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		this.userVoiceChannel = userVoiceChannel;
 		this.identifier = identifier;
 		this.putFirst = putFirst;
+		this.executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	@Override
@@ -96,10 +97,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					.withFooterText("This choice will be cancelled in " + CHOICE_DURATION + " seconds.");
 			BotUtils.sendMessage(embed.build(), musicManager.getChannel());
 
-			cancelTimer = new Timer((int) TimeUnit.SECONDS.toMillis(CHOICE_DURATION), event -> {
-				this.stopWaiting();
-			});
-			cancelTimer.start();
+			executor.schedule(() -> this.stopWaiting(), CHOICE_DURATION, TimeUnit.SECONDS);
 
 			resultsTracks = tracks;
 			MessageManager.addListener(musicManager.getChannel(), this);
@@ -197,7 +195,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	private void stopWaiting() {
-		cancelTimer.stop();
+		executor.shutdown();
 		resultsTracks.clear();
 		MessageManager.removeListener(musicManager.getChannel(), this);
 		musicManager.setWaiting(false);

@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.swing.Timer;
 
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
@@ -32,14 +32,12 @@ class RouletteManager {
 
 	private final ConcurrentHashMap<IUser, Pair<Integer, String>> playersPlace;
 	private final Context context;
-	private final Timer timer;
+	private final ScheduledExecutorService executor;
 
 	protected RouletteManager(Context context) {
 		this.context = context;
 		this.playersPlace = new ConcurrentHashMap<>();
-		this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(GAME_DURATION), event -> {
-			this.stop();
-		});
+		this.executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	protected void start() {
@@ -49,14 +47,14 @@ class RouletteManager {
 				.appendField(context.getAuthorName() + " started a Roulette game.",
 						"Use `" + context.getPrefix() + "roulette <bet> <place>` to join the game."
 								+ "\n\n**place** - must be a number between 1 and 36, red, black, even, odd, low or high", false)
-				.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to make your bets.");
+				.withFooterText("You have " + GAME_DURATION + " seconds to make your bets.");
 		BotUtils.sendMessage(builder.build(), context.getChannel()).get();
 
-		timer.start();
+		executor.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
 	}
 
 	protected void stop() {
-		timer.stop();
+		executor.shutdown();
 
 		int winningPlace = MathUtils.rand(1, 36);
 

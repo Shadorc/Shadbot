@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.swing.Timer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +37,7 @@ class TriviaManager implements MessageListener {
 
 	private final Context context;
 	private final List<IUser> alreadyAnswered;
-	private final Timer timer;
+	private final ScheduledExecutorService executor;
 
 	private long startTime;
 	private String correctAnswer;
@@ -46,10 +46,7 @@ class TriviaManager implements MessageListener {
 	protected TriviaManager(Context context) {
 		this.context = context;
 		this.alreadyAnswered = new ArrayList<>();
-		this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(LIMITED_TIME), event -> {
-			BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the correct answer was **" + correctAnswer + "**.", context.getChannel());
-			this.stop();
-		});
+		this.executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	// Trivia API doc : https://opentdb.com/api_config.php
@@ -91,12 +88,15 @@ class TriviaManager implements MessageListener {
 
 		this.correctAnswer = Jsoup.parse(correctAnswer).text();
 		this.startTime = System.currentTimeMillis();
-		this.timer.start();
+		this.executor.schedule(() -> {
+			BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the correct answer was **" + correctAnswer + "**.", context.getChannel());
+			this.stop();
+		}, LIMITED_TIME, TimeUnit.SECONDS);
 	}
 
 	private void stop() {
 		MessageManager.removeListener(context.getChannel(), this);
-		timer.stop();
+		executor.shutdown();
 		CHANNELS_TRIVIA.remove(context.getChannel().getLongID());
 	}
 

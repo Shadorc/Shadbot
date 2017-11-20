@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.owner;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.Shadbot;
@@ -22,6 +23,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class ShutdownCmd extends AbstractCommand {
 
+	protected final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
 	public ShutdownCmd() {
 		super(CommandCategory.OWNER, Role.OWNER, RateLimiter.DEFAULT_COOLDOWN, "shutdown");
 	}
@@ -34,12 +37,13 @@ public class ShutdownCmd extends AbstractCommand {
 				Shadbot.getClient().logout();
 				Scheduler.stop();
 				Shadbot.getDefaultThreadPool().shutdown();
+				executor.shutdown();
 				System.exit(0);
 			}
 		};
 
 		if(!context.hasArg()) {
-			Executors.newSingleThreadScheduledExecutor().submit(shutdownTask);
+			executor.submit(shutdownTask);
 			return;
 		}
 
@@ -63,7 +67,7 @@ public class ShutdownCmd extends AbstractCommand {
 		}
 
 		int delay = Integer.parseInt(timeStr);
-		Executors.newSingleThreadScheduledExecutor().schedule(shutdownTask, delay, TimeUnit.SECONDS);
+		executor.schedule(shutdownTask, delay, TimeUnit.SECONDS);
 
 		LogUtils.warn("Shadbot will restart in " + delay + " seconds. (Message: " + message + ")");
 	}

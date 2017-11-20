@@ -67,10 +67,10 @@ public class GuildMusicManager {
 
 	public void end() {
 		// Do not block the lavaplayer thread to allow the socket to be closed in time, avoiding a SocketClosed exception
-		new Thread(() -> {
+		Shadbot.getDefaultThreadPool().submit(() -> {
 			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
 			this.leaveVoiceChannel();
-		}).start();
+		});
 	}
 
 	public void leaveVoiceChannel() {

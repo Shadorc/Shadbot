@@ -3,9 +3,9 @@ package me.shadorc.discordbot.command.game.dice;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.swing.Timer;
 
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
@@ -27,16 +27,14 @@ class DiceManager {
 
 	private final ConcurrentHashMap<Integer, IUser> numsPlayers;
 	private final Context context;
-	private final Timer timer;
+	private final ScheduledExecutorService executor;
 	private final int bet;
 
 	protected DiceManager(Context context, int bet) {
 		this.context = context;
 		this.bet = bet;
 		this.numsPlayers = new ConcurrentHashMap<>();
-		this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(GAME_DURATION), event -> {
-			this.stop();
-		});
+		this.executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	protected void start() {
@@ -46,14 +44,14 @@ class DiceManager {
 				.appendField(context.getAuthorName() + " started a dice game.",
 						"Use `" + context.getPrefix() + "dice <num>` to join the game with a **" + FormatUtils.formatCoins(bet)
 								+ "** putting.", false)
-				.withFooterText("You have " + TimeUnit.MILLISECONDS.toSeconds(timer.getDelay()) + " seconds to make your bets.");
+				.withFooterText("You have " + GAME_DURATION + " seconds to make your bets.");
 		BotUtils.sendMessage(builder.build(), context.getChannel()).get();
 
-		timer.start();
+		executor.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
 	}
 
 	protected void stop() {
-		timer.stop();
+		executor.shutdown();
 
 		int winningNum = MathUtils.rand(1, 6);
 

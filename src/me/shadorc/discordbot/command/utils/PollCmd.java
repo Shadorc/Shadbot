@@ -5,10 +5,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import javax.swing.Timer;
 
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
@@ -119,33 +119,33 @@ public class PollCmd extends AbstractCommand {
 
 		private final Map<String, List<IUser>> choicesMap;
 		private final Context context;
+		private final int duration;
 		private final String question;
-		private final Timer timer;
+		private final ScheduledExecutorService executor;
 
 		private IMessage message;
 		private long startTime;
 
 		protected PollManager(Context context, int duration, String question, List<String> choicesList) {
 			this.context = context;
+			this.duration = duration;
 			this.question = question;
 			this.choicesMap = new LinkedHashMap<String, List<IUser>>();
 			for(String choice : choicesList) {
 				choicesMap.put(choice, new ArrayList<>());
 			}
-			this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(duration), event -> {
-				this.stop();
-			});
+			this.executor = Executors.newSingleThreadScheduledExecutor();
 		}
 
 		protected void start() {
 			startTime = System.currentTimeMillis();
-			timer.start();
+			executor.schedule(() -> this.stop(), duration, TimeUnit.SECONDS);
 			this.show();
 		}
 
 		protected void stop() {
 			CHANNELS_POLL.remove(context.getChannel().getLongID());
-			timer.stop();
+			executor.shutdown();
 			this.show();
 		}
 
@@ -181,7 +181,7 @@ public class PollCmd extends AbstractCommand {
 				count++;
 			}
 
-			long remainingTime = (timer.getDelay() - (System.currentTimeMillis() - startTime));
+			long remainingTime = (duration - (System.currentTimeMillis() - startTime));
 			EmbedBuilder embed = Utils.getDefaultEmbed()
 					.withAuthorName("Poll (Created by: " + context.getAuthorName() + ")")
 					.withThumbnail(context.getAuthor().getAvatarURL())
@@ -189,7 +189,7 @@ public class PollCmd extends AbstractCommand {
 							+ "\n\n__**" + question + "**__"
 							+ choicesStr.toString())
 					.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png")
-					.withFooterText(timer.isRunning() ? ("Time left: " + FormatUtils.formatDuration(remainingTime)) : "Finished");
+					.withFooterText(executor.isShutdown() ? ("Time left: " + FormatUtils.formatDuration(remainingTime)) : "Finished");
 
 			this.message = BotUtils.sendMessage(embed.build(), context.getChannel()).get();
 		}

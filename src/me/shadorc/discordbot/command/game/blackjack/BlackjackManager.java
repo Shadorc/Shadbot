@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import javax.swing.Timer;
 
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
@@ -35,7 +35,7 @@ public class BlackjackManager implements MessageListener {
 	private final List<BlackjackPlayer> players;
 	private final List<Card> dealerCards;
 	private final Context context;
-	private final Timer timer;
+	private final ScheduledExecutorService executor;
 
 	private long startTime;
 	private IMessage message;
@@ -44,9 +44,7 @@ public class BlackjackManager implements MessageListener {
 		this.players = Collections.synchronizedList(new ArrayList<>());
 		this.dealerCards = new ArrayList<>();
 		this.context = context;
-		this.timer = new Timer((int) TimeUnit.SECONDS.toMillis(GAME_DURATION), event -> {
-			this.stop();
-		});
+		this.executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	public void start() {
@@ -56,13 +54,13 @@ public class BlackjackManager implements MessageListener {
 		}
 
 		MessageManager.addListener(context.getChannel(), this);
-		timer.start();
+		executor.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
 		startTime = System.currentTimeMillis();
 		CHANNELS_BLACKJACK.putIfAbsent(context.getChannel().getLongID(), this);
 	}
 
 	public void stop() {
-		timer.stop();
+		executor.shutdown();
 
 		MessageManager.removeListener(context.getChannel(), this);
 		CHANNELS_BLACKJACK.remove(context.getChannel().getLongID());
@@ -95,7 +93,8 @@ public class BlackjackManager implements MessageListener {
 						+ " <bet>` to join the game.**"
 						+ "\n\nType `hit` to take another card, `stand` to pass or `double down` to double down.")
 				.appendField("Dealer's hand", BlackjackUtils.formatCards(isFinished ? dealerCards : dealerCards.subList(0, 1)), true)
-				.withFooterText(isFinished ? "Finished" : "This game will end automatically in " + FormatUtils.formatDuration(timer.getDelay() - System.currentTimeMillis() + startTime));
+				.withFooterText(isFinished ? "Finished" : "This game will end automatically in "
+						+ FormatUtils.formatDuration(TimeUnit.SECONDS.toMillis(GAME_DURATION) - System.currentTimeMillis() + startTime));
 
 		for(BlackjackPlayer player : players) {
 			builder.appendField(player.getUser().getName() + "'s hand"

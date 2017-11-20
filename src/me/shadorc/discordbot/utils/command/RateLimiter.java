@@ -3,9 +3,10 @@ package me.shadorc.discordbot.utils.command;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.StatCategory;
@@ -21,12 +22,12 @@ public class RateLimiter {
 	public static final int GAME_COOLDOWN = 5;
 
 	protected final ConcurrentHashMap<Long, ConcurrentHashMap<Long, Boolean>> guildsLimitedUsers;
-	private final Timer timer;
+	private final ScheduledExecutorService executor;
 	private final long timeout;
 
 	public RateLimiter(int timeout, ChronoUnit unit) {
 		this.timeout = Duration.of(timeout, unit).toMillis();
-		this.timer = new Timer();
+		this.executor = Executors.newSingleThreadScheduledExecutor();
 		this.guildsLimitedUsers = new ConcurrentHashMap<>();
 	}
 
@@ -50,15 +51,12 @@ public class RateLimiter {
 		}
 
 		guildMap.put(user.getLongID(), false);
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				guildMap.remove(user.getLongID());
-				if(guildMap.isEmpty()) {
-					guildsLimitedUsers.remove(guild.getLongID());
-				}
+		executor.schedule(() -> {
+			guildMap.remove(user.getLongID());
+			if(guildMap.isEmpty()) {
+				guildsLimitedUsers.remove(guild.getLongID());
 			}
-		}, timeout);
+		}, timeout, TimeUnit.MILLISECONDS);
 		return false;
 	}
 

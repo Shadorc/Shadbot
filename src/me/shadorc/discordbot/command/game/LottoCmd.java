@@ -3,8 +3,6 @@ package me.shadorc.discordbot.command.game;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.joda.time.Instant;
@@ -39,8 +37,6 @@ public class LottoCmd extends AbstractCommand {
 
 	public LottoCmd() {
 		super(CommandCategory.GAME, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "lotto");
-		Executors.newSingleThreadScheduledExecutor()
-				.scheduleAtFixedRate(() -> this.lotteryDraw(), this.getDelayBeforeNextDraw(), TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -120,7 +116,7 @@ public class LottoCmd extends AbstractCommand {
 	}
 
 	private String getDelaySentence() {
-		int minutes = this.getDelayBeforeNextDraw() / 1000 / 60;
+		int minutes = LottoCmd.getDelayBeforeNextDraw() / 1000 / 60;
 		int hours = minutes / 60;
 		int days = hours / 24;
 		return "The next draw will take place in "
@@ -129,7 +125,7 @@ public class LottoCmd extends AbstractCommand {
 				+ StringUtils.pluralOf(minutes % 60, "minute") + ". ";
 	}
 
-	private int getDelayBeforeNextDraw() {
+	public static int getDelayBeforeNextDraw() {
 		ZonedDateTime nextDate = ZonedDateTime.now()
 				.with(DayOfWeek.SUNDAY)
 				.withHour(12)
@@ -141,21 +137,7 @@ public class LottoCmd extends AbstractCommand {
 		return (int) (nextDate.toInstant().toEpochMilli() - Instant.now().getMillis());
 	}
 
-	@Override
-	public void showHelp(Context context) {
-		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Buy a ticket for the lottery or display the current lottery status.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " [<num>]`", false)
-				.appendField("Restrictions", "**num** - must be between 1 and 100", false)
-				.appendField("Info", "One winner is randomly drawn every Sunday at noon (English time)."
-						+ "\nIf no one wins, the prize pool is put back into play, "
-						+ "if there are multiple winners, the prize pool is splitted between them.", false)
-				.appendField("Gains", "The prize pool contains all coins lost at games during the week plus "
-						+ "the purchase price of the lottery tickets.", false);
-		BotUtils.sendMessage(builder.build(), context.getChannel());
-	}
-
-	private void lotteryDraw() {
+	public static void lotteryDraw() {
 		int winningNum = MathUtils.rand(1, 100);
 
 		List<JSONObject> winnersList = Utils.convertToList(LottoDataManager.getPlayers(), JSONObject.class);
@@ -170,7 +152,7 @@ public class LottoCmd extends AbstractCommand {
 			IUser user = Shadbot.getClient().getUserByID(winnerObj.getLong(JSONKey.USER_ID.toString()));
 			int coins = (int) Math.ceil((double) LottoDataManager.getPool() / winnersList.size());
 			DatabaseManager.addCoins(guild, user, coins);
-			StatsManager.updateGameStats(this.getFirstName(), coins);
+			StatsManager.updateGameStats("lotto", coins);
 		}
 
 		LottoDataManager.setHistoric(winnersList.size(), LottoDataManager.getPool(), winningNum);
@@ -179,5 +161,19 @@ public class LottoCmd extends AbstractCommand {
 			LottoDataManager.resetPool();
 		}
 		LottoDataManager.resetUsers();
+	}
+
+	@Override
+	public void showHelp(Context context) {
+		EmbedBuilder builder = Utils.getDefaultEmbed(this)
+				.appendDescription("**Buy a ticket for the lottery or display the current lottery status.**")
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " [<num>]`", false)
+				.appendField("Restrictions", "**num** - must be between 1 and 100", false)
+				.appendField("Info", "One winner is randomly drawn every Sunday at noon (English time)."
+						+ "\nIf no one wins, the prize pool is put back into play, "
+						+ "if there are multiple winners, the prize pool is splitted between them.", false)
+				.appendField("Gains", "The prize pool contains all coins lost at games during the week plus "
+						+ "the purchase price of the lottery tickets.", false);
+		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }
