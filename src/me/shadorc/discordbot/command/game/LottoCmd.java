@@ -17,7 +17,7 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.JSONKey;
 import me.shadorc.discordbot.data.LottoDataManager;
-import me.shadorc.discordbot.data.StatsManager;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
@@ -98,7 +98,7 @@ public class LottoCmd extends AbstractCommand {
 		int num = Integer.parseInt(context.getArg());
 
 		DatabaseManager.addCoins(context.getChannel(), context.getAuthor(), -PAID_COST);
-		StatsManager.updateGameStats(this.getFirstName(), -PAID_COST);
+		StatsManager.increment(this.getFirstName(), -PAID_COST);
 
 		LottoDataManager.addPlayer(context.getGuild(), context.getAuthor(), num);
 
@@ -152,7 +152,7 @@ public class LottoCmd extends AbstractCommand {
 			IUser user = Shadbot.getClient().getUserByID(winnerObj.getLong(JSONKey.USER_ID.toString()));
 			int coins = (int) Math.ceil((double) LottoDataManager.getPool() / winnersList.size());
 			DatabaseManager.addCoins(guild, user, coins);
-			StatsManager.updateGameStats("lotto", coins);
+			StatsManager.increment("lotto", coins);
 		}
 
 		LottoDataManager.setHistoric(winnersList.size(), LottoDataManager.getPool(), winningNum);

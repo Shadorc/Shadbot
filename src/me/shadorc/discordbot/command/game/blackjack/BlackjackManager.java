@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
-import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
@@ -149,7 +149,7 @@ public class BlackjackManager implements MessageListener {
 			}
 
 			DatabaseManager.addCoins(context.getChannel(), player.getUser(), gains);
-			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
+			StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
 			results.add(strBuilder.toString());
 		}
 

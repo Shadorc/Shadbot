@@ -4,17 +4,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
-
-import org.json.JSONObject;
 
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
-import me.shadorc.discordbot.data.StatCategory;
-import me.shadorc.discordbot.data.StatsManager;
+import me.shadorc.discordbot.stats.StatsEnum;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
@@ -44,24 +43,41 @@ public class StatsCmd extends AbstractCommand {
 			return;
 		}
 
-		if(!Arrays.stream(StatCategory.values()).anyMatch(category -> category.toString().equals(context.getArg()))) {
+		if(!Arrays.stream(StatsEnum.values()).anyMatch(stats -> stats.toString().equals(context.getArg()))) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Category unknown. (Options: "
-					+ FormatUtils.formatArray(StatCategory.values(), cat -> "**" + cat.toString() + "**", ", ") + ")", context.getChannel());
+					+ FormatUtils.formatArray(StatsEnum.values(), cat -> "**" + cat.toString() + "**", ", ") + ")", context.getChannel());
 			return;
 		}
 
-		StatCategory category = StatCategory.valueOf(context.getArg().toUpperCase());
+		if(context.getArg().equals(StatsEnum.VARIOUS.toString())) {
+			EmbedBuilder builder = Utils.getDefaultEmbed()
+					.setLenient(true)
+					.withAuthorName(StringUtils.capitalize(StatsEnum.VARIOUS.toString()) + "'s Stats");
 
-		JSONObject statsObj = StatsManager.getCategory(category);
-		if(statsObj.length() == 0) {
+			Map<String, AtomicLong> statsMap = StatsManager.get(StatsEnum.VARIOUS);
+			if(statsMap.isEmpty()) {
+				builder.appendDescription("There is nothing here.");
+			}
+
+			statsMap.keySet().stream().forEach(key -> builder.appendDescription("**" + key + "**: " + statsMap.get(key)));
+			BotUtils.sendMessage(builder.build(), context.getChannel());
+			return;
+		}
+
+		StatsEnum category = StatsEnum.valueOf(context.getArg().toUpperCase());
+
+		Map<String, AtomicLong> statsMap = StatsManager.get(category);
+		if(statsMap.isEmpty()) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This category is empty.", context.getChannel());
 			return;
 		}
 
-		final Map<String, Integer> statsMap = new HashMap<>();
-		for(Object key : statsObj.keySet()) {
+		Map<String, Long> homogenizedStatsMap = new HashMap<>();
+
+		for(Object key : statsMap.keySet()) {
 			String firstName = CommandManager.getCommand(key.toString()).getFirstName();
-			statsMap.put(firstName, statsMap.getOrDefault(firstName, 0) + statsObj.getInt(key.toString()));
+			homogenizedStatsMap.put(firstName,
+					homogenizedStatsMap.getOrDefault(firstName, 0L) + statsMap.get(key.toString()).get());
 		}
 
 		EmbedBuilder builder = Utils.getDefaultEmbed()
@@ -72,11 +88,11 @@ public class StatsCmd extends AbstractCommand {
 			builder.appendDescription("There is nothing here.");
 		}
 
-		List<String> statsList = Utils.sortByValue(statsMap).keySet().stream()
-				.map(key -> "**" + key + "**: " + statsMap.get(key))
+		List<String> statsList = Utils.sortByValue(homogenizedStatsMap).keySet().stream()
+				.map(key -> "**" + key + "**: " + homogenizedStatsMap.get(key))
 				.collect(Collectors.toList());
 
-		for(int i = 0; i < Math.ceil((float) statsMap.keySet().size() / ROW_SIZE); i++) {
+		for(int i = 0; i < Math.ceil((float) homogenizedStatsMap.keySet().size() / ROW_SIZE); i++) {
 			int minIndex = i * ROW_SIZE;
 			int size = Math.min(ROW_SIZE, statsList.size() - minIndex);
 			builder.appendField("Row N°" + (i + 1),
@@ -87,9 +103,9 @@ public class StatsCmd extends AbstractCommand {
 	}
 
 	private EmbedObject getAverage() {
-		JSONObject moneyGainsCommandObj = StatsManager.getCategory(StatCategory.MONEY_GAINS_COMMAND);
-		JSONObject moneyLossesCommandObj = StatsManager.getCategory(StatCategory.MONEY_LOSSES_COMMAND);
-		JSONObject commandObj = StatsManager.getCategory(StatCategory.COMMAND);
+		Map<String, AtomicLong> moneyGainsCommandObj = StatsManager.get(StatsEnum.MONEY_GAINED);
+		Map<String, AtomicLong> moneyLossesCommandObj = StatsManager.get(StatsEnum.MONEY_LOST);
+		Map<String, AtomicLong> commandObj = StatsManager.get(StatsEnum.COMMAND);
 
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.withAuthorName("Stats average");
@@ -98,9 +114,10 @@ public class StatsCmd extends AbstractCommand {
 		StringBuilder averageStr = new StringBuilder();
 		StringBuilder countStr = new StringBuilder();
 		for(Object key : moneyGainsCommandObj.keySet()) {
-			long gains = moneyGainsCommandObj.optLong(key.toString());
-			long losses = moneyLossesCommandObj.optLong(key.toString());
-			int count = CommandManager.getCommand(key.toString()).getNames().stream().mapToInt(name -> commandObj.optInt(name)).sum();
+			long gains = moneyGainsCommandObj.getOrDefault(key.toString(), new AtomicLong(0)).get();
+			long losses = moneyLossesCommandObj.getOrDefault(key.toString(), new AtomicLong(0)).get();
+			long count = CommandManager.getCommand(key.toString()).getNames().stream().mapToLong(
+					name -> commandObj.getOrDefault(name, new AtomicLong(0)).get()).sum();
 
 			if(gains == 0 || count == 0) {
 				continue;
@@ -129,7 +146,8 @@ public class StatsCmd extends AbstractCommand {
 				.appendDescription("**Show stats for the specified category or average amount of coins gained with minigames.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <category>`"
 						+ "\n`" + context.getPrefix() + this.getFirstName() + " average`", false)
-				.appendField("Argument", "**category** - " + FormatUtils.formatArray(StatCategory.values(), cat -> cat.toString(), ", "), false);
+				.appendField("Argument", "**category** - "
+						+ FormatUtils.formatArray(StatsEnum.values(), cat -> "`" + cat.toString() + "`", ", "), false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 
 	}

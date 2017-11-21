@@ -10,6 +10,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import me.shadorc.discordbot.stats.StatsEnum;
+import me.shadorc.discordbot.stats.StatsManager;
+
 public class TrackScheduler {
 
 	private final AudioPlayer audioPlayer;
@@ -30,6 +33,7 @@ public class TrackScheduler {
 	}
 
 	public void queue(AudioTrack track, boolean first) {
+		StatsManager.increment(StatsEnum.MUSICS_LOADED);
 		if(audioPlayer.startTrack(track, true)) {
 			this.currentTrack = track;
 		} else if(first) {

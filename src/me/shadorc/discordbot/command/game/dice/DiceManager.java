@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
-import me.shadorc.discordbot.data.StatsManager;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
@@ -69,7 +69,7 @@ class DiceManager {
 				losersList.add("**" + user.getName() + "** (Losses: **" + FormatUtils.formatCoins(gains) + ")**");
 			}
 			DatabaseManager.addCoins(context.getChannel(), user, gains);
-			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
+			StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 
 		StringBuilder strBuilder = new StringBuilder();

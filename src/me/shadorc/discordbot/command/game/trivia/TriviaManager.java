@@ -16,9 +16,9 @@ import org.jsoup.Jsoup;
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
-import me.shadorc.discordbot.data.StatsManager;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
@@ -124,7 +124,7 @@ class TriviaManager implements MessageListener {
 			int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
 			BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + gains + " coins**.", context.getChannel());
 			DatabaseManager.addCoins(message.getChannel(), author, gains);
-			StatsManager.updateGameStats(CommandManager.getFirstName(context.getCommand()), gains);
+			StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
 			this.stop();
 			return true;
 

@@ -14,7 +14,7 @@ import me.shadorc.discordbot.command.game.LottoCmd;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.LottoDataManager;
-import me.shadorc.discordbot.data.StatsManager;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.Utils;

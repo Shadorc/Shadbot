@@ -4,6 +4,8 @@ import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.message.MessageManager;
+import me.shadorc.discordbot.stats.StatsEnum;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -16,6 +18,8 @@ public class MessageListener {
 
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
+		StatsManager.increment(StatsEnum.MESSAGES_RECEIVED);
+
 		if(event.getAuthor().isBot()) {
 			return;
 		}
@@ -23,6 +27,7 @@ public class MessageListener {
 		if(event.getChannel().isPrivate()) {
 			BotUtils.sendMessage(Emoji.INFO + " Sorry, I don't respond (yet ?) to private messages.", event.getChannel());
 			LogUtils.info("Shadbot has received a private message. (Message: " + event.getMessage().getContent() + ")");
+			StatsManager.increment(StatsEnum.PRIVATE_MESSAGES_RECEIVED);
 			return;
 		}
 
