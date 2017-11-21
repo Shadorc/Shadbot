@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.data.Config;
@@ -21,18 +20,13 @@ public class StatsManager {
 
 	static {
 		if(!STATS_FILE.exists()) {
-			FileWriter writer = null;
-			try {
-				writer = new FileWriter(STATS_FILE);
+			try (FileWriter writer = new FileWriter(STATS_FILE)) {
 				writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
 				writer.flush();
 
 			} catch (IOException err) {
 				LogUtils.LOGGER.error("An error occurred during stats file creation. Exiting.", err);
 				System.exit(1);
-
-			} finally {
-				IOUtils.closeQuietly(writer);
 			}
 		}
 	}
@@ -65,20 +59,15 @@ public class StatsManager {
 	}
 
 	public static void save() {
-		FileWriter writer = null;
-		try {
-			JSONObject mainObj = new JSONObject();
-			STATS_MAP.keySet().stream().forEach(statsEnum -> mainObj.put(statsEnum.toString(), new JSONObject(STATS_MAP.get(statsEnum))));
+		JSONObject mainObj = new JSONObject();
+		STATS_MAP.keySet().stream().forEach(statsEnum -> mainObj.put(statsEnum.toString(), new JSONObject(STATS_MAP.get(statsEnum))));
 
-			writer = new FileWriter(STATS_FILE);
+		try (FileWriter writer = new FileWriter(STATS_FILE)) {
 			writer.write(mainObj.toString(Config.INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
 			LogUtils.error("Error while saving stats.", err);
-
-		} finally {
-			IOUtils.closeQuietly(writer);
 		}
 	}
 }

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,18 +25,13 @@ public class DatabaseManager {
 
 	static {
 		if(!USER_DATA_FILE.exists()) {
-			FileWriter writer = null;
-			try {
-				writer = new FileWriter(USER_DATA_FILE);
+			try (FileWriter writer = new FileWriter(USER_DATA_FILE)) {
 				writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
 				writer.flush();
 
 			} catch (IOException err) {
 				LogUtils.LOGGER.error("An error occurred during database file initialization. Exiting.", err);
 				System.exit(1);
-
-			} finally {
-				IOUtils.closeQuietly(writer);
 			}
 		}
 
@@ -165,17 +159,12 @@ public class DatabaseManager {
 	}
 
 	public synchronized static void save() {
-		FileWriter writer = null;
-		try {
-			writer = new FileWriter(USER_DATA_FILE);
+		try (FileWriter writer = new FileWriter(USER_DATA_FILE)) {
 			writer.write(userDataObj.toString(Config.INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
 			LogUtils.error("Error while saving database !", err);
-
-		} finally {
-			IOUtils.closeQuietly(writer);
 		}
 	}
 }

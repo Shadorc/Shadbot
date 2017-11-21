@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,9 +22,7 @@ public class LottoDataManager {
 
 	static {
 		if(!LOTTERY_DATA_FILE.exists()) {
-			FileWriter writer = null;
-			try {
-				writer = new FileWriter(LOTTERY_DATA_FILE);
+			try (FileWriter writer = new FileWriter(LOTTERY_DATA_FILE)) {
 				JSONObject defaultObj = new JSONObject();
 				defaultObj.put(JSONKey.USERS.toString(), new JSONArray());
 				defaultObj.put(JSONKey.POOL.toString(), 0);
@@ -35,9 +32,6 @@ public class LottoDataManager {
 			} catch (IOException err) {
 				LogUtils.LOGGER.error("An error occurred during lotto data file creation. Exiting.", err);
 				System.exit(1);
-
-			} finally {
-				IOUtils.closeQuietly(writer);
 			}
 		}
 
@@ -89,17 +83,12 @@ public class LottoDataManager {
 	}
 
 	public static void save() {
-		FileWriter writer = null;
-		try {
-			writer = new FileWriter(LOTTERY_DATA_FILE);
+		try (FileWriter writer = new FileWriter(LOTTERY_DATA_FILE)) {
 			writer.write(dataObj.toString(Config.INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
 			LogUtils.error("Error while saving lotto data.", err);
-
-		} finally {
-			IOUtils.closeQuietly(writer);
 		}
 	}
 }

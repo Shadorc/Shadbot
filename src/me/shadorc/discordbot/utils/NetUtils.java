@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
@@ -73,8 +72,6 @@ public class NetUtils {
 	}
 
 	private static void postStatsOn(String homeUrl, APIKey token) {
-		DataOutputStream out = null;
-		BufferedReader reader = null;
 		try {
 			URL url = new URL(homeUrl + "/api/bots/" + Shadbot.getClient().getOurUser().getLongID() + "/stats");
 
@@ -87,25 +84,22 @@ public class NetUtils {
 
 			JSONObject content = new JSONObject().put("server_count", Shadbot.getClient().getGuilds().size());
 
-			out = new DataOutputStream(urlConn.getOutputStream());
-			out.writeBytes(content.toString());
-			out.flush();
+			try (DataOutputStream out = new DataOutputStream(urlConn.getOutputStream());
+					BufferedReader reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream()))) {
 
-			reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+				out.writeBytes(content.toString());
+				out.flush();
 
-			StringBuilder strBuilder = new StringBuilder();
-			String line;
-			while((line = reader.readLine()) != null) {
-				strBuilder.append(line);
+				StringBuilder strBuilder = new StringBuilder();
+				String line;
+				while((line = reader.readLine()) != null) {
+					strBuilder.append(line);
+				}
+				LogUtils.info("Stats posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
 			}
-			LogUtils.info("Stats posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
 
 		} catch (Exception err) {
 			LogUtils.info("An error occurred while posting stats. (" + err.getClass().getSimpleName() + ": " + err.getMessage() + ")");
-
-		} finally {
-			IOUtils.closeQuietly(out);
-			IOUtils.closeQuietly(reader);
 		}
 	}
 }
