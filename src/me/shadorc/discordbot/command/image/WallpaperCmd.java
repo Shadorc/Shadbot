@@ -9,6 +9,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.UnrecognizedOptionException;
 
 import com.ivkos.wallhaven4j.Wallhaven;
 import com.ivkos.wallhaven4j.models.misc.Ratio;
@@ -65,6 +66,10 @@ public class WallpaperCmd extends AbstractCommand {
 		CommandLine cmd;
 		try {
 			cmd = new DefaultParser().parse(options, StringUtils.getSplittedArg(context.getArg()));
+		} catch (UnrecognizedOptionException err) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + err.getMessage() + ". "
+					+ "Use `" + context.getPrefix() + "help " + this.getFirstName() + "` for more information.", context.getChannel());
+			return;
 		} catch (ParseException err) {
 			ExceptionUtils.manageException("getting a wallpaper", context, err);
 			return;
