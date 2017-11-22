@@ -18,9 +18,10 @@ import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 import net.shadorc.overwatch4j.HeroDesc;
 import net.shadorc.overwatch4j.OverwatchPlayer;
-import net.shadorc.overwatch4j.enums.Plateform;
+import net.shadorc.overwatch4j.enums.Platform;
 import net.shadorc.overwatch4j.enums.Region;
 import net.shadorc.overwatch4j.enums.TopHeroesStats;
+import net.shadorc.overwatch4j.exceptions.NoDataException;
 import net.shadorc.overwatch4j.exceptions.UserNotFoundException;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -47,17 +48,17 @@ public class OverwatchCmd extends AbstractCommand {
 
 			} else if(splitArgs.length == 2) {
 				String platform = splitArgs[0].toUpperCase();
-				if(!Arrays.stream(Plateform.values()).anyMatch(platformValue -> platformValue.toString().equalsIgnoreCase(platform))) {
+				if(!Arrays.stream(Platform.values()).anyMatch(platformValue -> platformValue.toString().equalsIgnoreCase(platform))) {
 					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid platform. Options: pc, psn, xbl.", context.getChannel());
 					return;
 				}
 
 				String username = splitArgs[1];
-				player = new OverwatchPlayer(username, Plateform.valueOf(platform));
+				player = new OverwatchPlayer(username, Platform.valueOf(platform));
 
 			} else {
 				String platform = splitArgs[0].toUpperCase();
-				if(!Arrays.stream(Plateform.values()).anyMatch(platformValue -> platformValue.toString().equalsIgnoreCase(platform))) {
+				if(!Arrays.stream(Platform.values()).anyMatch(platformValue -> platformValue.toString().equalsIgnoreCase(platform))) {
 					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid platform. Options: pc, psn, xbl.", context.getChannel());
 					return;
 				}
@@ -69,7 +70,7 @@ public class OverwatchCmd extends AbstractCommand {
 				}
 
 				String username = splitArgs[2];
-				player = new OverwatchPlayer(username, Plateform.valueOf(platform), Region.valueOf(region));
+				player = new OverwatchPlayer(username, Platform.valueOf(platform), Region.valueOf(region));
 			}
 
 			EmbedBuilder builder = new EmbedBuilder()
@@ -79,7 +80,8 @@ public class OverwatchCmd extends AbstractCommand {
 					.withUrl(player.getProfileURL())
 					.withThumbnail(player.getIconUrl())
 					.withColor(Config.BOT_COLOR)
-					.appendDescription("Stats for user **" + player.getName() + "**" + (player.getRegion() == Region.NONE ? "" : " (Region: " + player.getRegion().toString().toUpperCase() + ")"))
+					.appendDescription("Stats for user **" + player.getName() + "**"
+							+ (player.getRegion() == Region.NONE ? "" : " (Region: " + player.getRegion().toString().toUpperCase() + ")"))
 					.appendField("Level", Integer.toString(player.getLevel()), true)
 					.appendField("Competitive rank", Integer.toString(player.getRank()), true)
 					.appendField("Wins", Integer.toString(player.getWins()), true)
@@ -90,8 +92,10 @@ public class OverwatchCmd extends AbstractCommand {
 
 		} catch (UserNotFoundException e) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Overwatch or doesn't exist.", context.getChannel());
+		} catch (NoDataException e) {
+			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " There is no data for this account yet.", context.getChannel());
 		} catch (IOException err) {
-			ExceptionUtils.manageException("getting information from Overwatch profil", context, err);
+			ExceptionUtils.manageException("getting information from Overwatch profile", context, err);
 		}
 	}
 
