@@ -32,14 +32,16 @@ public class StatsManager {
 	}
 
 	public static void increment(String gameName, int coins) {
-		STATS_MAP.putIfAbsent(StatsEnum.MONEY_LOST, new HashMap<>());
-		STATS_MAP.get(StatsEnum.MONEY_LOST).putIfAbsent(gameName, new AtomicLong(0));
+		StatsEnum statsEnum;
 		if(coins < 0) {
 			LottoDataManager.addToPool(Math.abs(coins));
-			STATS_MAP.get(StatsEnum.MONEY_LOST).get(gameName).addAndGet(Math.abs(coins));
+			statsEnum = StatsEnum.MONEY_LOST;
 		} else {
-			STATS_MAP.get(StatsEnum.MONEY_GAINED).get(gameName).addAndGet(coins);
+			statsEnum = StatsEnum.MONEY_GAINED;
 		}
+		STATS_MAP.putIfAbsent(statsEnum, new HashMap<>());
+		STATS_MAP.get(statsEnum).putIfAbsent(gameName, new AtomicLong(0));
+		STATS_MAP.get(statsEnum).get(gameName).addAndGet(Math.abs(coins));
 	}
 
 	public static void increment(StatsEnum stats, String cmdName) {
