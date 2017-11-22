@@ -30,6 +30,8 @@ public class ChatCmd extends AbstractCommand {
 	private static final ConcurrentHashMap<Long, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
 	private static final List<String> BOTS_ID = Arrays.asList("efc39100ce34d038", "b0dafd24ee35a477", "ea373c261e3458c6", "b0a6a41a5e345c23");
 
+	private static int errorCount;
+
 	public ChatCmd() {
 		super(CommandCategory.FUN, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "chat");
 	}
@@ -45,6 +47,7 @@ public class ChatCmd extends AbstractCommand {
 			try {
 				response = this.talk(context.getChannel(), botID, context.getArg());
 				BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
+				errorCount = 0;
 				break;
 			} catch (JSONException | IOException err) {
 				LogUtils.info("{" + this.getClass().getSimpleName() + "} " + botID + " is not reachable, trying another one.");
@@ -53,7 +56,10 @@ public class ChatCmd extends AbstractCommand {
 
 		if(response == null) {
 			BotUtils.sendMessage(Emoji.SLEEPING + " Sorry, A.L.I.C.E. seems to be AFK, she'll probably come back later.", context.getChannel());
-			LogUtils.error("No artificial intelligence is responding.");
+			errorCount++;
+			if(errorCount >= 5) {
+				LogUtils.error("No artificial intelligence is responding (Error count: " + errorCount + ").");
+			}
 		}
 	}
 
