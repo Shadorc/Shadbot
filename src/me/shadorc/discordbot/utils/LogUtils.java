@@ -7,47 +7,65 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.command.Emoji;
+import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.util.EmbedBuilder;
 
 public class LogUtils {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("Logger");
 
-	public static void error(String msg, Exception err, Context context) {
-		LOGGER.error(msg + " (Input: " + context.getMessage().getContent() + ")", err);
-		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, context.getChannel());
-		LogUtils.sendLogs("**[ERROR]** {User warned} " + msg
-				+ "\nError message: " + err.getMessage()
-				+ "\nInput: " + context.getMessage().getContent());
+	private enum LogType {
+		WARN, ERROR;
 	}
 
-	public static void error(String msg, Exception err) {
-		LOGGER.error(msg, err);
-		LogUtils.sendLogs("**[ERROR]** " + msg
-				+ "\nError message: " + err.getMessage());
+	private static void error(String msg, Exception err, String input, String cmdName, IChannel channel) {
+		if(channel != null) {
+			BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, channel);
+		}
+
+		LOGGER.error(msg + (input == null ? "" : " (Input: " + input + ")"), err);
+		LogUtils.sendEmbedLog(LogType.ERROR, msg,
+				"Command", cmdName,
+				"Error message", (err == null ? null : err.getMessage()),
+				"Input", input,
+				"User warned", Boolean.toString(channel != null));
+	}
+
+	public static void error(String msg, Exception err, Context context) {
+		LogUtils.error(msg, err, context.getMessage().getContent(), context.getCommand(), context.getChannel());
 	}
 
 	public static void error(String msg, Exception err, String input) {
-		LOGGER.error(msg + " (Input: " + input + ")", err);
-		LogUtils.sendLogs("**[ERROR]** " + msg
-				+ "\nError message: " + err.getMessage()
-				+ "\nInput: " + input);
+		LogUtils.error(msg, err, input, null, null);
+	}
+
+	public static void error(String msg, Exception err) {
+		LogUtils.error(msg, err, null, null, null);
 	}
 
 	public static void error(String msg) {
-		LOGGER.error(msg);
-		LogUtils.sendLogs("**[ERROR]** " + msg);
+		LogUtils.error(msg, null, null, null, null);
 	}
 
 	public static void warn(String msg) {
 		LOGGER.warn(msg);
-		LogUtils.sendLogs("**[WARN]** " + msg);
+		LogUtils.sendEmbedLog(LogType.WARN, msg);
 	}
 
 	public static void info(String msg) {
 		LOGGER.info(msg);
 	}
 
-	private static void sendLogs(String msg) {
-		BotUtils.sendMessage(msg, Shadbot.getClient().getChannelByID(Config.LOGS_CHANNEL_ID));
+	private static void sendEmbedLog(LogType type, String msg, String... fields) {
+		EmbedBuilder builder = Utils.getDefaultEmbed()
+				.setLenient(true)
+				.withAuthorName(StringUtils.capitalize(type.toString().toLowerCase()) + " (Version: " + Config.VERSION.toString() + ")")
+				.withDescription(msg);
+
+		for(int i = 0; i < fields.length; i += 2) {
+			builder.appendField(fields[i], fields[i + 1], true);
+		}
+
+		BotUtils.sendMessage(builder.build(), Shadbot.getClient().getChannelByID(Config.LOGS_CHANNEL_ID));
 	}
 }
