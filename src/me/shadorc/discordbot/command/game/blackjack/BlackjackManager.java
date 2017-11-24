@@ -34,6 +34,7 @@ public class BlackjackManager implements MessageListener {
 	protected static final ConcurrentHashMap<Long, BlackjackManager> CHANNELS_BLACKJACK = new ConcurrentHashMap<>();
 
 	private static final int GAME_DURATION = 60;
+	private static final float WIN_MULTIPLIER = 1.2f;
 
 	private final RateLimiter rateLimiter;
 	private final List<BlackjackPlayer> players;
@@ -147,7 +148,7 @@ public class BlackjackManager implements MessageListener {
 					strBuilder.append("(Draw)");
 					break;
 				case 1:
-					gains *= 2;
+					gains = (int) Math.ceil(gains * WIN_MULTIPLIER);
 					strBuilder.append("(Gains: *" + FormatUtils.formatCoins(gains) + "*)");
 					break;
 			}

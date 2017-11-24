@@ -16,7 +16,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class RouletteCmd extends AbstractCommand {
 
-	private static final int MAX_BET = 50_000_000;
+	private static final int MAX_BET = 500_000;
 
 	public RouletteCmd() {
 		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "roulette");

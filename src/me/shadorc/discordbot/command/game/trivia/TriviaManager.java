@@ -37,7 +37,7 @@ class TriviaManager implements MessageListener {
 
 	protected static final ConcurrentHashMap<Long, TriviaManager> CHANNELS_TRIVIA = new ConcurrentHashMap<>();
 
-	protected static final int MIN_GAINS = 150;
+	protected static final int MIN_GAINS = 100;
 	protected static final int MAX_BONUS = 100;
 	protected static final int LIMITED_TIME = 30;
 
