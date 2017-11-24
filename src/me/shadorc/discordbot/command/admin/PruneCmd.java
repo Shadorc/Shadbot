@@ -48,10 +48,6 @@ public class PruneCmd extends AbstractCommand {
 			return;
 		}
 
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
-
 		Options options = new Options();
 		options.addOption("c", "containing", true, "containing these words");
 
@@ -69,6 +65,10 @@ public class PruneCmd extends AbstractCommand {
 		} catch (ParseException err) {
 			ExceptionUtils.manageException("deleting messages", context, err);
 			return;
+		}
+
+		if(cmd.getOptions().length == 0) {
+			throw new MissingArgumentException();
 		}
 
 		String numStr = cmd.getOptionValue("number", "100");
