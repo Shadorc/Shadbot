@@ -8,11 +8,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import me.shadorc.discordbot.command.Context;
-import me.shadorc.discordbot.stats.StatsEnum;
-import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.TextUtils;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -31,10 +29,10 @@ public class RateLimiter {
 		this.guildsLimitedUsers = new ConcurrentHashMap<>();
 	}
 
-	public boolean isSpamming(Context context) {
-		if(this.isLimited(context.getGuild(), context.getAuthor())) {
-			if(!this.isWarned(context.getGuild(), context.getAuthor())) {
-				this.warn(context);
+	public boolean isSpamming(IChannel channel, IUser user) {
+		if(this.isLimited(channel.getGuild(), user)) {
+			if(!this.isWarned(channel.getGuild(), user)) {
+				this.warn(channel, user);
 			}
 			return true;
 		}
@@ -64,10 +62,9 @@ public class RateLimiter {
 		return guildsLimitedUsers.get(guild.getLongID()).get(user.getLongID());
 	}
 
-	private void warn(Context context) {
-		BotUtils.sendMessage(Emoji.STOPWATCH + " (**" + context.getAuthorName() + "**) " + TextUtils.getSpamMessage() + " You can use this"
-				+ " command once every *" + Duration.of(timeout, ChronoUnit.MILLIS).getSeconds() + " sec*.", context.getChannel());
-		guildsLimitedUsers.get(context.getGuild().getLongID()).put(context.getAuthor().getLongID(), true);
-		StatsManager.increment(StatsEnum.LIMITED, context.getCommand());
+	private void warn(IChannel channel, IUser user) {
+		BotUtils.sendMessage(Emoji.STOPWATCH + " (**" + user.getName() + "**) " + TextUtils.getSpamMessage() + " You can use this"
+				+ " command once every *" + Duration.of(timeout, ChronoUnit.MILLIS).getSeconds() + " sec*.", channel);
+		guildsLimitedUsers.get(channel.getGuild().getLongID()).put(user.getLongID(), true);
 	}
 }

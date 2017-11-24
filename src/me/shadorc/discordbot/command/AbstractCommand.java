@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import me.shadorc.discordbot.stats.StatsEnum;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 
@@ -38,9 +40,11 @@ public abstract class AbstractCommand {
 	public abstract void showHelp(Context context);
 
 	public final void checkSpamAndExecute(Context context) throws MissingArgumentException {
-		if(rateLimiter != null && rateLimiter.isSpamming(context)) {
+		if(rateLimiter != null && rateLimiter.isSpamming(context.getChannel(), context.getAuthor())) {
+			StatsManager.increment(StatsEnum.LIMITED, context.getCommand());
 			return;
 		}
+		StatsManager.increment(StatsEnum.COMMANDS_EXECUTED);
 		this.execute(context);
 	}
 

@@ -7,6 +7,8 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.music.GuildMusicManager;
+import me.shadorc.discordbot.stats.StatsEnum;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
@@ -27,8 +29,9 @@ public class SkipCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(rateLimiter.isSpamming(context)) {
+		if(rateLimiter.isSpamming(context.getChannel(), context.getAuthor())) {
 			BotUtils.sendMessage(Emoji.INFO + " You can use `" + context.getPrefix() + "skip <num>` to jump to a music in the playlist.", context.getChannel());
+			StatsManager.increment(StatsEnum.LIMITED, context.getCommand());
 			return;
 		}
 

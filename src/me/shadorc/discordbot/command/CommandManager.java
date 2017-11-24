@@ -182,7 +182,6 @@ public class CommandManager {
 
 		try {
 			command.checkSpamAndExecute(context);
-			StatsManager.increment(StatsEnum.COMMANDS_EXECUTED);
 			StatsManager.increment(StatsEnum.COMMAND, context.getCommand());
 		} catch (MissingArgumentException err) {
 			command.showHelp(context);
