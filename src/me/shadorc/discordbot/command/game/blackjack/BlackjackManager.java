@@ -1,5 +1,6 @@
 package me.shadorc.discordbot.command.game.blackjack;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
+import me.shadorc.discordbot.utils.command.RateLimiter;
 import me.shadorc.discordbot.utils.game.Card;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
@@ -33,6 +35,7 @@ public class BlackjackManager implements MessageListener {
 
 	private static final int GAME_DURATION = 60;
 
+	private final RateLimiter rateLimiter;
 	private final List<BlackjackPlayer> players;
 	private final List<Card> dealerCards;
 	private final Context context;
@@ -42,6 +45,7 @@ public class BlackjackManager implements MessageListener {
 	private IMessage message;
 
 	public BlackjackManager(Context context) {
+		this.rateLimiter = new RateLimiter(RateLimiter.DEFAULT_COOLDOWN, ChronoUnit.SECONDS);
 		this.players = Collections.synchronizedList(new ArrayList<>());
 		this.dealerCards = new ArrayList<>();
 		this.context = context;
@@ -161,6 +165,10 @@ public class BlackjackManager implements MessageListener {
 		List<BlackjackPlayer> matchingPlayers = players.stream().filter(playerItr -> playerItr.getUser().equals(message.getAuthor())).collect(Collectors.toList());
 		if(matchingPlayers.isEmpty()) {
 			return false;
+		}
+
+		if(rateLimiter.isLimited(message.getGuild(), message.getAuthor())) {
+			return true;
 		}
 
 		BlackjackPlayer player = matchingPlayers.get(0);

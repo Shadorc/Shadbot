@@ -39,7 +39,7 @@ public class RateLimiter {
 		return false;
 	}
 
-	private boolean isLimited(IGuild guild, IUser user) {
+	public boolean isLimited(IGuild guild, IUser user) {
 		guildsLimitedUsers.putIfAbsent(guild.getLongID(), new ConcurrentHashMap<>());
 
 		Map<Long, Boolean> guildMap = guildsLimitedUsers.get(guild.getLongID());

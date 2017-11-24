@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.command.game.trivia;
 
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,8 @@ import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
+import me.shadorc.discordbot.utils.command.RateLimiter;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
@@ -38,6 +41,7 @@ class TriviaManager implements MessageListener {
 	protected static final int MAX_BONUS = 100;
 	protected static final int LIMITED_TIME = 30;
 
+	private final RateLimiter rateLimiter;
 	private final Context context;
 	private final List<IUser> alreadyAnswered;
 	private final ScheduledExecutorService executor;
@@ -47,6 +51,7 @@ class TriviaManager implements MessageListener {
 	private List<String> answers;
 
 	protected TriviaManager(Context context) {
+		this.rateLimiter = new RateLimiter(LIMITED_TIME, ChronoUnit.SECONDS);
 		this.context = context;
 		this.alreadyAnswered = new ArrayList<>();
 		this.executor = Executors.newSingleThreadScheduledExecutor();
@@ -97,6 +102,18 @@ class TriviaManager implements MessageListener {
 		CHANNELS_TRIVIA.remove(context.getChannel().getLongID());
 	}
 
+	private void win(IChannel channel, IUser user) {
+		float coinsPerSec = (float) MAX_BONUS / LIMITED_TIME;
+		long remainingSec = TimeUnit.MILLISECONDS.toSeconds(MathUtils.remainingTime(startTime, TimeUnit.SECONDS.toMillis(LIMITED_TIME)));
+		int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
+
+		BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + user.getName() + "**, you won **" + gains + " coins**.", context.getChannel());
+		DatabaseManager.addCoins(channel, user, gains);
+		StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
+
+		this.stop();
+	}
+
 	@Override
 	public boolean onMessageReceived(IMessage message) {
 		String content = message.getContent();
@@ -115,17 +132,15 @@ class TriviaManager implements MessageListener {
 
 		IUser author = message.getAuthor();
 		if(alreadyAnswered.contains(author)) {
+			if(rateLimiter.isLimited(message.getGuild(), message.getAuthor())) {
+				return false;
+			}
+
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Sorry **" + author.getName() + "**, you can only answer once.", message.getChannel());
 			return true;
 
 		} else if(isGoodAnswer) {
-			float coinsPerSec = (float) MAX_BONUS / LIMITED_TIME;
-			long remainingSec = TimeUnit.MILLISECONDS.toSeconds(MathUtils.remainingTime(startTime, TimeUnit.SECONDS.toMillis(LIMITED_TIME)));
-			int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
-			BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + author.getName() + "**, you won **" + gains + " coins**.", context.getChannel());
-			DatabaseManager.addCoins(message.getChannel(), author, gains);
-			StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
-			this.stop();
+			this.win(message.getChannel(), message.getAuthor());
 			return true;
 
 		} else {

@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command.game.hangman;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
+import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
@@ -44,6 +46,7 @@ class HangmanManager implements MessageListener {
 	private static final int MAX_WORD_LENGTH = 10;
 	private static final int MIN_WORD_LENGTH = 5;
 
+	private final RateLimiter rateLimiter;
 	private final Context context;
 	private final String word;
 	private final List<String> charsTested;
@@ -53,6 +56,7 @@ class HangmanManager implements MessageListener {
 	private int failsCount;
 
 	protected HangmanManager(Context context) throws IOException {
+		this.rateLimiter = new RateLimiter(RateLimiter.DEFAULT_COOLDOWN, ChronoUnit.SECONDS);
 		this.context = context;
 		this.word = HangmanUtils.getWord(MIN_WORD_LENGTH, MAX_WORD_LENGTH);
 		this.charsTested = new ArrayList<>();
@@ -164,26 +168,28 @@ class HangmanManager implements MessageListener {
 
 	@Override
 	public boolean onMessageReceived(IMessage message) {
-		if(message.getAuthor().equals(context.getAuthor())) {
-			String content = message.getContent();
-
-			String prefix = (String) DatabaseManager.getSetting(message.getGuild(), Setting.PREFIX);
-			if(content.equalsIgnoreCase(prefix + "cancel")) {
-				BotUtils.sendMessage(Emoji.CHECK_MARK + " Game cancelled.", message.getChannel());
-				this.stop();
-				return true;
-			}
-
-			// Check only if content is an unique word
-			if(content.matches("[a-zA-Z]+")) {
-				if(content.length() == 1) {
-					this.checkLetter(content.toLowerCase());
-				} else if(content.length() >= MIN_WORD_LENGTH) {
-					this.checkWord(content);
-				}
-			}
-
+		if(!message.getAuthor().equals(context.getAuthor())) {
+			return false;
 		}
+
+		String content = message.getContent();
+
+		String prefix = (String) DatabaseManager.getSetting(message.getGuild(), Setting.PREFIX);
+		if(content.equalsIgnoreCase(prefix + "cancel")) {
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " Game cancelled.", message.getChannel());
+			this.stop();
+			return true;
+		}
+
+		// Check only if content is an unique word/letter
+		if(content.matches("[a-zA-Z]+")) {
+			if(content.length() == 1 && !rateLimiter.isLimited(message.getGuild(), message.getAuthor())) {
+				this.checkLetter(content.toLowerCase());
+			} else if(content.length() == word.length() && !rateLimiter.isLimited(message.getGuild(), message.getAuthor())) {
+				this.checkWord(content);
+			}
+		}
+
 		return false;
 	}
 }
