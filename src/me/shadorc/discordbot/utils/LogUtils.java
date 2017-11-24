@@ -18,6 +18,13 @@ public class LogUtils {
 		WARN, ERROR;
 	}
 
+	/**
+	 * @param msg - the custom error message
+	 * @param err - the exception
+	 * @param input - the user's input
+	 * @param cmdName - the name of the command executed while the exception occurred
+	 * @param channel - the channel in which send a message to warn users of this error
+	 */
 	private static void error(String msg, Exception err, String input, String cmdName, IChannel channel) {
 		if(channel != null) {
 			BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, channel);

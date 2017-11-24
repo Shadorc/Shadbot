@@ -2,9 +2,7 @@ package me.shadorc.discordbot.command.info;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
@@ -31,7 +29,7 @@ public class InfoCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		long ping = Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), context.getMessage().getCreationDate()));
+		int ping = Utils.getPing(context.getMessage().getCreationDate());
 
 		Runtime runtime = Runtime.getRuntime();
 		long usedMemory = runtime.totalMemory() - runtime.freeMemory();

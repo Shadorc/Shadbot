@@ -1,8 +1,5 @@
 package me.shadorc.discordbot.command.info;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -22,8 +19,7 @@ public class PingCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		long ping = Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), context.getMessage().getCreationDate()));
-		BotUtils.sendMessage(Emoji.GEAR + " Ping: " + ping + "ms", context.getChannel());
+		BotUtils.sendMessage(Emoji.GEAR + " Ping: " + Utils.getPing(context.getMessage().getCreationDate()) + "ms", context.getChannel());
 	}
 
 	@Override

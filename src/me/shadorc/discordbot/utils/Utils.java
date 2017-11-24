@@ -1,6 +1,8 @@
 package me.shadorc.discordbot.utils;
 
 import java.lang.management.ManagementFactory;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -52,6 +54,14 @@ public class Utils {
 		}
 
 		return cpuLoad;
+	}
+
+	/**
+	 * @param fromDate - the temporal object
+	 * @return the amount of ms between fromDate and now
+	 */
+	public static int getPing(LocalDateTime fromDate) {
+		return (int) Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), fromDate));
 	}
 
 	/**
