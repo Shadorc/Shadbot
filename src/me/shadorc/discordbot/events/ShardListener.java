@@ -21,6 +21,7 @@ public class ShardListener {
 
 	@EventSubscriber
 	public void onDisconnectedEvent(DisconnectedEvent event) {
+		LogUtils.info("Shard " + event.getShard().getInfo()[0] + " disconnected.");
 		if(event.getReason().equals(Reason.LOGGED_OUT)) {
 			LogUtils.info("------------------- Shadbot logged out [Version:" + Config.VERSION.toString() + "] -------------------");
 		}
@@ -29,6 +30,7 @@ public class ShardListener {
 
 	@EventSubscriber
 	public void onShardReadyEvent(ShardReadyEvent event) {
+		LogUtils.info("Shard " + event.getShard().getInfo()[0] + " ready.");
 		if(!CONNECTED_SHARD.contains(event.getShard())) {
 			CONNECTED_SHARD.add(event.getShard());
 		}
@@ -36,6 +38,7 @@ public class ShardListener {
 
 	@EventSubscriber
 	public void onReconnectSuccessEvent(ReconnectSuccessEvent event) {
+		LogUtils.info("Shard " + event.getShard().getInfo()[0] + " reconnected.");
 		if(!CONNECTED_SHARD.contains(event.getShard())) {
 			CONNECTED_SHARD.add(event.getShard());
 		}
@@ -43,6 +46,7 @@ public class ShardListener {
 
 	@EventSubscriber
 	public void onResumedEvent(ResumedEvent event) {
+		LogUtils.info("Shard " + event.getShard().getInfo()[0] + " resumed.");
 		if(!CONNECTED_SHARD.contains(event.getShard())) {
 			CONNECTED_SHARD.add(event.getShard());
 		}

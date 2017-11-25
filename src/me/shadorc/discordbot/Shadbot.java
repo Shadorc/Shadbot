@@ -10,6 +10,8 @@ import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.events.ReadyListener;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
+import me.shadorc.discordbot.utils.LogUtils;
+import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.schedule.Scheduler;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
@@ -36,9 +38,12 @@ public class Shadbot {
 
 		client = new ClientBuilder()
 				.withToken(Config.get(APIKey.DISCORD_TOKEN))
+				.withRecommendedShardCount()
 				.setMaxMessageCacheCount(0)
 				.setMaxReconnectAttempts(100)
 				.login();
+
+		LogUtils.info("Connecting to " + StringUtils.pluralOf(client.getShardCount(), "shard") + "...");
 
 		client.getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new ReadyListener());
 		client.getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new ShardListener());
