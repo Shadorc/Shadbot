@@ -51,8 +51,9 @@ public class InfoCmd extends AbstractCommand {
 						+ "\nUptime: " + DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true)
 						+ "\nDeveloper: " + Shadbot.getOwner().getName() + "#" + Shadbot.getOwner().getDiscriminator()
 						+ "\nVersion: " + Config.VERSION.toString()
-						+ "\nVoice Channels: " + Shadbot.getClient().getConnectedVoiceChannels().size()
+						+ "\nShards: " + Shadbot.getClient().getShardCount()
 						+ "\nServers: " + Shadbot.getClient().getGuilds().size()
+						+ "\nVoice Channels: " + Shadbot.getClient().getConnectedVoiceChannels().size()
 						+ "\nUsers: " + Shadbot.getClient().getUsers().size()
 						+ "\nPing: " + ping + "ms"
 						+ "```");
