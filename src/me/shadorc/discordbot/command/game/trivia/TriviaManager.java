@@ -14,6 +14,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
+import com.ivkos.wallhaven4j.util.exceptions.ParseException;
+
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
@@ -44,8 +46,8 @@ class TriviaManager implements MessageListener {
 	private final RateLimiter rateLimiter;
 	private final Context context;
 	private final List<IUser> alreadyAnswered;
-	private final ScheduledExecutorService executor;
 
+	private ScheduledExecutorService executor;
 	private long startTime;
 	private String correctAnswer;
 	private List<String> answers;
@@ -54,13 +56,16 @@ class TriviaManager implements MessageListener {
 		this.rateLimiter = new RateLimiter(LIMITED_TIME, ChronoUnit.SECONDS);
 		this.context = context;
 		this.alreadyAnswered = new ArrayList<>();
-		this.executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-TriviaManager@" + this.hashCode()));
 	}
 
 	// Trivia API doc : https://opentdb.com/api_config.php
-	protected void start() throws JSONException, IOException {
-		JSONObject mainObj = new JSONObject(NetUtils.getBody("https://opentdb.com/api.php?amount=1"));
-		JSONObject resultObj = mainObj.getJSONArray("results").getJSONObject(0);
+	protected void start() throws JSONException, IOException, ParseException {
+		String jsonStr = NetUtils.getBody("https://opentdb.com/api.php?amount=1");
+		if(jsonStr.isEmpty()) {
+			throw new ParseException("Body is empty.");
+		}
+
+		JSONObject resultObj = new JSONObject(jsonStr).getJSONArray("results").getJSONObject(0);
 
 		String type = resultObj.getString("type");
 
@@ -90,6 +95,7 @@ class TriviaManager implements MessageListener {
 		MessageManager.addListener(context.getChannel(), this);
 
 		startTime = System.currentTimeMillis();
+		executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-TriviaManager@" + this.hashCode()));
 		executor.schedule(() -> {
 			BotUtils.sendMessage(Emoji.HOURGLASS + " Time elapsed, the correct answer was **" + correctAnswer + "**.", context.getChannel());
 			this.stop();
