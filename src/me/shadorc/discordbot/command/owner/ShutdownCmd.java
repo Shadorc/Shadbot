@@ -23,14 +23,14 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class ShutdownCmd extends AbstractCommand {
 
-	protected final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-
 	public ShutdownCmd() {
 		super(CommandCategory.OWNER, Role.OWNER, RateLimiter.DEFAULT_COOLDOWN, "shutdown");
 	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-ShutdownCmd"));
+
 		Runnable shutdownTask = new Runnable() {
 			@Override
 			public void run() {

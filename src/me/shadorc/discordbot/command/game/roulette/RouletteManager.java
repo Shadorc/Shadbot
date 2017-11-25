@@ -37,7 +37,7 @@ class RouletteManager {
 	protected RouletteManager(Context context) {
 		this.context = context;
 		this.playersPlace = new ConcurrentHashMap<>();
-		this.executor = Executors.newSingleThreadScheduledExecutor();
+		this.executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-RouletteManager@" + this.hashCode()));
 	}
 
 	protected void start() {

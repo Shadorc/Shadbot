@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 import javax.management.Attribute;
@@ -19,6 +20,8 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.json.JSONArray;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
@@ -62,6 +65,14 @@ public class Utils {
 	 */
 	public static int getPing(LocalDateTime fromDate) {
 		return (int) Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), fromDate));
+	}
+
+	/**
+	 * @param name - the name format
+	 * @return a Thread Factory with name as name format
+	 */
+	public static ThreadFactory getThreadFactoryNamed(String name) {
+		return new ThreadFactoryBuilder().setNameFormat(name).build();
 	}
 
 	/**

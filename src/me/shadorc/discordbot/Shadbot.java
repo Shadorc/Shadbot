@@ -12,6 +12,7 @@ import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
+import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.schedule.Scheduler;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
@@ -19,7 +20,8 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class Shadbot {
 
-	private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
+	private static final ExecutorService THREAD_POOL =
+			Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-ThreadPool-%d"));
 
 	private static IDiscordClient client;
 	private static IUser owner;

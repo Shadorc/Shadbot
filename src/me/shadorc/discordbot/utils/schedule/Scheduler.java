@@ -24,7 +24,8 @@ import sx.blah.discord.handle.obj.IChannel;
 public class Scheduler {
 
 	private static final List<ScheduledMessage> MESSAGE_QUEUE = Collections.synchronizedList(new ArrayList<>());
-	private static final ScheduledExecutorService SCHEDULED_EXECUTOR = Executors.newScheduledThreadPool(2);
+	private static final ScheduledExecutorService SCHEDULED_EXECUTOR =
+			Executors.newScheduledThreadPool(2, Utils.getThreadFactoryNamed("Shadbot-Scheduler-%d"));
 
 	public static void start() {
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 1, 1, TimeUnit.MINUTES);

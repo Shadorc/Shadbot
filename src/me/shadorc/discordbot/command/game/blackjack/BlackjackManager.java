@@ -50,7 +50,7 @@ public class BlackjackManager implements MessageListener {
 		this.players = Collections.synchronizedList(new ArrayList<>());
 		this.dealerCards = new ArrayList<>();
 		this.context = context;
-		this.executor = Executors.newSingleThreadScheduledExecutor();
+		this.executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-BlackjackManager@" + this.hashCode()));
 	}
 
 	public void start() {

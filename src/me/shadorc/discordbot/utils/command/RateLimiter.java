@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.TextUtils;
+import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
@@ -25,7 +26,7 @@ public class RateLimiter {
 
 	public RateLimiter(int timeout, ChronoUnit unit) {
 		this.timeout = Duration.of(timeout, unit).toMillis();
-		this.executor = Executors.newSingleThreadScheduledExecutor();
+		this.executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-RateLimiter@" + this.hashCode()));
 		this.guildsLimitedUsers = new ConcurrentHashMap<>();
 	}
 

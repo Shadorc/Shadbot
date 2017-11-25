@@ -24,6 +24,7 @@ import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
+import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
@@ -52,7 +53,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		this.userVoiceChannel = userVoiceChannel;
 		this.identifier = identifier;
 		this.putFirst = putFirst;
-		this.executor = Executors.newSingleThreadScheduledExecutor();
+		this.executor = Executors.newSingleThreadScheduledExecutor(
+				Utils.getThreadFactoryNamed("Shadbot-AudioLoadResultListener@" + musicManager.hashCode()));
 	}
 
 	@Override

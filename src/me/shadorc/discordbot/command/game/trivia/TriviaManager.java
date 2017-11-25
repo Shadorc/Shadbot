@@ -54,7 +54,7 @@ class TriviaManager implements MessageListener {
 		this.rateLimiter = new RateLimiter(LIMITED_TIME, ChronoUnit.SECONDS);
 		this.context = context;
 		this.alreadyAnswered = new ArrayList<>();
-		this.executor = Executors.newSingleThreadScheduledExecutor();
+		this.executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-TriviaManager@" + this.hashCode()));
 	}
 
 	// Trivia API doc : https://opentdb.com/api_config.php

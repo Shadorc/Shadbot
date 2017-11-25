@@ -34,7 +34,7 @@ class DiceManager {
 		this.context = context;
 		this.bet = bet;
 		this.numsPlayers = new ConcurrentHashMap<>();
-		this.executor = Executors.newSingleThreadScheduledExecutor();
+		this.executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-DiceManager@" + this.hashCode()));
 	}
 
 	protected void start() {

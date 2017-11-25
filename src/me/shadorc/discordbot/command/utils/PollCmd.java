@@ -135,7 +135,7 @@ public class PollCmd extends AbstractCommand {
 			for(String choice : choicesList) {
 				choicesMap.put(choice, new ArrayList<>());
 			}
-			this.executor = Executors.newSingleThreadScheduledExecutor();
+			this.executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-PollManager@" + this.hashCode()));
 		}
 
 		protected void start() {
