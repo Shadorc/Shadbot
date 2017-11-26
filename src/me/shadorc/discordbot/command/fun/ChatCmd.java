@@ -30,6 +30,7 @@ public class ChatCmd extends AbstractCommand {
 	private static final ConcurrentHashMap<Long, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
 	private static final List<String> BOTS_ID = Arrays.asList("efc39100ce34d038", "b0dafd24ee35a477", "ea373c261e3458c6", "b0a6a41a5e345c23");
 
+	private static final int MAX_ERROR_COUNT = 10;
 	private static int errorCount;
 
 	public ChatCmd() {
@@ -57,7 +58,7 @@ public class ChatCmd extends AbstractCommand {
 		if(response == null) {
 			BotUtils.sendMessage(Emoji.SLEEPING + " Sorry, A.L.I.C.E. seems to be AFK, she'll probably come back later.", context.getChannel());
 			errorCount++;
-			if(errorCount >= 5) {
+			if(errorCount >= MAX_ERROR_COUNT) {
 				LogUtils.error("No artificial intelligence is responding (Error count: " + errorCount + ").");
 			}
 		}
