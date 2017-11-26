@@ -17,6 +17,7 @@ import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
+import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.schedule.ScheduledMessage.Reason;
 import sx.blah.discord.handle.obj.IChannel;
@@ -31,8 +32,11 @@ public class Scheduler {
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 1, 1, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> StatsManager.save(), 5, 5, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoDataManager.save(), 5, 5, TimeUnit.MINUTES);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help | "
+				+ TextUtils.getTip()), 0, 30, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> NetUtils.postStats(), 2, 2, TimeUnit.HOURS);
-		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoCmd.lotteryDraw(), LottoCmd.getDelayBeforeNextDraw(), TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoCmd.lotteryDraw(), LottoCmd.getDelayBeforeNextDraw(),
+				TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
 	}
 
 	public static void scheduleMessage(Object message, IChannel channel, Reason reason) {

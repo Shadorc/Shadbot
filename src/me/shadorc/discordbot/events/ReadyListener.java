@@ -17,7 +17,6 @@ public class ReadyListener {
 
 		Scheduler.start();
 
-		Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help");
 		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new GuildListener());
 		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new ChannelListener());
 		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new VoiceChannelListener());
