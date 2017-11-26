@@ -3,12 +3,15 @@ package me.shadorc.discordbot.stats;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.LottoDataManager;
@@ -29,6 +32,21 @@ public class StatsManager {
 				LogUtils.LOGGER.error("An error occurred during stats file creation. Exiting.", err);
 				System.exit(1);
 			}
+		}
+
+		try (InputStream stream = STATS_FILE.toURI().toURL().openStream()) {
+			JSONObject statsObj = new JSONObject(new JSONTokener(stream));
+			for(Object key : statsObj.keySet()) {
+				Map<String, AtomicLong> map = new HashMap<String, AtomicLong>();
+				JSONObject subStatsObj = statsObj.getJSONObject(key.toString());
+				for(Object subKey : subStatsObj.keySet()) {
+					map.put(subKey.toString(), new AtomicLong(subStatsObj.getLong(subKey.toString())));
+				}
+				STATS_MAP.put(StatsEnum.valueOf(key.toString().toUpperCase()), map);
+			}
+		} catch (JSONException | IOException err) {
+			LogUtils.LOGGER.error("An error occurred during stats file initialization. Exiting.", err);
+			System.exit(1);
 		}
 	}
 
