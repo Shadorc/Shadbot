@@ -3,6 +3,7 @@ package me.shadorc.discordbot.data;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,9 @@ public class Config {
 	public static final int MAX_COINS = Integer.MAX_VALUE;
 
 	public static final int DEFAULT_TIMEOUT = 5000;
-	public static final int DEFAULT_RETRY_TIME = 3;
+
+	public static final int MESSAGE_RETRY_INTERVAL = 3;
+	public static final int MESSAGE_RETRY_COUNT = 2;
 
 	public static final Color BOT_COLOR = new Color(170, 196, 222);
 
@@ -42,8 +45,8 @@ public class Config {
 			System.exit(1);
 		}
 
-		try {
-			JSONObject mainObj = new JSONObject(new JSONTokener(API_KEYS_FILE.toURI().toURL().openStream()));
+		try (InputStream stream = API_KEYS_FILE.toURI().toURL().openStream()) {
+			JSONObject mainObj = new JSONObject(new JSONTokener(stream));
 			for(APIKey key : APIKey.values()) {
 				API_KEYS_MAP.put(key, mainObj.getString(key.toString()));
 			}

@@ -75,8 +75,8 @@ public class Scheduler {
 	private static void waitAndSend(ScheduledMessage message) {
 		int count = 0;
 		boolean success = false;
-		while(!success && count < 2) {
-			Utils.sleep(TimeUnit.SECONDS.toMillis(Config.DEFAULT_RETRY_TIME));
+		while(!success && count < Config.MESSAGE_RETRY_COUNT) {
+			Utils.sleep(TimeUnit.SECONDS.toMillis(Config.MESSAGE_RETRY_INTERVAL));
 			if(Shadbot.getClient().getGuildByID(message.getGuildID()) == null) {
 				LogUtils.info("{Guild ID: " + message.getGuildID() + "} Shadbot is no longer in this guild, abort attempt to send message.");
 				return;

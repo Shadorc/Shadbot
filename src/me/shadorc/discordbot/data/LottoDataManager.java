@@ -3,6 +3,7 @@ package me.shadorc.discordbot.data;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,8 +36,8 @@ public class LottoDataManager {
 			}
 		}
 
-		try {
-			dataObj = new JSONObject(new JSONTokener(LOTTERY_DATA_FILE.toURI().toURL().openStream()));
+		try (InputStream stream = LOTTERY_DATA_FILE.toURI().toURL().openStream()) {
+			dataObj = new JSONObject(new JSONTokener(stream));
 		} catch (JSONException | IOException err) {
 			LogUtils.LOGGER.error("An error occurred during lotto data file initialization. Exiting.", err);
 			System.exit(1);
