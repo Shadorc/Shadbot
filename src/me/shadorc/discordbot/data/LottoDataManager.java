@@ -81,6 +81,7 @@ public class LottoDataManager {
 	}
 
 	public static void save() {
+		LogUtils.info("Saving lotto data...");
 		try (FileWriter writer = new FileWriter(LOTTERY_DATA_FILE)) {
 			writer.write(dataObj.toString(Config.INDENT_FACTOR));
 			writer.flush();
@@ -88,5 +89,6 @@ public class LottoDataManager {
 		} catch (IOException err) {
 			LogUtils.error("Error while saving lotto data.", err);
 		}
+		LogUtils.info("Lotto data saved.");
 	}
 }

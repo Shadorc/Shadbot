@@ -160,12 +160,14 @@ public class DatabaseManager {
 	}
 
 	public synchronized static void save() {
+		LogUtils.info("Saving database...");
 		try (FileWriter writer = new FileWriter(USER_DATA_FILE)) {
 			writer.write(userDataObj.toString(Config.INDENT_FACTOR));
 			writer.flush();
 
 		} catch (IOException err) {
-			LogUtils.error("Error while saving database !", err);
+			LogUtils.error("Error while saving database.", err);
 		}
+		LogUtils.info("Database saved.");
 	}
 }

@@ -20,6 +20,7 @@ import me.shadorc.discordbot.data.LottoDataManager;
 import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.TextUtils;
@@ -138,6 +139,7 @@ public class LottoCmd extends AbstractCommand {
 	}
 
 	public static void lotteryDraw() {
+		LogUtils.info("Lottery draw started...");
 		int winningNum = MathUtils.rand(1, 100);
 
 		List<JSONObject> winnersList = Utils.convertToList(LottoDataManager.getPlayers(), JSONObject.class);
@@ -157,6 +159,7 @@ public class LottoCmd extends AbstractCommand {
 
 		LottoDataManager.setHistoric(winnersList.size(), LottoDataManager.getPool(), winningNum);
 		LottoDataManager.reset();
+		LogUtils.info("Lottery draw done.");
 	}
 
 	@Override
