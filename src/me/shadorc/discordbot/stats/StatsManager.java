@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.json.JSONObject;
@@ -16,7 +17,7 @@ import me.shadorc.discordbot.utils.LogUtils;
 public class StatsManager {
 
 	private static final File STATS_FILE = new File("stats.json");
-	private static final Map<StatsEnum, Map<String, AtomicLong>> STATS_MAP = new HashMap<>();
+	private static final ConcurrentHashMap<StatsEnum, Map<String, AtomicLong>> STATS_MAP = new ConcurrentHashMap<>();
 
 	static {
 		if(!STATS_FILE.exists()) {
@@ -31,33 +32,34 @@ public class StatsManager {
 		}
 	}
 
+	private static void increment(StatsEnum statsEnum, String key, int count) {
+		STATS_MAP.putIfAbsent(statsEnum, new HashMap<>());
+		STATS_MAP.get(statsEnum).putIfAbsent(key, new AtomicLong(0));
+		STATS_MAP.get(statsEnum).get(key).addAndGet(count);
+	}
+
 	public static void increment(String gameName, int coins) {
 		StatsEnum statsEnum;
 		if(coins < 0) {
 			LottoDataManager.addToPool(Math.abs(coins));
-			statsEnum = StatsEnum.MONEY_LOST;
+			statsEnum = StatsEnum.MONEY_LOSSES_COMMAND;
 		} else {
-			statsEnum = StatsEnum.MONEY_GAINED;
+			statsEnum = StatsEnum.MONEY_GAINS_COMMAND;
 		}
-		STATS_MAP.putIfAbsent(statsEnum, new HashMap<>());
-		STATS_MAP.get(statsEnum).putIfAbsent(gameName, new AtomicLong(0));
-		STATS_MAP.get(statsEnum).get(gameName).addAndGet(Math.abs(coins));
+
+		StatsManager.increment(statsEnum, gameName, Math.abs(coins));
 	}
 
-	public static void increment(StatsEnum stats, String cmdName) {
-		STATS_MAP.putIfAbsent(stats, new HashMap<>());
-		STATS_MAP.get(stats).putIfAbsent(cmdName, new AtomicLong(0));
-		STATS_MAP.get(stats).get(cmdName).incrementAndGet();
+	public static void increment(StatsEnum statsEnum, String cmdName) {
+		StatsManager.increment(statsEnum, cmdName, 1);
 	}
 
-	public static void increment(StatsEnum stats) {
-		STATS_MAP.putIfAbsent(StatsEnum.VARIOUS, new HashMap<>());
-		STATS_MAP.get(StatsEnum.VARIOUS).putIfAbsent(stats.toString(), new AtomicLong(0));
-		STATS_MAP.get(StatsEnum.VARIOUS).get(stats.toString()).incrementAndGet();
+	public static void increment(StatsEnum statsEnum) {
+		StatsManager.increment(StatsEnum.VARIOUS, statsEnum.toString(), 1);
 	}
 
-	public static Map<String, AtomicLong> get(StatsEnum stats) {
-		return STATS_MAP.getOrDefault(stats, new HashMap<>());
+	public static Map<String, AtomicLong> get(StatsEnum statsEnum) {
+		return STATS_MAP.getOrDefault(statsEnum, new HashMap<>());
 	}
 
 	public static void save() {

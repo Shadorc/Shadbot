@@ -41,7 +41,7 @@ public abstract class AbstractCommand {
 
 	public final void checkSpamAndExecute(Context context) throws MissingArgumentException {
 		if(rateLimiter != null && rateLimiter.isSpamming(context.getChannel(), context.getAuthor())) {
-			StatsManager.increment(StatsEnum.LIMITED, context.getCommand());
+			StatsManager.increment(StatsEnum.LIMITED_COMMAND, context.getCommand());
 			return;
 		}
 		StatsManager.increment(StatsEnum.COMMANDS_EXECUTED);

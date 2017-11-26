@@ -185,7 +185,7 @@ public class CommandManager {
 			StatsManager.increment(StatsEnum.COMMAND, context.getCommand());
 		} catch (MissingArgumentException err) {
 			command.showHelp(context);
-			StatsManager.increment(StatsEnum.HELP, context.getCommand());
+			StatsManager.increment(StatsEnum.HELP_COMMAND, context.getCommand());
 		}
 	}
 

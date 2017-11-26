@@ -1,24 +1,31 @@
 package me.shadorc.discordbot.stats;
 
 public enum StatsEnum {
-	MONEY_LOST("money_gains_command"),
-	MONEY_GAINED("money_losses_command"),
+	MONEY_GAINS_COMMAND("money_gains_command", true),
+	MONEY_LOSSES_COMMAND("money_losses_command", true),
 
-	COMMAND("command"),
-	LIMITED("limited_command"),
-	HELP("help_command"),
+	COMMAND("command", true),
+	LIMITED_COMMAND("limited_command", true),
+	HELP_COMMAND("help_command", true),
 
-	VARIOUS("various"),
-	MUSICS_LOADED("musicsLoaded"),
-	COMMANDS_EXECUTED("commandsExecuted"),
-	RESPONSE_TIME("responseTime"),
-	MESSAGES_RECEIVED("messagesReceived"),
-	PRIVATE_MESSAGES_RECEIVED("privateMessagesReceived");
+	VARIOUS("various", true),
+
+	MUSICS_LOADED("musics_loaded", false),
+	COMMANDS_EXECUTED("command_executed", false),
+	RESPONSE_TIME("response_time", false),
+	MESSAGES_RECEIVED("messages_received", false),
+	PRIVATE_MESSAGES_RECEIVED("private_messages_received", false);
 
 	private final String key;
+	private final boolean isCategory;
 
-	StatsEnum(String key) {
+	StatsEnum(String key, boolean isCategory) {
 		this.key = key;
+		this.isCategory = isCategory;
+	}
+
+	public boolean isCategory() {
+		return isCategory;
 	}
 
 	@Override

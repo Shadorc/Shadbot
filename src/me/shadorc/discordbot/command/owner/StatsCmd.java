@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
+
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.CommandManager;
@@ -27,6 +29,8 @@ import sx.blah.discord.util.EmbedBuilder;
 public class StatsCmd extends AbstractCommand {
 
 	private static final int ROW_SIZE = 25;
+	private static final List<StatsEnum> CATEGORIES =
+			Arrays.stream(StatsEnum.values()).filter(statsEnum -> statsEnum.isCategory()).collect(Collectors.toList());
 
 	public StatsCmd() {
 		super(CommandCategory.OWNER, Role.OWNER, RateLimiter.DEFAULT_COOLDOWN, "stats");
@@ -43,68 +47,30 @@ public class StatsCmd extends AbstractCommand {
 			return;
 		}
 
-		if(!Arrays.stream(StatsEnum.values()).anyMatch(stats -> stats.toString().equals(context.getArg()))) {
+		if(!CATEGORIES.stream().anyMatch(stats -> stats.toString().equals(context.getArg()))) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Category unknown. (Options: "
-					+ FormatUtils.formatArray(StatsEnum.values(), cat -> "**" + cat.toString() + "**", ", ") + ")", context.getChannel());
-			return;
-		}
-
-		if(context.getArg().equals(StatsEnum.VARIOUS.toString())) {
-			EmbedBuilder builder = Utils.getDefaultEmbed()
-					.setLenient(true)
-					.withAuthorName(StringUtils.capitalize(StatsEnum.VARIOUS.toString()) + "'s Stats");
-
-			Map<String, AtomicLong> statsMap = StatsManager.get(StatsEnum.VARIOUS);
-			if(statsMap.isEmpty()) {
-				builder.appendDescription("There is nothing here.");
-			}
-
-			statsMap.keySet().stream().forEach(key -> builder.appendDescription("**" + key + "**: " + statsMap.get(key)));
-			BotUtils.sendMessage(builder.build(), context.getChannel());
+					+ FormatUtils.formatList(CATEGORIES, cat -> "**" + cat.toString() + "**", ", ") + ")", context.getChannel());
 			return;
 		}
 
 		StatsEnum category = StatsEnum.valueOf(context.getArg().toUpperCase());
 
-		Map<String, AtomicLong> statsMap = StatsManager.get(category);
-		if(statsMap.isEmpty()) {
+		if(StatsManager.get(category).isEmpty()) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This category is empty.", context.getChannel());
 			return;
 		}
 
-		Map<String, Long> homogenizedStatsMap = new HashMap<>();
-
-		for(Object key : statsMap.keySet()) {
-			String firstName = CommandManager.getCommand(key.toString()).getFirstName();
-			homogenizedStatsMap.put(firstName,
-					homogenizedStatsMap.getOrDefault(firstName, 0L) + statsMap.get(key.toString()).get());
+		if(category.equals(StatsEnum.VARIOUS)) {
+			BotUtils.sendMessage(this.getVarious(), context.getChannel());
+			return;
 		}
 
-		EmbedBuilder builder = Utils.getDefaultEmbed()
-				.setLenient(true)
-				.withAuthorName(StringUtils.capitalize(category.toString()) + "'s Stats");
-
-		if(statsMap.isEmpty()) {
-			builder.appendDescription("There is nothing here.");
-		}
-
-		List<String> statsList = Utils.sortByValue(homogenizedStatsMap).keySet().stream()
-				.map(key -> "**" + key + "**: " + homogenizedStatsMap.get(key))
-				.collect(Collectors.toList());
-
-		for(int i = 0; i < Math.ceil((float) homogenizedStatsMap.keySet().size() / ROW_SIZE); i++) {
-			int minIndex = i * ROW_SIZE;
-			int size = Math.min(ROW_SIZE, statsList.size() - minIndex);
-			builder.appendField("Row N°" + (i + 1),
-					FormatUtils.formatList(statsList.subList(minIndex, minIndex + size), str -> str, "\n"), true);
-		}
-
-		BotUtils.sendMessage(builder.build(), context.getChannel());
+		BotUtils.sendMessage(this.getCommandsStats(category), context.getChannel());
 	}
 
 	private EmbedObject getAverage() {
-		Map<String, AtomicLong> moneyGainsCommandObj = StatsManager.get(StatsEnum.MONEY_GAINED);
-		Map<String, AtomicLong> moneyLossesCommandObj = StatsManager.get(StatsEnum.MONEY_LOST);
+		Map<String, AtomicLong> moneyGainsCommandObj = StatsManager.get(StatsEnum.MONEY_GAINS_COMMAND);
+		Map<String, AtomicLong> moneyLossesCommandObj = StatsManager.get(StatsEnum.MONEY_LOSSES_COMMAND);
 		Map<String, AtomicLong> commandObj = StatsManager.get(StatsEnum.COMMAND);
 
 		EmbedBuilder builder = Utils.getDefaultEmbed()
@@ -140,6 +106,50 @@ public class StatsCmd extends AbstractCommand {
 		return builder.build();
 	}
 
+	private EmbedObject getVarious() {
+		EmbedBuilder builder = Utils.getDefaultEmbed()
+				.withAuthorName("Various stats");
+
+		StringBuilder nameStr = new StringBuilder();
+		StringBuilder countStr = new StringBuilder();
+
+		Map<String, AtomicLong> statsMap = StatsManager.get(StatsEnum.VARIOUS);
+		statsMap.keySet().stream().forEach(stat -> {
+			nameStr.append(stat + "\n");
+			countStr.append(statsMap.get(stat) + "\n");
+		});
+
+		builder.appendField("__Name__", nameStr.toString(), true);
+		builder.appendField("__Count__", countStr.toString(), true);
+
+		return builder.build();
+	}
+
+	private EmbedObject getCommandsStats(StatsEnum category) {
+		Map<String, AtomicLong> statsMap = StatsManager.get(category);
+		Map<String, Long> homogenizedStatsMap = new HashMap<>();
+
+		for(Object key : statsMap.keySet()) {
+			String firstName = CommandManager.getCommand(key.toString()).getFirstName();
+			homogenizedStatsMap.put(firstName,
+					homogenizedStatsMap.getOrDefault(firstName, 0L) + statsMap.get(key.toString()).get());
+		}
+
+		List<String> orderedStatsList = Utils.sortByValue(homogenizedStatsMap).keySet().stream()
+				.map(key -> "**" + key + "**: " + homogenizedStatsMap.get(key))
+				.collect(Collectors.toList());
+
+		EmbedBuilder builder = Utils.getDefaultEmbed()
+				.setLenient(true)
+				.withAuthorName(StringUtils.capitalize(category.toString()) + "'s Stats");
+
+		int size = (int) Math.ceil((float) homogenizedStatsMap.keySet().size() / ROW_SIZE);
+		Lists.partition(orderedStatsList, size).stream()
+				.forEach(sublist -> builder.appendField("Row", FormatUtils.formatList(sublist, str -> str, "\n"), true));
+
+		return builder.build();
+	}
+
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
@@ -147,7 +157,7 @@ public class StatsCmd extends AbstractCommand {
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <category>`"
 						+ "\n`" + context.getPrefix() + this.getFirstName() + " average`", false)
 				.appendField("Argument", "**category** - "
-						+ FormatUtils.formatArray(StatsEnum.values(), cat -> "`" + cat.toString() + "`", ", "), false);
+						+ FormatUtils.formatList(CATEGORIES, cat -> "`" + cat.toString() + "`", ", "), false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 
 	}
