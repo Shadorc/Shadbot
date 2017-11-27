@@ -131,28 +131,13 @@ public class DatabaseManager {
 	}
 
 	private synchronized static JSONObject getOrInit(IGuild guild, JSONKey category) {
-		JSONObject guildObj = userDataObj.optJSONObject(guild.getStringID());
-		if(guildObj == null) {
-			guildObj = new JSONObject();
-		}
-
-		JSONObject jsonObj = guildObj.optJSONObject(category.toString());
-		if(jsonObj == null) {
-			jsonObj = new JSONObject();
-		}
-		return jsonObj;
+		JSONObject guildObj = userDataObj.has(guild.getStringID()) ? userDataObj.getJSONObject(guild.getStringID()) : null;
+		return guildObj.has(category.toString()) ? guildObj.getJSONObject(category.toString()) : null;
 	}
 
 	private synchronized static void setOrInit(IGuild guild, JSONKey category, String key, Object value) {
-		JSONObject guildObj = userDataObj.optJSONObject(guild.getStringID());
-		if(guildObj == null) {
-			guildObj = new JSONObject();
-		}
-
-		JSONObject jsonObj = guildObj.optJSONObject(category.toString());
-		if(jsonObj == null) {
-			jsonObj = new JSONObject();
-		}
+		JSONObject guildObj = userDataObj.has(guild.getStringID()) ? userDataObj.getJSONObject(guild.getStringID()) : null;
+		JSONObject jsonObj = guildObj.has(category.toString()) ? guildObj.getJSONObject(category.toString()) : null;
 
 		jsonObj.put(key, value);
 		guildObj.put(category.toString(), jsonObj);

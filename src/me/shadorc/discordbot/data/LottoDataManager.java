@@ -44,12 +44,12 @@ public class LottoDataManager {
 		}
 	}
 
-	public static void addToPool(int coins) {
+	public static synchronized void addToPool(int coins) {
 		int pool = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) dataObj.optInt(JSONKey.POOL.toString()) + coins));
 		dataObj.put(JSONKey.POOL.toString(), pool);
 	}
 
-	public static void addPlayer(IGuild guild, IUser user, int num) {
+	public static synchronized void addPlayer(IGuild guild, IUser user, int num) {
 		JSONObject playerObj = new JSONObject()
 				.put(JSONKey.GUILD_ID.toString(), guild.getLongID())
 				.put(JSONKey.USER_ID.toString(), user.getLongID())
