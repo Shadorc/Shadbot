@@ -1,9 +1,10 @@
 package me.shadorc.discordbot.music;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.swing.Timer;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -28,12 +29,13 @@ public class GuildMusicManager {
 
 	private final static ConcurrentHashMap<Long, GuildMusicManager> MUSIC_MANAGERS = new ConcurrentHashMap<>();
 
+	private final ScheduledExecutorService executor;
 	private final IGuild guild;
 	private final AudioPlayer audioPlayer;
 	private final AudioProvider audioProvider;
-	private final TrackScheduler scheduler;
-	private final Timer leaveTimer;
+	private final TrackScheduler trackScheduler;
 
+	private Future<?> leaveTask;
 	private IChannel channel;
 	private IUser userDj;
 	private boolean isWaiting;
@@ -42,19 +44,19 @@ public class GuildMusicManager {
 		this.guild = guild;
 		this.audioPlayer = manager.createPlayer();
 		this.audioProvider = new AudioProvider(audioPlayer);
-		this.scheduler = new TrackScheduler(audioPlayer, (int) DatabaseManager.getSetting(guild, Setting.DEFAULT_VOLUME));
+		this.trackScheduler = new TrackScheduler(audioPlayer, (int) DatabaseManager.getSetting(guild, Setting.DEFAULT_VOLUME));
 		this.audioPlayer.addListener(new AudioEventListener(this));
-		this.leaveTimer = new Timer((int) TimeUnit.MINUTES.toMillis(1), event -> {
-			this.leaveVoiceChannel();
-		});
+		this.executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	public void scheduleLeave() {
-		leaveTimer.start();
+		leaveTask = executor.schedule(() -> this.leaveVoiceChannel(), 1, TimeUnit.MINUTES);
 	}
 
 	public void cancelLeave() {
-		leaveTimer.stop();
+		if(leaveTask != null) {
+			leaveTask.cancel(false);
+		}
 	}
 
 	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean force) {
@@ -104,11 +106,11 @@ public class GuildMusicManager {
 	}
 
 	public TrackScheduler getScheduler() {
-		return scheduler;
+		return trackScheduler;
 	}
 
 	public boolean isLeavingScheduled() {
-		return leaveTimer.isRunning();
+		return leaveTask != null && !leaveTask.isDone();
 	}
 
 	public boolean isWaiting() {
@@ -117,7 +119,8 @@ public class GuildMusicManager {
 
 	public void delete() {
 		this.cancelLeave();
-		scheduler.clearPlaylist();
+		executor.shutdownNow();
+		trackScheduler.clearPlaylist();
 		audioPlayer.destroy();
 		MUSIC_MANAGERS.remove(guild.getLongID());
 	}

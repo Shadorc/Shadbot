@@ -1,16 +1,15 @@
 package me.shadorc.discordbot.command.game.hangman;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.swing.Timer;
 
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
@@ -41,44 +40,48 @@ class HangmanManager implements MessageListener {
 			"https://upload.wikimedia.org/wikipedia/commons/6/6b/Hangman-5.png",
 			"https://upload.wikimedia.org/wikipedia/commons/d/d6/Hangman-6.png");
 
+	protected static final int MIN_WORD_LENGTH = 5;
+	protected static final int MAX_WORD_LENGTH = 10;
 	protected static final int MIN_GAINS = 200;
 	private static final int MAX_BONUS = 200;
-	private static final int MAX_WORD_LENGTH = 10;
-	private static final int MIN_WORD_LENGTH = 5;
+	private static final int IDLE_MIN = 1;
 
 	private final RateLimiter rateLimiter;
 	private final Context context;
 	private final String word;
 	private final List<String> charsTested;
+	private final ScheduledExecutorService executor;
 
+	private Future<?> leaveTask;
 	private IMessage message;
-	private Timer idleTimer;
 	private int failsCount;
 
 	protected HangmanManager(Context context) throws IOException {
 		this.rateLimiter = new RateLimiter(RateLimiter.DEFAULT_COOLDOWN, ChronoUnit.SECONDS);
 		this.context = context;
-		this.word = HangmanUtils.getWord(MIN_WORD_LENGTH, MAX_WORD_LENGTH);
+		this.word = HangmanUtils.getWord();
 		this.charsTested = new ArrayList<>();
 		this.failsCount = 0;
+		this.executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	protected void start() {
-		idleTimer = new Timer((int) TimeUnit.MINUTES.toMillis(1), new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				HangmanManager.this.stop();
-			}
-		});
-		idleTimer.start();
 		MessageManager.addListener(context.getChannel(), this);
+		this.restartIdleTimer();
 		this.show();
 	}
 
 	protected void stop() {
 		MessageManager.removeListener(context.getChannel(), this);
-		idleTimer.stop();
+		executor.shutdownNow();
 		CHANNELS_HANGMAN.remove(context.getChannel().getLongID());
+	}
+
+	private void restartIdleTimer() {
+		if(leaveTask != null) {
+			leaveTask.cancel(false);
+		}
+		leaveTask = executor.schedule(() -> this.stop(), IDLE_MIN, TimeUnit.MINUTES);
 	}
 
 	private void showResultAndStop(boolean win) {
@@ -96,7 +99,7 @@ class HangmanManager implements MessageListener {
 	}
 
 	private void checkLetter(String chr) {
-		idleTimer.restart();
+		this.restartIdleTimer();
 
 		if(!word.contains(chr)) {
 			failsCount++;
@@ -119,7 +122,7 @@ class HangmanManager implements MessageListener {
 	}
 
 	private void checkWord(String word) {
-		idleTimer.restart();
+		this.restartIdleTimer();
 
 		if(!this.word.equals(word)) {
 			failsCount++;
@@ -148,11 +151,10 @@ class HangmanManager implements MessageListener {
 				.appendField("Word", HangmanUtils.getRepresentation(word, charsTested), false)
 				.appendField("Letters tested", FormatUtils.formatList(charsTested, chr -> chr.toString().toUpperCase(), ", "), false);
 
-		if(idleTimer.isRunning()) {
-			builder.withFooterText("This game will be cancelled in " + TimeUnit.MILLISECONDS.toMinutes(idleTimer.getDelay())
-					+ "min in case of inactivity.");
-		} else {
+		if(leaveTask.isDone()) {
 			builder.withFooterText("Finished.");
+		} else {
+			builder.withFooterText("This game will be cancelled in " + IDLE_MIN + "min in case of inactivity.");
 		}
 
 		if(failsCount > 0) {
