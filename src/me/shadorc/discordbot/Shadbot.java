@@ -21,7 +21,7 @@ import sx.blah.discord.handle.obj.IUser;
 public class Shadbot {
 
 	private static final ExecutorService THREAD_POOL =
-			Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-ThreadPool-%d"));
+			Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-DefaultThreadPool-%d"));
 
 	private static IDiscordClient client;
 	private static IUser owner;

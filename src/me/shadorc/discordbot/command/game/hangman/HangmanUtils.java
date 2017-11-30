@@ -13,6 +13,7 @@ import me.shadorc.discordbot.utils.NetUtils;
 
 public class HangmanUtils {
 
+	@SuppressWarnings("ucd")
 	private static List<String> words;
 
 	static {
