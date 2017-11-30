@@ -10,6 +10,8 @@ import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.events.ShardListener;
+import me.shadorc.discordbot.stats.StatsEnum;
+import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
@@ -36,7 +38,9 @@ public class BotUtils {
 
 		return RequestBuffer.request(() -> {
 			try {
-				return channel.sendMessage(message);
+				IMessage iMessage = channel.sendMessage(message);
+				StatsManager.increment(StatsEnum.MESSAGES_SENT);
+				return iMessage;
 			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + "} Missing permissions.", err);
 			} catch (DiscordException err) {
@@ -62,7 +66,9 @@ public class BotUtils {
 
 		return RequestBuffer.request(() -> {
 			try {
-				return channel.sendMessage(embed);
+				IMessage iMessage = channel.sendMessage(embed);
+				StatsManager.increment(StatsEnum.EMBEDS_SENT);
+				return iMessage;
 			} catch (MissingPermissionsException err) {
 				LogUtils.error("{Guild ID: " + channel.getGuild().getLongID() + "} Missing permissions.", err);
 			} catch (DiscordException err) {
