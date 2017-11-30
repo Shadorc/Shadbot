@@ -41,7 +41,7 @@ public class Shadbot {
 		client = new ClientBuilder()
 				.withToken(Config.get(APIKey.DISCORD_TOKEN))
 				.withRecommendedShardCount()
-				.setMaxMessageCacheCount(0)
+				.setMaxMessageCacheCount(10)
 				.setMaxReconnectAttempts(100)
 				.login();
 
