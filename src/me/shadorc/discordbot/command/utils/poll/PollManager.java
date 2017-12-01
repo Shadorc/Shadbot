@@ -38,9 +38,7 @@ public class PollManager {
 		this.duration = duration;
 		this.question = question;
 		this.choicesMap = new LinkedHashMap<String, List<IUser>>();
-		for(String choice : choicesList) {
-			choicesMap.put(choice, new ArrayList<>());
-		}
+		choicesList.stream().forEach(choice -> choicesMap.put(choice, new ArrayList<>()));
 		this.executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-PollManager@" + this.hashCode()));
 	}
 
