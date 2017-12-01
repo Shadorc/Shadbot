@@ -53,7 +53,7 @@ class RouletteManager {
 		executor.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
 	}
 
-	protected void stop() {
+	private void stop() {
 		executor.shutdownNow();
 
 		int winningPlace = MathUtils.rand(1, 36);

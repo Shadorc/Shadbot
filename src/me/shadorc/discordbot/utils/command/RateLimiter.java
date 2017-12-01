@@ -20,7 +20,7 @@ public class RateLimiter {
 	public static final int DEFAULT_COOLDOWN = 1;
 	public static final int GAME_COOLDOWN = 5;
 
-	protected final ConcurrentHashMap<Long, ConcurrentHashMap<Long, Boolean>> guildsLimitedUsers;
+	private final ConcurrentHashMap<Long, ConcurrentHashMap<Long, Boolean>> guildsLimitedUsers;
 	private final ScheduledExecutorService executor;
 	private final long timeout;
 

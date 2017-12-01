@@ -71,7 +71,7 @@ class HangmanManager implements MessageListener {
 		this.show();
 	}
 
-	protected void stop() {
+	private void stop() {
 		leaveTask.cancel(false);
 		executor.shutdownNow();
 
