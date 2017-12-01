@@ -2,6 +2,8 @@ package me.shadorc.discordbot.utils;
 
 import java.net.SocketTimeoutException;
 
+import org.jsoup.HttpStatusException;
+
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.utils.schedule.ScheduledMessage.Reason;
 import me.shadorc.discordbot.utils.schedule.Scheduler;
@@ -26,7 +28,10 @@ public class ExceptionUtils {
 	}
 
 	public static void manageException(String action, Context context, Exception err) {
-		if(err instanceof SocketTimeoutException) {
+		if(err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
+			LogUtils.error("Mmmh... This service is currently unavailable... This is not my fault, I promise ! "
+					+ "Try again later.", err, context);
+		} else if(err instanceof SocketTimeoutException) {
 			LogUtils.error("Mmmh... " + StringUtils.capitalize(action) + " takes too long... This is not my fault, I promise ! "
 					+ "Try again later.", err, context);
 		} else {
