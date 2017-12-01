@@ -17,12 +17,11 @@ import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 import net.shadorc.overwatch4j.HeroDesc;
+import net.shadorc.overwatch4j.OverwatchException;
 import net.shadorc.overwatch4j.OverwatchPlayer;
 import net.shadorc.overwatch4j.enums.Platform;
 import net.shadorc.overwatch4j.enums.Region;
 import net.shadorc.overwatch4j.enums.TopHeroesStats;
-import net.shadorc.overwatch4j.exceptions.NoDataException;
-import net.shadorc.overwatch4j.exceptions.UserNotFoundException;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class OverwatchCmd extends AbstractCommand {
@@ -90,10 +89,18 @@ public class OverwatchCmd extends AbstractCommand {
 					.appendField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
 			BotUtils.sendMessage(builder.build(), context.getChannel());
 
-		} catch (UserNotFoundException e) {
-			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Overwatch or doesn't exist.", context.getChannel());
-		} catch (NoDataException e) {
-			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " There is no data for this account yet.", context.getChannel());
+		} catch (OverwatchException e) {
+			switch (e.getType()) {
+				case BLIZZARD_INTERNAL_ERROR:
+					BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " There's an internal error on the Blizzard side, please try again later.", context.getChannel());
+					break;
+				case NO_DATA:
+					BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " There is no data for this account yet.", context.getChannel());
+					break;
+				case USER_NOT_FOUND:
+					BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Overwatch or doesn't exist.", context.getChannel());
+					break;
+			}
 		} catch (IOException err) {
 			ExceptionUtils.manageException("getting information from Overwatch profile", context, err);
 		}
