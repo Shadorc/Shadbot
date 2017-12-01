@@ -2,8 +2,8 @@ package me.shadorc.discordbot.music;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -35,7 +35,7 @@ public class GuildMusicManager {
 	private final AudioProvider audioProvider;
 	private final TrackScheduler trackScheduler;
 
-	private Future<?> leaveTask;
+	private ScheduledFuture<?> leaveTask;
 	private IChannel channel;
 	private IUser userDj;
 	private boolean isWaiting;
@@ -118,11 +118,11 @@ public class GuildMusicManager {
 	}
 
 	public void delete() {
+		MUSIC_MANAGERS.remove(guild.getLongID());
 		this.cancelLeave();
 		executor.shutdownNow();
-		trackScheduler.clearPlaylist();
 		audioPlayer.destroy();
-		MUSIC_MANAGERS.remove(guild.getLongID());
+		trackScheduler.clearPlaylist();
 	}
 
 	public static GuildMusicManager createGuildMusicManager(IGuild guild) {
