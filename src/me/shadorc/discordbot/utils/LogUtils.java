@@ -1,5 +1,7 @@
 package me.shadorc.discordbot.utils;
 
+import java.awt.Color;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +68,7 @@ public class LogUtils {
 	private static void sendEmbedLog(LogType type, String msg, String... fields) {
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.setLenient(true)
+				.withColor(type.equals(LogType.WARN) ? Color.ORANGE : Color.RED)
 				.withAuthorName(StringUtils.capitalize(type.toString().toLowerCase()) + " (Version: " + Config.VERSION.toString() + ")")
 				.withDescription(msg);
 
