@@ -72,8 +72,10 @@ class HangmanManager implements MessageListener {
 	}
 
 	protected void stop() {
-		MessageManager.removeListener(context.getChannel(), this);
+		leaveTask.cancel(false);
 		executor.shutdownNow();
+
+		MessageManager.removeListener(context.getChannel(), this);
 		CHANNELS_HANGMAN.remove(context.getChannel().getLongID());
 	}
 

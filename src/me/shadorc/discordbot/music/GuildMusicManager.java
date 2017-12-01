@@ -118,9 +118,9 @@ public class GuildMusicManager {
 	}
 
 	public void delete() {
-		MUSIC_MANAGERS.remove(guild.getLongID());
 		this.cancelLeave();
 		executor.shutdownNow();
+		MUSIC_MANAGERS.remove(guild.getLongID());
 		audioPlayer.destroy();
 		trackScheduler.clearPlaylist();
 	}

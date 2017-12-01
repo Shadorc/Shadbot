@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -126,6 +127,7 @@ public class PollCmd extends AbstractCommand {
 
 		private IMessage message;
 		private long startTime;
+		private ScheduledFuture<?> stopTask;
 
 		protected PollManager(Context context, int duration, String question, List<String> choicesList) {
 			this.context = context;
@@ -140,13 +142,14 @@ public class PollCmd extends AbstractCommand {
 
 		protected void start() {
 			startTime = System.currentTimeMillis();
-			executor.schedule(() -> this.stop(), duration, TimeUnit.SECONDS);
+			stopTask = executor.schedule(() -> this.stop(), duration, TimeUnit.SECONDS);
 			this.show();
 		}
 
 		protected void stop() {
-			CHANNELS_POLL.remove(context.getChannel().getLongID());
+			stopTask.cancel(false);
 			executor.shutdownNow();
+			CHANNELS_POLL.remove(context.getChannel().getLongID());
 			this.show();
 		}
 

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,7 @@ public class BlackjackManager implements MessageListener {
 
 	private long startTime;
 	private IMessage message;
+	private ScheduledFuture<?> stopTask;
 
 	public BlackjackManager(Context context) {
 		this.rateLimiter = new RateLimiter(RateLimiter.DEFAULT_COOLDOWN, ChronoUnit.SECONDS);
@@ -60,12 +62,13 @@ public class BlackjackManager implements MessageListener {
 		}
 
 		MessageManager.addListener(context.getChannel(), this);
-		executor.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
+		stopTask = executor.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
 		startTime = System.currentTimeMillis();
 		CHANNELS_BLACKJACK.putIfAbsent(context.getChannel().getLongID(), this);
 	}
 
 	public void stop() {
+		stopTask.cancel(false);
 		executor.shutdownNow();
 
 		MessageManager.removeListener(context.getChannel(), this);

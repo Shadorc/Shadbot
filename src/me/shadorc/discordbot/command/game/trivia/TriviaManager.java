@@ -103,8 +103,8 @@ class TriviaManager implements MessageListener {
 	}
 
 	private void stop() {
-		MessageManager.removeListener(context.getChannel(), this);
 		executor.shutdownNow();
+		MessageManager.removeListener(context.getChannel(), this);
 		CHANNELS_TRIVIA.remove(context.getChannel().getLongID());
 	}
 
