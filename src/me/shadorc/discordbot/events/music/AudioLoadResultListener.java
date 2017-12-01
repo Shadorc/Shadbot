@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Jsoup;
@@ -46,6 +47,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private final boolean putFirst;
 
 	private List<AudioTrack> resultsTracks;
+	private ScheduledFuture<?> stopWaitingTask;
 
 	public AudioLoadResultListener(GuildMusicManager musicManager, IUser userDj, IVoiceChannel userVoiceChannel, String identifier, boolean putFirst) {
 		this.musicManager = musicManager;
@@ -99,7 +101,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					.withFooterText("This choice will be cancelled in " + CHOICE_DURATION + " seconds.");
 			BotUtils.sendMessage(embed.build(), musicManager.getChannel());
 
-			executor.schedule(() -> this.stopWaiting(), CHOICE_DURATION, TimeUnit.SECONDS);
+			stopWaitingTask = executor.schedule(() -> this.stopWaiting(), CHOICE_DURATION, TimeUnit.SECONDS);
 
 			resultsTracks = tracks;
 			MessageManager.addListener(musicManager.getChannel(), this);
@@ -197,10 +199,11 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	private void stopWaiting() {
-		executor.shutdownNow();
-		resultsTracks.clear();
 		MessageManager.removeListener(musicManager.getChannel(), this);
+		stopWaitingTask.cancel(false);
+		executor.shutdownNow();
 		musicManager.setWaiting(false);
+		resultsTracks.clear();
 
 		if(musicManager.getScheduler().isStopped()) {
 			musicManager.leaveVoiceChannel();
