@@ -35,7 +35,7 @@ public class BlackjackManager implements MessageListener {
 	protected static final ConcurrentHashMap<Long, BlackjackManager> CHANNELS_BLACKJACK = new ConcurrentHashMap<>();
 
 	private static final int GAME_DURATION = 60;
-	private static final float WIN_MULTIPLIER = 1.2f;
+	private static final float WIN_MULTIPLIER = 1.05f;
 
 	private final RateLimiter rateLimiter;
 	private final List<BlackjackPlayer> players;

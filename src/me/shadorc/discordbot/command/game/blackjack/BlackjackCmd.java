@@ -14,7 +14,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class BlackjackCmd extends AbstractCommand {
 
-	private static final int MAX_BET = 500_000;
+	private static final int MAX_BET = 100_000;
 
 	public BlackjackCmd() {
 		super(CommandCategory.GAME, Role.USER, RateLimiter.GAME_COOLDOWN, "blackjack");

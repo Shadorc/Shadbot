@@ -19,7 +19,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class RussianRouletteCmd extends AbstractCommand {
 
 	private static final int MAX_BET = 500_000;
-	private static final float WIN_MULTIPLIER = 2.20f;
+	private static final float WIN_MULTIPLIER = 2.012f;
 	private static final float LOSE_MULTIPLIER = 10f;
 
 	public RussianRouletteCmd() {
@@ -60,8 +60,8 @@ public class RussianRouletteCmd extends AbstractCommand {
 				.appendDescription("**Play Russian roulette.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <bet>`", false)
 				.appendField("Restriction", "**bet** - You can not bet more than **" + MAX_BET + " coins**.", false)
-				.appendField("Gains", "You have a **5-in-6** chance to win **" + WIN_MULTIPLIER + " times** your bet and "
-						+ "a **1-in-6** chance to lose **" + LOSE_MULTIPLIER + " times** your bet.", false);
+				.appendField("Gains", "You have a **5-in-6** chance to win **" + String.format("%.1f", WIN_MULTIPLIER) + " times** "
+						+ "your bet and a **1-in-6** chance to lose **" + String.format("%.1f", LOSE_MULTIPLIER) + " times** your bet.", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }
