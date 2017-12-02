@@ -17,7 +17,6 @@ import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
-import me.shadorc.discordbot.utils.schedule.Scheduler;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -31,19 +30,8 @@ public class ShutdownCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-ShutdownCmd"));
 
-		Runnable shutdownTask = new Runnable() {
-			@Override
-			public void run() {
-				Shadbot.getClient().logout();
-				Scheduler.stop();
-				Shadbot.getDefaultThreadPool().shutdownNow();
-				executor.shutdownNow();
-				System.exit(0);
-			}
-		};
-
 		if(!context.hasArg()) {
-			executor.submit(shutdownTask);
+			executor.submit(() -> System.exit(0));
 			return;
 		}
 
@@ -67,7 +55,7 @@ public class ShutdownCmd extends AbstractCommand {
 		}
 
 		int delay = Integer.parseInt(timeStr);
-		executor.schedule(shutdownTask, delay, TimeUnit.SECONDS);
+		executor.schedule(() -> System.exit(0), delay, TimeUnit.SECONDS);
 
 		LogUtils.warn("Shadbot will restart in " + delay + " seconds. (Message: " + message + ")");
 	}

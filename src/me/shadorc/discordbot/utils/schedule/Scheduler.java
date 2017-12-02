@@ -94,10 +94,6 @@ public class Scheduler {
 	}
 
 	public static void stop() {
-		if(SCHEDULED_EXECUTOR.isShutdown()) {
-			return;
-		}
-
 		try {
 			SCHEDULED_EXECUTOR.submit(() -> {
 				DatabaseManager.save();
