@@ -67,10 +67,6 @@ public class PruneCmd extends AbstractCommand {
 			return;
 		}
 
-		if(cmd.getOptions().length == 0) {
-			throw new MissingArgumentException();
-		}
-
 		String numStr = cmd.getOptionValue("number", "100");
 		if(!StringUtils.isPositiveInt(numStr)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number.", context.getChannel());
