@@ -3,13 +3,11 @@ package me.shadorc.discordbot.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.schedule.Scheduler;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.shard.DisconnectedEvent;
-import sx.blah.discord.handle.impl.events.shard.DisconnectedEvent.Reason;
 import sx.blah.discord.handle.impl.events.shard.ReconnectSuccessEvent;
 import sx.blah.discord.handle.impl.events.shard.ResumedEvent;
 import sx.blah.discord.handle.impl.events.shard.ShardReadyEvent;
@@ -21,10 +19,7 @@ public class ShardListener {
 
 	@EventSubscriber
 	public void onDisconnectedEvent(DisconnectedEvent event) {
-		LogUtils.info("Shard " + event.getShard().getInfo()[0] + " disconnected.");
-		if(event.getReason().equals(Reason.LOGGED_OUT)) {
-			LogUtils.info("------------------- Shadbot logged out [Version:" + Config.VERSION.toString() + "] -------------------");
-		}
+		LogUtils.info("Shard " + event.getShard().getInfo()[0] + " disconnected (Reason: " + event.getReason().toString() + ").");
 		CONNECTED_SHARD.remove(event.getShard());
 	}
 
