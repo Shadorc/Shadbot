@@ -38,7 +38,7 @@ public class HangmanUtils {
 	protected static String getRepresentation(String word, List<String> charsTested) {
 		StringBuilder strBuilder = new StringBuilder();
 		for(int i = 0; i < word.length(); i++) {
-			if(i == 0 || i == word.length() - 1 || charsTested.contains(Character.toString(word.charAt(i)))) {
+			if(charsTested.contains(Character.toString(word.charAt(i)))) {
 				strBuilder.append("**" + Character.toUpperCase(word.charAt(i)) + "** ");
 			} else {
 				strBuilder.append("\\_ ");

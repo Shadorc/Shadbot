@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import me.shadorc.discordbot.command.CommandManager;
 import me.shadorc.discordbot.command.Context;
@@ -143,6 +144,7 @@ class HangmanManager implements MessageListener {
 	private void show() {
 		BotUtils.deleteIfPossible(context.getChannel(), message);
 
+		List<String> missesList = charsTested.stream().filter(letter -> !word.contains(letter)).collect(Collectors.toList());
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorIcon(context.getAuthor().getAvatarURL())
@@ -151,7 +153,7 @@ class HangmanManager implements MessageListener {
 				.withDescription("Type letters or enter a word if you think you've guessed it."
 						+ "\nUse `" + context.getPrefix() + "cancel` to cancel this game.")
 				.appendField("Word", HangmanUtils.getRepresentation(word, charsTested), false)
-				.appendField("Letters tested", FormatUtils.formatList(charsTested, chr -> chr.toString().toUpperCase(), ", "), false);
+				.appendField("Misses", FormatUtils.formatList(missesList, chr -> chr.toString().toUpperCase(), ", "), false);
 
 		if(leaveTask.isDone()) {
 			builder.withFooterText("Finished.");
