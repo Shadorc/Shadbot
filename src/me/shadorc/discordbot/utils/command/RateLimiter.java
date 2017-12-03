@@ -64,9 +64,8 @@ public class RateLimiter {
 	}
 
 	private void warn(IChannel channel, IUser user) {
+		guildsLimitedUsers.get(channel.getGuild().getLongID()).put(user.getLongID(), true);
 		BotUtils.sendMessage(Emoji.STOPWATCH + " (**" + user.getName() + "**) " + TextUtils.getSpamMessage() + " You can use this"
 				+ " command once every *" + Duration.of(timeout, ChronoUnit.MILLIS).getSeconds() + " sec*.", channel);
-		guildsLimitedUsers.putIfAbsent(channel.getGuild().getLongID(), new ConcurrentHashMap<>());
-		guildsLimitedUsers.get(channel.getGuild().getLongID()).put(user.getLongID(), true);
 	}
 }
