@@ -17,6 +17,7 @@ import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 import net.shadorc.overwatch4j.HeroDesc;
+import net.shadorc.overwatch4j.Overwatch4J;
 import net.shadorc.overwatch4j.OverwatchException;
 import net.shadorc.overwatch4j.OverwatchPlayer;
 import net.shadorc.overwatch4j.enums.Platform;
@@ -29,6 +30,7 @@ public class OverwatchCmd extends AbstractCommand {
 	public OverwatchCmd() {
 		super(CommandCategory.GAMESTATS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "overwatch");
 		this.setAlias("ow");
+		Overwatch4J.timeout = Config.DEFAULT_TIMEOUT;
 	}
 
 	@Override
@@ -89,8 +91,8 @@ public class OverwatchCmd extends AbstractCommand {
 					.appendField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
 			BotUtils.sendMessage(builder.build(), context.getChannel());
 
-		} catch (OverwatchException e) {
-			switch (e.getType()) {
+		} catch (OverwatchException err) {
+			switch (err.getType()) {
 				case BLIZZARD_INTERNAL_ERROR:
 					BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " There's an internal error on the Blizzard side, please try again later.", context.getChannel());
 					break;
