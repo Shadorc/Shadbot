@@ -34,7 +34,7 @@ public class TrackScheduler {
 
 	public void queue(AudioTrack track, boolean first) {
 		StatsManager.increment(StatsEnum.MUSICS_LOADED);
-		if(audioPlayer.startTrack(track, true)) {
+		if(audioPlayer.startTrack(track.makeClone(), true)) {
 			this.currentTrack = track;
 		} else if(first) {
 			queue.offerFirst(track);
