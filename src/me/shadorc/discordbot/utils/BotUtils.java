@@ -9,7 +9,6 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.stats.StatsEnum;
 import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.command.Emoji;
@@ -26,7 +25,7 @@ import sx.blah.discord.util.RequestBuffer.RequestFuture;
 public class BotUtils {
 
 	public static RequestFuture<IMessage> sendMessage(String message, IChannel channel) {
-		if(!ShardListener.isShardConnected(channel.getShard())) {
+		if(!channel.getShard().isReady()) {
 			ExceptionUtils.manageMessageException(message, channel, new DiscordException("Attempt to send message before shard is ready!"));
 			return null;
 		}
@@ -52,7 +51,7 @@ public class BotUtils {
 
 	// EmbedBuilder doc: https://discord4j.readthedocs.io/en/latest/Making-embedded-content-using-EmbedBuilder/
 	public static RequestFuture<IMessage> sendMessage(EmbedObject embed, IChannel channel) {
-		if(!ShardListener.isShardConnected(channel.getShard())) {
+		if(!channel.getShard().isReady()) {
 			ExceptionUtils.manageMessageException(embed, channel, new DiscordException("Attempt to send message before shard is ready!"));
 			return null;
 		}

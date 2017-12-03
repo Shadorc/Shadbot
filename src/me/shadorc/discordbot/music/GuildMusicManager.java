@@ -13,7 +13,6 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.events.music.AudioEventListener;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -76,7 +75,7 @@ public class GuildMusicManager {
 
 	public void leaveVoiceChannel() {
 		IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
-		if(voiceChannel != null && ShardListener.isShardConnected(voiceChannel.getShard())) {
+		if(voiceChannel != null && voiceChannel.getShard().isReady()) {
 			voiceChannel.leave();
 		}
 	}

@@ -1,7 +1,6 @@
 package me.shadorc.discordbot.events.music;
 
 import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
@@ -26,7 +25,7 @@ public class VoiceChannelListener {
 
 			// If Shadbot is disconnected with status code 1008 and reason "NullPointerException", it will still be in the voice channel
 			// If not, this line will do nothing
-			if(event.getVoiceChannel() != null && ShardListener.isShardConnected(event.getVoiceChannel().getShard())) {
+			if(event.getVoiceChannel() != null && event.getVoiceChannel().getShard().isReady()) {
 				event.getVoiceChannel().leave();
 			}
 		}
