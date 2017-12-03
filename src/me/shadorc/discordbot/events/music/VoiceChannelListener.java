@@ -46,7 +46,7 @@ public class VoiceChannelListener {
 		this.check(event.getGuild());
 	}
 
-	private void check(IGuild guild) {
+	private synchronized void check(IGuild guild) {
 		IVoiceChannel botVoiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
 		if(botVoiceChannel != null) {
 
