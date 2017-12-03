@@ -35,6 +35,7 @@ public class LogUtils {
 		LOGGER.error(msg + (input == null ? "" : " (Input: " + input + ")"), err);
 		LogUtils.sendEmbedLog(LogType.ERROR, msg,
 				"Command", cmdName,
+				"Error type", (err == null ? null : err.getClass().getSimpleName()),
 				"Error message", (err == null ? null : err.getMessage()),
 				"Input", input,
 				"User warned", Boolean.toString(channel != null));
@@ -73,7 +74,7 @@ public class LogUtils {
 				.withDescription(msg);
 
 		for(int i = 0; i < fields.length; i += 2) {
-			builder.appendField(fields[i], fields[i + 1], true);
+			builder.appendField(fields[i], fields[i + 1], false);
 		}
 
 		BotUtils.sendMessage(builder.build(), Shadbot.getClient().getChannelByID(Config.LOGS_CHANNEL_ID));
