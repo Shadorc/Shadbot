@@ -1,6 +1,8 @@
 package me.shadorc.discordbot.events;
 
+import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.CommandManager;
+import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.message.MessageManager;
@@ -27,9 +29,13 @@ public class MessageListener {
 			}
 
 			if(event.getChannel().isPrivate()) {
-				BotUtils.sendMessage(Emoji.INFO + " Sorry, I don't respond (yet ?) to private messages.", event.getChannel());
-				LogUtils.info("Shadbot has received a private message. (Message: " + event.getMessage().getContent() + ")");
-				StatsManager.increment(StatsEnum.PRIVATE_MESSAGES_RECEIVED);
+				// If Shadbot didn't already send a message
+				if(!event.getChannel().getMessageHistory().stream().anyMatch(msg -> msg.getAuthor().equals(Shadbot.getClient().getOurUser()))) {
+					BotUtils.sendMessage(Emoji.INFO + " Sorry, I don't reply to private messages but you can still send me some, my developer"
+							+ " will be able to read them (:", event.getChannel());
+				}
+				BotUtils.sendMessage(event.getAuthor().getName() + " (ID: " + event.getAuthor().getLongID() + "): "
+						+ event.getMessage().getContent(), Shadbot.getClient().getChannelByID(Config.PM_CHANNEL_ID));
 				return;
 			}
 
