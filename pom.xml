@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.shadorc.discordbot</groupId>
 	<artifactId>discordbot</artifactId>
-	<version>1.9.11</version>
+	<version>1.9.12</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -101,7 +101,7 @@
 		<dependency>
 			<groupId>shadorc</groupId>
 			<artifactId>overwatch4j</artifactId>
-			<version>0.1.5</version>
+			<version>0.1.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ivkos</groupId>
