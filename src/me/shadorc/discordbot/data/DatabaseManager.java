@@ -57,6 +57,10 @@ public class DatabaseManager {
 	}
 
 	public static Object getSetting(IGuild guild, Setting setting) {
+		// Private message
+		if(guild == null) {
+			return DatabaseManager.getDefaultSetting(setting);
+		}
 		Object value = DatabaseManager.getOrInit(guild, JSONKey.SETTINGS).opt(setting.toString());
 		if(value == null) {
 			return DatabaseManager.getDefaultSetting(setting);

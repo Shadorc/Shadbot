@@ -27,13 +27,10 @@ public class HelpCmd extends AbstractCommand {
 			return;
 		}
 
-		String prefix = context.getPrefix();
-		Role authorRole = context.getAuthorRole();
-
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName("Shadbot Help")
-				.appendDescription("Get more information by using `" + prefix + "help <command>`.")
+				.appendDescription("Get more information by using `" + context.getPrefix() + "help <command>`.")
 				.withFooterText("Any issues, questions or suggestions ? Join https://discord.gg/CKnV4ff");
 
 		Arrays.stream(CommandCategory.values())
@@ -41,10 +38,10 @@ public class HelpCmd extends AbstractCommand {
 				.forEach(category -> builder.appendField(category.toString() + " Commands:",
 						CommandManager.getCommands().values().stream()
 								.filter(cmd -> cmd.getCategory().equals(category)
-										&& authorRole.getHierarchy() >= cmd.getRole().getHierarchy()
+										&& context.getAuthorRole().getHierarchy() >= cmd.getRole().getHierarchy()
 										&& BotUtils.isCommandAllowed(context.getGuild(), cmd))
 								.distinct()
-								.map(cmd -> "`" + prefix + cmd.getFirstName() + "`")
+								.map(cmd -> "`" + context.getPrefix() + cmd.getFirstName() + "`")
 								.collect(Collectors.joining(" ")), false));
 
 		BotUtils.sendMessage(builder.build(), context.getChannel());
