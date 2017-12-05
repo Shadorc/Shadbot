@@ -30,7 +30,7 @@ public class OverwatchCmd extends AbstractCommand {
 	public OverwatchCmd() {
 		super(CommandCategory.GAMESTATS, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "overwatch");
 		this.setAlias("ow");
-		Overwatch4J.timeout = Config.DEFAULT_TIMEOUT;
+		Overwatch4J.setTimeout(Config.DEFAULT_TIMEOUT);
 	}
 
 	@Override
