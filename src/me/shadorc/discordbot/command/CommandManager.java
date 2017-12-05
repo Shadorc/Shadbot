@@ -27,7 +27,6 @@ import me.shadorc.discordbot.command.gamestats.CounterStrikeCmd;
 import me.shadorc.discordbot.command.gamestats.DiabloCmd;
 import me.shadorc.discordbot.command.gamestats.OverwatchCmd;
 import me.shadorc.discordbot.command.hidden.HelpCmd;
-import me.shadorc.discordbot.command.hidden.ReportCmd;
 import me.shadorc.discordbot.command.image.GifCmd;
 import me.shadorc.discordbot.command.image.ImageCmd;
 import me.shadorc.discordbot.command.image.Rule34Cmd;
@@ -76,7 +75,6 @@ public class CommandManager {
 		CommandManager.register(
 				// Hidden Commands
 				new HelpCmd(),
-				new ReportCmd(),
 				// Utils Commands
 				new TranslateCmd(),
 				new WikiCmd(),

@@ -34,8 +34,7 @@ public class HelpCmd extends AbstractCommand {
 				.setLenient(true)
 				.withAuthorName("Shadbot Help")
 				.appendDescription("Get more information by using `" + prefix + "help <command>`.")
-				.withFooterIcon("http://www.urbanleagueneb.org/wp-content/uploads/2016/10/E-mail-Icon.png")
-				.withFooterText("You can send me a suggestion, a bug report, anything by using: " + prefix + "report <message>");
+				.withFooterText("Any issues, questions or suggestions ? Join https://discord.gg/CKnV4ff");
 
 		Arrays.stream(CommandCategory.values())
 				.filter(cmdCat -> !cmdCat.equals(CommandCategory.HIDDEN))

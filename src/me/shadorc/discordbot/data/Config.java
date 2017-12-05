@@ -18,7 +18,6 @@ public class Config {
 
 	public static final Version VERSION = new Version(1, 9, 12);
 
-	public static final long SUGGEST_CHANNEL_ID = 345898633805430785L;
 	public static final long LOGS_CHANNEL_ID = 346311941829951489L;
 	public static final long PM_CHANNEL_ID = 386908035949527042L;
 
