@@ -116,7 +116,7 @@ public class StatsCmd extends AbstractCommand {
 		Map<String, AtomicLong> statsMap = StatsManager.get(StatsEnum.VARIOUS);
 		statsMap.keySet().stream().forEach(stat -> {
 			nameStr.append(stat + "\n");
-			countStr.append(statsMap.get(stat) + "\n");
+			countStr.append(FormatUtils.formatNum(statsMap.get(stat).get()) + "\n");
 		});
 
 		builder.appendField("__Name__", nameStr.toString(), true);
