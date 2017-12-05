@@ -32,8 +32,14 @@ public class ServerInfoCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		IGuild guild = context.getGuild();
+
 		List<Long> allowedChannels = Utils.convertToList((JSONArray) DatabaseManager.getSetting(guild, Setting.ALLOWED_CHANNELS), Long.class);
+		String allowedChannelsStr = allowedChannels.isEmpty() ? "All" : "\n" +
+				FormatUtils.formatList(allowedChannels, channelID -> "\t" + guild.getChannelByID(channelID).getName(), "\n");
+
 		List<String> blacklistedCmd = Utils.convertToList((JSONArray) DatabaseManager.getSetting(guild, Setting.BLACKLIST), String.class);
+		String blacklistedCmdStr = blacklistedCmd.isEmpty() ? "None" : "\n"
+				+ FormatUtils.formatList(blacklistedCmd, cmdName -> "\t" + cmdName, "\n");
 
 		EmbedBuilder embed = Utils.getDefaultEmbed()
 				.setLenient(true)
@@ -48,13 +54,8 @@ public class ServerInfoCmd extends AbstractCommand {
 				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
 				.appendField("Settings", "**Prefix:** " + context.getPrefix()
 						+ "\n**Default volume:** " + DatabaseManager.getSetting(guild, Setting.DEFAULT_VOLUME) + "%"
-						+ "\n**Allowed channels:** " + (allowedChannels.isEmpty() ? "All" : "\n"
-								+ FormatUtils.formatList(
-										allowedChannels,
-										channelID -> "\t" + guild.getChannelByID(channelID).getName(),
-										"\n"))
-						+ "\n**Blacklisted command:** " + (blacklistedCmd.isEmpty() ? "None" : "\n"
-								+ FormatUtils.formatList(blacklistedCmd, cmdName -> "\t" + cmdName, "\n")), true)
+						+ "\n**Allowed channels:** " + allowedChannelsStr
+						+ "\n**Blacklisted command:** " + blacklistedCmdStr, true)
 				.appendField("Server ID", Long.toString(guild.getLongID()), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}

@@ -106,10 +106,14 @@ public class BlackjackManager implements MessageListener {
 						+ FormatUtils.formatDuration(MathUtils.remainingTime(startTime, TimeUnit.SECONDS.toMillis(GAME_DURATION))));
 
 		for(BlackjackPlayer player : players) {
-			builder.appendField(player.getUser().getName() + "'s hand"
-					+ (player.isStanding() ? " (Stand)" : "")
-					+ (player.hasDoubleDown() ? " (Double down)" : ""),
-					BlackjackUtils.formatCards(player.getCards()), true);
+			StringBuilder playerDesc = new StringBuilder(player.getUser().getName() + "'s hand");
+			if(player.isStanding()) {
+				playerDesc.append(" (Stand)");
+			}
+			if(player.hasDoubleDown()) {
+				playerDesc.append(" (Double down)");
+			}
+			builder.appendField(playerDesc.toString(), BlackjackUtils.formatCards(player.getCards()), true);
 		}
 
 		message = BotUtils.sendMessage(builder.build(), context.getChannel()).get();

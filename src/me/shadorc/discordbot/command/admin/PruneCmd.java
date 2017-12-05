@@ -1,7 +1,8 @@
 package me.shadorc.discordbot.command.admin;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -82,20 +83,15 @@ public class PruneCmd extends AbstractCommand {
 		int num = Math.min(100, Integer.parseInt(numStr));
 		List<IUser> usersMentioned = context.getMessage().getMentions();
 
-		List<IMessage> messagesList = new ArrayList<IMessage>();
-		for(IMessage message : context.getChannel().getMessageHistory(MESSAGE_COUNT)) {
-			if(messagesList.size() >= num) {
-				break;
-			}
-
-			if(!usersMentioned.isEmpty() && !usersMentioned.contains(message.getAuthor())) {
-				continue;
-			}
-			if(words != null && !message.getContent().contains(words)) {
-				continue;
-			}
-			messagesList.add(message);
+		Stream<IMessage> messagesStream = context.getChannel().getMessageHistory(MESSAGE_COUNT).stream();
+		if(!usersMentioned.isEmpty()) {
+			messagesStream = messagesStream.filter(msg -> usersMentioned.contains(msg.getAuthor()));
 		}
+		if(words != null) {
+			messagesStream = messagesStream.filter(msg -> msg.getContent().contains(words));
+		}
+
+		List<IMessage> messagesList = messagesStream.limit(num).collect(Collectors.toList());
 
 		if(messagesList.isEmpty()) {
 			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
