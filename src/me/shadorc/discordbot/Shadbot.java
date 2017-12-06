@@ -30,9 +30,6 @@ public class Shadbot {
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			@Override
 			public void run() {
-				if(Shadbot.getClient() != null) {
-					Shadbot.getClient().logout();
-				}
 				Scheduler.stop();
 				Shadbot.getDefaultThreadPool().shutdownNow();
 			}
