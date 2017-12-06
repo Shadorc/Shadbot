@@ -1,8 +1,11 @@
 package me.shadorc.discordbot.events;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import me.shadorc.discordbot.Shadbot;
+import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.CommandManager;
-import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
@@ -11,11 +14,12 @@ import me.shadorc.discordbot.stats.StatsEnum;
 import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
-import me.shadorc.discordbot.utils.command.Emoji;
+import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.util.EmbedBuilder;
 
 @SuppressWarnings("ucd")
 public class MessageListener {
@@ -54,17 +58,32 @@ public class MessageListener {
 
 	private void privateMessageReceived(MessageReceivedEvent event) throws MissingArgumentException {
 		if(event.getMessage().getContent().startsWith(Config.DEFAULT_PREFIX + "help")) {
-			CommandManager.getCommand("help").execute(new Context(event));
+			EmbedBuilder builder = Utils.getDefaultEmbed()
+					.setLenient(true)
+					.withAuthorName("Shadbot Help")
+					.withFooterText("Any issues, questions or suggestions ? Join https://discord.gg/CKnV4ff");
+
+			Arrays.stream(CommandCategory.values())
+					.filter(cmdCat -> !cmdCat.equals(CommandCategory.HIDDEN))
+					.forEach(category -> builder.appendField(category.toString() + " Commands:",
+							CommandManager.getCommands().values().stream()
+									.filter(cmd -> cmd.getCategory().equals(category))
+									.distinct()
+									.map(cmd -> "`" + Config.DEFAULT_PREFIX + cmd.getFirstName() + "`")
+									.collect(Collectors.joining(" ")), false));
+
+			BotUtils.sendMessage(builder.build(), event.getChannel());
 			return;
 		}
 
 		// If Shadbot didn't already send a message
 		if(!event.getChannel().getMessageHistory().stream().anyMatch(msg -> msg.getAuthor().equals(Shadbot.getClient().getOurUser()))) {
-			BotUtils.sendMessage(Emoji.SPEECH + " Sorry, I don't reply to private messages but you can still send me some, "
-					+ "my developer will be able to read them (:", event.getChannel());
+			BotUtils.sendMessage("Hello !"
+					+ "\nCommands only work in a server but you can see help using `/help`."
+					+ "\nIf you have a question, a suggestion or anything, don't hesitate to "
+					+ "join my support server : https://discord.gg/CKnV4ff", event.getChannel());
 		}
 
-		BotUtils.sendMessage("{User ID: " + event.getAuthor().getLongID() + "} "
-				+ event.getMessage().getContent().replace("://", ":// "), Shadbot.getClient().getChannelByID(Config.PM_CHANNEL_ID));
+		StatsManager.increment(StatsEnum.PRIVATE_MESSAGES_RECEIVED);
 	}
 }

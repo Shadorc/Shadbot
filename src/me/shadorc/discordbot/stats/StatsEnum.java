@@ -14,6 +14,7 @@ public enum StatsEnum {
 	COMMANDS_EXECUTED("command_executed", false),
 	RESPONSE_TIME("response_time", false),
 	MESSAGES_RECEIVED("messages_received", false),
+	PRIVATE_MESSAGES_RECEIVED("private_messages_received", false),
 	MESSAGES_SENT("messages_sent", false),
 	EMBEDS_SENT("embeds_sent", false);
 

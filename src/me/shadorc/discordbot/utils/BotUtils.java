@@ -130,11 +130,6 @@ public class BotUtils {
 	 * @return true if Shadbot is allowed to use this command, false otherwise
 	 */
 	public static boolean isCommandAllowed(IGuild guild, AbstractCommand cmd) {
-		// This is a private message, all commands are allowed.
-		if(guild == null) {
-			return true;
-		}
-
 		JSONArray blacklistArray = (JSONArray) DatabaseManager.getSetting(guild, Setting.BLACKLIST);
 
 		if(blacklistArray.length() == 0) {

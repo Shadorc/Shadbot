@@ -19,7 +19,6 @@ public class Config {
 	public static final Version VERSION = new Version(1, 9, 12);
 
 	public static final long LOGS_CHANNEL_ID = 346311941829951489L;
-	public static final long PM_CHANNEL_ID = 386908035949527042L;
 
 	public static final int INDENT_FACTOR = 2;
 
