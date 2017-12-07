@@ -26,6 +26,7 @@ import me.shadorc.discordbot.command.game.trivia.TriviaCmd;
 import me.shadorc.discordbot.command.gamestats.CounterStrikeCmd;
 import me.shadorc.discordbot.command.gamestats.DiabloCmd;
 import me.shadorc.discordbot.command.gamestats.OverwatchCmd;
+import me.shadorc.discordbot.command.hidden.ActivateRelicCmd;
 import me.shadorc.discordbot.command.hidden.HelpCmd;
 import me.shadorc.discordbot.command.image.GifCmd;
 import me.shadorc.discordbot.command.image.ImageCmd;
@@ -49,6 +50,7 @@ import me.shadorc.discordbot.command.music.SkipCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.owner.AddCoinsCmd;
+import me.shadorc.discordbot.command.owner.GenerateRelicCmd;
 import me.shadorc.discordbot.command.owner.SendMessageCmd;
 import me.shadorc.discordbot.command.owner.ShutdownCmd;
 import me.shadorc.discordbot.command.owner.StatsCmd;
@@ -75,6 +77,7 @@ public class CommandManager {
 		CommandManager.register(
 				// Hidden Commands
 				new HelpCmd(),
+				new ActivateRelicCmd(),
 				// Utils Commands
 				new TranslateCmd(),
 				new WikiCmd(),
@@ -140,7 +143,8 @@ public class CommandManager {
 				new SendMessageCmd(),
 				new ShutdownCmd(),
 				new AddCoinsCmd(),
-				new StatsCmd());
+				new StatsCmd(),
+				new GenerateRelicCmd());
 	}
 
 	private static void register(AbstractCommand... cmds) {

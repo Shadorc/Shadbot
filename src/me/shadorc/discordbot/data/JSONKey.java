@@ -15,7 +15,12 @@ public enum JSONKey {
 	HISTORIC("historic"),
 	HISTORIC_POOL("historicPool"),
 	HISTORIC_WINNERS_COUNT("historicWinnerCount"),
-	HISTORIC_NUM("historicNum");
+	HISTORIC_NUM("historicNum"),
+
+	RELIC_ID("relicID"),
+	RELIC_ACTIVATION_MILLIS("activationMillis"),
+	RELIC_DURATION("duration"),
+	RELIC_TYPE("type");
 
 	private final String key;
 

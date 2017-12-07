@@ -14,6 +14,7 @@ import me.shadorc.discordbot.command.game.LottoCmd;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.LottoDataManager;
+import me.shadorc.discordbot.data.PremiumManager;
 import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.NetUtils;
@@ -31,6 +32,7 @@ public class Scheduler {
 	public static void start() {
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 1, 1, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> StatsManager.save(), 5, 5, TimeUnit.MINUTES);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> PremiumManager.save(), 5, 5, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoDataManager.save(), 5, 5, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help | "
 				+ TextUtils.getTip()), 0, 30, TimeUnit.MINUTES);
@@ -97,6 +99,7 @@ public class Scheduler {
 		try {
 			SCHEDULED_EXECUTOR.submit(() -> {
 				DatabaseManager.save();
+				PremiumManager.save();
 				StatsManager.save();
 				LottoDataManager.save();
 			}).get();
