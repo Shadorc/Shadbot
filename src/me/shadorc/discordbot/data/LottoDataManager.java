@@ -39,7 +39,7 @@ public class LottoDataManager {
 		try (InputStream stream = LOTTERY_DATA_FILE.toURI().toURL().openStream()) {
 			dataObj = new JSONObject(new JSONTokener(stream));
 		} catch (JSONException | IOException err) {
-			LogUtils.LOGGER.error("An error occurred during lotto data file initialization. Exiting.", err);
+			LogUtils.LOGGER.error("An error occurred during lotto data file initialisation. Exiting.", err);
 			System.exit(1);
 		}
 	}

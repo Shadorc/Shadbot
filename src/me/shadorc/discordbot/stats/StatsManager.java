@@ -45,7 +45,7 @@ public class StatsManager {
 				STATS_MAP.put(StatsEnum.valueOf(key.toString().toUpperCase()), map);
 			}
 		} catch (JSONException | IOException err) {
-			LogUtils.LOGGER.error("An error occurred during stats file initialization. Exiting.", err);
+			LogUtils.LOGGER.error("An error occurred during stats file initialisation. Exiting.", err);
 			System.exit(1);
 		}
 	}
