@@ -130,21 +130,23 @@ public class StatsCmd extends AbstractCommand {
 		Map<String, Long> homogenizedStatsMap = new HashMap<>();
 
 		for(Object key : statsMap.keySet()) {
-			String firstName = CommandManager.getCommand(key.toString()).getFirstName();
-			homogenizedStatsMap.put(firstName,
-					homogenizedStatsMap.getOrDefault(firstName, 0L) + statsMap.get(key.toString()).get());
+			AbstractCommand cmd = CommandManager.getCommand(key.toString());
+			if(cmd == null) {
+				continue;
+			}
+			homogenizedStatsMap.put(cmd.getFirstName(),
+					homogenizedStatsMap.getOrDefault(cmd.getFirstName(), 0L) + statsMap.get(key.toString()).get());
 		}
 
 		List<String> orderedStatsList = Utils.sortByValue(homogenizedStatsMap).keySet().stream()
-				.map(key -> "**" + key + "**: " + homogenizedStatsMap.get(key))
+				.map(key -> "**" + key + "**: " + FormatUtils.formatNum(homogenizedStatsMap.get(key)))
 				.collect(Collectors.toList());
 
 		EmbedBuilder builder = Utils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName(StringUtils.capitalize(category.toString()) + "'s Stats");
 
-		int size = (int) Math.ceil((float) homogenizedStatsMap.keySet().size() / ROW_SIZE);
-		Lists.partition(orderedStatsList, size).stream()
+		Lists.partition(orderedStatsList, ROW_SIZE).stream()
 				.forEach(sublist -> builder.appendField("Row", FormatUtils.formatList(sublist, str -> str, "\n"), true));
 
 		return builder.build();
@@ -159,6 +161,5 @@ public class StatsCmd extends AbstractCommand {
 				.appendField("Argument", "**category** - "
 						+ FormatUtils.formatList(CATEGORIES, cat -> "`" + cat.toString() + "`", ", "), false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
-
 	}
 }
