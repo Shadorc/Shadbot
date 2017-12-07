@@ -18,7 +18,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class SlotMachineCmd extends AbstractCommand {
 
 	private enum SlotOptions {
-		CHERRIES(60),
+		CHERRIES(70),
 		BELL(700),
 		GIFT(10000);
 
