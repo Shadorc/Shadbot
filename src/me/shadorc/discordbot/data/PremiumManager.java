@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +48,7 @@ public class PremiumManager {
 		}
 	}
 
-	public static void generateRelic(String userID, RelicType type) {
+	public static JSONObject generateRelic(String userID, RelicType type) {
 		JSONArray userArray = dataObj.optJSONArray(userID);
 		if(userArray == null) {
 			userArray = new JSONArray();
@@ -56,10 +57,12 @@ public class PremiumManager {
 		JSONObject relicObj = new JSONObject();
 		relicObj.put(JSONKey.RELIC_ID.toString(), UUID.randomUUID().toString());
 		relicObj.put(JSONKey.RELIC_DURATION.toString(), 180);
+		relicObj.put(JSONKey.RELIC_EXPIRED.toString(), false);
 		relicObj.put(JSONKey.RELIC_TYPE.toString(), type.toString());
 		userArray.put(relicObj);
 
 		dataObj.put(userID, userArray);
+		return relicObj;
 	}
 
 	public static void activateRelic(IGuild guild, IUser user, String relicID) throws RelicActivationException {
@@ -89,7 +92,67 @@ public class PremiumManager {
 		}
 
 		relicObj.put(JSONKey.RELIC_ACTIVATION_MILLIS.toString(), System.currentTimeMillis());
-		relicObj.put(JSONKey.GUILD_ID.toString(), guild.getStringID());
+		relicObj.put(JSONKey.GUILD_ID.toString(), guild.getLongID());
+	}
+
+	public static boolean isGuildPremium(IGuild guild) {
+		for(Object userKey : dataObj.keySet()) {
+			JSONArray keysArray = dataObj.getJSONArray(userKey.toString());
+			for(int i = 0; i < keysArray.length(); i++) {
+				JSONObject keyObj = keysArray.getJSONObject(i);
+				if(PremiumManager.isValid(keyObj, RelicType.GUILD)
+						&& keyObj.optLong(JSONKey.GUILD_ID.toString()) == guild.getLongID()) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean isUserPremium(IUser user) {
+		JSONArray keysArray = PremiumManager.getKeysForUser(user.getLongID());
+		if(keysArray == null) {
+			return false;
+		}
+
+		for(int i = 0; i < keysArray.length(); i++) {
+			JSONObject keyObj = keysArray.getJSONObject(i);
+			if(PremiumManager.isValid(keyObj, RelicType.USER)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static boolean isValid(JSONObject keyObj, RelicType type) {
+		// Wrong type
+		if(!keyObj.getString(JSONKey.RELIC_TYPE.toString()).equals(type.toString())) {
+			return false;
+		}
+
+		// Update expiration
+		if(TimeUnit.MILLISECONDS.toDays(keyObj.getLong(JSONKey.RELIC_ACTIVATION_MILLIS.toString()) + System.currentTimeMillis()) > keyObj.getInt(JSONKey.RELIC_DURATION.toString())) {
+			keyObj.put(JSONKey.RELIC_EXPIRED.toString(), true);
+		}
+
+		// Expired
+		if(keyObj.getBoolean(JSONKey.RELIC_EXPIRED.toString())) {
+			return false;
+		}
+
+		// Is activated
+		return keyObj.optLong(JSONKey.RELIC_ACTIVATION_MILLIS.toString()) != 0;
+	}
+
+	private static JSONArray getKeysForUser(long userID) {
+		for(Object key : dataObj.keySet()) {
+			if(Long.parseLong(key.toString()) == userID) {
+				return dataObj.getJSONArray(key.toString());
+			}
+		}
+		return null;
 	}
 
 	public static void save() {

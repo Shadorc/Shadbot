@@ -20,6 +20,7 @@ public enum JSONKey {
 	RELIC_ID("relicID"),
 	RELIC_ACTIVATION_MILLIS("activationMillis"),
 	RELIC_DURATION("duration"),
+	RELIC_EXPIRED("relicExpired"),
 	RELIC_TYPE("type");
 
 	private final String key;
