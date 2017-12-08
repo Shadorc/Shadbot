@@ -35,6 +35,8 @@ import sx.blah.discord.util.EmbedBuilder;
 public class LottoCmd extends AbstractCommand {
 
 	private static final int PAID_COST = 100;
+	private static final int MIN_NUM = 1;
+	private final static int MAX_NUM = 100;
 
 	public LottoCmd() {
 		super(CommandCategory.GAME, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "lotto");
@@ -47,7 +49,7 @@ public class LottoCmd extends AbstractCommand {
 					.withAuthorName("Lotto")
 					.withThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 					.withDescription(this.getDelaySentence()
-							+ "\nTo participate, type: `" + context.getPrefix() + this.getFirstName() + " 1-100`")
+							+ "\nTo participate, type: `" + context.getPrefix() + this.getFirstName() + " " + MIN_NUM + "-" + MAX_NUM + "`")
 					.appendField("Number of participants", Integer.toString(LottoDataManager.getPlayers().length()), false)
 					.appendField("Prize pool", FormatUtils.formatNum(LottoDataManager.getPool()) + " coins", false);
 
@@ -91,8 +93,8 @@ public class LottoCmd extends AbstractCommand {
 			return;
 		}
 
-		if(!StringUtils.isIntBetween(context.getArg(), 1, 100)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between 1 and 100.", context.getChannel());
+		if(!StringUtils.isIntBetween(context.getArg(), MIN_NUM, MAX_NUM)) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid number, must be between " + MIN_NUM + " and " + MAX_NUM + ".", context.getChannel());
 			return;
 		}
 
@@ -140,7 +142,7 @@ public class LottoCmd extends AbstractCommand {
 
 	public static void lotteryDraw() {
 		LogUtils.info("Lottery draw started...");
-		int winningNum = MathUtils.rand(1, 100);
+		int winningNum = MathUtils.rand(MIN_NUM, MAX_NUM);
 
 		List<JSONObject> winnersList = Utils.convertToList(LottoDataManager.getPlayers(), JSONObject.class);
 		winnersList = winnersList.stream().filter(
@@ -167,7 +169,7 @@ public class LottoCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Buy a ticket for the lottery or display the current lottery status.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " [<num>]`", false)
-				.appendField("Restrictions", "**num** - must be between 1 and 100", false)
+				.appendField("Restrictions", "**num** - must be between " + MIN_NUM + " and " + MAX_NUM, false)
 				.appendField("Info", "One winner is randomly drawn every Sunday at noon (English time)."
 						+ "\nIf no one wins, the prize pool is put back into play, "
 						+ "if there are multiple winners, the prize pool is splitted between them.", false)
