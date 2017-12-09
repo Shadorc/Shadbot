@@ -132,21 +132,21 @@ public class PremiumManager {
 			return false;
 		}
 
+		// Is activated
+		if(keyObj.optLong(JSONKey.RELIC_ACTIVATION_MILLIS.toString()) == 0) {
+			return false;
+		}
+
 		// Update expiration
 		if(TimeUnit.MILLISECONDS.toDays(keyObj.getLong(JSONKey.RELIC_ACTIVATION_MILLIS.toString()) + System.currentTimeMillis()) > keyObj.getInt(JSONKey.RELIC_DURATION.toString())) {
 			keyObj.put(JSONKey.RELIC_EXPIRED.toString(), true);
 		}
 
 		// Expired
-		if(keyObj.getBoolean(JSONKey.RELIC_EXPIRED.toString())) {
-			return false;
-		}
-
-		// Is activated
-		return keyObj.optLong(JSONKey.RELIC_ACTIVATION_MILLIS.toString()) != 0;
+		return keyObj.getBoolean(JSONKey.RELIC_EXPIRED.toString());
 	}
 
-	private static JSONArray getKeysForUser(long userID) {
+	public static JSONArray getKeysForUser(long userID) {
 		for(Object key : dataObj.keySet()) {
 			if(Long.parseLong(key.toString()) == userID) {
 				return dataObj.getJSONArray(key.toString());

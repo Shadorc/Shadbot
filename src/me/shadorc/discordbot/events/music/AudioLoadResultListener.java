@@ -16,6 +16,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.PremiumManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.message.MessageListener;
 import me.shadorc.discordbot.message.MessageManager;
@@ -114,7 +115,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		for(AudioTrack track : tracks) {
 			musicManager.getScheduler().queue(track, putFirst);
 			count++;
-			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
+			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
+					&& !PremiumManager.isGuildPremium(musicManager.getChannel().getGuild())
+					&& !PremiumManager.isUserPremium(userDj)) {
 				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, musicManager.getChannel());
 				break;
 			}
@@ -188,7 +191,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 						+ "** has been added to the playlist.", musicManager.getChannel());
 			}
 			musicManager.getScheduler().queue(track, putFirst);
-			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
+			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
+					&& !PremiumManager.isGuildPremium(musicManager.getChannel().getGuild())
+					&& !PremiumManager.isUserPremium(userDj)) {
 				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, musicManager.getChannel());
 				break;
 			}

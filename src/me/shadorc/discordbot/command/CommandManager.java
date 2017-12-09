@@ -27,6 +27,7 @@ import me.shadorc.discordbot.command.gamestats.CounterStrikeCmd;
 import me.shadorc.discordbot.command.gamestats.DiabloCmd;
 import me.shadorc.discordbot.command.gamestats.OverwatchCmd;
 import me.shadorc.discordbot.command.hidden.ActivateRelicCmd;
+import me.shadorc.discordbot.command.hidden.ContributorStatusCmd;
 import me.shadorc.discordbot.command.hidden.HelpCmd;
 import me.shadorc.discordbot.command.image.GifCmd;
 import me.shadorc.discordbot.command.image.ImageCmd;
@@ -52,6 +53,7 @@ import me.shadorc.discordbot.command.music.VolumeCmd;
 import me.shadorc.discordbot.command.owner.AddCoinsCmd;
 import me.shadorc.discordbot.command.owner.GenerateRelicCmd;
 import me.shadorc.discordbot.command.owner.SendMessageCmd;
+import me.shadorc.discordbot.command.owner.SendToAllCmd;
 import me.shadorc.discordbot.command.owner.ShutdownCmd;
 import me.shadorc.discordbot.command.owner.StatsCmd;
 import me.shadorc.discordbot.command.utils.CalcCmd;
@@ -78,6 +80,7 @@ public class CommandManager {
 				// Hidden Commands
 				new HelpCmd(),
 				new ActivateRelicCmd(),
+				new ContributorStatusCmd(),
 				// Utils Commands
 				new TranslateCmd(),
 				new WikiCmd(),
@@ -144,7 +147,8 @@ public class CommandManager {
 				new ShutdownCmd(),
 				new AddCoinsCmd(),
 				new StatsCmd(),
-				new GenerateRelicCmd());
+				new GenerateRelicCmd(),
+				new SendToAllCmd());
 	}
 
 	private static void register(AbstractCommand... cmds) {

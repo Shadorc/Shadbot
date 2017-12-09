@@ -16,9 +16,11 @@ import me.shadorc.discordbot.utils.LogUtils;
 
 public class Config {
 
-	public static final Version VERSION = new Version(1, 9, 12);
+	public static final Version VERSION = new Version(1, 9, 13);
 
 	public static final long LOGS_CHANNEL_ID = 346311941829951489L;
+
+	public static final String PATREON_URL = "www.patreon.com/shadbot";
 
 	public static final int INDENT_FACTOR = 2;
 

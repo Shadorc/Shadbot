@@ -25,7 +25,7 @@ public class ActivateRelicCmd extends AbstractCommand {
 		}
 		try {
 			PremiumManager.activateRelic(context.getGuild(), context.getAuthor(), context.getArg());
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " Key successfully activated, enjoy !", context.getChannel());
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " Relic successfully activated, enjoy !", context.getChannel());
 		} catch (RelicActivationException err) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + err.getMessage(), context.getChannel());
 		}

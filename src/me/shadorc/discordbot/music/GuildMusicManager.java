@@ -11,7 +11,9 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 
 import me.shadorc.discordbot.Shadbot;
+import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.DatabaseManager;
+import me.shadorc.discordbot.data.PremiumManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.events.music.AudioEventListener;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -68,7 +70,12 @@ public class GuildMusicManager {
 	public void end() {
 		// Do not block the lavaplayer thread to allow the socket to be closed in time, avoiding a SocketClosed exception
 		Shadbot.getDefaultThreadPool().submit(() -> {
-			BotUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel);
+			StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
+			if(!PremiumManager.isGuildPremium(channel.getGuild())) {
+				strBuilder.append(" If you like me, please consider donating on " + Config.PATREON_URL + "."
+						+ " All donations are useful ! :heart:");
+			}
+			BotUtils.sendMessage(strBuilder.toString(), channel);
 			this.leaveVoiceChannel();
 		});
 	}

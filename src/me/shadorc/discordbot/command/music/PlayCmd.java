@@ -6,6 +6,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
+import me.shadorc.discordbot.data.PremiumManager;
 import me.shadorc.discordbot.events.music.AudioLoadResultListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -83,7 +84,9 @@ public class PlayCmd extends AbstractCommand {
 			musicManager = GuildMusicManager.createGuildMusicManager(context.getGuild());
 		}
 
-		if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE) {
+		if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
+				&& !PremiumManager.isGuildPremium(context.getGuild())
+				&& !PremiumManager.isUserPremium(context.getAuthor())) {
 			BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, context.getChannel());
 			return;
 		}

@@ -2,10 +2,13 @@ package me.shadorc.discordbot.command.owner;
 
 import java.util.Arrays;
 
+import org.json.JSONObject;
+
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
+import me.shadorc.discordbot.data.JSONKey;
 import me.shadorc.discordbot.data.PremiumManager;
 import me.shadorc.discordbot.data.PremiumManager.RelicType;
 import me.shadorc.discordbot.utils.BotUtils;
@@ -46,8 +49,9 @@ public class GenerateRelicCmd extends AbstractCommand {
 			return;
 		}
 
-		PremiumManager.generateRelic(userID, RelicType.valueOf(relicTypeStr.toUpperCase()));
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Key generated.", context.getChannel());
+		JSONObject keyObj = PremiumManager.generateRelic(userID, RelicType.valueOf(relicTypeStr.toUpperCase()));
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " " + StringUtils.capitalize(relicTypeStr) + " relic generated: **"
+				+ keyObj.getString(JSONKey.RELIC_ID.toString()) + "**", context.getChannel());
 	}
 
 	@Override
@@ -55,8 +59,8 @@ public class GenerateRelicCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Generate a relic.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <userID> <type>`", false)
-				.appendField("Arguments", "**userID** - User ID as a long to whom to give the relic"
-						+ "\n**type** - " + FormatUtils.formatArray(RelicType.values(), relic -> relic.toString(), ", "), false);
+				.appendField("Arguments", "**userID** - User ID as a long to whom to give the premium key"
+						+ "\n**type** - " + FormatUtils.formatArray(RelicType.values(), relic -> relic.toString().toLowerCase(), ", "), false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }
