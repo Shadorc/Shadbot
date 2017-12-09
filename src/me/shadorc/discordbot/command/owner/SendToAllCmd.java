@@ -10,6 +10,7 @@ import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class SendToAllCmd extends AbstractCommand {
@@ -24,11 +25,15 @@ public class SendToAllCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
+		int count = 0;
 		for(IGuild guild : Shadbot.getClient().getGuilds()) {
-			BotUtils.sendMessage(context.getArg().trim(), guild.getDefaultChannel());
+			if(BotUtils.hasPermission(guild.getDefaultChannel(), Permissions.SEND_MESSAGES)) {
+				BotUtils.sendMessage(context.getArg().trim(), guild.getDefaultChannel());
+				count++;
+			}
 		}
 
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent to " + count + "/" + Shadbot.getClient().getGuilds().size() + " guilds.", context.getChannel());
 	}
 
 	@Override
@@ -38,5 +43,4 @@ public class SendToAllCmd extends AbstractCommand {
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <message>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
-
 }
