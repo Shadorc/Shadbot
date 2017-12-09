@@ -1,7 +1,9 @@
 package me.shadorc.discordbot.utils;
 
 import java.lang.management.ManagementFactory;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,11 +62,11 @@ public class Utils {
 	}
 
 	/**
-	 * @param fromDate - the temporal object
+	 * @param instant - the temporal object
 	 * @return the amount of ms between fromDate and now
 	 */
-	public static int getPing(LocalDateTime fromDate) {
-		return (int) Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), fromDate));
+	public static int getPing(Instant instant) {
+		return (int) Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), instant));
 	}
 
 	/**
@@ -125,6 +127,14 @@ public class Utils {
 			}
 		}
 		return list;
+	}
+
+	/**
+	 * @param instant - the instant to convert
+	 * @return instant converted to local date time
+	 */
+	public static LocalDateTime convertToLocalDate(Instant instant) {
+		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}
 
 	/**

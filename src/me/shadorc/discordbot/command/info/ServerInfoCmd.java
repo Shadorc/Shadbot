@@ -26,7 +26,7 @@ public class ServerInfoCmd extends AbstractCommand {
 
 	public ServerInfoCmd() {
 		super(CommandCategory.INFO, Role.USER, RateLimiter.DEFAULT_COOLDOWN, "serverinfo", "server_info", "server-info");
-		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
+		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class ServerInfoCmd extends AbstractCommand {
 				.withThumbnail(guild.getIconURL())
 				.appendField("Owner", guild.getOwner().getName(), true)
 				.appendField("Region", guild.getRegion().getName(), true)
-				.appendField("Creation date", guild.getCreationDate().format(dateFormatter)
+				.appendField("Creation date", Utils.convertToLocalDate(guild.getCreationDate()).format(dateFormatter)
 						+ "\n(" + FormatUtils.formatDate(guild.getCreationDate()) + ")", true)
 				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
 				.appendField("Text channels", Integer.toString(guild.getChannels().size()), true)

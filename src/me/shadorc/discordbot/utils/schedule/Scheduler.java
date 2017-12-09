@@ -21,7 +21,9 @@ import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.schedule.ScheduledMessage.Reason;
+import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.StatusType;
 
 public class Scheduler {
 
@@ -34,8 +36,8 @@ public class Scheduler {
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> StatsManager.save(), 5, 5, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> PremiumManager.save(), 5, 5, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoDataManager.save(), 5, 5, TimeUnit.MINUTES);
-		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> Shadbot.getClient().changePlayingText(Config.DEFAULT_PREFIX + "help | "
-				+ TextUtils.getTip()), 0, 30, TimeUnit.MINUTES);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> Shadbot.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING,
+				Config.DEFAULT_PREFIX + "help | " + TextUtils.getTip()), 0, 30, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> NetUtils.postStats(), 2, 2, TimeUnit.HOURS);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoCmd.lotteryDraw(), LottoCmd.getDelayBeforeNextDraw(),
 				TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);

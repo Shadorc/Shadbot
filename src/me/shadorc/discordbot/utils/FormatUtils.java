@@ -1,6 +1,7 @@
 package me.shadorc.discordbot.utils;
 
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
@@ -70,11 +71,11 @@ public class FormatUtils {
 	}
 
 	/**
-	 * @param date - the date to format
+	 * @param instant - the date to format
 	 * @return the formatted date as "y years m months d days"
 	 */
-	public static String formatDate(LocalDateTime date) {
-		Period period = Period.between(date.toLocalDate(), LocalDateTime.now().toLocalDate());
+	public static String formatDate(Instant instant) {
+		Period period = Period.between(Utils.convertToLocalDate(instant).toLocalDate(), LocalDateTime.now().toLocalDate());
 		long years = period.get(ChronoUnit.YEARS);
 		long months = period.get(ChronoUnit.MONTHS);
 		long days = period.get(ChronoUnit.DAYS);
