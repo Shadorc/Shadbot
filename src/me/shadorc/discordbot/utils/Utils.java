@@ -66,7 +66,7 @@ public class Utils {
 	 * @return the amount of ms between fromDate and now
 	 */
 	public static int getPing(Instant instant) {
-		return (int) Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), instant));
+		return (int) Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), Utils.convertToLocalDate(instant)));
 	}
 
 	/**
