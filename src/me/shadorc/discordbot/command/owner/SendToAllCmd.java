@@ -27,22 +27,27 @@ public class SendToAllCmd extends AbstractCommand {
 		}
 
 		int count = 0;
+		int errorCount = 0;
 		for(IGuild guild : Shadbot.getClient().getGuilds()) {
-			if(BotUtils.isChannelAllowed(guild, guild.getDefaultChannel()) && BotUtils.hasPermission(guild.getDefaultChannel(), Permissions.SEND_MESSAGES)) {
-				BotUtils.sendMessage(context.getArg().trim(), guild.getDefaultChannel());
-				count++;
-			} else {
+			try {
 				for(IChannel channel : guild.getChannels()) {
+					if(channel.getMessageHistory().stream().anyMatch(msg -> msg.getContent().equals(context.getArg()))) {
+						continue;
+					}
+
 					if(BotUtils.isChannelAllowed(guild, channel) && BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES)) {
 						BotUtils.sendMessage(context.getArg().trim(), channel);
 						count++;
 						break;
 					}
 				}
+			} catch (Exception ignored) {
+				errorCount++;
 			}
 		}
 
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent to " + count + "/" + Shadbot.getClient().getGuilds().size() + " guilds.", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent to " + count + "/" + Shadbot.getClient().getGuilds().size()
+				+ " guilds (" + errorCount + " errors).", context.getChannel());
 	}
 
 	@Override
