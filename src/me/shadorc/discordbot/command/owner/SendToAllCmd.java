@@ -32,7 +32,7 @@ public class SendToAllCmd extends AbstractCommand {
 			try {
 				for(IChannel channel : guild.getChannels()) {
 					if(channel.getMessageHistory().stream().anyMatch(msg -> msg.getContent().equals(context.getArg()))) {
-						continue;
+						break;
 					}
 
 					if(BotUtils.isChannelAllowed(guild, channel) && BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES)) {
@@ -47,7 +47,7 @@ public class SendToAllCmd extends AbstractCommand {
 		}
 
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent to " + count + "/" + Shadbot.getClient().getGuilds().size()
-				+ " guilds (" + errorCount + " errors).", context.getChannel());
+				+ " guilds (" + errorCount + " error(s)).", context.getChannel());
 	}
 
 	@Override
