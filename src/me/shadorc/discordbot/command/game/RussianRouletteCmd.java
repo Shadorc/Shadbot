@@ -59,7 +59,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Play Russian roulette.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <bet>`", false)
-				.appendField("Restriction", "**bet** - You can not bet more than **" + MAX_BET + " coins**.", false)
+				.appendField("Restriction", "**bet** - You can not bet more than **" + FormatUtils.formatCoins(MAX_BET) + "**.", false)
 				.appendField("Gains", "You have a **5-in-6** chance to win **" + String.format("%.1f", WIN_MULTIPLIER) + " times** "
 						+ "your bet and a **1-in-6** chance to lose **" + String.format("%.1f", LOSE_MULTIPLIER) + " times** your bet.", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
