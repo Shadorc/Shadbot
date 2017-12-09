@@ -9,6 +9,7 @@ import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.MissingArgumentException;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
@@ -27,9 +28,17 @@ public class SendToAllCmd extends AbstractCommand {
 
 		int count = 0;
 		for(IGuild guild : Shadbot.getClient().getGuilds()) {
-			if(BotUtils.hasPermission(guild.getDefaultChannel(), Permissions.SEND_MESSAGES)) {
+			if(BotUtils.isChannelAllowed(guild, guild.getDefaultChannel()) && BotUtils.hasPermission(guild.getDefaultChannel(), Permissions.SEND_MESSAGES)) {
 				BotUtils.sendMessage(context.getArg().trim(), guild.getDefaultChannel());
 				count++;
+			} else {
+				for(IChannel channel : guild.getChannels()) {
+					if(BotUtils.isChannelAllowed(guild, channel) && BotUtils.hasPermission(channel, Permissions.SEND_MESSAGES)) {
+						BotUtils.sendMessage(context.getArg().trim(), channel);
+						count++;
+						break;
+					}
+				}
 			}
 		}
 
