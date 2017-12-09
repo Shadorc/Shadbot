@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.CommandManager;
+import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
@@ -67,7 +68,8 @@ public class MessageListener {
 					.filter(cmdCat -> !cmdCat.equals(CommandCategory.HIDDEN))
 					.forEach(category -> builder.appendField(category.toString() + " Commands:",
 							CommandManager.getCommands().values().stream()
-									.filter(cmd -> cmd.getCategory().equals(category))
+									.filter(cmd -> cmd.getCategory().equals(category)
+											&& Role.ADMIN.getHierarchy() >= cmd.getRole().getHierarchy())
 									.distinct()
 									.map(cmd -> "`" + Config.DEFAULT_PREFIX + cmd.getFirstName() + "`")
 									.collect(Collectors.joining(" ")), false));
