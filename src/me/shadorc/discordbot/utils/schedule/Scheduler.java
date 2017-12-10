@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +30,8 @@ public class Scheduler {
 	private static final List<ScheduledMessage> MESSAGE_QUEUE = Collections.synchronizedList(new ArrayList<>());
 	private static final ScheduledExecutorService SCHEDULED_EXECUTOR =
 			Executors.newScheduledThreadPool(2, Utils.getThreadFactoryNamed("Shadbot-Scheduler-%d"));
+	private final static ExecutorService MESSAGES_THREAD_POOL =
+			Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-MessagesThreadPool-%d"));
 
 	public static void start() {
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 1, 1, TimeUnit.MINUTES);
@@ -55,7 +58,7 @@ public class Scheduler {
 			return;
 		}
 
-		Shadbot.getDefaultThreadPool().submit(() -> {
+		MESSAGES_THREAD_POOL.submit(() -> {
 			Scheduler.waitAndSend(scheduledMsg);
 			MESSAGE_QUEUE.remove(scheduledMsg);
 		});
@@ -66,7 +69,7 @@ public class Scheduler {
 		while(msgItr.hasNext()) {
 			ScheduledMessage message = msgItr.next();
 			if(message.getReason().equals(Reason.SHARD_NOT_READY)) {
-				Shadbot.getDefaultThreadPool().submit(() -> {
+				MESSAGES_THREAD_POOL.submit(() -> {
 					Scheduler.waitAndSend(message);
 					msgItr.remove();
 				});
