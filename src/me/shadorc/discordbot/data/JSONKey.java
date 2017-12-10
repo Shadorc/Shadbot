@@ -2,6 +2,7 @@ package me.shadorc.discordbot.data;
 
 public enum JSONKey {
 
+	DONATORS("donators"),
 	USERS("users"),
 	SETTINGS("settings"),
 	COINS("coins"),
@@ -17,6 +18,7 @@ public enum JSONKey {
 	HISTORIC_WINNERS_COUNT("historicWinnerCount"),
 	HISTORIC_NUM("historicNum"),
 
+	UNUSED_RELICS("unusedRelics"),
 	RELIC_ID("relicID"),
 	RELIC_ACTIVATION_MILLIS("activationMillis"),
 	RELIC_DURATION("duration"),

@@ -31,7 +31,11 @@ public class PremiumManager {
 	static {
 		if(!PREMIUM_DATA_FILE.exists()) {
 			try (FileWriter writer = new FileWriter(PREMIUM_DATA_FILE)) {
-				writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
+				JSONObject defaultObj = new JSONObject();
+				defaultObj.put(JSONKey.DONATORS.toString(), new JSONObject());
+				defaultObj.put(JSONKey.UNUSED_RELICS.toString(), new JSONArray());
+
+				writer.write(defaultObj.toString(Config.INDENT_FACTOR));
 				writer.flush();
 
 			} catch (IOException err) {
@@ -48,56 +52,75 @@ public class PremiumManager {
 		}
 	}
 
-	public static JSONObject generateRelic(String userID, RelicType type) {
-		JSONArray userArray = dataObj.optJSONArray(userID);
-		if(userArray == null) {
-			userArray = new JSONArray();
-		}
-
+	public static JSONObject generateRelic(RelicType type) {
 		JSONObject relicObj = new JSONObject();
 		relicObj.put(JSONKey.RELIC_ID.toString(), UUID.randomUUID().toString());
 		relicObj.put(JSONKey.RELIC_DURATION.toString(), 180);
 		relicObj.put(JSONKey.RELIC_EXPIRED.toString(), false);
 		relicObj.put(JSONKey.RELIC_TYPE.toString(), type.toString());
-		userArray.put(relicObj);
 
-		dataObj.put(userID, userArray);
+		JSONArray unusedKeys = dataObj.getJSONArray(JSONKey.UNUSED_RELICS.toString());
+		unusedKeys.put(relicObj);
+
+		dataObj.put(JSONKey.UNUSED_RELICS.toString(), unusedKeys);
+		PremiumManager.save();
 		return relicObj;
 	}
 
 	public static void activateRelic(IGuild guild, IUser user, String relicID) throws RelicActivationException {
-		JSONArray userArray = dataObj.optJSONArray(user.getStringID());
-		if(userArray == null) {
-			throw new RelicActivationException("You don't have any Relic.");
-		}
-
-		JSONObject relicObj = null;
-		for(int i = 0; i < userArray.length(); i++) {
-			JSONObject obj = userArray.getJSONObject(i);
-			if(obj.getString(JSONKey.RELIC_ID.toString()).equals(relicID)) {
-				relicObj = obj;
-			}
-		}
+		JSONObject relicObj = PremiumManager.getUnusedRelic(relicID);
 
 		if(relicObj == null) {
-			throw new RelicActivationException("Invalid key.");
+			throw new RelicActivationException("This key is already activated or doesn't exist.");
 		}
 
-		if(relicObj.optLong(JSONKey.RELIC_ACTIVATION_MILLIS.toString()) != 0) {
-			throw new RelicActivationException("This key is already activated.");
-		}
-
-		if(relicObj.getString(JSONKey.RELIC_TYPE.toString()).equals(RelicType.GUILD.toString()) && guild == null) {
-			throw new RelicActivationException("You must activate the legendary relic in the desired server.");
+		boolean isLegendaryRelic = relicObj.getString(JSONKey.RELIC_TYPE.toString()).equals(RelicType.GUILD.toString());
+		if(isLegendaryRelic && guild == null) {
+			throw new RelicActivationException("You must activate a Legendary Relic in the desired server.");
 		}
 
 		relicObj.put(JSONKey.RELIC_ACTIVATION_MILLIS.toString(), System.currentTimeMillis());
-		relicObj.put(JSONKey.GUILD_ID.toString(), guild.getLongID());
+		if(isLegendaryRelic) {
+			relicObj.put(JSONKey.GUILD_ID.toString(), guild.getLongID());
+		}
+
+		JSONArray userKeys = dataObj.getJSONObject(JSONKey.DONATORS.toString()).optJSONArray(user.getStringID());
+		if(userKeys == null) {
+			userKeys = new JSONArray();
+		}
+
+		userKeys.put(relicObj);
+
+		dataObj.getJSONObject(JSONKey.DONATORS.toString()).put(user.getStringID(), userKeys);
+		dataObj.getJSONArray(JSONKey.UNUSED_RELICS.toString()).remove(PremiumManager.getUnusedRelicIndex(relicID));
+		PremiumManager.save();
+	}
+
+	private static JSONObject getUnusedRelic(String relicID) {
+		JSONArray unusedRelics = dataObj.getJSONArray(JSONKey.UNUSED_RELICS.toString());
+		for(int i = 0; i < unusedRelics.length(); i++) {
+			JSONObject relicObj = unusedRelics.getJSONObject(i);
+			if(relicObj.getString(JSONKey.RELIC_ID.toString()).equals(relicID)) {
+				return relicObj;
+			}
+		}
+		return null;
+	}
+
+	private static int getUnusedRelicIndex(String relicID) {
+		JSONArray unusedRelics = dataObj.getJSONArray(JSONKey.UNUSED_RELICS.toString());
+		for(int i = 0; i < unusedRelics.length(); i++) {
+			if(unusedRelics.getJSONObject(i).getString(JSONKey.RELIC_ID.toString()).equals(relicID)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	public static boolean isGuildPremium(IGuild guild) {
-		for(Object userKey : dataObj.keySet()) {
-			JSONArray keysArray = dataObj.getJSONArray(userKey.toString());
+		JSONObject donatorsObj = dataObj.getJSONObject(JSONKey.DONATORS.toString());
+		for(Object userKey : donatorsObj.keySet()) {
+			JSONArray keysArray = donatorsObj.getJSONArray(userKey.toString());
 			for(int i = 0; i < keysArray.length(); i++) {
 				JSONObject keyObj = keysArray.getJSONObject(i);
 				if(PremiumManager.isValid(keyObj, RelicType.GUILD)
@@ -147,15 +170,16 @@ public class PremiumManager {
 	}
 
 	public static JSONArray getKeysForUser(long userID) {
-		for(Object key : dataObj.keySet()) {
+		JSONObject donatorsObj = dataObj.getJSONObject(JSONKey.DONATORS.toString());
+		for(Object key : donatorsObj.keySet()) {
 			if(Long.parseLong(key.toString()) == userID) {
-				return dataObj.getJSONArray(key.toString());
+				return donatorsObj.getJSONArray(key.toString());
 			}
 		}
 		return null;
 	}
 
-	public static void save() {
+	private synchronized static void save() {
 		LogUtils.info("Saving premium data...");
 		try (FileWriter writer = new FileWriter(PREMIUM_DATA_FILE)) {
 			writer.write(dataObj.toString(Config.INDENT_FACTOR));

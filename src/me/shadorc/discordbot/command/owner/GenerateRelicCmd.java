@@ -31,25 +31,14 @@ public class GenerateRelicCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String[] splitArgs = StringUtils.getSplittedArg(context.getArg());
-		if(splitArgs.length != 2) {
-			throw new MissingArgumentException();
-		}
-
-		String userID = splitArgs[0];
-		if(!StringUtils.isPositiveLong(userID)) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid User ID.", context.getChannel());
-			return;
-		}
-
-		String relicTypeStr = splitArgs[1];
+		String relicTypeStr = context.getArg();
 		if(!Arrays.stream(RelicType.values()).anyMatch(type -> type.toString().equalsIgnoreCase(relicTypeStr))) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Invalid type. Options: "
-					+ FormatUtils.formatArray(RelicType.values(), relic -> relic.toString(), ", "), context.getChannel());
+					+ FormatUtils.formatArray(RelicType.values(), relic -> relic.toString().toLowerCase(), ", "), context.getChannel());
 			return;
 		}
 
-		JSONObject keyObj = PremiumManager.generateRelic(userID, RelicType.valueOf(relicTypeStr.toUpperCase()));
+		JSONObject keyObj = PremiumManager.generateRelic(RelicType.valueOf(relicTypeStr.toUpperCase()));
 		BotUtils.sendMessage(Emoji.CHECK_MARK + " " + StringUtils.capitalize(relicTypeStr) + " relic generated: **"
 				+ keyObj.getString(JSONKey.RELIC_ID.toString()) + "**", context.getChannel());
 	}
@@ -58,9 +47,9 @@ public class GenerateRelicCmd extends AbstractCommand {
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
 				.appendDescription("**Generate a relic.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <userID> <type>`", false)
-				.appendField("Arguments", "**userID** - User ID as a long to whom to give the premium key"
-						+ "\n**type** - " + FormatUtils.formatArray(RelicType.values(), relic -> relic.toString().toLowerCase(), ", "), false);
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <type>`", false)
+				.appendField("Arguments", "**type** - "
+						+ FormatUtils.formatArray(RelicType.values(), relic -> relic.toString().toLowerCase(), ", "), false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }
