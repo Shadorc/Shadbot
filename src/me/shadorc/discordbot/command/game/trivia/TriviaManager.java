@@ -45,6 +45,7 @@ class TriviaManager implements MessageListener {
 
 	private final RateLimiter rateLimiter;
 	private final Context context;
+	private final int categoryID;
 	private final List<IUser> alreadyAnswered;
 
 	private ScheduledExecutorService executor;
@@ -55,12 +56,13 @@ class TriviaManager implements MessageListener {
 	protected TriviaManager(Context context) {
 		this.rateLimiter = new RateLimiter(LIMITED_TIME, ChronoUnit.SECONDS);
 		this.context = context;
+		this.categoryID = context.hasArg() ? Integer.parseInt(context.getArg()) : -1;
 		this.alreadyAnswered = new ArrayList<>();
 	}
 
 	// Trivia API doc : https://opentdb.com/api_config.php
 	protected void start() throws JSONException, IOException, ParseException {
-		String jsonStr = NetUtils.getBody("https://opentdb.com/api.php?amount=1");
+		String jsonStr = NetUtils.getBody("https://opentdb.com/api.php?amount=1" + (categoryID == -1 ? "" : "&category=" + categoryID));
 		if(jsonStr.isEmpty()) {
 			throw new ParseException("Body is empty.");
 		}
