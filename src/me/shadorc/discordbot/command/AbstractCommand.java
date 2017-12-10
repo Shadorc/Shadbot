@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import me.shadorc.discordbot.exceptions.MissingArgumentException;
 import me.shadorc.discordbot.stats.StatsEnum;
 import me.shadorc.discordbot.stats.StatsManager;
-import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 
 public abstract class AbstractCommand {

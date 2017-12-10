@@ -5,11 +5,11 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.PremiumManager;
+import me.shadorc.discordbot.exceptions.MissingArgumentException;
 import me.shadorc.discordbot.exceptions.RelicActivationException;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
-import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class ActivateRelicCmd extends AbstractCommand {

@@ -11,12 +11,12 @@ import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.JSONKey;
 import me.shadorc.discordbot.data.PremiumManager;
 import me.shadorc.discordbot.data.PremiumManager.RelicType;
+import me.shadorc.discordbot.exceptions.MissingArgumentException;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
-import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class GenerateRelicCmd extends AbstractCommand {

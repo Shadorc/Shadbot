@@ -63,12 +63,12 @@ import me.shadorc.discordbot.command.utils.UrbanCmd;
 import me.shadorc.discordbot.command.utils.WeatherCmd;
 import me.shadorc.discordbot.command.utils.WikiCmd;
 import me.shadorc.discordbot.command.utils.poll.PollCmd;
+import me.shadorc.discordbot.exceptions.MissingArgumentException;
 import me.shadorc.discordbot.stats.StatsEnum;
 import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
-import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 public class CommandManager {

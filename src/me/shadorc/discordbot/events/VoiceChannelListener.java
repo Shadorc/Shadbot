@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.events.music;
+package me.shadorc.discordbot.events;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.music.GuildMusicManager;

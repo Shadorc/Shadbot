@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.utils.command;
+package me.shadorc.discordbot.exceptions;
 
 public class MissingArgumentException extends Exception {
 

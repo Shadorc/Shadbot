@@ -7,11 +7,11 @@ import org.json.JSONArray;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
+import me.shadorc.discordbot.exceptions.MissingArgumentException;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
-import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 

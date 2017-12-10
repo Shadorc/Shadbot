@@ -14,6 +14,7 @@ import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
 import me.shadorc.discordbot.command.Role;
 import me.shadorc.discordbot.data.Setting;
+import me.shadorc.discordbot.exceptions.MissingArgumentException;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.ExceptionUtils;
 import me.shadorc.discordbot.utils.FormatUtils;
@@ -22,7 +23,6 @@ import me.shadorc.discordbot.utils.NetUtils;
 import me.shadorc.discordbot.utils.TextUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
-import me.shadorc.discordbot.utils.command.MissingArgumentException;
 import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.util.EmbedBuilder;
 
