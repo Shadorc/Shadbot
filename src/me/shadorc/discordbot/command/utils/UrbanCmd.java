@@ -49,15 +49,17 @@ public class UrbanCmd extends AbstractCommand {
 			}
 
 			EmbedBuilder builder = Utils.getDefaultEmbed()
+					.setLenient(true)
 					.withAuthorName("Urban Dictionary: " + resultObj.getString("word"))
 					.withUrl(resultObj.getString("permalink"))
 					.withThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
 					.appendDescription(definition);
 
 			String example = resultObj.getString("example");
-			if(!example.isEmpty()) {
-				builder.appendField("Example", resultObj.getString("example"), false);
+			if(example.length() > EmbedBuilder.FIELD_CONTENT_LIMIT) {
+				example = example.substring(0, EmbedBuilder.FIELD_CONTENT_LIMIT - 3) + "...";
 			}
+			builder.appendField("Example", example, false);
 
 			BotUtils.sendMessage(builder.build(), context.getChannel());
 
