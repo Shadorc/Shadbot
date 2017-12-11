@@ -50,6 +50,7 @@ public class UrbanCmd extends AbstractCommand {
 
 			EmbedBuilder builder = Utils.getDefaultEmbed()
 					.withAuthorName("Urban Dictionary: " + resultObj.getString("word"))
+					.withUrl(resultObj.getString("permalink"))
 					.withThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
 					.appendDescription(definition);
 
