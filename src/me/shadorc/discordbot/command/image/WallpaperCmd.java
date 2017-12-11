@@ -169,7 +169,8 @@ public class WallpaperCmd extends AbstractCommand {
 						+ "\n**resolution** - image resolution (e.g. 1920x1080)"
 						+ "\n**keyword** - keywords (e.g. doom,game)", true)
 				.appendField("Example", "Search a *SFW* wallpaper in category *Anime*, with a *16x9* ratio :"
-						+ "\n`" + context.getPrefix() + this.getFirstName() + " -p sfw -c anime -rat 16x9`", false);
+						+ "\n`" + context.getPrefix() + this.getFirstName() + " -p sfw -c anime -rat 16x9`", false)
+				.appendField("Source", "https://alpha.wallhaven.cc/", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }
