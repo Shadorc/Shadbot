@@ -19,7 +19,7 @@ public class ShardStatus {
 		this.shard = shard;
 		this.threadPool = new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 4,
 				0, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(), Utils.getThreadFactoryNamed("Shadbot-Shard" + this.getShardNum() + "-%d"));
+				new LinkedBlockingQueue<Runnable>(), Utils.getThreadFactoryNamed("Shadbot-Shard-" + this.getShardNum() + "-%d"));
 		this.lastAlive = new AtomicLong();
 	}
 
