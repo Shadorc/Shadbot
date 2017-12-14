@@ -2,6 +2,7 @@ package me.shadorc.discordbot.events;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Config;
+import me.shadorc.discordbot.shards.ShardManager;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.schedule.Scheduler;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -15,10 +16,13 @@ public class ReadyListener {
 		LogUtils.info("------------------- Shadbot is ready [Version:" + Config.VERSION.toString() + "] -------------------");
 
 		Scheduler.start();
+		ShardManager.start();
 
-		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new GuildListener());
-		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new ChannelListener());
-		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new VoiceChannelListener());
-		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new MessageListener());
+		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getEventThreadPool(), new ChannelListener());
+		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getEventThreadPool(), new GuildListener());
+		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getEventThreadPool(), new GuildMemberListener());
+		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getEventThreadPool(), new MessageListener());
+		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getEventThreadPool(), new UserVoiceChannelListener());
+		Shadbot.getClient().getDispatcher().registerListener(Shadbot.getEventThreadPool(), new VoiceChannelListener());
 	}
 }

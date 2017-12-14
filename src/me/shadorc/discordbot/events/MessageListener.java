@@ -12,12 +12,14 @@ import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.exceptions.MissingArgumentException;
 import me.shadorc.discordbot.message.MessageManager;
+import me.shadorc.discordbot.shards.ShardManager;
 import me.shadorc.discordbot.stats.StatsEnum;
 import me.shadorc.discordbot.stats.StatsManager;
 import me.shadorc.discordbot.utils.BotUtils;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
@@ -26,7 +28,15 @@ import sx.blah.discord.util.EmbedBuilder;
 public class MessageListener {
 
 	@EventSubscriber
-	public void onMessageReceivedEvent(MessageReceivedEvent event) {
+	public void onMessageEvent(MessageEvent event) {
+		ShardManager.getThreadPool(event.getGuild().getShard()).execute(() -> {
+			if(event instanceof MessageReceivedEvent) {
+				this.onMessageReceivedEvent((MessageReceivedEvent) event);
+			}
+		});
+	}
+
+	private void onMessageReceivedEvent(MessageReceivedEvent event) {
 		IMessage message = event.getMessage();
 		try {
 			StatsManager.increment(StatsEnum.MESSAGES_RECEIVED);

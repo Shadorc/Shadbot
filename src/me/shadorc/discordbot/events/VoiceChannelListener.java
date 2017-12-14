@@ -1,23 +1,25 @@
 package me.shadorc.discordbot.events;
 
-import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.music.GuildMusicManager;
-import me.shadorc.discordbot.utils.BotUtils;
+import me.shadorc.discordbot.shards.ShardManager;
 import me.shadorc.discordbot.utils.LogUtils;
-import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.handle.impl.events.guild.voice.VoiceChannelEvent;
 import sx.blah.discord.handle.impl.events.guild.voice.VoiceDisconnectedEvent;
-import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelJoinEvent;
-import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelLeaveEvent;
-import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelMoveEvent;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IVoiceChannel;
 
 @SuppressWarnings("ucd")
 public class VoiceChannelListener {
 
 	@EventSubscriber
-	public void onVoiceDisconnectedEvent(VoiceDisconnectedEvent event) {
+	public void onVoiceChannelEvent(VoiceChannelEvent event) {
+		ShardManager.getThreadPool(event.getGuild().getShard()).execute(() -> {
+			if(event instanceof VoiceDisconnectedEvent) {
+				this.onVoiceDisconnectedEvent((VoiceDisconnectedEvent) event);
+			}
+		});
+	}
+
+	private void onVoiceDisconnectedEvent(VoiceDisconnectedEvent event) {
 		GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(event.getGuild());
 		if(musicManager != null) {
 			musicManager.delete();
@@ -29,47 +31,5 @@ public class VoiceChannelListener {
 				event.getVoiceChannel().leave();
 			}
 		}
-	}
-
-	@EventSubscriber
-	public void onUserVoiceChannelJoinEvent(UserVoiceChannelJoinEvent event) {
-		this.check(event.getGuild());
-	}
-
-	@EventSubscriber
-	public void onUserVoiceChannelLeaveEvent(UserVoiceChannelLeaveEvent event) {
-		this.check(event.getGuild());
-	}
-
-	@EventSubscriber
-	public void onUserVoiceChannelMoveEvent(UserVoiceChannelMoveEvent event) {
-		this.check(event.getGuild());
-	}
-
-	private synchronized void check(IGuild guild) {
-		IVoiceChannel botVoiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
-		if(botVoiceChannel != null) {
-
-			GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(guild);
-
-			if(musicManager == null) {
-				return;
-			}
-
-			if(this.isAlone(botVoiceChannel) && !musicManager.isLeavingScheduled()) {
-				BotUtils.sendMessage(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.", musicManager.getChannel());
-				musicManager.getScheduler().getAudioPlayer().setPaused(true);
-				musicManager.scheduleLeave();
-
-			} else if(!this.isAlone(botVoiceChannel) && musicManager.isLeavingScheduled()) {
-				BotUtils.sendMessage(Emoji.INFO + " Somebody joined me, music resumed.", musicManager.getChannel());
-				musicManager.getScheduler().getAudioPlayer().setPaused(false);
-				musicManager.cancelLeave();
-			}
-		}
-	}
-
-	private boolean isAlone(IVoiceChannel voiceChannel) {
-		return voiceChannel.getConnectedUsers().stream().filter(user -> !user.isBot()).count() == 0;
 	}
 }

@@ -69,7 +69,7 @@ public class GuildMusicManager {
 
 	public void end() {
 		// Do not block the lavaplayer thread to allow the socket to be closed in time, avoiding a SocketClosed exception
-		Shadbot.getDefaultThreadPool().submit(() -> {
+		Shadbot.getEventThreadPool().submit(() -> {
 			StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
 			if(!PremiumManager.isGuildPremium(channel.getGuild())) {
 				strBuilder.append(" If you like me, please consider donating on " + Config.PATREON_URL + "."

@@ -22,10 +22,10 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class Shadbot {
 
-	private static final ExecutorService THREAD_POOL =
-			new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 8,
+	private static final ExecutorService EVENT_THREAD_POOL =
+			new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 4,
 					0, TimeUnit.SECONDS,
-					new LinkedBlockingQueue<Runnable>(), Utils.getThreadFactoryNamed("Shadbot-DefaultThreadPool-%d"));
+					new LinkedBlockingQueue<Runnable>(), Utils.getThreadFactoryNamed("Shadbot-EventThreadPool-%d"));
 
 	private static IDiscordClient client;
 	private static IUser owner;
@@ -42,21 +42,21 @@ public class Shadbot {
 				.withToken(Config.get(APIKey.DISCORD_TOKEN))
 				.withRecommendedShardCount()
 				.setMaxMessageCacheCount(25)
-				.setMaxReconnectAttempts(100)
+				.setMaxReconnectAttempts(10)
 				.login();
 
 		LogUtils.info("Connecting to " + StringUtils.pluralOf(client.getShardCount(), "shard") + "...");
 
-		client.getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new ReadyListener());
-		client.getDispatcher().registerListener(Shadbot.getDefaultThreadPool(), new ShardListener());
+		client.getDispatcher().registerListener(Shadbot.getEventThreadPool(), new ReadyListener());
+		client.getDispatcher().registerListener(Shadbot.getEventThreadPool(), new ShardListener());
 
 		owner = client.getApplicationOwner();
 
 		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
 	}
 
-	public static ExecutorService getDefaultThreadPool() {
-		return THREAD_POOL;
+	public static ExecutorService getEventThreadPool() {
+		return EVENT_THREAD_POOL;
 	}
 
 	public static IDiscordClient getClient() {
