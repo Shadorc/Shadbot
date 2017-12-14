@@ -71,7 +71,7 @@ public class Rule34Cmd extends AbstractCommand {
 
 			String[] tags = postObj.getString("tags").trim().split(" ");
 
-			if(postObj.getBoolean("has_children") || this.isLegal(tags)) {
+			if(postObj.getBoolean("has_children") || this.isNotLegal(tags)) {
 				BotUtils.sendMessage(Emoji.WARNING + " Sorry, I don't display images containing children or tagged with `loli` or `shota`.", context.getChannel());
 				return;
 			}
@@ -108,7 +108,7 @@ public class Rule34Cmd extends AbstractCommand {
 		return "http:" + url;
 	}
 
-	private boolean isLegal(String... tags) {
+	private boolean isNotLegal(String... tags) {
 		return Arrays.asList(tags).stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"));
 	}
 
