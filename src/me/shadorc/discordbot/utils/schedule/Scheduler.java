@@ -34,9 +34,9 @@ public class Scheduler {
 			Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-MessagesThreadPool-%d"));
 
 	public static void start() {
-		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 1, 1, TimeUnit.MINUTES);
-		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> StatsManager.save(), 5, 5, TimeUnit.MINUTES);
-		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoDataManager.save(), 5, 5, TimeUnit.MINUTES);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> DatabaseManager.save(), 5, 5, TimeUnit.MINUTES);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> StatsManager.save(), 10, 10, TimeUnit.MINUTES);
+		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoDataManager.save(), 10, 10, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> Shadbot.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING,
 				Config.DEFAULT_PREFIX + "help | " + TextUtils.getTip()), 0, 30, TimeUnit.MINUTES);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> NetUtils.postStats(), 2, 2, TimeUnit.HOURS);
