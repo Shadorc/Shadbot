@@ -45,7 +45,7 @@ public class LottoDataManager {
 	}
 
 	public static synchronized void addToPool(int coins) {
-		int pool = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) dataObj.optInt(JSONKey.POOL.toString()) + Math.ceil(coins / 100f)));
+		int pool = (int) Math.max(0, Math.min(Config.MAX_COINS, dataObj.optInt(JSONKey.POOL.toString()) + Math.ceil(coins / 100f)));
 		dataObj.put(JSONKey.POOL.toString(), pool);
 	}
 

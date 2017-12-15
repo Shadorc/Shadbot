@@ -1,13 +1,12 @@
 package me.shadorc.discordbot.utils;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONObject;
+import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,6 +14,7 @@ import org.jsoup.nodes.Document;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Config.APIKey;
+import sx.blah.discord.api.IShard;
 
 public class NetUtils {
 
@@ -67,37 +67,33 @@ public class NetUtils {
 	}
 
 	public static void postStats() {
-		NetUtils.postStatsOn("https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN);
-		NetUtils.postStatsOn("https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN);
+		for(IShard shard : Shadbot.getClient().getShards()) {
+			NetUtils.postStatsOn("https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN, shard);
+			NetUtils.postStatsOn("https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN, shard);
+		}
 	}
 
-	private static void postStatsOn(String homeUrl, APIKey token) {
+	private static void postStatsOn(String homeUrl, APIKey token, IShard shard) {
 		try {
-			URL url = new URL(homeUrl + "/api/bots/" + Shadbot.getClient().getOurUser().getLongID() + "/stats");
+			JSONObject content = new JSONObject()
+					.put("shard_id", shard.getInfo()[0])
+					.put("shard_count", Shadbot.getClient().getShardCount())
+					.put("server_count", shard.getGuilds().size());
 
-			URLConnection urlConn = url.openConnection();
-			urlConn.setRequestProperty("Content-Type", "application/json");
-			urlConn.setRequestProperty("Authorization", Config.get(token));
-			urlConn.setDoOutput(true);
-			urlConn.setDoInput(true);
-			urlConn.setUseCaches(false);
+			Map<String, String> header = new HashMap<>();
+			header.put("Content-Type", "application/json");
+			header.put("Authorization", Config.get(token));
 
-			JSONObject content = new JSONObject().put("server_count", Shadbot.getClient().getGuilds().size());
+			String url = homeUrl + "/api/bots/" + Shadbot.getClient().getOurUser().getLongID() + "/stats";
+			Document response = Jsoup.connect(url)
+					.method(Method.POST)
+					.ignoreHttpErrors(true)
+					.ignoreContentType(true)
+					.headers(header)
+					.requestBody(content.toString())
+					.post();
 
-			try (DataOutputStream out = new DataOutputStream(urlConn.getOutputStream());
-					BufferedReader reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream()))) {
-
-				out.writeBytes(content.toString());
-				out.flush();
-
-				StringBuilder strBuilder = new StringBuilder();
-				String line;
-				while((line = reader.readLine()) != null) {
-					strBuilder.append(line);
-				}
-				LogUtils.info("Stats posted to " + homeUrl + " (Response: " + strBuilder.toString() + ")");
-			}
-
+			LogUtils.info("Stats posted to " + homeUrl + " (Response: " + response.text() + ")");
 		} catch (Exception err) {
 			LogUtils.info("An error occurred while posting stats. (" + err.getClass().getSimpleName() + ": " + err.getMessage() + ")");
 		}
