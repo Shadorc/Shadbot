@@ -1,9 +1,7 @@
 package me.shadorc.discordbot.shards;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 import me.shadorc.discordbot.utils.Utils;
@@ -17,9 +15,7 @@ public class ShardStatus {
 
 	public ShardStatus(IShard shard) {
 		this.shard = shard;
-		this.threadPool = new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 4,
-				0, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(), Utils.getThreadFactoryNamed("Shadbot-Shard-" + this.getShardNum() + "-%d"));
+		this.threadPool = Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-Shard-" + this.getShardNum() + "-%d"));
 		this.lastAlive = new AtomicLong();
 	}
 

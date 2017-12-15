@@ -1,9 +1,7 @@
 package me.shadorc.discordbot;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
 
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
@@ -23,13 +21,9 @@ import sx.blah.discord.handle.obj.IUser;
 public class Shadbot {
 
 	private static final ExecutorService EVENT_THREAD_POOL =
-			new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 4,
-					0, TimeUnit.SECONDS,
-					new LinkedBlockingQueue<Runnable>(), Utils.getThreadFactoryNamed("Shadbot-EventThreadPool-%d"));
+			Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-EventThreadPool-%d"));
 	private static final ExecutorService DEFAUT_THREAD_POOL =
-			new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 4,
-					0, TimeUnit.SECONDS,
-					new LinkedBlockingQueue<Runnable>(), Utils.getThreadFactoryNamed("Shadbot-DefaultThreadPool-%d"));
+			Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-DefaultThreadPool-%d"));
 
 	private static IDiscordClient client;
 	private static IUser owner;
