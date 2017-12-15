@@ -40,9 +40,11 @@ public class Context {
 	}
 
 	public Role getAuthorRole() {
-		if(event.getGuild() == null) {
-			LogUtils.warn("[DEBUG] Guild was null on Context#getAuthorRole()."
+		if(event.getGuild() == null || event.getGuild().getOwner() == null) {
+			LogUtils.warn("[DEBUG] Guild or owner was null on Context#getAuthorRole()."
 					+ "\nCommand: " + command
+					+ "\nGuild: " + event.getGuild()
+					+ "\nOwner: " + (event.getGuild() == null ? null : event.getGuild().getOwner())
 					+ "\nEvent: " + event.toString()
 					+ "\nIs channel private ? " + event.getChannel().isPrivate());
 			return Role.USER;
