@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
+import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -39,6 +40,14 @@ public class Context {
 	}
 
 	public Role getAuthorRole() {
+		if(event.getGuild() == null) {
+			LogUtils.warn("[DEBUG] Guild was null on Context#getAuthorRole()."
+					+ "\nCommand: " + command
+					+ "\nEvent: " + event.toString()
+					+ "\nIs channel private ? " + event.getChannel().isPrivate());
+			return Role.USER;
+		}
+
 		if(event.getAuthor().getLongID() == Shadbot.getOwner().getLongID()) {
 			return Role.OWNER;
 		} else if(event.getAuthor().getPermissionsForGuild(event.getGuild()).contains(Permissions.ADMINISTRATOR)) {
