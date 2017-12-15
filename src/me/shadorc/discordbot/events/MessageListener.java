@@ -30,8 +30,15 @@ public class MessageListener {
 	@EventSubscriber
 	public void onMessageEvent(MessageEvent event) {
 		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
+			long startTime = System.currentTimeMillis();
 			if(event instanceof MessageReceivedEvent) {
 				this.onMessageReceivedEvent((MessageReceivedEvent) event);
+			}
+			long elapsedTime = System.currentTimeMillis() - startTime;
+			if(elapsedTime / 1000 > 10) {
+				LogUtils.info("{DEBUG} MessageListener | Long event detected !"
+						+ "\nDuration: " + elapsedTime
+						+ "\nEvent: " + event);
 			}
 		});
 	}

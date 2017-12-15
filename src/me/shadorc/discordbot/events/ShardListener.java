@@ -14,6 +14,7 @@ public class ShardListener {
 
 	@EventSubscriber
 	public void onShardEvent(ShardEvent event) {
+		long startTime = System.currentTimeMillis();
 		if(event instanceof DisconnectedEvent) {
 			this.onDisconnectedEvent((DisconnectedEvent) event);
 		} else if(event instanceof ShardReadyEvent) {
@@ -22,6 +23,12 @@ public class ShardListener {
 			this.onReconnectSuccessEvent((ReconnectSuccessEvent) event);
 		} else if(event instanceof ResumedEvent) {
 			this.onResumedEvent((ResumedEvent) event);
+		}
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		if(elapsedTime / 1000 > 10) {
+			LogUtils.info("{DEBUG} ShardListener | Long event detected !"
+					+ "\nDuration: " + elapsedTime
+					+ "\nEvent: " + event);
 		}
 	}
 

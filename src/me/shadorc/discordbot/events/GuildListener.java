@@ -13,10 +13,17 @@ public class GuildListener {
 	@EventSubscriber
 	public void onGuildEvent(GuildEvent event) {
 		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
+			long startTime = System.currentTimeMillis();
 			if(event instanceof GuildCreateEvent) {
 				this.onGuildCreateEvent((GuildCreateEvent) event);
 			} else if(event instanceof GuildLeaveEvent) {
 				this.onGuildLeaveEvent((GuildLeaveEvent) event);
+			}
+			long elapsedTime = System.currentTimeMillis() - startTime;
+			if(elapsedTime / 1000 > 10) {
+				LogUtils.info("{DEBUG} GuildListener | Long event detected !"
+						+ "\nDuration: " + elapsedTime
+						+ "\nEvent: " + event);
 			}
 		});
 	}
