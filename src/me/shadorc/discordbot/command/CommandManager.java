@@ -3,6 +3,7 @@ package me.shadorc.discordbot.command;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import me.shadorc.discordbot.command.admin.GiveCoinsCmd;
 import me.shadorc.discordbot.command.admin.PruneCmd;
 import me.shadorc.discordbot.command.admin.SettingsManagerCmd;
 import me.shadorc.discordbot.command.currency.CoinsCmd;
@@ -50,7 +51,6 @@ import me.shadorc.discordbot.command.music.ShuffleCmd;
 import me.shadorc.discordbot.command.music.SkipCmd;
 import me.shadorc.discordbot.command.music.StopCmd;
 import me.shadorc.discordbot.command.music.VolumeCmd;
-import me.shadorc.discordbot.command.owner.AddCoinsCmd;
 import me.shadorc.discordbot.command.owner.GenerateRelicCmd;
 import me.shadorc.discordbot.command.owner.SendMessageCmd;
 import me.shadorc.discordbot.command.owner.SendToAllCmd;
@@ -145,7 +145,7 @@ public class CommandManager {
 				// Owner Commands
 				new SendMessageCmd(),
 				new ShutdownCmd(),
-				new AddCoinsCmd(),
+				new GiveCoinsCmd(),
 				new StatsCmd(),
 				new GenerateRelicCmd(),
 				new SendToAllCmd());

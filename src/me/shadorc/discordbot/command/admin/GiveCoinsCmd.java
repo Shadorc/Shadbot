@@ -1,4 +1,4 @@
-package me.shadorc.discordbot.command.owner;
+package me.shadorc.discordbot.command.admin;
 
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
@@ -15,10 +15,10 @@ import me.shadorc.discordbot.utils.command.RateLimiter;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
-public class AddCoinsCmd extends AbstractCommand {
+public class GiveCoinsCmd extends AbstractCommand {
 
-	public AddCoinsCmd() {
-		super(CommandCategory.OWNER, Role.OWNER, RateLimiter.DEFAULT_COOLDOWN, "add_coins");
+	public GiveCoinsCmd() {
+		super(CommandCategory.ADMIN, Role.ADMIN, RateLimiter.DEFAULT_COOLDOWN, "give_coins");
 	}
 
 	@Override
@@ -46,15 +46,14 @@ public class AddCoinsCmd extends AbstractCommand {
 			}
 			strBuilder.append(FormatUtils.formatList(context.getMessage().getMentions(), user -> user.getName(), ", "));
 		}
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " **" + strBuilder.toString() + "** received *" + FormatUtils.formatCoins(coins) + "*.", context.getChannel());
+		BotUtils.sendMessage(Emoji.CHECK_MARK + " **" + strBuilder.toString() + "** received **" + FormatUtils.formatCoins(coins) + "**.", context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Add coins to your wallet.**")
+				.appendDescription("**Give coins to an user.**")
 				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <coins> [<@user(s)>]`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
-
 }
