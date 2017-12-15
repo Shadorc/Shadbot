@@ -11,6 +11,7 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.Utils;
 import sx.blah.discord.api.IShard;
+import sx.blah.discord.handle.obj.IGuild;
 
 public class ShardManager {
 
@@ -28,7 +29,12 @@ public class ShardManager {
 		LogUtils.info("Shard watcher started.");
 	}
 
-	public static ExecutorService getThreadPool(IShard shard) {
+	public static ExecutorService getThreadPool(IGuild guild) {
+		if(guild == null) {
+			return Shadbot.getDefaultThreadPool();
+		}
+
+		IShard shard = guild.getShard();
 		for(ShardStatus shardStatus : SHARDS_STATUS) {
 			if(shardStatus.getShard().equals(shard)) {
 				shardStatus.alive();

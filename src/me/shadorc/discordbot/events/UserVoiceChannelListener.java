@@ -18,7 +18,7 @@ public class UserVoiceChannelListener {
 
 	@EventSubscriber
 	public void onUserVoiceChannelEvent(UserVoiceChannelEvent event) {
-		ShardManager.getThreadPool(event.getGuild().getShard()).execute(() -> {
+		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
 			if(event instanceof UserVoiceChannelJoinEvent) {
 				this.onUserVoiceChannelJoinEvent((UserVoiceChannelJoinEvent) event);
 			} else if(event instanceof UserVoiceChannelLeaveEvent) {

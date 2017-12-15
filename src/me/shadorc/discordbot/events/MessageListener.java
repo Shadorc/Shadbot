@@ -29,7 +29,7 @@ public class MessageListener {
 
 	@EventSubscriber
 	public void onMessageEvent(MessageEvent event) {
-		ShardManager.getThreadPool(event.getGuild().getShard()).execute(() -> {
+		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
 			if(event instanceof MessageReceivedEvent) {
 				this.onMessageReceivedEvent((MessageReceivedEvent) event);
 			}

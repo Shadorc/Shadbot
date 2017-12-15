@@ -26,6 +26,10 @@ public class Shadbot {
 			new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 4,
 					0, TimeUnit.SECONDS,
 					new LinkedBlockingQueue<Runnable>(), Utils.getThreadFactoryNamed("Shadbot-EventThreadPool-%d"));
+	private static final ExecutorService DEFAUT_THREAD_POOL =
+			new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 4,
+					0, TimeUnit.SECONDS,
+					new LinkedBlockingQueue<Runnable>(), Utils.getThreadFactoryNamed("Shadbot-DefaultThreadPool-%d"));
 
 	private static IDiscordClient client;
 	private static IUser owner;
@@ -57,6 +61,10 @@ public class Shadbot {
 
 	public static ExecutorService getEventThreadPool() {
 		return EVENT_THREAD_POOL;
+	}
+
+	public static ExecutorService getDefaultThreadPool() {
+		return DEFAUT_THREAD_POOL;
 	}
 
 	public static IDiscordClient getClient() {

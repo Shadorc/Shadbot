@@ -17,7 +17,7 @@ public class ChannelListener {
 
 	@EventSubscriber
 	public void onChannelEvent(ChannelEvent event) {
-		ShardManager.getThreadPool(event.getGuild().getShard()).execute(() -> {
+		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
 			if(event instanceof ChannelDeleteEvent) {
 				this.onChannelDeleteEvent((ChannelDeleteEvent) event);
 			}
