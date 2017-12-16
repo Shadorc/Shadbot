@@ -28,11 +28,10 @@ public class UserVoiceChannelListener {
 			} else if(event instanceof UserVoiceChannelMoveEvent) {
 				this.onUserVoiceChannelMoveEvent((UserVoiceChannelMoveEvent) event);
 			}
-			long elapsedTime = System.currentTimeMillis() - startTime;
-			if(elapsedTime / 1000 > 10) {
-				LogUtils.info("{DEBUG} UserVoiceChannelListener | Long event detected !"
-						+ "\nDuration: " + elapsedTime
-						+ "\nEvent: " + event);
+			float elapsedSec = (System.currentTimeMillis() - startTime) / 1000f;
+			if(elapsedSec > 10) {
+				LogUtils.info("{DEBUG} " + event.getClass().getSimpleName() + " | Long event detected ! "
+						+ "Duration: " + String.format("%.1f", elapsedSec) + "s.");
 			}
 		});
 	}

@@ -23,11 +23,10 @@ public class GuildMemberListener {
 			} else if(event instanceof UserLeaveEvent) {
 				this.onUserLeaveEvent((UserLeaveEvent) event);
 			}
-			long elapsedTime = System.currentTimeMillis() - startTime;
-			if(elapsedTime / 1000 > 10) {
-				LogUtils.info("{DEBUG} GuildMemberListener | Long event detected !"
-						+ "\nDuration: " + elapsedTime
-						+ "\nEvent: " + event);
+			float elapsedSec = (System.currentTimeMillis() - startTime) / 1000f;
+			if(elapsedSec > 10) {
+				LogUtils.info("{DEBUG} " + event.getClass().getSimpleName() + " | Long event detected ! "
+						+ "Duration: " + String.format("%.1f", elapsedSec) + "s.");
 			}
 		});
 	}
