@@ -122,10 +122,10 @@ public class LottoCmd extends AbstractCommand {
 		int minutes = LottoCmd.getDelayBeforeNextDraw() / 1000 / 60;
 		int hours = minutes / 60;
 		int days = hours / 24;
-		return "The next draw will take place in "
+		return "The next draw will take place in **"
 				+ (days > 0 ? StringUtils.pluralOf(days, "day") + " " : "")
 				+ (hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "")
-				+ StringUtils.pluralOf(minutes % 60, "minute") + ". ";
+				+ StringUtils.pluralOf(minutes % 60, "minute") + "**. ";
 	}
 
 	public static int getDelayBeforeNextDraw() {
