@@ -81,7 +81,6 @@ public class StatsManager {
 	}
 
 	public static void save() {
-		LogUtils.info("Saving stats...");
 		JSONObject mainObj = new JSONObject();
 		STATS_MAP.keySet().stream().forEach(statsEnum -> mainObj.put(statsEnum.toString(), new JSONObject(STATS_MAP.get(statsEnum))));
 

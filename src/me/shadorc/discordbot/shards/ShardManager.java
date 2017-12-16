@@ -29,6 +29,11 @@ public class ShardManager {
 		LogUtils.info("Shard watcher started.");
 	}
 
+	public static void stop() {
+		EXECUTOR.shutdownNow();
+		LogUtils.info("Shard watcher stopped.");
+	}
+
 	public static ExecutorService getThreadPool(IGuild guild) {
 		if(guild == null) {
 			return Shadbot.getDefaultThreadPool();
@@ -57,7 +62,7 @@ public class ShardManager {
 							lastEventTime / 1000));
 					shardStatus.restart();
 				} catch (Exception err) {
-					LogUtils.info("An error occurred while restarting shard " + shardStatus.getShardNum());
+					LogUtils.info("An error occurred while restarting shard " + shardStatus.getShardNum() + " (" + err.getMessage() + ")");
 				}
 			}
 		}

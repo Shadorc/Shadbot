@@ -42,6 +42,21 @@ public class Scheduler {
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> NetUtils.postStats(), 2, 2, TimeUnit.HOURS);
 		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoCmd.lotteryDraw(), LottoCmd.getDelayBeforeNextDraw(),
 				TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
+		LogUtils.info("Scheduler started.");
+	}
+
+	public static void stop() {
+		try {
+			SCHEDULED_EXECUTOR.submit(() -> {
+				DatabaseManager.save();
+				StatsManager.save();
+				LottoDataManager.save();
+			}).get();
+			SCHEDULED_EXECUTOR.shutdownNow();
+			LogUtils.info("Scheduler stopped.");
+		} catch (InterruptedException | ExecutionException err) {
+			LogUtils.info("An error occurred while stopping scheduler (" + err.getMessage() + ")");
+		}
 	}
 
 	public static void scheduleMessage(Object message, IChannel channel, Reason reason) {
@@ -95,19 +110,6 @@ public class Scheduler {
 			LogUtils.info("{Guild ID: " + message.getGuildID() + "} Pending message sent.");
 		} else {
 			LogUtils.info("{Guild ID: " + message.getGuildID() + "} Too many try, abort attempt to send message.");
-		}
-	}
-
-	public static void stop() {
-		try {
-			SCHEDULED_EXECUTOR.submit(() -> {
-				DatabaseManager.save();
-				StatsManager.save();
-				LottoDataManager.save();
-			}).get();
-			SCHEDULED_EXECUTOR.shutdownNow();
-		} catch (InterruptedException | ExecutionException err) {
-			LogUtils.error("An error occurred while stopping scheduler.", err);
 		}
 	}
 }

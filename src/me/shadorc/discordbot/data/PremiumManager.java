@@ -180,7 +180,6 @@ public class PremiumManager {
 	}
 
 	private synchronized static void save() {
-		LogUtils.info("Saving premium data...");
 		try (FileWriter writer = new FileWriter(PREMIUM_DATA_FILE)) {
 			writer.write(dataObj.toString(Config.INDENT_FACTOR));
 			writer.flush();

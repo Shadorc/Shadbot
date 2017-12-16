@@ -81,7 +81,6 @@ public class LottoDataManager {
 	}
 
 	public static void save() {
-		LogUtils.info("Saving lotto data...");
 		try (FileWriter writer = new FileWriter(LOTTERY_DATA_FILE)) {
 			writer.write(dataObj.toString(Config.INDENT_FACTOR));
 			writer.flush();

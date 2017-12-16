@@ -10,6 +10,7 @@ import me.shadorc.discordbot.data.Config.APIKey;
 import me.shadorc.discordbot.events.ReadyListener;
 import me.shadorc.discordbot.events.ShardListener;
 import me.shadorc.discordbot.music.GuildMusicManager;
+import me.shadorc.discordbot.shards.ShardManager;
 import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
@@ -29,12 +30,13 @@ public class Shadbot {
 	private static IUser owner;
 
 	public static void main(String[] args) {
-		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				Scheduler.stop();
+				ShardManager.stop();
 			}
-		}));
+		});
 
 		client = new ClientBuilder()
 				.withToken(Config.get(APIKey.DISCORD_TOKEN))
