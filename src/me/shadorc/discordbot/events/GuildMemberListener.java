@@ -25,7 +25,7 @@ public class GuildMemberListener {
 			}
 			float elapsedSec = (System.currentTimeMillis() - startTime) / 1000f;
 			if(elapsedSec > 10) {
-				LogUtils.info("{DEBUG} " + event.getClass().getSimpleName() + " | Long event detected ! "
+				LogUtils.warn("{DEBUG} " + event.getClass().getSimpleName() + " | Long event detected ! "
 						+ "Duration: " + String.format("%.1f", elapsedSec) + "s.");
 			}
 		});
