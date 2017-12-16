@@ -16,7 +16,7 @@ import me.shadorc.discordbot.utils.LogUtils;
 
 public class Config {
 
-	public static final Version VERSION = new Version(1, 10, 7);
+	public static final Version VERSION = new Version(1, 10, 8);
 
 	public static final long LOGS_CHANNEL_ID = 346311941829951489L;
 
