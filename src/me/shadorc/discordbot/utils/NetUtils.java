@@ -87,7 +87,6 @@ public class NetUtils {
 			String url = homeUrl + "/api/bots/" + Shadbot.getClient().getOurUser().getLongID() + "/stats";
 			Document response = Jsoup.connect(url)
 					.method(Method.POST)
-					.ignoreHttpErrors(true)
 					.ignoreContentType(true)
 					.headers(header)
 					.requestBody(content.toString())
