@@ -19,7 +19,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class RussianRouletteCmd extends AbstractCommand {
 
 	private static final int MAX_BET = 500_000;
-	private static final float WIN_MULTIPLIER = 2.05f;
+	private static final float WIN_MULTIPLIER = 2.025f;
 	private static final float LOSE_MULTIPLIER = 10f;
 
 	public RussianRouletteCmd() {
