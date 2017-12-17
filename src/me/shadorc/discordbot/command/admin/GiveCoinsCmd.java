@@ -46,7 +46,7 @@ public class GiveCoinsCmd extends AbstractCommand {
 			}
 			strBuilder.append(FormatUtils.formatList(context.getMessage().getMentions(), user -> user.getName(), ", "));
 		}
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " **" + strBuilder.toString() + "** received **" + FormatUtils.formatCoins(coins) + "**.", context.getChannel());
+		BotUtils.sendMessage(Emoji.MONEY_BAG + " **" + strBuilder.toString() + "** received **" + FormatUtils.formatCoins(coins) + "**.", context.getChannel());
 	}
 
 	@Override
