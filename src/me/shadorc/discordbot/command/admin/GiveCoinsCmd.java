@@ -1,5 +1,9 @@
 package me.shadorc.discordbot.command.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import me.shadorc.discordbot.command.AbstractCommand;
 import me.shadorc.discordbot.command.CommandCategory;
 import me.shadorc.discordbot.command.Context;
@@ -12,6 +16,7 @@ import me.shadorc.discordbot.utils.StringUtils;
 import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.discordbot.utils.command.RateLimiter;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -35,25 +40,31 @@ public class GiveCoinsCmd extends AbstractCommand {
 
 		int coins = Integer.parseInt(coinsStr);
 
-		StringBuilder strBuilder = new StringBuilder();
-		if(context.getMessage().getMentions().isEmpty()) {
-			DatabaseManager.addCoins(context.getChannel(), context.getAuthor(), coins);
-			strBuilder.append("You");
-
-		} else {
-			for(IUser user : context.getMessage().getMentions()) {
-				DatabaseManager.addCoins(context.getChannel(), user, coins);
-			}
-			strBuilder.append(FormatUtils.formatList(context.getMessage().getMentions(), user -> user.getName(), ", "));
+		List<IUser> users = new ArrayList<>(context.getMessage().getMentions());
+		for(IRole role : context.getMessage().getRoleMentions()) {
+			users.addAll(context.getGuild().getUsersByRole(role));
 		}
+		users = users.stream().distinct().collect(Collectors.toList());
+
+		for(IUser user : users) {
+			DatabaseManager.addCoins(context.getChannel(), user, coins);
+		}
+
+		StringBuilder strBuilder = new StringBuilder();
+		if(context.getMessage().mentionsEveryone()) {
+			strBuilder.append("Everyone");
+		} else {
+			strBuilder.append(FormatUtils.formatList(users, user -> user.getName(), ", "));
+		}
+
 		BotUtils.sendMessage(Emoji.MONEY_BAG + " **" + strBuilder.toString() + "** received **" + FormatUtils.formatCoins(coins) + "**.", context.getChannel());
 	}
 
 	@Override
 	public void showHelp(Context context) {
 		EmbedBuilder builder = Utils.getDefaultEmbed(this)
-				.appendDescription("**Give coins to an user.**")
-				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <coins> [<@user(s)>]`", false);
+				.appendDescription("**Give coins to an user/role.**")
+				.appendField("Usage", "`" + context.getPrefix() + this.getFirstName() + " <coins> <@user(s)/@role(s)>`", false);
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
 }
