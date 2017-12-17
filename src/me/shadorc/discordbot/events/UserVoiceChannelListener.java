@@ -4,7 +4,6 @@ import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.music.GuildMusicManager;
 import me.shadorc.discordbot.shards.ShardManager;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.discordbot.utils.command.Emoji;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelEvent;
@@ -20,18 +19,12 @@ public class UserVoiceChannelListener {
 	@EventSubscriber
 	public void onUserVoiceChannelEvent(UserVoiceChannelEvent event) {
 		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
-			long startTime = System.currentTimeMillis();
 			if(event instanceof UserVoiceChannelJoinEvent) {
 				this.onUserVoiceChannelJoinEvent((UserVoiceChannelJoinEvent) event);
 			} else if(event instanceof UserVoiceChannelLeaveEvent) {
 				this.onUserVoiceChannelLeaveEvent((UserVoiceChannelLeaveEvent) event);
 			} else if(event instanceof UserVoiceChannelMoveEvent) {
 				this.onUserVoiceChannelMoveEvent((UserVoiceChannelMoveEvent) event);
-			}
-			float elapsedSec = (System.currentTimeMillis() - startTime) / 1000f;
-			if(elapsedSec > 10) {
-				LogUtils.warn("{DEBUG} " + event.getClass().getSimpleName() + " | Long event detected ! "
-						+ "Duration: " + String.format("%.1f", elapsedSec) + "s.");
 			}
 		});
 	}

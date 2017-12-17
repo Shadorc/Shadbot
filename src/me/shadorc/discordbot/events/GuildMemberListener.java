@@ -4,7 +4,6 @@ import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.discordbot.data.Setting;
 import me.shadorc.discordbot.shards.ShardManager;
 import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.member.GuildMemberEvent;
 import sx.blah.discord.handle.impl.events.guild.member.UserJoinEvent;
@@ -17,16 +16,10 @@ public class GuildMemberListener {
 	@EventSubscriber
 	public void onGuildMemberEvent(GuildMemberEvent event) {
 		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
-			long startTime = System.currentTimeMillis();
 			if(event instanceof UserJoinEvent) {
 				this.onUserJoinEvent((UserJoinEvent) event);
 			} else if(event instanceof UserLeaveEvent) {
 				this.onUserLeaveEvent((UserLeaveEvent) event);
-			}
-			float elapsedSec = (System.currentTimeMillis() - startTime) / 1000f;
-			if(elapsedSec > 10) {
-				LogUtils.warn("{DEBUG} " + event.getClass().getSimpleName() + " | Long event detected ! "
-						+ "Duration: " + String.format("%.1f", elapsedSec) + "s.");
 			}
 		});
 	}
