@@ -46,7 +46,7 @@ class RouletteManager {
 				.withThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
 				.appendField(context.getAuthorName() + " started a Roulette game.",
 						"Use `" + context.getPrefix() + "roulette <bet> <place>` to join the game."
-								+ "\n\n**place** - must be a number between 1 and 36, red, black, even, odd, low or high", false)
+								+ "\n\n**Place** must be a number between `1 and 36`, `red`, `black`, `even`, `odd`, `low` or `high`", false)
 				.withFooterText("You have " + GAME_DURATION + " seconds to make your bets.");
 		BotUtils.sendMessage(builder.build(), context.getChannel()).get();
 
@@ -98,8 +98,8 @@ class RouletteManager {
 		CHANNELS_ROULETTE.remove(context.getChannel().getLongID());
 	}
 
-	protected void addPlayer(IUser user, Integer bet, String place) {
-		playersPlace.putIfAbsent(user, new Pair<Integer, String>(bet, place));
+	protected boolean addPlayer(IUser user, Integer bet, String place) {
+		return playersPlace.putIfAbsent(user, new Pair<Integer, String>(bet, place)) == null;
 	}
 
 	protected boolean isPlaying(IUser user) {
