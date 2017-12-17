@@ -42,14 +42,12 @@ public class RouletteCmd extends AbstractCommand {
 			return;
 		}
 
-		RouletteManager rouletteManager = RouletteManager.CHANNELS_ROULETTE.getOrDefault(context.getChannel().getLongID(),
-				new RouletteManager(context));
-
-		RouletteManager currentManager = RouletteManager.CHANNELS_ROULETTE.putIfAbsent(context.getChannel().getLongID(), rouletteManager);
-		if(currentManager == null) {
-			rouletteManager.start();
-		} else {
-			rouletteManager = currentManager;
+		RouletteManager rouletteManager = RouletteManager.CHANNELS_ROULETTE.get(context.getChannel().getLongID());
+		if(rouletteManager == null) {
+			rouletteManager = new RouletteManager(context);
+			if(RouletteManager.CHANNELS_ROULETTE.putIfAbsent(context.getChannel().getLongID(), rouletteManager) == null) {
+				rouletteManager.start();
+			}
 		}
 
 		if(rouletteManager.isPlaying(context.getAuthor())) {
