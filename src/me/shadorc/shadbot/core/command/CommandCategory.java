@@ -1,6 +1,6 @@
-package me.shadorc.shadbot.command;
+package me.shadorc.shadbot.core.command;
 
-public enum Category {
+public enum CommandCategory {
 
 	NONE("None"),
 	UTILS("Utility"),
@@ -17,7 +17,7 @@ public enum Category {
 
 	private final String name;
 
-	Category(String name) {
+	CommandCategory(String name) {
 		this.name = name;
 	}
 

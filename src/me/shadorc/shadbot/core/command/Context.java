@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.command;
+package me.shadorc.shadbot.core.command;
 
 import java.util.List;
 
@@ -73,5 +73,9 @@ public class Context {
 		} else {
 			return Role.USER;
 		}
+	}
+
+	public boolean hasArg() {
+		return !arg.isEmpty();
 	}
 }

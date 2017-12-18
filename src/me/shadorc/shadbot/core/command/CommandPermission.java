@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.command;
+package me.shadorc.shadbot.core.command;
 
 public enum CommandPermission {
 	USER(0),

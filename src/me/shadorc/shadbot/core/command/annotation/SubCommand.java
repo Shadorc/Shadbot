@@ -1,22 +1,18 @@
-package me.shadorc.shadbot.command;
+package me.shadorc.shadbot.core.command.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import me.shadorc.shadbot.core.command.CommandPermission;
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Command {
+public @interface SubCommand {
 
 	String[] names();
 
-	String alias() default "";
-
-	boolean hidden() default false;
-
-	CommandPermission role() default CommandPermission.USER;
-
-	Type type() default Type.COMMAND;
+	CommandPermission permission() default CommandPermission.USER;
 
 }

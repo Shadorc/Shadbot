@@ -15,6 +15,6 @@ public class StringUtils {
 	}
 
 	public static List<String> split(String str) {
-		return StringUtils.split(str, -1, " ");
+		return StringUtils.split(str, -1);
 	}
 }
