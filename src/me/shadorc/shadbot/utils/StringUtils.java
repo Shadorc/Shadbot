@@ -17,4 +17,8 @@ public class StringUtils {
 	public static List<String> split(String str) {
 		return StringUtils.split(str, -1);
 	}
+
+	public static String capitalize(String str) {
+		return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+	}
 }

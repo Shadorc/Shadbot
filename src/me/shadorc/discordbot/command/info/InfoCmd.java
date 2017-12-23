@@ -67,5 +67,4 @@ public class InfoCmd extends AbstractCommand {
 				.appendDescription("**Show Shadbot's info.**");
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}
-
 }

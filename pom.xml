@@ -2,14 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>me.shadorc.discordbot</groupId>
-	<artifactId>discordbot</artifactId>
-	<version>1.10.8</version>
+	<groupId>me.shadorc.shadbot</groupId>
+	<artifactId>shadbot</artifactId>
+	<version>2.0.0</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -25,7 +31,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>me.shadorc.discordbot.Shadbot</mainClass>
+									<mainClass>me.shadorc.shadbot.Shadbot</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>

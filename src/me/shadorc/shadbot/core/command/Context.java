@@ -4,6 +4,7 @@ import java.util.List;
 
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.command.Role;
+import me.shadorc.shadbot.shard.ShadbotShard;
 import me.shadorc.shadbot.utils.StringUtils;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.handle.obj.IChannel;
@@ -43,6 +44,11 @@ public class Context {
 
 	public String getArg() {
 		return arg;
+	}
+
+	public ShadbotShard getShadbotShard() {
+		// TODO
+		return null;
 	}
 
 	public IShard getShard() {

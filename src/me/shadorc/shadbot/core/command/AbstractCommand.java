@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import me.shadorc.discordbot.exceptions.MissingArgumentException;
-import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.exception.MissingArgumentException;
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 public abstract class AbstractCommand {
 
@@ -24,9 +24,9 @@ public abstract class AbstractCommand {
 		this.isHidden = annotation.hidden();
 	}
 
-	public abstract void execute(Context context) throws MissingArgumentException;
+	public abstract void execute(Context context) throws MissingArgumentException, IllegalArgumentException;
 
-	public abstract void help(Context context);
+	public abstract EmbedObject getHelp(Context context);
 
 	public List<String> getNames() {
 		return names;

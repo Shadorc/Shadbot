@@ -7,11 +7,10 @@ import java.util.Map;
 import org.reflections.Reflections;
 
 import me.shadorc.discordbot.command.Role;
-import me.shadorc.discordbot.exceptions.MissingArgumentException;
-import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
-import me.shadorc.discordbot.utils.command.Emoji;
-import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.command.Emoji;
 
 public class CommandManager {
 
@@ -22,7 +21,7 @@ public class CommandManager {
 
 		for(Class<?> cmdClass : new Reflections(this.getClass().getPackage()).getTypesAnnotatedWith(Command.class)) {
 			if(!cmdClass.isAssignableFrom(AbstractCommand.class)) {
-				// TODO
+				LogUtils.errorf("An error occurred while generating command, %s cannot be cast to AbstractCommand.", cmdClass.getSimpleName());
 				continue;
 			}
 
@@ -41,16 +40,6 @@ public class CommandManager {
 					continue;
 				}
 				commandsMap.put(name, cmd);
-
-				// Iterate over all sub-commands of this new class and add them to commandsMap too
-				/*
-				for(Method method : new Reflections(new MethodAnnotationsScanner()).getMethodsAnnotatedWith(Command.class)) {
-					if(method.getClass().equals(cmd.getClass())) {
-						commandsMap.put(name + " " + method.getName(), method);
-					}
-				}
-				 */
-
 			}
 		}
 	}
@@ -69,9 +58,10 @@ public class CommandManager {
 
 		try {
 			cmd.execute(context);
-		} catch (MissingArgumentException e) {
+		} catch (IllegalArgumentException err) {
 			// TODO
-			e.printStackTrace();
+		} catch (MissingArgumentException err) {
+			// TODO
 		}
 	}
 }

@@ -3,21 +3,20 @@ package me.shadorc.shadbot.utils;
 import me.shadorc.discordbot.Shadbot;
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.core.command.Context;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class HelpEmbedBuilder {
 
-	private final Context context;
+	private final String prefix;
 	private final AbstractCommand cmd;
 
 	private String usage;
 	private String example;
 	private String description;
 
-	public HelpEmbedBuilder(Context context, AbstractCommand cmd) {
-		this.context = context;
+	public HelpEmbedBuilder(AbstractCommand cmd, String prefix) {
+		this.prefix = prefix;
 		this.cmd = cmd;
 	}
 
@@ -28,7 +27,7 @@ public class HelpEmbedBuilder {
 
 	public HelpEmbedBuilder setArgs(String... args) {
 		this.usage = String.format("`%s%s %s`",
-				context.getPrefix(),
+				prefix,
 				cmd.getName(),
 				FormatUtils.formatArray(args, arg -> String.format("<%s>", arg), " "));
 		return this;
