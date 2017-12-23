@@ -83,13 +83,7 @@ public class GuildMusicManager {
 	public void leaveVoiceChannel() {
 		IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
 		if(voiceChannel != null && voiceChannel.getShard().isReady()) {
-			long startTime = System.currentTimeMillis();
 			voiceChannel.leave();
-			float elapsedSec = (System.currentTimeMillis() - startTime) / 1000f;
-			if(elapsedSec > 10) {
-				LogUtils.warn("{DEBUG} " + this.getClass().getSimpleName() + " | Long leave detected ! "
-						+ "Duration: " + String.format("%.1f", elapsedSec) + "s.");
-			}
 		}
 	}
 
