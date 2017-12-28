@@ -13,14 +13,8 @@ public class VoiceChannelListener {
 	@EventSubscriber
 	public void onVoiceChannelEvent(VoiceChannelEvent event) {
 		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
-			long startTime = System.currentTimeMillis();
 			if(event instanceof VoiceDisconnectedEvent) {
 				this.onVoiceDisconnectedEvent((VoiceDisconnectedEvent) event);
-			}
-			float elapsedSec = (System.currentTimeMillis() - startTime) / 1000f;
-			if(elapsedSec > 10) {
-				LogUtils.warn("{DEBUG} " + event.getClass().getSimpleName() + " | Long event detected ! "
-						+ "Duration: " + String.format("%.1f", elapsedSec) + "s.");
 			}
 		});
 	}
