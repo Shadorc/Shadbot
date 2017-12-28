@@ -14,7 +14,7 @@ public class LogUtils {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("Shadbot_Logger");
 
-	public static LogType type;
+	public static LogType type = LogType.WARN;
 
 	public static void error(String msg, Exception err) {
 		if(type.equals(LogType.ERROR)) {
@@ -27,8 +27,16 @@ public class LogUtils {
 		LogUtils.error(msg, null);
 	}
 
+	public static void error(Exception err, String msg) {
+		LogUtils.error(msg, err);
+	}
+
 	public static void errorf(String format, Object... args) {
 		LogUtils.error(String.format(format, args));
+	}
+
+	public static void errorf(Exception err, String format, Object... args) {
+		LogUtils.error(err, String.format(format, args));
 	}
 
 	public static void warn(String msg) {
@@ -43,6 +51,10 @@ public class LogUtils {
 			LogUtils.sendLog(new LogBuilder(LogType.INFO, msg));
 		}
 		LOGGER.info(msg);
+	}
+
+	public static void infof(String format, Object... args) {
+		LogUtils.info(String.format(format, args));
 	}
 
 	private static void sendLog(LogBuilder logBuilder) {

@@ -37,7 +37,7 @@ public class LogBuilder {
 		EmbedBuilder builder = new EmbedBuilder()
 				.setLenient(true)
 				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
-				.withAuthorName(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Shadbot.version))
+				.withAuthorName(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Shadbot.getVersion()))
 				.withDescription(message);
 
 		if(cmd != null) {

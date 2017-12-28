@@ -11,52 +11,51 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.utils.LogUtils;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.DBUser;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
-public class Database extends AbstractData {
+public class Database {
 
-	private static final File DB_FILE = new File("user_data.json");
+	private static final String FILE_NAME = "user_data.json";
+	private static final File FILE = new File(FILE_NAME);
 
-	private JSONObject dbObject;
+	private static JSONObject dbObject;
 
-	public Database() {
-		super(DB_FILE, 5, 5, TimeUnit.MINUTES);
-
-		if(!DB_FILE.exists()) {
-			try (FileWriter writer = new FileWriter(DB_FILE)) {
+	@DataInit
+	public static void init() throws JSONException, IOException {
+		if(!FILE.exists()) {
+			try (FileWriter writer = new FileWriter(FILE)) {
 				writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
-			} catch (IOException err) {
-				LogUtils.LOGGER.error("An error occurred during database file creation. Exiting.", err);
-				System.exit(1);
 			}
 		}
 
-		try (InputStream stream = DB_FILE.toURI().toURL().openStream()) {
+		try (InputStream stream = FILE.toURI().toURL().openStream()) {
 			dbObject = new JSONObject(new JSONTokener(stream));
-		} catch (JSONException | IOException err) {
-			LogUtils.LOGGER.error("An error occurred during database file initialisation. Exiting.", err);
-			System.exit(1);
 		}
 	}
 
-	public DBGuild getDBGuild(IGuild guild) {
+	@DataSave(filePath = FILE_NAME, initialDelay = 5, period = 5, unit = TimeUnit.MINUTES)
+	public static void save() throws JSONException, IOException {
+		try (FileWriter writer = new FileWriter(FILE)) {
+			writer.write(dbObject.toString(Config.INDENT_FACTOR));
+		}
+	}
+
+	public static JSONObject getJSON() {
+		return dbObject;
+	}
+
+	public static DBGuild getDBGuild(IGuild guild) {
 		return new DBGuild(guild);
 	}
 
-	public DBUser getDBUser(IGuild guild, IUser user) {
+	public static DBUser getDBUser(IGuild guild, IUser user) {
 		return new DBUser(guild, user.getLongID());
 	}
 
-	public JSONObject opt(String key) {
+	public static JSONObject opt(String key) {
 		return dbObject.optJSONObject(key);
-	}
-
-	@Override
-	public JSONObject getJSON() {
-		return dbObject;
 	}
 }

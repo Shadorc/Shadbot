@@ -21,4 +21,12 @@ public class StringUtils {
 	public static String capitalize(String str) {
 		return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
 	}
+
+	public static String pluralOf(int count, String str) {
+		if(count > 1) {
+			return String.format("%d %ss", count, str);
+		}
+		return String.format("%d %s", count, str);
+	}
+
 }

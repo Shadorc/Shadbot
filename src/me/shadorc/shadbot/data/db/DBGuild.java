@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 import me.shadorc.discordbot.data.Config;
 import me.shadorc.discordbot.data.Setting;
-import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.utils.JSONUtils;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -33,7 +33,7 @@ public class DBGuild {
 	}
 
 	private void load() {
-		JSONObject guildObj = Shadbot.getDBManager().opt(guild.getStringID());
+		JSONObject guildObj = Database.opt(guild.getStringID());
 		if(guildObj == null) {
 			return;
 		}

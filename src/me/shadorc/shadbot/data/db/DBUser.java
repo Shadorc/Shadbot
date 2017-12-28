@@ -3,7 +3,7 @@ package me.shadorc.shadbot.data.db;
 import org.json.JSONObject;
 
 import me.shadorc.discordbot.data.Config;
-import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.utils.JSONUtils;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -18,7 +18,7 @@ public class DBUser {
 	public DBUser(IGuild guild, long userID) {
 		this.guild = guild;
 		this.userID = userID;
-		this.userObj = JSONUtils.getOrDefault(Shadbot.getDBManager().getJSON(), new JSONObject(),
+		this.userObj = JSONUtils.getOrDefault(Database.getJSON(), new JSONObject(),
 				guild.getStringID(), DBGuild.USERS_KEY, Long.toString(userID));
 	}
 

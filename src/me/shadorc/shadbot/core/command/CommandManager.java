@@ -5,47 +5,60 @@ import java.util.List;
 import java.util.Map;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 
 import me.shadorc.discordbot.command.Role;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 
 public class CommandManager {
 
-	private final Map<String, AbstractCommand> commandsMap;
+	private static final Map<String, AbstractCommand> COMMANDS_MAP = new HashMap<>();
 
-	public CommandManager() throws InstantiationException, IllegalAccessException {
-		commandsMap = new HashMap<>();
+	public static boolean init() {
+		LogUtils.info("Initializing commands...");
 
-		for(Class<?> cmdClass : new Reflections(this.getClass().getPackage()).getTypesAnnotatedWith(Command.class)) {
-			if(!cmdClass.isAssignableFrom(AbstractCommand.class)) {
+		Reflections reflections = new Reflections(Shadbot.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
+		for(Class<?> cmdClass : reflections.getTypesAnnotatedWith(Command.class)) {
+			if(!AbstractCommand.class.isAssignableFrom(cmdClass)) {
 				LogUtils.errorf("An error occurred while generating command, %s cannot be cast to AbstractCommand.", cmdClass.getSimpleName());
 				continue;
 			}
 
-			AbstractCommand cmd = (AbstractCommand) cmdClass.newInstance();
+			try {
+				AbstractCommand cmd = (AbstractCommand) cmdClass.newInstance();
 
-			List<String> names = cmd.getNames();
-			if(!cmd.getAlias().isEmpty()) {
-				names.add(cmd.getAlias());
-			}
-
-			for(String name : names) {
-				if(commandsMap.containsKey(name)) {
-					LogUtils.error(String.format("Command name collision between %s and %s",
-							cmd.getClass().getSimpleName(),
-							commandsMap.get(name).getClass().getSimpleName()));
-					continue;
+				List<String> names = cmd.getNames();
+				if(!cmd.getAlias().isEmpty()) {
+					names.add(cmd.getAlias());
 				}
-				commandsMap.put(name, cmd);
+
+				for(String name : names) {
+					if(COMMANDS_MAP.containsKey(name)) {
+						LogUtils.error(String.format("Command name collision between %s and %s",
+								cmd.getClass().getSimpleName(),
+								COMMANDS_MAP.get(name).getClass().getSimpleName()));
+						continue;
+					}
+					COMMANDS_MAP.put(name, cmd);
+				}
+			} catch (InstantiationException | IllegalAccessException err) {
+				LogUtils.errorf(err, "An error occurred while initializing command %s.", cmdClass.getDeclaringClass().getSimpleName());
+				return false;
 			}
 		}
+
+		LogUtils.infof("%s initialized.", StringUtils.pluralOf((int) COMMANDS_MAP.values().stream().distinct().count(), "command"));
+		return true;
 	}
 
 	public void execute(Context context) {
-		AbstractCommand cmd = commandsMap.get(context.getCommandName());
+		AbstractCommand cmd = COMMANDS_MAP.get(context.getCommandName());
 		if(cmd == null) {
 			return;
 		}
