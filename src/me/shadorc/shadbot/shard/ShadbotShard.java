@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
-import me.shadorc.discordbot.utils.Utils;
+import me.shadorc.shadbot.utils.Utils;
 import sx.blah.discord.api.IShard;
 
 public class ShadbotShard {

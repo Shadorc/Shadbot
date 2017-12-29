@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Properties;
 
+import me.shadorc.shadbot.data.annotation.DataInit;
+
 public class APIKeys {
 
 	private static final Properties KEYS_PROPERTIES = new Properties();

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
@@ -26,6 +27,7 @@ public abstract class AbstractCommand {
 
 	public abstract void execute(Context context) throws MissingArgumentException, IllegalArgumentException;
 
+	// TODO: Is Context necessary ? Prefix should be the only thing needed
 	public abstract EmbedObject getHelp(Context context);
 
 	public List<String> getNames() {

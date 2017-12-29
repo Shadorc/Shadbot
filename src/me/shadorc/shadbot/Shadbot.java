@@ -5,14 +5,16 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.listener.ReadyListener;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.listener.ShardListener;
+import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.embed.LogUtils;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.StatusType;
@@ -39,26 +41,27 @@ public class Shadbot {
 			return;
 		}
 
-		System.exit(0);
-
 		client = new ClientBuilder()
 				.withToken(APIKeys.get(APIKey.DISCORD_TOKEN))
 				.withRecommendedShardCount()
 				.setMaxMessageCacheCount(25)
 				.setMaxReconnectAttempts(10)
-				.setPresence(StatusType.IDLE) // TODO: Change to ONLINE when everything is ready
+				.setPresence(StatusType.IDLE)
 				.build();
 
 		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(client.getShardCount(), "shard"));
 
-		client.getDispatcher().registerListeners(Shadbot.getEventThreadPool(), new ReadyListener());
-		// client.getDispatcher().registerListeners(Shadbot.getEventThreadPool(),
-		// new ReadyListener(),
-		// new ShardListener());
+		client.getDispatcher().registerListeners(Shadbot.getEventThreadPool(), new ReadyListener(), new ShardListener());
 
 		// AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
 
 		client.login();
+	}
+
+	public static void stop() {
+		DataManager.stop();
+		ShardManager.stop();
+		System.exit(0);
 	}
 
 	public static String getVersion() {

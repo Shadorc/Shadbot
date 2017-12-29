@@ -29,4 +29,11 @@ public class StringUtils {
 		return String.format("%d %s", count, str);
 	}
 
+	public static String truncate(String str, int size) {
+		if(str.length() > size) {
+			return str.substring(0, size-3) + "...";
+		}
+		return str;
+	}
+
 }

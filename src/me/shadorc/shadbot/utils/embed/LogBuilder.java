@@ -1,8 +1,7 @@
-package me.shadorc.shadbot.utils;
+package me.shadorc.shadbot.utils.embed;
 
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.utils.LogUtils.LogType;
+import me.shadorc.shadbot.utils.StringUtils;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
@@ -13,36 +12,29 @@ public class LogBuilder {
 	private final String message;
 	private final Exception err;
 	private final String input;
-	private final AbstractCommand cmd;
 	private final IChannel channel;
 
-	public LogBuilder(LogType type, String message, Exception err, String input, AbstractCommand cmd, IChannel channel) {
+	public LogBuilder(LogType type, String message, Exception err, String input, IChannel channel) {
 		this.type = type;
 		this.message = message;
 		this.err = err;
 		this.input = input;
-		this.cmd = cmd;
 		this.channel = channel;
 	}
 
 	public LogBuilder(LogType type, String message, Exception err) {
-		this(type, message, err, null, null, null);
+		this(type, message, err, null, null);
 	}
 
 	public LogBuilder(LogType type, String message) {
-		this(type, message, null, null, null, null);
+		this(type, message, null, null, null);
 	}
 
 	public EmbedObject build() {
-		EmbedBuilder builder = new EmbedBuilder()
+		EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)
-				.withAuthorIcon(Shadbot.getClient().getOurUser().getAvatarURL())
 				.withAuthorName(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Shadbot.getVersion()))
 				.withDescription(message);
-
-		if(cmd != null) {
-			builder.appendField("Command", cmd.getName(), false);
-		}
 
 		if(err != null) {
 			builder.appendField("Error type", err.getClass().getSimpleName(), false);

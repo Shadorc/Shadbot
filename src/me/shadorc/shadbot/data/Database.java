@@ -10,7 +10,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import me.shadorc.discordbot.data.Config;
+import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.data.annotation.DataInit;
+import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.DBUser;
 import sx.blah.discord.handle.obj.IGuild;
@@ -27,7 +29,7 @@ public class Database {
 	public static void init() throws JSONException, IOException {
 		if(!FILE.exists()) {
 			try (FileWriter writer = new FileWriter(FILE)) {
-				writer.write(new JSONObject().toString(Config.INDENT_FACTOR));
+				writer.write(new JSONObject().toString(Config.JSON_INDENT_FACTOR));
 			}
 		}
 
@@ -39,7 +41,7 @@ public class Database {
 	@DataSave(filePath = FILE_NAME, initialDelay = 5, period = 5, unit = TimeUnit.MINUTES)
 	public static void save() throws JSONException, IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
-			writer.write(dbObject.toString(Config.INDENT_FACTOR));
+			writer.write(dbObject.toString(Config.JSON_INDENT_FACTOR));
 		}
 	}
 

@@ -2,10 +2,12 @@ package me.shadorc.shadbot.core.command;
 
 import java.util.List;
 
-import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.command.Role;
+import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.shard.ShadbotShard;
+import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.StringUtils;
+import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -22,8 +24,7 @@ public class Context {
 
 	public Context(IMessage message) {
 		this.message = message;
-		// this.prefix = Storage#getPrefix
-		this.prefix = "placeholder";
+		this.prefix = message.getGuild() == null ? Config.DEFAULT_PREFIX : Database.getDBGuild(message.getGuild()).getPrefix();
 
 		List<String> splittedMsg = StringUtils.split(message.getContent(), 2);
 		this.cmdName = splittedMsg.get(0).substring(prefix.length()).toLowerCase();
@@ -32,6 +33,10 @@ public class Context {
 
 	public IMessage getMessage() {
 		return message;
+	}
+
+	public String getContent() {
+		return message.getContent();
 	}
 
 	public String getPrefix() {
@@ -46,9 +51,12 @@ public class Context {
 		return arg;
 	}
 
+	public IDiscordClient getClient() {
+		return message.getClient();
+	}
+
 	public ShadbotShard getShadbotShard() {
-		// TODO
-		return null;
+		return ShardManager.getShadbotShard(this.getShard());
 	}
 
 	public IShard getShard() {
@@ -71,13 +79,15 @@ public class Context {
 		return this.getAuthor().getName();
 	}
 
-	public Role getAuthorRole() {
-		if(this.getAuthor().equals(Shadbot.getOwner())) {
-			return Role.OWNER;
+	public CommandPermission getPermission() {
+		if(this.getAuthor().equals(this.getClient().getApplicationOwner())) {
+			return CommandPermission.OWNER;
+		} else if(this.getGuild() == null) {
+			return CommandPermission.ADMIN;
 		} else if(this.getAuthor().getPermissionsForGuild(this.getGuild()).contains(Permissions.ADMINISTRATOR)) {
-			return Role.ADMIN;
+			return CommandPermission.ADMIN;
 		} else {
-			return Role.USER;
+			return CommandPermission.USER;
 		}
 	}
 

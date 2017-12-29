@@ -7,8 +7,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 
-import me.shadorc.discordbot.utils.Utils;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.data.annotation.DataInit;
+import me.shadorc.shadbot.data.annotation.DataSave;
+import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.embed.LogUtils;
 
 public class DataManager {
 
@@ -16,7 +18,7 @@ public class DataManager {
 			Executors.newScheduledThreadPool(2, Utils.getThreadFactoryNamed("Shadbot-DataManager-%d"));
 
 	public static boolean init() {
-		LogUtils.info("Initializing data files...");
+		LogUtils.infof("Initializing data files...");
 
 		Reflections reflections = new Reflections(DataManager.class.getPackage().getName(), new MethodAnnotationsScanner());
 		for(Method initMethod : reflections.getMethodsAnnotatedWith(DataInit.class)) {
@@ -28,13 +30,13 @@ public class DataManager {
 				return false;
 			}
 
-			// Search for save() method and if found, scheduled it
+			// Search for save() method and if found, schedule it
 			for(Method method : initMethod.getDeclaringClass().getMethods()) {
 				if(method.isAnnotationPresent(DataSave.class)) {
 					DataSave annotation = method.getAnnotation(DataSave.class);
 					Runnable saveTask = () -> {
-						LogUtils.infof("Saving %s...", initMethod.getDeclaringClass().getSimpleName());
 						try {
+							LogUtils.infof("Saving %s...", initMethod.getDeclaringClass().getSimpleName());
 							method.invoke(null);
 							LogUtils.infof("%s saved.", initMethod.getDeclaringClass().getSimpleName());
 						} catch (Exception err) {
@@ -48,7 +50,12 @@ public class DataManager {
 			LogUtils.infof("%s initialized.", initMethod.getDeclaringClass().getSimpleName());
 		}
 
-		LogUtils.info("Data files initialized.");
+		LogUtils.infof("Data files initialized.");
 		return true;
+	}
+
+	public static void stop() {
+		// Shutdown executor and run waiting tasks
+		SCHEDULED_EXECUTOR.shutdownNow().stream().forEach(runnable -> runnable.run());
 	}
 }
