@@ -2,7 +2,7 @@ package me.shadorc.shadbot.listener;
 
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.shard.ShardManager;
-import me.shadorc.shadbot.utils.embed.LogUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.StatusType;

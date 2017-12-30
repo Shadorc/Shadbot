@@ -4,20 +4,18 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.time.temporal.ChronoUnit;
 
-import me.shadorc.shadbot.core.command.CommandCategory;
-import me.shadorc.shadbot.core.command.CommandPermission;
+import me.shadorc.shadbot.utils.ratelimiter.RateLimiter;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Command {
+public @interface RateLimited {
 
-	String[] names();
+	int max() default 3;
 
-	CommandCategory category();
+	int cooldown() default RateLimiter.DEFAULT_COOLDOWN;
 
-	CommandPermission permission() default CommandPermission.USER;
-
-	String alias() default "";
+	ChronoUnit unit() default ChronoUnit.SECONDS;
 
 }

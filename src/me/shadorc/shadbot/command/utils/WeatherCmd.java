@@ -8,6 +8,7 @@ import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -25,6 +26,7 @@ import net.aksingh.owmjapis.OpenWeatherMap.Units;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
+@RateLimited
 @Command(category = CommandCategory.UTILS, names = { "weather" })
 public class WeatherCmd extends AbstractCommand {
 

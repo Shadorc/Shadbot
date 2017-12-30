@@ -1,16 +1,17 @@
-package me.shadorc.shadbot.utils.embed;
+package me.shadorc.shadbot.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.embed.LogBuilder;
+import me.shadorc.shadbot.utils.embed.LogType;
 import sx.blah.discord.handle.obj.IChannel;
 
 public class LogUtils {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("Shadbot_Logger");
-	//	TODO: public static LogType type = LogType.WARN;
+	// TODO: public static LogType type = LogType.WARN;
 
 	private static void errorf(String message, Exception err, String input, IChannel channel) {
 		BotUtils.sendMessage(new LogBuilder(LogType.ERROR, message, err, input, channel).build(), channel);

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.utils.Argument;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.obj.Embed.EmbedField;
 import sx.blah.discord.util.EmbedBuilder;

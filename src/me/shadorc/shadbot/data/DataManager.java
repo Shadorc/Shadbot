@@ -9,8 +9,8 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
+import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.LogUtils;
 
 public class DataManager {
 

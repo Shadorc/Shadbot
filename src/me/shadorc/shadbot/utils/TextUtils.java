@@ -16,12 +16,12 @@ public class TextUtils {
 	private static final String[] SPAM_MESSAGES = { "Take it easy, we are not in a hurry !",
 			"Phew.. give me time to rest, you're too fast for me.",
 			"I'm not going anywhere, no need to be this fast.",
-	"I don't think everyone here want to be spammed by us, just wait a little bit." };
+			"I don't think everyone here want to be spammed by us, just wait a little bit." };
 
 	private static final String[] TIPS_MESSAGES = { "Did you try " + Config.DEFAULT_PREFIX + "lotto ?",
 			"Add a music first using " + Config.DEFAULT_PREFIX + "playfirst !",
 			"Help me keep Shadbot alive ! " + Config.PATREON_URL,
-	"Need some help ? Join https://discord.gg/gafaTJw" };
+			"Need some help ? Join https://discord.gg/gafaTJw" };
 
 	public static String getSpamMessage() {
 		return SPAM_MESSAGES[MathUtils.rand(SPAM_MESSAGES.length)];

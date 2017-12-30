@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.ratelimiter.RateLimiter;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 public abstract class AbstractCommand {
@@ -14,15 +16,21 @@ public abstract class AbstractCommand {
 	private final String alias;
 	private final CommandCategory category;
 	private final CommandPermission permission;
-	private final boolean isHidden;
+	private final RateLimiter rateLimiter;
 
 	public AbstractCommand() {
-		Command annotation = this.getClass().getAnnotation(Command.class);
-		this.names = new ArrayList<>(Arrays.asList(annotation.names()));
-		this.alias = annotation.alias();
-		this.category = annotation.category();
-		this.permission = annotation.permission();
-		this.isHidden = annotation.hidden();
+		Command cmdAnnotation = this.getClass().getAnnotation(Command.class);
+		this.names = new ArrayList<>(Arrays.asList(cmdAnnotation.names()));
+		this.alias = cmdAnnotation.alias();
+		this.category = cmdAnnotation.category();
+		this.permission = cmdAnnotation.permission();
+
+		RateLimited limiterAnnotation = this.getClass().getAnnotation(RateLimited.class);
+		if(limiterAnnotation == null) {
+			this.rateLimiter = null;
+		} else {
+			this.rateLimiter = new RateLimiter(limiterAnnotation.max(), limiterAnnotation.cooldown(), limiterAnnotation.unit());
+		}
 	}
 
 	public abstract void execute(Context context) throws MissingArgumentException, IllegalArgumentException;
@@ -50,7 +58,7 @@ public abstract class AbstractCommand {
 		return permission;
 	}
 
-	public boolean isHidden() {
-		return isHidden;
+	public RateLimiter getRateLimiter() {
+		return rateLimiter;
 	}
 }

@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils;
+package me.shadorc.shadbot.utils.embed;
 
 public class Argument {
 

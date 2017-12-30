@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.listener;
 
 import me.shadorc.shadbot.shard.ShardManager;
-import me.shadorc.shadbot.utils.embed.LogUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.shard.DisconnectedEvent;
 import sx.blah.discord.handle.impl.events.shard.ReconnectSuccessEvent;

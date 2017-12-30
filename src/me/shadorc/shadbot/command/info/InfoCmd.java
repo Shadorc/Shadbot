@@ -9,6 +9,7 @@ import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -17,6 +18,7 @@ import sx.blah.discord.Discord4J;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IUser;
 
+@RateLimited
 @Command(category = CommandCategory.INFO, names = { "info" })
 public class InfoCmd extends AbstractCommand {
 

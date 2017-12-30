@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.utils;
 
-import me.shadorc.shadbot.utils.embed.LogUtils;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;

@@ -7,7 +7,7 @@ import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.embed.LogUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;

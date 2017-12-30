@@ -12,9 +12,9 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
-import me.shadorc.shadbot.utils.embed.LogUtils;
 
 public class CommandManager {
 
@@ -66,6 +66,10 @@ public class CommandManager {
 		CommandPermission authorPermission = context.getPermission();
 		if(cmd.getPermission().getHierarchy() > authorPermission.getHierarchy()) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel());
+			return;
+		}
+
+		if(cmd.getRateLimiter().isLimited(context.getChannel(), context.getAuthor())) {
 			return;
 		}
 
