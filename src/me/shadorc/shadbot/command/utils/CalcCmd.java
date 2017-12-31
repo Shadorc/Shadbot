@@ -37,7 +37,7 @@ public class CalcCmd extends AbstractCommand {
 	public EmbedObject getHelp(Context context) {
 		return new HelpBuilder(this, context.getPrefix())
 				.setDescription("Calculate an expression.")
-				.appendArg("expression", false)
+				.addArg("expression", false)
 				.build();
 	}
 

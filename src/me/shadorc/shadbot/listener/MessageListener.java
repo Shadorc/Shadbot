@@ -36,11 +36,9 @@ public class MessageListener {
 				return;
 			}
 
-			/*
 			if(!BotUtils.isChannelAllowed(event.getGuild(), event.getChannel())) {
 				return;
 			}
-			 */
 
 			// if(MessageManager.isWaitingForMessage(event.getChannel()) && MessageManager.notify(message)) {
 			// return;
@@ -51,8 +49,9 @@ public class MessageListener {
 				CommandManager.execute(new Context(message));
 			}
 		} catch (Exception err) {
-			// LogUtils.error("{Guild ID: " + event.getGuild().getLongID() + "} An unknown error occurred while receiving a message.", err, message.getContent());
-			LogUtils.errorf(err, "Something exploded lul");
+			//TODO: Bad, do we have to warn user ? In this case, don't include ID
+			LogUtils.errorf(String.format("{Guild ID: %d} An unknown error occurred while receiving a message.", event.getGuild().getLongID()),
+					err, message.getContent(), event.getChannel());
 		}
 	}
 

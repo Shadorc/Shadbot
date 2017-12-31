@@ -1,7 +1,8 @@
 package me.shadorc.shadbot.utils;
 
-import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.utils.command.Emoji;
+import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.data.Setting;
+import me.shadorc.shadbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IUser;
 
 public class TextUtils {
@@ -38,5 +39,10 @@ public class TextUtils {
 
 	public static String noResult(String search) {
 		return String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.", search);
+	}
+
+	public static String mustBeNSFW(String prefix) {
+		return String.format(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use `%ssettings %s toggle`",
+				prefix, Setting.NSFW);
 	}
 }

@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import me.shadorc.discordbot.data.Setting;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.Database;
+import me.shadorc.shadbot.data.Setting;
 import me.shadorc.shadbot.utils.JSONUtils;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -62,12 +62,40 @@ public class DBGuild {
 		}
 	}
 
+	public List<String> getBlacklistedCmd() {
+		if(settingsMap.containsKey(Setting.BLACKLIST)) {
+			return JSONUtils.toList((JSONArray) settingsMap.get(Setting.BLACKLIST), String.class);
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
 	public String getPrefix() {
 		if(settingsMap.containsKey(Setting.PREFIX)) {
 			return settingsMap.get(Setting.PREFIX).toString();
 		} else {
 			return Config.DEFAULT_PREFIX;
 		}
+	}
+
+	public int getDefaultVol() {
+		if(settingsMap.containsKey(Setting.DEFAULT_VOLUME)) {
+			return Integer.parseInt(settingsMap.get(Setting.DEFAULT_VOLUME).toString());
+		} else {
+			return Config.DEFAULT_VOLUME;
+		}
+	}
+
+	public Long getMessageChannelID() {
+		return (Long) settingsMap.getOrDefault(Setting.MESSAGE_CHANNEL_ID, null);
+	}
+
+	public String getJoinMessage() {
+		return (String) settingsMap.get(Setting.JOIN_MESSAGE);
+	}
+
+	public String getLeaveMessage() {
+		return (String) settingsMap.get(Setting.LEAVE_MESSAGE);
 	}
 
 	public IGuild getGuild() {

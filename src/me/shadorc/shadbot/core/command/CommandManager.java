@@ -69,7 +69,7 @@ public class CommandManager {
 			return;
 		}
 
-		if(cmd.getRateLimiter().isLimited(context.getChannel(), context.getAuthor())) {
+		if(cmd.getRateLimiter() != null && cmd.getRateLimiter().isLimited(context.getChannel(), context.getAuthor())) {
 			return;
 		}
 

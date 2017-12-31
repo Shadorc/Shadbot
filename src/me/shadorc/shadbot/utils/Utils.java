@@ -1,7 +1,11 @@
 package me.shadorc.shadbot.utils;
 
 import java.lang.management.ManagementFactory;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -43,6 +47,17 @@ public class Utils {
 
 	public static ThreadFactory getThreadFactoryNamed(String name) {
 		return new ThreadFactoryBuilder().setNameFormat(name).build();
+	}
+
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+		return map.entrySet()
+				.stream()
+				.sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
+				.collect(Collectors.toMap(
+						Map.Entry::getKey,
+						Map.Entry::getValue,
+						(value1, value2) -> value1,
+						LinkedHashMap::new));
 	}
 
 }

@@ -63,7 +63,7 @@ public class UrbanCmd extends AbstractCommand {
 	public EmbedObject getHelp(Context context) {
 		return new HelpBuilder(this, context.getPrefix())
 				.setDescription("Show Urban Dictionary definition for a search.")
-				.appendArg("search", false)
+				.addArg("search", false)
 				.build();
 	}
 

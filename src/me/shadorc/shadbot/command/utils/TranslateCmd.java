@@ -87,8 +87,8 @@ public class TranslateCmd extends AbstractCommand {
 	public EmbedObject getHelp(Context context) {
 		return new HelpBuilder(this, context.getPrefix())
 				.setDescription("Translate a text from a language to another.")
-				.appendArg("lang1", "source language, by leaving it blank the language will be automatically detected", true)
-				.appendArg("lang2", "destination language", false)
+				.addArg("lang1", "source language, by leaving it blank the language will be automatically detected", true)
+				.addArg("lang2", "destination language", false)
 				.appendField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false)
 				.build();
 	}

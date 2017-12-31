@@ -104,7 +104,7 @@ public class WeatherCmd extends AbstractCommand {
 	public EmbedObject getHelp(Context context) {
 		return new HelpBuilder(this, context.getPrefix())
 				.setDescription("Show weather report for a city.")
-				.appendArg("city", false)
+				.addArg("city", false)
 				.build();
 	}
 }

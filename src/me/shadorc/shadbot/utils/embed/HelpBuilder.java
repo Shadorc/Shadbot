@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.utils.FormatUtils;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.obj.Embed.EmbedField;
 import sx.blah.discord.util.EmbedBuilder;
@@ -16,6 +17,7 @@ public class HelpBuilder {
 	private final List<EmbedField> fields;
 
 	private String example;
+	private String usage;
 	private String description;
 
 	public HelpBuilder(AbstractCommand cmd, String prefix) {
@@ -35,13 +37,22 @@ public class HelpBuilder {
 		return this;
 	}
 
-	public HelpBuilder appendArg(String name, String desc, boolean isFacultative) {
+	public HelpBuilder setUsage(String usage) {
+		this.usage = usage;
+		return this;
+	}
+
+	public HelpBuilder addArg(String name, String desc, boolean isFacultative) {
 		args.add(new Argument(name, desc, isFacultative));
 		return this;
 	}
 
-	public HelpBuilder appendArg(String name, boolean isFacultative) {
-		return this.appendArg(name, null, isFacultative);
+	public HelpBuilder addArg(String name, boolean isFacultative) {
+		return this.addArg(name, null, isFacultative);
+	}
+
+	public HelpBuilder addArg(List<?> options, boolean isFacultative) {
+		return this.addArg(FormatUtils.formatList(options, opt -> opt.toString(), "|"), null, isFacultative);
 	}
 
 	public HelpBuilder appendField(String name, String value, boolean inline) {
@@ -70,14 +81,13 @@ public class HelpBuilder {
 	}
 
 	private String getUsage() {
-		StringBuilder usageBld = new StringBuilder(String.format("`%s%s", prefix, cmd.getName()));
-		for(Argument arg : args) {
-			if(arg.isFacultative()) {
-				usageBld.append(String.format("[<%s>]", arg.getName()));
-			} else {
-				usageBld.append(String.format("<%s>", arg.getName()));
-			}
+		StringBuilder usageBld = new StringBuilder(String.format("`%s%s ", prefix, cmd.getName()));
+		if(usage == null) {
+			usageBld.append(FormatUtils.formatList(args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), " "));
+		} else {
+			usageBld.append(usage);
 		}
+		usageBld.append('`');
 		return usageBld.toString();
 	}
 

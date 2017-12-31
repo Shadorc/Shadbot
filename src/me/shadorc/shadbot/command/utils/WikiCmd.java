@@ -72,7 +72,7 @@ public class WikiCmd extends AbstractCommand {
 	public EmbedObject getHelp(Context context) {
 		return new HelpBuilder(this, context.getPrefix())
 				.setDescription("Show Wikipedia description for a search.")
-				.appendArg("search", false)
+				.addArg("search", false)
 				.build();
 	}
 
