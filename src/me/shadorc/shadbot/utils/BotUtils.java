@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.data.db.DBGuild;
+import me.shadorc.shadbot.data.db.Database;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -20,7 +20,7 @@ public class BotUtils {
 			try {
 				channel.sendMessage(message);
 			} catch (DiscordException err) {
-				LogUtils.error("An error occurred while sending message.", err);
+				LogUtils.errorf(err, "An error occurred while sending message.");
 			}
 		});
 	}
@@ -30,7 +30,7 @@ public class BotUtils {
 			try {
 				channel.sendMessage(embed);
 			} catch (DiscordException err) {
-				LogUtils.error("An error occurred while sending message.", err);
+				LogUtils.errorf(err, "An error occurred while sending message.");
 			}
 		});
 	}

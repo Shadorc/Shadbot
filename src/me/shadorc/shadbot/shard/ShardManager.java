@@ -7,8 +7,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
+
 import me.shadorc.shadbot.utils.LogUtils;
-import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.ThreadPoolUtils;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -18,9 +20,9 @@ public class ShardManager {
 
 	private final static Map<IShard, ShadbotShard> SHARDS_MAP = new HashMap<>();
 	private final static ScheduledExecutorService EXECUTOR =
-			Executors.newSingleThreadScheduledExecutor(Utils.getThreadFactoryNamed("Shadbot-ShardWatcher"));
+			Executors.newSingleThreadScheduledExecutor(ThreadPoolUtils.getThreadFactoryNamed("Shadbot-ShardWatcher"));
 	private static final ExecutorService DEFAUT_THREAD_POOL =
-			Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-DefaultThreadPool-%d"));
+			Executors.newCachedThreadPool(ThreadPoolUtils.getThreadFactoryNamed("Shadbot-DefaultThreadPool-%d"));
 
 	public static void start() {
 		EXECUTOR.scheduleAtFixedRate(() -> ShardManager.check(), 10, 10, TimeUnit.MINUTES);
@@ -54,10 +56,10 @@ public class ShardManager {
 		for(ShadbotShard shardStatus : SHARDS_MAP.values()) {
 			long lastEventTime = System.currentTimeMillis() - shardStatus.getLastUsed();
 			if(lastEventTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
-				LogUtils.infof(String.format("Restarting shard %d (Response time: %d ms | Last event: %d seconds ago)",
+				LogUtils.infof(String.format("Restarting shard %d (Response time: %d ms | Last event: %s ago)",
 						shardStatus.getID(),
 						shardStatus.getShard().getResponseTime(),
-						lastEventTime / 1000));
+						DurationFormatUtils.formatDurationWords(lastEventTime, true, true)));
 				shardStatus.restart();
 			}
 		}

@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.utils.embed;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -53,6 +54,10 @@ public class HelpBuilder {
 
 	public HelpBuilder addArg(List<?> options, boolean isFacultative) {
 		return this.addArg(FormatUtils.formatList(options, opt -> opt.toString(), "|"), null, isFacultative);
+	}
+
+	public HelpBuilder addArg(Object[] options, boolean isFacultative) {
+		return this.addArg(Arrays.asList(options), isFacultative);
 	}
 
 	public HelpBuilder appendField(String name, String value, boolean inline) {

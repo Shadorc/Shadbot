@@ -9,16 +9,15 @@ import me.shadorc.shadbot.core.command.Context;
 public class ExceptionUtils {
 
 	public static void handle(String action, Context context, Exception err) {
+		String msg;
 		if(err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
-			LogUtils.errorf(context, err,
-					"Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.");
+			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
 		} else if(err instanceof SocketTimeoutException) {
-			LogUtils.errorf(context, err,
-					"Mmmh... " + StringUtils.capitalize(action) + " takes too long... This is not my fault, I promise ! Try again later.");
+			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.", StringUtils.capitalize(action));
 		} else {
-			LogUtils.errorf(context, err,
-					"Sorry, something went wrong while " + action + "... I will try to fix this as soon as possible.");
+			msg = String.format("Sorry, something went wrong while %s... I will try to fix this as soon as possible.", action);
 		}
+		LogUtils.errorf(context.getContent(), context.getChannel(), err, msg);
 	}
 
 }

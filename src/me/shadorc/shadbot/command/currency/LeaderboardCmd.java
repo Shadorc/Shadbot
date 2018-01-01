@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.data.db.DBUser;
+import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -45,22 +44,16 @@ public class LeaderboardCmd extends AbstractCommand {
 		final Map<String, Integer> sortedUsersMap = Utils.sortByValue(unsortedUsersMap);
 		List<String> usersList = new ArrayList<>(unsortedUsersMap.keySet());
 
-		StringBuilder strBuilder = new StringBuilder();
-		IntStream.rangeClosed(1, 10)
-				.boxed()
-				.limit(unsortedUsersMap.size())
-				.forEach(count -> strBuilder.append(String.format("%n%d. **%d** - %s",
-						count,
-						usersList.get(count - 1),
-						FormatUtils.formatCoins(sortedUsersMap.get(usersList.get(count - 1))))));
+		String leaderboard = FormatUtils.numberedList(10, unsortedUsersMap.size(), count -> String.format("%d. **%d** - %s",
+				count, usersList.get(count - 1), FormatUtils.formatCoins(sortedUsersMap.get(usersList.get(count - 1)))));
 
-		if(strBuilder.length() == 0) {
-			strBuilder.append("\nEveryone is poor here.");
+		if(leaderboard.isEmpty()) {
+			leaderboard = "\nEveryone is poor here.";
 		}
 
 		EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Leaderboard")
-				.appendDescription(strBuilder.toString());
+				.appendDescription(leaderboard);
 
 		BotUtils.sendMessage(builder.build(), context.getChannel());
 	}

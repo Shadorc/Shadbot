@@ -3,7 +3,7 @@ package me.shadorc.shadbot.core.command;
 import java.util.List;
 
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.Database;
+import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.shard.ShadbotShard;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.StringUtils;

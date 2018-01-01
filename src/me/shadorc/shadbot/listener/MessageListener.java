@@ -3,7 +3,7 @@ package me.shadorc.shadbot.listener;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.data.Database;
+import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -49,9 +49,9 @@ public class MessageListener {
 				CommandManager.execute(new Context(message));
 			}
 		} catch (Exception err) {
-			//TODO: Bad, do we have to warn user ? In this case, don't include ID
-			LogUtils.errorf(String.format("{Guild ID: %d} An unknown error occurred while receiving a message.", event.getGuild().getLongID()),
-					err, message.getContent(), event.getChannel());
+			// TODO improve message
+			LogUtils.errorf(message.getContent(), message.getChannel(), err,
+					"An unknown error occurred.", event.getGuild().getLongID());
 		}
 	}
 

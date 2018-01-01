@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.data;
 
 public enum Setting {
-	// NSFW("nsfw"),
+	NSFW("nsfw"),
 	ALLOWED_CHANNELS("allowed_channels"),
 	PREFIX("prefix"),
 	DEFAULT_VOLUME("default_volume"),

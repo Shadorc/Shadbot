@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
-import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.ThreadPoolUtils;
 import sx.blah.discord.api.IShard;
 
 public class ShadbotShard {
@@ -17,7 +17,7 @@ public class ShadbotShard {
 	public ShadbotShard(IShard shard) {
 		this.shard = shard;
 		this.shardID = shard.getInfo()[0];
-		this.threadPool = Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("ShadbotShard-" + this.getID() + "-%d"));
+		this.threadPool = Executors.newCachedThreadPool(ThreadPoolUtils.getThreadFactoryNamed("ShadbotShard-" + this.getID() + "-%d"));
 		this.lastUsed = new AtomicLong();
 	}
 

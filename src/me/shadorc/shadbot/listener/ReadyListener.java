@@ -18,6 +18,9 @@ public class ReadyListener {
 		event.getClient().changePresence(StatusType.ONLINE);
 
 		event.getClient().getDispatcher().registerListeners(Shadbot.getEventThreadPool(),
+				new ChannelListener(),
+				new GuildListener(),
+				new GuildMemberListener(),
 				new MessageListener());
 	}
 

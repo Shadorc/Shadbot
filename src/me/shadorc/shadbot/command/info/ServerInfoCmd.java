@@ -9,8 +9,8 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.data.db.DBGuild;
+import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DateUtils;
@@ -33,11 +33,11 @@ public class ServerInfoCmd extends AbstractCommand {
 
 		DBGuild dbGuild = Database.getDBGuild(guild);
 
-		String allowedChannelsStr = "\n"
-				+ FormatUtils.formatList("All", dbGuild.getAllowedChannels(), chlID -> "\t" + guild.getChannelByID(chlID).getName(), "\n");
+		String allowedChannelsStr =
+				FormatUtils.formatList("All", dbGuild.getAllowedChannels(), chlID -> "\n\t" + guild.getChannelByID(chlID).getName(), "");
 
-		String blacklistedCmdStr = "\n"
-				+ FormatUtils.formatList("None", dbGuild.getBlacklistedCmd(), cmdName -> "\t" + cmdName, "\n");
+		String blacklistedCmdStr =
+				FormatUtils.formatList("None", dbGuild.getBlacklistedCmd(), cmdName -> "\n\t" + cmdName, "");
 
 		String creationDate = String.format("%s%n(%s)",
 				DateUtils.toLocalDate(guild.getCreationDate()).format(dateFormatter),
@@ -56,7 +56,7 @@ public class ServerInfoCmd extends AbstractCommand {
 				.appendField("Settings", "**Prefix:** " + context.getPrefix()
 						+ "\n**Default volume:** " + dbGuild.getDefaultVol() + "%"
 						+ "\n**Allowed channels:** " + allowedChannelsStr
-						+ "\n**Blacklisted command:** " + blacklistedCmdStr, true)
+						+ "\n**Blacklisted commands:** " + blacklistedCmdStr, true)
 				.appendField("Server ID", Long.toString(guild.getLongID()), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}

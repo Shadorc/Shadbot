@@ -14,7 +14,7 @@ import me.shadorc.shadbot.listener.ShardListener;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.ThreadPoolUtils;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.StatusType;
@@ -22,7 +22,7 @@ import sx.blah.discord.handle.obj.StatusType;
 public class Shadbot {
 
 	private static final ExecutorService EVENT_THREAD_POOL =
-			Executors.newCachedThreadPool(Utils.getThreadFactoryNamed("Shadbot-EventThreadPool-%d"));
+			Executors.newCachedThreadPool(ThreadPoolUtils.getThreadFactoryNamed("Shadbot-EventThreadPool-%d"));
 
 	private static String version;
 	private static IDiscordClient client;
@@ -33,7 +33,7 @@ public class Shadbot {
 			properties.load(Shadbot.class.getClassLoader().getResourceAsStream("project.properties"));
 			version = properties.getProperty("version");
 		} catch (IOException err) {
-			LogUtils.error("An error occurred while getting version.", err);
+			LogUtils.errorf(err, "An error occurred while getting version.");
 		}
 
 		// Initialization

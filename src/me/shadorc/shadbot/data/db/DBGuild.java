@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.data.Setting;
 import me.shadorc.shadbot.utils.JSONUtils;
 import sx.blah.discord.handle.obj.IGuild;

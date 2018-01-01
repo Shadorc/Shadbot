@@ -46,16 +46,12 @@ public class StringUtils {
 		return str;
 	}
 
-	public static String normalizeSpace(String str) {
-		return str.trim().replaceAll(" +", " ");
+	public static String remove(String str, String... toRemove) {
+		return str.replaceAll(Arrays.stream(toRemove).collect(Collectors.joining("|")), "");
 	}
 
-	public static boolean isPositiveInt(String str) {
-		try {
-			return Integer.parseInt(str) > 0;
-		} catch (NumberFormatException err) {
-			return false;
-		}
+	public static String normalizeSpace(String str) {
+		return str.trim().replaceAll(" +", " ");
 	}
 
 }

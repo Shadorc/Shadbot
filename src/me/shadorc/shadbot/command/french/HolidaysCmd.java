@@ -12,6 +12,7 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TwitterUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -36,7 +37,7 @@ public class HolidaysCmd extends AbstractCommand {
 		}
 
 		try {
-			String holidays = TwitterUtils.getLastTweet("Vacances_Zone" + zone).replace("#", "");
+			String holidays = StringUtils.remove(TwitterUtils.getLastTweet("Vacances_Zone" + zone), "#");
 			BotUtils.sendMessage(Emoji.BEACH + " " + holidays, context.getChannel());
 		} catch (TwitterException err) {
 			ExceptionUtils.handle("getting holidays information", context, err);

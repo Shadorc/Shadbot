@@ -48,7 +48,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 					.withAuthorName("SuicideGirls Image")
 					.withAuthorIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/SuicideGirls_logo.svg/1280px-SuicideGirls_logo.svg.png")
 					.withUrl(url)
-					.appendDescription("Girl: **" + StringUtils.capitalize(name) + "**")
+					.appendDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
 					.withImage(imageUrl);
 
 			BotUtils.sendMessage(builder.build(), context.getChannel());

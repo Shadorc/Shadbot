@@ -2,16 +2,16 @@ package me.shadorc.shadbot.command.currency;
 
 import java.util.List;
 
-import me.shadorc.discordbot.data.DatabaseManager;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.data.Database;
+import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -41,12 +41,11 @@ public class TransferCoinsCmd extends AbstractCommand {
 			throw new IllegalArgumentException("You cannot transfer coins to yourself.");
 		}
 
-		String coinsStr = splitCmd.get(0);
-		if(!StringUtils.isPositiveInt(coinsStr)) {
+		Integer coins = CastUtils.asPositiveInt(splitCmd.get(0));
+		if(coins == null) {
 			throw new IllegalArgumentException("Invalid amount.");
 		}
 
-		int coins = Integer.parseInt(coinsStr);
 		if(Database.getDBUser(context.getGuild(), senderUser).getCoins() < coins) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;
@@ -58,8 +57,8 @@ public class TransferCoinsCmd extends AbstractCommand {
 			return;
 		}
 
-		DatabaseManager.addCoins(context.getGuild(), senderUser, -coins);
-		DatabaseManager.addCoins(context.getGuild(), receiverUser, coins);
+		Database.getDBUser(context.getGuild(), senderUser).addCoins(-coins);
+		Database.getDBUser(context.getGuild(), receiverUser).addCoins(coins);
 
 		BotUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
 				senderUser.mention(),

@@ -58,7 +58,7 @@ public class LyricsCmd extends AbstractCommand {
 			Document doc = NetUtils.getDoc(url).outputSettings(new Document.OutputSettings().prettyPrint(false));
 
 			String artist = doc.getElementsByClass("mxm-track-title__artist").html();
-			String title = doc.getElementsByClass("mxm-track-title__track ").text().replace("Lyrics", "");
+			String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
 			String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
 			String lyrics = StringUtils.truncate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
 

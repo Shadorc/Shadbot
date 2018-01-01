@@ -5,9 +5,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
+
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.ThreadPoolUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -23,8 +25,7 @@ public class RateLimiter {
 	private final int cooldown;
 
 	public RateLimiter(int max, int cooldown, ChronoUnit unit) {
-		this.executor = new ScheduledThreadPoolExecutor(1, Utils.getThreadFactoryNamed("Shadbot-RateLimite-%d"));
-		this.executor.setRemoveOnCancelPolicy(true);
+		this.executor = ThreadPoolUtils.newSingleScheduledThreadPoolExecutor("Shadbot-RateLimiter-%d");
 		this.guildsLimitedMap = new ConcurrentHashMap<>();
 		this.max = max;
 		this.cooldown = (int) Duration.of(cooldown, unit).toMillis();
@@ -57,10 +58,10 @@ public class RateLimiter {
 	}
 
 	private void warn(IChannel channel, IUser user) {
-		BotUtils.sendMessage(String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command once every *%d sec*.",
+		BotUtils.sendMessage(String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command once every *%s*.",
 				user.getName(),
 				TextUtils.getSpamMessage(),
-				Duration.of(cooldown, ChronoUnit.MILLIS).getSeconds()), channel);
+				DurationFormatUtils.formatDurationWords(cooldown, true, true)), channel);
 	}
 
 }

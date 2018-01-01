@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.listener;
 
-import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.data.db.DBGuild;
+import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import sx.blah.discord.api.events.EventSubscriber;

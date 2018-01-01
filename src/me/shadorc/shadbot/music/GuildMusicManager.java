@@ -1,24 +1,23 @@
-package me.shadorc.discordbot.music;
+package me.shadorc.shadbot.music;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 
-import me.shadorc.discordbot.Shadbot;
-import me.shadorc.discordbot.data.Config;
-import me.shadorc.discordbot.data.DatabaseManager;
-import me.shadorc.discordbot.data.PremiumManager;
-import me.shadorc.discordbot.data.Setting;
-import me.shadorc.discordbot.events.music.AudioEventListener;
-import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.LogUtils;
-import me.shadorc.discordbot.utils.command.Emoji;
+import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.premium.PremiumManager;
+import me.shadorc.shadbot.listener.music.AudioEventListener;
+import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.ThreadPoolUtils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
@@ -29,8 +28,8 @@ public class GuildMusicManager {
 	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
 
 	private final static ConcurrentHashMap<Long, GuildMusicManager> MUSIC_MANAGERS = new ConcurrentHashMap<>();
+	private final static ScheduledThreadPoolExecutor EXECUTOR = ThreadPoolUtils.newSingleScheduledThreadPoolExecutor("Shadbot-MusicLeaver-%d");
 
-	private final ScheduledExecutorService executor;
 	private final IGuild guild;
 	private final AudioPlayer audioPlayer;
 	private final AudioProvider audioProvider;
@@ -41,17 +40,16 @@ public class GuildMusicManager {
 	private IUser userDj;
 	private boolean isWaiting;
 
-	private GuildMusicManager(IGuild guild, AudioPlayerManager manager) {
+	private GuildMusicManager(IGuild guild, AudioPlayerManager audioPlayerManager) {
 		this.guild = guild;
-		this.audioPlayer = manager.createPlayer();
+		this.audioPlayer = audioPlayerManager.createPlayer();
 		this.audioProvider = new AudioProvider(audioPlayer);
-		this.trackScheduler = new TrackScheduler(audioPlayer, (int) DatabaseManager.getSetting(guild, Setting.DEFAULT_VOLUME));
+		this.trackScheduler = new TrackScheduler(audioPlayer, Database.getDBGuild(guild).getDefaultVol());
 		this.audioPlayer.addListener(new AudioEventListener(this));
-		this.executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	public void scheduleLeave() {
-		leaveTask = executor.schedule(() -> this.leaveVoiceChannel(), 1, TimeUnit.MINUTES);
+		leaveTask = EXECUTOR.schedule(() -> this.leaveVoiceChannel(), 1, TimeUnit.MINUTES);
 	}
 
 	public void cancelLeave() {
@@ -60,25 +58,21 @@ public class GuildMusicManager {
 		}
 	}
 
-	// TODO: When do 'force' is used ?
-	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean force) {
-		if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null || force) {
+	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean forceJoin) {
+		if(voiceChannel.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null || forceJoin) {
 			voiceChannel.join();
-			LogUtils.info("{Guild ID: " + voiceChannel.getGuild().getLongID() + "} Voice channel joined.");
+			LogUtils.infof("{Guild ID: %d} Voice channel joined.", voiceChannel.getGuild().getLongID());
 		}
 	}
 
 	public void end() {
-		// Do not block the lavaplayer thread to allow the socket to be closed in time, avoiding a SocketClosed exception
-		Shadbot.getEventThreadPool().submit(() -> {
-			StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
-			if(!PremiumManager.isGuildPremium(channel.getGuild())) {
-				strBuilder.append(" If you like me, please consider donating on " + Config.PATREON_URL + "."
-						+ " All donations are useful ! :heart:");
-			}
-			BotUtils.sendMessage(strBuilder.toString(), channel);
-			this.leaveVoiceChannel();
-		});
+		StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
+		if(!PremiumManager.isGuildPremium(channel.getGuild())) {
+			strBuilder.append(String.format(" If you like me, please consider donating on %s. All donations are useful ! :heart:",
+					Config.PATREON_URL));
+		}
+		BotUtils.sendMessage(strBuilder.toString(), channel);
+		this.leaveVoiceChannel();
 	}
 
 	public void leaveVoiceChannel() {
@@ -126,7 +120,6 @@ public class GuildMusicManager {
 
 	public void delete() {
 		this.cancelLeave();
-		executor.shutdownNow();
 		MUSIC_MANAGERS.remove(guild.getLongID());
 		audioPlayer.destroy();
 		trackScheduler.clearPlaylist();

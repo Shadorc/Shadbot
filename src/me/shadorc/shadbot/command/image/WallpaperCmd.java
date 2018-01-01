@@ -28,6 +28,7 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
@@ -134,7 +135,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 		Wallpaper wallpaper = wallpapers.get(MathUtils.rand(wallpapers.size()));
 
-		String tags = FormatUtils.formatList(wallpaper.getTags(), tag -> "`" + tag.toString().replace("#", "") + "`", " ");
+		String tags = FormatUtils.formatList(wallpaper.getTags(), tag -> "`" + StringUtils.remove(tag.toString(), "#") + "`", " ");
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Wallpaper")
 				.withUrl(wallpaper.getUrl())
@@ -151,11 +152,16 @@ public class WallpaperCmd extends AbstractCommand {
 	}
 
 	private Dimension parseDimension(String arg) {
-		String[] ratioArray = arg.split(arg.contains("x") ? "x" : "\\*");
-		if(ratioArray.length != 2 || !StringUtils.isPositiveInt(ratioArray[0]) || !StringUtils.isPositiveInt(ratioArray[1])) {
+		List<String> ratioArray = StringUtils.split(arg.contains("x") ? "x" : "\\*");
+		if(ratioArray.size() != 2) {
 			return null;
 		}
-		return new Dimension(Integer.parseInt(ratioArray[0]), Integer.parseInt(ratioArray[1]));
+		Integer width = CastUtils.asPositiveInt(ratioArray.get(0));
+		Integer height = CastUtils.asPositiveInt(ratioArray.get(1));
+		if(width == null || height == null) {
+			return null;
+		}
+		return new Dimension(width, height);
 	}
 
 	@Override

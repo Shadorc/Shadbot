@@ -10,12 +10,12 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.utils.LogUtils;
-import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.ThreadPoolUtils;
 
 public class DataManager {
 
 	private static final ScheduledExecutorService SCHEDULED_EXECUTOR =
-			Executors.newScheduledThreadPool(2, Utils.getThreadFactoryNamed("Shadbot-DataManager-%d"));
+			Executors.newScheduledThreadPool(2, ThreadPoolUtils.getThreadFactoryNamed("Shadbot-DataManager-%d"));
 
 	public static boolean init() {
 		LogUtils.infof("Initializing data files...");

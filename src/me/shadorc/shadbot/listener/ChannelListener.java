@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.json.JSONArray;
 
-import me.shadorc.shadbot.data.Database;
 import me.shadorc.shadbot.data.Setting;
+import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.shard.ShardManager;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.ChannelDeleteEvent;

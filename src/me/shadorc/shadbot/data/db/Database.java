@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.data;
+package me.shadorc.shadbot.data.db;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,8 +13,6 @@ import org.json.JSONTokener;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
-import me.shadorc.shadbot.data.db.DBGuild;
-import me.shadorc.shadbot.data.db.DBUser;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 

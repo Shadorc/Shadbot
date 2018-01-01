@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -18,7 +19,6 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
@@ -40,7 +40,8 @@ public class GifCmd extends AbstractCommand {
 				return;
 			}
 
-			EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+			EmbedBuilder builder = new EmbedBuilder()
+					.withColor(Config.BOT_COLOR)
 					.withImage(mainObj.getJSONObject("data").getString("image_url"));
 			BotUtils.sendMessage(builder.build(), context.getChannel());
 
