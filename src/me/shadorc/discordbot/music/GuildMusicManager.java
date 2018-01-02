@@ -60,7 +60,6 @@ public class GuildMusicManager {
 		}
 	}
 
-	// TODO: When do 'force' is used ?
 	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean force) {
 		if(Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null || force) {
 			voiceChannel.join();
