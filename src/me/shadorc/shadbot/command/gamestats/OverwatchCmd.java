@@ -10,13 +10,13 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.command.LoadingMessage;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import net.shadorc.overwatch4j.HeroDesc;
@@ -43,6 +43,9 @@ public class OverwatchCmd extends AbstractCommand {
 		if(!MathUtils.inRange(splitArgs.size(), 1, 3)) {
 			throw new MissingArgumentException();
 		}
+
+		LoadingMessage loadingMsg = new LoadingMessage("Loading Overwatch profile...", context.getChannel());
+		loadingMsg.send();
 
 		try {
 			String username = null;
@@ -81,7 +84,7 @@ public class OverwatchCmd extends AbstractCommand {
 					.appendField("Game time", player.getTimePlayed(), true)
 					.appendField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
 					.appendField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
-			BotUtils.sendMessage(builder.build(), context.getChannel());
+			loadingMsg.edit(builder.build());
 
 		} catch (OverwatchException err) {
 			String msg;
@@ -99,7 +102,7 @@ public class OverwatchCmd extends AbstractCommand {
 					msg = "An unknown error occurred while getting information from Overwatch profile.";
 					break;
 			}
-			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " " + msg, context.getChannel());
+			loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " " + msg);
 		} catch (IOException err) {
 			ExceptionUtils.handle("getting information from Overwatch profile", context, err);
 		}

@@ -53,7 +53,8 @@ public class DiabloCmd extends AbstractCommand {
 
 		Region region = Utils.getValueOrNull(Region.class, splitArgs.get(0));
 		if(region == null) {
-			throw new IllegalArgumentException("Region is invalid. Options: " + FormatUtils.formatArray(Region.values(), reg -> reg.toString(), ", "));
+			throw new IllegalArgumentException("Region is invalid. Options: "
+					+ FormatUtils.formatArray(Region.values(), reg -> reg.toString(), ", "));
 		}
 
 		String battletag = splitArgs.get(1);

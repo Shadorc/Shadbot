@@ -2,6 +2,14 @@ package me.shadorc.shadbot.utils;
 
 public class CastUtils {
 
+	public static Integer asInt(String str) {
+		try {
+			return Integer.parseInt(str);
+		} catch (NumberFormatException err) {
+			return null;
+		}
+	}
+
 	public static Integer asIntBetween(String str, int min, int max) {
 		try {
 			Integer nbr = Integer.parseInt(str);

@@ -13,11 +13,11 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.command.LoadingMessage;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -29,6 +29,9 @@ public class JokeCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		LoadingMessage loadingMsg = new LoadingMessage("Loading joke...", context.getChannel());
+		loadingMsg.send();
+
 		try {
 			String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d", MathUtils.rand(1, 5));
 			Document doc = NetUtils.getDoc(url);
@@ -44,7 +47,7 @@ public class JokeCmd extends AbstractCommand {
 					.withAuthorName("Blague")
 					.withUrl("http://www.une-blague.com/")
 					.appendDescription(joke);
-			BotUtils.sendMessage(embed.build(), context.getChannel());
+			loadingMsg.edit(embed.build());
 
 		} catch (IOException err) {
 			ExceptionUtils.handle("getting a joke", context, err);

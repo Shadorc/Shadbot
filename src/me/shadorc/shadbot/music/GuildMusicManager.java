@@ -58,6 +58,8 @@ public class GuildMusicManager {
 		}
 	}
 
+	// TODO: When do 'force' is used ?
+	// FIXME: Missing permissions sometimes thrown when joining
 	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean forceJoin) {
 		if(voiceChannel.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null || forceJoin) {
 			voiceChannel.join();
@@ -68,7 +70,7 @@ public class GuildMusicManager {
 	public void end() {
 		StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
 		if(!PremiumManager.isGuildPremium(channel.getGuild())) {
-			strBuilder.append(String.format(" If you like me, please consider donating on %s. All donations are useful ! :heart:",
+			strBuilder.append(String.format(" If you like me, you can make a donation on %s, it will help my creator keeping me alive :heart:",
 					Config.PATREON_URL));
 		}
 		BotUtils.sendMessage(strBuilder.toString(), channel);
@@ -82,16 +84,11 @@ public class GuildMusicManager {
 		}
 	}
 
-	public void setChannel(IChannel channel) {
-		this.channel = channel;
-	}
-
-	public void setDj(IUser userDj) {
-		this.userDj = userDj;
-	}
-
-	public void setWaiting(boolean isWaiting) {
-		this.isWaiting = isWaiting;
+	public void delete() {
+		this.cancelLeave();
+		MUSIC_MANAGERS.remove(guild.getLongID());
+		audioPlayer.destroy();
+		trackScheduler.clearPlaylist();
 	}
 
 	public IChannel getChannel() {
@@ -118,11 +115,16 @@ public class GuildMusicManager {
 		return isWaiting;
 	}
 
-	public void delete() {
-		this.cancelLeave();
-		MUSIC_MANAGERS.remove(guild.getLongID());
-		audioPlayer.destroy();
-		trackScheduler.clearPlaylist();
+	public void setChannel(IChannel channel) {
+		this.channel = channel;
+	}
+
+	public void setDj(IUser userDj) {
+		this.userDj = userDj;
+	}
+
+	public void setWaiting(boolean isWaiting) {
+		this.isWaiting = isWaiting;
 	}
 
 	public static GuildMusicManager createGuildMusicManager(IGuild guild) {
@@ -134,11 +136,11 @@ public class GuildMusicManager {
 		return musicManager;
 	}
 
-	public static void putGuildMusicManagerIfAbsent(IGuild guild, GuildMusicManager musicManager) {
-		MUSIC_MANAGERS.putIfAbsent(guild.getLongID(), musicManager);
-	}
-
 	public static GuildMusicManager getGuildMusicManager(IGuild guild) {
 		return MUSIC_MANAGERS.get(guild.getLongID());
+	}
+
+	public static void putGuildMusicManagerIfAbsent(IGuild guild, GuildMusicManager musicManager) {
+		MUSIC_MANAGERS.putIfAbsent(guild.getLongID(), musicManager);
 	}
 }

@@ -27,6 +27,7 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.ThreadPoolUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
@@ -61,7 +62,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	@Override
 	public void trackLoaded(AudioTrack track) {
 		musicManager.joinVoiceChannel(userVoiceChannel, false);
-		if(!musicManager.getScheduler().queue(track, putFirst)) {
+		if(!musicManager.getScheduler().startOrQueue(track, putFirst)) {
 			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
 					FormatUtils.formatTrackName(track.getInfo())), musicManager.getChannel());
 		}
@@ -84,17 +85,16 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			String choices = FormatUtils.numberedList(5, tracks.size(), count -> String.format("%n%t**%d.** %s",
 					count, FormatUtils.formatTrackName(tracks.get(count - 1).getInfo())));
 
-			EmbedBuilder embed = new EmbedBuilder()
-					.withAuthorName(String.format("Results (Use %scancel to cancel the selection)",
-							Database.getDBGuild(musicManager.getChannel().getGuild()).getPrefix()))
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
+					.withAuthorName("Results")
 					.withAuthorIcon(musicManager.getDj().getAvatarURL())
-					.withColor(Config.BOT_COLOR)
 					.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 					.appendDescription("**Select a music by typing the corresponding number.**"
 							+ "\nYou can choose several musics by separating them with a comma."
 							+ "\nExample: 1,3,4"
 							+ "\n" + choices)
-					.withFooterText("This choice will be cancelled in " + CHOICE_DURATION + " seconds.");
+					.withFooterText(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
+							Database.getDBGuild(musicManager.getChannel().getGuild()).getPrefix(), CHOICE_DURATION));
 			BotUtils.sendMessage(embed.build(), musicManager.getChannel());
 
 			stopWaitingTask = EXECUTOR.schedule(() -> this.stopWaiting(), CHOICE_DURATION, TimeUnit.SECONDS);
@@ -106,10 +106,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		musicManager.joinVoiceChannel(userVoiceChannel, false);
 
-		int count = 0;
+		int musicsAdded = 0;
 		for(AudioTrack track : tracks) {
-			musicManager.getScheduler().queue(track, putFirst);
-			count++;
+			musicManager.getScheduler().startOrQueue(track, putFirst);
+			musicsAdded++;
 			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
 					&& !PremiumManager.isGuildPremium(musicManager.getChannel().getGuild())
 					&& !PremiumManager.isUserPremium(userDj)) {
@@ -118,7 +118,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 		}
 
-		BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " " + count + " musics have been added to the playlist.", musicManager.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded), musicManager.getChannel());
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + FormatUtils.formatTrackName(track.getInfo())
 						+ "** has been added to the playlist.", musicManager.getChannel());
 			}
-			musicManager.getScheduler().queue(track, putFirst);
+			musicManager.getScheduler().startOrQueue(track, putFirst);
 			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
 					&& !PremiumManager.isGuildPremium(musicManager.getChannel().getGuild())
 					&& !PremiumManager.isUserPremium(userDj)) {

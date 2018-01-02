@@ -46,11 +46,11 @@ public class HelpCmd extends AbstractCommand {
 			StringBuilder contentBuilder = new StringBuilder();
 
 			for(AbstractCommand cmd : CommandManager.getCommands().values().stream().distinct().collect(Collectors.toList())) {
-				if(!cmd.getCategory().equals(category) || context.getPermission().getHierarchy() < cmd.getPermission().getHierarchy()) {
+				if(!cmd.getCategory().equals(category)
+						|| context.getPermission().getHierarchy() < cmd.getPermission().getHierarchy()
+						|| context.getGuild() != null && !BotUtils.isCommandAllowed(context.getGuild(), cmd)) {
 					continue;
 				}
-
-				// TODO: && BotUtils.isCommandAllowed(context.getGuild(), cmd)
 
 				contentBuilder.append("`" + context.getPrefix() + cmd.getName() + "` ");
 			}

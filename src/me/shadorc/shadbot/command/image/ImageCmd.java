@@ -23,6 +23,7 @@ import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.command.LoadingMessage;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -42,6 +43,9 @@ public class ImageCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
+		LoadingMessage loadingMsg = new LoadingMessage("Loading image...", context.getChannel());
+		loadingMsg.send();
+
 		try {
 			String encodedSearch = NetUtils.encode(context.getArg());
 			JSONObject resultObj = this.getRandomPopularResult(encodedSearch);
@@ -60,7 +64,7 @@ public class ImageCmd extends AbstractCommand {
 					.appendField("Category", resultObj.getString("category_path"), false)
 					.withImage(resultObj.getJSONObject("content").getString("src"));
 
-			BotUtils.sendMessage(builder.build(), context.getChannel());
+			loadingMsg.edit(builder.build());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting an image", context, err);

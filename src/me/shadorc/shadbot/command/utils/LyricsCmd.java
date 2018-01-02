@@ -3,7 +3,10 @@ package me.shadorc.shadbot.command.utils;
 import java.io.IOException;
 import java.util.List;
 
+import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.jsoup.nodes.Element;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -11,11 +14,12 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.command.LoadingMessage;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -25,6 +29,8 @@ import sx.blah.discord.util.EmbedBuilder;
 @Command(category = CommandCategory.UTILS, names = { "lyrics" })
 public class LyricsCmd extends AbstractCommand {
 
+	// Make html() preserve linebreaks and spacing
+	private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
 	private static final String HOME_URL = "https://www.musixmatch.com";
 	private static final int MAX_LYRICS_LENGTH = EmbedBuilder.DESCRIPTION_CONTENT_LIMIT / 4;
 
@@ -35,6 +41,9 @@ public class LyricsCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
+		LoadingMessage loadingMsg = new LoadingMessage(Emoji.HOURGLASS + " Loading lyrics...", context.getChannel());
+		loadingMsg.send();
+
 		try {
 			String artistSrch = NetUtils.encode(args.get(0).replaceAll("[^A-Za-z0-9]", "-"));
 			String titleSrch = NetUtils.encode(args.get(1).replaceAll("[^A-Za-z0-9]", "-"));
@@ -42,20 +51,23 @@ public class LyricsCmd extends AbstractCommand {
 			// Make a direct search with the artist and the title
 			String url = String.format("%s/lyrics/%s/%s", HOME_URL, artistSrch, titleSrch);
 
+			Response response = NetUtils.getResponse(url);
+			Document doc = NetUtils.getResponse(url).parse().outputSettings(PRESERVE_FORMAT);
+
 			// If the direct search found nothing
-			if(NetUtils.getResponse(url).statusCode() == 404) {
+			if(response.statusCode() == 404 || response.parse().text().contains("Oops! We couldn't find that page.")) {
+				url = String.format("%s/search/%s-%s?", HOME_URL, artistSrch, titleSrch);
 				// Make a search request on the site
-				Document searchDoc = NetUtils.getDoc(String.format("%s/search/%s-%s", HOME_URL, artistSrch, titleSrch));
-				if(!searchDoc.getElementsByClass("empty").isEmpty()) {
-					BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
+				Document searchDoc = NetUtils.getDoc(url);
+				Element trackListElement = searchDoc.getElementsByClass("tracks list").first();
+				if(trackListElement == null) {
+					loadingMsg.edit(TextUtils.noResult(context.getArg()));
 					return;
 				}
 				// Find the first element containing "title" (generally the best result) and get its URL
-				url = HOME_URL + searchDoc.getElementsByClass("title").attr("href");
+				url = HOME_URL + trackListElement.getElementsByClass("title").attr("href");
+				doc = NetUtils.getDoc(url).outputSettings(PRESERVE_FORMAT);
 			}
-
-			// Make html() preserve linebreaks and spacing
-			Document doc = NetUtils.getDoc(url).outputSettings(new Document.OutputSettings().prettyPrint(false));
 
 			String artist = doc.getElementsByClass("mxm-track-title__artist").html();
 			String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
@@ -68,7 +80,7 @@ public class LyricsCmd extends AbstractCommand {
 					.withUrl(url)
 					.withThumbnail(albumImg)
 					.appendDescription(url + "\n\n" + lyrics);
-			BotUtils.sendMessage(embed.build(), context.getChannel());
+			loadingMsg.edit(embed.build());
 
 		} catch (IOException err) {
 			ExceptionUtils.handle("getting lyrics", context, err);

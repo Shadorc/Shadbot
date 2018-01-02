@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.LogBuilder;
 import me.shadorc.shadbot.utils.embed.LogType;
 import sx.blah.discord.api.IDiscordClient;
@@ -17,7 +18,7 @@ public class LogUtils {
 	public static void errorf(String input, IChannel channel, Exception err, String format, Object... args) {
 		LOGGER.error(String.format(format, args), err);
 		LogUtils.sendLog(new LogBuilder(LogType.ERROR, String.format(format, args), err, input, channel));
-		BotUtils.sendMessage(String.format(format, args), channel);
+		BotUtils.sendMessage(Emoji.RED_FLAG + " " + String.format(format, args), channel);
 	}
 
 	public static void errorf(Exception err, String format, Object... args) {

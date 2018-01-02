@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.temporal.ChronoUnit;
 
-import me.shadorc.shadbot.utils.ratelimiter.RateLimiter;
+import me.shadorc.shadbot.ratelimiter.RateLimiter;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

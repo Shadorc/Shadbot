@@ -20,10 +20,6 @@ public class TrackScheduler {
 	private RepeatMode repeatMode;
 	private AudioTrack currentTrack;
 
-	public enum RepeatMode {
-		NONE, SONG, PLAYLIST;
-	}
-
 	public TrackScheduler(AudioPlayer audioPlayer, int defaultVolume) {
 		this.audioPlayer = audioPlayer;
 		this.queue = new LinkedBlockingDeque<>();
@@ -34,7 +30,7 @@ public class TrackScheduler {
 	/**
 	 * @return true if the music has been started, false if it was added to the queue
 	 */
-	public boolean queue(AudioTrack track, boolean first) {
+	public boolean startOrQueue(AudioTrack track, boolean first) {
 		// StatsManager.increment(StatsEnum.MUSICS_LOADED);
 		// The track has been started
 		if(audioPlayer.startTrack(track.makeClone(), true)) {
@@ -103,19 +99,19 @@ public class TrackScheduler {
 		return repeatMode;
 	}
 
-	public void setVolume(int volume) {
-		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
-	}
-
-	public void setRepeatMode(RepeatMode repeatMode) {
-		this.repeatMode = repeatMode;
-	}
-
 	public boolean isPlaying() {
 		return audioPlayer.getPlayingTrack() != null;
 	}
 
 	public boolean isStopped() {
 		return queue.isEmpty() && !this.isPlaying();
+	}
+
+	public void setVolume(int volume) {
+		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
+	}
+
+	public void setRepeatMode(RepeatMode repeatMode) {
+		this.repeatMode = repeatMode;
 	}
 }

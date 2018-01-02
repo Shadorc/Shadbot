@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils.ratelimiter;
+package me.shadorc.shadbot.ratelimiter;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

@@ -22,6 +22,7 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.command.LoadingMessage;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -44,6 +45,9 @@ public class Rule34Cmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
+		LoadingMessage loadingMsg = new LoadingMessage("Loading message...", context.getChannel());
+		loadingMsg.send();
+
 		try {
 			JSONObject mainObj = XML.toJSONObject(NetUtils.getBody("https://rule34.xxx/index.php?"
 					+ "page=dapi"
@@ -54,7 +58,7 @@ public class Rule34Cmd extends AbstractCommand {
 			JSONObject postsObj = mainObj.getJSONObject("posts");
 
 			if(postsObj.getInt("count") == 0) {
-				BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
+				loadingMsg.edit(TextUtils.noResult(context.getArg()));
 				return;
 			}
 
@@ -69,7 +73,7 @@ public class Rule34Cmd extends AbstractCommand {
 			String[] tags = postObj.getString("tags").trim().split(" ");
 
 			if(postObj.getBoolean("has_children") || this.isNotLegal(tags)) {
-				BotUtils.sendMessage(Emoji.WARNING + " Sorry, I don't display images containing children or tagged with `loli` or `shota`.", context.getChannel());
+				loadingMsg.edit(Emoji.WARNING + " Sorry, I don't display images containing children or tagged with `loli` or `shota`.");
 				return;
 			}
 
@@ -87,7 +91,7 @@ public class Rule34Cmd extends AbstractCommand {
 					.appendField("Tags", formattedtags, false)
 					.withImage(fileUrl)
 					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
-			BotUtils.sendMessage(builder.build(), context.getChannel());
+			loadingMsg.edit(builder.build());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting an image from Rule34", context, err);

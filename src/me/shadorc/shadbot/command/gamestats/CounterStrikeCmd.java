@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.gamestats;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,11 +15,12 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.command.LoadingMessage;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -34,16 +36,22 @@ public class CounterStrikeCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
+		LoadingMessage tempMsg = new LoadingMessage("Loading information...", context.getChannel());
+		tempMsg.send();
+
 		try {
 			String arg = context.getArg();
 			String steamid = null;
+
+			// The user provided an URL that can contains a pseudo or an ID
+			if(arg.contains("/")) {
+				List<String> splittedURl = StringUtils.split(arg, "/");
+				arg = splittedURl.get(splittedURl.size() - 1);
+			}
+
 			// The user directly provided the ID
 			if(CastUtils.isPositiveLong(arg)) {
 				steamid = arg;
-			}
-			// The user provided an URL
-			else if(context.getArg().contains("/")) {
-				steamid = arg.substring(arg.lastIndexOf('/'), arg.length());
 			}
 			// The user provided a pseudo
 			else {
@@ -51,10 +59,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 						APIKeys.get(APIKey.STEAM_API_KEY), NetUtils.encode(arg));
 				JSONObject mainObj = new JSONObject(NetUtils.getBody(url));
 				JSONObject responseObj = mainObj.getJSONObject("response");
-				// User found
-				if(responseObj.has("steamid")) {
-					steamid = responseObj.getString("steamid");
-				}
+				steamid = responseObj.optString("steamid");
 			}
 
 			String url = String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
@@ -64,7 +69,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			// Search users matching the steamID
 			JSONArray players = mainUserObj.getJSONObject("response").getJSONArray("players");
 			if(players.length() == 0) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " User not found.", context.getChannel());
+				tempMsg.edit(Emoji.MAGNIFYING_GLASS + " User not found.");
 				return;
 			}
 
@@ -77,7 +82,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			 * 3: Public
 			 */
 			if(userObj.getInt("communityvisibilitystate") != 3) {
-				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " This profile is private.", context.getChannel());
+				tempMsg.edit(Emoji.ACCESS_DENIED + " This profile is private.");
 				return;
 			}
 
@@ -86,7 +91,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			JSONObject mainStatsObj = new JSONObject(NetUtils.getBody(url));
 
 			if(!mainStatsObj.has("playerstats") || !mainStatsObj.getJSONObject("playerstats").has("stats")) {
-				BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.", context.getChannel());
+				tempMsg.edit(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.");
 				return;
 			}
 
@@ -104,7 +109,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills") / this.getValue(statsArray, "total_deaths")), true)
 					.appendField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
 					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
-			BotUtils.sendMessage(builder.build(), context.getChannel());
+			tempMsg.edit(builder.build());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting Counter-Strike: Global Offensive stats", context, err);
