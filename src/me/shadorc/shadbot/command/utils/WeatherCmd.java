@@ -50,7 +50,7 @@ public class WeatherCmd extends AbstractCommand {
 				float humidity = weather.getMainInstance().getHumidity();
 				float temperature = weather.getMainInstance().getTemperature();
 
-				EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+				EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 						.withAuthorName("Weather for: " + weather.getCityName())
 						.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
 						.withUrl("http://openweathermap.org/city/" + weather.getCityCode())
@@ -61,7 +61,7 @@ public class WeatherCmd extends AbstractCommand {
 						.appendField(Emoji.DROPLET + " Humidity", humidity + "%", true)
 						.appendField(Emoji.THERMOMETER + " Temperature", String.format("%.1f", temperature) + "°C", true);
 
-				BotUtils.sendMessage(builder.build(), context.getChannel());
+				BotUtils.sendMessage(embed.build(), context.getChannel());
 			} else {
 				BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
 			}
@@ -101,8 +101,8 @@ public class WeatherCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show weather report for a city.")
 				.addArg("city", false)
 				.build();

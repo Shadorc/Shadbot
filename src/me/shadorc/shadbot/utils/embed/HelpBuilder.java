@@ -3,6 +3,7 @@ package me.shadorc.shadbot.utils.embed;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -17,9 +18,11 @@ public class HelpBuilder {
 	private final List<Argument> args;
 	private final List<EmbedField> fields;
 
-	private String example;
-	private String usage;
 	private String description;
+	private String usage;
+	private String example;
+	private String gains;
+	private String source;
 
 	public HelpBuilder(AbstractCommand cmd, String prefix) {
 		this.prefix = prefix;
@@ -33,13 +36,27 @@ public class HelpBuilder {
 		return this;
 	}
 
+	public HelpBuilder setFullUsage(String usage) {
+		this.usage = usage;
+		return this;
+	}
+
+	public HelpBuilder setUsage(String usage) {
+		return this.setFullUsage(String.format("%s%s %s", prefix, cmd.getName(), usage));
+	}
+
 	public HelpBuilder setExample(String example) {
 		this.example = example;
 		return this;
 	}
 
-	public HelpBuilder setUsage(String usage) {
-		this.usage = usage;
+	public HelpBuilder setGains(String format, Object... args) {
+		this.gains = String.format(format, args);
+		return this;
+	}
+
+	public HelpBuilder setSource(String source) {
+		this.source = source;
 		return this;
 	}
 
@@ -53,7 +70,7 @@ public class HelpBuilder {
 	}
 
 	public HelpBuilder addArg(List<?> options, boolean isFacultative) {
-		return this.addArg(FormatUtils.formatList(options, opt -> opt.toString(), "|"), null, isFacultative);
+		return this.addArg(FormatUtils.formatList(options, Object::toString, "|"), null, isFacultative);
 	}
 
 	public HelpBuilder addArg(Object[] options, boolean isFacultative) {
@@ -72,7 +89,9 @@ public class HelpBuilder {
 				.withDescription(description)
 				.appendField("Usage", this.getUsage(), false)
 				.appendField("Arguments", this.getArguments(), false)
-				.appendField("Example", example, false);
+				.appendField("Example", example, false)
+				.appendField("Gains", gains, false)
+				.appendField("Source", source, false);
 
 		for(EmbedField field : fields) {
 			embedBuilder.appendField(field);
@@ -86,30 +105,19 @@ public class HelpBuilder {
 	}
 
 	private String getUsage() {
-		StringBuilder usageBld = new StringBuilder(String.format("`%s%s ", prefix, cmd.getName()));
-		if(usage == null) {
-			usageBld.append(FormatUtils.formatList(args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), " "));
-		} else {
-			usageBld.append(usage);
+		if(usage != null) {
+			return String.format("`%s`", usage);
 		}
-		usageBld.append('`');
-		return usageBld.toString();
+
+		return String.format("`%s%s %s`",
+				prefix, cmd.getName(),
+				FormatUtils.formatList(args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), " "));
 	}
 
 	private String getArguments() {
-		StringBuilder argBld = new StringBuilder();
-		for(Argument arg : args) {
-			if(arg.getDesc() == null) {
-				continue;
-			}
-
-			argBld.append(String.format("\n**%s** - ", arg.getName()));
-			if(arg.isFacultative()) {
-				argBld.append("[OPTIONAL] ");
-			}
-			argBld.append(arg.getDesc());
-		}
-
-		return argBld.toString();
+		return args.stream()
+				.filter(arg -> arg.getDesc() != null)
+				.map(arg -> String.format("%n%s**%s** - %s", arg.isFacultative() ? "[OPTIONAL] " : "", arg.getName(), arg.getDesc()))
+				.collect(Collectors.joining());
 	}
 }

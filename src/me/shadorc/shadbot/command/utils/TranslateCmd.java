@@ -84,11 +84,13 @@ public class TranslateCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Translate a text from a language to another.")
-				.addArg("lang1", "source language, by leaving it blank the language will be automatically detected", true)
-				.addArg("lang2", "destination language", false)
+				.addArg("fromLang", "source language, by leaving it blank the language will be automatically detected", true)
+				.addArg("toLang", "destination language", false)
+				.addArg("text", false)
+				.setExample(String.format("`%s%s en fr How are you ?`", prefix, this.getName()))
 				.appendField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false)
 				.build();
 	}

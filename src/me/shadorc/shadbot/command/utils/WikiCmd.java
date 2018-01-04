@@ -54,14 +54,14 @@ public class WikiCmd extends AbstractCommand {
 
 			String extract = StringUtils.truncate(resultObj.getString("extract"), EmbedBuilder.DESCRIPTION_CONTENT_LIMIT);
 
-			EmbedBuilder builder = new EmbedBuilder()
+			EmbedBuilder embed = new EmbedBuilder()
 					.withAuthorName("Wikipedia")
 					.withAuthorIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mohapedia.png/842px-Mohapedia.png")
 					.withUrl("https://fr.wikipedia.org/wiki/" + resultObj.getString("title").replace(" ", "_"))
 					.withColor(Config.BOT_COLOR)
 					.withTitle(resultObj.getString("title"))
 					.appendDescription(extract);
-			BotUtils.sendMessage(builder.build(), context.getChannel());
+			BotUtils.sendMessage(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting Wikipedia information", context, err);
@@ -69,8 +69,8 @@ public class WikiCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show Wikipedia description for a search.")
 				.addArg("search", false)
 				.build();

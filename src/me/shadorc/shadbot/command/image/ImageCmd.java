@@ -55,7 +55,7 @@ public class ImageCmd extends AbstractCommand {
 				return;
 			}
 
-			EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("DeviantArt (Search: " + context.getArg() + ")")
 					.withUrl(resultObj.getString("url"))
 					.withThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
@@ -64,7 +64,7 @@ public class ImageCmd extends AbstractCommand {
 					.appendField("Category", resultObj.getString("category_path"), false)
 					.withImage(resultObj.getJSONObject("content").getString("src"));
 
-			loadingMsg.edit(builder.build());
+			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting an image", context, err);
@@ -118,10 +118,11 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Search for a random image on DeviantArt.")
 				.addArg("search", false)
+				.setSource("https://www.deviantart.com")
 				.build();
 	}
 }

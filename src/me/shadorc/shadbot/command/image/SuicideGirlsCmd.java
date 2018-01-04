@@ -48,22 +48,22 @@ public class SuicideGirlsCmd extends AbstractCommand {
 			String imageUrl = girl.select("noscript").attr("data-retina");
 			String url = girl.getElementsByClass("facebook-share").attr("href");
 
-			EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("SuicideGirls Image")
 					.withAuthorIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/SuicideGirls_logo.svg/1280px-SuicideGirls_logo.svg.png")
 					.withUrl(url)
 					.appendDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
 					.withImage(imageUrl);
 
-			loadingMsg.edit(builder.build());
+			loadingMsg.edit(embed.build());
 		} catch (IOException err) {
 			ExceptionUtils.handle("getting SuicideGirls image", context, err);
 		}
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show a random image from SuicideGirls website.")
 				.build();
 	}

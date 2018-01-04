@@ -44,23 +44,23 @@ public class LeaderboardCmd extends AbstractCommand {
 		final Map<String, Integer> sortedUsersMap = Utils.sortByValue(unsortedUsersMap);
 		List<String> usersList = new ArrayList<>(unsortedUsersMap.keySet());
 
-		String leaderboard = FormatUtils.numberedList(10, unsortedUsersMap.size(), count -> String.format("%d. **%d** - %s",
+		String leaderboard = FormatUtils.numberedList(10, unsortedUsersMap.size(), count -> String.format("%d. **%s** - %s",
 				count, usersList.get(count - 1), FormatUtils.formatCoins(sortedUsersMap.get(usersList.get(count - 1)))));
 
 		if(leaderboard.isEmpty()) {
 			leaderboard = "\nEveryone is poor here.";
 		}
 
-		EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Leaderboard")
 				.appendDescription(leaderboard);
 
-		BotUtils.sendMessage(builder.build(), context.getChannel());
+		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show coins leaderboard for this server.")
 				.build();
 	}

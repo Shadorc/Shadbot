@@ -97,7 +97,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");
 
-			EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Counter-Strike: Global Offensive Stats")
 					.withAuthorIcon("http://www.icon100.com/up/2841/256/csgo.png")
@@ -109,7 +109,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills") / this.getValue(statsArray, "total_deaths")), true)
 					.appendField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
 					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
-			tempMsg.edit(builder.build());
+			tempMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting Counter-Strike: Global Offensive stats", context, err);
@@ -127,8 +127,8 @@ public class CounterStrikeCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Counter-Strike: Global Offensive.")
 				.addArg("steamID", "steam ID, custom ID or profile URL", false)
 				.build();

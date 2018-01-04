@@ -107,9 +107,30 @@ public class DBGuild {
 
 	public void setSetting(Setting setting, Object value) {
 		settingsMap.put(setting, value);
+		Database.save(this);
 	}
 
 	public void removeSetting(Setting setting) {
 		settingsMap.remove(setting);
+		Database.save(this);
 	}
+
+	public JSONObject toJSON() {
+		JSONObject guildObj = new JSONObject();
+
+		JSONObject settingsObj = new JSONObject();
+		for(Setting setting : settingsMap.keySet()) {
+			settingsObj.put(setting.toString(), settingsMap.get(setting));
+		}
+		guildObj.put(SETTINGS_KEY, settingsObj);
+
+		JSONObject usersObj = new JSONObject();
+		for(Long userID : usersMap.keySet()) {
+			usersObj.put(userID.toString(), usersMap.get(userID).toJSON());
+		}
+		guildObj.put(USERS_KEY, usersObj);
+
+		return guildObj;
+	}
+
 }

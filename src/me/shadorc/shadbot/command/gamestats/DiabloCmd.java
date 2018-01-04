@@ -31,7 +31,7 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
-@Command(category = CommandCategory.GAMESTATS, names = { "CommandCategory.GAMESTATS" }, alias = "d3")
+@Command(category = CommandCategory.GAMESTATS, names = { "diablo" }, alias = "d3")
 public class DiabloCmd extends AbstractCommand {
 
 	private final DecimalFormat formatter = new DecimalFormat("#,###");
@@ -54,7 +54,7 @@ public class DiabloCmd extends AbstractCommand {
 		Region region = Utils.getValueOrNull(Region.class, splitArgs.get(0));
 		if(region == null) {
 			throw new IllegalArgumentException("Region is invalid. Options: "
-					+ FormatUtils.formatArray(Region.values(), reg -> reg.toString(), ", "));
+					+ FormatUtils.formatArray(Region.values(), Object::toString, ", "));
 		}
 
 		String battletag = splitArgs.get(1);
@@ -81,7 +81,7 @@ public class DiabloCmd extends AbstractCommand {
 				heroesList.add(new JSONObject(NetUtils.getBody(url)));
 			}
 
-			EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Diablo 3 Stats")
 					.withThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
@@ -103,7 +103,7 @@ public class DiabloCmd extends AbstractCommand {
 									heroObj -> String.format("%d DPS",
 											formatter.format(heroObj.getJSONObject("stats").getDouble("damage"))),
 									"\n"), true);
-			BotUtils.sendMessage(builder.build(), context.getChannel());
+			BotUtils.sendMessage(embed.build(), context.getChannel());
 
 		} catch (FileNotFoundException err) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
@@ -113,11 +113,12 @@ public class DiabloCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Diablo 3.")
-				.addArg(Region.values(), false)
+				.addArg("region", String.format("user's region (%s)", FormatUtils.formatArray(Region.values(), region -> region.toString().toLowerCase(), ", ")), false)
 				.addArg("battletag#0000", false)
+				.setExample(String.format("`%s%s eu Shadbot#1758`", prefix, this.getName()))
 				.build();
 	}
 

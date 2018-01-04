@@ -21,7 +21,7 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "give_coins" })
+@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "give_coins", "add_coins" })
 public class GiveCoinsCmd extends AbstractCommand {
 
 	@Override
@@ -48,7 +48,7 @@ public class GiveCoinsCmd extends AbstractCommand {
 		if(context.getMessage().mentionsEveryone()) {
 			msg = "Everyone";
 		} else {
-			msg = FormatUtils.formatList(users, user -> user.getName(), ", ");
+			msg = FormatUtils.formatList(users, IUser::getName, ", ");
 		}
 
 		BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** received **%s**.",
@@ -56,9 +56,9 @@ public class GiveCoinsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
-				.setDescription("Give coins to users and/or roles.")
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
+				.setDescription("Give coins to user(s) and/or role(s).")
 				.addArg("coins", "can be positive or negative", false)
 				.addArg("@user(s)/@role(s)", false)
 				.build();

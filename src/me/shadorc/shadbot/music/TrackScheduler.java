@@ -10,8 +10,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.shadbot.utils.MathUtils;
-
 public class TrackScheduler {
 
 	private final AudioPlayer audioPlayer;
@@ -67,11 +65,9 @@ public class TrackScheduler {
 		this.currentTrack = track;
 	}
 
-	public long changePosition(long time) throws IllegalArgumentException {
+	public long changePosition(long time) {
 		long newPosition = audioPlayer.getPlayingTrack().getPosition() + time;
-		if(!MathUtils.inRange(newPosition, 0, audioPlayer.getPlayingTrack().getDuration())) {
-			throw new IllegalArgumentException();
-		}
+		newPosition = Math.max(0, Math.min(audioPlayer.getPlayingTrack().getDuration(), newPosition));
 		audioPlayer.getPlayingTrack().setPosition(newPosition);
 		return newPosition;
 	}

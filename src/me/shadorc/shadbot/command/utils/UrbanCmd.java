@@ -44,7 +44,7 @@ public class UrbanCmd extends AbstractCommand {
 			String definition = StringUtils.truncate(resultObj.getString("definition"), EmbedBuilder.DESCRIPTION_CONTENT_LIMIT);
 			String example = StringUtils.truncate(resultObj.getString("example"), EmbedBuilder.FIELD_CONTENT_LIMIT);
 
-			EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Urban Dictionary: " + resultObj.getString("word"))
 					.withUrl(resultObj.getString("permalink"))
@@ -52,7 +52,7 @@ public class UrbanCmd extends AbstractCommand {
 					.appendDescription(definition)
 					.appendField("Example", example, false);
 
-			BotUtils.sendMessage(builder.build(), context.getChannel());
+			BotUtils.sendMessage(embed.build(), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting Urban Dictionary definition", context, err);
@@ -60,8 +60,8 @@ public class UrbanCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show Urban Dictionary definition for a search.")
 				.addArg("search", false)
 				.build();

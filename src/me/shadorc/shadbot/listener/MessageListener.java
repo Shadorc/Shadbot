@@ -5,6 +5,7 @@ import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
@@ -36,13 +37,15 @@ public class MessageListener {
 				return;
 			}
 
+			ShardManager.getShadbotShard(message.getShard()).messageReceived();
+
 			if(!BotUtils.isChannelAllowed(event.getGuild(), event.getChannel())) {
 				return;
 			}
 
-			// if(MessageManager.isWaitingForMessage(event.getChannel()) && MessageManager.notify(message)) {
-			// return;
-			// }
+			if(MessageManager.intercept(message)) {
+				return;
+			}
 
 			String prefix = Database.getDBGuild(message.getGuild()).getPrefix();
 			if(message.getContent().startsWith(prefix)) {
@@ -63,10 +66,10 @@ public class MessageListener {
 
 		// If Shadbot didn't already send a message
 		if(!message.getChannel().getMessageHistory().stream().anyMatch(msg -> msg.getAuthor().equals(message.getClient().getOurUser()))) {
-			BotUtils.sendMessage("Hello !"
-					+ "\nCommands only work in a server but you can see help using `" + Config.DEFAULT_PREFIX + "help`."
-					+ "\nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
-					+ "join my support server : " + Config.SUPPORT_SERVER, message.getChannel());
+			BotUtils.sendMessage(String.format("Hello !"
+					+ "%nCommands only work in a server but you can see help using `%shelp`."
+					+ "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
+					+ "join my support server : %s", Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER), message.getChannel());
 		}
 	}
 }

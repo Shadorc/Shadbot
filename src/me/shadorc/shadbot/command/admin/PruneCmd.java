@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.admin;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -12,12 +11,15 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
+import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.handle.obj.IEmbed;
+import sx.blah.discord.handle.obj.IEmbed.IEmbedField;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
@@ -45,7 +47,7 @@ public class PruneCmd extends AbstractCommand {
 
 		// Remove everything from arg (users mentioned and quoted words) to keep only count if specified
 		String argCleaned = StringUtils.remove(context.getArg(),
-				usersMentioned.stream().map(user -> String.format("<@%s>", user.getLongID())).collect(Collectors.joining(" ")),
+				FormatUtils.formatList(usersMentioned, IUser::mention, " "),
 				String.format("\"%s\"", words))
 				.trim();
 
@@ -56,16 +58,11 @@ public class PruneCmd extends AbstractCommand {
 		}
 		count = count == null ? 100 : Math.min(100, count);
 
-		Stream<IMessage> messagesStream = context.getChannel().getMessageHistory(MESSAGE_COUNT).stream();
-
-		if(!usersMentioned.isEmpty()) {
-			messagesStream = messagesStream.filter(msg -> usersMentioned.contains(msg.getAuthor()));
-		}
-		if(words != null) {
-			messagesStream = messagesStream.filter(msg -> msg.getContent().contains(words));
-		}
-
-		List<IMessage> messagesList = messagesStream.limit(count).collect(Collectors.toList());
+		List<IMessage> messagesList = context.getChannel().getMessageHistory(MESSAGE_COUNT).stream()
+				.filter(msg -> usersMentioned.isEmpty() || usersMentioned.contains(msg.getAuthor()))
+				.filter(msg -> words == null || msg.getContent().contains(words) || this.getEmbedContent(msg).contains(words))
+				.limit(count)
+				.collect(Collectors.toList());
 
 		int deletedMsg = BotUtils.deleteMessages(context.getChannel(), messagesList);
 		if(deletedMsg == 0) {
@@ -77,15 +74,30 @@ public class PruneCmd extends AbstractCommand {
 		}
 	}
 
+	private String getEmbedContent(IMessage message) {
+		StringBuilder strBuilder = new StringBuilder();
+		for(IEmbed embed : message.getEmbeds()) {
+			List<IEmbedField> fields = embed.getEmbedFields();
+			if(fields == null) {
+				continue;
+			}
+			for(IEmbedField field : fields) {
+				strBuilder.append(field.getName() + "\n" + field.getValue() + "\n");
+			}
+		}
+		return strBuilder.toString();
+	}
+
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Delete messages.")
 				.addArg("@user(s)", "from these users", true)
-				.addArg("words", "containing these words", true)
+				.addArg("\"words\"", "containing these words", true)
 				.addArg("number", "number of messages to delete (max: 100)", true)
 				.setExample(String.format("Delete **15** messages from user **@Shadbot** containing **hi guys**:"
-						+ "%n`%s%s @Shadbot \"hi guys\" 15`", context.getPrefix(), this.getName()))
+						+ "%n`%s%s @Shadbot \"hi guys\" 15`", prefix, this.getName()))
+				.appendField("Info", "Messages older than 2 weeks cannot be deleted.", false)
 				.build();
 	}
 

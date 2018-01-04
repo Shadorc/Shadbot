@@ -14,10 +14,10 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.command.LoadingMessage;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -29,6 +29,9 @@ public class DtcCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
+		LoadingMessage loadingMsg = new LoadingMessage("Loading quote...", context.getChannel());
+		loadingMsg.send();
+
 		try {
 			String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", APIKeys.get(APIKey.DTC_API_KEY));
 			JSONArray arrayObj = new JSONArray(NetUtils.getBody(url));
@@ -56,7 +59,7 @@ public class DtcCmd extends AbstractCommand {
 					.withUrl(String.format("https://danstonchat.com/%s.html", quoteObj.getString("id")))
 					.withThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
 					.appendDescription(strBuilder.toString());
-			BotUtils.sendMessage(embed.build(), context.getChannel());
+			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting a quote from DansTonChat.com", context, err);
@@ -64,9 +67,10 @@ public class DtcCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show a random quote from DansTonChat.com")
+				.setSource("https://danstonchat.com")
 				.build();
 	}
 }

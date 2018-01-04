@@ -18,6 +18,7 @@ import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.premium.PremiumManager;
+import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
@@ -42,7 +43,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			ThreadPoolUtils.newSingleScheduledThreadPoolExecutor("Shadbot-MusicChoiceWaiter-%d");
 	private static final int CHOICE_DURATION = 30;
 
-	private final GuildMusicManager musicManager;
+	private final GuildMusic guildMusic;
 	private final IUser userDj;
 	private final IVoiceChannel userVoiceChannel;
 	private final String identifier;
@@ -51,8 +52,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private List<AudioTrack> resultsTracks;
 	private ScheduledFuture<?> stopWaitingTask;
 
-	public AudioLoadResultListener(GuildMusicManager musicManager, IUser userDj, IVoiceChannel userVoiceChannel, String identifier, boolean putFirst) {
-		this.musicManager = musicManager;
+	public AudioLoadResultListener(GuildMusic guildMusic, IUser userDj, IVoiceChannel userVoiceChannel, String identifier, boolean putFirst) {
+		this.guildMusic = guildMusic;
 		this.userDj = userDj;
 		this.userVoiceChannel = userVoiceChannel;
 		this.identifier = identifier;
@@ -61,10 +62,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 	@Override
 	public void trackLoaded(AudioTrack track) {
-		musicManager.joinVoiceChannel(userVoiceChannel, false);
-		if(!musicManager.getScheduler().startOrQueue(track, putFirst)) {
+		guildMusic.joinVoiceChannel(userVoiceChannel, false);
+		if(!guildMusic.getScheduler().startOrQueue(track, putFirst)) {
 			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-					FormatUtils.formatTrackName(track.getInfo())), musicManager.getChannel());
+					FormatUtils.formatTrackName(track.getInfo())), guildMusic.getChannel());
 		}
 	}
 
@@ -79,56 +80,56 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
-			musicManager.setDj(userDj);
-			musicManager.setWaiting(true);
+			guildMusic.setDj(userDj);
+			guildMusic.setWaiting(true);
 
 			String choices = FormatUtils.numberedList(5, tracks.size(), count -> String.format("%n%t**%d.** %s",
 					count, FormatUtils.formatTrackName(tracks.get(count - 1).getInfo())));
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("Results")
-					.withAuthorIcon(musicManager.getDj().getAvatarURL())
+					.withAuthorIcon(guildMusic.getDj().getAvatarURL())
 					.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 					.appendDescription("**Select a music by typing the corresponding number.**"
 							+ "\nYou can choose several musics by separating them with a comma."
 							+ "\nExample: 1,3,4"
 							+ "\n" + choices)
 					.withFooterText(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-							Database.getDBGuild(musicManager.getChannel().getGuild()).getPrefix(), CHOICE_DURATION));
-			BotUtils.sendMessage(embed.build(), musicManager.getChannel());
+							Database.getDBGuild(guildMusic.getChannel().getGuild()).getPrefix(), CHOICE_DURATION));
+			BotUtils.sendMessage(embed.build(), guildMusic.getChannel());
 
 			stopWaitingTask = EXECUTOR.schedule(() -> this.stopWaiting(), CHOICE_DURATION, TimeUnit.SECONDS);
 
 			resultsTracks = new ArrayList<>(tracks);
-			MessageManager.addListener(musicManager.getChannel(), this);
+			MessageManager.addListener(guildMusic.getChannel(), this);
 			return;
 		}
 
-		musicManager.joinVoiceChannel(userVoiceChannel, false);
+		guildMusic.joinVoiceChannel(userVoiceChannel, false);
 
 		int musicsAdded = 0;
 		for(AudioTrack track : tracks) {
-			musicManager.getScheduler().startOrQueue(track, putFirst);
+			guildMusic.getScheduler().startOrQueue(track, putFirst);
 			musicsAdded++;
-			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
-					&& !PremiumManager.isGuildPremium(musicManager.getChannel().getGuild())
+			if(guildMusic.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
+					&& !PremiumManager.isGuildPremium(guildMusic.getChannel().getGuild())
 					&& !PremiumManager.isUserPremium(userDj)) {
-				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, musicManager.getChannel());
+				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getChannel());
 				break;
 			}
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded), musicManager.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded), guildMusic.getChannel());
 	}
 
 	@Override
 	public void loadFailed(FriendlyException err) {
 		String errMessage = Jsoup.parse(StringUtils.remove(err.getMessage(), "Watch on YouTube")).text().trim();
-		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), musicManager.getChannel());
-		LogUtils.infof("{Guild ID: %d} Load failed: %s", musicManager.getChannel().getGuild().getLongID(), errMessage);
+		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), guildMusic.getChannel());
+		LogUtils.infof("{Guild ID: %d} Load failed: %s", guildMusic.getChannel().getGuild().getLongID(), errMessage);
 
-		if(musicManager.getScheduler().isStopped()) {
-			musicManager.leaveVoiceChannel();
+		if(guildMusic.getScheduler().isStopped()) {
+			guildMusic.leaveVoiceChannel();
 		}
 	}
 
@@ -138,23 +139,23 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	private void onNoMatches() {
-		BotUtils.sendMessage(TextUtils.noResult(StringUtils.remove(identifier, YT_SEARCH, SC_SEARCH)), musicManager.getChannel());
-		LogUtils.infof("{Guild ID: %d} No matches: %s", musicManager.getChannel().getGuild().getLongID(), identifier);
+		BotUtils.sendMessage(TextUtils.noResult(StringUtils.remove(identifier, YT_SEARCH, SC_SEARCH)), guildMusic.getChannel());
+		LogUtils.infof("{Guild ID: %d} No matches: %s", guildMusic.getChannel().getGuild().getLongID(), identifier);
 
-		if(musicManager.getScheduler().isStopped()) {
-			musicManager.leaveVoiceChannel();
+		if(guildMusic.getScheduler().isStopped()) {
+			guildMusic.leaveVoiceChannel();
 		}
 	}
 
 	@Override
 	public boolean onMessageReceived(IMessage message) {
-		if(!message.getAuthor().equals(musicManager.getDj())) {
+		if(!message.getAuthor().equals(guildMusic.getDj())) {
 			return false;
 		}
 
-		String prefix = (String) Database.getDBGuild(musicManager.getChannel().getGuild()).getPrefix();
+		String prefix = (String) Database.getDBGuild(guildMusic.getChannel().getGuild()).getPrefix();
 		if(message.getContent().equalsIgnoreCase(prefix + "cancel")) {
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice cancelled.", musicManager.getChannel());
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice cancelled.", guildMusic.getChannel());
 			this.stopWaiting();
 			return true;
 		}
@@ -175,20 +176,20 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel
-		GuildMusicManager.putGuildMusicManagerIfAbsent(message.getGuild(), musicManager);
-		musicManager.joinVoiceChannel(userVoiceChannel, false);
+		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(message.getGuild().getLongID(), guildMusic);
+		guildMusic.joinVoiceChannel(userVoiceChannel, false);
 
 		for(int choice : choices) {
 			AudioTrack track = resultsTracks.get(choice - 1);
-			if(musicManager.getScheduler().isPlaying()) {
+			if(guildMusic.getScheduler().isPlaying()) {
 				BotUtils.sendMessage(Emoji.MUSICAL_NOTE + " **" + FormatUtils.formatTrackName(track.getInfo())
-						+ "** has been added to the playlist.", musicManager.getChannel());
+						+ "** has been added to the playlist.", guildMusic.getChannel());
 			}
-			musicManager.getScheduler().startOrQueue(track, putFirst);
-			if(musicManager.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
-					&& !PremiumManager.isGuildPremium(musicManager.getChannel().getGuild())
+			guildMusic.getScheduler().startOrQueue(track, putFirst);
+			if(guildMusic.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
+					&& !PremiumManager.isGuildPremium(guildMusic.getChannel().getGuild())
 					&& !PremiumManager.isUserPremium(userDj)) {
-				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, musicManager.getChannel());
+				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getChannel());
 				break;
 			}
 		}
@@ -199,12 +200,12 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 	private void stopWaiting() {
 		stopWaitingTask.cancel(false);
-		MessageManager.removeListener(musicManager.getChannel(), this);
-		musicManager.setWaiting(false);
+		MessageManager.removeListener(guildMusic.getChannel(), this);
+		guildMusic.setWaiting(false);
 		resultsTracks.clear();
 
-		if(musicManager.getScheduler().isStopped()) {
-			musicManager.leaveVoiceChannel();
+		if(guildMusic.getScheduler().isStopped()) {
+			guildMusic.leaveVoiceChannel();
 		}
 	}
 }

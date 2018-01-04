@@ -165,8 +165,8 @@ public class WallpaperCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Search for a wallpaper.")
 				.setUsage("[-p purity] [-c category] [-rat ratio] [-res resolution] [-k keywords]")
 				.addArg("purity", FormatUtils.formatArray(Purity.values(), purity -> purity.toString().toLowerCase(), ", "), true)
@@ -175,8 +175,8 @@ public class WallpaperCmd extends AbstractCommand {
 				.addArg("resolution", "image resolution (e.g. 1920x1080)", true)
 				.addArg("keyword", "keywords (e.g. doom,game)", true)
 				.setExample(String.format("Search a *SFW* wallpaper in category *Anime*, with a *16x9* ratio :"
-						+ "%n`%s%s -p sfw -c anime -rat 16x9`", context.getPrefix(), this.getName()))
-				.appendField("Source", "https://alpha.wallhaven.cc/", false)
+						+ "%n`%s%s -p sfw -c anime -rat 16x9`", prefix, this.getName()))
+				.setSource("https://alpha.wallhaven.cc")
 				.build();
 	}
 }

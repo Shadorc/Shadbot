@@ -11,6 +11,7 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
@@ -48,9 +49,9 @@ public class ShutdownCmd extends AbstractCommand {
 
 		String message = splitArgs.get(1);
 		for(IGuild guild : context.getClient().getGuilds()) {
-			GuildMusicManager musicManager = GuildMusicManager.getGuildMusicManager(guild);
-			if(musicManager != null && musicManager.getChannel() != null) {
-				BotUtils.sendMessage(Emoji.INFO + " " + message, musicManager.getChannel());
+			GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guild.getLongID());
+			if(guildMusic != null && guildMusic.getChannel() != null) {
+				BotUtils.sendMessage(Emoji.INFO + " " + message, guildMusic.getChannel());
 			}
 		}
 
@@ -60,8 +61,8 @@ public class ShutdownCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Schedule a shutdown after a fixed amount of seconds and send a message to all guilds playing musics.")
 				.addArg("seconds", true)
 				.addArg("message", true)

@@ -34,10 +34,10 @@ public class CoinsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
-				.setDescription("Show how much coins you or another user have.")
-				.addArg("@user", true)
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
+				.setDescription("Show how many coins has an user.")
+				.addArg("@user", "if not specified, it will show you your coins", true)
 				.build();
 	}
 }

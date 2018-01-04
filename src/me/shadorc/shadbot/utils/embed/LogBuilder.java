@@ -31,22 +31,22 @@ public class LogBuilder {
 	}
 
 	public EmbedObject build() {
-		EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Shadbot.getVersion()))
 				.withDescription(message);
 
 		if(err != null) {
-			builder.appendField("Error type", err.getClass().getSimpleName(), false);
-			builder.appendField("Error message", err.getMessage(), false);
+			embed.appendField("Error type", err.getClass().getSimpleName(), false);
+			embed.appendField("Error message", err.getMessage(), false);
 		}
 
 		if(input != null) {
-			builder.appendField("Input", input, false);
+			embed.appendField("Input", input, false);
 		}
 
-		builder.appendField("User warned", Boolean.toString(channel != null), false);
+		embed.appendField("User warned", Boolean.toString(channel != null), false);
 
-		return builder.build();
+		return embed.build();
 	}
 }

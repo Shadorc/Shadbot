@@ -78,7 +78,7 @@ public class CommandManager {
 		} catch (IllegalArgumentException err) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 		} catch (MissingArgumentException err) {
-			BotUtils.sendMessage(cmd.getHelp(context), context.getChannel());
+			BotUtils.sendMessage(cmd.getHelp(context.getPrefix()), context.getChannel());
 		}
 	}
 

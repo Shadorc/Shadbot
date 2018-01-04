@@ -33,7 +33,7 @@ public class FormatUtils {
 		return FormatUtils.formatList("", list, mapper, delimiter);
 	}
 
-	public static String formatArray(Object[] array, Function<Object, String> mapper, String delimiter) {
+	public static <T> String formatArray(T[] array, Function<T, String> mapper, String delimiter) {
 		return FormatUtils.formatList(Arrays.asList(array), mapper, delimiter);
 	}
 
@@ -67,7 +67,7 @@ public class FormatUtils {
 				times.add(StringUtils.pluralOf(time, StringUtils.singularOf(unit.toString())));
 			}
 		}
-		return FormatUtils.formatList(times, time -> time.toString(), ", ");
+		return FormatUtils.formatList(times, Object::toString, ", ");
 	}
 
 	public static String formatDuration(long durationMillis) {

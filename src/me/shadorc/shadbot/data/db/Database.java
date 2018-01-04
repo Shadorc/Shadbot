@@ -13,6 +13,7 @@ import org.json.JSONTokener;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
+import me.shadorc.shadbot.utils.LogUtils;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -43,10 +44,6 @@ public class Database {
 		}
 	}
 
-	public static JSONObject getJSON() {
-		return dbObject;
-	}
-
 	public static DBGuild getDBGuild(IGuild guild) {
 		return new DBGuild(guild);
 	}
@@ -57,5 +54,23 @@ public class Database {
 
 	public static JSONObject opt(String key) {
 		return dbObject.optJSONObject(key);
+	}
+
+	public static void save(DBGuild dbGuild) {
+		dbObject.put(dbGuild.getGuild().getStringID(), dbGuild.toJSON());
+		LogUtils.infof("Guild %d saved.", dbGuild.getGuild().getLongID());
+	}
+
+	public static void save(DBUser dbUser) {
+		JSONObject guildObj = dbObject.optJSONObject(dbUser.getGuild().getStringID());
+		if(guildObj == null) {
+			guildObj = new JSONObject().put(DBGuild.USERS_KEY, new JSONObject());
+		}
+
+		guildObj.getJSONObject(DBGuild.USERS_KEY)
+				.put(Long.toString(dbUser.getUserID()), dbUser.toJSON());
+
+		dbObject.put(dbUser.getGuild().getStringID(), guildObj);
+		LogUtils.infof("User %d saved.", dbUser.getUserID());
 	}
 }

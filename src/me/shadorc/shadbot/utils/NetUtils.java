@@ -2,6 +2,7 @@ package me.shadorc.shadbot.utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 
 import org.jsoup.Connection.Response;
@@ -34,6 +35,15 @@ public class NetUtils {
 
 	public static String encode(String str) throws UnsupportedEncodingException {
 		return URLEncoder.encode(str, "UTF-8");
+	}
+
+	public static boolean isValidURL(String url) {
+		try {
+			new URL(url).openConnection().connect();
+			return true;
+		} catch (IllegalArgumentException | IOException err) {
+			return false;
+		}
 	}
 
 }

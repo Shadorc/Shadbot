@@ -81,7 +81,7 @@ public class Rule34Cmd extends AbstractCommand {
 			String fileUrl = this.getValidURL(postObj.getString("file_url"));
 			String sourceUrl = this.getValidURL(postObj.get("source").toString());
 
-			EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
 					.withUrl(fileUrl)
@@ -91,7 +91,7 @@ public class Rule34Cmd extends AbstractCommand {
 					.appendField("Tags", formattedtags, false)
 					.withImage(fileUrl)
 					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
-			loadingMsg.edit(builder.build());
+			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting an image from Rule34", context, err);
@@ -110,8 +110,8 @@ public class Rule34Cmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show a random image corresponding to a tag from Rule34 website.")
 				.addArg("tag", false)
 				.build();

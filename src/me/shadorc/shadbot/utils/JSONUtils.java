@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class JSONUtils {
 
@@ -22,22 +21,6 @@ public class JSONUtils {
 			}
 		}
 		return list;
-	}
-
-	public static JSONObject getOrDefault(JSONObject obj, JSONObject defaultObj, String... keys) {
-		if(obj == null) {
-			return defaultObj;
-		}
-
-		JSONObject lastObj = obj;
-		for(String key : keys) {
-			if(lastObj != null && lastObj.has(key)) {
-				lastObj = obj.optJSONObject(key);
-			} else {
-				return defaultObj;
-			}
-		}
-		return lastObj;
 	}
 
 }

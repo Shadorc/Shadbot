@@ -43,10 +43,10 @@ public class GifCmd extends AbstractCommand {
 				return;
 			}
 
-			EmbedBuilder builder = new EmbedBuilder()
+			EmbedBuilder embed = new EmbedBuilder()
 					.withColor(Config.BOT_COLOR)
 					.withImage(mainObj.getJSONObject("data").getString("image_url"));
-			loadingMsg.edit(builder.build());
+			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting a gif", context, err);
@@ -54,10 +54,11 @@ public class GifCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show a random gif")
 				.addArg("tag", "the tag to search", true)
+				.setSource("https://giphy.com")
 				.build();
 	}
 

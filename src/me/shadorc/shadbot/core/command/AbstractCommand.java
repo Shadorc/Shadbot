@@ -35,8 +35,7 @@ public abstract class AbstractCommand {
 
 	public abstract void execute(Context context) throws MissingArgumentException, IllegalArgumentException;
 
-	// TODO: Is Context necessary ? Prefix should be the only thing needed
-	public abstract EmbedObject getHelp(Context context);
+	public abstract EmbedObject getHelp(String prefix);
 
 	public List<String> getNames() {
 		return names;

@@ -34,10 +34,11 @@ public class CalcCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Calculate an expression.")
 				.addArg("expression", false)
+				.setExample(String.format("`%s%s 3+3*3+3`", prefix, this.getName()))
 				.build();
 	}
 

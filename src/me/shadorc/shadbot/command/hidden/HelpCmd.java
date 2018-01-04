@@ -28,11 +28,11 @@ public class HelpCmd extends AbstractCommand {
 				return;
 			}
 
-			BotUtils.sendMessage(cmd.getHelp(context), context.getChannel());
+			BotUtils.sendMessage(cmd.getHelp(context.getPrefix()), context.getChannel());
 			return;
 		}
 
-		EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName("Shadbot Help")
 				.appendDescription(String.format("Get more information by using `%s%s <command>`.", context.getPrefix(), this.getName()))
@@ -55,15 +55,15 @@ public class HelpCmd extends AbstractCommand {
 				contentBuilder.append("`" + context.getPrefix() + cmd.getName() + "` ");
 			}
 
-			builder.appendField(String.format("%s Commands", category.toString()), contentBuilder.toString(), false);
+			embed.appendField(String.format("%s Commands", category.toString()), contentBuilder.toString(), false);
 		}
 
-		BotUtils.sendMessage(builder.build(), context.getChannel());
+		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show the list of available commands.")
 				.build();
 	}

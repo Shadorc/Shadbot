@@ -11,6 +11,7 @@ import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.listener.ReadyListener;
 import me.shadorc.shadbot.listener.ShardListener;
+import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -41,6 +42,15 @@ public class Shadbot {
 			return;
 		}
 
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				GuildMusicManager.stop();
+				ShardManager.stop();
+				DataManager.stop();
+			}
+		});
+
 		client = new ClientBuilder()
 				.withToken(APIKeys.get(APIKey.DISCORD_TOKEN))
 				.withRecommendedShardCount()
@@ -52,9 +62,6 @@ public class Shadbot {
 		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(client.getShardCount(), "shard"));
 
 		client.getDispatcher().registerListeners(Shadbot.getEventThreadPool(), new ReadyListener(), new ShardListener());
-
-		// AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
-
 		client.login();
 	}
 

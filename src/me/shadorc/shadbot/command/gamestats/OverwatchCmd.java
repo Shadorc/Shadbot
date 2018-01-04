@@ -70,7 +70,7 @@ public class OverwatchCmd extends AbstractCommand {
 
 			OverwatchPlayer player = new OverwatchPlayer(username, platform, region);
 
-			EmbedBuilder builder = EmbedUtils.getDefaultEmbed()
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Overwatch Stats")
 					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
@@ -84,7 +84,7 @@ public class OverwatchCmd extends AbstractCommand {
 					.appendField("Game time", player.getTimePlayed(), true)
 					.appendField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
 					.appendField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
-			loadingMsg.edit(builder.build());
+			loadingMsg.edit(embed.build());
 
 		} catch (OverwatchException err) {
 			String msg;
@@ -117,7 +117,7 @@ public class OverwatchCmd extends AbstractCommand {
 		Platform platform = Utils.getValueOrNull(Platform.class, str.toUpperCase());
 		if(platform == null) {
 			throw new IllegalArgumentException("Invalid platform. Options: "
-					+ FormatUtils.formatArray(Platform.values(), plat -> plat.toString(), ", "));
+					+ FormatUtils.formatArray(Platform.values(), Object::toString, ", "));
 		}
 		return platform;
 	}
@@ -126,17 +126,19 @@ public class OverwatchCmd extends AbstractCommand {
 		Region region = Utils.getValueOrNull(Region.class, str.toUpperCase());
 		if(region == null) {
 			throw new IllegalArgumentException("Invalid region. Options: "
-					+ FormatUtils.formatArray(Region.values(), reg -> reg.toString(), ", "));
+					+ FormatUtils.formatArray(Region.values(), Object::toString, ", "));
 		}
 		return region;
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Overwatch.")
-				.addArg(Utils.removeAndGet(Platform.values(), Platform.NONE), true)
-				.addArg(Utils.removeAndGet(Region.values(), Region.NONE), true)
+				.addArg("platform", String.format("user's platform (%s)",
+						FormatUtils.formatList(Utils.removeAndGet(Platform.values(), Platform.NONE), platform -> platform.toString().toLowerCase(), ", ")), true)
+				.addArg("region", String.format("user's region (%s)",
+						FormatUtils.formatList(Utils.removeAndGet(Region.values(), Region.NONE), region -> region.toString().toLowerCase(), ", ")), true)
 				.addArg("battletag#0000", false)
 				.appendField("Info", "**platform** and **region** are automatically detected if nothing is specified.", false)
 				.build();

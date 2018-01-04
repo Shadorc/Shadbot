@@ -33,7 +33,7 @@ public class HolidaysCmd extends AbstractCommand {
 
 		String zone = context.getArg().toUpperCase();
 		if(!ZONES.contains(zone)) {
-			throw new IllegalArgumentException("Invalid zone. Options: " + FormatUtils.formatList(ZONES, opt -> opt.toString(), ", "));
+			throw new IllegalArgumentException("Invalid zone. Options: " + FormatUtils.formatList(ZONES, Object::toString, ", "));
 		}
 
 		try {
@@ -45,8 +45,8 @@ public class HolidaysCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show the number of remaining days before the next school holidays for the indicated zone.")
 				.addArg(ZONES, false)
 				.build();

@@ -17,6 +17,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -49,13 +50,13 @@ public class UserInfoCmd extends AbstractCommand {
 				.appendField("Join date", joinDate, true)
 				.appendField("Status", user.getPresence().getStatus().toString(), true)
 				.appendField("Playing text", user.getPresence().getText().orElse(null), true)
-				.appendField("Roles", FormatUtils.formatList(user.getRolesForGuild(context.getGuild()), role -> role.getName(), "\n"), true);
+				.appendField("Roles", FormatUtils.formatList(user.getRolesForGuild(context.getGuild()), IRole::getName, "\n"), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Show info about an user.")
 				.addArg("@user", false)
 				.build();

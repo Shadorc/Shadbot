@@ -1,48 +1,58 @@
 package me.shadorc.shadbot.shard;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
-import me.shadorc.shadbot.utils.ThreadPoolUtils;
 import sx.blah.discord.api.IShard;
 
 public class ShadbotShard {
 
 	private final IShard shard;
 	private final int shardID;
-	private final ExecutorService threadPool;
-	private final AtomicLong lastUsed;
+	private ExecutorService threadPool;
+	private final AtomicLong lastEvent;
+	private final AtomicLong lastMessage;
 
 	public ShadbotShard(IShard shard) {
 		this.shard = shard;
 		this.shardID = shard.getInfo()[0];
-		this.threadPool = Executors.newCachedThreadPool(ThreadPoolUtils.getThreadFactoryNamed("ShadbotShard-" + this.getID() + "-%d"));
-		this.lastUsed = new AtomicLong();
+		this.threadPool = ShardManager.createThreadPool(this);
+		this.lastEvent = new AtomicLong();
+		this.lastMessage = new AtomicLong();
 	}
 
-	public final IShard getShard() {
+	public IShard getShard() {
 		return shard;
 	}
 
-	public final int getID() {
+	public int getID() {
 		return shardID;
 	}
 
-	public final ExecutorService getThreadPool() {
+	public ExecutorService getThreadPool() {
 		return threadPool;
 	}
 
-	public final long getLastUsed() {
-		return lastUsed.get();
+	public long getLastEventTime() {
+		return lastEvent.get();
 	}
 
-	public final void used() {
-		lastUsed.set(System.currentTimeMillis());
+	public long getLastMessageTime() {
+		return lastMessage.get();
 	}
 
-	public final void restart() {
+	public void eventReceived() {
+		lastEvent.set(System.currentTimeMillis());
+	}
+
+	public void messageReceived() {
+		lastMessage.set(System.currentTimeMillis());
+	}
+
+	public void restart() {
 		shard.logout();
+		threadPool.shutdownNow();
 		shard.login();
+		threadPool = ShardManager.createThreadPool(this);
 	}
 }

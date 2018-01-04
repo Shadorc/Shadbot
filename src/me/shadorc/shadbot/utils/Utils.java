@@ -64,7 +64,7 @@ public class Utils {
 		return null;
 	}
 
-	public static <T> List<T> removeAndGet(T array[], T elmt) {
+	public static <T> List<T> removeAndGet(T[] array, T elmt) {
 		return Arrays.stream(array).filter(element -> !element.equals(elmt)).collect(Collectors.toList());
 	}
 

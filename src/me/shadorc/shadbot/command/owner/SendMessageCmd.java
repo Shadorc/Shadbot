@@ -47,8 +47,8 @@ public class SendMessageCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(Context context) {
-		return new HelpBuilder(this, context.getPrefix())
+	public EmbedObject getHelp(String prefix) {
+		return new HelpBuilder(this, prefix)
 				.setDescription("Send a private message to an user.")
 				.addArg("userID", false)
 				.addArg("message", false)

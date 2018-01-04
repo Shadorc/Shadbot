@@ -1,6 +1,8 @@
 package me.shadorc.shadbot.data;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -16,6 +18,8 @@ public class DataManager {
 
 	private static final ScheduledExecutorService SCHEDULED_EXECUTOR =
 			Executors.newScheduledThreadPool(2, ThreadPoolUtils.getThreadFactoryNamed("Shadbot-DataManager-%d"));
+
+	private static final List<Runnable> SAVE_TASKS = new ArrayList<>();
 
 	public static boolean init() {
 		LogUtils.infof("Initializing data files...");
@@ -43,6 +47,7 @@ public class DataManager {
 							LogUtils.errorf(err, "An error occurred while saving %s.", annotation.filePath());
 						}
 					};
+					SAVE_TASKS.add(saveTask);
 					SCHEDULED_EXECUTOR.scheduleAtFixedRate(saveTask, annotation.initialDelay(), annotation.period(), annotation.unit());
 				}
 			}
@@ -55,7 +60,7 @@ public class DataManager {
 	}
 
 	public static void stop() {
-		// Shutdown executor and run waiting tasks
-		SCHEDULED_EXECUTOR.shutdownNow().stream().forEach(runnable -> runnable.run());
+		SCHEDULED_EXECUTOR.shutdownNow();
+		SAVE_TASKS.stream().forEach(Runnable::run);
 	}
 }
