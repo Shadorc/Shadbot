@@ -11,6 +11,10 @@ public class DateUtils {
 		return Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), DateUtils.toLocalDate(instant)));
 	}
 
+	public static long getMillisUntil(long epochMilli) {
+		return DateUtils.getMillisUntil(Instant.ofEpochMilli(epochMilli));
+	}
+
 	public static LocalDateTime toLocalDate(Instant instant) {
 		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}

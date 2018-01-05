@@ -7,6 +7,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
@@ -15,7 +16,7 @@ import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.game.GameUtils;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
-@RateLimited
+@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
 @Command(category = CommandCategory.GAME, names = { "russian_roulette", "russian-roulette", "russianroulette" }, alias = "rr")
 public class RussianRouletteCmd extends AbstractCommand {
 
@@ -55,8 +56,8 @@ public class RussianRouletteCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Play Russian roulette.")
 				.addArg("bet", String.format("You can not bet more than **%s**.", FormatUtils.formatCoins(MAX_BET)), false)
-				.setGains("You have a **5-in-6** chance to win **%.1f times** your bet and a **1-in-6** chance to lose **%.1f times** your bet.",
-						WIN_MULTIPLIER, LOSE_MULTIPLIER)
+				.setGains("You have a **5-in-6** chance to win **%d times** your bet and a **1-in-6** chance to lose **%d times** your bet.",
+						(int) WIN_MULTIPLIER, (int) LOSE_MULTIPLIER)
 				.build();
 	}
 }

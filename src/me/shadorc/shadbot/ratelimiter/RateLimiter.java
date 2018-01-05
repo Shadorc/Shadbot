@@ -8,6 +8,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.ThreadPoolUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
@@ -58,9 +59,10 @@ public class RateLimiter {
 	}
 
 	private void warn(IChannel channel, IUser user) {
-		BotUtils.sendMessage(String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command once every *%s*.",
+		BotUtils.sendMessage(String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
 				user.getName(),
 				TextUtils.getSpamMessage(),
+				StringUtils.pluralOf(max, "time"),
 				DurationFormatUtils.formatDurationWords(cooldown, true, true)), channel);
 	}
 

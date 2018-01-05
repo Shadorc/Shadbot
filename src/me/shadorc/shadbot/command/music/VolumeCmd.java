@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.music;
 
-import me.shadorc.discordbot.utils.MathUtils;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -42,12 +41,9 @@ public class VolumeCmd extends AbstractCommand {
 			throw new IllegalArgumentException("Invalid volume.");
 		}
 
-		if(!MathUtils.inRange(volume, 0, 100)) {
-			throw new IllegalArgumentException("Volume must be between **0** and **100**.");
-		}
-
 		scheduler.setVolume(volume);
-		BotUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to %s%%", volume), context.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%**", scheduler.getAudioPlayer().getVolume()),
+				context.getChannel());
 	}
 
 	@Override

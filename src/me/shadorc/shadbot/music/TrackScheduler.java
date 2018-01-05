@@ -48,7 +48,7 @@ public class TrackScheduler {
 				queue.offer(currentTrack.makeClone());
 			case NONE:
 				this.currentTrack = queue.poll();
-				return audioPlayer.startTrack(currentTrack, false);
+				return audioPlayer.startTrack(currentTrack.makeClone(), false);
 			case SONG:
 				audioPlayer.playTrack(currentTrack.makeClone());
 				break;

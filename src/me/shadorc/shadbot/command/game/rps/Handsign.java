@@ -19,15 +19,14 @@ public enum Handsign {
 		return handsign;
 	}
 
+	public String getRepresentation() {
+		return emoji + " " + handsign;
+	}
+
 	public boolean isSuperior(Handsign other) {
 		return this.equals(Handsign.ROCK) && other.equals(Handsign.SCISSORS)
 				|| this.equals(Handsign.PAPER) && other.equals(Handsign.ROCK)
 				|| this.equals(Handsign.SCISSORS) && other.equals(Handsign.PAPER);
-	}
-
-	@Override
-	public String toString() {
-		return emoji + " " + handsign;
 	}
 
 }

@@ -7,6 +7,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
@@ -14,7 +15,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
-@RateLimited
+@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
 @Command(category = CommandCategory.GAME, names = { "rps" })
 public class RpsCmd extends AbstractCommand {
 
@@ -34,7 +35,7 @@ public class RpsCmd extends AbstractCommand {
 		Handsign botHandsign = Handsign.values()[MathUtils.rand(Handsign.values().length)];
 
 		StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s.%n**Shadbot**: %s.%n",
-				context.getAuthorName(), userHandsign, botHandsign));
+				context.getAuthorName(), userHandsign.getRepresentation(), botHandsign.getRepresentation()));
 
 		if(userHandsign.equals(botHandsign)) {
 			strBuilder.append("It's a draw !");

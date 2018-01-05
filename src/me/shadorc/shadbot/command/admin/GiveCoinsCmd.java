@@ -26,11 +26,12 @@ public class GiveCoinsCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.hasArg()) {
+		List<String> splitArgs = StringUtils.split(context.getArg());
+		if(splitArgs.size() != 2) {
 			throw new MissingArgumentException();
 		}
 
-		Integer coins = CastUtils.asInt(StringUtils.split(context.getArg()).get(0));
+		Integer coins = CastUtils.asInt(splitArgs.get(0));
 		if(coins == null) {
 			throw new IllegalArgumentException("Invalid amount.");
 		}

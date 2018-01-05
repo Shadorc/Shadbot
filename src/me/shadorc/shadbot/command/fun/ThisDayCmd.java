@@ -12,10 +12,10 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.command.LoadingMessage;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -29,6 +29,9 @@ public class ThisDayCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) {
+		LoadingMessage loadingMsg = new LoadingMessage("Loading information...", context.getChannel());
+		loadingMsg.send();
+
 		try {
 			Document doc = NetUtils.getDoc(HOME_URL);
 
@@ -47,7 +50,7 @@ public class ThisDayCmd extends AbstractCommand {
 					.withThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
 					.appendDescription(result);
 
-			BotUtils.sendMessage(embed.build(), context.getChannel());
+			loadingMsg.edit(embed.build());
 
 		} catch (IOException err) {
 			ExceptionUtils.handle("getting events", context, err);

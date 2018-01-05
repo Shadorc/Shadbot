@@ -1,32 +1,40 @@
 package me.shadorc.shadbot.game;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import sx.blah.discord.handle.obj.IUser;
+import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.utils.ThreadPoolUtils;
 
 public abstract class AbstractGameManager {
 
-	private final List<IUser> players;
+	private static final ScheduledThreadPoolExecutor SCHEDULER =
+			ThreadPoolUtils.newSingleScheduledThreadPoolExecutor("Shadbot-GameManager-%d");
 
-	public AbstractGameManager() {
-		this.players = new ArrayList<>();
+	private final String cmdName;
+
+	private ScheduledFuture<?> scheduledTask;
+
+	public AbstractGameManager(AbstractCommand cmd) {
+		this.cmdName = cmd.getName();
 	}
 
-	public abstract void start();
+	@SuppressWarnings("PMD.SignatureDeclareThrowsException")
+	public abstract void start() throws Exception;
 
 	public abstract void stop();
 
-	public void addPlayer(IUser user) {
-		players.add(user);
+	public String getCmdName() {
+		return cmdName;
 	}
 
-	public boolean isPlaying(IUser user) {
-		return players.contains(user);
+	public void schedule(Runnable command, long delay, TimeUnit unit) {
+		scheduledTask = SCHEDULER.schedule(command, delay, unit);
 	}
 
-	public List<IUser> getPlayers() {
-		return players;
+	public void cancelScheduledTask() {
+		scheduledTask.cancel(true);
 	}
 
 }

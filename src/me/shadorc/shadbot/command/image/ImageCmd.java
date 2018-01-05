@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
@@ -73,7 +72,7 @@ public class ImageCmd extends AbstractCommand {
 
 	private JSONObject getRandomPopularResult(String encodedSearch) throws JSONException, IOException {
 		try {
-			if(DateUtils.getMillisUntil(Instant.ofEpochMilli(lastTokenGeneration)) >= TimeUnit.SECONDS.toMillis(expiresIn)) {
+			if(DateUtils.getMillisUntil(lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(expiresIn)) {
 				this.generateAccessToken();
 			}
 

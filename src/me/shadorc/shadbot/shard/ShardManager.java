@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.shard;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -61,8 +60,8 @@ public class ShardManager {
 	private static void check() {
 		LogUtils.infof("Checking dead shards...");
 		for(ShadbotShard shardStatus : SHARDS_MAP.values()) {
-			long lastEventTime = DateUtils.getMillisUntil(Instant.ofEpochMilli(shardStatus.getLastEventTime()));
-			long lastMessageTime = DateUtils.getMillisUntil(Instant.ofEpochMilli(shardStatus.getLastMessageTime()));
+			long lastEventTime = DateUtils.getMillisUntil(shardStatus.getLastEventTime());
+			long lastMessageTime = DateUtils.getMillisUntil(shardStatus.getLastMessageTime());
 			if(lastEventTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT) || lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
 				LogUtils.infof(String.format("Restarting shard %d (Response time: %d ms | Last event: %s ago | Last message: %s ago)",
 						shardStatus.getID(),

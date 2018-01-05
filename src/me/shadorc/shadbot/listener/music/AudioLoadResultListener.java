@@ -13,11 +13,11 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.discordbot.message.MessageListener;
-import me.shadorc.discordbot.message.MessageManager;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.premium.PremiumManager;
+import me.shadorc.shadbot.message.MessageListener;
+import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -83,7 +83,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			guildMusic.setDj(userDj);
 			guildMusic.setWaiting(true);
 
-			String choices = FormatUtils.numberedList(5, tracks.size(), count -> String.format("%n%t**%d.** %s",
+			String choices = FormatUtils.numberedList(5, tracks.size(), count -> String.format("\t**%d.** %s",
 					count, FormatUtils.formatTrackName(tracks.get(count - 1).getInfo())));
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
@@ -93,7 +93,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					.appendDescription("**Select a music by typing the corresponding number.**"
 							+ "\nYou can choose several musics by separating them with a comma."
 							+ "\nExample: 1,3,4"
-							+ "\n" + choices)
+							+ "\n\n" + choices)
 					.withFooterText(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
 							Database.getDBGuild(guildMusic.getChannel().getGuild()).getPrefix(), CHOICE_DURATION));
 			BotUtils.sendMessage(embed.build(), guildMusic.getChannel());
@@ -148,7 +148,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	}
 
 	@Override
-	public boolean onMessageReceived(IMessage message) {
+	public boolean intercept(IMessage message) {
 		if(!message.getAuthor().equals(guildMusic.getDj())) {
 			return false;
 		}
