@@ -54,7 +54,7 @@ public class MessageListener {
 		} catch (Exception err) {
 			// TODO improve message
 			LogUtils.errorf(message.getContent(), message.getChannel(), err,
-					"An unknown error occurred.", event.getGuild().getLongID());
+					"Sorry, an unknown error occurred. My developer has been warned.", event.getGuild().getLongID());
 		}
 	}
 

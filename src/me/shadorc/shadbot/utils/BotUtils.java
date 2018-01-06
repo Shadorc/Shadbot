@@ -1,6 +1,8 @@
 package me.shadorc.shadbot.utils;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -55,10 +57,10 @@ public class BotUtils {
 		});
 	}
 
-	public static int deleteMessages(IChannel channel, List<IMessage> messages) {
+	public static int deleteMessages(IChannel channel, IMessage... messages) {
 		// Only keeps messages that are at most 2 weeks old
-		List<IMessage> toDelete = messages.stream()
-				.filter(msg -> msg.getLongID() >= (((System.currentTimeMillis() - 14 * 24 * 60 * 60 * 1000) - 1420070400000L) << 22))
+		List<IMessage> toDelete = Arrays.asList(messages).stream()
+				.filter(msg -> msg != null && DateUtils.getMillisUntil(msg.getCreationDate()) < TimeUnit.DAYS.toMillis(7 * 2))
 				.distinct()
 				.collect(Collectors.toList());
 
@@ -67,7 +69,7 @@ public class BotUtils {
 		}
 
 		return RequestBuffer.request(() -> {
-			return channel.bulkDelete(messages).size();
+			return channel.bulkDelete(toDelete).size();
 		}).get();
 	}
 

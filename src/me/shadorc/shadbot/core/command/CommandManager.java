@@ -14,7 +14,7 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.object.Emoji;
 
 public class CommandManager {
 

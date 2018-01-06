@@ -15,13 +15,13 @@ public class ReadyListener {
 
 		ShardManager.start();
 
-		event.getClient().changePresence(StatusType.ONLINE);
-
 		event.getClient().getDispatcher().registerListeners(Shadbot.getEventThreadPool(),
 				new ChannelListener(),
 				new GuildListener(),
 				new GuildMemberListener(),
 				new MessageListener());
+
+		event.getClient().changePresence(StatusType.ONLINE);
 	}
 
 }

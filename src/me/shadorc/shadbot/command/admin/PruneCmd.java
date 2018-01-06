@@ -15,8 +15,8 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IEmbed;
 import sx.blah.discord.handle.obj.IEmbed.IEmbedField;
@@ -64,7 +64,7 @@ public class PruneCmd extends AbstractCommand {
 				.limit(count)
 				.collect(Collectors.toList());
 
-		int deletedMsg = BotUtils.deleteMessages(context.getChannel(), messagesList);
+		int deletedMsg = BotUtils.deleteMessages(context.getChannel(), messagesList.toArray(new IMessage[messagesList.size()]));
 		if(deletedMsg == 0) {
 			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
 		} else {

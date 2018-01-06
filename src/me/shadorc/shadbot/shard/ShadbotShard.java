@@ -50,7 +50,9 @@ public class ShadbotShard {
 	}
 
 	public void restart() {
-		shard.logout();
+		if(shard.isLoggedIn()) {
+			shard.logout();
+		}
 		threadPool.shutdownNow();
 		shard.login();
 		threadPool = ShardManager.createThreadPool(this);

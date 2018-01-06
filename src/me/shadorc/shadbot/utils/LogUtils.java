@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.LogBuilder;
 import me.shadorc.shadbot.utils.embed.LogType;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 

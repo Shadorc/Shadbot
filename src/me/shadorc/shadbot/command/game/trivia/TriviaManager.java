@@ -23,8 +23,8 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.JSONUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
@@ -36,7 +36,6 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 	protected static final int MAX_BONUS = 100;
 	protected static final int LIMITED_TIME = 30;
 
-	private final IChannel channel;
 	private final Integer categoryID;
 	private final List<IUser> alreadyAnswered;
 
@@ -44,9 +43,8 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 	private String correctAnswer;
 	private List<String> answers;
 
-	public TriviaManager(AbstractCommand cmd, IChannel channel, Integer categoryID) {
-		super(cmd);
-		this.channel = channel;
+	public TriviaManager(AbstractCommand cmd, IChannel channel, IUser author, Integer categoryID) {
+		super(cmd, channel, author);
 		this.categoryID = categoryID;
 		this.alreadyAnswered = new ArrayList<>();
 	}
@@ -86,13 +84,13 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 				.appendField("Difficulty", String.format("`%s`", resultObj.getString("difficulty")), true)
 				.withFooterText(String.format("You have %d seconds to answer.", LIMITED_TIME));
 
-		BotUtils.sendMessage(embed.build(), channel);
+		BotUtils.sendMessage(embed.build(), this.getChannel());
 
-		MessageManager.addListener(channel, this);
+		MessageManager.addListener(this.getChannel(), this);
 
 		startTime = System.currentTimeMillis();
 		this.schedule(() -> {
-			BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer), channel);
+			BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer), this.getChannel());
 			this.stop();
 		}, LIMITED_TIME, TimeUnit.SECONDS);
 	}
@@ -100,8 +98,8 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 	@Override
 	public void stop() {
 		this.cancelScheduledTask();
-		MessageManager.removeListener(channel, this);
-		TriviaCmd.MANAGERS.remove(channel.getLongID());
+		MessageManager.removeListener(this.getChannel(), this);
+		TriviaCmd.MANAGERS.remove(this.getChannel().getLongID());
 	}
 
 	@Override
@@ -124,13 +122,13 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 			// return false;
 			// }
 
-			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " Sorry **%s**, you can only answer once.", author.getName()), channel);
+			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " Sorry **%s**, you can only answer once.", author.getName()), this.getChannel());
 
 		} else if(answer.equalsIgnoreCase(correctAnswer)) {
 			this.win(message.getChannel(), message.getAuthor());
 
 		} else {
-			BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", channel);
+			BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", this.getChannel());
 			alreadyAnswered.add(author);
 		}
 

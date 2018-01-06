@@ -1,11 +1,7 @@
-package me.shadorc.shadbot.utils.game;
+package me.shadorc.shadbot.utils;
 
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 

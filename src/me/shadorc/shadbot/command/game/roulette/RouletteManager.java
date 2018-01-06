@@ -14,8 +14,8 @@ import me.shadorc.shadbot.game.AbstractGameManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.Pair;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -27,14 +27,10 @@ public class RouletteManager extends AbstractGameManager {
 
 	private static final int GAME_DURATION = 30;
 
-	private final IChannel channel;
-	private final IUser user;
 	private final ConcurrentHashMap<IUser, Pair<Integer, String>> playersPlace;
 
-	public RouletteManager(AbstractCommand cmd, IChannel channel, IUser user) {
-		super(cmd);
-		this.channel = channel;
-		this.user = user;
+	public RouletteManager(AbstractCommand cmd, IChannel channel, IUser author) {
+		super(cmd, channel, author);
 		this.playersPlace = new ConcurrentHashMap<>();
 	}
 
@@ -43,12 +39,12 @@ public class RouletteManager extends AbstractGameManager {
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Roulette Game")
 				.withThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
-				.appendField(String.format("%s started a Roulette game.", user.getName()),
+				.appendField(String.format("%s started a Roulette game.", this.getAuthor().getName()),
 						String.format("Use `%s%s <bet> <place>` to join the game."
 								+ "%n%n**Place** must be a number between `1 and 36`, `red`, `black`, `even`, `odd`, `low` or `high`",
-								Database.getDBGuild(channel.getGuild()).getPrefix(), this.getCmdName()), false)
+								Database.getDBGuild(this.getGuild()).getPrefix(), this.getCmdName()), false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
-		BotUtils.sendMessage(embed.build(), channel).get();
+		BotUtils.sendMessage(embed.build(), this.getChannel()).get();
 		this.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
 	}
 
@@ -82,21 +78,21 @@ public class RouletteManager extends AbstractGameManager {
 
 			gains *= multiplier;
 			if(gains > 0) {
-				list.add(0, String.format("**%s** (Gains: **%s)**", user.getName(), FormatUtils.formatCoins(gains)));
+				list.add(0, String.format("**%s** (Gains: **%s**)", user.getName(), FormatUtils.formatCoins(gains)));
 			} else {
-				list.add(String.format("**%s** (Losses: **%s)**", user.getName(), FormatUtils.formatCoins(Math.abs(gains))));
+				list.add(String.format("**%s** (Losses: **%s**)", user.getName(), FormatUtils.formatCoins(Math.abs(gains))));
 			}
-			Database.getDBUser(channel.getGuild(), user).addCoins(gains);
+			Database.getDBUser(this.getGuild(), user).addCoins(gains);
 			// StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 
 		BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%d)** !"
 				+ "\n" + Emoji.BANK + " __Results:__ %s.",
 				winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black", FormatUtils.formatList(list, Object::toString, ", ")),
-				channel);
+				this.getChannel());
 
 		playersPlace.clear();
-		RouletteCmd.MANAGERS.remove(channel.getLongID());
+		RouletteCmd.MANAGERS.remove(this.getChannel().getLongID());
 	}
 
 	protected boolean addPlayer(IUser user, Integer bet, String place) {

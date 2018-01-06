@@ -2,7 +2,7 @@ package me.shadorc.shadbot.utils;
 
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.Setting;
-import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 

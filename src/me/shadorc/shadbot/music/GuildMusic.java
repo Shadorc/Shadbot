@@ -15,7 +15,7 @@ import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.ThreadPoolUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;

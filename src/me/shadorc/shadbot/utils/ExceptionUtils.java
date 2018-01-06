@@ -15,7 +15,7 @@ public class ExceptionUtils {
 		} else if(err instanceof SocketTimeoutException) {
 			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.", StringUtils.capitalize(action));
 		} else {
-			msg = String.format("Sorry, something went wrong while %s... I will try to fix this as soon as possible.", action);
+			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
 		}
 		LogUtils.errorf(context.getContent(), context.getChannel(), err, msg);
 	}

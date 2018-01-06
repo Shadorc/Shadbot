@@ -12,11 +12,11 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
+import me.shadorc.shadbot.utils.GameUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.game.GameUtils;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
@@ -72,7 +72,7 @@ public class DiceCmd extends AbstractCommand {
 			diceManager.start();
 		}
 
-		if(diceManager.getPlayers() == 6) {
+		if(diceManager.getPlayersCount() == 6) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " Sorry, there are already 6 players.", context.getChannel());
 			return;
 		}
@@ -82,7 +82,7 @@ public class DiceCmd extends AbstractCommand {
 			return;
 		}
 
-		if(diceManager.isBet(num)) {
+		if(diceManager.isNumBet(num)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
 			return;
 		}

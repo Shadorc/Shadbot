@@ -60,15 +60,23 @@ public class ShardManager {
 	private static void check() {
 		LogUtils.infof("Checking dead shards...");
 		for(ShadbotShard shardStatus : SHARDS_MAP.values()) {
-			long lastEventTime = DateUtils.getMillisUntil(shardStatus.getLastEventTime());
-			long lastMessageTime = DateUtils.getMillisUntil(shardStatus.getLastMessageTime());
-			if(lastEventTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT) || lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
-				LogUtils.infof(String.format("Restarting shard %d (Response time: %d ms | Last event: %s ago | Last message: %s ago)",
-						shardStatus.getID(),
-						shardStatus.getShard().getResponseTime(),
-						DurationFormatUtils.formatDurationWords(lastEventTime, true, true),
-						DurationFormatUtils.formatDurationWords(lastMessageTime, true, true)));
-				shardStatus.restart();
+			try {
+				// Ignore shards with less than 100 guilds
+				if(shardStatus.getShard().getGuilds().size() < 100) {
+					continue;
+				}
+				long lastEventTime = DateUtils.getMillisUntil(shardStatus.getLastEventTime());
+				long lastMessageTime = DateUtils.getMillisUntil(shardStatus.getLastMessageTime());
+				if(lastEventTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT) || lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
+					LogUtils.infof(String.format("Restarting shard %d (Response time: %d ms | Last event: %s ago | Last message: %s ago)",
+							shardStatus.getID(),
+							shardStatus.getShard().getResponseTime(),
+							DurationFormatUtils.formatDurationWords(lastEventTime, true, true),
+							DurationFormatUtils.formatDurationWords(lastMessageTime, true, true)));
+					shardStatus.restart();
+				}
+			} catch (Exception err) {
+				LogUtils.errorf(err, "An error occurred while restarting a shard.");
 			}
 		}
 		LogUtils.infof("Dead shards checked.");

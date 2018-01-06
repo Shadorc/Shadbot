@@ -24,9 +24,9 @@ import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
@@ -62,7 +62,7 @@ public class TriviaCmd extends AbstractCommand {
 
 		TriviaManager triviaManager = MANAGERS.get(context.getChannel().getLongID());
 		if(triviaManager == null) {
-			triviaManager = new TriviaManager(this, context.getChannel(), categoryID);
+			triviaManager = new TriviaManager(this, context.getChannel(), context.getAuthor(), categoryID);
 		}
 
 		if(MANAGERS.putIfAbsent(context.getChannel().getLongID(), triviaManager) == null) {
@@ -83,7 +83,7 @@ public class TriviaCmd extends AbstractCommand {
 		try {
 			JSONObject mainObj = new JSONObject(NetUtils.getBody("https://opentdb.com/api_category.php"));
 			JSONArray categoriesArray = mainObj.getJSONArray("trivia_categories");
-			categoriesArray.forEach(obj -> categories.put(((JSONObject) obj).getInt("id"), ((JSONObject) obj).getString("name"))); 
+			categoriesArray.forEach(obj -> categories.put(((JSONObject) obj).getInt("id"), ((JSONObject) obj).getString("name")));
 		} catch (JSONException | IOException err) {
 			LogUtils.errorf(err, "An error occurred while getting Trivia categories.");
 		}

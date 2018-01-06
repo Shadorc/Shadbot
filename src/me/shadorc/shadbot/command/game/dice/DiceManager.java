@@ -21,15 +21,11 @@ public class DiceManager extends AbstractGameManager {
 
 	private static final int GAME_DURATION = 30;
 
-	private final IChannel channel;
-	private final IUser user;
 	private final ConcurrentHashMap<Integer, IUser> numsPlayers;
 	private final int bet;
 
-	public DiceManager(AbstractCommand cmd, IChannel channel, IUser user, int bet) {
-		super(cmd);
-		this.channel = channel;
-		this.user = user;
+	public DiceManager(AbstractCommand cmd, IChannel channel, IUser author, int bet) {
+		super(cmd, channel, author);
 		this.bet = bet;
 		this.numsPlayers = new ConcurrentHashMap<>();
 	}
@@ -39,12 +35,12 @@ public class DiceManager extends AbstractGameManager {
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Dice Game")
 				.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
-				.appendField(String.format("%s started a dice game.", user.getName()),
+				.appendField(String.format("%s started a dice game.", this.getAuthor().getName()),
 						String.format("Use `%s%s <num>` to join the game with a **%s** putting.",
-								Database.getDBGuild(channel.getGuild()).getPrefix(), this.getCmdName(), FormatUtils.formatCoins(bet)),
+								Database.getDBGuild(this.getGuild()).getPrefix(), this.getCmdName(), FormatUtils.formatCoins(bet)),
 						false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
-		BotUtils.sendMessage(embed.build(), channel).get();
+		BotUtils.sendMessage(embed.build(), this.getChannel()).get();
 
 		this.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
 	}
@@ -67,35 +63,31 @@ public class DiceManager extends AbstractGameManager {
 				list.add(String.format("**%s** (Losses: **%s)**", user.getName(), FormatUtils.formatCoins(Math.abs(gains))));
 			}
 
-			Database.getDBUser(channel.getGuild(), user).addCoins(gains);
+			Database.getDBUser(this.getGuild(), user).addCoins(gains);
 			// StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 
 		BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !%n" + Emoji.BANK + " __Results:__ %s.",
 				winningNum, FormatUtils.formatList(list, Object::toString, ", ")),
-				channel);
+				this.getChannel());
 
 		numsPlayers.clear();
-		DiceCmd.MANAGERS.remove(channel.getLongID());
+		DiceCmd.MANAGERS.remove(this.getChannel().getLongID());
 	}
 
 	public int getBet() {
 		return bet;
 	}
 
-	public int getPlayers() {
+	public int getPlayersCount() {
 		return numsPlayers.size();
 	}
 
-	protected boolean addPlayer(IUser user, int num) {
+	public boolean addPlayer(IUser user, int num) {
 		return numsPlayers.putIfAbsent(num, user) == null;
 	}
 
-	protected boolean isPlaying(IUser user) {
-		return numsPlayers.containsValue(user);
-	}
-
-	protected boolean isBet(int num) {
+	protected boolean isNumBet(int num) {
 		return numsPlayers.containsKey(num);
 	}
 }
