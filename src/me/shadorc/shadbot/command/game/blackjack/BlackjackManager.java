@@ -139,7 +139,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 					break;
 				case 0:
 					gains *= 0;
-					results.add(String.format("**%s** (Draw)", username, gainsStr));
+					results.add(String.format("**%s** (Draw)", username));
 					break;
 				case -1:
 					gains *= -1;

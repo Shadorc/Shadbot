@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 import javax.management.Attribute;
@@ -16,7 +17,13 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 public class Utils {
+
+	public static ThreadFactory getThreadFactoryNamed(String name) {
+		return new ThreadFactoryBuilder().setNameFormat(name).build();
+	}
 
 	public static double getProcessCpuLoad() {
 		double cpuLoad;
@@ -44,6 +51,15 @@ public class Utils {
 		return cpuLoad;
 	}
 
+	public static <T extends Enum<T>> T getValueOrNull(Class<T> enumClass, String value) {
+		for(T enumeration : enumClass.getEnumConstants()) {
+			if(enumeration.toString().equalsIgnoreCase(value)) {
+				return enumeration;
+			}
+		}
+		return null;
+	}
+
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
 		return map.entrySet()
 				.stream()
@@ -53,15 +69,6 @@ public class Utils {
 						Map.Entry::getValue,
 						(value1, value2) -> value1,
 						LinkedHashMap::new));
-	}
-
-	public static <T extends Enum<T>> T getValueOrNull(Class<T> enumClass, String value) {
-		for(T enumeration : enumClass.getEnumConstants()) {
-			if(enumeration.toString().equalsIgnoreCase(value)) {
-				return enumeration;
-			}
-		}
-		return null;
 	}
 
 	public static <T> List<T> removeAndGet(T[] array, T elmt) {

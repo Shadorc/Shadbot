@@ -5,15 +5,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.utils.ThreadPoolUtils;
+import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
 public abstract class AbstractGameManager {
 
-	private static final ScheduledThreadPoolExecutor SCHEDULER =
-			ThreadPoolUtils.newSingleScheduledThreadPoolExecutor("Shadbot-GameManager-%d");
+	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("Shadbot-GameManager-%d");
 
 	private final String cmdName;
 	private final IChannel channel;
@@ -56,7 +55,7 @@ public abstract class AbstractGameManager {
 		if(scheduledTask != null) {
 			this.cancelScheduledTask();
 		}
-		scheduledTask = SCHEDULER.schedule(command, delay, unit);
+		scheduledTask = SCHEDULED_EXECUTOR.schedule(command, delay, unit);
 	}
 
 	public void cancelScheduledTask() {

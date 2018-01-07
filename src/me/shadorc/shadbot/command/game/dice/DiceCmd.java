@@ -97,9 +97,8 @@ public class DiceCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Start a dice game with a common bet.")
 				.addArg("bet", false)
-				.addArg("num", "must be between 1 and 6\nYou can't bet on a number that has already been chosen by another player.", false)
-				.setGains("The winner gets the common bet multiplied by %d plus the number of players.%ngains = bet * (%d + players)",
-						MULTIPLIER, MULTIPLIER)
+				.addArg("num", "number between 1 and 6\nYou can't bet on a number that has already been chosen by another player.", false)
+				.setGains("The winner gets the prize pool plus %d times his bet", MULTIPLIER)
 				.build();
 	}
 }

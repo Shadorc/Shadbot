@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import me.shadorc.discordbot.utils.BotUtils;
-import me.shadorc.discordbot.utils.FormatUtils;
-import me.shadorc.discordbot.utils.MathUtils;
-import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.game.AbstractGameManager;
+import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;

@@ -3,8 +3,7 @@ package me.shadorc.shadbot.data;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -12,13 +11,11 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.utils.LogUtils;
-import me.shadorc.shadbot.utils.ThreadPoolUtils;
+import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 
 public class DataManager {
 
-	private static final ScheduledExecutorService SCHEDULED_EXECUTOR =
-			Executors.newScheduledThreadPool(2, ThreadPoolUtils.getThreadFactoryNamed("Shadbot-DataManager-%d"));
-
+	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor(2, "Shadbot-DataManager-%d");
 	private static final List<Runnable> SAVE_TASKS = new ArrayList<>();
 
 	public static boolean init() {

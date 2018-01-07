@@ -1,8 +1,7 @@
 package me.shadorc.shadbot.command.owner;
 
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -17,8 +16,8 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.ThreadPoolUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IGuild;
@@ -28,12 +27,11 @@ public class ShutdownCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		ScheduledExecutorService executor =
-				Executors.newSingleThreadScheduledExecutor(ThreadPoolUtils.getThreadFactoryNamed("Shadbot-ShutdownCmd"));
+		ScheduledThreadPoolExecutor scheduledExecutor = new ShadbotScheduledExecutor("Shadbot-ShutdownCmd");
 
 		if(!context.hasArg()) {
 			// TODO: Ask for confirmation
-			executor.submit(() -> System.exit(0));
+			scheduledExecutor.submit(() -> System.exit(0));
 			return;
 		}
 
@@ -55,7 +53,7 @@ public class ShutdownCmd extends AbstractCommand {
 			}
 		}
 
-		executor.schedule(() -> System.exit(0), delay, TimeUnit.SECONDS);
+		scheduledExecutor.schedule(() -> System.exit(0), delay, TimeUnit.SECONDS);
 
 		LogUtils.warnf("Shadbot will restart in %d seconds. (Message: %s)", delay, message);
 	}

@@ -26,8 +26,8 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.ThreadPoolUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
@@ -39,8 +39,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	public static final String YT_SEARCH = "ytsearch: ";
 	public static final String SC_SEARCH = "scsearch: ";
 
-	private static final ScheduledThreadPoolExecutor EXECUTOR =
-			ThreadPoolUtils.newSingleScheduledThreadPoolExecutor("Shadbot-MusicChoiceWaiter-%d");
+	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("Shadbot-MusicChoiceWaiter-%d");
 	private static final int CHOICE_DURATION = 30;
 
 	private final GuildMusic guildMusic;
@@ -98,7 +97,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 							Database.getDBGuild(guildMusic.getChannel().getGuild()).getPrefix(), CHOICE_DURATION));
 			BotUtils.sendMessage(embed.build(), guildMusic.getChannel());
 
-			stopWaitingTask = EXECUTOR.schedule(() -> this.stopWaiting(), CHOICE_DURATION, TimeUnit.SECONDS);
+			stopWaitingTask = SCHEDULED_EXECUTOR.schedule(() -> this.stopWaiting(), CHOICE_DURATION, TimeUnit.SECONDS);
 
 			resultsTracks = new ArrayList<>(tracks);
 			MessageManager.addListener(guildMusic.getChannel(), this);

@@ -2,8 +2,7 @@ package me.shadorc.shadbot;
 
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.data.APIKeys;
@@ -15,15 +14,14 @@ import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.ThreadPoolUtils;
+import me.shadorc.shadbot.utils.executor.ShadbotCachedExecutor;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.StatusType;
 
 public class Shadbot {
 
-	private static final ExecutorService EVENT_THREAD_POOL =
-			Executors.newCachedThreadPool(ThreadPoolUtils.getThreadFactoryNamed("Shadbot-EventThreadPool-%d"));
+	private static final ThreadPoolExecutor EVENT_THREAD_POOL = new ShadbotCachedExecutor("Shadbot-EventThreadPool-%d");
 
 	private static String version;
 	private static IDiscordClient client;
@@ -79,7 +77,7 @@ public class Shadbot {
 		return client;
 	}
 
-	public static ExecutorService getEventThreadPool() {
+	public static ThreadPoolExecutor getEventThreadPool() {
 		return EVENT_THREAD_POOL;
 	}
 

@@ -1,6 +1,6 @@
 package me.shadorc.shadbot.shard;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import sx.blah.discord.api.IShard;
@@ -9,9 +9,10 @@ public class ShadbotShard {
 
 	private final IShard shard;
 	private final int shardID;
-	private ExecutorService threadPool;
 	private final AtomicLong lastEvent;
 	private final AtomicLong lastMessage;
+
+	private ThreadPoolExecutor threadPool;
 
 	public ShadbotShard(IShard shard) {
 		this.shard = shard;
@@ -29,7 +30,7 @@ public class ShadbotShard {
 		return shardID;
 	}
 
-	public ExecutorService getThreadPool() {
+	public ThreadPoolExecutor getThreadPool() {
 		return threadPool;
 	}
 

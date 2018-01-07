@@ -10,7 +10,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.ThreadPoolUtils;
+import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -20,13 +20,13 @@ public class RateLimiter {
 	public static final int DEFAULT_COOLDOWN = 5;
 	public static final int GAME_COOLDOWN = 5;
 
-	private final ScheduledThreadPoolExecutor executor;
+	private final ScheduledThreadPoolExecutor scheduledExecutor;
 	private final ConcurrentHashMap<Long, LimitedGuild> guildsLimitedMap;
 	private final int max;
 	private final int cooldown;
 
 	public RateLimiter(int max, int cooldown, ChronoUnit unit) {
-		this.executor = ThreadPoolUtils.newSingleScheduledThreadPoolExecutor("Shadbot-RateLimiter-%d");
+		this.scheduledExecutor = new ShadbotScheduledExecutor("Shadbot-RateLimiter-%d");
 		this.guildsLimitedMap = new ConcurrentHashMap<>();
 		this.max = max;
 		this.cooldown = (int) Duration.of(cooldown, unit).toMillis();
@@ -43,13 +43,13 @@ public class RateLimiter {
 
 		// The user has not exceeded the limit yet, he is not limited
 		if(limitedUser.getCount() <= max) {
-			limitedGuild.scheduledDeletion(executor, user, cooldown);
+			limitedGuild.scheduledDeletion(scheduledExecutor, user, cooldown);
 			return false;
 		}
 
 		// The user has exceeded the limit, he's warned and limited
 		if(limitedUser.getCount() == max + 1) {
-			limitedGuild.scheduledDeletion(executor, user, cooldown);
+			limitedGuild.scheduledDeletion(scheduledExecutor, user, cooldown);
 			this.warn(channel, user);
 			return true;
 		}

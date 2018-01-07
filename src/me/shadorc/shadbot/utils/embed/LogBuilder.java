@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.utils.embed;
 
+import java.awt.Color;
+
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.StringUtils;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -35,6 +37,18 @@ public class LogBuilder {
 				.setLenient(true)
 				.withAuthorName(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Shadbot.getVersion()))
 				.withDescription(message);
+
+		switch (type) {
+			case ERROR:
+				embed.withColor(Color.RED);
+				break;
+			case WARN:
+				embed.withColor(Color.ORANGE);
+				break;
+			case INFO:
+				embed.withColor(Color.GREEN);
+				break;
+		}
 
 		if(err != null) {
 			embed.appendField("Error type", err.getClass().getSimpleName(), false);
