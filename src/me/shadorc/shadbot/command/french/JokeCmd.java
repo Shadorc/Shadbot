@@ -40,7 +40,7 @@ public class JokeCmd extends AbstractCommand {
 			String joke;
 			do {
 				Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
-				joke = FormatUtils.formatArray(element.html().split("<br>"), line -> Jsoup.parse(line.toString()).text().trim(), "\n");
+				joke = FormatUtils.format(element.html().split("<br>"), line -> Jsoup.parse(line.toString()).text().trim(), "\n");
 			} while(joke.length() > 1000);
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()

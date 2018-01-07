@@ -7,6 +7,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.GameUtils;
@@ -23,7 +24,7 @@ public class BlackjackCmd extends AbstractCommand {
 	private static final int MAX_BET = 100_000;
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}

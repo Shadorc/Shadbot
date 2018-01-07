@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.info;
 
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,11 +33,11 @@ public class UserInfoCmd extends AbstractCommand {
 
 		String creationDate = String.format("%s%n(%s)",
 				DateUtils.toLocalDate(user.getCreationDate()).format(dateFormatter),
-				FormatUtils.formatDate(user.getCreationDate(), ChronoUnit.DAYS));
+				FormatUtils.formatDuration(user.getCreationDate().toEpochMilli()));
 
 		String joinDate = String.format("%s%n(%s)",
 				DateUtils.toLocalDate(context.getGuild().getJoinTimeForUser(user)).format(dateFormatter),
-				FormatUtils.formatDate(context.getGuild().getJoinTimeForUser(user), ChronoUnit.DAYS));
+				FormatUtils.formatDuration(context.getGuild().getJoinTimeForUser(user).toEpochMilli()));
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)
@@ -50,7 +49,7 @@ public class UserInfoCmd extends AbstractCommand {
 				.appendField("Join date", joinDate, true)
 				.appendField("Status", user.getPresence().getStatus().toString(), true)
 				.appendField("Playing text", user.getPresence().getText().orElse(null), true)
-				.appendField("Roles", FormatUtils.formatList(user.getRolesForGuild(context.getGuild()), IRole::getName, "\n"), true);
+				.appendField("Roles", FormatUtils.format(user.getRolesForGuild(context.getGuild()), IRole::getName, "\n"), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 

@@ -9,6 +9,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -38,9 +39,9 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		List<String> splitArgs = StringUtils.split(context.getArg());
-		if(!MathUtils.inRange(splitArgs.size(), 1, 3)) {
+		if(!MathUtils.isInRange(splitArgs.size(), 1, 3)) {
 			throw new MissingArgumentException();
 		}
 
@@ -113,20 +114,20 @@ public class OverwatchCmd extends AbstractCommand {
 				count, heroesList.get(count - 1).getName(), heroesList.get(count - 1).getDesc()));
 	}
 
-	private Platform getPlatform(String str) {
+	private Platform getPlatform(String str) throws IllegalCmdArgumentException {
 		Platform platform = Utils.getValueOrNull(Platform.class, str.toUpperCase());
 		if(platform == null) {
-			throw new IllegalArgumentException("Invalid platform. Options: "
-					+ FormatUtils.formatArray(Platform.values(), Object::toString, ", "));
+			throw new IllegalCmdArgumentException("Invalid platform. Options: "
+					+ FormatUtils.format(Platform.values(), Object::toString, ", "));
 		}
 		return platform;
 	}
 
-	private Region getRegion(String str) {
+	private Region getRegion(String str) throws IllegalCmdArgumentException {
 		Region region = Utils.getValueOrNull(Region.class, str.toUpperCase());
 		if(region == null) {
-			throw new IllegalArgumentException("Invalid region. Options: "
-					+ FormatUtils.formatArray(Region.values(), Object::toString, ", "));
+			throw new IllegalCmdArgumentException("Invalid region. Options: "
+					+ FormatUtils.format(Region.values(), Object::toString, ", "));
 		}
 		return region;
 	}
@@ -136,9 +137,9 @@ public class OverwatchCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Overwatch.")
 				.addArg("platform", String.format("user's platform (%s)",
-						FormatUtils.formatList(Utils.removeAndGet(Platform.values(), Platform.NONE), platform -> platform.toString().toLowerCase(), ", ")), true)
+						FormatUtils.format(Utils.removeAndGet(Platform.values(), Platform.NONE), platform -> platform.toString().toLowerCase(), ", ")), true)
 				.addArg("region", String.format("user's region (%s)",
-						FormatUtils.formatList(Utils.removeAndGet(Region.values(), Region.NONE), region -> region.toString().toLowerCase(), ", ")), true)
+						FormatUtils.format(Utils.removeAndGet(Region.values(), Region.NONE), region -> region.toString().toLowerCase(), ", ")), true)
 				.addArg("battletag#0000", false)
 				.appendField("Info", "**platform** and **region** are automatically detected if nothing is specified.", false)
 				.build();

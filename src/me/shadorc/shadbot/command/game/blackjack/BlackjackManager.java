@@ -81,7 +81,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 	}
 
 	private void stopOrShow() {
-		if(players.stream().allMatch(BlackjackPlayer::isStanding)) {
+		if(players.stream().noneMatch(BlackjackPlayer::isStanding)) {
 			this.show();
 		} else {
 			this.stop();
@@ -94,7 +94,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 				.withThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
 				.appendDescription(String.format("**Use `%s%s <bet>` to join the game.**"
 						+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
-						Database.getDBGuild(this.getGuild()).getPrefix(), this.getCmdName()))
+						this.getPrefix(), this.getCmdName()))
 				.appendField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? dealerCards : dealerCards.subList(0, 1)), true);
 
 		if(this.isTaskDone()) {
@@ -143,7 +143,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 					break;
 				case -1:
 					gains *= -1;
-					results.add(results.size() - 1, String.format("**%s** (Losses: **%s**)", username, gainsStr));
+					results.add(results.size(), String.format("**%s** (Losses: **%s**)", username, gainsStr));
 					break;
 			}
 
@@ -151,7 +151,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 			// StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 
-		BotUtils.sendMessage(Emoji.DICE + " __Results:__ " + FormatUtils.formatList(results, str -> str, ", "), this.getChannel());
+		BotUtils.sendMessage(Emoji.DICE + " __Results:__ " + FormatUtils.format(results, str -> str, ", "), this.getChannel());
 	}
 
 	@Override

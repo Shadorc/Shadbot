@@ -8,7 +8,7 @@ import me.shadorc.shadbot.utils.object.Card;
 public class BlackjackUtils {
 
 	public static String formatCards(List<Card> cards) {
-		return FormatUtils.formatList(cards, card -> String.format("`%s` %s", card.getName(), card.getSign().getEmoji()), " | ")
+		return FormatUtils.format(cards, card -> String.format("`%s` %s", card.getName(), card.getSign().getEmoji()), " | ")
 				+ "\nValue: " + BlackjackUtils.getValue(cards);
 	}
 

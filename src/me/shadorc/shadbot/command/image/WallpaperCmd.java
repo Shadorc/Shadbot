@@ -54,8 +54,8 @@ public class WallpaperCmd extends AbstractCommand {
 		}
 
 		Options options = new Options();
-		options.addOption("p", "purity", true, FormatUtils.formatArray(Purity.values(), purity -> purity.toString().toLowerCase(), ", "));
-		options.addOption("c", "category", true, FormatUtils.formatArray(Category.values(), cat -> cat.toString().toLowerCase(), ", "));
+		options.addOption("p", "purity", true, FormatUtils.format(Purity.values(), purity -> purity.toString().toLowerCase(), ", "));
+		options.addOption("c", "category", true, FormatUtils.format(Category.values(), cat -> cat.toString().toLowerCase(), ", "));
 		options.addOption("rat", "ratio", true, "image ratio");
 		options.addOption("res", "resolution", true, "image resolution");
 
@@ -135,7 +135,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 		Wallpaper wallpaper = wallpapers.get(MathUtils.rand(wallpapers.size()));
 
-		String tags = FormatUtils.formatList(wallpaper.getTags(), tag -> "`" + StringUtils.remove(tag.toString(), "#") + "`", " ");
+		String tags = FormatUtils.format(wallpaper.getTags(), tag -> "`" + StringUtils.remove(tag.toString(), "#") + "`", " ");
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Wallpaper")
 				.withUrl(wallpaper.getUrl())
@@ -169,8 +169,8 @@ public class WallpaperCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Search for a wallpaper.")
 				.setUsage("[-p purity] [-c category] [-rat ratio] [-res resolution] [-k keywords]")
-				.addArg("purity", FormatUtils.formatArray(Purity.values(), purity -> purity.toString().toLowerCase(), ", "), true)
-				.addArg("category", FormatUtils.formatArray(Category.values(), cat -> cat.toString().toLowerCase(), ", "), true)
+				.addArg("purity", FormatUtils.format(Purity.values(), purity -> purity.toString().toLowerCase(), ", "), true)
+				.addArg("category", FormatUtils.format(Category.values(), cat -> cat.toString().toLowerCase(), ", "), true)
 				.addArg("ratio", "image ratio (e.g. 16x9)", true)
 				.addArg("resolution", "image resolution (e.g. 1920x1080)", true)
 				.addArg("keyword", "keywords (e.g. doom,game)", true)

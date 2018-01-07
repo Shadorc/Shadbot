@@ -5,6 +5,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
@@ -19,7 +20,7 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 public class SkipCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(context.getGuild().getLongID());
 
 		if(guildMusic == null || guildMusic.getScheduler().isStopped()) {
@@ -30,7 +31,7 @@ public class SkipCmd extends AbstractCommand {
 		if(context.hasArg()) {
 			Integer num = CastUtils.asIntBetween(context.getArg(), 1, guildMusic.getScheduler().getPlaylist().size());
 			if(num == null) {
-				throw new IllegalArgumentException(String.format("Number must be between 1 and %d.",
+				throw new IllegalCmdArgumentException(String.format("Number must be between 1 and %d.",
 						guildMusic.getScheduler().getPlaylist().size()));
 			}
 			guildMusic.getScheduler().skipTo(num);

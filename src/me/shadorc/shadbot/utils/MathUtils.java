@@ -14,7 +14,7 @@ public class MathUtils {
 		return RAND.nextInt(bound);
 	}
 
-	public static boolean inRange(float nbr, float min, float max) {
+	public static boolean isInRange(float nbr, float min, float max) {
 		return nbr >= min && nbr <= max;
 	}
 }

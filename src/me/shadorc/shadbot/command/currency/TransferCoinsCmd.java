@@ -9,6 +9,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
@@ -25,7 +26,7 @@ import sx.blah.discord.handle.obj.IUser;
 public class TransferCoinsCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
@@ -38,12 +39,12 @@ public class TransferCoinsCmd extends AbstractCommand {
 		IUser receiverUser = context.getMessage().getMentions().get(0);
 		IUser senderUser = context.getAuthor();
 		if(receiverUser.equals(senderUser)) {
-			throw new IllegalArgumentException("You cannot transfer coins to yourself.");
+			throw new IllegalCmdArgumentException("You cannot transfer coins to yourself.");
 		}
 
 		Integer coins = CastUtils.asPositiveInt(splitCmd.get(0));
 		if(coins == null) {
-			throw new IllegalArgumentException("Invalid amount.");
+			throw new IllegalCmdArgumentException("Invalid amount.");
 		}
 
 		if(Database.getDBUser(context.getGuild(), senderUser).getCoins() < coins) {

@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.shard.ShardManager;
+import me.shadorc.shadbot.utils.object.QueuedMessage;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -21,6 +23,12 @@ import sx.blah.discord.util.RequestBuffer.RequestFuture;
 public class BotUtils {
 
 	public static RequestFuture<IMessage> sendMessage(String message, IChannel channel) {
+		if(!channel.getShard().isReady()) {
+			LogUtils.infof("{Guild ID: %d} A message could not be sent because shard isn't ready, adding it to queue.", channel.getGuild().getLongID());
+			ShardManager.getShadbotShard(channel.getShard()).queue(new QueuedMessage(channel, message));
+			return null;
+		}
+
 		if(!BotUtils.hasPermissions(channel, Permissions.SEND_MESSAGES)) {
 			LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to send a message.", channel.getGuild().getLongID());
 			return null;
@@ -57,7 +65,7 @@ public class BotUtils {
 		});
 	}
 
-	public static int deleteMessages(IChannel channel, IMessage... messages) {
+	public static RequestFuture<Integer> deleteMessages(IChannel channel, IMessage... messages) {
 		// Only keeps messages that are at most 2 weeks old
 		List<IMessage> toDelete = Arrays.asList(messages).stream()
 				.filter(msg -> msg != null && DateUtils.getMillisUntil(msg.getCreationDate()) < TimeUnit.DAYS.toMillis(7 * 2))
@@ -65,12 +73,12 @@ public class BotUtils {
 				.collect(Collectors.toList());
 
 		if(toDelete.isEmpty()) {
-			return 0;
+			throw new IllegalArgumentException("There is no message to delete.");
 		}
 
 		return RequestBuffer.request(() -> {
 			return channel.bulkDelete(toDelete).size();
-		}).get();
+		});
 	}
 
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {

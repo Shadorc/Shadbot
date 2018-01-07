@@ -7,6 +7,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.premium.PremiumManager;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.music.GuildMusic;
@@ -27,7 +28,7 @@ import sx.blah.discord.handle.obj.Permissions;
 public class PlayCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
@@ -36,12 +37,12 @@ public class PlayCmd extends AbstractCommand {
 		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
 
 		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
-			throw new IllegalArgumentException(String.format("I'm currently playing music in voice channel %s"
+			throw new IllegalCmdArgumentException(String.format("I'm currently playing music in voice channel %s"
 					+ ", join me before using this command.", botVoiceChannel.mention()));
 		}
 
 		if(userVoiceChannel == null) {
-			throw new IllegalArgumentException("Join a voice channel before using this command.");
+			throw new IllegalCmdArgumentException("Join a voice channel before using this command.");
 		}
 
 		if(botVoiceChannel == null && !BotUtils.hasPermissions(userVoiceChannel, Permissions.VOICE_CONNECT, Permissions.VOICE_SPEAK)) {
@@ -63,7 +64,7 @@ public class PlayCmd extends AbstractCommand {
 
 		if(guildMusic != null && guildMusic.isWaiting()) {
 			if(guildMusic.getDj().equals(context.getAuthor())) {
-				throw new IllegalArgumentException(String.format("(**%s**) You're already selecting a music. "
+				throw new IllegalCmdArgumentException(String.format("(**%s**) You're already selecting a music. "
 						+ "Enter a number or use `%scancel` to cancel the selection.", context.getAuthorName(), context.getPrefix()));
 			}
 

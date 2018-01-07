@@ -13,7 +13,8 @@ public class ExceptionUtils {
 		if(err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
 			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
 		} else if(err instanceof SocketTimeoutException) {
-			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.", StringUtils.capitalize(action));
+			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.",
+					StringUtils.capitalize(action));
 		} else {
 			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
 		}

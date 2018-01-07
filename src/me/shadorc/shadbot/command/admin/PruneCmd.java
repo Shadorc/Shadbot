@@ -8,6 +8,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
@@ -30,7 +31,7 @@ public class PruneCmd extends AbstractCommand {
 	private static final int MESSAGE_COUNT = 300;
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!BotUtils.hasPermissions(context.getChannel(), Permissions.MANAGE_MESSAGES, Permissions.READ_MESSAGE_HISTORY)) {
 			LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to manage messages/read message history.", context.getGuild().getLongID());
 			BotUtils.sendMessage(TextUtils.missingPerm(Permissions.MANAGE_MESSAGES, Permissions.READ_MESSAGE_HISTORY), context.getChannel());
@@ -39,7 +40,7 @@ public class PruneCmd extends AbstractCommand {
 
 		List<String> quotedList = StringUtils.getQuotedWords(context.getArg());
 		if(context.getArg().contains("\"") && quotedList.isEmpty() || quotedList.size() > 1) {
-			throw new IllegalArgumentException("You have forgotten a quote or have specified several quotes in quotation marks.");
+			throw new IllegalCmdArgumentException("You have forgotten a quote or have specified several quotes in quotation marks.");
 		}
 		String words = quotedList.isEmpty() ? null : quotedList.get(0);
 
@@ -47,13 +48,13 @@ public class PruneCmd extends AbstractCommand {
 
 		// Remove everything from arg (users mentioned and quoted words) to keep only count if specified
 		String argCleaned = StringUtils.remove(context.getArg(),
-				FormatUtils.formatList(usersMentioned, IUser::mention, " "),
+				FormatUtils.format(usersMentioned, user -> user.mention(false), " "),
 				String.format("\"%s\"", words))
 				.trim();
 
 		Integer count = CastUtils.asPositiveInt(argCleaned);
 		if(!argCleaned.isEmpty() && count == null) {
-			throw new IllegalArgumentException(String.format("Invalid number. If you want to specify a word or a sentence, "
+			throw new IllegalCmdArgumentException(String.format("Invalid number. If you want to specify a word or a sentence, "
 					+ "please include them in quotation marks. See `%shelp %s` for more information.", context.getPrefix(), this.getName()));
 		}
 		count = count == null ? 100 : Math.min(100, count);
@@ -64,13 +65,13 @@ public class PruneCmd extends AbstractCommand {
 				.limit(count)
 				.collect(Collectors.toList());
 
-		int deletedMsg = BotUtils.deleteMessages(context.getChannel(), messagesList.toArray(new IMessage[messagesList.size()]));
-		if(deletedMsg == 0) {
-			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
-		} else {
+		try {
+			int deletedMsg = BotUtils.deleteMessages(context.getChannel(), messagesList.toArray(new IMessage[messagesList.size()])).get();
 			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
 					context.getAuthorName(), StringUtils.pluralOf(deletedMsg, "message")),
 					context.getChannel());
+		} catch (IllegalArgumentException err) {
+			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
 		}
 	}
 

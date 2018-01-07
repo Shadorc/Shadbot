@@ -7,6 +7,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
@@ -23,7 +24,7 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 public class ForwardCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(context.getGuild().getLongID());
 
 		if(guildMusic == null || guildMusic.getScheduler().isStopped()) {
@@ -37,11 +38,11 @@ public class ForwardCmd extends AbstractCommand {
 
 		Integer num = CastUtils.asPositiveInt(context.getArg());
 		if(num == null) {
-			throw new IllegalArgumentException("Invalid number.");
+			throw new IllegalCmdArgumentException("Invalid number.");
 		}
 
 		long newPosition = guildMusic.getScheduler().changePosition(TimeUnit.SECONDS.toMillis(num));
-		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New position: %s", FormatUtils.formatDuration(newPosition)),
+		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New position: %s", FormatUtils.formatShortDuration(newPosition)),
 				context.getChannel());
 	}
 

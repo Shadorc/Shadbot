@@ -6,6 +6,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -22,14 +23,14 @@ public class RpsCmd extends AbstractCommand {
 	private static final int GAINS = 170;
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
 		Handsign userHandsign = Utils.getValueOrNull(Handsign.class, context.getArg());
 		if(userHandsign == null) {
-			throw new IllegalArgumentException("Invalid handsign, use `rock`, `paper` or `scissors`.");
+			throw new IllegalCmdArgumentException("Invalid handsign, use `rock`, `paper` or `scissors`.");
 		}
 
 		Handsign botHandsign = Handsign.values()[MathUtils.rand(Handsign.values().length)];
@@ -54,7 +55,7 @@ public class RpsCmd extends AbstractCommand {
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Play a Rock–paper–scissors game.")
-				.addArg("handsign", FormatUtils.formatArray(Handsign.values(), Handsign::getHandsign, ", "), false)
+				.addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)
 				.setGains("The winner gets **%d coins**.", GAINS)
 				.build();
 	}

@@ -8,6 +8,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
@@ -21,7 +22,7 @@ import sx.blah.discord.handle.obj.IUser;
 public class SendMessageCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
@@ -33,7 +34,7 @@ public class SendMessageCmd extends AbstractCommand {
 
 		Integer userID = CastUtils.asPositiveInt(splitArgs.get(0));
 		if(userID == null) {
-			throw new IllegalArgumentException("Invalid user ID.");
+			throw new IllegalCmdArgumentException("Invalid user ID.");
 		}
 
 		IUser user = Shadbot.getClient().getUserByID(userID);

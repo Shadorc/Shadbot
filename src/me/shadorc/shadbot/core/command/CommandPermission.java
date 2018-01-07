@@ -14,4 +14,8 @@ public enum CommandPermission {
 	public int getHierarchy() {
 		return hierarchy;
 	}
+
+	public boolean isSuperior(CommandPermission perm) {
+		return this.getHierarchy() > perm.getHierarchy();
+	}
 }

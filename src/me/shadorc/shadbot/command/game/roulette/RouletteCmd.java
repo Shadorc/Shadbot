@@ -8,10 +8,10 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.GameUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -27,7 +27,7 @@ public class RouletteCmd extends AbstractCommand {
 	private static final int MAX_BET = 100_000;
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		List<String> splitArgs = StringUtils.split(context.getArg());
 		if(splitArgs.size() != 2) {
 			throw new MissingArgumentException();
@@ -41,7 +41,7 @@ public class RouletteCmd extends AbstractCommand {
 		String place = splitArgs.get(1).toLowerCase();
 		// Match [1-36], red, black, odd, even, high or low
 		if(!place.matches("^([1-9]|1[0-9]|2[0-9]|3[0-6])$|red|black|odd|even|high|low")) {
-			throw new IllegalArgumentException("Invalid place, must be a number between "
+			throw new IllegalCmdArgumentException("Invalid place, must be a number between "
 					+ "**1 and 36**, **red**, **black**, **odd**, **even**, **low** or **high**.");
 		}
 
@@ -56,11 +56,7 @@ public class RouletteCmd extends AbstractCommand {
 
 		if(!rouletteManager.addPlayer(context.getAuthor(), bet, place)) {
 			BotUtils.sendMessage(Emoji.INFO + " You're already participating.", context.getChannel());
-			return;
 		}
-
-		BotUtils.sendMessage(String.format(Emoji.DICE + " **%s** bets **%s** on **%s**.",
-				context.getAuthorName(), FormatUtils.formatCoins(bet), place), context.getChannel());
 	}
 
 	@Override
@@ -68,7 +64,7 @@ public class RouletteCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Play a roulette game in which everyone can participate.")
 				.addArg("bet", false)
-				.addArg("place", "must be a number between 1 and 36, red, black, even, odd, low or high", false)
+				.addArg("place", "number between 1 and 36, red, black, even, odd, low or high", false)
 				.appendField("Info", "**low** - numbers between 1 and 18"
 						+ "\n**high** - numbers between 19 and 36", false)
 				.build();

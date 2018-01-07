@@ -41,7 +41,7 @@ public class NetUtils {
 		try {
 			new URL(url).openConnection().connect();
 			return true;
-		} catch (IllegalArgumentException | IOException err) {
+		} catch (IOException err) {
 			return false;
 		}
 	}

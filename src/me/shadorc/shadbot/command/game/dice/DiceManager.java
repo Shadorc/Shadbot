@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.Database;
@@ -13,6 +14,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.object.UpdateableMessage;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
@@ -23,26 +25,34 @@ public class DiceManager extends AbstractGameManager {
 
 	private final ConcurrentHashMap<Integer, IUser> numsPlayers;
 	private final int bet;
+	private final UpdateableMessage message;
+
+	private String results;
 
 	public DiceManager(AbstractCommand cmd, IChannel channel, IUser author, int bet) {
 		super(cmd, channel, author);
 		this.bet = bet;
 		this.numsPlayers = new ConcurrentHashMap<>();
+		this.message = new UpdateableMessage(channel);
 	}
 
 	@Override
 	public void start() {
+		this.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
+	}
+
+	private void show() {
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
+				.setLenient(true)
 				.withAuthorName("Dice Game")
 				.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
-				.appendField(String.format("%s started a dice game.", this.getAuthor().getName()),
-						String.format("Use `%s%s <num>` to join the game with a **%s** putting.",
-								Database.getDBGuild(this.getGuild()).getPrefix(), this.getCmdName(), FormatUtils.formatCoins(bet)),
-						false)
+				.withDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
+						this.getPrefix(), this.getCmdName(), FormatUtils.formatCoins(bet)))
+				.appendField("Player", numsPlayers.values().stream().map(IUser::getName).collect(Collectors.joining("\n")), true)
+				.appendField("Number", numsPlayers.keySet().stream().map(Object::toString).collect(Collectors.joining("\n")), true)
+				.appendField("Results", results, false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
-		BotUtils.sendMessage(embed.build(), this.getChannel()).get();
-
-		this.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
+		message.send(embed.build()).get();
 	}
 
 	@Override
@@ -57,19 +67,19 @@ public class DiceManager extends AbstractGameManager {
 			int gains = bet;
 			if(num == winningNum) {
 				gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
-				list.add(0, String.format("**%s** (Gains: **%s)**", user.getName(), FormatUtils.formatCoins(gains)));
 			} else {
 				gains *= -1;
-				list.add(String.format("**%s** (Losses: **%s)**", user.getName(), FormatUtils.formatCoins(Math.abs(gains))));
 			}
+			list.add(gains > 0 ? 0 : list.size(), String.format("%s (**%s**)", user.getName(), FormatUtils.formatCoins(gains)));
 
 			Database.getDBUser(this.getGuild(), user).addCoins(gains);
 			// StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !%n" + Emoji.BANK + " __Results:__ %s.",
-				winningNum, FormatUtils.formatList(list, Object::toString, ", ")),
-				this.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getChannel()).get();
+
+		this.results = FormatUtils.format(list, Object::toString, "\n");
+		this.show();
 
 		numsPlayers.clear();
 		DiceCmd.MANAGERS.remove(this.getChannel().getLongID());
@@ -84,7 +94,11 @@ public class DiceManager extends AbstractGameManager {
 	}
 
 	public boolean addPlayer(IUser user, int num) {
-		return numsPlayers.putIfAbsent(num, user) == null;
+		if(numsPlayers.putIfAbsent(num, user) == null) {
+			this.show();
+			return true;
+		}
+		return false;
 	}
 
 	protected boolean isNumBet(int num) {

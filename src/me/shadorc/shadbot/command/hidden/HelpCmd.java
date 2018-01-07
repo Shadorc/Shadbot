@@ -9,6 +9,7 @@ import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -21,7 +22,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class HelpCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(context.hasArg()) {
 			AbstractCommand cmd = CommandManager.getCommand(context.getArg());
 			if(cmd == null) {
@@ -35,8 +36,9 @@ public class HelpCmd extends AbstractCommand {
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName("Shadbot Help")
-				.appendDescription(String.format("Get more information by using `%s%s <command>`.", context.getPrefix(), this.getName()))
-				.withFooterText(String.format("Any issues, questions or suggestions ? Join %s", Config.SUPPORT_SERVER));
+				.appendDescription(String.format("Any issues, questions or suggestions ? Join the [support server.](%s)"
+						+ "%nGet more information by using `%s%s <command>`.",
+						Config.SUPPORT_SERVER, context.getPrefix(), this.getName()));
 
 		for(CommandCategory category : CommandCategory.values()) {
 			if(category.equals(CommandCategory.HIDDEN)) {
@@ -47,7 +49,7 @@ public class HelpCmd extends AbstractCommand {
 
 			for(AbstractCommand cmd : CommandManager.getCommands().values().stream().distinct().collect(Collectors.toList())) {
 				if(!cmd.getCategory().equals(category)
-						|| context.getPermission().getHierarchy() < cmd.getPermission().getHierarchy()
+						|| cmd.getPermission().isSuperior(context.getPermission())
 						|| context.getGuild() != null && !BotUtils.isCommandAllowed(context.getGuild(), cmd)) {
 					continue;
 				}

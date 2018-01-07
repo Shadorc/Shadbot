@@ -9,6 +9,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -19,7 +20,7 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 public class CalcCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
@@ -29,7 +30,7 @@ public class CalcCmd extends AbstractCommand {
 			String expression = context.getArg();
 			BotUtils.sendMessage(String.format("%s = %s", expression.replace("*", "\\*"), engine.eval(expression)), context.getChannel());
 		} catch (ScriptException err) {
-			throw new IllegalArgumentException("Invalid expression.");
+			throw new IllegalCmdArgumentException("Invalid expression.");
 		}
 	}
 

@@ -50,7 +50,7 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 
 	public HangmanManager(AbstractCommand cmd, IChannel channel, IUser author) throws IOException {
 		super(cmd, channel, author);
-		this.rateLimiter = new RateLimiter(1, 2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(2, 2, ChronoUnit.SECONDS);
 		this.message = new UpdateableMessage(channel);
 		this.word = HangmanCmd.WORDS.get(MathUtils.rand(HangmanCmd.WORDS.size()));
 		this.charsTested = new ArrayList<>();
@@ -128,7 +128,7 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 	}
 
 	private String getRepresentation(String word) {
-		return FormatUtils.formatList(StringUtils.split(word, ""),
+		return FormatUtils.format(StringUtils.split(word, ""),
 				letter -> charsTested.contains(letter) ? String.format("**%s**", letter.toUpperCase()) : "\\_",
 				" ");
 	}
@@ -142,13 +142,13 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 				.withThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")
 				.withDescription("Type letters or enter a word if you think you've guessed it.")
 				.appendField("Word", this.getRepresentation(word), false)
-				.appendField("Misses", FormatUtils.formatList(missesList, chr -> chr.toString().toUpperCase(), ", "), false);
+				.appendField("Misses", FormatUtils.format(missesList, chr -> chr.toString().toUpperCase(), ", "), false);
 
 		if(this.isTaskDone()) {
 			embed.withFooterText("Finished.");
 		} else {
 			embed.withFooterText(String.format("Use %scancel to cancel this game (Automatically cancelled in %d min in case of inactivity)",
-					Database.getDBGuild(this.getGuild()).getPrefix(), IDLE_MIN));
+					this.getPrefix(), IDLE_MIN));
 		}
 
 		if(failsCount > 0) {

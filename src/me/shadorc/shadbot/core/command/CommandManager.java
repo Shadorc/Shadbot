@@ -10,6 +10,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
@@ -64,7 +65,7 @@ public class CommandManager {
 		}
 
 		CommandPermission authorPermission = context.getPermission();
-		if(cmd.getPermission().getHierarchy() > authorPermission.getHierarchy()) {
+		if(cmd.getPermission().isSuperior(authorPermission)) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel());
 			return;
 		}
@@ -75,7 +76,7 @@ public class CommandManager {
 
 		try {
 			cmd.execute(context);
-		} catch (IllegalArgumentException err) {
+		} catch (IllegalCmdArgumentException err) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 		} catch (MissingArgumentException err) {
 			BotUtils.sendMessage(cmd.getHelp(context.getPrefix()), context.getChannel());

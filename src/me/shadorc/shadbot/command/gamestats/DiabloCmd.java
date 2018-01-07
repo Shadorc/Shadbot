@@ -17,6 +17,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
@@ -41,7 +42,7 @@ public class DiabloCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
@@ -53,13 +54,13 @@ public class DiabloCmd extends AbstractCommand {
 
 		Region region = Utils.getValueOrNull(Region.class, splitArgs.get(0));
 		if(region == null) {
-			throw new IllegalArgumentException("Region is invalid. Options: "
-					+ FormatUtils.formatArray(Region.values(), Object::toString, ", "));
+			throw new IllegalCmdArgumentException("Region is invalid. Options: "
+					+ FormatUtils.format(Region.values(), Object::toString, ", "));
 		}
 
 		String battletag = splitArgs.get(1);
 		if(!battletag.matches("(\\p{L}*)#[0-9]*")) {
-			throw new IllegalArgumentException("Invalid Battletag.");
+			throw new IllegalCmdArgumentException("Invalid Battletag.");
 		}
 		battletag = battletag.replaceAll("#", "-");
 
@@ -94,12 +95,12 @@ public class DiabloCmd extends AbstractCommand {
 							String.format("**Normal:** %d%n**Hardcore:** %d",
 									playerObj.getInt("paragonLevelSeason"), playerObj.getInt("paragonLevelSeasonHardcore")), true)
 					.appendField("__Heroes__",
-							FormatUtils.formatList(heroesList,
+							FormatUtils.format(heroesList,
 									heroObj -> String.format("**%s** (*%s*)",
 											heroObj.getString("name"), StringUtils.capitalize(heroObj.getString("class").replace("-", " "))),
 									"\n"), true)
 					.appendField("__Damage__",
-							FormatUtils.formatList(heroesList,
+							FormatUtils.format(heroesList,
 									heroObj -> String.format("%d DPS",
 											formatter.format(heroObj.getJSONObject("stats").getDouble("damage"))),
 									"\n"), true);
@@ -116,7 +117,7 @@ public class DiabloCmd extends AbstractCommand {
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Diablo 3.")
-				.addArg("region", String.format("user's region (%s)", FormatUtils.formatArray(Region.values(), region -> region.toString().toLowerCase(), ", ")), false)
+				.addArg("region", String.format("user's region (%s)", FormatUtils.format(Region.values(), region -> region.toString().toLowerCase(), ", ")), false)
 				.addArg("battletag#0000", false)
 				.setExample(String.format("`%s%s eu Shadbot#1758`", prefix, this.getName()))
 				.build();

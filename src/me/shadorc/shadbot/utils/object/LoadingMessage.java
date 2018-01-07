@@ -30,4 +30,9 @@ public class LoadingMessage {
 		msgRequest.get().edit(embed);
 	}
 
+	// TODO: Check permissions everywhere
+	public void delete() {
+		msgRequest.get().delete();
+	}
+
 }

@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.info;
 
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -33,15 +32,13 @@ public class ServerInfoCmd extends AbstractCommand {
 
 		DBGuild dbGuild = Database.getDBGuild(guild);
 
-		String allowedChannelsStr =
-				FormatUtils.formatList("All", dbGuild.getAllowedChannels(), chlID -> "\n\t" + guild.getChannelByID(chlID).getName(), "");
+		String allowedChannelsStr = dbGuild.getAllowedChannels().isEmpty() ? "All" : FormatUtils.format(dbGuild.getAllowedChannels(), chlID -> "\n\t" + guild.getChannelByID(chlID).getName(), "");
 
-		String blacklistedCmdStr =
-				FormatUtils.formatList("None", dbGuild.getBlacklistedCmd(), cmdName -> "\n\t" + cmdName, "");
+		String blacklistedCmdStr = dbGuild.getBlacklistedCmd().isEmpty() ? "None" : FormatUtils.format(dbGuild.getBlacklistedCmd(), cmdName -> "\n\t" + cmdName, "");
 
 		String creationDate = String.format("%s%n(%s)",
 				DateUtils.toLocalDate(guild.getCreationDate()).format(dateFormatter),
-				FormatUtils.formatDate(guild.getCreationDate(), ChronoUnit.DAYS));
+				FormatUtils.formatDuration(guild.getCreationDate().toEpochMilli()));
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)

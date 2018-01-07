@@ -6,6 +6,7 @@ import java.util.List;
 
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -33,7 +34,7 @@ public abstract class AbstractCommand {
 		}
 	}
 
-	public abstract void execute(Context context) throws MissingArgumentException, IllegalArgumentException;
+	public abstract void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException;
 
 	public abstract EmbedObject getHelp(String prefix);
 

@@ -9,6 +9,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
@@ -26,7 +27,7 @@ import sx.blah.discord.handle.obj.IGuild;
 public class ShutdownCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		ScheduledThreadPoolExecutor scheduledExecutor = new ShadbotScheduledExecutor("Shadbot-ShutdownCmd");
 
 		if(!context.hasArg()) {
@@ -42,7 +43,7 @@ public class ShutdownCmd extends AbstractCommand {
 
 		Integer delay = CastUtils.asPositiveInt(splitArgs.get(0));
 		if(delay == null) {
-			throw new IllegalArgumentException("Invalid time.");
+			throw new IllegalCmdArgumentException("Invalid time.");
 		}
 
 		String message = splitArgs.get(1);

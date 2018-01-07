@@ -1,16 +1,17 @@
 package me.shadorc.shadbot.utils;
 
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 public class GameUtils {
 
-	public static Integer checkAndGetBet(IChannel channel, IUser user, String betStr, int maxValue) {
+	public static Integer checkAndGetBet(IChannel channel, IUser user, String betStr, int maxValue) throws IllegalCmdArgumentException {
 		Integer bet = CastUtils.asPositiveInt(betStr);
 		if(bet == null) {
-			throw new IllegalArgumentException("Invalid amount.");
+			throw new IllegalCmdArgumentException("Invalid amount.");
 		}
 
 		if(Database.getDBUser(channel.getGuild(), user).getCoins() < bet) {

@@ -77,7 +77,7 @@ public class Rule34Cmd extends AbstractCommand {
 				return;
 			}
 
-			String formattedtags = StringUtils.truncate(FormatUtils.formatArray(tags, tag -> "`" + tag.toString().trim() + "`", " "), MAX_TAGS_LENGTH);
+			String formattedtags = StringUtils.truncate(FormatUtils.format(tags, tag -> "`" + tag.toString().trim() + "`", " "), MAX_TAGS_LENGTH);
 			String fileUrl = this.getValidURL(postObj.getString("file_url"));
 			String sourceUrl = this.getValidURL(postObj.get("source").toString());
 

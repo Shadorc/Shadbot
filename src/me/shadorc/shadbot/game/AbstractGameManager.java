@@ -5,6 +5,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -33,6 +34,10 @@ public abstract class AbstractGameManager {
 
 	public String getCmdName() {
 		return cmdName;
+	}
+
+	public String getPrefix() {
+		return Database.getDBGuild(channel.getGuild()).getPrefix();
 	}
 
 	public IGuild getGuild() {

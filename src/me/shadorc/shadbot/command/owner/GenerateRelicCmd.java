@@ -8,6 +8,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.RelicType;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -21,15 +22,15 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 public class GenerateRelicCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
 		RelicType type = Utils.getValueOrNull(RelicType.class, context.getArg());
 		if(type == null) {
-			throw new IllegalArgumentException(String.format("Invalid type. Options: %s",
-					FormatUtils.formatArray(RelicType.values(), relic -> relic.toString().toLowerCase(), ", ")));
+			throw new IllegalCmdArgumentException(String.format("Invalid type. Options: %s",
+					FormatUtils.format(RelicType.values(), relic -> relic.toString().toLowerCase(), ", ")));
 		}
 
 		Relic relic = PremiumManager.generateRelic(type);

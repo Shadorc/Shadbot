@@ -8,6 +8,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
@@ -26,14 +27,14 @@ public class HolidaysCmd extends AbstractCommand {
 	private static final List<String> ZONES = Arrays.asList("A", "B", "C");
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
 		String zone = context.getArg().toUpperCase();
 		if(!ZONES.contains(zone)) {
-			throw new IllegalArgumentException("Invalid zone. Options: " + FormatUtils.formatList(ZONES, Object::toString, ", "));
+			throw new IllegalCmdArgumentException("Invalid zone. Options: " + FormatUtils.format(ZONES, Object::toString, ", "));
 		}
 
 		try {

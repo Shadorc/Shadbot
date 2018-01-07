@@ -48,7 +48,7 @@ public class SlotMachineCmd extends AbstractCommand {
 		// StatsManager.increment(this.getFirstName(), gains);
 
 		BotUtils.sendMessage(String.format("%s%nYou %s **%s** !",
-				FormatUtils.formatList(Arrays.asList(slot1, slot2, slot3), opt -> String.format(":%s:", opt.toString().toLowerCase()), " "),
+				FormatUtils.format(Arrays.asList(slot1, slot2, slot3), opt -> String.format(":%s:", opt.toString().toLowerCase()), " "),
 				gains > 0 ? "win" : "have lost", FormatUtils.formatCoins(Math.abs(gains))), context.getChannel());
 	}
 
@@ -58,7 +58,7 @@ public class SlotMachineCmd extends AbstractCommand {
 				.setDescription("Play slot machine.")
 				.appendField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)
 				.setGains("You can win %s ! Good luck.",
-						FormatUtils.formatArray(SlotOptions.values(), opt -> String.format("**%d**", opt.getGain()), ", "))
+						FormatUtils.format(SlotOptions.values(), opt -> String.format("**%d**", opt.getGain()), ", "))
 				.build();
 	}
 

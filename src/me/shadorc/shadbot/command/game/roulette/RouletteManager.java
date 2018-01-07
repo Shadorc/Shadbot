@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.Database;
@@ -17,6 +18,7 @@ import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.Pair;
+import me.shadorc.shadbot.utils.object.UpdateableMessage;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
@@ -27,25 +29,37 @@ public class RouletteManager extends AbstractGameManager {
 
 	private static final int GAME_DURATION = 30;
 
+	// User, Pair<Bet, Place>
 	private final ConcurrentHashMap<IUser, Pair<Integer, String>> playersPlace;
+	private final UpdateableMessage message;
+
+	private String results;
 
 	public RouletteManager(AbstractCommand cmd, IChannel channel, IUser author) {
 		super(cmd, channel, author);
 		this.playersPlace = new ConcurrentHashMap<>();
+		this.message = new UpdateableMessage(channel);
 	}
 
 	@Override
 	public void start() {
+		this.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
+	}
+
+	public void show() {
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
+				.setLenient(true)
 				.withAuthorName("Roulette Game")
 				.withThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
-				.appendField(String.format("%s started a Roulette game.", this.getAuthor().getName()),
-						String.format("Use `%s%s <bet> <place>` to join the game."
-								+ "%n%n**Place** must be a number between `1 and 36`, `red`, `black`, `even`, `odd`, `low` or `high`",
-								Database.getDBGuild(this.getGuild()).getPrefix(), this.getCmdName()), false)
+				.withDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
+						+ "%n%n**Place** is a `number between 1 and 36`, `red`, `black`, `even`, `odd`, `low` or `high`",
+						this.getPrefix(), this.getCmdName()))
+				.appendField("Player (Bet)", FormatUtils.format(playersPlace.keySet().stream(),
+						user -> String.format("**%s** (%s)", user.getName(), FormatUtils.formatCoins(playersPlace.get(user).getFirst())), "\n"), true)
+				.appendField("Place", playersPlace.values().stream().map(Pair::getSecond).collect(Collectors.joining("\n")), true)
+				.appendField("Results", results, false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
-		BotUtils.sendMessage(embed.build(), this.getChannel()).get();
-		this.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
+		message.send(embed.build()).get();
 	}
 
 	@Override
@@ -62,8 +76,8 @@ public class RouletteManager extends AbstractGameManager {
 			Map<String, Boolean> testsMap = new HashMap<>();
 			testsMap.put("red", RED_NUMS.contains(winningPlace));
 			testsMap.put("black", !RED_NUMS.contains(winningPlace));
-			testsMap.put("low", MathUtils.inRange(winningPlace, 1, 19));
-			testsMap.put("high", MathUtils.inRange(winningPlace, 19, 37));
+			testsMap.put("low", MathUtils.isInRange(winningPlace, 1, 19));
+			testsMap.put("high", MathUtils.isInRange(winningPlace, 19, 37));
 			testsMap.put("even", winningPlace % 2 == 0);
 			testsMap.put("odd", winningPlace % 2 != 0);
 
@@ -86,17 +100,23 @@ public class RouletteManager extends AbstractGameManager {
 			// StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%d)** !"
-				+ "\n" + Emoji.BANK + " __Results:__ %s.",
-				winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black", FormatUtils.formatList(list, Object::toString, ", ")),
-				this.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
+				winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"),
+				this.getChannel()).get();
+
+		this.results = FormatUtils.format(list, Object::toString, ", ");
+		this.show();
 
 		playersPlace.clear();
 		RouletteCmd.MANAGERS.remove(this.getChannel().getLongID());
 	}
 
 	protected boolean addPlayer(IUser user, Integer bet, String place) {
-		return playersPlace.putIfAbsent(user, new Pair<Integer, String>(bet, place)) == null;
+		if(playersPlace.putIfAbsent(user, new Pair<Integer, String>(bet, place)) == null) {
+			this.show();
+			return true;
+		}
+		return false;
 	}
 
 }

@@ -21,6 +21,7 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.object.LoadingMessage;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited
@@ -36,11 +37,14 @@ public class HangmanCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		if(WORDS.isEmpty()) {
+			LoadingMessage loadingMsg = new LoadingMessage("Loading word...", context.getChannel());
+			loadingMsg.send();
 			try {
 				this.load();
 			} catch (JSONException | IOException err) {
 				ExceptionUtils.handle("getting words list", context, err);
 			}
+			loadingMsg.delete();
 		}
 
 		HangmanManager hangmanManager = MANAGERS.get(context.getChannel().getLongID());
@@ -63,7 +67,7 @@ public class HangmanCmd extends AbstractCommand {
 	private void load() throws JSONException, IOException {
 		String url = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt";
 		WORDS.addAll(StringUtils.split(NetUtils.getBody(url), "\n").stream()
-				.filter(word -> MathUtils.inRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
+				.filter(word -> MathUtils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
 				.collect(Collectors.toList()));
 	}
 

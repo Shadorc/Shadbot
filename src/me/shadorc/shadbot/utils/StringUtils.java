@@ -72,4 +72,8 @@ public class StringUtils {
 		return matches;
 	}
 
+	public static int countMatches(String str, String toMatch) {
+		return str.length() - str.replace(toMatch, "").length();
+	}
+
 }

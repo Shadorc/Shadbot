@@ -73,27 +73,27 @@ public class WeatherCmd extends AbstractCommand {
 	private String getWindDesc(float windSpeed) {
 		if(windSpeed < 1) {
 			return "Calm";
-		} else if(MathUtils.inRange(windSpeed, 1, 6)) {
+		} else if(MathUtils.isInRange(windSpeed, 1, 6)) {
 			return "Light air";
-		} else if(MathUtils.inRange(windSpeed, 6, 12)) {
+		} else if(MathUtils.isInRange(windSpeed, 6, 12)) {
 			return "Light breeze";
-		} else if(MathUtils.inRange(windSpeed, 12, 20)) {
+		} else if(MathUtils.isInRange(windSpeed, 12, 20)) {
 			return "Gentle breeze";
-		} else if(MathUtils.inRange(windSpeed, 20, 29)) {
+		} else if(MathUtils.isInRange(windSpeed, 20, 29)) {
 			return "Moderate breeze";
-		} else if(MathUtils.inRange(windSpeed, 29, 39)) {
+		} else if(MathUtils.isInRange(windSpeed, 29, 39)) {
 			return "Fresh breeze";
-		} else if(MathUtils.inRange(windSpeed, 39, 50)) {
+		} else if(MathUtils.isInRange(windSpeed, 39, 50)) {
 			return "Strong breeze";
-		} else if(MathUtils.inRange(windSpeed, 50, 62)) {
+		} else if(MathUtils.isInRange(windSpeed, 50, 62)) {
 			return "Near gale";
-		} else if(MathUtils.inRange(windSpeed, 62, 75)) {
+		} else if(MathUtils.isInRange(windSpeed, 62, 75)) {
 			return "Gale";
-		} else if(MathUtils.inRange(windSpeed, 75, 89)) {
+		} else if(MathUtils.isInRange(windSpeed, 75, 89)) {
 			return "Strong gale";
-		} else if(MathUtils.inRange(windSpeed, 89, 103)) {
+		} else if(MathUtils.isInRange(windSpeed, 89, 103)) {
 			return "Storm";
-		} else if(MathUtils.inRange(windSpeed, 103, 118)) {
+		} else if(MathUtils.isInRange(windSpeed, 103, 118)) {
 			return "Violent storm";
 		} else {
 			return "Hurricane";

@@ -16,6 +16,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -38,7 +39,7 @@ public class TriviaCmd extends AbstractCommand {
 	private final Map<Integer, String> categories = new TreeMap<>();
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(categories.isEmpty()) {
 			this.load();
 		}
@@ -46,8 +47,8 @@ public class TriviaCmd extends AbstractCommand {
 		if(context.getArg().equals("categories")) {
 			EmbedObject embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("Trivia categories")
-					.appendField("ID", FormatUtils.formatArray(categories.keySet().toArray(), Object::toString, "\n"), true)
-					.appendField("Name", FormatUtils.formatArray(categories.keySet().toArray(), categories::get, "\n"), true)
+					.appendField("ID", FormatUtils.format(categories.keySet().toArray(), Object::toString, "\n"), true)
+					.appendField("Name", FormatUtils.format(categories.keySet().toArray(), categories::get, "\n"), true)
 					.build();
 			BotUtils.sendMessage(embed, context.getChannel());
 			return;
@@ -56,7 +57,7 @@ public class TriviaCmd extends AbstractCommand {
 		Integer categoryID = CastUtils.asPositiveInt(context.getArg());
 
 		if(context.hasArg() && (categoryID == null || !categories.containsKey(categoryID))) {
-			throw new IllegalArgumentException(String.format("Invalid ID, use `%s%s categories` to see the complete list of categories.",
+			throw new IllegalCmdArgumentException(String.format("Invalid ID, use `%s%s categories` to see the complete list of categories.",
 					context.getPrefix(), this.getName()));
 		}
 

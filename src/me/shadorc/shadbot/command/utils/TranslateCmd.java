@@ -14,6 +14,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
@@ -36,7 +37,7 @@ public class TranslateCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		List<String> args = StringUtils.split(context.getArg(), 3);
 		if(args.size() < 2) {
 			throw new MissingArgumentException();
@@ -50,7 +51,7 @@ public class TranslateCmd extends AbstractCommand {
 		String langTo = this.toISO(args.get(1));
 
 		if(langFrom == null || langTo == null) {
-			throw new IllegalArgumentException("One of the specified language doesn't exist."
+			throw new IllegalCmdArgumentException("One of the specified language doesn't exist."
 					+ " Use `" + context.getPrefix() + "help " + this.getName() + "` to see a complete list of supported languages.");
 		}
 
@@ -63,7 +64,7 @@ public class TranslateCmd extends AbstractCommand {
 			JSONArray result = new JSONArray(NetUtils.getBody(url));
 
 			if(!(result.get(0) instanceof JSONArray)) {
-				throw new IllegalArgumentException("One of the specified language isn't supported. "
+				throw new IllegalCmdArgumentException("One of the specified language isn't supported. "
 						+ String.format("Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 

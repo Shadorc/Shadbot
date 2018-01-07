@@ -4,6 +4,7 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.shard.ShardManager;
@@ -58,7 +59,7 @@ public class MessageListener {
 		}
 	}
 
-	private void privateMessageReceived(IMessage message) throws IllegalArgumentException, MissingArgumentException {
+	private void privateMessageReceived(IMessage message) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(message.getContent().startsWith(Config.DEFAULT_PREFIX + "help")) {
 			CommandManager.getCommand("help").execute(new Context(message));
 			return;

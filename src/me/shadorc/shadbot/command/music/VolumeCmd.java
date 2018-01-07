@@ -5,6 +5,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
@@ -21,7 +22,7 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 public class VolumeCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(context.getGuild().getLongID());
 
 		if(guildMusic == null || guildMusic.getScheduler().isStopped()) {
@@ -38,7 +39,7 @@ public class VolumeCmd extends AbstractCommand {
 
 		Integer volume = CastUtils.asPositiveInt(context.getArg());
 		if(volume == null) {
-			throw new IllegalArgumentException("Invalid volume.");
+			throw new IllegalCmdArgumentException("Invalid volume.");
 		}
 
 		scheduler.setVolume(volume);

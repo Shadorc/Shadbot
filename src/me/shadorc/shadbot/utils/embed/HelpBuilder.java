@@ -70,7 +70,7 @@ public class HelpBuilder {
 	}
 
 	public HelpBuilder addArg(List<?> options, boolean isFacultative) {
-		return this.addArg(FormatUtils.formatList(options, Object::toString, "|"), null, isFacultative);
+		return this.addArg(FormatUtils.format(options, Object::toString, "|"), null, isFacultative);
 	}
 
 	public HelpBuilder addArg(Object[] options, boolean isFacultative) {
@@ -111,7 +111,7 @@ public class HelpBuilder {
 
 		return String.format("`%s%s %s`",
 				prefix, cmd.getName(),
-				FormatUtils.formatList(args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), " "));
+				FormatUtils.format(args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), " "));
 	}
 
 	private String getArguments() {

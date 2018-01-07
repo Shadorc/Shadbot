@@ -39,6 +39,6 @@ public class ShardListener {
 
 	private void onResumedEvent(ResumedEvent event) {
 		LogUtils.infof("Shard %d resumed.", event.getShard().getInfo()[0]);
-		// TODO Scheduler.sendMsgWaitingForShard();
+		ShardManager.getShadbotShard(event.getShard()).sendQueue();
 	}
 }

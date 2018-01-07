@@ -10,6 +10,7 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
@@ -25,7 +26,7 @@ import sx.blah.discord.handle.obj.IUser;
 public class GiveCoinsCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		List<String> splitArgs = StringUtils.split(context.getArg());
 		if(splitArgs.size() != 2) {
 			throw new MissingArgumentException();
@@ -33,7 +34,7 @@ public class GiveCoinsCmd extends AbstractCommand {
 
 		Integer coins = CastUtils.asInt(splitArgs.get(0));
 		if(coins == null) {
-			throw new IllegalArgumentException("Invalid amount.");
+			throw new IllegalCmdArgumentException("Invalid amount.");
 		}
 
 		List<IUser> users = new ArrayList<>();
@@ -49,7 +50,7 @@ public class GiveCoinsCmd extends AbstractCommand {
 		if(context.getMessage().mentionsEveryone()) {
 			msg = "Everyone";
 		} else {
-			msg = FormatUtils.formatList(users, IUser::getName, ", ");
+			msg = FormatUtils.format(users, IUser::getName, ", ");
 		}
 
 		BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** received **%s**.",

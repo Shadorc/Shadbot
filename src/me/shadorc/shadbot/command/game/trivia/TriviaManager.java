@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.ParseException;
@@ -37,7 +38,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 	protected static final int LIMITED_TIME = 30;
 
 	private final Integer categoryID;
-	private final List<IUser> alreadyAnswered;
+	private final ConcurrentHashMap<IUser, Boolean> alreadyAnswered;
 
 	private long startTime;
 	private String correctAnswer;
@@ -46,7 +47,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 	public TriviaManager(AbstractCommand cmd, IChannel channel, IUser author, Integer categoryID) {
 		super(cmd, channel, author);
 		this.categoryID = categoryID;
-		this.alreadyAnswered = new ArrayList<>();
+		this.alreadyAnswered = new ConcurrentHashMap<>();
 	}
 
 	// Trivia API doc : https://opentdb.com/api_config.php
@@ -114,22 +115,25 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 			return false;
 		}
 
+		IUser author = message.getAuthor();
+
+		// If the user has already answered and has been warned, ignore him
+		if(alreadyAnswered.containsKey(author) && alreadyAnswered.get(author)) {
+			return false;
+		}
+
 		String answer = choice == null ? content : answers.get(choice - 1);
 
-		IUser author = message.getAuthor();
-		if(alreadyAnswered.contains(author)) {
-			// if(rateLimiter.isLimited(message.getGuild(), message.getAuthor())) {
-			// return false;
-			// }
-
-			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " Sorry **%s**, you can only answer once.", author.getName()), this.getChannel());
-
+		if(alreadyAnswered.containsKey(author)) {
+			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.", author.getName()),
+					this.getChannel());
+			alreadyAnswered.put(author, true);
 		} else if(answer.equalsIgnoreCase(correctAnswer)) {
 			this.win(message.getChannel(), message.getAuthor());
 
 		} else {
-			BotUtils.sendMessage(Emoji.THUMBSDOWN + " Wrong answer.", this.getChannel());
-			alreadyAnswered.add(author);
+			BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.", message.getAuthor().getName()), this.getChannel());
+			alreadyAnswered.put(author, false);
 		}
 
 		return true;

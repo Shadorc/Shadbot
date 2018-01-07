@@ -8,6 +8,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -19,7 +20,7 @@ import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
-@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
+@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 2)
 @Command(category = CommandCategory.GAME, names = { "dice" })
 public class DiceCmd extends AbstractCommand {
 
@@ -29,23 +30,28 @@ public class DiceCmd extends AbstractCommand {
 	private static final int MAX_BET = 100_000;
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!context.hasArg()) {
 			throw new MissingArgumentException();
 		}
 
 		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
-		if(!MathUtils.inRange(splitArgs.size(), 1, 2)) {
+		if(!MathUtils.isInRange(splitArgs.size(), 1, 2)) {
 			throw new MissingArgumentException();
 		}
 
 		String numStr = splitArgs.get(splitArgs.size() == 1 ? 0 : 1);
 		Integer num = CastUtils.asIntBetween(numStr, 1, 6);
 		if(num == null) {
-			throw new IllegalArgumentException("Invalid number, must be between 1 and 6.");
+			throw new IllegalCmdArgumentException("Invalid number, must be between 1 and 6.");
 		}
 
 		DiceManager diceManager = MANAGERS.get(context.getChannel().getLongID());
+
+		// The user tries to join a game and no game are currently playing
+		if(splitArgs.size() == 1 && diceManager == null) {
+			throw new MissingArgumentException();
+		}
 
 		String betStr = splitArgs.size() == 1 ? Integer.toString(diceManager.getBet()) : splitArgs.get(0);
 		Integer bet = GameUtils.checkAndGetBet(context.getChannel(), context.getAuthor(), betStr, MAX_BET);
@@ -53,15 +59,11 @@ public class DiceCmd extends AbstractCommand {
 			return;
 		}
 
-		// The user try to join a game and no game are currently playing
-		if(splitArgs.size() == 1 && diceManager == null) {
-			throw new MissingArgumentException();
-		}
-
 		if(splitArgs.size() == 2) {
-			// The user try to start a game and it has already been started
+			// The user tries to start a game and it has already been started
 			if(diceManager != null) {
-				BotUtils.sendMessage(Emoji.INFO + " A Dice game has already been started.", context.getChannel());
+				BotUtils.sendMessage(String.format(Emoji.INFO + " A **Dice Game** has already been started. Use `%s%s <num>` to join it.",
+						context.getPrefix(), this.getName()), context.getChannel());
 				return;
 			}
 
@@ -77,19 +79,15 @@ public class DiceCmd extends AbstractCommand {
 			return;
 		}
 
-		if(!diceManager.addPlayer(context.getAuthor(), num)) {
-			BotUtils.sendMessage(Emoji.INFO + " You're already participating.", context.getChannel());
-			return;
-		}
-
 		if(diceManager.isNumBet(num)) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " This number has already been bet, please try with another one.", context.getChannel());
 			return;
 		}
 
-		diceManager.addPlayer(context.getAuthor(), num);
-
-		BotUtils.sendMessage(Emoji.DICE + " **" + context.getAuthorName() + "** bets on **" + num + "**.", context.getChannel());
+		if(!diceManager.addPlayer(context.getAuthor(), num)) {
+			BotUtils.sendMessage(Emoji.INFO + " You're already participating.", context.getChannel());
+			return;
+		}
 	}
 
 	@Override
