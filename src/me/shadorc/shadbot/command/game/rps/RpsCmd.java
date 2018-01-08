@@ -6,6 +6,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
@@ -43,7 +45,7 @@ public class RpsCmd extends AbstractCommand {
 		} else if(userHandsign.isSuperior(botHandsign)) {
 			strBuilder.append(String.format("%s wins ! Well done, you won **%d coins**.", context.getAuthorName(), GAINS));
 			Database.getDBUser(context.getGuild(), context.getAuthor()).addCoins(GAINS);
-			// StatsManager.increment(this.getFirstName(), GAINS);
+			StatsManager.increment(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
 		} else {
 			strBuilder.append(context.getClient().getOurUser().getName() + " wins !");
 		}

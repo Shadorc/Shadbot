@@ -11,6 +11,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.message.MessageListener;
+import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -22,17 +24,19 @@ import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "shutdown" })
-public class ShutdownCmd extends AbstractCommand {
+public class ShutdownCmd extends AbstractCommand implements MessageListener {
+
+	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("Shadbot-ShutdownCmd");
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		ScheduledThreadPoolExecutor scheduledExecutor = new ShadbotScheduledExecutor("Shadbot-ShutdownCmd");
-
 		if(!context.hasArg()) {
-			// TODO: Ask for confirmation
-			scheduledExecutor.submit(() -> System.exit(0));
+			MessageManager.addListener(context.getChannel(), this);
+			BotUtils.sendMessage(String.format(Emoji.QUESTION + " Do you really want to shutdown %s ? Yes/No",
+					context.getClient().getOurUser().mention()), context.getChannel());
 			return;
 		}
 
@@ -54,7 +58,7 @@ public class ShutdownCmd extends AbstractCommand {
 			}
 		}
 
-		scheduledExecutor.schedule(() -> System.exit(0), delay, TimeUnit.SECONDS);
+		SCHEDULED_EXECUTOR.schedule(() -> System.exit(0), delay, TimeUnit.SECONDS);
 
 		LogUtils.warnf("Shadbot will restart in %d seconds. (Message: %s)", delay, message);
 	}
@@ -66,6 +70,25 @@ public class ShutdownCmd extends AbstractCommand {
 				.addArg("seconds", true)
 				.addArg("message", true)
 				.build();
+	}
+
+	@Override
+	public boolean intercept(IMessage message) {
+		if(!message.getAuthor().equals(message.getClient().getApplicationOwner())) {
+			return false;
+		}
+
+		String content = message.getContent().toLowerCase();
+		if("yes".equalsIgnoreCase(content) || "y".equalsIgnoreCase(content)) {
+			SCHEDULED_EXECUTOR.submit(() -> System.exit(0));
+			return true;
+		} else if("no".equalsIgnoreCase(content) || "n".equalsIgnoreCase(content)) {
+			MessageManager.removeListener(message.getChannel(), this);
+			BotUtils.sendMessage(Emoji.INFO + " Shutdown cancelled.", message.getChannel());
+			return true;
+		}
+
+		return false;
 	}
 
 }

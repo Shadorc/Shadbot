@@ -53,10 +53,9 @@ public class GuildMusic {
 		}
 	}
 
-	// TODO: When do 'force' is used ?
 	// FIXME: Missing permissions sometimes thrown when joining
-	public void joinVoiceChannel(IVoiceChannel voiceChannel, boolean forceJoin) {
-		if(voiceChannel.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null || forceJoin) {
+	public void joinVoiceChannel(IVoiceChannel voiceChannel) {
+		if(voiceChannel.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null) {
 			voiceChannel.join();
 			LogUtils.infof("{Guild ID: %d} Voice channel joined.", voiceChannel.getGuild().getLongID());
 		}

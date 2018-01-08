@@ -9,6 +9,8 @@ import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.data.stats.Stats.CommandEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -30,6 +32,7 @@ public class HelpCmd extends AbstractCommand {
 			}
 
 			BotUtils.sendMessage(cmd.getHelp(context.getPrefix()), context.getChannel());
+			StatsManager.increment(CommandEnum.COMMAND_HELPED, cmd.getName());
 			return;
 		}
 

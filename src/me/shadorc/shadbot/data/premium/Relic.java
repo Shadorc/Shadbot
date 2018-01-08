@@ -7,9 +7,10 @@ import org.json.JSONObject;
 public class Relic {
 
 	private final static String RELIC_ID = "relicID";
-	// private final static String RELIC_ACTIVATION_MILLIS = "activationMillis";
-	private final static String RELIC_DURATION = "duration";
-	private final static String RELIC_TYPE = "type";
+	private final static String ACTIVATION = "activationMillis";
+	private final static String DURATION = "duration";
+	private final static String TYPE = "type";
+	private static final String GUILD_ID = "guildID";
 
 	private final String relicID;
 	private final int duration;
@@ -26,8 +27,13 @@ public class Relic {
 
 	public Relic(JSONObject relicObj) {
 		this.relicID = relicObj.getString(RELIC_ID);
-		this.duration = relicObj.getInt(RELIC_DURATION);
-		this.type = RelicType.valueOf(relicObj.getString(RELIC_TYPE));
+		this.duration = relicObj.getInt(DURATION);
+		this.type = RelicType.valueOf(relicObj.getString(TYPE));
+	}
+
+	public void activate() {
+		this.activationTime = System.currentTimeMillis();
+		PremiumManager.save(this);
 	}
 
 	public String getID() {
@@ -54,20 +60,18 @@ public class Relic {
 		return TimeUnit.MILLISECONDS.toDays(this.getActivationTime() + System.currentTimeMillis()) > this.getDuration();
 	}
 
-	public void activate() {
-		// TODO: Need to be saved
-		this.activationTime = System.currentTimeMillis();
-	}
-
 	public void setGuildID(long guildID) {
 		this.guildID = guildID;
+		PremiumManager.save(this);
 	}
 
 	public JSONObject toJSON() {
 		return new JSONObject()
 				.put(RELIC_ID, this.getID())
-				.put(RELIC_DURATION, this.getDuration())
-				.put(RELIC_TYPE, this.getType());
+				.put(DURATION, this.getDuration())
+				.put(TYPE, this.getType())
+				.putOpt(ACTIVATION, this.getActivationTime())
+				.putOpt(GUILD_ID, this.getGuildID());
 	}
 
 }

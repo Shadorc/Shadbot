@@ -14,6 +14,8 @@ import org.jsoup.Jsoup;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.game.AbstractGameManager;
 import me.shadorc.shadbot.message.MessageListener;
 import me.shadorc.shadbot.message.MessageManager;
@@ -146,7 +148,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 
 		BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + user.getName() + "**, you won **" + gains + " coins**.", channel);
 		Database.getDBUser(channel.getGuild(), user).addCoins(gains);
-		// StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
+		StatsManager.increment(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
 
 		this.stop();
 	}

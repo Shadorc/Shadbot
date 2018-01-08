@@ -10,6 +10,9 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.data.stats.Stats.CommandEnum;
+import me.shadorc.shadbot.data.stats.Stats.VariousEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -71,11 +74,14 @@ public class CommandManager {
 		}
 
 		if(cmd.getRateLimiter() != null && cmd.getRateLimiter().isLimited(context.getChannel(), context.getAuthor())) {
+			StatsManager.increment(CommandEnum.COMMAND_LIMITED, cmd.getName());
 			return;
 		}
 
 		try {
 			cmd.execute(context);
+			StatsManager.increment(CommandEnum.COMMAND_USED, cmd.getName());
+			StatsManager.increment(VariousEnum.COMMANDS_EXECUTED);
 		} catch (IllegalCmdArgumentException err) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 		} catch (MissingArgumentException err) {

@@ -10,6 +10,7 @@ public enum Emoji {
 	GREY_EXCLAMATION("grey_exclamation"),
 	RED_EXCLAMATION("exclamation"),
 	RED_FLAG("triangular_flag_on_post"),
+	QUESTION("question"),
 
 	INFO("information_source"),
 	MAGNIFYING_GLASS("mag"),

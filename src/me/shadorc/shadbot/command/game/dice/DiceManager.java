@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.game.AbstractGameManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -67,13 +69,14 @@ public class DiceManager extends AbstractGameManager {
 			int gains = bet;
 			if(num == winningNum) {
 				gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
+				StatsManager.increment(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
 			} else {
 				gains *= -1;
+				StatsManager.increment(MoneyEnum.MONEY_LOST, this.getCmdName(), Math.abs(gains));
 			}
 			list.add(gains > 0 ? 0 : list.size(), String.format("%s (**%s**)", user.getName(), FormatUtils.formatCoins(gains)));
 
 			Database.getDBUser(this.getGuild(), user).addCoins(gains);
-			// StatsManager.increment(CommandManager.getFirstName(context.getCommand()), gains);
 		}
 
 		BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getChannel()).get();

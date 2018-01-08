@@ -6,6 +6,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
@@ -41,14 +43,15 @@ public class RussianRouletteCmd extends AbstractCommand {
 		int gains;
 		if(MathUtils.rand(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
+			StatsManager.increment(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
 			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.formatCoins(gains)));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
+			StatsManager.increment(MoneyEnum.MONEY_GAINED, this.getName(), gains);
 			strBuilder.append(String.format("**click** ... Phew, you are still alive ! You get **%s**.", FormatUtils.formatCoins(gains)));
 		}
 
 		Database.getDBUser(context.getGuild(), context.getAuthor()).addCoins(gains);
-		// StatsManager.increment(this.getName(), gains);
 		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 	}
 

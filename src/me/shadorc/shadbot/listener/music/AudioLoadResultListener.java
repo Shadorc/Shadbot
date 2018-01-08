@@ -61,7 +61,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 	@Override
 	public void trackLoaded(AudioTrack track) {
-		guildMusic.joinVoiceChannel(userVoiceChannel, false);
+		guildMusic.joinVoiceChannel(userVoiceChannel);
 		if(!guildMusic.getScheduler().startOrQueue(track, putFirst)) {
 			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
 					FormatUtils.formatTrackName(track.getInfo())), guildMusic.getChannel());
@@ -104,7 +104,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return;
 		}
 
-		guildMusic.joinVoiceChannel(userVoiceChannel, false);
+		guildMusic.joinVoiceChannel(userVoiceChannel);
 
 		int musicsAdded = 0;
 		for(AudioTrack track : tracks) {
@@ -152,7 +152,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return false;
 		}
 
-		String prefix = (String) Database.getDBGuild(guildMusic.getChannel().getGuild()).getPrefix();
+		String prefix = Database.getDBGuild(guildMusic.getChannel().getGuild()).getPrefix();
 		if(message.getContent().equalsIgnoreCase(prefix + "cancel")) {
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Choice cancelled.", guildMusic.getChannel());
 			this.stopWaiting();
@@ -176,7 +176,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel
 		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(message.getGuild().getLongID(), guildMusic);
-		guildMusic.joinVoiceChannel(userVoiceChannel, false);
+		guildMusic.joinVoiceChannel(userVoiceChannel);
 
 		for(int choice : choices) {
 			AudioTrack track = resultsTracks.get(choice - 1);

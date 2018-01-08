@@ -8,42 +8,32 @@ import java.util.stream.Collectors;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.stats.Stats.VariousEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.shard.ShardManager;
-import me.shadorc.shadbot.utils.object.QueuedMessage;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.PermissionUtils;
 import sx.blah.discord.util.RequestBuffer;
 import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class BotUtils {
 
-	public static RequestFuture<IMessage> sendMessage(String message, IChannel channel) {
-		if(!channel.getShard().isReady()) {
-			LogUtils.infof("{Guild ID: %d} A message could not be sent because shard isn't ready, adding it to queue.", channel.getGuild().getLongID());
-			ShardManager.getShadbotShard(channel.getShard()).queue(new QueuedMessage(channel, message));
-			return null;
-		}
-
+	public static RequestFuture<IMessage> sendMessage(String content, IChannel channel) {
 		if(!BotUtils.hasPermissions(channel, Permissions.SEND_MESSAGES)) {
 			LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to send a message.", channel.getGuild().getLongID());
 			return null;
 		}
 
-		return RequestBuffer.request(() -> {
-			try {
-				return channel.sendMessage(message);
-			} catch (MissingPermissionsException err) {
-				LogUtils.infof("{Guild ID: %d} %s", channel.getGuild().getLongID(), err.getMessage());
-			} catch (DiscordException err) {
-				LogUtils.errorf(err, "An error occurred while sending message.");
-			}
-			return null;
-		});
+		StatsManager.increment(VariousEnum.MESSAGES_SENT);
+
+		return BotUtils.sendMessage(new MessageBuilder(channel.getClient()).withChannel(channel).withContent(content));
 	}
 
 	public static RequestFuture<IMessage> sendMessage(EmbedObject embed, IChannel channel) {
@@ -53,11 +43,25 @@ public class BotUtils {
 			return null;
 		}
 
+		StatsManager.increment(VariousEnum.EMBEDS_SENT);
+
+		return BotUtils.sendMessage(new MessageBuilder(channel.getClient()).withChannel(channel).withEmbed(embed));
+	}
+
+	public static RequestFuture<IMessage> sendMessage(MessageBuilder message) {
+		IGuild guild = message.getChannel().getGuild();
+		if(!guild.getShard().isReady()) {
+			LogUtils.infof("{Guild ID: %d} A message could not be sent because shard isn't ready, adding it to queue.",
+					guild.getLongID());
+			ShardManager.getShadbotShard(guild.getShard()).queue(message);
+			return null;
+		}
+
 		return RequestBuffer.request(() -> {
 			try {
-				return channel.sendMessage(embed);
+				return message.send();
 			} catch (MissingPermissionsException err) {
-				LogUtils.infof("{Guild ID: %d} %s", channel.getGuild().getLongID(), err.getMessage());
+				LogUtils.infof("{Guild ID: %d} %s", guild.getLongID(), err.getMessage());
 			} catch (DiscordException err) {
 				LogUtils.errorf(err, "An error occurred while sending message.");
 			}
@@ -105,12 +109,7 @@ public class BotUtils {
 	}
 
 	public static boolean hasPermissions(IChannel channel, Permissions... permissions) {
-		for(Permissions perm : permissions) {
-			if(!channel.getModifiedPermissions(channel.getClient().getOurUser()).contains(perm)) {
-				return false;
-			}
-		}
-		return true;
+		return PermissionUtils.hasPermissions(channel, channel.getClient().getOurUser(), permissions);
 	}
 
 }

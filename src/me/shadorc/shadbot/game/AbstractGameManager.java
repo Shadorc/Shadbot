@@ -56,14 +56,14 @@ public abstract class AbstractGameManager {
 		return scheduledTask == null || scheduledTask.isDone();
 	}
 
-	public void schedule(Runnable command, long delay, TimeUnit unit) {
+	public final void schedule(Runnable command, long delay, TimeUnit unit) {
 		if(scheduledTask != null) {
 			this.cancelScheduledTask();
 		}
 		scheduledTask = SCHEDULED_EXECUTOR.schedule(command, delay, unit);
 	}
 
-	public void cancelScheduledTask() {
+	public final void cancelScheduledTask() {
 		scheduledTask.cancel(true);
 	}
 

@@ -77,7 +77,6 @@ public class LottoCmd extends AbstractCommand {
 		}
 
 		dbUser.addCoins(-PAID_COST);
-		// StatsManager.increment(this.getFirstName(), -PAID_COST);
 
 		LottoManager.addPlayer(context.getGuild(), context.getAuthor(), num);
 
@@ -157,7 +156,6 @@ public class LottoCmd extends AbstractCommand {
 			IUser user = Shadbot.getClient().getUserByID(winner.getUserID());
 			int coins = (int) Math.ceil((double) LottoManager.getPool() / winners.size());
 			Database.getDBUser(guild, user).addCoins(coins);
-			// StatsManager.increment("lotto", coins);
 		}
 
 		LogUtils.infof("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",

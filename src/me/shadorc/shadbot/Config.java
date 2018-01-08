@@ -18,11 +18,6 @@ public class Config {
 	public static final int DEFAULT_TIMEOUT = 20_000;
 	public static final String USER_AGENT = String.format("Shadbot/%s/D4J-DiscordBot (%s)", Shadbot.getVersion(), GITHUB_URL);
 
-	/* TODO: Find more explicit names
-	public static final int MESSAGE_RETRY_INTERVAL = 3;
-	public static final int MESSAGE_RETRY_COUNT = 2;
-	 */
-
 	public static final Color BOT_COLOR = new Color(170, 196, 222);
 
 	public static final String DEFAULT_PREFIX = "/";

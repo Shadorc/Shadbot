@@ -5,15 +5,18 @@ import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 
+import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
-import me.shadorc.shadbot.utils.object.QueuedMessage;
 import sx.blah.discord.api.IShard;
+import sx.blah.discord.util.MessageBuilder;
 
 public class ShadbotShard {
 
+	private final static int MAX_QUEUE_SIZE = 20;
+
 	private final IShard shard;
 	private final int shardID;
-	private final List<QueuedMessage> messagesQueue;
+	private final List<MessageBuilder> messagesQueue;
 	private final AtomicLong lastEvent;
 	private final AtomicLong lastMessage;
 
@@ -48,16 +51,16 @@ public class ShadbotShard {
 		return lastMessage.get();
 	}
 
-	public void queue(QueuedMessage message) {
+	public void queue(MessageBuilder message) {
 		messagesQueue.add(0, message);
-		if(messagesQueue.size() > 25) {
+		if(messagesQueue.size() > MAX_QUEUE_SIZE) {
 			messagesQueue.remove(messagesQueue.size() - 1);
 			LogUtils.infof("{Shard %d} The limit size of the queue has been exceeded, last message removed.", this.getID());
 		}
 	}
 
 	public void sendQueue() {
-		messagesQueue.stream().forEach(QueuedMessage::send);
+		messagesQueue.stream().forEach(BotUtils::sendMessage);
 		messagesQueue.clear();
 	}
 

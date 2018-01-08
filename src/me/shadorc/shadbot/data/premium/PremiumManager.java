@@ -61,6 +61,39 @@ public class PremiumManager {
 		}
 	}
 
+	public static Relic generateRelic(RelicType type) {
+		Relic relic = new Relic(UUID.randomUUID().toString(), 180, type);
+		UNUSED_RELICS_LIST.add(relic);
+		return relic;
+	}
+
+	public static void activateRelic(IGuild guild, IUser user, String relicID) throws RelicActivationException {
+		Relic relic = UNUSED_RELICS_LIST.stream().filter(unusedRelic -> unusedRelic.getID().equals(relicID)).findAny().get();
+
+		if(relic == null) {
+			throw new RelicActivationException("This key is already activated or doesn't exist.");
+		}
+
+		if(relic.getType().equals(RelicType.GUILD) && guild == null) {
+			throw new RelicActivationException("You must activate a Legendary Relic in the desired server.");
+		}
+
+		relic.activate();
+		if(relic.getType().equals(RelicType.GUILD)) {
+			relic.setGuildID(guild.getLongID());
+		}
+
+		JSONArray userKeys = premiumObj.getJSONObject(DONATORS).optJSONArray(user.getStringID());
+		if(userKeys == null) {
+			userKeys = new JSONArray();
+		}
+
+		userKeys.put(relic.toJSON());
+		UNUSED_RELICS_LIST.remove(relic);
+
+		premiumObj.getJSONObject(DONATORS).put(user.getStringID(), userKeys);
+	}
+
 	public static List<Relic> getRelicsForUser(long userID) {
 		List<Relic> relics = new ArrayList<>();
 		JSONObject donatorsObj = premiumObj.getJSONObject(DONATORS);
@@ -69,12 +102,6 @@ public class PremiumManager {
 			donatorRelics.forEach(relicObj -> relics.add(new Relic((JSONObject) relicObj)));
 		}
 		return relics;
-	}
-
-	public static Relic generateRelic(RelicType type) {
-		Relic relic = new Relic(UUID.randomUUID().toString(), 180, type);
-		UNUSED_RELICS_LIST.add(relic);
-		return relic;
 	}
 
 	public static boolean isGuildPremium(IGuild guild) {
@@ -105,30 +132,7 @@ public class PremiumManager {
 		return relic.getType().equals(type) && relic.getActivationTime() != 0 && !relic.isExpired();
 	}
 
-	public static void activateRelic(IGuild guild, IUser user, String relicID) throws RelicActivationException {
-		Relic relic = UNUSED_RELICS_LIST.stream().filter(unusedRelic -> unusedRelic.getID().equals(relicID)).findAny().get();
-
-		if(relic == null) {
-			throw new RelicActivationException("This key is already activated or doesn't exist.");
-		}
-
-		if(relic.getType().equals(RelicType.GUILD) && guild == null) {
-			throw new RelicActivationException("You must activate a Legendary Relic in the desired server.");
-		}
-
-		relic.activate();
-		if(relic.getType().equals(RelicType.GUILD)) {
-			relic.setGuildID(guild.getLongID());
-		}
-
-		JSONArray userKeys = premiumObj.getJSONObject(DONATORS).optJSONArray(user.getStringID());
-		if(userKeys == null) {
-			userKeys = new JSONArray();
-		}
-
-		userKeys.put(relic.toJSON());
-		UNUSED_RELICS_LIST.remove(relic);
-
-		premiumObj.getJSONObject(DONATORS).put(user.getStringID(), userKeys);
+	public static void save(Relic relic) {
+		// TODO
 	}
 }

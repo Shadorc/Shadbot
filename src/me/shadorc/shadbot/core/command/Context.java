@@ -55,6 +55,10 @@ public class Context {
 		return message.getClient();
 	}
 
+	public IUser getOurUser() {
+		return message.getClient().getOurUser();
+	}
+
 	public ShadbotShard getShadbotShard() {
 		return ShardManager.getShadbotShard(this.getShard());
 	}

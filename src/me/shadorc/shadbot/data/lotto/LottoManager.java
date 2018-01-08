@@ -33,7 +33,6 @@ public class LottoManager {
 	private static final String FILE_NAME = "lotto_data.json";
 	private static final File FILE = new File(FILE_NAME);
 
-	@SuppressWarnings("ucd")
 	private static JSONObject dataObj;
 
 	@DataInit

@@ -37,7 +37,7 @@ public class Shadbot {
 
 		// Initialization
 		if(!DataManager.init() || !CommandManager.init()) {
-			return;
+			System.exit(1);
 		}
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -61,12 +61,6 @@ public class Shadbot {
 
 		client.getDispatcher().registerListeners(Shadbot.getEventThreadPool(), new ReadyListener(), new ShardListener());
 		client.login();
-	}
-
-	public static void stop() {
-		DataManager.stop();
-		ShardManager.stop();
-		System.exit(0);
 	}
 
 	public static String getVersion() {

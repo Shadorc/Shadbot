@@ -4,6 +4,8 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.stats.Stats.VariousEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.message.MessageManager;
@@ -27,6 +29,8 @@ public class MessageListener {
 	}
 
 	private void onMessageReceivedEvent(MessageReceivedEvent event) {
+		StatsManager.increment(VariousEnum.MESSAGES_RECEIVED);
+
 		IMessage message = event.getMessage();
 		try {
 			if(message.getAuthor().isBot()) {
@@ -53,13 +57,14 @@ public class MessageListener {
 				CommandManager.execute(new Context(message));
 			}
 		} catch (Exception err) {
-			// TODO improve message
 			LogUtils.errorf(message.getContent(), message.getChannel(), err,
 					"Sorry, an unknown error occurred. My developer has been warned.", event.getGuild().getLongID());
 		}
 	}
 
 	private void privateMessageReceived(IMessage message) throws MissingArgumentException, IllegalCmdArgumentException {
+		StatsManager.increment(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
+
 		if(message.getContent().startsWith(Config.DEFAULT_PREFIX + "help")) {
 			CommandManager.getCommand("help").execute(new Context(message));
 			return;
