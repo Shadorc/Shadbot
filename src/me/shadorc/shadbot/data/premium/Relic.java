@@ -6,10 +6,10 @@ import org.json.JSONObject;
 
 public class Relic {
 
-	private final static String RELIC_ID = "relicID";
-	private final static String ACTIVATION = "activationMillis";
-	private final static String DURATION = "duration";
-	private final static String TYPE = "type";
+	private static final String RELIC_ID = "relicID";
+	private static final String ACTIVATION = "activationMillis";
+	private static final String DURATION = "duration";
+	private static final String TYPE = "type";
 	private static final String GUILD_ID = "guildID";
 
 	private final String relicID;

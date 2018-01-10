@@ -3,8 +3,6 @@ package me.shadorc.shadbot.command.game;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.Shadbot;
@@ -29,7 +27,6 @@ import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IGuild;
@@ -40,15 +37,9 @@ import sx.blah.discord.util.EmbedBuilder;
 @Command(category = CommandCategory.GAME, names = { "lotto" })
 public class LottoCmd extends AbstractCommand {
 
-	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("LottoCmd-%d");
-
 	private static final int PAID_COST = 100;
 	private static final int MIN_NUM = 1;
-	private final static int MAX_NUM = 100;
-
-	static {
-		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> LottoCmd.lotteryDraw(), LottoCmd.getDelay(), TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
-	}
+	private static final int MAX_NUM = 100;
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
@@ -141,7 +132,7 @@ public class LottoCmd extends AbstractCommand {
 		return DateUtils.getMillisUntil(nextDate.toInstant());
 	}
 
-	public static void lotteryDraw() {
+	public static void draw() {
 		LogUtils.infof("Lottery draw started...");
 		int winningNum = MathUtils.rand(MIN_NUM, MAX_NUM);
 

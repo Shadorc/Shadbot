@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.json.JSONArray;
 
-import me.shadorc.shadbot.data.Setting;
+import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.shard.ShardManager;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -25,7 +25,7 @@ public class ChannelListener {
 	private void onChannelDeleteEvent(ChannelDeleteEvent event) {
 		List<Long> allowedChannelsID = Database.getDBGuild(event.getGuild()).getAllowedChannels();
 		if(allowedChannelsID.remove(event.getChannel().getLongID())) {
-			Database.getDBGuild(event.getGuild()).setSetting(Setting.ALLOWED_CHANNELS, new JSONArray(allowedChannelsID));
+			Database.getDBGuild(event.getGuild()).setSetting(SettingEnum.ALLOWED_CHANNELS, new JSONArray(allowedChannelsID));
 		}
 	}
 }

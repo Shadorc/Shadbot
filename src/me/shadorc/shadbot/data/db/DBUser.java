@@ -57,7 +57,12 @@ public class DBUser {
 	}
 
 	public void addCoins(int gains) {
-		coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) this.getCoins() + gains));
+		this.coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) this.getCoins() + gains));
+		Database.save(this);
+	}
+
+	public void resetCoins() {
+		this.coins = 0;
 		Database.save(this);
 	}
 

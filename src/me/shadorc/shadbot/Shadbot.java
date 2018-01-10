@@ -2,6 +2,7 @@ package me.shadorc.shadbot;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import me.shadorc.shadbot.core.command.CommandManager;
@@ -15,6 +16,7 @@ import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.executor.ShadbotCachedExecutor;
+import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.StatusType;
@@ -22,6 +24,7 @@ import sx.blah.discord.handle.obj.StatusType;
 public class Shadbot {
 
 	private static final ThreadPoolExecutor EVENT_THREAD_POOL = new ShadbotCachedExecutor("Shadbot-EventThreadPool-%d");
+	private static final ScheduledThreadPoolExecutor DEFAULT_SCHEDULER = new ShadbotScheduledExecutor(2, "Shadbot-DefaultScheduler-%d");
 
 	private static String version;
 	private static IDiscordClient client;
@@ -73,6 +76,10 @@ public class Shadbot {
 
 	public static ThreadPoolExecutor getEventThreadPool() {
 		return EVENT_THREAD_POOL;
+	}
+
+	public static ScheduledThreadPoolExecutor getScheduler() {
+		return DEFAULT_SCHEDULER;
 	}
 
 }

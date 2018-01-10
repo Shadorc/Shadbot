@@ -33,13 +33,6 @@ public class StringUtils {
 		return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
 	}
 
-	public static String singularOf(String str) {
-		if(str.charAt(str.length() - 1) == 's') {
-			return str.substring(0, str.length() - 1);
-		}
-		return str;
-	}
-
 	public static String pluralOf(long count, String str) {
 		if(count > 1) {
 			return String.format("%d %ss", count, str);

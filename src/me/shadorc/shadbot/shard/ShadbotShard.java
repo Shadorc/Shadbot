@@ -12,7 +12,7 @@ import sx.blah.discord.util.MessageBuilder;
 
 public class ShadbotShard {
 
-	private final static int MAX_QUEUE_SIZE = 20;
+	private static final int MAX_QUEUE_SIZE = 20;
 
 	private final IShard shard;
 	private final int shardID;

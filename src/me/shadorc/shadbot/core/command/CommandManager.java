@@ -43,13 +43,11 @@ public class CommandManager {
 				}
 
 				for(String name : names) {
-					if(COMMANDS_MAP.containsKey(name)) {
+					if(COMMANDS_MAP.putIfAbsent(name, cmd) != null) {
 						LogUtils.errorf(String.format("Command name collision between %s and %s",
-								cmd.getClass().getSimpleName(),
-								COMMANDS_MAP.get(name).getClass().getSimpleName()));
+								cmdClass.getSimpleName(), COMMANDS_MAP.get(name).getClass().getSimpleName()));
 						continue;
 					}
-					COMMANDS_MAP.put(name, cmd);
 				}
 			} catch (InstantiationException | IllegalAccessException err) {
 				LogUtils.errorf(err, "An error occurred while initializing command %s.", cmdClass.getDeclaringClass().getSimpleName());
@@ -64,6 +62,10 @@ public class CommandManager {
 	public static void execute(Context context) {
 		AbstractCommand cmd = COMMANDS_MAP.get(context.getCommandName());
 		if(cmd == null) {
+			return;
+		}
+
+		if(!BotUtils.isCommandAllowed(context.getGuild(), cmd)) {
 			return;
 		}
 

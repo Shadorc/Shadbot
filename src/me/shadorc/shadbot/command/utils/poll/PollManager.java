@@ -7,8 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.game.AbstractGameManager;
+import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -63,22 +62,19 @@ public class PollManager extends AbstractGameManager {
 		StringBuilder choicesStr = new StringBuilder();
 		for(String choice : choicesMap.keySet()) {
 			List<IUser> votersList = choicesMap.get(choice);
-
-			StringBuilder votersDesc = new StringBuilder(StringUtils.truncate(FormatUtils.format(votersList, IUser::getName, ", "), 30));
-			if(votersDesc.length() > 0) {
-				votersDesc.insert(0, String.format(" *(Vote: %d)*%n\t\t", votersList.size()));
+			choicesStr.append(String.format("%n\t**%d.** %s", count, choice));
+			if(!votersList.isEmpty()) {
+				choicesStr.append(String.format(" *(Vote: %d)*", votersList.size()));
+				choicesStr.append(String.format("%n\t\t%s", StringUtils.truncate(FormatUtils.format(votersList, IUser::getName, ", "), 30)));
 			}
-
-			choicesStr.append(String.format("%n\t**%d.** %s%s", count, choice, votersDesc.toString()));
 			count++;
 		}
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName(String.format("Poll (Created by: %s)", this.getAuthor().getName()))
 				.withThumbnail(this.getAuthor().getAvatarURL())
-				.appendDescription("Vote using: `" + Database.getDBGuild(this.getGuild()).getPrefix() + "poll <choice>`"
-						+ "\n\n__**" + question + "**__"
-						+ choicesStr.toString())
+				.appendDescription(String.format("Vote using: `%s%s <choice>`%n%n__**%s**__%s",
+						this.getPrefix(), this.getCmdName(), question, choicesStr.toString()))
 				.withFooterIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png");
 
 		if(this.isTaskDone()) {

@@ -2,34 +2,31 @@ package me.shadorc.shadbot.shard;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.executor.ShadbotCachedExecutor;
-import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.handle.obj.IGuild;
 
 public class ShardManager {
 
-	private final static int SHARD_TIMEOUT = 30;
+	private static final int SHARD_TIMEOUT = 30;
 
-	private final static Map<IShard, ShadbotShard> SHARDS_MAP = new HashMap<>();
-	private final static ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("Shadbot-ShardWatcher");
+	private static final Map<IShard, ShadbotShard> SHARDS_MAP = new HashMap<>();
 	private static final ThreadPoolExecutor DEFAUT_THREAD_POOL = new ShadbotCachedExecutor("Shadbot-DefaultThreadPool-%d");
 
 	public static void start() {
-		SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> ShardManager.check(), 10, 10, TimeUnit.MINUTES);
+		Shadbot.getScheduler().scheduleAtFixedRate(() -> ShardManager.check(), 10, 10, TimeUnit.MINUTES);
 	}
 
 	public static void stop() {
 		SHARDS_MAP.values().stream().forEach(shadbotShard -> shadbotShard.getThreadPool().shutdownNow());
-		SCHEDULED_EXECUTOR.shutdownNow();
 		DEFAUT_THREAD_POOL.shutdownNow();
 	}
 

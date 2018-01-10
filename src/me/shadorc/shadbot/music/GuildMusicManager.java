@@ -10,8 +10,8 @@ import sx.blah.discord.handle.obj.IGuild;
 
 public class GuildMusicManager {
 
-	public final static AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
-	public final static ConcurrentHashMap<Long, GuildMusic> GUILD_MUSIC_MAP = new ConcurrentHashMap<>();
+	public static final AudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
+	public static final ConcurrentHashMap<Long, GuildMusic> GUILD_MUSIC_MAP = new ConcurrentHashMap<>();
 
 	static {
 		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);

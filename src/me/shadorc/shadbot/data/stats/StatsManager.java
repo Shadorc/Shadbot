@@ -21,6 +21,8 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.data.annotation.StatsEnum;
+import me.shadorc.shadbot.data.lotto.LottoManager;
+import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
 
 public class StatsManager {
 
@@ -61,7 +63,7 @@ public class StatsManager {
 				}
 			} else {
 				String name = statsEnum.name();
-				STATS_MAP.put(statsClass.getSimpleName(), new StatsObject(name, dataObj.optJSONObject(name)));
+				STATS_MAP.put(statsClass.getSimpleName().toLowerCase(), new StatsObject(name, dataObj.optJSONObject(name)));
 			}
 		}
 	}
@@ -84,6 +86,9 @@ public class StatsManager {
 	 * @param count - the count to increment
 	 */
 	public static void increment(Object stat, String key, int count) {
+		if(MoneyEnum.MONEY_LOST.equals(stat)) {
+			LottoManager.addToPool(count);
+		}
 		STATS_MAP.get(stat.toString().toLowerCase()).increment(key, count);
 	}
 
@@ -92,7 +97,7 @@ public class StatsManager {
 	}
 
 	public static void increment(Object stat, int count) {
-		STATS_MAP.get(stat.getClass().getSimpleName()).increment(stat.toString().toLowerCase(), count);
+		STATS_MAP.get(stat.getClass().getSimpleName().toLowerCase()).increment(stat.toString().toLowerCase(), count);
 	}
 
 	public static void increment(Object stat) {

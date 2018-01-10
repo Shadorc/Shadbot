@@ -31,6 +31,15 @@ public class CastUtils {
 		}
 	}
 
+	public static Long asPositiveLong(String str) {
+		try {
+			Long nbr = Long.parseLong(str);
+			return nbr > 0 ? nbr : null;
+		} catch (NumberFormatException err) {
+			return null;
+		}
+	}
+
 	public static boolean isPositiveLong(String str) {
 		try {
 			return Long.parseLong(str) > 0;

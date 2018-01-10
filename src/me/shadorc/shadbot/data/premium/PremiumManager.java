@@ -23,8 +23,8 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class PremiumManager {
 
-	private final static String DONATORS = "donators";
-	private final static String UNUSED_RELICS = "unusedRelics";
+	private static final String DONATORS = "donators";
+	private static final String UNUSED_RELICS = "unusedRelics";
 
 	private static final String FILE_NAME = "premium_data.json";
 	private static final File FILE = new File(FILE_NAME);
@@ -104,7 +104,11 @@ public class PremiumManager {
 		return relics;
 	}
 
-	public static boolean isGuildPremium(IGuild guild) {
+	public static boolean isPremium(IGuild guild, IUser user) {
+		return PremiumManager.isPremium(guild) || PremiumManager.isPremium(user);
+	}
+
+	public static boolean isPremium(IGuild guild) {
 		JSONObject donatorsObj = premiumObj.getJSONObject(DONATORS);
 		for(String userKey : donatorsObj.keySet()) {
 			JSONArray keysArray = donatorsObj.getJSONArray(userKey);
@@ -119,7 +123,7 @@ public class PremiumManager {
 		return false;
 	}
 
-	public static boolean isUserPremium(IUser user) {
+	public static boolean isPremium(IUser user) {
 		List<Relic> relics = PremiumManager.getRelicsForUser(user.getLongID());
 		if(relics.isEmpty()) {
 			return false;

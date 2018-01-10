@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.utils;
 
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.Setting;
+import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
@@ -44,7 +44,7 @@ public class TextUtils {
 
 	public static String mustBeNSFW(String prefix) {
 		return String.format(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use `%ssettings %s toggle`",
-				prefix, Setting.NSFW);
+				prefix, SettingEnum.NSFW);
 	}
 
 	public static String missingPerm(Permissions... permissions) {

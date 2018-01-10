@@ -32,7 +32,7 @@ public class HangmanCmd extends AbstractCommand {
 	private static final int MAX_WORD_LENGTH = 10;
 
 	protected static final ConcurrentHashMap<Long, HangmanManager> MANAGERS = new ConcurrentHashMap<>();
-	protected final static List<String> WORDS = new ArrayList<>();
+	protected static final List<String> WORDS = new ArrayList<>();
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {

@@ -10,10 +10,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
 import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.game.AbstractGameManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;

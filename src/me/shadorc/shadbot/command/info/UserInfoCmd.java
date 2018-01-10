@@ -37,7 +37,7 @@ public class UserInfoCmd extends AbstractCommand {
 
 		String joinDate = String.format("%s%n(%s)",
 				DateUtils.toLocalDate(context.getGuild().getJoinTimeForUser(user)).format(dateFormatter),
-				FormatUtils.formatDuration(context.getGuild().getJoinTimeForUser(user).toEpochMilli()));
+				FormatUtils.formatDuration(DateUtils.getMillisUntil(context.getGuild().getJoinTimeForUser(user))));
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)

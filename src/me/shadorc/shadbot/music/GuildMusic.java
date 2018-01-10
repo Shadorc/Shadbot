@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.music;
 
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -14,7 +13,6 @@ import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
-import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -22,8 +20,6 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class GuildMusic {
-
-	private final static ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("Shadbot-MusicLeaver-%d");
 
 	private final IGuild guild;
 	private final AudioPlayer audioPlayer;
@@ -44,7 +40,7 @@ public class GuildMusic {
 	}
 
 	public void scheduleLeave() {
-		leaveTask = SCHEDULED_EXECUTOR.schedule(() -> this.leaveVoiceChannel(), 1, TimeUnit.MINUTES);
+		leaveTask = Shadbot.getScheduler().schedule(() -> this.leaveVoiceChannel(), 1, TimeUnit.MINUTES);
 	}
 
 	public void cancelLeave() {
@@ -63,7 +59,7 @@ public class GuildMusic {
 
 	public void end() {
 		StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
-		if(!PremiumManager.isGuildPremium(channel.getGuild())) {
+		if(!PremiumManager.isPremium(channel.getGuild())) {
 			strBuilder.append(String.format(" If you like me, you can make a donation on %s, it will help my creator keeping me alive :heart:",
 					Config.PATREON_URL));
 		}

@@ -80,8 +80,7 @@ public class PlayCmd extends AbstractCommand {
 		}
 
 		if(guildMusic.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
-				&& !PremiumManager.isGuildPremium(context.getGuild())
-				&& !PremiumManager.isUserPremium(context.getAuthor())) {
+				&& !PremiumManager.isPremium(context.getGuild(), context.getAuthor())) {
 			BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, context.getChannel());
 			return;
 		}

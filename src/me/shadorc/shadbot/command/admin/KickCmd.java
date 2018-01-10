@@ -21,8 +21,8 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.Ban;
 import sx.blah.discord.util.PermissionUtils;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "softban" })
-public class SoftBanCmd extends AbstractCommand {
+@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "kick" })
+public class KickCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
@@ -35,26 +35,26 @@ public class SoftBanCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		if(!PermissionUtils.hasPermissions(context.getChannel(), context.getAuthor(), Permissions.BAN)) {
-			throw new IllegalArgumentException("You don't have permission to ban.");
+		if(!PermissionUtils.hasPermissions(context.getChannel(), context.getAuthor(), Permissions.KICK)) {
+			throw new IllegalArgumentException("You don't have permission to kick.");
 		}
 
-		if(!BotUtils.hasPermissions(context.getChannel(), Permissions.BAN)) {
-			BotUtils.sendMessage(TextUtils.missingPerm(Permissions.BAN), context.getChannel());
+		if(!BotUtils.hasPermissions(context.getChannel(), Permissions.KICK)) {
+			BotUtils.sendMessage(TextUtils.missingPerm(Permissions.KICK), context.getChannel());
 			return;
 		}
 
 		if(mentionedUsers.contains(context.getAuthor())) {
-			throw new IllegalCmdArgumentException("You cannot softban yourself.");
+			throw new IllegalCmdArgumentException("You cannot kick yourself.");
 		}
 
 		for(IUser user : mentionedUsers) {
 			if(PermissionUtils.isUserHigher(context.getGuild(), user, context.getAuthor())) {
-				throw new IllegalCmdArgumentException(String.format("You can't softban %s because he is higher in the role hierarchy than you.",
+				throw new IllegalCmdArgumentException(String.format("You can't kick %s because he is higher in the role hierarchy than you.",
 						user.getName()));
 			}
 			if(PermissionUtils.isUserHigher(context.getGuild(), user, context.getOurUser())) {
-				throw new IllegalCmdArgumentException(String.format("I cannot softban %s because he is higher in the role hierarchy than me.",
+				throw new IllegalCmdArgumentException(String.format("I cannot kick %s because he is higher in the role hierarchy than me.",
 						user.getName()));
 			}
 		}
@@ -70,14 +70,13 @@ public class SoftBanCmd extends AbstractCommand {
 
 		for(IUser user : mentionedUsers) {
 			if(!user.isBot()) {
-				BotUtils.sendMessage(String.format(Emoji.INFO + " You were softbanned by **%s** on server **%s** (Reason: **%s**).",
+				BotUtils.sendMessage(String.format(Emoji.INFO + " You were kicked by **%s** on server **%s** (Reason: **%s**).",
 						context.getAuthorName(), context.getGuild().getName(), reason), user.getOrCreatePMChannel());
 			}
-			context.getGuild().banUser(user, reason, 7);
-			context.getGuild().pardonUser(user.getLongID());
+			context.getGuild().kickUser(user, reason);
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) %s %s been softbanned (Reason: %s)",
+		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) %s %s been kicked (Reason: %s)",
 				context.getAuthorName(),
 				FormatUtils.format(mentionedUsers, IUser::getName, ", "),
 				mentionedUsers.size() > 1 ? "have" : "has",
@@ -87,8 +86,7 @@ public class SoftBanCmd extends AbstractCommand {
 	@Override
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
-				.setDescription("Ban and instantly unban user(s).\nIt's like kicking him/them but it also deletes his/their messages "
-						+ "from the last 7 days.")
+				.setDescription("Kick user(s).")
 				.addArg("@user(s)", false)
 				.addArg("reason", true)
 				.build();

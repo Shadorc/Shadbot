@@ -1,9 +1,13 @@
 package me.shadorc.shadbot.command.owner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.google.common.collect.Lists;
 
 import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -48,11 +52,14 @@ public class StatsCmd extends AbstractCommand {
 		concurrentMap.keySet().stream().forEach(key -> unsortedMap.put(key, concurrentMap.get(key).get()));
 
 		Map<String, Integer> sortedMap = Utils.sortByValue(unsortedMap);
+		List<List<String>> lists = Lists.partition(new ArrayList<>(sortedMap.keySet()), ROW_SIZE);
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-				.withAuthorName(String.format("Stats (%s)", context.getArg()))
-				.appendField("Name", FormatUtils.format(sortedMap.keySet().stream(), Object::toString, "\n"), true)
-				.appendField("Value", FormatUtils.format(sortedMap.values().stream(), Object::toString, "\n"), true);
+				.withAuthorName(String.format("Stats (%s)", context.getArg()));
+		for(List<String> list : lists) {
+			embed.appendField("Name", FormatUtils.format(list, Object::toString, "\n"), true);
+			embed.appendField("Value", FormatUtils.format(list, key -> sortedMap.get(key).toString(), "\n"), true);
+		}
 
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}

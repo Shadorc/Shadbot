@@ -18,6 +18,7 @@ public class HelpBuilder {
 	private final List<Argument> args;
 	private final List<EmbedField> fields;
 
+	private String thumbnail;
 	private String description;
 	private String usage;
 	private String example;
@@ -29,6 +30,11 @@ public class HelpBuilder {
 		this.cmd = cmd;
 		this.args = new ArrayList<>();
 		this.fields = new ArrayList<>();
+	}
+
+	public HelpBuilder setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
+		return this;
 	}
 
 	public HelpBuilder setDescription(String description) {
@@ -83,7 +89,7 @@ public class HelpBuilder {
 	}
 
 	public EmbedObject build() {
-		EmbedBuilder embedBuilder = EmbedUtils.getDefaultEmbed()
+		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName(String.format("Help for %s command", cmd.getName()))
 				.withDescription(description)
@@ -93,15 +99,19 @@ public class HelpBuilder {
 				.appendField("Gains", gains, false)
 				.appendField("Source", source, false);
 
+		if(thumbnail != null) {
+			embed.withThumbnail(thumbnail);
+		}
+
 		for(EmbedField field : fields) {
-			embedBuilder.appendField(field);
+			embed.appendField(field);
 		}
 
 		if(!cmd.getAlias().isEmpty()) {
-			embedBuilder.withFooterText(String.format("Alias: %s", cmd.getAlias()));
+			embed.withFooterText(String.format("Alias: %s", cmd.getAlias()));
 		}
 
-		return embedBuilder.build();
+		return embed.build();
 	}
 
 	private String getUsage() {

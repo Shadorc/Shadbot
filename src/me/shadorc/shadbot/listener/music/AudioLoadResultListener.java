@@ -3,7 +3,6 @@ package me.shadorc.shadbot.listener.music;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Jsoup;
@@ -14,6 +13,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.message.MessageListener;
@@ -27,7 +27,6 @@ import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
@@ -39,7 +38,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	public static final String YT_SEARCH = "ytsearch: ";
 	public static final String SC_SEARCH = "scsearch: ";
 
-	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("Shadbot-MusicChoiceWaiter-%d");
 	private static final int CHOICE_DURATION = 30;
 
 	private final GuildMusic guildMusic;
@@ -97,7 +95,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 							Database.getDBGuild(guildMusic.getChannel().getGuild()).getPrefix(), CHOICE_DURATION));
 			BotUtils.sendMessage(embed.build(), guildMusic.getChannel());
 
-			stopWaitingTask = SCHEDULED_EXECUTOR.schedule(() -> this.stopWaiting(), CHOICE_DURATION, TimeUnit.SECONDS);
+			stopWaitingTask = Shadbot.getScheduler().schedule(() -> this.stopWaiting(), CHOICE_DURATION, TimeUnit.SECONDS);
 
 			resultsTracks = new ArrayList<>(tracks);
 			MessageManager.addListener(guildMusic.getChannel(), this);
@@ -111,8 +109,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			guildMusic.getScheduler().startOrQueue(track, putFirst);
 			musicsAdded++;
 			if(guildMusic.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
-					&& !PremiumManager.isGuildPremium(guildMusic.getChannel().getGuild())
-					&& !PremiumManager.isUserPremium(userDj)) {
+					&& !PremiumManager.isPremium(guildMusic.getChannel().getGuild(), userDj)) {
 				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getChannel());
 				break;
 			}
@@ -186,8 +183,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 			guildMusic.getScheduler().startOrQueue(track, putFirst);
 			if(guildMusic.getScheduler().getPlaylist().size() >= Config.MAX_PLAYLIST_SIZE - 1
-					&& !PremiumManager.isGuildPremium(guildMusic.getChannel().getGuild())
-					&& !PremiumManager.isUserPremium(userDj)) {
+					&& !PremiumManager.isPremium(guildMusic.getChannel().getGuild(), userDj)) {
 				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getChannel());
 				break;
 			}

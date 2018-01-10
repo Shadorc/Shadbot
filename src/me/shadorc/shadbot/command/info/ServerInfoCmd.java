@@ -38,7 +38,7 @@ public class ServerInfoCmd extends AbstractCommand {
 
 		String creationDate = String.format("%s%n(%s)",
 				DateUtils.toLocalDate(guild.getCreationDate()).format(dateFormatter),
-				FormatUtils.formatDuration(guild.getCreationDate().toEpochMilli()));
+				FormatUtils.formatDuration(DateUtils.getMillisUntil(guild.getCreationDate())));
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)

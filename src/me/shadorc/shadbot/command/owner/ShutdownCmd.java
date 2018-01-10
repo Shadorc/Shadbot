@@ -1,9 +1,9 @@
 package me.shadorc.shadbot.command.owner;
 
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -20,7 +20,6 @@ import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IGuild;
@@ -28,8 +27,6 @@ import sx.blah.discord.handle.obj.IMessage;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "shutdown" })
 public class ShutdownCmd extends AbstractCommand implements MessageListener {
-
-	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("Shadbot-ShutdownCmd");
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
@@ -58,7 +55,7 @@ public class ShutdownCmd extends AbstractCommand implements MessageListener {
 			}
 		}
 
-		SCHEDULED_EXECUTOR.schedule(() -> System.exit(0), delay, TimeUnit.SECONDS);
+		Shadbot.getScheduler().schedule(() -> System.exit(0), delay, TimeUnit.SECONDS);
 
 		LogUtils.warnf("Shadbot will restart in %d seconds. (Message: %s)", delay, message);
 	}
@@ -80,7 +77,7 @@ public class ShutdownCmd extends AbstractCommand implements MessageListener {
 
 		String content = message.getContent().toLowerCase();
 		if("yes".equalsIgnoreCase(content) || "y".equalsIgnoreCase(content)) {
-			SCHEDULED_EXECUTOR.submit(() -> System.exit(0));
+			Shadbot.getScheduler().submit(() -> System.exit(0));
 			return true;
 		} else if("no".equalsIgnoreCase(content) || "n".equalsIgnoreCase(content)) {
 			MessageManager.removeListener(message.getChannel(), this);

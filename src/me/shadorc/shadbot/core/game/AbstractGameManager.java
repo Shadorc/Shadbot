@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.game;
+package me.shadorc.shadbot.core.game;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;

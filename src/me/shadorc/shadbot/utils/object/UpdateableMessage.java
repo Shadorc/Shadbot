@@ -30,17 +30,4 @@ public class UpdateableMessage {
 		return futureMsg;
 	}
 
-	public RequestFuture<IMessage> send(String message) {
-		if(futureMsg != null) {
-			if(BotUtils.hasPermissions(channel, Permissions.MANAGE_MESSAGES)) {
-				futureMsg.get().delete();
-			} else {
-				LogUtils.infof("{%d} Shadbot wasn't allowed to delete message.", channel.getGuild().getLongID());
-			}
-		}
-
-		futureMsg = BotUtils.sendMessage(message, channel);
-		return futureMsg;
-	}
-
 }

@@ -10,7 +10,7 @@ import sx.blah.discord.handle.obj.IMessage;
 
 public class MessageManager {
 
-	private final static ConcurrentHashMap<Long, List<MessageListener>> CHANNELS_LISTENERS = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<Long, List<MessageListener>> CHANNELS_LISTENERS = new ConcurrentHashMap<>();
 
 	public static void addListener(IChannel channel, MessageListener listener) {
 		CHANNELS_LISTENERS.putIfAbsent(channel.getLongID(), new CopyOnWriteArrayList<>(new ArrayList<>()));

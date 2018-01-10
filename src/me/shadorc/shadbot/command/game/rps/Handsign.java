@@ -7,8 +7,8 @@ public enum Handsign {
 	PAPER("Paper", Emoji.LEAF),
 	SCISSORS("Scissors", Emoji.SCISSORS);
 
-	private String handsign;
-	private Emoji emoji;
+	private final String handsign;
+	private final Emoji emoji;
 
 	Handsign(String handsign, Emoji emoji) {
 		this.handsign = handsign;

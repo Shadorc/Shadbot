@@ -17,7 +17,6 @@ public enum Emoji {
 	STOPWATCH("stopwatch"),
 	GEAR("gear"),
 
-	MONEY_WINGS("money_with_wings"),
 	HOURGLASS("hourglass_flowing_sand"),
 	PURSE("purse"),
 	MONEY_BAG("moneybag"),

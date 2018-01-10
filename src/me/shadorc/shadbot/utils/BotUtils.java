@@ -1,10 +1,13 @@
 package me.shadorc.shadbot.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
@@ -12,10 +15,14 @@ import me.shadorc.shadbot.data.stats.Stats.VariousEnum;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.shard.ShardManager;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IRole;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
+import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
@@ -85,6 +92,20 @@ public class BotUtils {
 		});
 	}
 
+	public static void updatePresence() {
+		Shadbot.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING,
+				String.format("%shelp | %s", Config.DEFAULT_PREFIX, TextUtils.getTip()));
+	}
+
+	public static List<IUser> getUsersFrom(IMessage message) {
+		List<IUser> users = new ArrayList<>(message.getMentions());
+		for(IRole role : message.getRoleMentions()) {
+			users.addAll(message.getGuild().getUsersByRole(role));
+		}
+		users = users.stream().distinct().collect(Collectors.toList());
+		return users;
+	}
+
 	public static boolean isChannelAllowed(IGuild guild, IChannel channel) {
 		DBGuild dbGuild = Database.getDBGuild(guild);
 		List<Long> allowedChannels = dbGuild.getAllowedChannels();
@@ -98,14 +119,12 @@ public class BotUtils {
 	}
 
 	public static boolean isCommandAllowed(IGuild guild, AbstractCommand cmd) {
-		DBGuild dbGuild = Database.getDBGuild(guild);
-		List<String> blacklistedCmd = dbGuild.getBlacklistedCmd();
-
+		List<String> blacklistedCmd = Database.getDBGuild(guild).getBlacklistedCmd();
 		if(blacklistedCmd.isEmpty()) {
 			return true;
 		}
 
-		return cmd.getNames().stream().anyMatch(cmdName -> blacklistedCmd.stream().anyMatch(cmdName::equalsIgnoreCase));
+		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
 	}
 
 	public static boolean hasPermissions(IChannel channel, Permissions... permissions) {
