@@ -26,6 +26,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
@@ -34,9 +35,9 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -44,87 +45,73 @@ import sx.blah.discord.util.EmbedBuilder;
 @Command(category = CommandCategory.IMAGE, names = { "wallpaper" }, alias = "wp")
 public class WallpaperCmd extends AbstractCommand {
 
+	private final static String PURITY = "purity";
+	private final static String CATEGORY = "category";
+	private final static String RATIO = "ratio";
+	private final static String RESOLUTION = "resolution";
+	private final static String KEYWORD = "keyword";
+
 	private Wallhaven wallhaven;
 
-	// TODO: refactor this mess
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(wallhaven == null) {
 			wallhaven = new Wallhaven(APIKeys.get(APIKey.WALLHAVEN_LOGIN), APIKeys.get(APIKey.WALLHAVEN_PASSWORD));
 		}
 
 		Options options = new Options();
-		options.addOption("p", "purity", true, FormatUtils.format(Purity.values(), purity -> purity.toString().toLowerCase(), ", "));
-		options.addOption("c", "category", true, FormatUtils.format(Category.values(), cat -> cat.toString().toLowerCase(), ", "));
-		options.addOption("rat", "ratio", true, "image ratio");
-		options.addOption("res", "resolution", true, "image resolution");
+		options.addOption("p", PURITY, true, FormatUtils.format(Purity.values(), purity -> purity.toString().toLowerCase(), ", "));
+		options.addOption("c", CATEGORY, true, FormatUtils.format(Category.values(), cat -> cat.toString().toLowerCase(), ", "));
 
-		Option keyOpt = new Option("k", "keyword", true, "keyword");
+		Option ratioOpt = new Option("rat", RATIO, true, "image ratio");
+		ratioOpt.setValueSeparator('x');
+		options.addOption(ratioOpt);
+
+		Option resOpt = new Option("res", RESOLUTION, true, "image resolution");
+		resOpt.setValueSeparator('x');
+		options.addOption(resOpt);
+
+		Option keyOpt = new Option("k", KEYWORD, true, KEYWORD);
 		keyOpt.setValueSeparator(',');
 		options.addOption(keyOpt);
 
-		CommandLine cmd;
+		CommandLine cmdLine;
 		try {
 			List<String> args = StringUtils.split(context.getArg());
-			cmd = new DefaultParser().parse(options, args.toArray(new String[args.size()]));
+			cmdLine = new DefaultParser().parse(options, args.toArray(new String[args.size()]));
 		} catch (UnrecognizedOptionException err) {
-			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " %s. Use `%shelp %s` for more information.",
-					err.getMessage(), context.getPrefix(), this.getName()), context.getChannel());
-			return;
+			throw new IllegalCmdArgumentException(String.format("%s. Use `%shelp %s` for more information.",
+					err.getMessage(), context.getPrefix(), this.getName()));
 		} catch (ParseException err) {
 			ExceptionUtils.handle("getting a wallpaper", context, err);
 			return;
 		}
 
+		Purity purity = this.parseEnum(context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
+		if((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !context.getChannel().isNSFW()) {
+			BotUtils.sendMessage(TextUtils.mustBeNSFW(context.getPrefix()), context.getChannel());
+			return;
+		}
+
 		SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
+		queryBuilder.purity(purity);
 
-		String purity = cmd.getOptionValue("purity", Purity.SFW.toString());
-		if(purity != null) {
-			if(!Arrays.stream(Purity.values()).anyMatch(purityValue -> purityValue.toString().equalsIgnoreCase(purity))) {
-				this.sendInvalidArg("purity", context);
-				return;
-			}
-
-			if(purity.matches("nsfw|sketchy") && !context.getChannel().isNSFW()) {
-				BotUtils.sendMessage(TextUtils.mustBeNSFW(context.getPrefix()), context.getChannel());
-				return;
-			}
-
-			queryBuilder.purity(Purity.valueOf(purity.toUpperCase()));
+		if(cmdLine.hasOption(CATEGORY)) {
+			queryBuilder.categories(this.parseEnum(context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
 		}
 
-		String category = cmd.getOptionValue("category");
-		if(category != null) {
-			if(!Arrays.stream(Category.values()).anyMatch(catValue -> catValue.toString().equalsIgnoreCase(category))) {
-				this.sendInvalidArg("category", context);
-				return;
-			}
-			queryBuilder.categories(Category.valueOf(category.toUpperCase()));
-		}
-
-		String ratio = cmd.getOptionValue("ratio");
-		if(ratio != null) {
-			Dimension dim = this.parseDimension(ratio);
-			if(dim == null) {
-				this.sendInvalidArg("ratio", context);
-				return;
-			}
+		if(cmdLine.hasOption(RATIO)) {
+			Dimension dim = this.parseDim(context, RATIO, cmdLine.getOptionValues(RATIO));
 			queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
 		}
 
-		String resolution = cmd.getOptionValue("resolution");
-		if(resolution != null) {
-			Dimension dim = this.parseDimension(resolution);
-			if(dim == null) {
-				this.sendInvalidArg("resolution", context);
-				return;
-			}
+		if(cmdLine.hasOption(RESOLUTION)) {
+			Dimension dim = this.parseDim(context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
 			queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
 		}
 
-		String keyword = cmd.getOptionValue("keyword");
-		if(keyword != null) {
-			queryBuilder.keywords(keyword.split(","));
+		if(cmdLine.hasOption(KEYWORD)) {
+			queryBuilder.keywords(cmdLine.getOptionValues(KEYWORD));
 		}
 
 		List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
@@ -135,7 +122,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 		Wallpaper wallpaper = wallpapers.get(MathUtils.rand(wallpapers.size()));
 
-		String tags = FormatUtils.format(wallpaper.getTags(), tag -> "`" + StringUtils.remove(tag.toString(), "#") + "`", " ");
+		String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Wallpaper")
 				.withUrl(wallpaper.getUrl())
@@ -146,34 +133,42 @@ public class WallpaperCmd extends AbstractCommand {
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 
-	private void sendInvalidArg(String arg, Context context) {
-		BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " Invalid %s. Use `%shelp %s` for more information.",
-				arg, context.getPrefix(), this.getName()), context.getChannel());
-	}
-
-	private Dimension parseDimension(String arg) {
-		List<String> ratioArray = StringUtils.split(arg.contains("x") ? "x" : "\\*");
-		if(ratioArray.size() != 2) {
-			return null;
+	private Dimension parseDim(Context context, String name, String... values) throws IllegalCmdArgumentException {
+		List<String> sizeList = Arrays.asList(values);
+		if(sizeList.size() != 2) {
+			this.throwInvalidArg(context, name);
 		}
-		Integer width = CastUtils.asPositiveInt(ratioArray.get(0));
-		Integer height = CastUtils.asPositiveInt(ratioArray.get(1));
+		Integer width = CastUtils.asPositiveInt(sizeList.get(0));
+		Integer height = CastUtils.asPositiveInt(sizeList.get(1));
 		if(width == null || height == null) {
-			return null;
+			this.throwInvalidArg(context, name);
 		}
 		return new Dimension(width, height);
+	}
+
+	private <T extends Enum<T>> T parseEnum(Context context, Class<T> enumClass, String name, String value) throws IllegalCmdArgumentException {
+		T enumObj = Utils.getValueOrNull(enumClass, value);
+		if(enumObj == null) {
+			this.throwInvalidArg(context, name);
+		}
+		return enumObj;
+	}
+
+	private void throwInvalidArg(Context context, String name) throws IllegalCmdArgumentException {
+		throw new IllegalCmdArgumentException(String.format("`%s` value is not valid. Use `%shelp %s` for more information.",
+				name, context.getPrefix(), this.getName()));
 	}
 
 	@Override
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Search for a wallpaper.")
-				.setUsage("[-p purity] [-c category] [-rat ratio] [-res resolution] [-k keywords]")
-				.addArg("purity", FormatUtils.format(Purity.values(), purity -> purity.toString().toLowerCase(), ", "), true)
-				.addArg("category", FormatUtils.format(Category.values(), cat -> cat.toString().toLowerCase(), ", "), true)
-				.addArg("ratio", "image ratio (e.g. 16x9)", true)
-				.addArg("resolution", "image resolution (e.g. 1920x1080)", true)
-				.addArg("keyword", "keywords (e.g. doom,game)", true)
+				.setUsage(String.format("[-p %s] [-c %s] [-rat %s] [-res %s] [-k %s]", PURITY, CATEGORY, RATIO, RESOLUTION, KEYWORD))
+				.addArg(PURITY, FormatUtils.format(Purity.values(), purity -> purity.toString().toLowerCase(), ", "), true)
+				.addArg(CATEGORY, FormatUtils.format(Category.values(), cat -> cat.toString().toLowerCase(), ", "), true)
+				.addArg(RATIO, "image ratio (e.g. 16x9)", true)
+				.addArg(RESOLUTION, "image resolution (e.g. 1920x1080)", true)
+				.addArg(KEYWORD, "keywords (e.g. doom,game)", true)
 				.setExample(String.format("Search a *SFW* wallpaper in category *Anime*, with a *16x9* ratio :"
 						+ "%n`%s%s -p sfw -c anime -rat 16x9`", prefix, this.getName()))
 				.setSource("https://alpha.wallhaven.cc")

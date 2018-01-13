@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,18 +45,15 @@ public class Rule34Cmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading message...", context.getChannel());
+		LoadingMessage loadingMsg = new LoadingMessage("Loading image...", context.getChannel());
 		loadingMsg.send();
 
 		try {
-			JSONObject mainObj = XML.toJSONObject(NetUtils.getBody("https://rule34.xxx/index.php?"
-					+ "page=dapi"
-					+ "&s=post"
-					+ "&q=index"
-					+ "&tags=" + NetUtils.encode(context.getArg().replace(" ", "_"))));
+			String url = String.format("https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=%s",
+					NetUtils.encode(context.getArg().replace(" ", "_")));
+			JSONObject mainObj = XML.toJSONObject(NetUtils.getBody(url));
 
 			JSONObject postsObj = mainObj.getJSONObject("posts");
-
 			if(postsObj.getInt("count") == 0) {
 				loadingMsg.edit(TextUtils.noResult(context.getArg()));
 				return;
@@ -70,43 +67,29 @@ public class Rule34Cmd extends AbstractCommand {
 				postObj = postsObj.getJSONObject("post");
 			}
 
-			String[] tags = postObj.getString("tags").trim().split(" ");
-
-			if(postObj.getBoolean("has_children") || this.isNotLegal(tags)) {
+			List<String> tags = StringUtils.split(postObj.getString("tags"), " ");
+			if(postObj.getBoolean("has_children") || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
 				loadingMsg.edit(Emoji.WARNING + " Sorry, I don't display images containing children or tagged with `loli` or `shota`.");
 				return;
 			}
 
-			String formattedtags = StringUtils.truncate(FormatUtils.format(tags, tag -> "`" + tag.toString().trim() + "`", " "), MAX_TAGS_LENGTH);
-			String fileUrl = this.getValidURL(postObj.getString("file_url"));
-			String sourceUrl = this.getValidURL(postObj.get("source").toString());
-
+			String formattedtags = StringUtils.truncate(
+					FormatUtils.format(tags, tag -> String.format("`%s`", tag.toString()), " "), MAX_TAGS_LENGTH);
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
-					.withUrl(fileUrl)
+					.withUrl(postObj.getString("file_url"))
 					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
-					.appendField("Resolution", String.format("%dx%d", postObj.getInt("width"), postObj.getInt("height")), false)
-					.appendField("Source", sourceUrl, false)
+					.withDescription(String.format("%n[**Source**](%s)", postObj.get("source").toString()))
+					.appendField("Resolution", String.format("%dx%s", postObj.getInt("width"), postObj.getInt("height")), false)
 					.appendField("Tags", formattedtags, false)
-					.withImage(fileUrl)
+					.withImage(postObj.getString("file_url"))
 					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
 			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting an image from Rule34", context, err);
 		}
-	}
-
-	private String getValidURL(String url) {
-		if(url == null || !url.startsWith("//")) {
-			return url;
-		}
-		return "http:" + url;
-	}
-
-	private boolean isNotLegal(String... tags) {
-		return Arrays.asList(tags).stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"));
 	}
 
 	@Override

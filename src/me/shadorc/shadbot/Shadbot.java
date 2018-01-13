@@ -1,6 +1,7 @@
 package me.shadorc.shadbot;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -30,6 +31,8 @@ public class Shadbot {
 	private static IDiscordClient client;
 
 	public static void main(String[] args) {
+		Locale.setDefault(new Locale("en", "US"));
+
 		try {
 			Properties properties = new Properties();
 			properties.load(Shadbot.class.getClassLoader().getResourceAsStream("project.properties"));

@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -17,6 +16,7 @@ import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
@@ -54,12 +54,10 @@ public class WikiCmd extends AbstractCommand {
 
 			String extract = StringUtils.truncate(resultObj.getString("extract"), EmbedBuilder.DESCRIPTION_CONTENT_LIMIT);
 
-			EmbedBuilder embed = new EmbedBuilder()
-					.withAuthorName("Wikipedia")
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
+					.withAuthorName(String.format("Wikipedia: %s", resultObj.getString("title")))
 					.withAuthorIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mohapedia.png/842px-Mohapedia.png")
-					.withUrl("https://fr.wikipedia.org/wiki/" + resultObj.getString("title").replace(" ", "_"))
-					.withColor(Config.BOT_COLOR)
-					.withTitle(resultObj.getString("title"))
+					.withUrl(String.format("https://en.wikipedia.org/wiki/%s", resultObj.getString("title").replace(" ", "_")))
 					.appendDescription(extract);
 			BotUtils.sendMessage(embed.build(), context.getChannel());
 

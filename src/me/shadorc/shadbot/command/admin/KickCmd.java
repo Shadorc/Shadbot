@@ -76,10 +76,9 @@ public class KickCmd extends AbstractCommand {
 			context.getGuild().kickUser(user, reason);
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) %s %s been kicked (Reason: %s)",
+		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) %s got kicked (Reason: %s)",
 				context.getAuthorName(),
 				FormatUtils.format(mentionedUsers, IUser::getName, ", "),
-				mentionedUsers.size() > 1 ? "have" : "has",
 				reason), context.getChannel());
 	}
 

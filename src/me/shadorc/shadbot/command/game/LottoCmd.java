@@ -64,7 +64,8 @@ public class LottoCmd extends AbstractCommand {
 
 		Integer num = CastUtils.asIntBetween(context.getArg(), MIN_NUM, MAX_NUM);
 		if(num == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid number, must be between %d and %d.", MIN_NUM, MAX_NUM));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number, it must be between %d and %d.",
+					context.getArg(), MIN_NUM, MAX_NUM));
 		}
 
 		dbUser.addCoins(-PAID_COST);
@@ -82,7 +83,7 @@ public class LottoCmd extends AbstractCommand {
 				.withAuthorName("Lotto")
 				.withThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 				.withDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
-						FormatUtils.formatDuration(LottoCmd.getDelay()),
+						FormatUtils.formatLongDuration(LottoCmd.getDelay()),
 						context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
 				.appendField("Number of participants", Integer.toString(players.size()), false)
 				.appendField("Prize pool", FormatUtils.formatCoins(LottoManager.getPool()), false);

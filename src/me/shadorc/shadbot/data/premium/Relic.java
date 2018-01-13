@@ -33,7 +33,6 @@ public class Relic {
 
 	public void activate() {
 		this.activationTime = System.currentTimeMillis();
-		PremiumManager.save(this);
 	}
 
 	public String getID() {
@@ -62,7 +61,6 @@ public class Relic {
 
 	public void setGuildID(long guildID) {
 		this.guildID = guildID;
-		PremiumManager.save(this);
 	}
 
 	public JSONObject toJSON() {

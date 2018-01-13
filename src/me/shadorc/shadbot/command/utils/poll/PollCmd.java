@@ -39,7 +39,7 @@ public class PollCmd extends AbstractCommand {
 
 		if(context.getArg().matches("stop|cancel")
 				&& pollManager != null
-				&& (context.getAuthor().equals(pollManager.getAuthor()) || context.getPermission().isSuperior(CommandPermission.USER))) {
+				&& (context.getAuthor().equals(pollManager.getAuthor()) || context.getAuthorPermission().isSuperior(CommandPermission.USER))) {
 			pollManager.stop();
 			return;
 		}
@@ -47,7 +47,8 @@ public class PollCmd extends AbstractCommand {
 		if(pollManager != null) {
 			Integer num = CastUtils.asIntBetween(context.getArg(), 1, pollManager.getChoicesCount());
 			if(num == null) {
-				throw new IllegalCmdArgumentException(String.format("Invalid number, must be between 1 and %d.", pollManager.getChoicesCount()));
+				throw new IllegalCmdArgumentException(String.format("``%s` is not a valid number, must be between 1 and %d.",
+						context.getArg(), pollManager.getChoicesCount()));
 			}
 			pollManager.vote(context.getAuthor(), num);
 			return;
@@ -68,8 +69,8 @@ public class PollCmd extends AbstractCommand {
 
 		Integer duration = CastUtils.asIntBetween(splitArgs.get(0), MIN_DURATION, MAX_DURATION);
 		if(duration == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid duration, must be between %ds and %ds.",
-					MIN_DURATION, MAX_DURATION));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
+					splitArgs.get(0), MIN_DURATION, MAX_DURATION));
 		}
 
 		List<String> substrings = StringUtils.getQuotedWords(splitArgs.get(1));

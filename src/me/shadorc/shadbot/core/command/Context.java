@@ -83,7 +83,7 @@ public class Context {
 		return this.getAuthor().getName();
 	}
 
-	public CommandPermission getPermission() {
+	public CommandPermission getAuthorPermission() {
 		if(this.getAuthor().equals(this.getClient().getApplicationOwner())) {
 			return CommandPermission.OWNER;
 		} else if(this.getGuild() == null) {

@@ -43,7 +43,7 @@ public class DiceCmd extends AbstractCommand {
 		String numStr = splitArgs.get(splitArgs.size() == 1 ? 0 : 1);
 		Integer num = CastUtils.asIntBetween(numStr, 1, 6);
 		if(num == null) {
-			throw new IllegalCmdArgumentException("Invalid number, must be between 1 and 6.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number, must be between 1 and 6.", numStr));
 		}
 
 		DiceManager diceManager = MANAGERS.get(context.getChannel().getLongID());

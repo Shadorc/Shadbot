@@ -17,7 +17,7 @@ public class PingCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) {
-		BotUtils.sendMessage(String.format(Emoji.GEAR + " Ping: %d ms",
+		BotUtils.sendMessage(String.format(Emoji.GEAR + " Ping: %dms",
 				DateUtils.getMillisUntil(context.getMessage().getCreationDate())), context.getChannel());
 	}
 

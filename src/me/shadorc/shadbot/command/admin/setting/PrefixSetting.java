@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.admin.setting;
 
-import me.shadorc.discordbot.utils.Utils;
 import me.shadorc.shadbot.command.admin.setting.core.AbstractSetting;
 import me.shadorc.shadbot.command.admin.setting.core.Setting;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
@@ -9,6 +8,7 @@ import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -29,7 +29,7 @@ public class PrefixSetting extends AbstractSetting {
 
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
-		return Utils.getDefaultEmbed()
+		return EmbedUtils.getDefaultEmbed()
 				.appendField("Usage", String.format("`%s%s <prefix>`", prefix, this.getCmdName()), false)
 				.appendField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
 				.appendField("Example", String.format("`%s%s !`", prefix, this.getCmdName()), false);

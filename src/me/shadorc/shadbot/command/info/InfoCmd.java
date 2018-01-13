@@ -12,6 +12,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DateUtils;
+import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.Discord4J;
@@ -36,9 +37,9 @@ public class InfoCmd extends AbstractCommand {
 
 		String info = new String("```prolog"
 				+ String.format("%n-= Performance Info =-")
-				+ String.format("%nMemory: %d / %d MB", usedMemory, maxMemory)
+				+ String.format("%nMemory: %s/%s MB", FormatUtils.formatNum(usedMemory), FormatUtils.formatNum(maxMemory))
 				+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
-				+ String.format("%nThreads Count: %d", Thread.activeCount())
+				+ String.format("%nThreads Count: %s", FormatUtils.formatNum(Thread.activeCount()))
 				+ String.format("%n%n-= APIs Info =-")
 				+ String.format("%nJava Version: %s", System.getProperty("java.version"))
 				+ String.format("%n%s Version: %s", Discord4J.NAME, Discord4J.VERSION)
@@ -47,10 +48,10 @@ public class InfoCmd extends AbstractCommand {
 				+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true))
 				+ String.format("%nDeveloper: %s#%s", owner.getName(), owner.getDiscriminator())
 				+ String.format("%nShadbot Version: %s", Shadbot.getVersion())
-				+ String.format("%nShard: %d / %d", context.getShadbotShard().getID() + 1, context.getClient().getShardCount())
-				+ String.format("%nServers: %d", context.getClient().getGuilds().size())
+				+ String.format("%nShard: %d/%d", context.getShadbotShard().getID() + 1, context.getClient().getShardCount())
+				+ String.format("%nServers: %s", FormatUtils.formatNum(context.getClient().getGuilds().size()))
 				+ String.format("%nVoice Channels: %d", context.getClient().getConnectedVoiceChannels().size())
-				+ String.format("%nUsers: %d", context.getClient().getUsers().size())
+				+ String.format("%nUsers: %s", FormatUtils.formatNum(context.getClient().getUsers().size()))
 				+ String.format("%nPing: %dms", ping)
 				+ "```");
 

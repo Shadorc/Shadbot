@@ -19,6 +19,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
+import sx.blah.discord.util.MessageBuilder;
 
 public class CommandManager {
 
@@ -69,7 +70,7 @@ public class CommandManager {
 			return;
 		}
 
-		CommandPermission authorPermission = context.getPermission();
+		CommandPermission authorPermission = context.getAuthorPermission();
 		if(cmd.getPermission().isSuperior(authorPermission)) {
 			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel());
 			return;
@@ -87,7 +88,10 @@ public class CommandManager {
 		} catch (IllegalCmdArgumentException err) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 		} catch (MissingArgumentException err) {
-			BotUtils.sendMessage(cmd.getHelp(context.getPrefix()), context.getChannel());
+			BotUtils.sendMessage(new MessageBuilder(context.getClient())
+					.withChannel(context.getChannel())
+					.withContent(Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.")
+					.withEmbed(cmd.getHelp(context.getPrefix())));
 		}
 	}
 

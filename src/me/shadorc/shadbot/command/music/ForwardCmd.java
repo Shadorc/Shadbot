@@ -38,7 +38,7 @@ public class ForwardCmd extends AbstractCommand {
 
 		Integer num = CastUtils.asPositiveInt(context.getArg());
 		if(num == null) {
-			throw new IllegalCmdArgumentException("Invalid number.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number.", context.getArg()));
 		}
 
 		long newPosition = guildMusic.getScheduler().changePosition(TimeUnit.SECONDS.toMillis(num));

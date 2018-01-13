@@ -41,8 +41,8 @@ public class RouletteCmd extends AbstractCommand {
 		String place = splitArgs.get(1).toLowerCase();
 		// Match [1-36], red, black, odd, even, high or low
 		if(!place.matches("^([1-9]|1[0-9]|2[0-9]|3[0-6])$|red|black|odd|even|high|low")) {
-			throw new IllegalCmdArgumentException("Invalid place, must be a number between "
-					+ "**1 and 36**, **red**, **black**, **odd**, **even**, **low** or **high**.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid place, must be a number between "
+					+ "**1 and 36**, **red**, **black**, **odd**, **even**, **low** or **high**.", place));
 		}
 
 		RouletteManager rouletteManager = MANAGERS.get(context.getChannel().getLongID());

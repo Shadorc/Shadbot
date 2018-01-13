@@ -77,11 +77,8 @@ public class SoftBanCmd extends AbstractCommand {
 			context.getGuild().pardonUser(user.getLongID());
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) %s %s been softbanned (Reason: %s)",
-				context.getAuthorName(),
-				FormatUtils.format(mentionedUsers, IUser::getName, ", "),
-				mentionedUsers.size() > 1 ? "have" : "has",
-				reason), context.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) %s got softbanned (Reason: %s)",
+				context.getAuthorName(), FormatUtils.format(mentionedUsers, IUser::getName, ", "), reason), context.getChannel());
 	}
 
 	@Override

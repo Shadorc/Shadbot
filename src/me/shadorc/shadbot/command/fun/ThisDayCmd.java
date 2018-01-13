@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.command.fun;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -37,18 +37,17 @@ public class ThisDayCmd extends AbstractCommand {
 
 			String date = doc.getElementsByClass("date-large").first().attr("datetime");
 
-			Elements eventsEl = doc.getElementsByClass("event-list event-list--with-advert").first().getElementsByClass("event-list__item");
-			StringBuilder strBuilder = new StringBuilder();
-			for(Element eventEl : eventsEl) {
-				strBuilder.append(Jsoup.parse(eventEl.html().replaceAll("<b>|</b>", "**")).text() + "\n\n");
-			}
+			Elements eventsElmt = doc.getElementsByClass("event-list event-list--with-advert").first().getElementsByClass("event-list__item");
 
-			String result = StringUtils.truncate(strBuilder.toString(), EmbedBuilder.DESCRIPTION_CONTENT_LIMIT);
+			String events = eventsElmt.stream()
+					.map(elmt -> Jsoup.parse(elmt.html().replaceAll("<b>|</b>", "**")).text())
+					.collect(Collectors.joining("\n\n"));
+
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName(String.format("On This Day (%s)", date))
 					.withUrl(HOME_URL)
 					.withThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-					.appendDescription(result);
+					.appendDescription(StringUtils.truncate(events, EmbedBuilder.DESCRIPTION_CONTENT_LIMIT));
 
 			loadingMsg.edit(embed.build());
 

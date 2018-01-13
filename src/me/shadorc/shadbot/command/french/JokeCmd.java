@@ -1,11 +1,11 @@
 package me.shadorc.shadbot.command.french;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -35,13 +35,14 @@ public class JokeCmd extends AbstractCommand {
 		try {
 			String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d", MathUtils.rand(1, 5));
 			Document doc = NetUtils.getDoc(url);
-			Elements jokesElements = doc.getElementsByClass("texte ");
 
-			String joke;
-			do {
-				Element element = jokesElements.get(MathUtils.rand(jokesElements.size()));
-				joke = FormatUtils.format(element.html().split("<br>"), line -> Jsoup.parse(line.toString()).text().trim(), "\n");
-			} while(joke.length() > 1000);
+			List<String> jokes = doc.getElementsByClass("texte ").stream()
+					.map(elmt -> elmt.html())
+					.filter(elmt -> elmt.length() < 1000)
+					.collect(Collectors.toList());
+
+			String jokeHtml = jokes.get(MathUtils.rand(jokes.size()));
+			String joke = FormatUtils.format(jokeHtml.split("<br>"), line -> Jsoup.parse(line).text().trim(), "\n");
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("Blague")

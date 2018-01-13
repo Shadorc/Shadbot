@@ -76,11 +76,8 @@ public class BanCmd extends AbstractCommand {
 			context.getGuild().banUser(user, reason, 7);
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) %s %s been banned (Reason: %s)",
-				context.getAuthorName(),
-				FormatUtils.format(mentionedUsers, IUser::getName, ", "),
-				mentionedUsers.size() > 1 ? "have" : "has",
-				reason), context.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) %s got banned (Reason: %s)",
+				context.getAuthorName(), FormatUtils.format(mentionedUsers, IUser::getName, ", "), reason), context.getChannel());
 	}
 
 	@Override

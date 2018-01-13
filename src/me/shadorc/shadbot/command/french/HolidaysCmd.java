@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.command.french;
 
-import java.util.Arrays;
-import java.util.List;
-
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -15,6 +12,7 @@ import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TwitterUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -24,7 +22,9 @@ import twitter4j.TwitterException;
 @Command(category = CommandCategory.FRENCH, names = { "vacs", "vacances" })
 public class HolidaysCmd extends AbstractCommand {
 
-	private static final List<String> ZONES = Arrays.asList("A", "B", "C");
+	private enum Zone {
+		A, B, C;
+	}
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
@@ -32,9 +32,10 @@ public class HolidaysCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		String zone = context.getArg().toUpperCase();
-		if(!ZONES.contains(zone)) {
-			throw new IllegalCmdArgumentException("Invalid zone. Options: " + FormatUtils.format(ZONES, Object::toString, ", "));
+		Zone zone = Utils.getValueOrNull(Zone.class, context.getArg());
+		if(zone == null) {
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid zone. Options: %s",
+					context.getArg(), FormatUtils.format(Zone.values(), Object::toString, ", ")));
 		}
 
 		try {
@@ -49,7 +50,7 @@ public class HolidaysCmd extends AbstractCommand {
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show the number of remaining days before the next school holidays for the indicated zone.")
-				.addArg(ZONES, false)
+				.addArg(Zone.values(), false)
 				.build();
 	}
 

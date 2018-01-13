@@ -24,7 +24,8 @@ public class VolumeSetting extends AbstractSetting {
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
 		Integer volume = CastUtils.asIntBetween(arg, MIN_VOLUME, MAX_VOLUME);
 		if(volume == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid number, must be between %d and %d.", MIN_VOLUME, MAX_VOLUME));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number, must be between %d and %d.",
+					arg, MIN_VOLUME, MAX_VOLUME));
 		}
 
 		Database.getDBGuild(context.getGuild()).setSetting(this.getSetting(), volume);

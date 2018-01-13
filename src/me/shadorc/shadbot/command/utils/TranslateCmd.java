@@ -1,13 +1,14 @@
 package me.shadorc.shadbot.command.utils;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -28,7 +29,7 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 @Command(category = CommandCategory.UTILS, names = { "translate", "translation", "trans" })
 public class TranslateCmd extends AbstractCommand {
 
-	private static final Map<String, String> LANG_ISO_MAP = new HashMap<>();
+	private static final BiMap<String, String> LANG_ISO_MAP = HashBiMap.create();
 
 	static {
 		for(String iso : Locale.getISOLanguages()) {
@@ -51,25 +52,25 @@ public class TranslateCmd extends AbstractCommand {
 		String langTo = this.toISO(args.get(1));
 
 		if(langFrom == null || langTo == null) {
-			throw new IllegalCmdArgumentException("One of the specified language doesn't exist."
-					+ " Use `" + context.getPrefix() + "help " + this.getName() + "` to see a complete list of supported languages.");
+			throw new IllegalCmdArgumentException(String.format("One of the specified language doesn't exist. "
+					+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 		}
 
 		String sourceText = args.get(2);
 		try {
 			String url = String.format("https://translate.googleapis.com/translate_a/single?client=gtx&sl=%s&tl=%s&dt=t&q=%s",
-					NetUtils.encode(langFrom),
-					NetUtils.encode(langTo),
-					NetUtils.encode(sourceText));
+					NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
 			JSONArray result = new JSONArray(NetUtils.getBody(url));
 
 			if(!(result.get(0) instanceof JSONArray)) {
-				throw new IllegalCmdArgumentException("One of the specified language isn't supported. "
-						+ String.format("Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
+				throw new IllegalCmdArgumentException(String.format("One of the specified language isn't supported. "
+						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
 			String translatedText = ((JSONArray) ((JSONArray) result.get(0)).get(0)).get(0).toString();
-			BotUtils.sendMessage(Emoji.MAP + " Translation: " + translatedText, context.getChannel());
+			BotUtils.sendMessage(Emoji.MAP + String.format(" **%s** (%s) <=> **%s** (%s)",
+					sourceText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)),
+					translatedText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo))), context.getChannel());
 
 		} catch (JSONException | IOException err) {
 			ExceptionUtils.handle("getting translation", context, err);

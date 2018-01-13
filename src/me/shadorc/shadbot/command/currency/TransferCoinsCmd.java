@@ -44,7 +44,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 
 		Integer coins = CastUtils.asPositiveInt(splitCmd.get(0));
 		if(coins == null) {
-			throw new IllegalCmdArgumentException("Invalid amount.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount.", splitCmd.get(0)));
 		}
 
 		if(Database.getDBUser(context.getGuild(), senderUser).getCoins() < coins) {
@@ -53,8 +53,8 @@ public class TransferCoinsCmd extends AbstractCommand {
 		}
 
 		if(Database.getDBUser(context.getGuild(), receiverUser).getCoins() + coins >= Config.MAX_COINS) {
-			BotUtils.sendMessage(Emoji.BANK + " This transfer cannot be done because " + receiverUser.getName()
-					+ " would exceed the maximum coins cap.", context.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.BANK + " This transfer cannot be done because %s would exceed the maximum coins cap.",
+					receiverUser.getName()), context.getChannel());
 			return;
 		}
 
@@ -62,10 +62,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 		Database.getDBUser(context.getGuild(), receiverUser).addCoins(coins);
 
 		BotUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
-				senderUser.mention(),
-				FormatUtils.formatCoins(coins),
-				receiverUser.mention()),
-				context.getChannel());
+				senderUser.mention(), FormatUtils.formatCoins(coins), receiverUser.mention()), context.getChannel());
 	}
 
 	@Override

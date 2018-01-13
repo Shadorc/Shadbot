@@ -136,7 +136,4 @@ public class PremiumManager {
 		return relic.getType().equals(type) && relic.getActivationTime() != 0 && !relic.isExpired();
 	}
 
-	public static void save(Relic relic) {
-		// TODO
-	}
 }

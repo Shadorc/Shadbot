@@ -34,7 +34,7 @@ public class SendMessageCmd extends AbstractCommand {
 
 		Integer userID = CastUtils.asPositiveInt(splitArgs.get(0));
 		if(userID == null) {
-			throw new IllegalCmdArgumentException("Invalid user ID.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", splitArgs.get(0)));
 		}
 
 		IUser user = Shadbot.getClient().getUserByID(userID);

@@ -1,9 +1,10 @@
 package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,6 +19,7 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
+import me.shadorc.shadbot.utils.JSONUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -46,9 +48,7 @@ public class ImageCmd extends AbstractCommand {
 		loadingMsg.send();
 
 		try {
-			String encodedSearch = NetUtils.encode(context.getArg());
-			JSONObject resultObj = this.getRandomPopularResult(encodedSearch);
-
+			JSONObject resultObj = this.getRandomPopularResult(NetUtils.encode(context.getArg()));
 			if(resultObj == null) {
 				BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
 				return;
@@ -85,20 +85,15 @@ public class ImageCmd extends AbstractCommand {
 					encodedSearch, MathUtils.rand(150), this.accessToken);
 
 			JSONObject mainObj = new JSONObject(NetUtils.getBody(url));
-			JSONArray resultsArray = mainObj.getJSONArray("results");
 
-			JSONObject resultObj;
-			do {
-				if(resultsArray.length() == 0) {
-					return null;
-				}
+			List<JSONObject> results = JSONUtils.toList(mainObj.getJSONArray("results"), JSONObject.class).stream()
+					.filter(obj -> obj.has("content")).collect(Collectors.toList());
 
-				int index = MathUtils.rand(resultsArray.length());
-				resultObj = resultsArray.getJSONObject(index);
-				resultsArray.remove(index);
-			} while(!resultObj.has("content"));
+			if(results.isEmpty()) {
+				return null;
+			}
 
-			return resultObj;
+			return results.get(MathUtils.rand(results.size()));
 
 		} catch (JSONException | IOException err) {
 			return null;

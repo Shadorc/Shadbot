@@ -15,7 +15,7 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
-import me.shadorc.shadbot.utils.MathUtils;
+import me.shadorc.shadbot.utils.JSONUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -34,15 +34,11 @@ public class DtcCmd extends AbstractCommand {
 
 		try {
 			String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", APIKeys.get(APIKey.DTC_API_KEY));
-			JSONArray arrayObj = new JSONArray(NetUtils.getBody(url));
 
-			JSONObject quoteObj;
-			String content;
-			do {
-				quoteObj = arrayObj.getJSONObject(MathUtils.rand(arrayObj.length()));
-				content = quoteObj.getString("content");
-				content = content.replace("*", "\\*");
-			} while(content.length() > 1000);
+			JSONObject quoteObj = JSONUtils.toList(new JSONArray(NetUtils.getBody(url)), JSONObject.class).stream()
+					.filter(obj -> obj.getString("content").length() < 1000).findAny().get();
+
+			String content = quoteObj.getString("content").replace("*", "\\*");
 
 			StringBuilder strBuilder = new StringBuilder();
 			for(String line : content.split("\n")) {

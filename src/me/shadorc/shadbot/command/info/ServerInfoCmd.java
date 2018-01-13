@@ -38,23 +38,23 @@ public class ServerInfoCmd extends AbstractCommand {
 
 		String creationDate = String.format("%s%n(%s)",
 				DateUtils.toLocalDate(guild.getCreationDate()).format(dateFormatter),
-				FormatUtils.formatDuration(DateUtils.getMillisUntil(guild.getCreationDate())));
+				FormatUtils.formatLongDuration(guild.getCreationDate().toEpochMilli()));
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)
 				.withAuthorName(String.format("Info about \"%s\"", guild.getName()))
 				.withThumbnail(guild.getIconURL())
 				.appendField("Owner", guild.getOwner().getName(), true)
-				.appendField("Region", guild.getRegion().getName(), true)
+				.appendField("Server ID", Long.toString(guild.getLongID()), true)
 				.appendField("Creation date", creationDate, true)
+				.appendField("Region", guild.getRegion().getName(), true)
+				.appendField("Channels", String.format("**Voice:** %d", guild.getVoiceChannels().size())
+						+ String.format("%n**Text:** %d", guild.getChannels().size()), true)
 				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
-				.appendField("Text channels", Integer.toString(guild.getChannels().size()), true)
-				.appendField("Voice channels", Integer.toString(guild.getVoiceChannels().size()), true)
-				.appendField("Settings", "**Prefix:** " + context.getPrefix()
-						+ "\n**Default volume:** " + dbGuild.getDefaultVol() + "%"
-						+ "\n**Allowed channels:** " + allowedChannelsStr
-						+ "\n**Blacklisted commands:** " + blacklistedCmdStr, true)
-				.appendField("Server ID", Long.toString(guild.getLongID()), true);
+				.appendField("Settings", String.format("**Prefix:** %s", context.getPrefix())
+						+ String.format("%n**Default volume:** %d%%", dbGuild.getDefaultVol())
+						+ String.format("%n**Allowed channels:** %s", allowedChannelsStr)
+						+ String.format("%n**Blacklisted commands:** %s", blacklistedCmdStr), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 

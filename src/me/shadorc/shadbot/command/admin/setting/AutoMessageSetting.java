@@ -39,14 +39,14 @@ public class AutoMessageSetting extends AbstractSetting {
 
 		Action action = Utils.getValueOrNull(Action.class, splitArgs.get(0));
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid action. Use `%s%s help` to see help.",
-					context.getPrefix(), this.getCmdName()));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. Options: %s",
+					splitArgs.get(0), FormatUtils.format(Action.values(), value -> value.toString().toLowerCase(), ", ")));
 		}
 
 		Type type = Utils.getValueOrNull(Type.class, splitArgs.get(1));
 		if(type == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid type. Use `%s%s help` to see help.",
-					context.getPrefix(), this.getCmdName()));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid type. Options: %s",
+					splitArgs.get(1), FormatUtils.format(Type.values(), value -> value.toString().toLowerCase(), ", ")));
 		}
 
 		switch (type) {

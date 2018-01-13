@@ -33,8 +33,8 @@ public class NSFWSetting extends AbstractSetting {
 
 		Action action = Utils.getValueOrNull(Action.class, arg);
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid action. Use `%s%s help` to see help.",
-					context.getPrefix(), this.getCmdName()));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. Options: %s",
+					arg, FormatUtils.format(Action.values(), value -> value.toString().toLowerCase(), ", ")));
 		}
 
 		boolean isNSFW = false;

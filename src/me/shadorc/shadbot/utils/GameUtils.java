@@ -11,7 +11,7 @@ public class GameUtils {
 	public static Integer checkAndGetBet(IChannel channel, IUser user, String betStr, int maxValue) throws IllegalCmdArgumentException {
 		Integer bet = CastUtils.asPositiveInt(betStr);
 		if(bet == null) {
-			throw new IllegalCmdArgumentException("Invalid amount.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount.", betStr));
 		}
 
 		if(Database.getDBUser(channel.getGuild(), user).getCoins() < bet) {

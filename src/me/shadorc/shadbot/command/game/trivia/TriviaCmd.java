@@ -57,8 +57,8 @@ public class TriviaCmd extends AbstractCommand {
 		Integer categoryID = CastUtils.asPositiveInt(context.getArg());
 
 		if(context.hasArg() && (categoryID == null || !categories.containsKey(categoryID))) {
-			throw new IllegalCmdArgumentException(String.format("Invalid ID, use `%s%s categories` to see the complete list of categories.",
-					context.getPrefix(), this.getName()));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list "
+					+ "of categories.", context.getArg(), context.getPrefix(), this.getName()));
 		}
 
 		TriviaManager triviaManager = MANAGERS.get(context.getChannel().getLongID());

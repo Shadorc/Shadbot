@@ -42,8 +42,8 @@ public class ChannelSetting extends AbstractSetting {
 
 		Action action = Utils.getValueOrNull(Action.class, splitArgs.get(0));
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid action. Use `%s%s help` to see help.",
-					context.getPrefix(), this.getCmdName()));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. Options: %s",
+					splitArgs.get(0), FormatUtils.format(Action.values(), value -> value.toString().toLowerCase(), ", ")));
 		}
 
 		List<Long> allowedChannelsList = Database.getDBGuild(context.getGuild()).getAllowedChannels();
@@ -59,13 +59,12 @@ public class ChannelSetting extends AbstractSetting {
 					.filter(channelID -> !allowedChannelsList.contains(channelID))
 					.collect(Collectors.toList()));
 
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s has been added to allowed channels.",
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
 					FormatUtils.format(mentionedChannels, IChannel::mention, ", ")), context.getChannel());
 
 		} else {
 			allowedChannelsList.removeAll(mentionedChannels.stream().map(IChannel::getLongID).collect(Collectors.toList()));
-			// TODO: improve has/have
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s has been removed from allowed channels.",
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
 					FormatUtils.format(mentionedChannels, IChannel::mention, ", ")), context.getChannel());
 		}
 

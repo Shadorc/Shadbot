@@ -36,7 +36,7 @@ public class DatabaseCmd extends AbstractCommand {
 
 		Long guildID = CastUtils.asPositiveLong(splitArgs.get(0));
 		if(guildID == null) {
-			throw new IllegalCmdArgumentException(String.format("%s is not a valid guild ID.", splitArgs.get(0)));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid guild ID.", splitArgs.get(0)));
 		}
 
 		IGuild guild = context.getClient().getGuildByID(guildID);
@@ -52,7 +52,7 @@ public class DatabaseCmd extends AbstractCommand {
 		} else if(splitArgs.size() == 2) {
 			Long userID = CastUtils.asPositiveLong(splitArgs.get(1));
 			if(userID == null) {
-				throw new IllegalCmdArgumentException(String.format("%s is not a valid user ID.", splitArgs.get(0)));
+				throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", splitArgs.get(0)));
 			}
 
 			DBUser dbUser = new DBUser(guild, userID);

@@ -30,8 +30,7 @@ public class LeaderboardCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		Map<String, Integer> unsortedUsersMap = new HashMap<>();
 
-		List<DBUser> users = Database.getDBGuild(context.getGuild()).getUsers();
-		for(DBUser dbUser : users) {
+		for(DBUser dbUser : Database.getDBGuild(context.getGuild()).getUsers()) {
 			int userCoin = dbUser.getCoins();
 			if(userCoin > 0) {
 				IUser user = context.getGuild().getUserByID(dbUser.getUserID());
@@ -41,11 +40,12 @@ public class LeaderboardCmd extends AbstractCommand {
 			}
 		}
 
-		final Map<String, Integer> sortedUsersMap = Utils.sortByValue(unsortedUsersMap);
+		Map<String, Integer> sortedUsersMap = Utils.sortByValue(unsortedUsersMap);
 		List<String> usersList = new ArrayList<>(unsortedUsersMap.keySet());
 
-		String leaderboard = FormatUtils.numberedList(10, unsortedUsersMap.size(), count -> String.format("%d. **%s** - %s",
-				count, usersList.get(count - 1), FormatUtils.formatCoins(sortedUsersMap.get(usersList.get(count - 1)))));
+		String leaderboard = FormatUtils.numberedList(10, unsortedUsersMap.size(),
+				count -> String.format("%d. **%s** - %s",
+						count, usersList.get(count - 1), FormatUtils.formatCoins(sortedUsersMap.get(usersList.get(count - 1)))));
 
 		if(leaderboard.isEmpty()) {
 			leaderboard = "\nEveryone is poor here.";

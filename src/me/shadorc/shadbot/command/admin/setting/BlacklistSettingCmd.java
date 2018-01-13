@@ -37,8 +37,8 @@ public class BlacklistSettingCmd extends AbstractSetting {
 
 		Action action = Utils.getValueOrNull(Action.class, splitArgs.get(0));
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid action. Use `%s%s help` to see help.",
-					context.getPrefix(), this.getCmdName()));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. Options: %s",
+					splitArgs.get(0), FormatUtils.format(Action.values(), value -> value.toString().toLowerCase(), ", ")));
 		}
 
 		List<String> blacklist = Database.getDBGuild(context.getGuild()).getBlacklistedCmd();
@@ -50,11 +50,11 @@ public class BlacklistSettingCmd extends AbstractSetting {
 			}
 
 			blacklist.addAll(commands);
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " `%s` has been added to the blacklist.",
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " `%s` added to the blacklist.",
 					FormatUtils.format(commands, Object::toString, ", ")), context.getChannel());
 		} else if(Action.REMOVE.equals(action)) {
 			blacklist.removeAll(commands);
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " `%s` has been removed from the blacklist.",
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " `%s` removed from the blacklist.",
 					FormatUtils.format(commands, Object::toString, ", ")), context.getChannel());
 		}
 

@@ -54,8 +54,9 @@ public class PruneCmd extends AbstractCommand {
 
 		Integer count = CastUtils.asPositiveInt(argCleaned);
 		if(!argCleaned.isEmpty() && count == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid number. If you want to specify a word or a sentence, "
-					+ "please include them in quotation marks. See `%shelp %s` for more information.", context.getPrefix(), this.getName()));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
+					+ "please include them in quotation marks. See `%shelp %s` for more information.",
+					argCleaned, context.getPrefix(), this.getName()));
 		}
 		count = count == null ? 100 : Math.min(100, count);
 

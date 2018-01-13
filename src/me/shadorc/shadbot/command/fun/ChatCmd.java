@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
+import org.jsoup.nodes.Document;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -64,10 +65,9 @@ public class ChatCmd extends AbstractCommand {
 
 	private String talk(IChannel channel, String botID, String input) throws UnsupportedEncodingException, IOException {
 		String url = String.format("https://www.pandorabots.com/pandora/talk-xml?botid=%s&input=%s&custid=%s",
-				botID,
-				NetUtils.encode(input),
-				CHANNELS_CUSTID.getOrDefault(channel.getLongID(), ""));
-		JSONObject mainObj = XML.toJSONObject(NetUtils.getDoc(url).toString());
+				botID, NetUtils.encode(input), CHANNELS_CUSTID.getOrDefault(channel.getLongID(), ""));
+		Document doc = NetUtils.getDoc(url);
+		JSONObject mainObj = XML.toJSONObject(doc.text());
 		JSONObject resultObj = mainObj.getJSONObject("result");
 		CHANNELS_CUSTID.put(channel.getLongID(), resultObj.getString("custid"));
 		return StringUtils.normalizeSpace(resultObj.getString("that").replace("<br>", "\n"));

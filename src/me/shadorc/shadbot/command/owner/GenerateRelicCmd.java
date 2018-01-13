@@ -29,8 +29,8 @@ public class GenerateRelicCmd extends AbstractCommand {
 
 		RelicType type = Utils.getValueOrNull(RelicType.class, context.getArg());
 		if(type == null) {
-			throw new IllegalCmdArgumentException(String.format("Invalid type. Options: %s",
-					FormatUtils.format(RelicType.values(), relic -> relic.toString().toLowerCase(), ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s`in not a valid type. Options: %s",
+					context.getArg(), FormatUtils.format(RelicType.values(), relic -> relic.toString().toLowerCase(), ", ")));
 		}
 
 		Relic relic = PremiumManager.generateRelic(type);

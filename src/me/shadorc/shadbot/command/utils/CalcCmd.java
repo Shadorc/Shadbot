@@ -13,6 +13,7 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited
@@ -28,9 +29,10 @@ public class CalcCmd extends AbstractCommand {
 		try {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			String expression = context.getArg();
-			BotUtils.sendMessage(String.format("%s = %s", expression.replace("*", "\\*"), engine.eval(expression)), context.getChannel());
+			BotUtils.sendMessage(Emoji.TRIANGULAR_RULER + String.format(" %s = %s",
+					expression.replace("*", "\\*"), engine.eval(expression)), context.getChannel());
 		} catch (ScriptException err) {
-			throw new IllegalCmdArgumentException("Invalid expression.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid expression.", context.getArg()));
 		}
 	}
 

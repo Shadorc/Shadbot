@@ -1,7 +1,9 @@
 package me.shadorc.shadbot.utils;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -37,23 +39,13 @@ public class FormatUtils {
 		return String.format("%s coin%s", FormatUtils.formatNum(coins), Math.abs(coins) > 1 ? "s" : "");
 	}
 
-	public static String formatDuration(long duration) {
-		long totalSecs = duration / 1000;
-		long days = totalSecs / (24 * 60 * 60);
-		long hours = totalSecs / (60 * 60) % 24;
-		long mins = (totalSecs / 60) % 60;
-
-		List<String> test = new ArrayList<>();
-		if(days != 0) {
-			test.add(StringUtils.pluralOf(days, "day"));
-		}
-		if(hours != 0) {
-			test.add(StringUtils.pluralOf(hours, "hour"));
-		}
-		if(mins != 0) {
-			test.add(StringUtils.pluralOf(mins, "minute"));
-		}
-		return format(test, Object::toString, ", ");
+	public static String formatLongDuration(long duration) {
+		Period period = Period.between(DateUtils.toLocalDate(Instant.ofEpochMilli(duration)).toLocalDate(), LocalDate.now());
+		String str = period.getUnits().stream()
+				.filter(unit -> period.get(unit) != 0)
+				.map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
+				.collect(Collectors.joining(", "));
+		return str.isEmpty() ? FormatUtils.formatShortDuration(duration) : str;
 	}
 
 	public static String formatShortDuration(long duration) {

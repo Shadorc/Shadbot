@@ -44,7 +44,7 @@ public class ShutdownCmd extends AbstractCommand implements MessageListener {
 
 		Integer delay = CastUtils.asPositiveInt(splitArgs.get(0));
 		if(delay == null) {
-			throw new IllegalCmdArgumentException("Invalid time.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid time.", splitArgs.get(0)));
 		}
 
 		String message = splitArgs.get(1);

@@ -10,6 +10,7 @@ public enum Emoji {
 	GREY_EXCLAMATION("grey_exclamation"),
 	RED_EXCLAMATION("exclamation"),
 	RED_FLAG("triangular_flag_on_post"),
+	WHITE_FLAG("flag_white"),
 	QUESTION("question"),
 
 	INFO("information_source"),
@@ -49,6 +50,7 @@ public enum Emoji {
 	SPEECH("speech_balloon"),
 	KEYBOARD("keyboard"),
 	CLAP("clap"),
+	TRIANGULAR_RULER("triangular_ruler"),
 
 	SCISSORS("scissors"),
 	GEM("gem"),

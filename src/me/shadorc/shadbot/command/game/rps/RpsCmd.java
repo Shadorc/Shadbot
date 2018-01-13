@@ -32,7 +32,8 @@ public class RpsCmd extends AbstractCommand {
 
 		Handsign userHandsign = Utils.getValueOrNull(Handsign.class, context.getArg());
 		if(userHandsign == null) {
-			throw new IllegalCmdArgumentException("Invalid handsign, use `rock`, `paper` or `scissors`.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid handsign. Options: %s.",
+					context.getArg(), FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", ")));
 		}
 
 		Handsign botHandsign = Handsign.values()[MathUtils.rand(Handsign.values().length)];

@@ -35,7 +35,7 @@ public class GifCmd extends AbstractCommand {
 		try {
 			String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
 					APIKeys.get(APIKey.GIPHY_API_KEY),
-					context.hasArg() ? NetUtils.encode(context.getArg()) : "");
+					NetUtils.encode(context.getArg()));
 
 			JSONObject mainObj = new JSONObject(NetUtils.getBody(url));
 			if(mainObj.get("data") instanceof JSONArray) {

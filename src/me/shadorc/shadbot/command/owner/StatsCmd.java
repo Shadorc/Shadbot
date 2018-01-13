@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.Lists;
 
-import me.shadorc.discordbot.utils.command.Emoji;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -23,6 +22,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -38,8 +38,8 @@ public class StatsCmd extends AbstractCommand {
 		}
 
 		if(!StatsManager.getKeys().contains(context.getArg())) {
-			throw new IllegalCmdArgumentException(String.format("Invalid category. Options: %s",
-					FormatUtils.format(StatsManager.getKeys(), Object::toString, ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid category. Options: %s",
+					context.getArg(), FormatUtils.format(StatsManager.getKeys(), Object::toString, ", ")));
 		}
 
 		ConcurrentHashMap<String, AtomicInteger> concurrentMap = StatsManager.get(context.getArg());

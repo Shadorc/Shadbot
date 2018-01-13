@@ -39,7 +39,7 @@ public class VolumeCmd extends AbstractCommand {
 
 		Integer volume = CastUtils.asPositiveInt(context.getArg());
 		if(volume == null) {
-			throw new IllegalCmdArgumentException("Invalid volume.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid volume.", context.getArg()));
 		}
 
 		scheduler.setVolume(volume);

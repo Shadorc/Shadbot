@@ -41,10 +41,12 @@ public class StringUtils {
 	}
 
 	public static String truncate(String str, int size) {
-		if(str.length() > size) {
-			return str.substring(0, size - 3) + "...";
+		if(str.length() <= size) {
+			return str;
 		}
-		return str;
+
+		String truncatedStr = str.substring(0, size - 3);
+		return truncatedStr.substring(0, truncatedStr.lastIndexOf(' ')) + "...";
 	}
 
 	public static String remove(String text, String... toRemove) {
@@ -55,6 +57,10 @@ public class StringUtils {
 		return str.trim().replaceAll(" +", " ");
 	}
 
+	public static int countMatches(String str, String toMatch) {
+		return str.length() - str.replace(toMatch, "").length();
+	}
+
 	public static List<String> getQuotedWords(String text) {
 		List<String> matches = new ArrayList<>();
 		Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(text);
@@ -63,10 +69,6 @@ public class StringUtils {
 		}
 		matches.removeAll(Collections.singleton(""));
 		return matches;
-	}
-
-	public static int countMatches(String str, String toMatch) {
-		return str.length() - str.replace(toMatch, "").length();
 	}
 
 }

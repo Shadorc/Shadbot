@@ -26,9 +26,8 @@ public class CoinsCmd extends AbstractCommand {
 					FormatUtils.formatCoins(Database.getDBUser(context.getGuild(), context.getAuthor()).getCoins()));
 		} else {
 			IUser user = context.getMessage().getMentions().get(0);
-			int coins = Database.getDBUser(context.getGuild(), user).getCoins();
 			str = String.format("%s has **%s**.",
-					user.getName(), FormatUtils.formatCoins(coins));
+					user.getName(), FormatUtils.formatCoins(Database.getDBUser(context.getGuild(), user).getCoins()));
 		}
 		BotUtils.sendMessage(Emoji.PURSE + " " + str, context.getChannel());
 	}

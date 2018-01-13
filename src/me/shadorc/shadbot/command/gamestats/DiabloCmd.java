@@ -54,13 +54,13 @@ public class DiabloCmd extends AbstractCommand {
 
 		Region region = Utils.getValueOrNull(Region.class, splitArgs.get(0));
 		if(region == null) {
-			throw new IllegalCmdArgumentException("Region is invalid. Options: "
-					+ FormatUtils.format(Region.values(), Object::toString, ", "));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Region. Options: %s",
+					splitArgs.get(0), FormatUtils.format(Region.values(), Object::toString, ", ")));
 		}
 
 		String battletag = splitArgs.get(1);
 		if(!battletag.matches("(\\p{L}*)#[0-9]*")) {
-			throw new IllegalCmdArgumentException("Invalid Battletag.");
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Battletag.", splitArgs.get(1)));
 		}
 		battletag = battletag.replaceAll("#", "-");
 

@@ -13,6 +13,7 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -33,23 +34,23 @@ public class UserInfoCmd extends AbstractCommand {
 
 		String creationDate = String.format("%s%n(%s)",
 				DateUtils.toLocalDate(user.getCreationDate()).format(dateFormatter),
-				FormatUtils.formatDuration(user.getCreationDate().toEpochMilli()));
+				FormatUtils.formatLongDuration(user.getCreationDate().toEpochMilli()));
 
 		String joinDate = String.format("%s%n(%s)",
 				DateUtils.toLocalDate(context.getGuild().getJoinTimeForUser(user)).format(dateFormatter),
-				FormatUtils.formatDuration(DateUtils.getMillisUntil(context.getGuild().getJoinTimeForUser(user))));
+				FormatUtils.formatLongDuration(context.getGuild().getJoinTimeForUser(user).toEpochMilli()));
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)
-				.withAuthorName(String.format("Info about user \"%s%s\"", user.getName(), user.isBot() ? " (Bot)" : ""))
+				.withAuthorName(String.format("Info about user \"%s\"%s", user.getName(), user.isBot() ? " (Bot)" : ""))
 				.withThumbnail(user.getAvatarURL())
 				.appendField("Display name", user.getDisplayName(context.getGuild()), true)
 				.appendField("User ID", Long.toString(user.getLongID()), true)
 				.appendField("Creation date", creationDate, true)
 				.appendField("Join date", joinDate, true)
-				.appendField("Status", user.getPresence().getStatus().toString(), true)
-				.appendField("Playing text", user.getPresence().getText().orElse(null), true)
-				.appendField("Roles", FormatUtils.format(user.getRolesForGuild(context.getGuild()), IRole::getName, "\n"), true);
+				.appendField("Roles", FormatUtils.format(user.getRolesForGuild(context.getGuild()), IRole::getName, "\n"), true)
+				.appendField("Status", StringUtils.capitalize(user.getPresence().getStatus().toString()), true)
+				.appendField("Playing text", user.getPresence().getText().orElse(null), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 
@@ -57,7 +58,7 @@ public class UserInfoCmd extends AbstractCommand {
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show info about an user.")
-				.addArg("@user", false)
+				.addArg("@user", true)
 				.build();
 	}
 

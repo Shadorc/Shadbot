@@ -48,19 +48,15 @@ public class HelpCmd extends AbstractCommand {
 				continue;
 			}
 
-			StringBuilder contentBuilder = new StringBuilder();
+			String commands = CommandManager.getCommands().values().stream()
+					.distinct()
+					.filter(cmd -> cmd.getCategory().equals(category)
+							&& !cmd.getPermission().isSuperior(context.getAuthorPermission())
+							&& (context.getGuild() == null || BotUtils.isCommandAllowed(context.getGuild(), cmd)))
+					.map(cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()))
+					.collect(Collectors.joining(" "));
 
-			for(AbstractCommand cmd : CommandManager.getCommands().values().stream().distinct().collect(Collectors.toList())) {
-				if(!cmd.getCategory().equals(category)
-						|| cmd.getPermission().isSuperior(context.getPermission())
-						|| context.getGuild() != null && !BotUtils.isCommandAllowed(context.getGuild(), cmd)) {
-					continue;
-				}
-
-				contentBuilder.append("`" + context.getPrefix() + cmd.getName() + "` ");
-			}
-
-			embed.appendField(String.format("%s Commands", category.toString()), contentBuilder.toString(), false);
+			embed.appendField(String.format("%s Commands", category.toString()), commands, false);
 		}
 
 		BotUtils.sendMessage(embed.build(), context.getChannel());
