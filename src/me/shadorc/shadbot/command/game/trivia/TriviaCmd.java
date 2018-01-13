@@ -21,10 +21,10 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -73,7 +73,7 @@ public class TriviaCmd extends AbstractCommand {
 				BotUtils.sendMessage(Emoji.RED_FLAG + " I can't get a question right now, please try again later.", context.getChannel());
 				LogUtils.infof("{%s} Empty body.", this.getClass().getSimpleName());
 			} catch (JSONException | IOException err) {
-				ExceptionUtils.handle("getting a question", context, err);
+				Utils.handle("getting a question", context, err);
 			}
 		} else {
 			BotUtils.sendMessage(Emoji.INFO + " A Trivia game has already been started.", context.getChannel());

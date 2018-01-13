@@ -18,12 +18,11 @@ import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DateUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
-import me.shadorc.shadbot.utils.JSONUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
@@ -66,7 +65,7 @@ public class ImageCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
-			ExceptionUtils.handle("getting an image", context, err);
+			Utils.handle("getting an image", context, err);
 		}
 	}
 
@@ -86,7 +85,7 @@ public class ImageCmd extends AbstractCommand {
 
 			JSONObject mainObj = new JSONObject(NetUtils.getBody(url));
 
-			List<JSONObject> results = JSONUtils.toList(mainObj.getJSONArray("results"), JSONObject.class).stream()
+			List<JSONObject> results = Utils.toList(mainObj.getJSONArray("results"), JSONObject.class).stream()
 					.filter(obj -> obj.has("content")).collect(Collectors.toList());
 
 			if(results.isEmpty()) {

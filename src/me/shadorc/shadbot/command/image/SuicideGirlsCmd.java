@@ -13,11 +13,11 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
@@ -57,7 +57,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 
 			loadingMsg.edit(embed.build());
 		} catch (IOException err) {
-			ExceptionUtils.handle("getting SuicideGirls image", context, err);
+			Utils.handle("getting SuicideGirls image", context, err);
 		}
 	}
 

@@ -15,10 +15,10 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
@@ -42,7 +42,7 @@ public class HangmanCmd extends AbstractCommand {
 			try {
 				this.load();
 			} catch (JSONException | IOException err) {
-				ExceptionUtils.handle("getting words list", context, err);
+				Utils.handle("getting words list", context, err);
 			}
 			loadingMsg.delete();
 		}
@@ -56,7 +56,7 @@ public class HangmanCmd extends AbstractCommand {
 					hangmanManager.start();
 				}
 			} catch (IOException err) {
-				ExceptionUtils.handle("getting a word", context, err);
+				Utils.handle("getting a word", context, err);
 			}
 		} else {
 			BotUtils.sendMessage(String.format(Emoji.INFO + " A Hangman game has already been started by **%s**. Please, wait for him to finish.",

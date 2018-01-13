@@ -23,9 +23,9 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.JSONUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
@@ -68,7 +68,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 		correctAnswer = Jsoup.parse(resultObj.getString("correct_answer")).text();
 
 		if("multiple".equals(questionType)) {
-			answers = JSONUtils.toList(resultObj.getJSONArray("incorrect_answers"), String.class);
+			answers = Utils.toList(resultObj.getJSONArray("incorrect_answers"), String.class);
 			answers.add(MathUtils.rand(answers.size()), correctAnswer);
 		} else {
 			answers = new ArrayList<>(Arrays.asList("True", "False"));

@@ -18,9 +18,9 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -73,7 +73,7 @@ public class TranslateCmd extends AbstractCommand {
 					translatedText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo))), context.getChannel());
 
 		} catch (JSONException | IOException err) {
-			ExceptionUtils.handle("getting translation", context, err);
+			Utils.handle("getting translation", context, err);
 		}
 	}
 

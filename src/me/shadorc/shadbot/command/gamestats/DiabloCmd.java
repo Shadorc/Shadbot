@@ -20,7 +20,6 @@ import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -109,7 +108,7 @@ public class DiabloCmd extends AbstractCommand {
 		} catch (FileNotFoundException err) {
 			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
 		} catch (JSONException | IOException err) {
-			ExceptionUtils.handle("getting Diablo 3 stats", context, err);
+			Utils.handle("getting Diablo 3 stats", context, err);
 		}
 	}
 

@@ -13,9 +13,9 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.GameUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -54,7 +54,7 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		String betStr = splitArgs.size() == 1 ? Integer.toString(diceManager.getBet()) : splitArgs.get(0);
-		Integer bet = GameUtils.checkAndGetBet(context.getChannel(), context.getAuthor(), betStr, MAX_BET);
+		Integer bet = Utils.checkAndGetBet(context.getChannel(), context.getAuthor(), betStr, MAX_BET);
 		if(bet == null) {
 			return;
 		}

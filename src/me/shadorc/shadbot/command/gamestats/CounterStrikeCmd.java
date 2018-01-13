@@ -16,9 +16,9 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -112,7 +112,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			tempMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
-			ExceptionUtils.handle("getting Counter-Strike: Global Offensive stats", context, err);
+			Utils.handle("getting Counter-Strike: Global Offensive stats", context, err);
 		}
 	}
 

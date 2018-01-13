@@ -14,9 +14,8 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.ExceptionUtils;
-import me.shadorc.shadbot.utils.JSONUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
@@ -35,7 +34,7 @@ public class DtcCmd extends AbstractCommand {
 		try {
 			String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", APIKeys.get(APIKey.DTC_API_KEY));
 
-			JSONObject quoteObj = JSONUtils.toList(new JSONArray(NetUtils.getBody(url)), JSONObject.class).stream()
+			JSONObject quoteObj = Utils.toList(new JSONArray(NetUtils.getBody(url)), JSONObject.class).stream()
 					.filter(obj -> obj.getString("content").length() < 1000).findAny().get();
 
 			String content = quoteObj.getString("content").replace("*", "\\*");
@@ -58,7 +57,7 @@ public class DtcCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
-			ExceptionUtils.handle("getting a quote from DansTonChat.com", context, err);
+			Utils.handle("getting a quote from DansTonChat.com", context, err);
 		}
 	}
 

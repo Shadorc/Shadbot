@@ -13,7 +13,7 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.data.stats.Stats.DatabaseEnum;
 import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.utils.JSONUtils;
+import me.shadorc.shadbot.utils.Utils;
 import sx.blah.discord.handle.obj.IGuild;
 
 public class DBGuild {
@@ -59,7 +59,7 @@ public class DBGuild {
 
 	public List<Long> getAllowedChannels() {
 		if(settingsMap.containsKey(SettingEnum.ALLOWED_CHANNELS)) {
-			return JSONUtils.toList((JSONArray) settingsMap.get(SettingEnum.ALLOWED_CHANNELS), Long.class);
+			return Utils.toList((JSONArray) settingsMap.get(SettingEnum.ALLOWED_CHANNELS), Long.class);
 		} else {
 			return new ArrayList<>();
 		}
@@ -67,7 +67,7 @@ public class DBGuild {
 
 	public List<String> getBlacklistedCmd() {
 		if(settingsMap.containsKey(SettingEnum.BLACKLIST)) {
-			return JSONUtils.toList((JSONArray) settingsMap.get(SettingEnum.BLACKLIST), String.class);
+			return Utils.toList((JSONArray) settingsMap.get(SettingEnum.BLACKLIST), String.class);
 		} else {
 			return new ArrayList<>();
 		}

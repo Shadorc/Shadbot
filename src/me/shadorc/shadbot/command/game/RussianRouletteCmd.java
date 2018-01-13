@@ -13,8 +13,8 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.GameUtils;
 import me.shadorc.shadbot.utils.MathUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -33,7 +33,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Integer bet = GameUtils.checkAndGetBet(context.getChannel(), context.getAuthor(), context.getArg(), MAX_BET);
+		Integer bet = Utils.checkAndGetBet(context.getChannel(), context.getAuthor(), context.getArg(), MAX_BET);
 		if(bet == null) {
 			return;
 		}

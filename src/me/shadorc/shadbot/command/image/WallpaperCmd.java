@@ -30,7 +30,6 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -83,7 +82,7 @@ public class WallpaperCmd extends AbstractCommand {
 			throw new IllegalCmdArgumentException(String.format("%s. Use `%shelp %s` for more information.",
 					err.getMessage(), context.getPrefix(), this.getName()));
 		} catch (ParseException err) {
-			ExceptionUtils.handle("getting a wallpaper", context, err);
+			Utils.handle("getting a wallpaper", context, err);
 			return;
 		}
 

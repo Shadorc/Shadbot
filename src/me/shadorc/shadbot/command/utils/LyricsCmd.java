@@ -14,10 +14,10 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
@@ -82,7 +82,7 @@ public class LyricsCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (IOException err) {
-			ExceptionUtils.handle("getting lyrics", context, err);
+			Utils.handle("getting lyrics", context, err);
 		}
 	}
 

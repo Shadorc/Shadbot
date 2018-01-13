@@ -11,7 +11,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -105,7 +104,7 @@ public class OverwatchCmd extends AbstractCommand {
 			}
 			loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " " + msg);
 		} catch (IOException err) {
-			ExceptionUtils.handle("getting information from Overwatch profile", context, err);
+			Utils.handle("getting information from Overwatch profile", context, err);
 		}
 	}
 

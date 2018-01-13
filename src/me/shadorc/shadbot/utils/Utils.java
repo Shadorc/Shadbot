@@ -1,6 +1,8 @@
 package me.shadorc.shadbot.utils;
 
 import java.lang.management.ManagementFactory;
+import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -17,7 +19,17 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import org.json.JSONArray;
+import org.jsoup.HttpStatusException;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.utils.object.Emoji;
+import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IUser;
 
 public class Utils {
 
@@ -60,6 +72,22 @@ public class Utils {
 		return null;
 	}
 
+	public static <T> List<T> toList(JSONArray array, Class<T> listClass) {
+		if(array == null) {
+			return null;
+		}
+	
+		List<T> list = new ArrayList<>();
+		for(int i = 0; i < array.length(); i++) {
+			if(listClass.isInstance(array.get(i))) {
+				list.add(listClass.cast(array.get(i)));
+			} else {
+				throw new IllegalArgumentException(String.format("Array's elements cannot be casted to %s.", listClass.getSimpleName()));
+			}
+		}
+		return list;
+	}
+
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
 		return map.entrySet()
 				.stream()
@@ -73,6 +101,39 @@ public class Utils {
 
 	public static <T> List<T> removeAndGet(T[] array, T elmt) {
 		return Arrays.stream(array).filter(element -> !element.equals(elmt)).collect(Collectors.toList());
+	}
+
+	public static void handle(String action, Context context, Exception err) {
+		String msg;
+		if(err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
+			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
+		} else if(err instanceof SocketTimeoutException) {
+			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.",
+					StringUtils.capitalize(action));
+		} else {
+			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
+		}
+		LogUtils.errorf(context.getContent(), context.getChannel(), err, msg);
+	}
+
+	public static Integer checkAndGetBet(IChannel channel, IUser user, String betStr, int maxValue) throws IllegalCmdArgumentException {
+		Integer bet = CastUtils.asPositiveInt(betStr);
+		if(bet == null) {
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount.", betStr));
+		}
+
+		if(Database.getDBUser(channel.getGuild(), user).getCoins() < bet) {
+			BotUtils.sendMessage(TextUtils.notEnoughCoins(user), channel);
+			return null;
+		}
+
+		if(bet > maxValue) {
+			BotUtils.sendMessage(String.format(Emoji.BANK + " Sorry, you can't bet more than **%s**.",
+					FormatUtils.formatCoins(maxValue)), channel);
+			return null;
+		}
+
+		return bet;
 	}
 
 }
