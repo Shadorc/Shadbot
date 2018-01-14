@@ -67,7 +67,7 @@ public class ChatCmd extends AbstractCommand {
 		String url = String.format("https://www.pandorabots.com/pandora/talk-xml?botid=%s&input=%s&custid=%s",
 				botID, NetUtils.encode(input), CHANNELS_CUSTID.getOrDefault(channel.getLongID(), ""));
 		Document doc = NetUtils.getDoc(url);
-		JSONObject mainObj = XML.toJSONObject(doc.text());
+		JSONObject mainObj = XML.toJSONObject(doc.html());
 		JSONObject resultObj = mainObj.getJSONObject("result");
 		CHANNELS_CUSTID.put(channel.getLongID(), resultObj.getString("custid"));
 		return StringUtils.normalizeSpace(resultObj.getString("that").replace("<br>", "\n"));
@@ -78,6 +78,11 @@ public class ChatCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Chat with an artificial intelligence.")
 				.addArg("message", false)
+				.setSource("https://pandorabots.com/"
+						+ "\n**Marvin** (ID: efc39100ce34d038)"
+						+ "\n**Chomsky** (ID: b0dafd24ee35a477)"
+						+ "\n**R.I.V.K.A** (ID: ea373c261e3458c6)"
+						+ "\n**Lisa** (ID: b0a6a41a5e345c23)")
 				.build();
 	}
 }
