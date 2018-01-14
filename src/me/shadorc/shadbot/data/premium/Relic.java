@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 
 public class Relic {
@@ -31,6 +32,7 @@ public class Relic {
 		this.relicID = relicObj.getString(RELIC_ID);
 		this.duration = relicObj.getInt(DURATION);
 		this.type = Utils.getValueOrNull(RelicType.class, relicObj.get(TYPE).toString());
+		this.activationTime = relicObj.optLong(ACTIVATION);
 	}
 
 	public void activate() {
@@ -58,7 +60,7 @@ public class Relic {
 	}
 
 	public boolean isExpired() {
-		return TimeUnit.MILLISECONDS.toDays(this.getActivationTime() + System.currentTimeMillis()) > this.getDuration();
+		return TimeUnit.MILLISECONDS.toDays(TimeUtils.getMillisUntil(this.getActivationTime())) >= this.getDuration();
 	}
 
 	public void setGuildID(long guildID) {

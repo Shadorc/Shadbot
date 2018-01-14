@@ -40,7 +40,7 @@ public abstract class AbstractGameManager {
 	public final boolean isCancelCmd(IMessage message) {
 		IUser user = message.getAuthor();
 		if(message.getContent().equals(this.getPrefix() + "cancel")
-				&& author.equals(user) || PermissionUtils.hasPermissions(channel, user, Permissions.ADMINISTRATOR)) {
+				&& (author.equals(user) || PermissionUtils.hasPermissions(channel, user, Permissions.ADMINISTRATOR))) {
 			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", user.getName()), channel);
 			this.stop();
 			return true;

@@ -14,7 +14,7 @@ public class TextUtils {
 
 	public static final String PLAYLIST_LIMIT_REACHED =
 			String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "
-					+ "You can remove this limit by contributing to Shadbot. More info on %s", Config.MAX_PLAYLIST_SIZE, Config.PATREON_URL);
+					+ "You can remove this limit by contributing to Shadbot. More info on **%s**", Config.MAX_PLAYLIST_SIZE, Config.PATREON_URL);
 
 	public static final String NO_PLAYING_MUSIC =
 			Emoji.MUTE + " No currently playing music.";
@@ -26,7 +26,7 @@ public class TextUtils {
 
 	private static final String[] TIPS_MESSAGES = { String.format("Check %slotto", Config.DEFAULT_PREFIX),
 			String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
-			String.format("Help me to keep Shadbot alive ! %s", Config.PATREON_URL),
+			String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
 			String.format("Support server: %s", Config.SUPPORT_SERVER) };
 
 	public static String getSpamMessage() {

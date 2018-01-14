@@ -56,8 +56,8 @@ public class BotUtils {
 	}
 
 	public static RequestFuture<IMessage> sendMessage(MessageBuilder message) {
-		IGuild guild = message.getChannel().getGuild();
-		if(!guild.getShard().isReady()) {
+		IGuild guild = message.getChannel().isPrivate() ? null : message.getChannel().getGuild();
+		if(guild != null && !guild.getShard().isReady()) {
 			LogUtils.infof("{Guild ID: %d} A message could not be sent because shard isn't ready, adding it to queue.",
 					guild.getLongID());
 			ShardManager.getShadbotShard(guild.getShard()).queue(message);

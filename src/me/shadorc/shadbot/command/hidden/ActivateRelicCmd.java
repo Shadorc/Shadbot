@@ -12,7 +12,7 @@ import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
-@Command(category = CommandCategory.HIDDEN, names = { "activate_relic" })
+@Command(category = CommandCategory.HIDDEN, names = { "activate_relic", "activate" })
 public class ActivateRelicCmd extends AbstractCommand {
 
 	@Override

@@ -20,6 +20,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.Ban;
 import sx.blah.discord.util.PermissionUtils;
+import sx.blah.discord.util.RequestBuffer;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "ban" })
 public class BanCmd extends AbstractCommand {
@@ -50,33 +51,36 @@ public class BanCmd extends AbstractCommand {
 
 		for(IUser user : mentionedUsers) {
 			if(PermissionUtils.isUserHigher(context.getGuild(), user, context.getAuthor())) {
-				throw new IllegalCmdArgumentException(String.format("You can't ban %s because he is higher in the role hierarchy than you.",
+				throw new IllegalCmdArgumentException(String.format("You can't ban **%s** because he is higher in the role hierarchy than you.",
 						user.getName()));
 			}
 			if(PermissionUtils.isUserHigher(context.getGuild(), user, context.getOurUser())) {
-				throw new IllegalCmdArgumentException(String.format("I cannot ban %s because he is higher in the role hierarchy than me.",
+				throw new IllegalCmdArgumentException(String.format("I cannot ban **%s** because he is higher in the role hierarchy than me.",
 						user.getName()));
 			}
 		}
 
-		String reason = StringUtils.remove(context.getArg(), FormatUtils.format(mentionedUsers, user -> user.mention(false), " ")).trim();
+		StringBuilder reason = new StringBuilder();
+		reason.append(StringUtils.remove(context.getArg(), FormatUtils.format(mentionedUsers, user -> user.mention(false), " ")).trim());
 		if(reason.length() > Ban.MAX_REASON_LENGTH) {
-			throw new IllegalCmdArgumentException(String.format("Reason cannot exceed %d characters.", Ban.MAX_REASON_LENGTH));
+			throw new IllegalCmdArgumentException(String.format("Reason cannot exceed **%d characters**.", Ban.MAX_REASON_LENGTH));
 		}
 
-		if(reason.isEmpty()) {
-			reason = "Reason not specified.";
+		if(reason.length() == 0) {
+			reason.append("Reason not specified.");
 		}
 
 		for(IUser user : mentionedUsers) {
 			if(!user.isBot()) {
-				BotUtils.sendMessage(String.format(Emoji.INFO + " You were banned by **%s** on server **%s** (Reason: **%s**).",
-						context.getAuthorName(), context.getGuild().getName(), reason), user.getOrCreatePMChannel());
+				BotUtils.sendMessage(String.format(Emoji.INFO + " You were banned from the server **%s** by **%s**. Reason: `%s`",
+						context.getGuild().getName(), context.getAuthorName(), reason), user.getOrCreatePMChannel());
 			}
-			context.getGuild().banUser(user, reason, 7);
+			RequestBuffer.request(() -> {
+				context.getGuild().banUser(user, reason.toString(), 7);
+			}).get();
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) %s got banned (Reason: %s)",
+		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) **%s** got banned. Reason: `%s`",
 				context.getAuthorName(), FormatUtils.format(mentionedUsers, IUser::getName, ", "), reason), context.getChannel());
 	}
 

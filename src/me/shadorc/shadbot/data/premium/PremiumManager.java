@@ -68,8 +68,7 @@ public class PremiumManager {
 	}
 
 	public static void activateRelic(IGuild guild, IUser user, String relicID) throws RelicActivationException {
-		Relic relic = UNUSED_RELICS_LIST.stream().filter(unusedRelic -> unusedRelic.getRelicID().equals(relicID)).findAny().get();
-
+		Relic relic = UNUSED_RELICS_LIST.stream().filter(unusedRelic -> unusedRelic.getRelicID().equals(relicID)).findAny().orElse(null);
 		if(relic == null) {
 			throw new RelicActivationException("This key is already activated or doesn't exist.");
 		}
