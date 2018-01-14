@@ -12,10 +12,12 @@ import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.TextUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.util.MissingPermissionsException;
 
 public class MessageListener {
 
@@ -44,7 +46,7 @@ public class MessageListener {
 
 			ShardManager.getShadbotShard(message.getShard()).messageReceived();
 
-			if(!BotUtils.isChannelAllowed(event.getGuild(), event.getChannel())) {
+			if(!BotUtils.isChannelAllowed(message.getGuild(), message.getChannel())) {
 				return;
 			}
 
@@ -56,9 +58,12 @@ public class MessageListener {
 			if(message.getContent().startsWith(prefix)) {
 				CommandManager.execute(new Context(message));
 			}
+		} catch (MissingPermissionsException err) {
+			BotUtils.sendMessage(TextUtils.missingPerm(err.getMissingPermissions()), message.getChannel());
+			LogUtils.infof("{Guild ID: %d} %s", message.getGuild().getLongID(), err.getMessage());
 		} catch (Exception err) {
 			LogUtils.errorf(message.getContent(), message.getChannel(), err,
-					"Sorry, an unknown error occurred. My developer has been warned.", event.getGuild().getLongID());
+					"Sorry, an unknown error occurred. My developer has been warned.", message.getGuild().getLongID());
 		}
 	}
 

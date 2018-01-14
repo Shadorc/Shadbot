@@ -68,7 +68,7 @@ public class BotUtils {
 			try {
 				return message.send();
 			} catch (MissingPermissionsException err) {
-				// BotUtils.sendMessage(TextUtils.missingPerm(new ArrayList<>(err.getMissingPermissions())), message.getChannel());
+				BotUtils.sendMessage(TextUtils.missingPerm(err.getMissingPermissions()), message.getChannel());
 				LogUtils.infof("{Guild ID: %d} %s", guild.getLongID(), err.getMessage());
 			} catch (DiscordException err) {
 				LogUtils.errorf(err, "An error occurred while sending message.");

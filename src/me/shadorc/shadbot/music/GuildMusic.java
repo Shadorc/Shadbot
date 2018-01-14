@@ -49,7 +49,6 @@ public class GuildMusic {
 		}
 	}
 
-	// FIXME: Missing permissions sometimes thrown when joining
 	public void joinVoiceChannel(IVoiceChannel voiceChannel) {
 		if(voiceChannel.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null) {
 			voiceChannel.join();

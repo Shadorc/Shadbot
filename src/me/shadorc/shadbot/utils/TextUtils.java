@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.utils;
 
+import java.util.EnumSet;
+
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -47,6 +49,10 @@ public class TextUtils {
 	public static String mustBeNSFW(String prefix) {
 		return String.format(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",
 				prefix, SettingEnum.NSFW);
+	}
+
+	public static String missingPerm(EnumSet<Permissions> permissions) {
+		return TextUtils.missingPerm(permissions.toArray(new Permissions[permissions.size()]));
 	}
 
 	public static String missingPerm(Permissions... permissions) {
