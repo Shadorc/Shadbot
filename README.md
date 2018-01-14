@@ -9,7 +9,7 @@
 <body>
     <hr>
     <h2>Usage</h2>
-    <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=3369984">link</a> !</b></p>
+    <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=271674390">link</a> !</b></p>
     <hr>
     <h2>Support</h2>
     <p><b><a href="https://discord.gg/8jkSr5a">Join</a> the support guild to ask any question.</b></p>
