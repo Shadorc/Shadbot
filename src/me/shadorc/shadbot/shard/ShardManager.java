@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.executor.ShadbotCachedExecutor;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.handle.obj.IGuild;
@@ -60,8 +60,8 @@ public class ShardManager {
 				if(shardStatus.getShard().getGuilds().size() < 100) {
 					continue;
 				}
-				long lastEventTime = DateUtils.getMillisUntil(shardStatus.getLastEventTime());
-				long lastMessageTime = DateUtils.getMillisUntil(shardStatus.getLastMessageTime());
+				long lastEventTime = TimeUtils.getMillisUntil(shardStatus.getLastEventTime());
+				long lastMessageTime = TimeUtils.getMillisUntil(shardStatus.getLastMessageTime());
 				if(lastEventTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT) || lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
 					LogUtils.infof(String.format("Restarting shard %d (Response time: %d ms | Last event: %s ago | Last message: %s ago)",
 							shardStatus.getID(),

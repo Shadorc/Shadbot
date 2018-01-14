@@ -73,6 +73,14 @@ public class DBGuild {
 		}
 	}
 
+	public List<Long> getAutoAssignedRoles() {
+		if(settingsMap.containsKey(SettingEnum.AUTO_ASSIGN)) {
+			return Utils.toList((JSONArray) settingsMap.get(SettingEnum.AUTO_ASSIGN), Long.class);
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
 	public String getPrefix() {
 		if(settingsMap.containsKey(SettingEnum.PREFIX)) {
 			return settingsMap.get(SettingEnum.PREFIX).toString();

@@ -12,19 +12,23 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.util.EmbedBuilder;
 
-@Setting(description = "Change Shadbot's prefix.", setting = SettingEnum.PREFIX)
+@Setting(description = "Manage Shadbot's prefix.", setting = SettingEnum.PREFIX)
 public class PrefixSetting extends AbstractSetting {
 
 	private static final int MAX_PREFIX_LENGTH = 5;
 
 	@Override
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+		if(arg == null) {
+			throw new MissingArgumentException();
+		}
+
 		if(arg.length() > MAX_PREFIX_LENGTH) {
 			throw new IllegalCmdArgumentException(String.format("Prefix cannot contain more than %s characters.", MAX_PREFIX_LENGTH));
 		}
 
 		Database.getDBGuild(context.getGuild()).setSetting(this.getSetting(), arg);
-		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " '%s' is now the prefix for this server.", arg), context.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", arg), context.getChannel());
 	}
 
 	@Override

@@ -16,7 +16,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 
-@Setting(description = "Change the current channel's NSFW state.", setting = SettingEnum.NSFW)
+@Setting(description = "Manage current channel's NSFW state.", setting = SettingEnum.NSFW)
 public class NSFWSetting extends AbstractSetting {
 
 	private enum Action {
@@ -27,14 +27,18 @@ public class NSFWSetting extends AbstractSetting {
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
 		if(!BotUtils.hasPermissions(context.getChannel(), Permissions.MANAGE_CHANNELS)) {
 			BotUtils.sendMessage(TextUtils.missingPerm(Permissions.MANAGE_CHANNEL), context.getChannel());
-			LogUtils.infof("{Guild ID: %d} hadbot wasn't allowed to manage channel.", context.getGuild().getLongID());
+			LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to manage channel.", context.getGuild().getLongID());
 			return;
+		}
+
+		if(arg == null) {
+			throw new MissingArgumentException();
 		}
 
 		Action action = Utils.getValueOrNull(Action.class, arg);
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. Options: %s",
-					arg, FormatUtils.format(Action.values(), value -> value.toString().toLowerCase(), ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. %s",
+					arg, FormatUtils.formatOptions(Action.class)));
 		}
 
 		boolean isNSFW = false;

@@ -12,8 +12,8 @@ import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -37,8 +37,8 @@ public class ServerInfoCmd extends AbstractCommand {
 		String blacklistedCmdStr = dbGuild.getBlacklistedCmd().isEmpty() ? "None" : FormatUtils.format(dbGuild.getBlacklistedCmd(), cmdName -> "\n\t" + cmdName, "");
 
 		String creationDate = String.format("%s%n(%s)",
-				DateUtils.toLocalDate(guild.getCreationDate()).format(dateFormatter),
-				FormatUtils.formatLongDuration(guild.getCreationDate().toEpochMilli()));
+				TimeUtils.toLocalDate(guild.getCreationDate()).format(dateFormatter),
+				FormatUtils.formatLongDuration(guild.getCreationDate()));
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)

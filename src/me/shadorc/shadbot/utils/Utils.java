@@ -76,7 +76,7 @@ public class Utils {
 		if(array == null) {
 			return null;
 		}
-	
+
 		List<T> list = new ArrayList<>();
 		for(int i = 0; i < array.length(); i++) {
 			if(listClass.isInstance(array.get(i))) {

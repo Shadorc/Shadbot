@@ -16,12 +16,11 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -49,7 +48,7 @@ public class ImageCmd extends AbstractCommand {
 		try {
 			JSONObject resultObj = this.getRandomPopularResult(NetUtils.encode(context.getArg()));
 			if(resultObj == null) {
-				BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
+				loadingMsg.edit(TextUtils.noResult(context.getArg()));
 				return;
 			}
 
@@ -65,13 +64,14 @@ public class ImageCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting an image", context, err);
 		}
 	}
 
 	private JSONObject getRandomPopularResult(String encodedSearch) throws JSONException, IOException {
 		try {
-			if(DateUtils.getMillisUntil(lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(expiresIn)) {
+			if(TimeUtils.getMillisUntil(lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(expiresIn)) {
 				this.generateAccessToken();
 			}
 

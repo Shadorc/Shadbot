@@ -88,6 +88,7 @@ public class Rule34Cmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting an image from Rule34", context, err);
 		}
 	}

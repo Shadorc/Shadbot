@@ -39,7 +39,7 @@ public class StatsCmd extends AbstractCommand {
 
 		if(!StatsManager.getKeys().contains(context.getArg())) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid category. Options: %s",
-					context.getArg(), FormatUtils.format(StatsManager.getKeys(), Object::toString, ", ")));
+					context.getArg(), FormatUtils.format(StatsManager.getKeys(), value -> String.format("`%s`", value), ", ")));
 		}
 
 		ConcurrentHashMap<String, AtomicInteger> concurrentMap = StatsManager.get(context.getArg());

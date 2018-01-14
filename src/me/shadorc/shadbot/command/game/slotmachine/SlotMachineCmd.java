@@ -63,8 +63,6 @@ public class SlotMachineCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Play slot machine.")
 				.appendField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)
-				.setGains("You can win %s ! Good luck.",
-						FormatUtils.format(SlotOptions.values(), opt -> String.format("**%d**", opt.getGain()), ", "))
 				.build();
 	}
 

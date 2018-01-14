@@ -29,13 +29,13 @@ public class GenerateRelicCmd extends AbstractCommand {
 
 		RelicType type = Utils.getValueOrNull(RelicType.class, context.getArg());
 		if(type == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s`in not a valid type. Options: %s",
-					context.getArg(), FormatUtils.format(RelicType.values(), relic -> relic.toString().toLowerCase(), ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s`in not a valid type. %s",
+					context.getArg(), FormatUtils.formatOptions(RelicType.class)));
 		}
 
 		Relic relic = PremiumManager.generateRelic(type);
 		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-				StringUtils.capitalize(type.toString()), relic.getID()), context.getChannel());
+				StringUtils.capitalize(type.toString()), relic.getRelicID()), context.getChannel());
 	}
 
 	@Override

@@ -8,9 +8,10 @@ public enum SettingEnum {
 	ALLOWED_CHANNELS("allowed_channels"),
 	BLACKLIST("blacklist"),
 	AUTO_MESSAGE("auto_message"),
-	MESSAGE_CHANNEL_ID("message_chhanel_id"),
+	MESSAGE_CHANNEL_ID("message_channel_id"),
 	JOIN_MESSAGE("join_message"),
-	LEAVE_MESSAGE("leave_message");
+	LEAVE_MESSAGE("leave_message"),
+	AUTO_ASSIGN("auto_assign");
 
 	private final String name;
 

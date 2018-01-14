@@ -18,6 +18,7 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.util.MessageBuilder;
 
@@ -90,7 +91,7 @@ public class CommandManager {
 		} catch (MissingArgumentException err) {
 			BotUtils.sendMessage(new MessageBuilder(context.getClient())
 					.withChannel(context.getChannel())
-					.withContent(Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.")
+					.withContent(TextUtils.MISSING_ARG)
 					.withEmbed(cmd.getHelp(context.getPrefix())));
 		}
 	}

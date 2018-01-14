@@ -104,6 +104,7 @@ public class OverwatchCmd extends AbstractCommand {
 			}
 			loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " " + msg);
 		} catch (IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting information from Overwatch profile", context, err);
 		}
 	}
@@ -116,8 +117,8 @@ public class OverwatchCmd extends AbstractCommand {
 	private Platform getPlatform(String str) throws IllegalCmdArgumentException {
 		Platform platform = Utils.getValueOrNull(Platform.class, str.toUpperCase());
 		if(platform == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Platform. Options: %s",
-					str, FormatUtils.format(Platform.values(), Object::toString, ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Platform. %s",
+					str, FormatUtils.formatOptions(Platform.class)));
 		}
 		return platform;
 	}
@@ -125,8 +126,8 @@ public class OverwatchCmd extends AbstractCommand {
 	private Region getRegion(String str) throws IllegalCmdArgumentException {
 		Region region = Utils.getValueOrNull(Region.class, str.toUpperCase());
 		if(region == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Region. Options: %s",
-					str, FormatUtils.format(Region.values(), Object::toString, ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Region. %s",
+					str, FormatUtils.formatOptions(Region.class)));
 		}
 		return region;
 	}

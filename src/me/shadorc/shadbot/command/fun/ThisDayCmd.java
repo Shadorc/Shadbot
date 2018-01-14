@@ -52,6 +52,7 @@ public class ThisDayCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting events", context, err);
 		}
 	}

@@ -14,6 +14,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.message.MessageListener;
@@ -84,7 +85,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 					count, FormatUtils.formatTrackName(tracks.get(count - 1).getInfo())));
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-					.withAuthorName("Results")
+					.withAuthorName("Music results")
 					.withAuthorIcon(guildMusic.getDj().getAvatarURL())
 					.withThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 					.appendDescription("**Select a music by typing the corresponding number.**"
@@ -156,12 +157,16 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			return true;
 		}
 
-		String content = message.getContent();
+		// Remove prefix and command names from message content
+		String content = message.getContent().toLowerCase();
+		for(String cmdName : CommandManager.getCommand("play").getNames()) {
+			content = StringUtils.remove(content, prefix, cmdName);
+		}
+		content = content.trim();
 
 		List<Integer> choices = new ArrayList<>();
 		for(String str : content.split(",")) {
-			// Remove all non numeric characters
-			Integer num = CastUtils.asIntBetween(StringUtils.remove(str, "[^\\d]"), 1, Math.min(5, resultsTracks.size()));
+			Integer num = CastUtils.asIntBetween(str, 1, Math.min(5, resultsTracks.size()));
 			if(num == null) {
 				return false;
 			}

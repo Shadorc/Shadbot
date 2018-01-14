@@ -36,8 +36,8 @@ public class ManageCoinsCmd extends AbstractCommand {
 
 		Action action = Utils.getValueOrNull(Action.class, splitArgs.get(0));
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. Options: %s",
-					splitArgs.get(0), FormatUtils.format(Action.values(), value -> value.toString().toLowerCase(), ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. %s",
+					splitArgs.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
 		Integer coins = CastUtils.asInt(splitArgs.get(1));
@@ -54,7 +54,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 		switch (action) {
 			case ADD:
 				users.stream().forEach(user -> Database.getDBUser(context.getGuild(), user).addCoins(coins));
-				BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** gained **%s**.",
+				BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** received **%s**.",
 						mentionsStr, FormatUtils.formatCoins(coins)), context.getChannel());
 				break;
 			case REMOVE:

@@ -4,6 +4,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.util.RequestBuffer;
 import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class UpdateableMessage {
@@ -17,9 +18,10 @@ public class UpdateableMessage {
 
 	public RequestFuture<IMessage> send(EmbedObject embed) {
 		if(futureMsg != null) {
-			futureMsg.get().delete();
+			RequestBuffer.request(() -> {
+				futureMsg.get().delete();
+			}).get();
 		}
-
 		futureMsg = BotUtils.sendMessage(embed, channel);
 		return futureMsg;
 	}

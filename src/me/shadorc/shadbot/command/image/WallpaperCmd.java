@@ -28,7 +28,6 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
@@ -37,6 +36,7 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.object.LoadingMessage;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -54,6 +54,9 @@ public class WallpaperCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+		LoadingMessage loadingMsg = new LoadingMessage("Loading Wallpaper...", context.getChannel());
+		loadingMsg.send();
+
 		if(wallhaven == null) {
 			wallhaven = new Wallhaven(APIKeys.get(APIKey.WALLHAVEN_LOGIN), APIKeys.get(APIKey.WALLHAVEN_PASSWORD));
 		}
@@ -79,16 +82,18 @@ public class WallpaperCmd extends AbstractCommand {
 			List<String> args = StringUtils.split(context.getArg());
 			cmdLine = new DefaultParser().parse(options, args.toArray(new String[args.size()]));
 		} catch (UnrecognizedOptionException err) {
+			loadingMsg.delete();
 			throw new IllegalCmdArgumentException(String.format("%s. Use `%shelp %s` for more information.",
 					err.getMessage(), context.getPrefix(), this.getName()));
 		} catch (ParseException err) {
+			loadingMsg.delete();
 			Utils.handle("getting a wallpaper", context, err);
 			return;
 		}
 
-		Purity purity = this.parseEnum(context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
+		Purity purity = this.parseEnum(loadingMsg, context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
 		if((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !context.getChannel().isNSFW()) {
-			BotUtils.sendMessage(TextUtils.mustBeNSFW(context.getPrefix()), context.getChannel());
+			loadingMsg.edit(TextUtils.mustBeNSFW(context.getPrefix()));
 			return;
 		}
 
@@ -96,16 +101,16 @@ public class WallpaperCmd extends AbstractCommand {
 		queryBuilder.purity(purity);
 
 		if(cmdLine.hasOption(CATEGORY)) {
-			queryBuilder.categories(this.parseEnum(context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
+			queryBuilder.categories(this.parseEnum(loadingMsg, context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
 		}
 
 		if(cmdLine.hasOption(RATIO)) {
-			Dimension dim = this.parseDim(context, RATIO, cmdLine.getOptionValues(RATIO));
+			Dimension dim = this.parseDim(loadingMsg, context, RATIO, cmdLine.getOptionValues(RATIO));
 			queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
 		}
 
 		if(cmdLine.hasOption(RESOLUTION)) {
-			Dimension dim = this.parseDim(context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
+			Dimension dim = this.parseDim(loadingMsg, context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
 			queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
 		}
 
@@ -115,7 +120,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 		List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
 		if(wallpapers.isEmpty()) {
-			BotUtils.sendMessage(TextUtils.noResult(context.getMessage().getContent()), context.getChannel());
+			loadingMsg.edit(TextUtils.noResult(context.getMessage().getContent()));
 			return;
 		}
 
@@ -129,31 +134,32 @@ public class WallpaperCmd extends AbstractCommand {
 				.appendField("Resolution", wallpaper.getResolution().toString(), false)
 				.appendField("Tags", tags, false);
 
-		BotUtils.sendMessage(embed.build(), context.getChannel());
+		loadingMsg.edit(embed.build());
 	}
 
-	private Dimension parseDim(Context context, String name, String... values) throws IllegalCmdArgumentException {
+	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) throws IllegalCmdArgumentException {
 		List<String> sizeList = Arrays.asList(values);
 		if(sizeList.size() != 2) {
-			this.throwInvalidArg(context, name);
+			this.throwInvalidArg(msg, context, name);
 		}
 		Integer width = CastUtils.asPositiveInt(sizeList.get(0));
 		Integer height = CastUtils.asPositiveInt(sizeList.get(1));
 		if(width == null || height == null) {
-			this.throwInvalidArg(context, name);
+			this.throwInvalidArg(msg, context, name);
 		}
 		return new Dimension(width, height);
 	}
 
-	private <T extends Enum<T>> T parseEnum(Context context, Class<T> enumClass, String name, String value) throws IllegalCmdArgumentException {
+	private <T extends Enum<T>> T parseEnum(LoadingMessage msg, Context context, Class<T> enumClass, String name, String value) throws IllegalCmdArgumentException {
 		T enumObj = Utils.getValueOrNull(enumClass, value);
 		if(enumObj == null) {
-			this.throwInvalidArg(context, name);
+			this.throwInvalidArg(msg, context, name);
 		}
 		return enumObj;
 	}
 
-	private void throwInvalidArg(Context context, String name) throws IllegalCmdArgumentException {
+	private void throwInvalidArg(LoadingMessage msg, Context context, String name) throws IllegalCmdArgumentException {
+		msg.delete();
 		throw new IllegalCmdArgumentException(String.format("`%s` value is not valid. Use `%shelp %s` for more information.",
 				name, context.getPrefix(), this.getName()));
 	}

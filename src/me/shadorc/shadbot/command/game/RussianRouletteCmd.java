@@ -44,7 +44,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(MathUtils.rand(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			StatsManager.increment(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
-			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.formatCoins(gains)));
+			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.formatCoins(Math.abs(gains))));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
 			StatsManager.increment(MoneyEnum.MONEY_GAINED, this.getName(), gains);
@@ -59,9 +59,9 @@ public class RussianRouletteCmd extends AbstractCommand {
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Play Russian roulette.")
-				.addArg("bet", String.format("You can not bet more than **%s**.", FormatUtils.formatCoins(MAX_BET)), false)
-				.setGains("You have a **5-in-6** chance to win **%d times** your bet and a **1-in-6** chance to lose **%d times** your bet.",
-						(int) WIN_MULTIPLIER, (int) LOSE_MULTIPLIER)
+				.addArg("bet", String.format("You can't bet more than **%s**.", FormatUtils.formatCoins(MAX_BET)), false)
+				.setGains("You have a **5-in-6** chance to win **%.1f times** your bet and a **1-in-6** chance to lose **%.1f times** your bet.",
+						WIN_MULTIPLIER, LOSE_MULTIPLIER)
 				.build();
 	}
 }

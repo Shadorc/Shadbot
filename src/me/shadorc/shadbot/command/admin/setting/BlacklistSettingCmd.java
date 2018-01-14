@@ -21,7 +21,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.util.EmbedBuilder;
 
-@Setting(description = "Blacklist command.", setting = SettingEnum.BLACKLIST)
+@Setting(description = "Manage blacklisted commands.", setting = SettingEnum.BLACKLIST)
 public class BlacklistSettingCmd extends AbstractSetting {
 
 	private enum Action {
@@ -30,6 +30,10 @@ public class BlacklistSettingCmd extends AbstractSetting {
 
 	@Override
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+		if(arg == null) {
+			throw new MissingArgumentException();
+		}
+
 		List<String> splitArgs = StringUtils.split(arg, 2);
 		if(splitArgs.size() != 2) {
 			throw new MissingArgumentException();
@@ -37,25 +41,27 @@ public class BlacklistSettingCmd extends AbstractSetting {
 
 		Action action = Utils.getValueOrNull(Action.class, splitArgs.get(0));
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. Options: %s",
-					splitArgs.get(0), FormatUtils.format(Action.values(), value -> value.toString().toLowerCase(), ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. %s",
+					splitArgs.get(0), FormatUtils.formatOptions(Action.class)));
+		}
+
+		List<String> commands = StringUtils.split(splitArgs.get(1).toLowerCase());
+
+		List<String> unknownCmds = commands.stream().filter(cmd -> CommandManager.getCommand(cmd) == null).collect(Collectors.toList());
+		if(!unknownCmds.isEmpty()) {
+			throw new IllegalCmdArgumentException(String.format("Command %s doesn't exist.",
+					FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", ")));
 		}
 
 		List<String> blacklist = Database.getDBGuild(context.getGuild()).getBlacklistedCmd();
-		List<String> commands = StringUtils.split(splitArgs.get(1).toLowerCase());
 		if(Action.ADD.equals(action)) {
-			if(commands.stream().anyMatch(cmd -> CommandManager.getCommand(cmd) == null)) {
-				throw new IllegalCmdArgumentException(String.format(" `%s` doesn't exist.",
-						commands.stream().filter(cmd -> CommandManager.getCommand(cmd) == null).collect(Collectors.joining(", "))));
-			}
-
 			blacklist.addAll(commands);
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " `%s` added to the blacklist.",
-					FormatUtils.format(commands, Object::toString, ", ")), context.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` added to the blacklist.",
+					FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
 		} else if(Action.REMOVE.equals(action)) {
 			blacklist.removeAll(commands);
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " `%s` removed from the blacklist.",
-					FormatUtils.format(commands, Object::toString, ", ")), context.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` removed from the blacklist.",
+					FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
 		}
 
 		Database.getDBGuild(context.getGuild()).setSetting(this.getSetting(), new JSONArray(blacklist));

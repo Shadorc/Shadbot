@@ -49,6 +49,7 @@ public class GifCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting a gif", context, err);
 		}
 	}

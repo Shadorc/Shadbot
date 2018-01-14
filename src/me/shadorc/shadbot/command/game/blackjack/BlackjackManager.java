@@ -17,8 +17,8 @@ import me.shadorc.shadbot.message.MessageListener;
 import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Card;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -102,7 +102,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 		if(this.isTaskDone()) {
 			embed.withFooterText("Finished");
 		} else {
-			long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(DateUtils.getMillisUntil(startTime));
+			long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(startTime));
 			embed.withFooterText(String.format("This game will end automatically in %d seconds.", remainingTime));
 		}
 
@@ -159,15 +159,19 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 
 	@Override
 	public boolean intercept(IMessage message) {
-		BlackjackPlayer player = players.stream().filter(playerItr -> playerItr.getUser().equals(message.getAuthor())).findAny().get();
-		if(player == null) {
+		if(this.isCancelCmd(message)) {
+			return true;
+		}
+
+		if(players.stream().noneMatch(playerItr -> playerItr.getUser().equals(message.getAuthor()))) {
 			return false;
 		}
 
 		if(rateLimiter.isLimited(message.getChannel(), message.getAuthor())) {
-			return true;
+			return false;
 		}
 
+		BlackjackPlayer player = players.stream().filter(playerItr -> playerItr.getUser().equals(message.getAuthor())).findAny().get();
 		if(player.isStanding()) {
 			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't play anymore.",
 					this.getAuthor().getName()), message.getChannel());
@@ -175,7 +179,6 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 		}
 
 		String content = message.getContent().toLowerCase().trim();
-
 		if("double down".equals(content) && player.getCards().size() != 2) {
 			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a maximum of 2 cards to use `double down`.",
 					player.getUser().getName()), message.getChannel());

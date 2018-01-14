@@ -20,11 +20,11 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -83,7 +83,7 @@ public class LottoCmd extends AbstractCommand {
 				.withAuthorName("Lotto")
 				.withThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 				.withDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
-						FormatUtils.formatLongDuration(LottoCmd.getDelay()),
+						FormatUtils.formatCustomDate(LottoCmd.getDelay()),
 						context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
 				.appendField("Number of participants", Integer.toString(players.size()), false)
 				.appendField("Prize pool", FormatUtils.formatCoins(LottoManager.getPool()), false);
@@ -130,7 +130,7 @@ public class LottoCmd extends AbstractCommand {
 			nextDate = nextDate.plusWeeks(1);
 		}
 
-		return DateUtils.getMillisUntil(nextDate.toInstant());
+		return TimeUtils.getMillisUntil(nextDate.toInstant());
 	}
 
 	public static void draw() {

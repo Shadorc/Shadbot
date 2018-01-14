@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
-import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.UpdateableMessage;
 import sx.blah.discord.handle.obj.IChannel;
@@ -81,7 +81,7 @@ public class PollManager extends AbstractGameManager {
 			embed.withFooterText("Finished");
 		} else {
 			embed.withFooterText(String.format("Time left: %s",
-					FormatUtils.formatShortDuration(TimeUnit.SECONDS.toMillis(duration) - DateUtils.getMillisUntil(startTime))));
+					FormatUtils.formatShortDuration(TimeUnit.SECONDS.toMillis(duration) - TimeUtils.getMillisUntil(startTime))));
 		}
 
 		message.send(embed.build()).get();

@@ -31,6 +31,11 @@ public class FormatUtils {
 		return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
 	}
 
+	public static <T extends Enum<T>> String formatOptions(Class<T> enumClass) {
+		return String.format("Options: %s",
+				FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
+	}
+
 	public static String formatNum(double num) {
 		return NumberFormat.getNumberInstance(Locale.ENGLISH).format(num);
 	}
@@ -39,13 +44,23 @@ public class FormatUtils {
 		return String.format("%s coin%s", FormatUtils.formatNum(coins), Math.abs(coins) > 1 ? "s" : "");
 	}
 
-	public static String formatLongDuration(long duration) {
-		Period period = Period.between(DateUtils.toLocalDate(Instant.ofEpochMilli(duration)).toLocalDate(), LocalDate.now());
+	public static String formatCustomDate(long millis) {
+		long minutes = millis / 1000 / 60;
+		long hours = minutes / 60;
+		long days = hours / 24;
+		return String.format("%s%s%s",
+				days > 0 ? StringUtils.pluralOf(days, "day") + " " : "",
+				hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "",
+				StringUtils.pluralOf(minutes % 60, "minute"));
+	}
+
+	public static String formatLongDuration(Instant instant) {
+		Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
 		String str = period.getUnits().stream()
 				.filter(unit -> period.get(unit) != 0)
 				.map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
 				.collect(Collectors.joining(", "));
-		return str.isEmpty() ? FormatUtils.formatShortDuration(duration) : str;
+		return str.isEmpty() ? FormatUtils.formatShortDuration(instant.toEpochMilli()) : str;
 	}
 
 	public static String formatShortDuration(long duration) {

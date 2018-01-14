@@ -70,6 +70,7 @@ public class WeatherCmd extends AbstractCommand {
 
 			loadingMsg.edit(embed.build());
 		} catch (IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting weather information", context, err);
 		}
 	}

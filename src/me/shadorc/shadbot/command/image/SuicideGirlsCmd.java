@@ -57,6 +57,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 
 			loadingMsg.edit(embed.build());
 		} catch (IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting SuicideGirls image", context, err);
 		}
 	}

@@ -19,7 +19,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
-@Setting(description = "Define auto messages on user join/leave.", setting = SettingEnum.AUTO_MESSAGE)
+@Setting(description = "Manage auto messages on user join/leave.", setting = SettingEnum.AUTO_MESSAGE)
 public class AutoMessageSetting extends AbstractSetting {
 
 	private enum Action {
@@ -32,6 +32,10 @@ public class AutoMessageSetting extends AbstractSetting {
 
 	@Override
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+		if(arg == null) {
+			throw new MissingArgumentException();
+		}
+
 		List<String> splitArgs = StringUtils.split(arg, 3);
 		if(splitArgs.size() < 2) {
 			throw new MissingArgumentException();
@@ -39,14 +43,14 @@ public class AutoMessageSetting extends AbstractSetting {
 
 		Action action = Utils.getValueOrNull(Action.class, splitArgs.get(0));
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. Options: %s",
-					splitArgs.get(0), FormatUtils.format(Action.values(), value -> value.toString().toLowerCase(), ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. %s",
+					splitArgs.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
 		Type type = Utils.getValueOrNull(Type.class, splitArgs.get(1));
 		if(type == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid type. Options: %s",
-					splitArgs.get(1), FormatUtils.format(Type.values(), value -> value.toString().toLowerCase(), ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid type. %s",
+					splitArgs.get(1), FormatUtils.formatOptions(Type.class)));
 		}
 
 		switch (type) {

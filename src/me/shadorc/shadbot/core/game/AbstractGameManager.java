@@ -6,10 +6,15 @@ import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
+import sx.blah.discord.util.PermissionUtils;
 
 public abstract class AbstractGameManager {
 
@@ -31,6 +36,17 @@ public abstract class AbstractGameManager {
 	public abstract void start() throws Exception;
 
 	public abstract void stop();
+
+	public final boolean isCancelCmd(IMessage message) {
+		IUser user = message.getAuthor();
+		if(message.getContent().equals(this.getPrefix() + "cancel")
+				&& author.equals(user) || PermissionUtils.hasPermissions(channel, user, Permissions.ADMINISTRATOR)) {
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", user.getName()), channel);
+			this.stop();
+			return true;
+		}
+		return false;
+	}
 
 	public String getCmdName() {
 		return cmdName;

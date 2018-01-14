@@ -11,8 +11,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.Discord4J;
@@ -25,8 +25,8 @@ public class InfoCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) {
-		long ping = DateUtils.getMillisUntil(context.getMessage().getCreationDate());
-		long uptime = DateUtils.getMillisUntil(Discord4J.getLaunchTime());
+		long ping = TimeUtils.getMillisUntil(context.getMessage().getCreationDate());
+		long uptime = TimeUtils.getMillisUntil(Discord4J.getLaunchTime());
 
 		Runtime runtime = Runtime.getRuntime();
 		int mbUnit = 1024 * 1024;

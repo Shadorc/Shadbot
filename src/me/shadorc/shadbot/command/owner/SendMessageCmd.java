@@ -32,7 +32,7 @@ public class SendMessageCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Integer userID = CastUtils.asPositiveInt(splitArgs.get(0));
+		Long userID = CastUtils.asPositiveLong(splitArgs.get(0));
 		if(userID == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", splitArgs.get(0)));
 		}
@@ -41,6 +41,14 @@ public class SendMessageCmd extends AbstractCommand {
 		if(user == null) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " User not found.", context.getChannel());
 			return;
+		}
+
+		if(user.equals(context.getOurUser())) {
+			throw new IllegalCmdArgumentException("I can't send a private message to myself.");
+		}
+
+		if(user.isBot()) {
+			throw new IllegalCmdArgumentException("I can't send private message to other bots.");
 		}
 
 		context.getClient().getOrCreatePMChannel(user).sendMessage(splitArgs.get(1));

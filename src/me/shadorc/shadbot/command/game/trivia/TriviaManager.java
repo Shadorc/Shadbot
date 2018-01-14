@@ -21,10 +21,10 @@ import me.shadorc.shadbot.message.MessageListener;
 import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -107,6 +107,10 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 
 	@Override
 	public boolean intercept(IMessage message) {
+		if(this.isCancelCmd(message)) {
+			return true;
+		}
+
 		String content = message.getContent();
 
 		// It's a number or a text
@@ -143,7 +147,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 
 	private void win(IChannel channel, IUser user) {
 		float coinsPerSec = (float) MAX_BONUS / LIMITED_TIME;
-		long remainingSec = LIMITED_TIME - TimeUnit.MILLISECONDS.toSeconds(DateUtils.getMillisUntil(startTime));
+		long remainingSec = LIMITED_TIME - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(startTime));
 		int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
 
 		BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + user.getName() + "**, you won **" + gains + " coins**.", channel);

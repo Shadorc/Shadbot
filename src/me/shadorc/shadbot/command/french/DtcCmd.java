@@ -57,6 +57,7 @@ public class DtcCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting a quote from DansTonChat.com", context, err);
 		}
 	}

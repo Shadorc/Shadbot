@@ -51,6 +51,7 @@ public class JokeCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting a joke", context, err);
 		}
 	}

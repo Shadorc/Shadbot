@@ -162,21 +162,18 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 
 	@Override
 	public boolean intercept(IMessage message) {
+		if(this.isCancelCmd(message)) {
+			return true;
+		}
+
 		if(!message.getAuthor().equals(this.getAuthor())) {
 			return false;
 		}
 
 		String content = message.getContent().toLowerCase().trim();
 
-		String prefix = Database.getDBGuild(message.getGuild()).getPrefix();
-		if(content.equals(prefix + "cancel")) {
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " Game cancelled.", message.getChannel());
-			this.stop();
-			return true;
-		}
-
 		// Check only if content is an unique word/letter
-		if(!content.matches("[a-zA-Z]+")) {
+		if(!content.matches("[a-z]+")) {
 			return false;
 		}
 

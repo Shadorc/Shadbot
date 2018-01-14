@@ -22,8 +22,8 @@ public class CoinsCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		String str;
 		if(context.getMessage().getMentions().isEmpty()) {
-			str = String.format("You have **%s**.",
-					FormatUtils.formatCoins(Database.getDBUser(context.getGuild(), context.getAuthor()).getCoins()));
+			str = String.format("(%s) You have **%s**.",
+					context.getAuthorName(), FormatUtils.formatCoins(Database.getDBUser(context.getGuild(), context.getAuthor()).getCoins()));
 		} else {
 			IUser user = context.getMessage().getMentions().get(0);
 			str = String.format("%s has **%s**.",

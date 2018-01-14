@@ -13,7 +13,7 @@ import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.RelicType;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DateUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -21,14 +21,14 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
 @Command(category = CommandCategory.HIDDEN, names = { "contributor_status", "donator_status", "relic_status" })
-public class ContributorStatusCmd extends AbstractCommand {
+public class RelicStatusCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		List<Relic> relics = PremiumManager.getRelicsForUser(context.getAuthor().getLongID());
 		if(relics.isEmpty()) {
-			BotUtils.sendMessage(String.format(Emoji.INFO + " You are not a contributor. If you like Shadbot, please consider donating on %s."
-					+ "%nAll donations are important and help me keeping Shadbot alive. Thanks !", Config.PATREON_URL), context.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.INFO + " You are not a donator. If you like Shadbot, please consider donating on %s."
+					+ "%nAll donations are important and help me keeping Shadbot alive !", Config.PATREON_URL), context.getChannel());
 			return;
 		}
 
@@ -38,13 +38,13 @@ public class ContributorStatusCmd extends AbstractCommand {
 
 		for(Relic relic : relics) {
 			StringBuilder contentBld = new StringBuilder();
-			contentBld.append(String.format("**ID:** %s", relic.getID()));
+			contentBld.append(String.format("**ID:** %s", relic.getRelicID()));
 			if(relic.getType().equals(RelicType.GUILD)) {
 				contentBld.append(String.format("%n**Guild ID:** %d", relic.getGuildID()));
 			}
 			contentBld.append(String.format("%n**Duration:** %d days", relic.getDuration()));
 			if(!relic.isExpired()) {
-				long daysLeft = relic.getDuration() - TimeUnit.MILLISECONDS.toDays(DateUtils.getMillisUntil(relic.getActivationTime()));
+				long daysLeft = relic.getDuration() - TimeUnit.MILLISECONDS.toDays(TimeUtils.getMillisUntil(relic.getActivationTime()));
 				contentBld.append(String.format("%n**Expires in:** %d days", daysLeft));
 			}
 

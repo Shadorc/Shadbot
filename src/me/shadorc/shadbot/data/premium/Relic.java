@@ -4,6 +4,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
+import me.shadorc.shadbot.utils.Utils;
+
 public class Relic {
 
 	private static final String RELIC_ID = "relicID";
@@ -28,14 +30,14 @@ public class Relic {
 	public Relic(JSONObject relicObj) {
 		this.relicID = relicObj.getString(RELIC_ID);
 		this.duration = relicObj.getInt(DURATION);
-		this.type = RelicType.valueOf(relicObj.getString(TYPE));
+		this.type = Utils.getValueOrNull(RelicType.class, relicObj.get(TYPE).toString());
 	}
 
 	public void activate() {
 		this.activationTime = System.currentTimeMillis();
 	}
 
-	public String getID() {
+	public String getRelicID() {
 		return relicID;
 	}
 
@@ -65,7 +67,7 @@ public class Relic {
 
 	public JSONObject toJSON() {
 		return new JSONObject()
-				.put(RELIC_ID, this.getID())
+				.put(RELIC_ID, this.getRelicID())
 				.put(DURATION, this.getDuration())
 				.put(TYPE, this.getType())
 				.putOpt(ACTIVATION, this.getActivationTime())

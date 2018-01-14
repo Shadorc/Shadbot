@@ -14,22 +14,26 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.util.EmbedBuilder;
 
-@Setting(description = "Change music default volume.", setting = SettingEnum.VOLUME)
+@Setting(description = "Manage music default volume.", setting = SettingEnum.VOLUME)
 public class VolumeSetting extends AbstractSetting {
 
 	private static final int MIN_VOLUME = 1;
-	private static final int MAX_VOLUME = 50;
+	private static final int MAX_VOLUME = 75;
 
 	@Override
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+		if(arg == null) {
+			throw new MissingArgumentException();
+		}
+
 		Integer volume = CastUtils.asIntBetween(arg, MIN_VOLUME, MAX_VOLUME);
 		if(volume == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number, must be between %d and %d.",
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number, it must be between %d and %d.",
 					arg, MIN_VOLUME, MAX_VOLUME));
 		}
 
 		Database.getDBGuild(context.getGuild()).setSetting(this.getSetting(), volume);
-		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Default volume set to **%d%**", volume), context.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), context.getChannel());
 	}
 
 	@Override

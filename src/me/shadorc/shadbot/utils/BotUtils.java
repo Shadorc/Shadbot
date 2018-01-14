@@ -68,6 +68,7 @@ public class BotUtils {
 			try {
 				return message.send();
 			} catch (MissingPermissionsException err) {
+				// BotUtils.sendMessage(TextUtils.missingPerm(new ArrayList<>(err.getMissingPermissions())), message.getChannel());
 				LogUtils.infof("{Guild ID: %d} %s", guild.getLongID(), err.getMessage());
 			} catch (DiscordException err) {
 				LogUtils.errorf(err, "An error occurred while sending message.");
@@ -79,7 +80,7 @@ public class BotUtils {
 	public static RequestFuture<Integer> deleteMessages(IChannel channel, IMessage... messages) {
 		// Only keeps messages that are at most 2 weeks old
 		List<IMessage> toDelete = Arrays.asList(messages).stream()
-				.filter(msg -> msg != null && DateUtils.getMillisUntil(msg.getCreationDate()) < TimeUnit.DAYS.toMillis(7 * 2))
+				.filter(msg -> msg != null && TimeUtils.getMillisUntil(msg.getCreationDate()) < TimeUnit.DAYS.toMillis(7 * 2))
 				.distinct()
 				.collect(Collectors.toList());
 

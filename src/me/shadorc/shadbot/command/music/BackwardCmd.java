@@ -15,6 +15,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -36,9 +37,13 @@ public class BackwardCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Integer num = CastUtils.asPositiveInt(context.getArg());
+		Long num = CastUtils.asPositiveLong(context.getArg());
 		if(num == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number.", context.getArg()));
+			try {
+				num = TimeUtils.parseTime(context.getArg());
+			} catch (IllegalArgumentException err) {
+				throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number / time.", context.getArg()));
+			}
 		}
 
 		long newPosition = guildMusic.getScheduler().changePosition(-TimeUnit.SECONDS.toMillis(num));
@@ -49,8 +54,8 @@ public class BackwardCmd extends AbstractCommand {
 	@Override
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
-				.setDescription("Fast backward current song a specified amount of time (in seconds).")
-				.addArg("sec", false)
+				.setDescription("Fast backward current song a specified amount of time.")
+				.addArg("time", "can be seconds or time (e.g. 1m12s)", false)
 				.build();
 	}
 }

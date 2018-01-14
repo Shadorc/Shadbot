@@ -36,8 +36,8 @@ public class CounterStrikeCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		LoadingMessage tempMsg = new LoadingMessage("Loading information...", context.getChannel());
-		tempMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage("Loading information...", context.getChannel());
+		loadingMsg.send();
 
 		try {
 			String arg = context.getArg();
@@ -69,7 +69,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			// Search users matching the steamID
 			JSONArray players = mainUserObj.getJSONObject("response").getJSONArray("players");
 			if(players.length() == 0) {
-				tempMsg.edit(Emoji.MAGNIFYING_GLASS + " User not found.");
+				loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " User not found.");
 				return;
 			}
 
@@ -82,7 +82,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			 * 3: Public
 			 */
 			if(userObj.getInt("communityvisibilitystate") != 3) {
-				tempMsg.edit(Emoji.ACCESS_DENIED + " This profile is private.");
+				loadingMsg.edit(Emoji.ACCESS_DENIED + " This profile is private.");
 				return;
 			}
 
@@ -91,7 +91,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			JSONObject mainStatsObj = new JSONObject(NetUtils.getBody(url));
 
 			if(!mainStatsObj.has("playerstats") || !mainStatsObj.getJSONObject("playerstats").has("stats")) {
-				tempMsg.edit(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.");
+				loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.");
 				return;
 			}
 
@@ -109,9 +109,10 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills") / this.getValue(statsArray, "total_deaths")), true)
 					.appendField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
 					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
-			tempMsg.edit(embed.build());
+			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting Counter-Strike: Global Offensive stats", context, err);
 		}
 	}

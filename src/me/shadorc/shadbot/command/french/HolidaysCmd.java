@@ -33,8 +33,8 @@ public class HolidaysCmd extends AbstractCommand {
 
 		Zone zone = Utils.getValueOrNull(Zone.class, context.getArg());
 		if(zone == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid zone. Options: %s",
-					context.getArg(), FormatUtils.format(Zone.values(), Object::toString, ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid zone. %s",
+					context.getArg(), FormatUtils.formatOptions(Zone.class)));
 		}
 
 		try {

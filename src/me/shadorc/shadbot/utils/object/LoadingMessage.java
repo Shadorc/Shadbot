@@ -4,6 +4,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.util.RequestBuffer;
 import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class LoadingMessage {
@@ -23,15 +24,21 @@ public class LoadingMessage {
 	}
 
 	public void edit(String content) {
-		msgRequest.get().edit(content);
+		RequestBuffer.request(() -> {
+			msgRequest.get().edit(content);
+		});
 	}
 
 	public void edit(EmbedObject embed) {
-		msgRequest.get().edit(embed);
+		RequestBuffer.request(() -> {
+			msgRequest.get().edit(embed);
+		});
 	}
 
 	public void delete() {
-		msgRequest.get().delete();
+		RequestBuffer.request(() -> {
+			msgRequest.get().delete();
+		});
 	}
 
 }

@@ -58,13 +58,15 @@ public class GuildMusic {
 	}
 
 	public void end() {
-		StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
-		if(!PremiumManager.isPremium(channel.getGuild())) {
-			strBuilder.append(String.format(" If you like me, you can make a donation on %s, it will help my creator keeping me alive :heart:",
-					Config.PATREON_URL));
-		}
-		BotUtils.sendMessage(strBuilder.toString(), channel);
-		this.leaveVoiceChannel();
+		Shadbot.getEventThreadPool().submit(() -> {
+			StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
+			if(!PremiumManager.isPremium(channel.getGuild())) {
+				strBuilder.append(String.format(" If you like me, you can make a donation on %s, it will help my creator keeping me alive :heart:",
+						Config.PATREON_URL));
+			}
+			BotUtils.sendMessage(strBuilder.toString(), channel);
+			this.leaveVoiceChannel();
+		});
 	}
 
 	public void leaveVoiceChannel() {

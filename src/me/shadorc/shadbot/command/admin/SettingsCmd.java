@@ -21,10 +21,11 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import sx.blah.discord.util.MessageBuilder;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "setting", "settings" })
 public class SettingsCmd extends AbstractCommand {
@@ -60,36 +61,39 @@ public class SettingsCmd extends AbstractCommand {
 		}
 
 		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
-		if(splitArgs.size() != 2) {
+		if(splitArgs.isEmpty()) {
 			throw new MissingArgumentException();
 		}
 
 		SettingEnum settingEnum = Utils.getValueOrNull(SettingEnum.class, splitArgs.get(0));
-		if(settingEnum == null) {
-			throw new IllegalCmdArgumentException(String.format("This setting does not exist. Use `%shelp %s` to see all available settings.",
-					context.getPrefix(), this.getName()));
+		if(settingEnum == null || !SETTINGS_MAP.containsKey(settingEnum)) {
+			throw new IllegalCmdArgumentException(String.format("Setting `%s` does not exist. Use `%shelp %s` to see all available settings.",
+					splitArgs.get(0), context.getPrefix(), this.getName()));
 		}
 
 		AbstractSetting setting = SETTINGS_MAP.get(settingEnum);
 
-		String arg = splitArgs.get(1);
+		String arg = splitArgs.size() == 2 ? splitArgs.get(1) : null;
 		if("help".equals(arg)) {
-			this.showHelp(context, setting);
+			BotUtils.sendMessage(this.getHelp(context.getPrefix(), setting), context.getChannel());
 			return;
 		}
 
 		try {
 			setting.execute(context, arg);
 		} catch (MissingArgumentException e) {
-			this.showHelp(context, setting);
+			BotUtils.sendMessage(new MessageBuilder(context.getClient())
+					.withChannel(context.getChannel())
+					.withContent(TextUtils.MISSING_ARG)
+					.withEmbed(this.getHelp(context.getPrefix(), setting)));
 		}
 	}
 
-	private void showHelp(Context context, AbstractSetting setting) {
-		EmbedBuilder embed = setting.getHelp(context.getPrefix())
+	private EmbedObject getHelp(String prefix, AbstractSetting setting) {
+		return setting.getHelp(prefix)
 				.withAuthorName(String.format("Help for setting: %s", setting.getName()))
-				.appendDescription(String.format("**%s**", setting.getDescription()));
-		BotUtils.sendMessage(embed.build(), context.getChannel());
+				.appendDescription(String.format("**%s**", setting.getDescription()))
+				.build();
 	}
 
 	@Override

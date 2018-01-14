@@ -53,8 +53,8 @@ public class DiabloCmd extends AbstractCommand {
 
 		Region region = Utils.getValueOrNull(Region.class, splitArgs.get(0));
 		if(region == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Region. Options: %s",
-					splitArgs.get(0), FormatUtils.format(Region.values(), Object::toString, ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Region. %s",
+					splitArgs.get(0), FormatUtils.formatOptions(Region.class)));
 		}
 
 		String battletag = splitArgs.get(1);

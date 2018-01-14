@@ -11,9 +11,9 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DateUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -33,12 +33,12 @@ public class UserInfoCmd extends AbstractCommand {
 		IUser user = mentions.isEmpty() ? context.getAuthor() : mentions.get(0);
 
 		String creationDate = String.format("%s%n(%s)",
-				DateUtils.toLocalDate(user.getCreationDate()).format(dateFormatter),
-				FormatUtils.formatLongDuration(user.getCreationDate().toEpochMilli()));
+				TimeUtils.toLocalDate(user.getCreationDate()).format(dateFormatter),
+				FormatUtils.formatLongDuration(user.getCreationDate()));
 
 		String joinDate = String.format("%s%n(%s)",
-				DateUtils.toLocalDate(context.getGuild().getJoinTimeForUser(user)).format(dateFormatter),
-				FormatUtils.formatLongDuration(context.getGuild().getJoinTimeForUser(user).toEpochMilli()));
+				TimeUtils.toLocalDate(context.getGuild().getJoinTimeForUser(user)).format(dateFormatter),
+				FormatUtils.formatLongDuration(context.getGuild().getJoinTimeForUser(user)));
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)

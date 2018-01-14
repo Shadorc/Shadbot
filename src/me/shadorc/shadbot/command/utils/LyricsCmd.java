@@ -82,6 +82,7 @@ public class LyricsCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (IOException err) {
+			loadingMsg.delete();
 			Utils.handle("getting lyrics", context, err);
 		}
 	}

@@ -21,7 +21,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
-@Setting(description = "Allow Shadbot to post messages only in the mentioned channels.", setting = SettingEnum.ALLOWED_CHANNELS)
+@Setting(description = "Manage channels allowed to Shadbot.", setting = SettingEnum.ALLOWED_CHANNELS)
 public class ChannelSetting extends AbstractSetting {
 
 	private enum Action {
@@ -30,6 +30,10 @@ public class ChannelSetting extends AbstractSetting {
 
 	@Override
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+		if(arg == null) {
+			throw new MissingArgumentException();
+		}
+
 		List<String> splitArgs = StringUtils.split(arg);
 		if(splitArgs.size() < 2) {
 			throw new MissingArgumentException();
@@ -42,8 +46,8 @@ public class ChannelSetting extends AbstractSetting {
 
 		Action action = Utils.getValueOrNull(Action.class, splitArgs.get(0));
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. Options: %s",
-					splitArgs.get(0), FormatUtils.format(Action.values(), value -> value.toString().toLowerCase(), ", ")));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. %s",
+					splitArgs.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
 		List<Long> allowedChannelsList = Database.getDBGuild(context.getGuild()).getAllowedChannels();
