@@ -24,7 +24,7 @@ public class RouletteCmd extends AbstractCommand {
 
 	protected static final ConcurrentHashMap<Long, RouletteManager> MANAGERS = new ConcurrentHashMap<>();
 
-	private static final int MAX_BET = 100_000;
+	private static final int MAX_BET = 250_000;
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {

@@ -47,7 +47,7 @@ public class ForwardCmd extends AbstractCommand {
 		}
 
 		long newPosition = guildMusic.getScheduler().changePosition(TimeUnit.SECONDS.toMillis(num));
-		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New position: %s", FormatUtils.formatShortDuration(newPosition)),
+		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New position: **%s**", FormatUtils.formatShortDuration(newPosition)),
 				context.getChannel());
 	}
 

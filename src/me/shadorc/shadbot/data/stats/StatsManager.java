@@ -5,7 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -104,8 +106,16 @@ public class StatsManager {
 		StatsManager.increment(stat, 1);
 	}
 
-	public static ConcurrentHashMap<String, AtomicInteger> get(String key) {
-		return STATS_MAP.containsKey(key) ? STATS_MAP.get(key).getMap() : null;
+	public static Map<String, Integer> get(String key) {
+		if(!STATS_MAP.containsKey(key.toLowerCase())) {
+			return null;
+		}
+
+		Map<String, Integer> map = new HashMap<>();
+		ConcurrentHashMap<String, AtomicInteger> concurrentMap = STATS_MAP.get(key.toLowerCase()).getMap();
+		concurrentMap.keySet().stream().forEach(concurrentKey -> map.put(concurrentKey, concurrentMap.get(concurrentKey).get()));
+
+		return map;
 	}
 
 	public static List<String> getKeys() {

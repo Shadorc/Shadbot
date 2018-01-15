@@ -32,7 +32,7 @@ public class VolumeCmd extends AbstractCommand {
 
 		TrackScheduler scheduler = guildMusic.getScheduler();
 		if(!context.hasArg()) {
-			BotUtils.sendMessage(String.format(Emoji.SOUND + " Current volume level: %d%%", scheduler.getAudioPlayer().getVolume()),
+			BotUtils.sendMessage(String.format(Emoji.SOUND + " Current volume level: **%d%%**", scheduler.getAudioPlayer().getVolume()),
 					context.getChannel());
 			return;
 		}

@@ -8,7 +8,9 @@ public class Stats {
 	public enum CommandEnum {
 		COMMAND_USED,
 		COMMAND_LIMITED,
-		COMMAND_HELPED
+		COMMAND_HELPED,
+		COMMAND_MISSING_ARG,
+		COMMAND_ILLEGAL_ARG
 	}
 
 	@StatsEnum(name = "money", isSubdivided = true)

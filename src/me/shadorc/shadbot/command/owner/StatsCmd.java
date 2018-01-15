@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.Lists;
 
@@ -14,6 +12,8 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.data.stats.Stats.CommandEnum;
+import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -37,21 +37,28 @@ public class StatsCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
+		if(context.getArg().equals("average")) {
+			EmbedObject embedAverage = this.getAverage();
+			if(embedAverage == null) {
+				BotUtils.sendMessage(Emoji.INFO + " Game stats are empty.", context.getChannel());
+				return;
+			}
+			BotUtils.sendMessage(embedAverage, context.getChannel());
+			return;
+		}
+
 		if(!StatsManager.getKeys().contains(context.getArg())) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid category. Options: %s",
 					context.getArg(), FormatUtils.format(StatsManager.getKeys(), value -> String.format("`%s`", value), ", ")));
 		}
 
-		ConcurrentHashMap<String, AtomicInteger> concurrentMap = StatsManager.get(context.getArg());
-		if(concurrentMap == null || concurrentMap.isEmpty()) {
+		Map<String, Integer> map = StatsManager.get(context.getArg());
+		if(map == null || map.isEmpty()) {
 			BotUtils.sendMessage(Emoji.INFO + " This category is empty.", context.getChannel());
 			return;
 		}
 
-		Map<String, Integer> unsortedMap = new HashMap<>();
-		concurrentMap.keySet().stream().forEach(key -> unsortedMap.put(key, concurrentMap.get(key).get()));
-
-		Map<String, Integer> sortedMap = Utils.sortByValue(unsortedMap);
+		Map<String, Integer> sortedMap = Utils.sortByValue(map);
 		List<List<String>> lists = Lists.partition(new ArrayList<>(sortedMap.keySet()), ROW_SIZE);
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
@@ -64,10 +71,35 @@ public class StatsCmd extends AbstractCommand {
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 
+	private EmbedObject getAverage() {
+		Map<String, Integer> moneyGained = StatsManager.get(MoneyEnum.MONEY_GAINED.toString());
+		Map<String, Integer> gameUsed = StatsManager.get(CommandEnum.COMMAND_USED.toString());
+
+		if(moneyGained == null || moneyGained.isEmpty() || gameUsed == null || gameUsed.isEmpty()) {
+			return null;
+		}
+
+		Map<String, Integer> moneyLost = StatsManager.get(MoneyEnum.MONEY_LOST.toString());
+
+		Map<String, String> averagesMap = new HashMap<>();
+		for(String key : moneyGained.keySet()) {
+			float average = ((float) moneyGained.get(key) - moneyLost.getOrDefault(key, 0)) / gameUsed.getOrDefault(key, 1);
+			averagesMap.put(key, String.format("%.1f", average));
+		}
+
+		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
+				.withAuthorName("Average")
+				.appendField("Name", FormatUtils.format(averagesMap.keySet().stream(), Object::toString, "\n"), true)
+				.appendField("Average", FormatUtils.format(averagesMap.values().stream(), Object::toString, "\n"), true)
+				.appendField("Count", FormatUtils.format(gameUsed.values().stream(), Object::toString, "\n"), true);
+
+		return embed.build();
+	}
+
 	@Override
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
-				.setDescription("Show stats for the specified category or average amount of coins gained with minigames.")
+				.setDescription("Show stats for the specified category or average amount of coins gained with mini-games.")
 				.addArg("category", FormatUtils.format(StatsManager.getKeys(), Object::toString, ", "), false)
 				.build();
 	}

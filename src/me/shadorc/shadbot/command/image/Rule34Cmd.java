@@ -80,11 +80,16 @@ public class Rule34Cmd extends AbstractCommand {
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
 					.withUrl(postObj.getString("file_url"))
 					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
-					.withDescription(String.format("%n[**Source**](%s)", postObj.get("source").toString()))
 					.appendField("Resolution", String.format("%dx%s", postObj.getInt("width"), postObj.getInt("height")), false)
 					.appendField("Tags", formattedtags, false)
 					.withImage(postObj.getString("file_url"))
 					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
+
+			String source = postObj.get("source").toString();
+			if(!source.isEmpty()) {
+				embed.withDescription(String.format("%n[**Source**](%s)", source));
+			}
+
 			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {

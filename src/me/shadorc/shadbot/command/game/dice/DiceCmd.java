@@ -26,8 +26,8 @@ public class DiceCmd extends AbstractCommand {
 
 	protected static final ConcurrentHashMap<Long, DiceManager> MANAGERS = new ConcurrentHashMap<>();
 
-	protected static final int MULTIPLIER = 5;
-	private static final int MAX_BET = 100_000;
+	protected static final int MULTIPLIER = 4;
+	private static final int MAX_BET = 250_000;
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {

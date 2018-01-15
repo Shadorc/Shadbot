@@ -88,11 +88,13 @@ public class CommandManager {
 			StatsManager.increment(VariousEnum.COMMANDS_EXECUTED);
 		} catch (IllegalCmdArgumentException err) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
+			StatsManager.increment(CommandEnum.COMMAND_ILLEGAL_ARG, cmd.getName());
 		} catch (MissingArgumentException err) {
 			BotUtils.sendMessage(new MessageBuilder(context.getClient())
 					.withChannel(context.getChannel())
 					.withContent(TextUtils.MISSING_ARG)
 					.withEmbed(cmd.getHelp(context.getPrefix())));
+			StatsManager.increment(CommandEnum.COMMAND_MISSING_ARG, cmd.getName());
 		}
 	}
 

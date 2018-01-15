@@ -73,11 +73,14 @@ public class ShadbotShard {
 	}
 
 	public void restart() {
+		LogUtils.infof("{Shard %d} Logging out.", this.getID());
 		if(shard.isLoggedIn()) {
 			shard.logout();
 		}
 		threadPool.shutdownNow();
+		LogUtils.infof("{Shard %d} Logging in.", this.getID());
 		shard.login();
+		LogUtils.infof("{Shard %d} Shard restarted.", this.getID());
 		threadPool = ShardManager.createThreadPool(this);
 	}
 }
