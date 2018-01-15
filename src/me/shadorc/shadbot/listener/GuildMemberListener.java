@@ -38,7 +38,7 @@ public class GuildMemberListener {
 		String joinMsg = dbGuild.getJoinMessage();
 		this.sendAutoMsg(event.getGuild(), channelID, joinMsg);
 
-		List<IRole> roles = dbGuild.getAutoAssignedRoles().stream()
+		List<IRole> roles = dbGuild.getAutoRoles().stream()
 				.map(event.getGuild()::getRoleByID)
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());

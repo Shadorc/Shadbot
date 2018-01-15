@@ -1,8 +1,12 @@
 package me.shadorc.shadbot.command.info;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -17,7 +21,9 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
@@ -32,9 +38,31 @@ public class ServerInfoCmd extends AbstractCommand {
 
 		DBGuild dbGuild = Database.getDBGuild(guild);
 
-		String allowedChannelsStr = dbGuild.getAllowedChannels().isEmpty() ? "All" : FormatUtils.format(dbGuild.getAllowedChannels(), chlID -> "\n\t" + guild.getChannelByID(chlID).getName(), "");
-
-		String blacklistedCmdStr = dbGuild.getBlacklistedCmd().isEmpty() ? "None" : FormatUtils.format(dbGuild.getBlacklistedCmd(), cmdName -> "\n\t" + cmdName, "");
+		StringBuilder settingsStr = new StringBuilder();
+		if(!dbGuild.getPrefix().equals(Config.DEFAULT_PREFIX)) {
+			settingsStr.append(String.format("**Prefix:** %s", context.getPrefix()));
+		}
+		if(dbGuild.getDefaultVol() != Config.DEFAULT_VOLUME) {
+			settingsStr.append(String.format("%n**Default volume:** %d%%", dbGuild.getDefaultVol()));
+		}
+		if(!dbGuild.getAllowedChannels().isEmpty()) {
+			List<IChannel> channels = dbGuild.getAllowedChannels().stream()
+					.map(guild::getChannelByID)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList());
+			settingsStr.append(String.format("%n**Allowed channels:**%n\t%s", FormatUtils.format(channels, IChannel::getName, "\n\t")));
+		}
+		if(!dbGuild.getBlacklistedCmd().isEmpty()) {
+			settingsStr.append(String.format("%n**Blacklisted commands:**%n\t%s",
+					FormatUtils.format(dbGuild.getBlacklistedCmd(), Object::toString, "\n\t")));
+		}
+		if(!dbGuild.getAutoRoles().isEmpty()) {
+			List<IRole> roles = dbGuild.getAutoRoles().stream()
+					.map(guild::getRoleByID)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList());
+			settingsStr.append(String.format("%n**Auto-roles:**%n\t%s", FormatUtils.format(roles, IRole::mention, "\n\t")));
+		}
 
 		String creationDate = String.format("%s%n(%s)",
 				TimeUtils.toLocalDate(guild.getCreationDate()).format(dateFormatter),
@@ -51,10 +79,7 @@ public class ServerInfoCmd extends AbstractCommand {
 				.appendField("Channels", String.format("**Voice:** %d", guild.getVoiceChannels().size())
 						+ String.format("%n**Text:** %d", guild.getChannels().size()), true)
 				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
-				.appendField("Settings", String.format("**Prefix:** %s", context.getPrefix())
-						+ String.format("%n**Default volume:** %d%%", dbGuild.getDefaultVol())
-						+ String.format("%n**Allowed channels:** %s", allowedChannelsStr)
-						+ String.format("%n**Blacklisted commands:** %s", blacklistedCmdStr), true);
+				.appendField("Settings", settingsStr.toString(), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 

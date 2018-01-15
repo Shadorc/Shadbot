@@ -24,8 +24,8 @@ import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 
-@Setting(description = "Manage auto assigned role(s).", setting = SettingEnum.AUTO_ASSIGN)
-public class AutoAssignSetting extends AbstractSetting {
+@Setting(description = "Manage auto assigned role(s).", setting = SettingEnum.AUTO_ROLE)
+public class AutoRoleSetting extends AbstractSetting {
 
 	private enum Action {
 		SET, REMOVE;
@@ -61,15 +61,15 @@ public class AutoAssignSetting extends AbstractSetting {
 
 		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
 		if(Action.SET.equals(action)) {
-			dbGuild.setSetting(SettingEnum.AUTO_ASSIGN, new JSONArray(roles.stream().map(IRole::getLongID).collect(Collectors.toList())));
+			dbGuild.setSetting(SettingEnum.AUTO_ROLE, new JSONArray(roles.stream().map(IRole::getLongID).collect(Collectors.toList())));
 			BotUtils.sendMessage(String.format("New comers will now have role(s): %s",
-					FormatUtils.format(roles, IRole::getName, ", ")), context.getChannel());
+					FormatUtils.format(roles, IRole::mention, ", ")), context.getChannel());
 		} else if(Action.REMOVE.equals(action)) {
-			List<Long> oldRoles = dbGuild.getAutoAssignedRoles();
+			List<Long> oldRoles = dbGuild.getAutoRoles();
 			oldRoles.removeAll(roles.stream().map(IRole::getLongID).collect(Collectors.toList()));
-			dbGuild.setSetting(SettingEnum.AUTO_ASSIGN, new JSONArray(oldRoles));
-			BotUtils.sendMessage(String.format("`%s` removed from auto-assigned roles.",
-					FormatUtils.format(roles, IRole::getName, ", ")), context.getChannel());
+			dbGuild.setSetting(SettingEnum.AUTO_ROLE, new JSONArray(oldRoles));
+			BotUtils.sendMessage(String.format("%s removed from auto-assigned roles.",
+					FormatUtils.format(roles, IRole::mention, ", ")), context.getChannel());
 		}
 	}
 
