@@ -23,7 +23,7 @@ import sx.blah.discord.util.EmbedBuilder;
 public class AutoMessageSetting extends AbstractSetting {
 
 	private enum Action {
-		SET, REMOVE;
+		ENABLE, DISABLE;
 	}
 
 	private enum Type {
@@ -73,13 +73,12 @@ public class AutoMessageSetting extends AbstractSetting {
 		}
 
 		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
-
 		IChannel channel = channelsMentioned.get(0);
-		if(Action.SET.equals(action)) {
+		if(Action.ENABLE.equals(action)) {
 			dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channel.getLongID());
 			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
 					channel.mention()), context.getChannel());
-		} else if(Action.REMOVE.equals(action)) {
+		} else if(Action.DISABLE.equals(action)) {
 			dbGuild.removeSetting(SettingEnum.MESSAGE_CHANNEL_ID);
 			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send automatic messages "
 					+ "until a new channel is defined.", channel.mention()), context.getChannel());
@@ -88,12 +87,12 @@ public class AutoMessageSetting extends AbstractSetting {
 
 	private void updateJoinMessage(Context context, Action action, List<String> args) {
 		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
-		if(Action.SET.equals(action)) {
-			String message = args.get(3);
+		if(Action.ENABLE.equals(action)) {
+			String message = args.get(2);
 			dbGuild.setSetting(SettingEnum.JOIN_MESSAGE, message);
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Join message set to \"%s\"", message), context.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Join message set to `%s`", message), context.getChannel());
 
-		} else if(Action.REMOVE.equals(action)) {
+		} else if(Action.DISABLE.equals(action)) {
 			dbGuild.removeSetting(SettingEnum.JOIN_MESSAGE);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Join message disabled.", context.getChannel());
 		}
@@ -101,12 +100,12 @@ public class AutoMessageSetting extends AbstractSetting {
 
 	private void updateLeaveMessage(Context context, Action action, List<String> args) {
 		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
-		if(Action.SET.equals(action)) {
-			String message = args.get(3);
+		if(Action.ENABLE.equals(action)) {
+			String message = args.get(2);
 			dbGuild.setSetting(SettingEnum.LEAVE_MESSAGE, message);
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Leave message set to \"%s\"", message), context.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Leave message set to `%s`", message), context.getChannel());
 
-		} else if(Action.REMOVE.equals(action)) {
+		} else if(Action.DISABLE.equals(action)) {
 			dbGuild.removeSetting(SettingEnum.LEAVE_MESSAGE);
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Leave message disabled.", context.getChannel());
 		}
@@ -115,10 +114,16 @@ public class AutoMessageSetting extends AbstractSetting {
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
-				.appendField("Usage", String.format("`%s%s <action> <type> [<message>]`", prefix, this.getCmdName()), false)
-				.appendField("Argument", String.format("**action** - %s%n**type** - %s",
+				.appendField("Usage", String.format("`%s%s <action> <type> [<value>]`", prefix, this.getCmdName()), false)
+				.appendField("Argument", String.format("**action** - %s"
+						+ "%n**type** - %s"
+						+ "%n**value** - a message for *%s* and *%s* or a @channel for *%s*",
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/"),
-						FormatUtils.format(Type.values(), type -> type.toString().toLowerCase(), "/")), false)
+						FormatUtils.format(Type.values(), type -> type.toString().toLowerCase(), "/"),
+						Type.JOIN_MESSAGE.toString().toLowerCase(),
+						Type.LEAVE_MESSAGE.toString().toLowerCase(),
+						Type.CHANNEL.toString().toLowerCase()), false)
+				.appendField("Info", "You don't need to specify *value* to disable a type.", false)
 				.appendField("Example", String.format("`%s%s set join_message Hello you (:`", prefix, this.getCmdName()), false);
 	}
 }
