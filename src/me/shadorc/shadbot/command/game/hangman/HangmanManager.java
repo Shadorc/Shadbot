@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.game.hangman;
 
-import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.Database;
@@ -18,7 +18,6 @@ import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -50,11 +49,11 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 
 	private int failsCount;
 
-	public HangmanManager(AbstractCommand cmd, IChannel channel, IUser author) throws IOException {
+	public HangmanManager(AbstractCommand cmd, IChannel channel, IUser author, Difficulty difficulty) {
 		super(cmd, channel, author);
 		this.rateLimiter = new RateLimiter(2, 2, ChronoUnit.SECONDS);
 		this.message = new UpdateableMessage(channel);
-		this.word = HangmanCmd.WORDS.get(MathUtils.rand(HangmanCmd.WORDS.size()));
+		this.word = HangmanCmd.getWord(difficulty);
 		this.charsTested = new ArrayList<>();
 		this.failsCount = 0;
 	}
