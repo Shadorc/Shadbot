@@ -7,13 +7,13 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TwitterUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.object.LoadingMessage;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import twitter4j.TwitterException;
 
@@ -37,10 +37,14 @@ public class HolidaysCmd extends AbstractCommand {
 					context.getArg(), FormatUtils.formatOptions(Zone.class)));
 		}
 
+		LoadingMessage loadingMsg = new LoadingMessage("Loading holidays information...", context.getChannel());
+		loadingMsg.send();
+
 		try {
 			String holidays = StringUtils.remove(TwitterUtils.getLastTweet("Vacances_Zone" + zone), "#");
-			BotUtils.sendMessage(Emoji.BEACH + " " + holidays, context.getChannel());
+			loadingMsg.edit(Emoji.BEACH + " " + holidays);
 		} catch (TwitterException err) {
+			loadingMsg.delete();
 			Utils.handle("getting holidays information", context, err);
 		}
 	}
