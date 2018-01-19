@@ -13,8 +13,8 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
@@ -80,7 +80,7 @@ public class PollCmd extends AbstractCommand {
 
 		// Remove duplicate choices
 		List<String> choicesList = substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList());
-		if(!MathUtils.isInRange(choicesList.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
+		if(!Utils.isInRange(choicesList.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
 			throw new IllegalCmdArgumentException(String.format("You must specify between %d and %d different non-empty choices.",
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}

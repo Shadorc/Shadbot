@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,6 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.LogUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
@@ -81,7 +81,7 @@ public class ImageCmd extends AbstractCommand {
 					+ "&limit=25" // The pagination limit (min: 1 max: 50)
 					+ "&offset=%d" // The pagination offset (min: 0 max: 50000)
 					+ "&access_token=%s",
-					encodedSearch, MathUtils.rand(150), this.accessToken);
+					encodedSearch, ThreadLocalRandom.current().nextInt(150), this.accessToken);
 
 			JSONObject mainObj = new JSONObject(NetUtils.getBody(url));
 
@@ -92,7 +92,7 @@ public class ImageCmd extends AbstractCommand {
 				return null;
 			}
 
-			return results.get(MathUtils.rand(results.size()));
+			return results.get(ThreadLocalRandom.current().nextInt(results.size()));
 
 		} catch (JSONException | IOException err) {
 			return null;

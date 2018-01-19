@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.game;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.Shadbot;
@@ -22,7 +23,6 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.LogUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -135,7 +135,7 @@ public class LottoCmd extends AbstractCommand {
 
 	public static void draw() {
 		LogUtils.infof("Lottery draw started...");
-		int winningNum = MathUtils.rand(MIN_NUM, MAX_NUM);
+		int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
 		List<LottoPlayer> winners = LottoManager.getPlayers().stream()
 				.filter(player -> player.getNum() == winningNum

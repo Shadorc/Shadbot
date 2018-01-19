@@ -13,7 +13,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -36,7 +35,7 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
-		if(!MathUtils.isInRange(splitArgs.size(), 1, 2)) {
+		if(!Utils.isInRange(splitArgs.size(), 1, 2)) {
 			throw new MissingArgumentException();
 		}
 

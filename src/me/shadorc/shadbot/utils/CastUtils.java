@@ -13,7 +13,7 @@ public class CastUtils {
 	public static Integer asIntBetween(String str, int min, int max) {
 		try {
 			Integer nbr = Integer.parseInt(str);
-			if(!MathUtils.isInRange(nbr, min, max)) {
+			if(!Utils.isInRange(nbr, min, max)) {
 				return null;
 			}
 			return nbr;

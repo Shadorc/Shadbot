@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.game.slotmachine;
 
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -14,7 +15,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -37,9 +37,9 @@ public class SlotMachineCmd extends AbstractCommand {
 			return;
 		}
 
-		SlotOptions slot1 = SLOTS_ARRAY[MathUtils.rand(SLOTS_ARRAY.length)];
-		SlotOptions slot2 = SLOTS_ARRAY[MathUtils.rand(SLOTS_ARRAY.length)];
-		SlotOptions slot3 = SLOTS_ARRAY[MathUtils.rand(SLOTS_ARRAY.length)];
+		SlotOptions slot1 = SLOTS_ARRAY[ThreadLocalRandom.current().nextInt(SLOTS_ARRAY.length)];
+		SlotOptions slot2 = SLOTS_ARRAY[ThreadLocalRandom.current().nextInt(SLOTS_ARRAY.length)];
+		SlotOptions slot3 = SLOTS_ARRAY[ThreadLocalRandom.current().nextInt(SLOTS_ARRAY.length)];
 
 		int gains = -PAID_COST;
 		if(Arrays.asList(slot2, slot3).stream().allMatch(slot1::equals)) {

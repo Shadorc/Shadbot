@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,7 @@ import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.Pair;
@@ -68,7 +69,7 @@ public class RouletteManager extends AbstractGameManager {
 	public void stop() {
 		this.cancelScheduledTask();
 
-		int winningPlace = MathUtils.rand(1, 36);
+		int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
 
 		List<String> list = new ArrayList<>();
 		for(IUser user : playersPlace.keySet()) {
@@ -78,8 +79,8 @@ public class RouletteManager extends AbstractGameManager {
 			Map<String, Boolean> testsMap = new HashMap<>();
 			testsMap.put("red", RED_NUMS.contains(winningPlace));
 			testsMap.put("black", !RED_NUMS.contains(winningPlace));
-			testsMap.put("low", MathUtils.isInRange(winningPlace, 1, 19));
-			testsMap.put("high", MathUtils.isInRange(winningPlace, 19, 37));
+			testsMap.put("low", Utils.isInRange(winningPlace, 1, 19));
+			testsMap.put("high", Utils.isInRange(winningPlace, 19, 37));
 			testsMap.put("even", winningPlace % 2 == 0);
 			testsMap.put("odd", winningPlace % 2 != 0);
 

@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.french;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
@@ -14,7 +15,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -33,7 +33,7 @@ public class JokeCmd extends AbstractCommand {
 		loadingMsg.send();
 
 		try {
-			String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d", MathUtils.rand(1, 5));
+			String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d", ThreadLocalRandom.current().nextInt(1, 6));
 			Document doc = NetUtils.getDoc(url);
 
 			List<String> jokes = doc.getElementsByClass("texte ").stream()
@@ -41,7 +41,7 @@ public class JokeCmd extends AbstractCommand {
 					.filter(elmt -> elmt.length() < 1000)
 					.collect(Collectors.toList());
 
-			String jokeHtml = jokes.get(MathUtils.rand(jokes.size()));
+			String jokeHtml = jokes.get(ThreadLocalRandom.current().nextInt(jokes.size()));
 			String joke = FormatUtils.format(jokeHtml.split("<br>"), line -> Jsoup.parse(line).text().trim(), "\n");
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()

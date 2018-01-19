@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.ParseException;
@@ -22,7 +23,6 @@ import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -69,7 +69,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 
 		if("multiple".equals(questionType)) {
 			answers = Utils.toList(resultObj.getJSONArray("incorrect_answers"), String.class);
-			answers.add(MathUtils.rand(answers.size()), correctAnswer);
+			answers.add(ThreadLocalRandom.current().nextInt(answers.size()), correctAnswer);
 		} else {
 			answers = new ArrayList<>(Arrays.asList("True", "False"));
 		}

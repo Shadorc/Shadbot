@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.game;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -13,7 +15,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -41,7 +42,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		StringBuilder strBuilder = new StringBuilder(Emoji.DICE + " You break a sweat, you pull the trigger... ");
 
 		int gains;
-		if(MathUtils.rand(6) == 0) {
+		if(ThreadLocalRandom.current().nextInt(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			StatsManager.increment(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
 			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.formatCoins(Math.abs(gains))));

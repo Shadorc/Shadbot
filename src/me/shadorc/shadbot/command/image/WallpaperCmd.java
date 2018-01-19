@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.image;
 import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -30,7 +31,6 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -124,7 +124,7 @@ public class WallpaperCmd extends AbstractCommand {
 			return;
 		}
 
-		Wallpaper wallpaper = wallpapers.get(MathUtils.rand(wallpapers.size()));
+		Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
 
 		String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()

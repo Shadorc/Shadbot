@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,7 +14,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -42,7 +42,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 			Document doc = NetUtils.getDoc("https://www.suicidegirls.com/photos/sg/recent/all/");
 
 			Elements girls = doc.getElementsByTag("article");
-			Element girl = girls.get(MathUtils.rand(girls.size()));
+			Element girl = girls.get(ThreadLocalRandom.current().nextInt(girls.size()));
 
 			String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();
 			String imageUrl = girl.select("noscript").attr("data-retina");

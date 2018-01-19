@@ -3,8 +3,7 @@ package me.shadorc.shadbot.utils.object;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-
-import me.shadorc.shadbot.utils.MathUtils;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Card {
 
@@ -67,7 +66,7 @@ public class Card {
 	}
 
 	public static Card pick() {
-		return new Card(MathUtils.rand(1, 13), Sign.values()[MathUtils.rand(Sign.values().length)]);
+		return new Card(ThreadLocalRandom.current().nextInt(1, 14), Sign.values()[ThreadLocalRandom.current().nextInt(Sign.values().length)]);
 	}
 
 	public static List<Card> pick(int count) {

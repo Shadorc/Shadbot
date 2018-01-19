@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,7 +17,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -62,7 +62,7 @@ public class Rule34Cmd extends AbstractCommand {
 			JSONObject postObj;
 			if(postsObj.get("post") instanceof JSONArray) {
 				JSONArray postsArray = postsObj.getJSONArray("post");
-				postObj = postsArray.getJSONObject(MathUtils.rand(postsArray.length()));
+				postObj = postsArray.getJSONObject(ThreadLocalRandom.current().nextInt(postsArray.length()));
 			} else {
 				postObj = postsObj.getJSONObject("post");
 			}

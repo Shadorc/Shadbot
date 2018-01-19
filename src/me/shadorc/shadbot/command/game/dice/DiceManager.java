@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.game.dice;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,6 @@ import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.UpdateableMessage;
@@ -61,7 +61,7 @@ public class DiceManager extends AbstractGameManager {
 	public void stop() {
 		this.cancelScheduledTask();
 
-		int winningNum = MathUtils.rand(1, 6);
+		int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
 
 		List<String> list = new ArrayList<>();
 		for(int num : numsPlayers.keySet()) {

@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.utils;
 
 import java.util.EnumSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
@@ -30,11 +31,11 @@ public class TextUtils {
 			String.format("Support server: %s", Config.SUPPORT_SERVER) };
 
 	public static String getSpamMessage() {
-		return SPAM_MESSAGES[MathUtils.rand(SPAM_MESSAGES.length)];
+		return SPAM_MESSAGES[ThreadLocalRandom.current().nextInt(SPAM_MESSAGES.length)];
 	}
 
 	public static String getTip() {
-		return TIPS_MESSAGES[MathUtils.rand(TIPS_MESSAGES.length)];
+		return TIPS_MESSAGES[ThreadLocalRandom.current().nextInt(TIPS_MESSAGES.length)];
 	}
 
 	public static String notEnoughCoins(IUser user) {

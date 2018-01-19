@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.json.JSONException;
@@ -17,7 +18,6 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -82,7 +82,7 @@ public class HangmanCmd extends AbstractCommand {
 		if(HARD_WORDS.isEmpty()) {
 			String url = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt";
 			HARD_WORDS.addAll(StringUtils.split(NetUtils.getBody(url), "\n").stream()
-					.filter(word -> MathUtils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
+					.filter(word -> Utils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
 					.limit(500)
 					.collect(Collectors.toList()));
 		}
@@ -90,7 +90,7 @@ public class HangmanCmd extends AbstractCommand {
 		if(EASY_WORDS.isEmpty()) {
 			String url = "https://gist.githubusercontent.com/deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt";
 			EASY_WORDS.addAll(StringUtils.split(NetUtils.getBody(url), "\n").stream()
-					.filter(word -> MathUtils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
+					.filter(word -> Utils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
 					.limit(500)
 					.collect(Collectors.toList()));
 		}
@@ -98,9 +98,9 @@ public class HangmanCmd extends AbstractCommand {
 
 	protected static String getWord(Difficulty difficulty) {
 		if(difficulty.equals(Difficulty.EASY)) {
-			return EASY_WORDS.get(MathUtils.rand(HangmanCmd.EASY_WORDS.size()));
+			return EASY_WORDS.get(ThreadLocalRandom.current().nextInt(HangmanCmd.EASY_WORDS.size()));
 		}
-		return HARD_WORDS.get(MathUtils.rand(HangmanCmd.HARD_WORDS.size()));
+		return HARD_WORDS.get(ThreadLocalRandom.current().nextInt(HangmanCmd.HARD_WORDS.size()));
 	}
 
 	@Override

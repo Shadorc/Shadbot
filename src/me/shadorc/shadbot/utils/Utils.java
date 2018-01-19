@@ -136,4 +136,8 @@ public class Utils {
 		return bet;
 	}
 
+	public static boolean isInRange(float nbr, float min, float max) {
+		return nbr >= min && nbr <= max;
+	}
+
 }

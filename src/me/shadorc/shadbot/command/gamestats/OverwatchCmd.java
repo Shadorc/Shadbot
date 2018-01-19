@@ -12,7 +12,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -40,7 +39,7 @@ public class OverwatchCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		List<String> splitArgs = StringUtils.split(context.getArg());
-		if(!MathUtils.isInRange(splitArgs.size(), 1, 3)) {
+		if(!Utils.isInRange(splitArgs.size(), 1, 3)) {
 			throw new MissingArgumentException();
 		}
 

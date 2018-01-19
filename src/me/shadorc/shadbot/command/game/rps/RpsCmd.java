@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.game.rps;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -13,7 +15,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.MathUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -36,7 +37,7 @@ public class RpsCmd extends AbstractCommand {
 					context.getArg(), FormatUtils.formatOptions(Handsign.class)));
 		}
 
-		Handsign botHandsign = Handsign.values()[MathUtils.rand(Handsign.values().length)];
+		Handsign botHandsign = Handsign.values()[ThreadLocalRandom.current().nextInt(Handsign.values().length)];
 
 		StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s.%n**Shadbot**: %s.%n",
 				context.getAuthorName(), userHandsign.getRepresentation(), botHandsign.getRepresentation()));
