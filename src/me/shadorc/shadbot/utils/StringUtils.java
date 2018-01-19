@@ -50,7 +50,10 @@ public class StringUtils {
 	}
 
 	public static String remove(String text, String... toRemove) {
-		return text.replaceAll(Arrays.stream(toRemove).filter(str -> !str.isEmpty()).collect(Collectors.joining("|")), "");
+		return text.replaceAll(Arrays.stream(toRemove)
+				.filter(str -> !str.isEmpty())
+				.map(Pattern::quote)
+				.collect(Collectors.joining("|")), "");
 	}
 
 	public static String normalizeSpace(String str) {
