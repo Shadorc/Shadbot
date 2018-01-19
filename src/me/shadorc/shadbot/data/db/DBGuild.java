@@ -90,8 +90,8 @@ public class DBGuild {
 	}
 
 	public int getDefaultVol() {
-		if(settingsMap.containsKey(SettingEnum.VOLUME)) {
-			return Integer.parseInt(settingsMap.get(SettingEnum.VOLUME).toString());
+		if(settingsMap.containsKey(SettingEnum.DEFAULT_VOLUME)) {
+			return Integer.parseInt(settingsMap.get(SettingEnum.DEFAULT_VOLUME).toString());
 		} else {
 			return Config.DEFAULT_VOLUME;
 		}

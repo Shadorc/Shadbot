@@ -14,7 +14,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.util.EmbedBuilder;
 
-@Setting(description = "Manage music default volume.", setting = SettingEnum.VOLUME)
+@Setting(description = "Manage music default volume.", setting = SettingEnum.DEFAULT_VOLUME)
 public class VolumeSetting extends AbstractSetting {
 
 	private static final int MIN_VOLUME = 1;

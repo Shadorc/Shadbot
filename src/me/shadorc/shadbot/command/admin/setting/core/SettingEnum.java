@@ -3,7 +3,7 @@ package me.shadorc.shadbot.command.admin.setting.core;
 public enum SettingEnum {
 
 	PREFIX("prefix"),
-	VOLUME("volume"),
+	DEFAULT_VOLUME("default_volume"),
 	NSFW("nsfw"),
 	ALLOWED_CHANNELS("allowed_channels"),
 	BLACKLIST("blacklist"),
