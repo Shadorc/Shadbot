@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.exception.RelicActivationException;
@@ -27,7 +28,7 @@ public class PremiumManager {
 	private static final String UNUSED_RELICS = "unusedRelics";
 
 	private static final String FILE_NAME = "premium_data.json";
-	private static final File FILE = new File(FILE_NAME);
+	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
 
 	private static final List<Relic> UNUSED_RELICS_LIST = new ArrayList<>();
 

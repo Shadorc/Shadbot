@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.data.stats.Stats.DatabaseEnum;
@@ -21,7 +22,7 @@ import sx.blah.discord.handle.obj.IUser;
 public class Database {
 
 	private static final String FILE_NAME = "user_data.json";
-	private static final File FILE = new File(FILE_NAME);
+	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
 
 	private static JSONObject dbObject;
 
@@ -53,16 +54,16 @@ public class Database {
 		return new DBUser(guild, user.getLongID());
 	}
 
-	public static JSONObject opt(String key) {
+	public synchronized static JSONObject opt(String key) {
 		return dbObject.optJSONObject(key);
 	}
 
-	public static void save(DBGuild dbGuild) {
+	public synchronized static void save(DBGuild dbGuild) {
 		dbObject.put(dbGuild.getGuild().getStringID(), dbGuild.toJSON());
 		StatsManager.increment(DatabaseEnum.GUILD_SAVED);
 	}
 
-	public static void save(DBUser dbUser) {
+	public synchronized static void save(DBUser dbUser) {
 		JSONObject guildObj = dbObject.optJSONObject(dbUser.getGuild().getStringID());
 		if(guildObj == null) {
 			guildObj = new JSONObject().put(DBGuild.USERS_KEY, new JSONObject());

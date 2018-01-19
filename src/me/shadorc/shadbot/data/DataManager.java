@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.data;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +16,18 @@ import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 
 public class DataManager {
 
+	public static final File SAVE_DIR = new File("./saves");
+
 	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor(2, "Shadbot-DataManager-%d");
 	private static final List<Runnable> SAVE_TASKS = new ArrayList<>();
 
 	public static boolean init() {
 		LogUtils.infof("Initializing data files...");
+
+		if(!SAVE_DIR.exists() && !SAVE_DIR.mkdir()) {
+			LogUtils.errorf("The save folder could not be created.");
+			return false;
+		}
 
 		Reflections reflections = new Reflections(DataManager.class.getPackage().getName(), new MethodAnnotationsScanner());
 		for(Method initMethod : reflections.getMethodsAnnotatedWith(DataInit.class)) {
