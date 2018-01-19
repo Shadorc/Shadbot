@@ -30,7 +30,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		List<String> splitArgs = StringUtils.split(context.getArg());
-		if(splitArgs.size() != 3) {
+		if(!Utils.isInRange(splitArgs.size(), 2, 3)) {
 			throw new MissingArgumentException();
 		}
 
@@ -64,8 +64,8 @@ public class ManageCoinsCmd extends AbstractCommand {
 				break;
 			case RESET:
 				users.stream().forEach(user -> Database.getDBUser(context.getGuild(), user).resetCoins());
-				BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** lost all his/their coins.",
-						mentionsStr), context.getChannel());
+				BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.",
+						mentionsStr, users.size() == 1 ? "his" : "their"), context.getChannel());
 				break;
 		}
 	}
@@ -77,6 +77,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 				.addArg("action", FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), " / "), false)
 				.addArg("coins", "can be positive or negative", true)
 				.addArg("@user(s)/@role(s)", false)
+				.setExample(String.format("`%s%s add 150 @Shadbot`%n`%s%s reset @Shadbot`", prefix, this.getName(), prefix, this.getName()))
 				.build();
 	}
 }

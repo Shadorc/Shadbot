@@ -127,7 +127,7 @@ public class HelpBuilder {
 	private String getArguments() {
 		return args.stream()
 				.filter(arg -> arg.getDesc() != null)
-				.map(arg -> String.format("%n%s**%s** - %s", arg.isFacultative() ? "[OPTIONAL] " : "", arg.getName(), arg.getDesc()))
+				.map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isFacultative() ? "[optional] " : "", arg.getDesc()))
 				.collect(Collectors.joining());
 	}
 }
