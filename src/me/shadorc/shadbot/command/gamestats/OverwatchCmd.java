@@ -48,27 +48,30 @@ public class OverwatchCmd extends AbstractCommand {
 		loadingMsg.send();
 
 		try {
+			OverwatchPlayer player;
+
 			String username = null;
 			Platform platform = null;
 			Region region = null;
 			switch (splitArgs.size()) {
 				case 1:
 					username = splitArgs.get(0);
+					player = new OverwatchPlayer(username);
 					break;
 
 				case 2:
 					platform = this.getPlatform(splitArgs.get(0));
 					username = splitArgs.get(1);
+					player = new OverwatchPlayer(username, platform);
 					break;
 
 				default:
 					platform = this.getPlatform(splitArgs.get(0));
 					region = this.getRegion(splitArgs.get(1));
 					username = splitArgs.get(2);
+					player = new OverwatchPlayer(username, platform, region);
 					break;
 			}
-
-			OverwatchPlayer player = new OverwatchPlayer(username, platform, region);
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.setLenient(true)
