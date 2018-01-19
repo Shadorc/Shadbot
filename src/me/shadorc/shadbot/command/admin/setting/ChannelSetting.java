@@ -55,7 +55,7 @@ public class ChannelSetting extends AbstractSetting {
 			if(allowedChannelsList.isEmpty()
 					&& mentionedChannels.stream().noneMatch(channel -> channel.getLongID() == context.getChannel().getLongID())) {
 				BotUtils.sendMessage(Emoji.WARNING + " You did not mentioned this channel. "
-						+ "I will not reply until it's added to the list of allowed channels.", context.getChannel());
+						+ "I will not reply here until this channel is added to the list of allowed channels.", context.getChannel());
 			}
 
 			allowedChannelsList.addAll(mentionedChannels.stream()

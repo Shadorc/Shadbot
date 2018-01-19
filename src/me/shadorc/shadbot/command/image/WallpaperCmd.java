@@ -54,7 +54,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		LoadingMessage loadingMsg = new LoadingMessage("Loading Wallpaper...", context.getChannel());
+		LoadingMessage loadingMsg = new LoadingMessage("Loading wallpaper...", context.getChannel());
 		loadingMsg.send();
 
 		if(wallhaven == null) {

@@ -44,7 +44,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 
 		Integer coins = CastUtils.asPositiveInt(splitCmd.get(0));
 		if(coins == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount.", splitCmd.get(0)));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", splitCmd.get(0)));
 		}
 
 		if(Database.getDBUser(context.getGuild(), senderUser).getCoins() < coins) {

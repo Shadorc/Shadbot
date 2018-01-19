@@ -22,11 +22,11 @@ public class CoinsCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		String str;
 		if(context.getMessage().getMentions().isEmpty()) {
-			str = String.format("(%s) You have **%s**.",
+			str = String.format("(**%s**) You have **%s**.",
 					context.getAuthorName(), FormatUtils.formatCoins(Database.getDBUser(context.getGuild(), context.getAuthor()).getCoins()));
 		} else {
 			IUser user = context.getMessage().getMentions().get(0);
-			str = String.format("%s has **%s**.",
+			str = String.format("**%s** has **%s**.",
 					user.getName(), FormatUtils.formatCoins(Database.getDBUser(context.getGuild(), user).getCoins()));
 		}
 		BotUtils.sendMessage(Emoji.PURSE + " " + str, context.getChannel());

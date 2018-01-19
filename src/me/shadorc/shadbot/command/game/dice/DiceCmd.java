@@ -85,7 +85,8 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		if(!diceManager.addPlayer(context.getAuthor(), num)) {
-			BotUtils.sendMessage(Emoji.INFO + " You're already participating.", context.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+					context.getAuthorName()), context.getChannel());
 			return;
 		}
 	}

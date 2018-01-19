@@ -37,7 +37,7 @@ public class HolidaysCmd extends AbstractCommand {
 					context.getArg(), FormatUtils.formatOptions(Zone.class)));
 		}
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading holidays information...", context.getChannel());
+		LoadingMessage loadingMsg = new LoadingMessage("Loading holiday information...", context.getChannel());
 		loadingMsg.send();
 
 		try {

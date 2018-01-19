@@ -36,7 +36,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading information...", context.getChannel());
+		LoadingMessage loadingMsg = new LoadingMessage("Loading CS:GO stats...", context.getChannel());
 		loadingMsg.send();
 
 		try {

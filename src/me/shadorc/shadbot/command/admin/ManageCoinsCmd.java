@@ -42,7 +42,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 
 		Integer coins = CastUtils.asInt(splitArgs.get(1));
 		if(coins == null && action != Action.RESET) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount.", splitArgs.get(1)));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", splitArgs.get(1)));
 		}
 
 		List<IUser> users = BotUtils.getUsersFrom(context.getMessage());
