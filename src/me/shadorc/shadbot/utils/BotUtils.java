@@ -56,6 +56,15 @@ public class BotUtils {
 	}
 
 	public static RequestFuture<IMessage> sendMessage(MessageBuilder message) {
+		return BotUtils.sendMessage(message, 5);
+	}
+
+	public static RequestFuture<IMessage> sendMessage(MessageBuilder message, int retry) {
+		if(retry == 0) {
+			LogUtils.warnf("{Guild ID: %d} Abort attempt to send message (5 failed requests).", message.getChannel().getGuild());
+			return null;
+		}
+
 		IGuild guild = message.getChannel().isPrivate() ? null : message.getChannel().getGuild();
 		if(guild != null && !guild.getShard().isReady()) {
 			LogUtils.infof("{Guild ID: %d} A message could not be sent because shard isn't ready, adding it to queue.",
@@ -71,6 +80,9 @@ public class BotUtils {
 				BotUtils.sendMessage(TextUtils.missingPerm(err.getMissingPermissions()), message.getChannel());
 				LogUtils.infof("{Guild ID: %d} %s", guild.getLongID(), err.getMessage());
 			} catch (DiscordException err) {
+				if(err.getMessage().contains("Message was unable to be sent (Discord didn't return a response)")) {
+					return BotUtils.sendMessage(message, retry - 1).get();
+				}
 				LogUtils.errorf(err, "An error occurred while sending message.");
 			}
 			return null;
