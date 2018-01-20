@@ -49,14 +49,16 @@ public class KickCmd extends AbstractCommand {
 			throw new IllegalCmdArgumentException("You cannot kick yourself.");
 		}
 
-		for(IUser user : mentionedUsers) {
-			if(PermissionUtils.isUserHigher(context.getGuild(), user, context.getAuthor())) {
-				throw new IllegalCmdArgumentException(String.format("You can't kick **%s** because he is higher in the role hierarchy than you.",
-						user.getName()));
+		for(IUser mentionedUser : mentionedUsers) {
+			if(!PermissionUtils.isUserHigher(context.getGuild(), context.getAuthor(), mentionedUser)) {
+				throw new IllegalCmdArgumentException(String.format("You can't kick **%s** because he has the same or a higher role "
+						+ "position than you in the role hierarchy.",
+						mentionedUser.getName()));
 			}
-			if(PermissionUtils.isUserHigher(context.getGuild(), user, context.getOurUser())) {
-				throw new IllegalCmdArgumentException(String.format("I cannot kick **%s** because he is higher in the role hierarchy than me.",
-						user.getName()));
+			if(!PermissionUtils.isUserHigher(context.getGuild(), context.getOurUser(), mentionedUser)) {
+				throw new IllegalCmdArgumentException(String.format("I cannot kick **%s** because he has the same or a higher role "
+						+ "position than me in the role hierarchy.",
+						mentionedUser.getName()));
 			}
 		}
 

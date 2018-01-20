@@ -49,14 +49,16 @@ public class SoftBanCmd extends AbstractCommand {
 			throw new IllegalCmdArgumentException("You cannot softban yourself.");
 		}
 
-		for(IUser user : mentionedUsers) {
-			if(PermissionUtils.isUserHigher(context.getGuild(), user, context.getAuthor())) {
-				throw new IllegalCmdArgumentException(String.format("You can't softban **%s** because he is higher in the role hierarchy than you.",
-						user.getName()));
+		for(IUser mentionedUser : mentionedUsers) {
+			if(!PermissionUtils.isUserHigher(context.getGuild(), context.getAuthor(), mentionedUser)) {
+				throw new IllegalCmdArgumentException(String.format("You can't softban **%s** because he has the same or a higher role "
+						+ "position than you in the role hierarchy.",
+						mentionedUser.getName()));
 			}
-			if(PermissionUtils.isUserHigher(context.getGuild(), user, context.getOurUser())) {
-				throw new IllegalCmdArgumentException(String.format("I cannot softban **%s** because he is higher in the role hierarchy than me.",
-						user.getName()));
+			if(!PermissionUtils.isUserHigher(context.getGuild(), context.getOurUser(), mentionedUser)) {
+				throw new IllegalCmdArgumentException(String.format("I cannot softban **%s** because he has the same or a higher role "
+						+ "position than me in the role hierarchy.",
+						mentionedUser.getName()));
 			}
 		}
 
