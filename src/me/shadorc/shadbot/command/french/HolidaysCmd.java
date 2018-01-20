@@ -45,7 +45,7 @@ public class HolidaysCmd extends AbstractCommand {
 			loadingMsg.edit(Emoji.BEACH + " " + holidays);
 		} catch (TwitterException err) {
 			loadingMsg.delete();
-			Utils.handle("getting holidays information", context, err);
+			Utils.handle("getting holidays information", context, err.getCause());
 		}
 	}
 

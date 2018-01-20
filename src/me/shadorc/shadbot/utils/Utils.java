@@ -103,7 +103,7 @@ public class Utils {
 		return Arrays.stream(array).filter(element -> !element.equals(elmt)).collect(Collectors.toList());
 	}
 
-	public static void handle(String action, Context context, Exception err) {
+	public static void handle(String action, Context context, Throwable err) {
 		String msg;
 		if(err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
 			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
