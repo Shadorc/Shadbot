@@ -2,8 +2,6 @@ package me.shadorc.shadbot.core.command;
 
 import java.util.List;
 
-import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.shard.ShadbotShard;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -22,9 +20,9 @@ public class Context {
 	private final String cmdName;
 	private final String arg;
 
-	public Context(IMessage message) {
+	public Context(String prefix, IMessage message) {
 		this.message = message;
-		this.prefix = message.getGuild() == null ? Config.DEFAULT_PREFIX : Database.getDBGuild(message.getGuild()).getPrefix();
+		this.prefix = prefix;
 
 		List<String> splittedMsg = StringUtils.split(message.getContent(), 2);
 		this.cmdName = splittedMsg.get(0).substring(prefix.length()).toLowerCase();

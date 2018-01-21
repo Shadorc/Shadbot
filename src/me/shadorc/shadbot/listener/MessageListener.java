@@ -56,7 +56,7 @@ public class MessageListener {
 
 			String prefix = Database.getDBGuild(message.getGuild()).getPrefix();
 			if(message.getContent().startsWith(prefix)) {
-				CommandManager.execute(new Context(message));
+				CommandManager.execute(new Context(prefix, message));
 			}
 		} catch (MissingPermissionsException err) {
 			BotUtils.sendMessage(TextUtils.missingPerm(err.getMissingPermissions()), message.getChannel());
@@ -71,7 +71,7 @@ public class MessageListener {
 		StatsManager.increment(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
 
 		if(message.getContent().startsWith(Config.DEFAULT_PREFIX + "help")) {
-			CommandManager.getCommand("help").execute(new Context(message));
+			CommandManager.getCommand("help").execute(new Context(Config.DEFAULT_PREFIX, message));
 			return;
 		}
 
