@@ -23,6 +23,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.object.Pair;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -73,25 +74,25 @@ public class StatsCmd extends AbstractCommand {
 
 	private EmbedObject getAverage() {
 		Map<String, Integer> moneyGained = StatsManager.get(MoneyEnum.MONEY_GAINED.toString());
-		Map<String, Integer> gameUsed = StatsManager.get(CommandEnum.COMMAND_USED.toString());
+		Map<String, Integer> commandsUsed = StatsManager.get(CommandEnum.COMMAND_USED.toString());
 
-		if(moneyGained == null || moneyGained.isEmpty() || gameUsed == null || gameUsed.isEmpty()) {
+		if(moneyGained == null || moneyGained.isEmpty() || commandsUsed == null || commandsUsed.isEmpty()) {
 			return null;
 		}
 
 		Map<String, Integer> moneyLost = StatsManager.get(MoneyEnum.MONEY_LOST.toString());
 
-		Map<String, String> averagesMap = new HashMap<>();
-		for(String key : moneyGained.keySet()) {
-			float average = ((float) moneyGained.get(key) - moneyLost.getOrDefault(key, 0)) / gameUsed.getOrDefault(key, 1);
-			averagesMap.put(key, String.format("%.1f", average));
+		Map<String, Pair<Float, Integer>> averageMap = new HashMap<>();
+		for(String gameName : moneyGained.keySet()) {
+			float average = ((float) moneyGained.get(gameName) - moneyLost.getOrDefault(gameName, 0)) / commandsUsed.get(gameName);
+			averageMap.put(gameName, new Pair<Float, Integer>(average, commandsUsed.get(gameName)));
 		}
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Average")
-				.appendField("Name", FormatUtils.format(averagesMap.keySet().stream(), Object::toString, "\n"), true)
-				.appendField("Average", FormatUtils.format(averagesMap.values().stream(), Object::toString, "\n"), true)
-				.appendField("Count", FormatUtils.format(gameUsed.values().stream(), Object::toString, "\n"), true);
+				.appendField("Name", FormatUtils.format(averageMap.keySet().stream(), Object::toString, "\n"), true)
+				.appendField("Average", FormatUtils.format(averageMap.values().stream().map(Pair::getFirst), num -> FormatUtils.formatNum(num), "\n"), true)
+				.appendField("Count", FormatUtils.format(averageMap.values().stream().map(Pair::getSecond), num -> FormatUtils.formatNum(num), "\n"), true);
 
 		return embed.build();
 	}
