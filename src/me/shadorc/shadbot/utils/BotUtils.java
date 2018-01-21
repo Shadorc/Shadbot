@@ -141,7 +141,21 @@ public class BotUtils {
 	}
 
 	public static boolean hasPermissions(IChannel channel, Permissions... permissions) {
-		return PermissionUtils.hasPermissions(channel, channel.getClient().getOurUser(), permissions);
+		try {
+			return PermissionUtils.hasPermissions(channel, channel.getClient().getOurUser(), permissions);
+		} catch (Exception err) {
+			LogUtils.errorf(err, "An error occurred while checking permissions (Message: %s).", err.getMessage());
+			return true;
+		}
+	}
+
+	public static boolean hasPermissions(IGuild guild, Permissions... permissions) {
+		try {
+			return PermissionUtils.hasPermissions(guild, guild.getClient().getOurUser(), permissions);
+		} catch (Exception err) {
+			LogUtils.errorf(err, "An error occurred while checking permissions (Message: %s).", err.getMessage());
+			return true;
+		}
 	}
 
 }
