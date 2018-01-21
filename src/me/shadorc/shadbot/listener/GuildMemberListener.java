@@ -16,7 +16,6 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.PermissionUtils;
 
 public class GuildMemberListener {
 
@@ -42,7 +41,7 @@ public class GuildMemberListener {
 				.map(event.getGuild()::getRoleByID)
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
-		if(PermissionUtils.hasPermissions(event.getGuild(), event.getClient().getOurUser(), Permissions.MANAGE_ROLES)) {
+		if(BotUtils.hasPermissions(event.getGuild(), Permissions.MANAGE_ROLES)) {
 			event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
 		}
 	}
