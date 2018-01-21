@@ -65,7 +65,7 @@ public class StatsCmd extends AbstractCommand {
 				.withAuthorName(String.format("Stats (%s)", context.getArg()));
 		for(List<String> list : lists) {
 			embed.appendField("Name", FormatUtils.format(list, Object::toString, "\n"), true);
-			embed.appendField("Value", FormatUtils.format(list, key -> sortedMap.get(key).toString(), "\n"), true);
+			embed.appendField("Value", FormatUtils.format(list, key -> FormatUtils.formatNum(sortedMap.get(key)), "\n"), true);
 		}
 
 		BotUtils.sendMessage(embed.build(), context.getChannel());
