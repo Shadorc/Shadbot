@@ -69,7 +69,9 @@ public class Database {
 			guildObj = new JSONObject();
 		}
 
-		guildObj.putOnce(DBGuild.USERS_KEY, new JSONObject());
+		if(!guildObj.has(DBGuild.USERS_KEY)) {
+			guildObj.put(DBGuild.USERS_KEY, new JSONObject());
+		}
 
 		guildObj.getJSONObject(DBGuild.USERS_KEY)
 				.put(Long.toString(dbUser.getUserID()), dbUser.toJSON());
