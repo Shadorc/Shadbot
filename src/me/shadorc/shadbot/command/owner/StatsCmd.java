@@ -1,11 +1,7 @@
 package me.shadorc.shadbot.command.owner;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import com.google.common.collect.Lists;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -29,8 +25,6 @@ import sx.blah.discord.util.EmbedBuilder;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "stats" })
 public class StatsCmd extends AbstractCommand {
-
-	private static final int ROW_SIZE = 25;
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
@@ -60,14 +54,11 @@ public class StatsCmd extends AbstractCommand {
 		}
 
 		Map<String, Integer> sortedMap = Utils.sortByValue(map);
-		List<List<String>> lists = Lists.partition(new ArrayList<>(sortedMap.keySet()), ROW_SIZE);
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-				.withAuthorName(String.format("Stats (%s)", context.getArg()));
-		for(List<String> list : lists) {
-			embed.appendField("Name", FormatUtils.format(list, Object::toString, "\n"), true);
-			embed.appendField("Value", FormatUtils.format(list, key -> FormatUtils.formatNum(sortedMap.get(key)), "\n"), true);
-		}
+				.withAuthorName(String.format("Stats (%s)", context.getArg()))
+				.appendField("Name", FormatUtils.format(sortedMap.keySet().stream(), Object::toString, "\n"), true)
+				.appendField("Value", FormatUtils.format(sortedMap.values().stream(), key -> FormatUtils.formatNum(key), "\n"), true);
 
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
