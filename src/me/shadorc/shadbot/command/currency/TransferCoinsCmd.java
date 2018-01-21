@@ -31,6 +31,10 @@ public class TransferCoinsCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
+		if(context.getMessage().getMentions().isEmpty()) {
+			throw new MissingArgumentException();
+		}
+
 		List<String> splitCmd = StringUtils.split(context.getArg(), 2);
 		if(splitCmd.size() != 2) {
 			throw new MissingArgumentException();
