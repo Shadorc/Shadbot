@@ -23,7 +23,7 @@ public class DBUser {
 		this.load();
 	}
 
-	public final void load() {
+	private void load() {
 		StatsManager.increment(DatabaseEnum.USER_LOADED);
 
 		JSONObject guildObj = Database.opt(guild.getStringID());

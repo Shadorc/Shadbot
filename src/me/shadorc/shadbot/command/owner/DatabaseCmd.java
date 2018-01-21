@@ -10,6 +10,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.DBUser;
+import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -46,7 +47,7 @@ public class DatabaseCmd extends AbstractCommand {
 
 		String json = null;
 		if(splitArgs.size() == 1) {
-			DBGuild dbGuild = new DBGuild(guild);
+			DBGuild dbGuild = Database.getDBGuild(guild);
 			json = dbGuild.toJSON().toString(Config.JSON_INDENT_FACTOR);
 
 		} else if(splitArgs.size() == 2) {

@@ -47,6 +47,13 @@ public class DBGuild {
 				settingsMap.put(SettingEnum.valueOf(settingKey.toUpperCase()), settingsObj.get(settingKey));
 			}
 		}
+	}
+
+	private void loadUsers() {
+		JSONObject guildObj = Database.opt(guild.getStringID());
+		if(guildObj == null) {
+			return;
+		}
 
 		JSONObject usersObj = guildObj.optJSONObject(USERS_KEY);
 		if(usersObj != null) {
@@ -114,6 +121,7 @@ public class DBGuild {
 	}
 
 	public List<DBUser> getUsers() {
+		this.loadUsers();
 		return usersMap.values().stream().collect(Collectors.toList());
 	}
 
@@ -135,6 +143,8 @@ public class DBGuild {
 			settingsObj.put(setting.toString(), settingsMap.get(setting));
 		}
 		guildObj.put(SETTINGS_KEY, settingsObj);
+
+		this.loadUsers();
 
 		JSONObject usersObj = new JSONObject();
 		for(Long userID : usersMap.keySet()) {
