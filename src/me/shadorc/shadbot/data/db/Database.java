@@ -66,8 +66,10 @@ public class Database {
 	public synchronized static void save(DBUser dbUser) {
 		JSONObject guildObj = dbObject.optJSONObject(dbUser.getGuild().getStringID());
 		if(guildObj == null) {
-			guildObj = new JSONObject().put(DBGuild.USERS_KEY, new JSONObject());
+			guildObj = new JSONObject();
 		}
+
+		guildObj.putOnce(DBGuild.USERS_KEY, new JSONObject());
 
 		guildObj.getJSONObject(DBGuild.USERS_KEY)
 				.put(Long.toString(dbUser.getUserID()), dbUser.toJSON());
