@@ -54,7 +54,7 @@ public class DiceManager extends AbstractGameManager {
 				.appendField("Number", numsPlayers.keySet().stream().map(Object::toString).collect(Collectors.joining("\n")), true)
 				.appendField("Results", results, false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
-		message.send(embed.build()).get();
+		message.send(embed.build());
 	}
 
 	@Override
