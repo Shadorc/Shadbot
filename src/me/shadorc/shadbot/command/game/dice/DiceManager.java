@@ -79,7 +79,7 @@ public class DiceManager extends AbstractGameManager {
 			Database.getDBUser(this.getGuild(), user).addCoins(gains);
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getChannel()).get();
+		BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getChannel());
 
 		this.results = FormatUtils.format(list, Object::toString, "\n");
 		this.show();
