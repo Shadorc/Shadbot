@@ -9,6 +9,7 @@ import me.shadorc.shadbot.command.admin.setting.core.AbstractSetting;
 import me.shadorc.shadbot.command.admin.setting.core.Setting;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -50,7 +51,8 @@ public class ChannelSetting extends AbstractSetting {
 					splitArgs.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
-		List<Long> allowedChannelsList = Database.getDBGuild(context.getGuild()).getAllowedChannels();
+		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
+		List<Long> allowedChannelsList = dbGuild.getAllowedChannels();
 		if(Action.ADD.equals(action)) {
 			if(allowedChannelsList.isEmpty()
 					&& mentionedChannels.stream().noneMatch(channel -> channel.getLongID() == context.getChannel().getLongID())) {
@@ -72,7 +74,7 @@ public class ChannelSetting extends AbstractSetting {
 					FormatUtils.format(mentionedChannels, IChannel::mention, ", ")), context.getChannel());
 		}
 
-		Database.getDBGuild(context.getGuild()).setSetting(this.getSetting(), new JSONArray(allowedChannelsList));
+		dbGuild.setSetting(this.getSetting(), new JSONArray(allowedChannelsList));
 	}
 
 	@Override

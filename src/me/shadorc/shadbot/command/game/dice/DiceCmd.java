@@ -66,7 +66,7 @@ public class DiceCmd extends AbstractCommand {
 				return;
 			}
 
-			diceManager = new DiceManager(this, context.getChannel(), context.getAuthor(), bet);
+			diceManager = new DiceManager(this, context.getPrefix(), context.getChannel(), context.getAuthor(), bet);
 		}
 
 		if(MANAGERS.putIfAbsent(context.getChannel().getLongID(), diceManager) == null) {

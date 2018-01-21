@@ -85,7 +85,7 @@ public class PollCmd extends AbstractCommand {
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}
 
-		return new PollManager(this, context.getChannel(), context.getAuthor(), duration, substrings.get(0), choicesList);
+		return new PollManager(this, context.getPrefix(), context.getChannel(), context.getAuthor(), duration, substrings.get(0), choicesList);
 	}
 
 	@Override

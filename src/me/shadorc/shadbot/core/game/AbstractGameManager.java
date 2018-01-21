@@ -5,7 +5,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -21,13 +20,15 @@ public abstract class AbstractGameManager {
 	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("Shadbot-GameManager-%d");
 
 	private final String cmdName;
+	private final String prefix;
 	private final IChannel channel;
 	private final IUser author;
 
 	private ScheduledFuture<?> scheduledTask;
 
-	public AbstractGameManager(AbstractCommand cmd, IChannel channel, IUser author) {
+	public AbstractGameManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author) {
 		this.cmdName = cmd.getName();
+		this.prefix = prefix;
 		this.channel = channel;
 		this.author = author;
 	}
@@ -53,7 +54,7 @@ public abstract class AbstractGameManager {
 	}
 
 	public String getPrefix() {
-		return Database.getDBGuild(channel.getGuild()).getPrefix();
+		return prefix;
 	}
 
 	public IGuild getGuild() {

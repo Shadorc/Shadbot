@@ -38,8 +38,8 @@ public class RouletteManager extends AbstractGameManager {
 
 	private String results;
 
-	public RouletteManager(AbstractCommand cmd, IChannel channel, IUser author) {
-		super(cmd, channel, author);
+	public RouletteManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author) {
+		super(cmd, prefix, channel, author);
 		this.playersPlace = new ConcurrentHashMap<>();
 		this.message = new UpdateableMessage(channel);
 	}

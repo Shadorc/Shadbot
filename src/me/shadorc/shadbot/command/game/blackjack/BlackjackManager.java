@@ -40,8 +40,8 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 
 	private long startTime;
 
-	public BlackjackManager(AbstractCommand cmd, IChannel channel, IUser author) {
-		super(cmd, channel, author);
+	public BlackjackManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author) {
+		super(cmd, prefix, channel, author);
 		this.rateLimiter = new RateLimiter(1, 2, ChronoUnit.SECONDS);
 		this.players = Collections.synchronizedList(new ArrayList<>());
 		this.dealerCards = new ArrayList<>();

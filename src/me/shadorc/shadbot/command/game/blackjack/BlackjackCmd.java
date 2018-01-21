@@ -36,7 +36,7 @@ public class BlackjackCmd extends AbstractCommand {
 
 		BlackjackManager blackjackManager = MANAGERS.get(context.getChannel().getLongID());
 		if(blackjackManager == null) {
-			blackjackManager = new BlackjackManager(this, context.getChannel(), context.getAuthor());
+			blackjackManager = new BlackjackManager(this, context.getPrefix(), context.getChannel(), context.getAuthor());
 		}
 
 		if(MANAGERS.putIfAbsent(context.getChannel().getLongID(), blackjackManager) == null) {

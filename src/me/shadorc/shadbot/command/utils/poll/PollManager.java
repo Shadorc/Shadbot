@@ -27,8 +27,8 @@ public class PollManager extends AbstractGameManager {
 
 	private long startTime;
 
-	protected PollManager(AbstractCommand cmd, IChannel channel, IUser author, int duration, String question, List<String> choicesList) {
-		super(cmd, channel, author);
+	protected PollManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author, int duration, String question, List<String> choicesList) {
+		super(cmd, prefix, channel, author);
 		this.duration = duration;
 		this.question = question;
 		this.message = new UpdateableMessage(channel);

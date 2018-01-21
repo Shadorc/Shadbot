@@ -47,7 +47,7 @@ public class RouletteCmd extends AbstractCommand {
 
 		RouletteManager rouletteManager = MANAGERS.get(context.getChannel().getLongID());
 		if(rouletteManager == null) {
-			rouletteManager = new RouletteManager(this, context.getChannel(), context.getAuthor());
+			rouletteManager = new RouletteManager(this, context.getPrefix(), context.getChannel(), context.getAuthor());
 		}
 
 		if(MANAGERS.putIfAbsent(context.getChannel().getLongID(), rouletteManager) == null) {

@@ -10,6 +10,7 @@ import me.shadorc.shadbot.command.admin.setting.core.Setting;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -53,7 +54,8 @@ public class BlacklistSettingCmd extends AbstractSetting {
 					FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", ")));
 		}
 
-		List<String> blacklist = Database.getDBGuild(context.getGuild()).getBlacklistedCmd();
+		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
+		List<String> blacklist = dbGuild.getBlacklistedCmd();
 		if(Action.ADD.equals(action)) {
 			blacklist.addAll(commands);
 			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` added to the blacklist.",
@@ -64,7 +66,7 @@ public class BlacklistSettingCmd extends AbstractSetting {
 					FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
 		}
 
-		Database.getDBGuild(context.getGuild()).setSetting(this.getSetting(), new JSONArray(blacklist));
+		dbGuild.setSetting(this.getSetting(), new JSONArray(blacklist));
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class HangmanCmd extends AbstractCommand {
 		HangmanManager hangmanManager = MANAGERS.get(context.getChannel().getLongID());
 
 		if(hangmanManager == null) {
-			hangmanManager = new HangmanManager(this, context.getChannel(), context.getAuthor(), difficulty);
+			hangmanManager = new HangmanManager(this, context.getPrefix(), context.getChannel(), context.getAuthor(), difficulty);
 			if(MANAGERS.putIfAbsent(context.getChannel().getLongID(), hangmanManager) == null) {
 				hangmanManager.start();
 			}

@@ -31,8 +31,8 @@ public class DiceManager extends AbstractGameManager {
 
 	private String results;
 
-	public DiceManager(AbstractCommand cmd, IChannel channel, IUser author, int bet) {
-		super(cmd, channel, author);
+	public DiceManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author, int bet) {
+		super(cmd, prefix, channel, author);
 		this.bet = bet;
 		this.numsPlayers = new ConcurrentHashMap<>();
 		this.message = new UpdateableMessage(channel);

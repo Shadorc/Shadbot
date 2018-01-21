@@ -46,8 +46,8 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 	private String correctAnswer;
 	private List<String> answers;
 
-	public TriviaManager(AbstractCommand cmd, IChannel channel, IUser author, Integer categoryID) {
-		super(cmd, channel, author);
+	public TriviaManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author, Integer categoryID) {
+		super(cmd, prefix, channel, author);
 		this.categoryID = categoryID;
 		this.alreadyAnswered = new ConcurrentHashMap<>();
 	}

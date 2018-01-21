@@ -49,8 +49,8 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 
 	private int failsCount;
 
-	public HangmanManager(AbstractCommand cmd, IChannel channel, IUser author, Difficulty difficulty) {
-		super(cmd, channel, author);
+	public HangmanManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author, Difficulty difficulty) {
+		super(cmd, prefix, channel, author);
 		this.rateLimiter = new RateLimiter(2, 2, ChronoUnit.SECONDS);
 		this.message = new UpdateableMessage(channel);
 		this.word = HangmanCmd.getWord(difficulty);

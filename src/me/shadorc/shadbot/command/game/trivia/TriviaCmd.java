@@ -63,7 +63,7 @@ public class TriviaCmd extends AbstractCommand {
 
 		TriviaManager triviaManager = MANAGERS.get(context.getChannel().getLongID());
 		if(triviaManager == null) {
-			triviaManager = new TriviaManager(this, context.getChannel(), context.getAuthor(), categoryID);
+			triviaManager = new TriviaManager(this, context.getPrefix(), context.getChannel(), context.getAuthor(), categoryID);
 		}
 
 		if(MANAGERS.putIfAbsent(context.getChannel().getLongID(), triviaManager) == null) {
