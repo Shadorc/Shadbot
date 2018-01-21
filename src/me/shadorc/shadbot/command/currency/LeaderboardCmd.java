@@ -41,9 +41,9 @@ public class LeaderboardCmd extends AbstractCommand {
 		}
 
 		Map<String, Integer> sortedUsersMap = Utils.sortByValue(unsortedUsersMap);
-		List<String> usersList = new ArrayList<>(unsortedUsersMap.keySet());
+		List<String> usersList = new ArrayList<>(sortedUsersMap.keySet());
 
-		String leaderboard = FormatUtils.numberedList(10, unsortedUsersMap.size(),
+		String leaderboard = FormatUtils.numberedList(10, sortedUsersMap.size(),
 				count -> String.format("%d. **%s** - %s",
 						count, usersList.get(count - 1), FormatUtils.formatCoins(sortedUsersMap.get(usersList.get(count - 1)))));
 
