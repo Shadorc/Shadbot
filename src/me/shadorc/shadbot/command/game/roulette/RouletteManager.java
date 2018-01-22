@@ -62,7 +62,7 @@ public class RouletteManager extends AbstractGameManager {
 				.appendField("Place", playersPlace.values().stream().map(Pair::getSecond).collect(Collectors.joining("\n")), true)
 				.appendField("Results", results, false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
-		message.send(embed.build());
+		message.send(embed.build()).get();
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class RouletteManager extends AbstractGameManager {
 
 		BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
 				winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"),
-				this.getChannel());
+				this.getChannel()).get();
 
 		this.results = FormatUtils.format(list, Object::toString, ", ");
 		this.show();

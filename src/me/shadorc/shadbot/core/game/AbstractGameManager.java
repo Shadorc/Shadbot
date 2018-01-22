@@ -81,7 +81,7 @@ public abstract class AbstractGameManager {
 	}
 
 	public final void cancelScheduledTask() {
-		scheduledTask.cancel(true);
+		scheduledTask.cancel(false);
 	}
 
 }

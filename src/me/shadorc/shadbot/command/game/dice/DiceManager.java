@@ -54,7 +54,7 @@ public class DiceManager extends AbstractGameManager {
 				.appendField("Number", numsPlayers.keySet().stream().map(Object::toString).collect(Collectors.joining("\n")), true)
 				.appendField("Results", results, false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
-		message.send(embed.build());
+		message.send(embed.build()).get();
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class DiceManager extends AbstractGameManager {
 			Database.getDBUser(this.getGuild(), user).addCoins(gains);
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getChannel());
+		BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getChannel()).get();
 
 		this.results = FormatUtils.format(list, Object::toString, "\n");
 		this.show();
