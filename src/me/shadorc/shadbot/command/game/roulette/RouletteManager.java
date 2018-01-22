@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.Database;
@@ -55,8 +56,9 @@ public class RouletteManager extends AbstractGameManager {
 				.withAuthorName("Roulette Game")
 				.withThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
 				.withDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
-						+ "%n%n**Place** is a `number between 1 and 36`, `red`, `black`, `even`, `odd`, `low` or `high`",
-						this.getPrefix(), this.getCmdName()))
+						+ "%n%n**Place** is a `number between 1 and 36`, %s",
+						this.getPrefix(), this.getCmdName(),
+						FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
 				.appendField("Player (Bet)", FormatUtils.format(playersPlace.keySet().stream(),
 						user -> String.format("**%s** (%s)", user.getName(), FormatUtils.formatCoins(playersPlace.get(user).getFirst())), "\n"), true)
 				.appendField("Place", playersPlace.values().stream().map(Pair::getSecond).collect(Collectors.joining("\n")), true)
@@ -76,18 +78,18 @@ public class RouletteManager extends AbstractGameManager {
 			int gains = playersPlace.get(user).getFirst();
 			String place = playersPlace.get(user).getSecond();
 
-			Map<String, Boolean> testsMap = new HashMap<>();
-			testsMap.put("red", RED_NUMS.contains(winningPlace));
-			testsMap.put("black", !RED_NUMS.contains(winningPlace));
-			testsMap.put("low", Utils.isInRange(winningPlace, 1, 19));
-			testsMap.put("high", Utils.isInRange(winningPlace, 19, 37));
-			testsMap.put("even", winningPlace % 2 == 0);
-			testsMap.put("odd", winningPlace % 2 != 0);
+			Map<Place, Boolean> testsMap = new HashMap<>();
+			testsMap.put(Place.RED, RED_NUMS.contains(winningPlace));
+			testsMap.put(Place.BLACK, !RED_NUMS.contains(winningPlace));
+			testsMap.put(Place.LOW, Utils.isInRange(winningPlace, 1, 19));
+			testsMap.put(Place.HIGH, Utils.isInRange(winningPlace, 19, 37));
+			testsMap.put(Place.EVEN, winningPlace % 2 == 0);
+			testsMap.put(Place.ODD, winningPlace % 2 != 0);
 
 			int multiplier = 0;
 			if(place.equals(Integer.toString(winningPlace))) {
 				multiplier = 36;
-			} else if(testsMap.get(place)) {
+			} else if(testsMap.getOrDefault(place, false)) {
 				multiplier = 2;
 			} else {
 				multiplier = -1;
