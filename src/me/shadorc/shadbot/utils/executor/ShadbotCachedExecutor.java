@@ -16,6 +16,10 @@ public class ShadbotCachedExecutor extends ThreadPoolExecutor {
 
 	@Override
 	public void execute(Runnable command) {
+		if(this.isTerminated()) {
+			LogUtils.infof("Abort attempt to execute a command on a terminated executor.");
+			return;
+		}
 		super.execute(this.wrapRunnable(command));
 	}
 
