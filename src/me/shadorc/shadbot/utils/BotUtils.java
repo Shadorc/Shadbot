@@ -56,7 +56,7 @@ public class BotUtils {
 	}
 
 	public static RequestFuture<IMessage> sendMessage(MessageBuilder message) {
-		return BotUtils.sendMessage(message, 5);
+		return BotUtils.sendMessage(message, 3);
 	}
 
 	public static RequestFuture<IMessage> sendMessage(MessageBuilder message, int retry) {
@@ -81,6 +81,8 @@ public class BotUtils {
 				LogUtils.infof("{Guild ID: %d} %s", guild.getLongID(), err.getMessage());
 			} catch (DiscordException err) {
 				if(err.getMessage().contains("Message was unable to be sent (Discord didn't return a response)")) {
+					LogUtils.infof("{Guild ID: %d} A message could not be send because Discord didn't return a response, retrying.",
+							message.getChannel().getGuild().getLongID());
 					return BotUtils.sendMessage(message, retry - 1).get();
 				}
 				LogUtils.errorf(err, "An error occurred while sending message.");
