@@ -35,6 +35,7 @@ public class TranslateCmd extends AbstractCommand {
 		for(String iso : Locale.getISOLanguages()) {
 			LANG_ISO_MAP.put(new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(), iso);
 		}
+		LANG_ISO_MAP.put("auto", "auto");
 	}
 
 	@Override
@@ -48,8 +49,8 @@ public class TranslateCmd extends AbstractCommand {
 			args.add(0, "auto");
 		}
 
-		String langFrom = this.toISO(args.get(0));
-		String langTo = this.toISO(args.get(1));
+		String langFrom = LANG_ISO_MAP.getOrDefault(args.get(0), args.get(0));
+		String langTo = LANG_ISO_MAP.getOrDefault(args.get(1), args.get(1));
 
 		if(langFrom == null || langTo == null) {
 			throw new IllegalCmdArgumentException(String.format("One of the specified language doesn't exist. "
@@ -74,14 +75,6 @@ public class TranslateCmd extends AbstractCommand {
 
 		} catch (JSONException | IOException err) {
 			Utils.handle("getting translation", context, err);
-		}
-	}
-
-	private String toISO(String lang) {
-		if("auto".equals(lang) || LANG_ISO_MAP.containsValue(lang)) {
-			return lang;
-		} else {
-			return LANG_ISO_MAP.get(lang);
 		}
 	}
 
