@@ -82,7 +82,7 @@ public class StatsCmd extends AbstractCommand {
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Average")
 				.appendField("Name", FormatUtils.format(averageMap.keySet().stream(), Object::toString, "\n"), true)
-				.appendField("Average", FormatUtils.format(averageMap.values().stream().map(Pair::getFirst), num -> FormatUtils.formatNum(num), "\n"), true)
+				.appendField("Average", FormatUtils.format(averageMap.values().stream().map(Pair::getFirst), num -> FormatUtils.formatNum(num.intValue()), "\n"), true)
 				.appendField("Count", FormatUtils.format(averageMap.values().stream().map(Pair::getSecond), num -> FormatUtils.formatNum(num), "\n"), true);
 
 		return embed.build();
