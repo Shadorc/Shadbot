@@ -4,8 +4,6 @@ import java.lang.management.ManagementFactory;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
@@ -22,6 +20,9 @@ import javax.management.ReflectionException;
 import org.json.JSONArray;
 import org.jsoup.HttpStatusException;
 
+import com.google.common.base.Functions;
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.Ordering;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import me.shadorc.shadbot.core.command.Context;
@@ -89,14 +90,7 @@ public class Utils {
 	}
 
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
-		return map.entrySet()
-				.stream()
-				.sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
-				.collect(Collectors.toMap(
-						Map.Entry::getKey,
-						Map.Entry::getValue,
-						(value1, value2) -> value1,
-						LinkedHashMap::new));
+		return ImmutableSortedMap.copyOf(map, Ordering.natural().onResultOf(Functions.forMap(map)).reverse());
 	}
 
 	public static <T> List<T> removeAndGet(T[] array, T elmt) {

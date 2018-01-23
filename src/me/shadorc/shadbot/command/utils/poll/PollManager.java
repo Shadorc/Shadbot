@@ -33,7 +33,7 @@ public class PollManager extends AbstractGameManager {
 		this.question = question;
 		this.message = new UpdateableMessage(channel);
 
-		this.choicesMap = new LinkedHashMap<String, List<IUser>>();
+		this.choicesMap = new LinkedHashMap<String, List<IUser>>(10);
 		choicesList.stream().forEach(choice -> choicesMap.put(choice, new ArrayList<>()));
 	}
 
@@ -48,6 +48,7 @@ public class PollManager extends AbstractGameManager {
 	public void stop() {
 		this.cancelScheduledTask();
 		PollCmd.MANAGER.remove(this.getChannel().getLongID());
+		choicesMap.clear();
 		this.show();
 	}
 
