@@ -47,6 +47,8 @@ public class LeaderboardCmd extends AbstractCommand {
 				count -> String.format("%d. **%s** - %s",
 						count, usersList.get(count - 1), FormatUtils.formatCoins(sortedUsersMap.get(usersList.get(count - 1)))));
 
+		sortedUsersMap.clear();
+
 		if(leaderboard.isEmpty()) {
 			leaderboard = "\nEveryone is poor here.";
 		}

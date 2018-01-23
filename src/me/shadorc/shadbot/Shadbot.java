@@ -13,7 +13,6 @@ import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.listener.ReadyListener;
 import me.shadorc.shadbot.listener.ShardListener;
 import me.shadorc.shadbot.music.GuildMusicManager;
-import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.executor.ShadbotCachedExecutor;
@@ -50,8 +49,8 @@ public class Shadbot {
 			@Override
 			public void run() {
 				GuildMusicManager.stop();
-				//FIXME: Event arrived after thread pools are shutdown which throws exceptions
-				//ShardManager.stop();
+				// FIXME: Event arrived after thread pools are shutdown which throws exceptions
+				// ShardManager.stop();
 				DataManager.stop();
 			}
 		});

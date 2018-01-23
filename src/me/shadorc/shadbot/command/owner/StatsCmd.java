@@ -60,6 +60,8 @@ public class StatsCmd extends AbstractCommand {
 				.appendField("Name", FormatUtils.format(sortedMap.keySet().stream(), Object::toString, "\n"), true)
 				.appendField("Value", FormatUtils.format(sortedMap.values().stream(), key -> FormatUtils.formatNum(key), "\n"), true);
 
+		sortedMap.clear();
+
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 
