@@ -3,6 +3,7 @@ package me.shadorc.shadbot.shard;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import me.shadorc.shadbot.utils.BotUtils;
@@ -77,7 +78,18 @@ public class ShadbotShard {
 		if(shard.isLoggedIn()) {
 			shard.logout();
 		}
-		threadPool.shutdownNow();
+
+		threadPool.shutdown();
+		try {
+			if(!threadPool.awaitTermination(10, TimeUnit.SECONDS)) {
+				LogUtils.infof("{Shard %d} Thread pool was abruptly shut down. %d tasks will not be executed.",
+						this.getID(), threadPool.shutdownNow().size());
+			}
+		} catch (InterruptedException e) {
+			LogUtils.infof("{Shard %d} Thread was interrupted, thread pool was abruptly shut down. %d tasks will not be executed.",
+					this.getID(), threadPool.shutdownNow().size());
+		}
+
 		LogUtils.infof("{Shard %d} Logging in.", this.getID());
 		shard.login();
 		LogUtils.infof("{Shard %d} Shard restarted.", this.getID());
