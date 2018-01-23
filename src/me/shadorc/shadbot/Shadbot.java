@@ -50,7 +50,8 @@ public class Shadbot {
 			@Override
 			public void run() {
 				GuildMusicManager.stop();
-				ShardManager.stop();
+				//FIXME: Event arrived after thread pools are shutdown which throws exceptions
+				//ShardManager.stop();
 				DataManager.stop();
 			}
 		});
