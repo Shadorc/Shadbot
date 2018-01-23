@@ -1,10 +1,11 @@
 package me.shadorc.shadbot.shard;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import com.google.common.collect.EvictingQueue;
 
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
@@ -13,11 +14,9 @@ import sx.blah.discord.util.MessageBuilder;
 
 public class ShadbotShard {
 
-	private static final int MAX_QUEUE_SIZE = 20;
-
 	private final IShard shard;
 	private final int shardID;
-	private final List<MessageBuilder> messagesQueue;
+	private final Queue<MessageBuilder> messagesQueue;
 	private final AtomicLong lastEvent;
 	private final AtomicLong lastMessage;
 
@@ -26,7 +25,7 @@ public class ShadbotShard {
 	public ShadbotShard(IShard shard) {
 		this.shard = shard;
 		this.shardID = shard.getInfo()[0];
-		this.messagesQueue = new LinkedList<>();
+		this.messagesQueue = EvictingQueue.create(20);
 		this.threadPool = ShardManager.createThreadPool(this);
 		this.lastEvent = new AtomicLong();
 		this.lastMessage = new AtomicLong();
@@ -53,11 +52,7 @@ public class ShadbotShard {
 	}
 
 	public void queue(MessageBuilder message) {
-		messagesQueue.add(0, message);
-		if(messagesQueue.size() > MAX_QUEUE_SIZE) {
-			messagesQueue.remove(messagesQueue.size() - 1);
-			LogUtils.infof("{Shard %d} The limit size of the queue has been exceeded, last message removed.", this.getID());
-		}
+		messagesQueue.add(message);
 	}
 
 	public void sendQueue() {
