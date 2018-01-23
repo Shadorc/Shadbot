@@ -49,8 +49,8 @@ public class TranslateCmd extends AbstractCommand {
 			args.add(0, "auto");
 		}
 
-		String langFrom = LANG_ISO_MAP.getOrDefault(args.get(0), args.get(0));
-		String langTo = LANG_ISO_MAP.getOrDefault(args.get(1), args.get(1));
+		String langFrom = this.toISO(args.get(0));
+		String langTo = this.toISO(args.get(1));
 
 		if(langFrom == null || langTo == null) {
 			throw new IllegalCmdArgumentException(String.format("One of the specified language doesn't exist. "
@@ -76,6 +76,10 @@ public class TranslateCmd extends AbstractCommand {
 		} catch (JSONException | IOException err) {
 			Utils.handle("getting translation", context, err);
 		}
+	}
+
+	private String toISO(String lang) {
+		return LANG_ISO_MAP.containsValue(lang) ? lang : LANG_ISO_MAP.get(lang);
 	}
 
 	@Override
