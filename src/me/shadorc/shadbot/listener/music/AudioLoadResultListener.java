@@ -176,7 +176,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 		}
 
-		this.stopWaiting();
+		if(resultsTracks.isEmpty()) {
+			LogUtils.warnf("Results tracks were empty.");
+			return true;
+		}
 
 		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel
 		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(message.getGuild().getLongID(), guildMusic);
@@ -196,6 +199,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 		}
 
+		this.stopWaiting();
 		return true;
 	}
 
