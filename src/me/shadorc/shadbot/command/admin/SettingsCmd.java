@@ -57,10 +57,6 @@ public class SettingsCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
-
 		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
 		if(splitArgs.isEmpty()) {
 			throw new MissingArgumentException();
