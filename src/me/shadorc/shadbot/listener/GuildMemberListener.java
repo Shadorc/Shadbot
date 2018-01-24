@@ -41,7 +41,7 @@ public class GuildMemberListener {
 				.map(event.getGuild()::getRoleByID)
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
-		if(BotUtils.hasPermissions(event.getGuild(), Permissions.MANAGE_ROLES)) {
+		if(BotUtils.hasPermissions(event.getGuild(), Permissions.MANAGE_ROLES) && BotUtils.canInteract(event.getGuild(), event.getUser())) {
 			event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
 		}
 	}

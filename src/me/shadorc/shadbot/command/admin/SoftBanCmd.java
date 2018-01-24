@@ -55,7 +55,7 @@ public class SoftBanCmd extends AbstractCommand {
 						+ "position than you in the role hierarchy.",
 						mentionedUser.getName()));
 			}
-			if(!PermissionUtils.isUserHigher(context.getGuild(), context.getOurUser(), mentionedUser)) {
+			if(!BotUtils.canInteract(context.getGuild(), mentionedUser)) {
 				throw new IllegalCmdArgumentException(String.format("I cannot softban **%s** because he has the same or a higher role "
 						+ "position than me in the role hierarchy.",
 						mentionedUser.getName()));

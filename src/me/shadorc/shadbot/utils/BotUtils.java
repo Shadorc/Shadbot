@@ -152,12 +152,11 @@ public class BotUtils {
 	}
 
 	public static boolean hasPermissions(IGuild guild, Permissions... permissions) {
-		try {
-			return PermissionUtils.hasPermissions(guild, guild.getClient().getOurUser(), permissions);
-		} catch (Exception err) {
-			LogUtils.error(err, String.format("An error occurred while checking permissions (Message: %s).", err.getMessage()));
-			return true;
-		}
+		return PermissionUtils.hasPermissions(guild, guild.getClient().getOurUser(), permissions);
+	}
+
+	public static boolean canInteract(IGuild guild, IUser user) {
+		return PermissionUtils.isUserHigher(guild, guild.getClient().getOurUser(), user);
 	}
 
 }
