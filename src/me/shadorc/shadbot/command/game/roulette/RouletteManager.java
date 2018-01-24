@@ -77,6 +77,7 @@ public class RouletteManager extends AbstractGameManager {
 		for(IUser user : playersPlace.keySet()) {
 			int gains = playersPlace.get(user).getFirst();
 			String place = playersPlace.get(user).getSecond();
+			Place placeEnum = Utils.getValueOrNull(Place.class, place);
 
 			Map<Place, Boolean> testsMap = new HashMap<>();
 			testsMap.put(Place.RED, RED_NUMS.contains(winningPlace));
@@ -89,11 +90,13 @@ public class RouletteManager extends AbstractGameManager {
 			int multiplier = 0;
 			if(place.equals(Integer.toString(winningPlace))) {
 				multiplier = 36;
-			} else if(testsMap.getOrDefault(place, false)) {
+			} else if(placeEnum != null && testsMap.get(placeEnum)) {
 				multiplier = 2;
 			} else {
 				multiplier = -1;
 			}
+
+			testsMap.clear();
 
 			gains *= multiplier;
 			if(gains > 0) {
