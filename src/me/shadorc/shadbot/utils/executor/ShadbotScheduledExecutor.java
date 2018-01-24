@@ -46,8 +46,8 @@ public class ShadbotScheduledExecutor extends ScheduledThreadPoolExecutor {
 				try {
 					command.run();
 				} catch (Exception err) {
-					LogUtils.errorf(err, "{%s} An unknown exception occurred while running a scheduled task.",
-							ShadbotScheduledExecutor.class.getSimpleName());
+					LogUtils.error(err, String.format("{%s} An unknown exception occurred while running a scheduled task.",
+							ShadbotScheduledExecutor.class.getSimpleName()));
 					throw new RuntimeException(err);
 				}
 			}

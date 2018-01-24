@@ -7,7 +7,6 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.embed.LogBuilder;
 import me.shadorc.shadbot.utils.embed.LogType;
-import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 
@@ -15,20 +14,19 @@ public class LogUtils {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("Shadbot-Logger");
 
-	public static void errorf(String input, IChannel channel, Exception err, String format, Object... args) {
-		LOGGER.error(String.format(format, args), err);
-		LogUtils.sendLog(new LogBuilder(LogType.ERROR, String.format(format, args), err, input, channel));
-		BotUtils.sendMessage(Emoji.RED_FLAG + " " + String.format(format, args), channel);
+	public static void error(String input, IChannel channel, Throwable err, String msg) {
+		LOGGER.error(String.format("%s (Input: %s)", msg, input), err);
+		LogUtils.sendLog(new LogBuilder(LogType.ERROR, msg, err, input, channel));
 	}
 
-	public static void errorf(Exception err, String format, Object... args) {
-		LOGGER.error(String.format(format, args), err);
-		LogUtils.sendLog(new LogBuilder(LogType.ERROR, String.format(format, args), err));
+	public static void error(Throwable err, String msg) {
+		LOGGER.error(msg, err);
+		LogUtils.sendLog(new LogBuilder(LogType.ERROR, msg, err));
 	}
 
-	public static void errorf(String format, Object... args) {
-		LOGGER.error(String.format(format, args));
-		LogUtils.sendLog(new LogBuilder(LogType.ERROR, String.format(format, args)));
+	public static void error(String msg) {
+		LOGGER.error(msg);
+		LogUtils.sendLog(new LogBuilder(LogType.ERROR, msg));
 	}
 
 	public static void warnf(String format, Object... args) {

@@ -113,7 +113,8 @@ public class Utils {
 		} else {
 			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
 		}
-		LogUtils.errorf(context.getContent(), context.getChannel(), err, msg);
+		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, context.getChannel());
+		LogUtils.error(context.getContent(), context.getChannel(), err, String.format("{Guild ID: %d} %s", context.getGuild().getLongID(), msg));
 	}
 
 	public static Integer checkAndGetBet(IChannel channel, IUser user, String betStr, int maxValue) throws IllegalCmdArgumentException {

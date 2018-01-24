@@ -71,7 +71,7 @@ public class ShardManager {
 					shardStatus.restart();
 				}
 			} catch (Exception err) {
-				LogUtils.errorf(err, "An error occurred while restarting a shard.");
+				LogUtils.error(err, "An error occurred while restarting a shard.");
 			}
 		}
 		LogUtils.infof("Dead shards checked.");

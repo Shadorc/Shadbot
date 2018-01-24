@@ -12,11 +12,11 @@ public class LogBuilder {
 
 	private final LogType type;
 	private final String message;
-	private final Exception err;
+	private final Throwable err;
 	private final String input;
 	private final IChannel channel;
 
-	public LogBuilder(LogType type, String message, Exception err, String input, IChannel channel) {
+	public LogBuilder(LogType type, String message, Throwable err, String input, IChannel channel) {
 		this.type = type;
 		this.message = message;
 		this.err = err;
@@ -24,7 +24,7 @@ public class LogBuilder {
 		this.channel = channel;
 	}
 
-	public LogBuilder(LogType type, String message, Exception err) {
+	public LogBuilder(LogType type, String message, Throwable err) {
 		this(type, message, err, null, null);
 	}
 

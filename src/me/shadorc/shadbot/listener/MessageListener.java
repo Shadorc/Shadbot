@@ -13,6 +13,7 @@ import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -62,8 +63,9 @@ public class MessageListener {
 			BotUtils.sendMessage(TextUtils.missingPerm(err.getMissingPermissions()), message.getChannel());
 			LogUtils.infof("{Guild ID: %d} %s", message.getGuild().getLongID(), err.getMessage());
 		} catch (Exception err) {
-			LogUtils.errorf(message.getContent(), message.getChannel(), err,
-					"Sorry, an unknown error occurred. My developer has been warned.", message.getGuild().getLongID());
+			BotUtils.sendMessage(Emoji.RED_FLAG + " Sorry, an unknown error occurred. My developer has been warned.", message.getChannel());
+			LogUtils.error(message.getContent(), message.getChannel(), err,
+					String.format("{Guild ID: %d} An unknown error occurred while receiving a message.", message.getGuild().getLongID()));
 		}
 	}
 

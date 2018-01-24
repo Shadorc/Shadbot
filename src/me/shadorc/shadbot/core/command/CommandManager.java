@@ -32,7 +32,8 @@ public class CommandManager {
 		Reflections reflections = new Reflections(Shadbot.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
 		for(Class<?> cmdClass : reflections.getTypesAnnotatedWith(Command.class)) {
 			if(!AbstractCommand.class.isAssignableFrom(cmdClass)) {
-				LogUtils.errorf("An error occurred while generating command, %s cannot be cast to AbstractCommand.", cmdClass.getSimpleName());
+				LogUtils.error(String.format("An error occurred while generating command, %s cannot be cast to AbstractCommand.",
+						cmdClass.getSimpleName()));
 				continue;
 			}
 
@@ -46,13 +47,14 @@ public class CommandManager {
 
 				for(String name : names) {
 					if(COMMANDS_MAP.putIfAbsent(name, cmd) != null) {
-						LogUtils.errorf(String.format("Command name collision between %s and %s",
+						LogUtils.error(String.format("Command name collision between %s and %s",
 								cmdClass.getSimpleName(), COMMANDS_MAP.get(name).getClass().getSimpleName()));
 						continue;
 					}
 				}
 			} catch (InstantiationException | IllegalAccessException err) {
-				LogUtils.errorf(err, "An error occurred while initializing command %s.", cmdClass.getDeclaringClass().getSimpleName());
+				LogUtils.error(err, String.format("An error occurred while initializing command %s.",
+						cmdClass.getDeclaringClass().getSimpleName()));
 				return false;
 			}
 		}

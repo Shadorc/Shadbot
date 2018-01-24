@@ -25,7 +25,7 @@ public class DataManager {
 		LogUtils.infof("Initializing data files...");
 
 		if(!SAVE_DIR.exists() && !SAVE_DIR.mkdir()) {
-			LogUtils.errorf("The save folder could not be created.");
+			LogUtils.error("The save folder could not be created.");
 			return false;
 		}
 
@@ -35,7 +35,8 @@ public class DataManager {
 			try {
 				initMethod.invoke(null);
 			} catch (Exception err) {
-				LogUtils.errorf(err, "An error occurred while initializing data %s.", initMethod.getDeclaringClass().getSimpleName());
+				LogUtils.error(err, String.format("An error occurred while initializing data %s.",
+						initMethod.getDeclaringClass().getSimpleName()));
 				return false;
 			}
 
@@ -49,7 +50,7 @@ public class DataManager {
 							method.invoke(null);
 							LogUtils.infof("%s saved.", initMethod.getDeclaringClass().getSimpleName());
 						} catch (Exception err) {
-							LogUtils.errorf(err, "An error occurred while saving %s.", annotation.filePath());
+							LogUtils.error(err, String.format("An error occurred while saving %s.", annotation.filePath()));
 						}
 					};
 					SAVE_TASKS.add(saveTask);

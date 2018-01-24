@@ -86,7 +86,7 @@ public class TriviaCmd extends AbstractCommand {
 			JSONArray categoriesArray = mainObj.getJSONArray("trivia_categories");
 			categoriesArray.forEach(obj -> categories.put(((JSONObject) obj).getInt("id"), ((JSONObject) obj).getString("name")));
 		} catch (JSONException | IOException err) {
-			LogUtils.errorf(err, "An error occurred while getting Trivia categories.");
+			LogUtils.error(err, "An error occurred while getting Trivia categories.");
 		}
 	}
 

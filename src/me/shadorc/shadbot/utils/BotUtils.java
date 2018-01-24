@@ -85,7 +85,7 @@ public class BotUtils {
 							message.getChannel().getGuild().getLongID());
 					return BotUtils.sendMessage(message, retry - 1).get();
 				}
-				LogUtils.errorf(err, "An error occurred while sending message.");
+				LogUtils.error(err, "An error occurred while sending message.");
 			}
 			return null;
 		});
@@ -146,7 +146,7 @@ public class BotUtils {
 		try {
 			return PermissionUtils.hasPermissions(channel, channel.getClient().getOurUser(), permissions);
 		} catch (Exception err) {
-			LogUtils.errorf(err, "An error occurred while checking permissions (Message: %s).", err.getMessage());
+			LogUtils.error(err, String.format("An error occurred while checking permissions (Message: %s).", err.getMessage()));
 			return true;
 		}
 	}
@@ -155,7 +155,7 @@ public class BotUtils {
 		try {
 			return PermissionUtils.hasPermissions(guild, guild.getClient().getOurUser(), permissions);
 		} catch (Exception err) {
-			LogUtils.errorf(err, "An error occurred while checking permissions (Message: %s).", err.getMessage());
+			LogUtils.error(err, String.format("An error occurred while checking permissions (Message: %s).", err.getMessage()));
 			return true;
 		}
 	}

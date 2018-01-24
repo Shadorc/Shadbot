@@ -37,7 +37,7 @@ public class Shadbot {
 			properties.load(Shadbot.class.getClassLoader().getResourceAsStream("project.properties"));
 			version = properties.getProperty("version");
 		} catch (IOException err) {
-			LogUtils.errorf(err, "An error occurred while getting version.");
+			LogUtils.error(err, "An error occurred while getting version.");
 		}
 
 		// Initialization

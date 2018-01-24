@@ -36,20 +36,21 @@ public class SettingsCmd extends AbstractCommand {
 		Reflections reflections = new Reflections(SettingsCmd.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
 		for(Class<?> settingClass : reflections.getTypesAnnotatedWith(Setting.class)) {
 			if(!AbstractSetting.class.isAssignableFrom(settingClass)) {
-				LogUtils.errorf("An error occurred while generating setting, %s cannot be cast to AbstractSetting.",
-						settingClass.getSimpleName());
+				LogUtils.error(String.format("An error occurred while generating setting, %s cannot be cast to AbstractSetting.",
+						settingClass.getSimpleName()));
 				continue;
 			}
 
 			try {
 				AbstractSetting settingCmd = (AbstractSetting) settingClass.newInstance();
 				if(SETTINGS_MAP.putIfAbsent(settingCmd.getSetting(), settingCmd) != null) {
-					LogUtils.errorf(String.format("Command name collision between %s and %s",
+					LogUtils.error(String.format("Command name collision between %s and %s",
 							settingClass.getSimpleName(), SETTINGS_MAP.get(settingCmd.getSetting()).getClass().getSimpleName()));
 					continue;
 				}
 			} catch (InstantiationException | IllegalAccessException err) {
-				LogUtils.errorf(err, "An error occurred while initializing setting %s.", settingClass.getDeclaringClass().getSimpleName());
+				LogUtils.error(err, String.format("An error occurred while initializing setting %s.",
+						settingClass.getDeclaringClass().getSimpleName()));
 			}
 		}
 	}

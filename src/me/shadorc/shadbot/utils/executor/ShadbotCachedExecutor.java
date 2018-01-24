@@ -31,8 +31,8 @@ public class ShadbotCachedExecutor extends ThreadPoolExecutor {
 				try {
 					command.run();
 				} catch (Exception err) {
-					LogUtils.errorf(err, "{%s} An unknown exception occurred while running a task.",
-							ShadbotCachedExecutor.class.getSimpleName());
+					LogUtils.error(err, String.format("{%s} An unknown exception occurred while running a task.",
+							ShadbotCachedExecutor.class.getSimpleName()));
 					throw new RuntimeException(err);
 				}
 			}
