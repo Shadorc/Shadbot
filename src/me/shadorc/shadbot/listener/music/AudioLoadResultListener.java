@@ -176,6 +176,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 		}
 
+		this.stopWaiting();
+
 		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel
 		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(message.getGuild().getLongID(), guildMusic);
 		guildMusic.joinVoiceChannel(userVoiceChannel);
@@ -194,7 +196,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 		}
 
-		this.stopWaiting();
 		return true;
 	}
 
