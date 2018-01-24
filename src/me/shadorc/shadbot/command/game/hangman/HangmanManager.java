@@ -51,7 +51,7 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 
 	public HangmanManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author, Difficulty difficulty) {
 		super(cmd, prefix, channel, author);
-		this.rateLimiter = new RateLimiter(2, 2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(3, 2, ChronoUnit.SECONDS);
 		this.message = new UpdateableMessage(channel);
 		this.word = HangmanCmd.getWord(difficulty);
 		this.charsTested = new ArrayList<>();
@@ -103,7 +103,7 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 
 		charsTested.add(chr);
 
-		if(StringUtils.remove(this.getRepresentation(word), "\\*", " ").equalsIgnoreCase(word)) {
+		if(StringUtils.remove(this.getRepresentation(word), "\\", " ", "*").equalsIgnoreCase(word)) {
 			this.showResultAndStop(true);
 			return;
 		}
@@ -129,9 +129,8 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 	}
 
 	private String getRepresentation(String word) {
-		return FormatUtils.format(StringUtils.split(word, ""),
-				letter -> charsTested.contains(letter) ? String.format("**%s**", letter.toUpperCase()) : "\\_",
-				" ");
+		return String.format("**%s**",
+				FormatUtils.format(StringUtils.split(word, ""), letter -> charsTested.contains(letter) ? letter.toUpperCase() : "\\_", " "));
 	}
 
 	private void show() {
