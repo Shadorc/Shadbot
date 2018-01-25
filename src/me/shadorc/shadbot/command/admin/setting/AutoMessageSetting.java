@@ -85,9 +85,12 @@ public class AutoMessageSetting extends AbstractSetting {
 		}
 	}
 
-	private void updateJoinMessage(Context context, Action action, List<String> args) {
+	private void updateJoinMessage(Context context, Action action, List<String> args) throws MissingArgumentException {
 		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
 		if(Action.ENABLE.equals(action)) {
+			if(args.size() < 3) {
+				throw new MissingArgumentException();
+			}
 			String message = args.get(2);
 			dbGuild.setSetting(SettingEnum.JOIN_MESSAGE, message);
 			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Join message set to `%s`", message), context.getChannel());
@@ -98,9 +101,12 @@ public class AutoMessageSetting extends AbstractSetting {
 		}
 	}
 
-	private void updateLeaveMessage(Context context, Action action, List<String> args) {
+	private void updateLeaveMessage(Context context, Action action, List<String> args) throws MissingArgumentException {
 		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
 		if(Action.ENABLE.equals(action)) {
+			if(args.size() < 3) {
+				throw new MissingArgumentException();
+			}
 			String message = args.get(2);
 			dbGuild.setSetting(SettingEnum.LEAVE_MESSAGE, message);
 			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Leave message set to `%s`", message), context.getChannel());
@@ -124,6 +130,7 @@ public class AutoMessageSetting extends AbstractSetting {
 						Type.LEAVE_MESSAGE.toString().toLowerCase(),
 						Type.CHANNEL.toString().toLowerCase()), false)
 				.appendField("Info", "You don't need to specify *value* to disable a type.", false)
-				.appendField("Example", String.format("`%s%s set join_message Hello you (:`", prefix, this.getCmdName()), false);
+				.appendField("Example", String.format("`%s%s enable join_message Hello you (:`"
+						+ "%n`%s%s disable leave_message`", prefix, this.getCmdName(), prefix, this.getCmdName()), false);
 	}
 }
