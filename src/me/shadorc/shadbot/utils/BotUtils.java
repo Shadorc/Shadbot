@@ -108,8 +108,10 @@ public class BotUtils {
 	}
 
 	public static void updatePresence() {
-		Shadbot.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING,
-				String.format("%shelp | %s", Config.DEFAULT_PREFIX, TextUtils.getTip()));
+		if(Shadbot.getClient().isReady()) {
+			Shadbot.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING,
+					String.format("%shelp | %s", Config.DEFAULT_PREFIX, TextUtils.getTip()));
+		}
 	}
 
 	public static List<IUser> getUsersFrom(IMessage message) {
