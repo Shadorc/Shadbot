@@ -177,7 +177,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 		}
 
 		if(resultsTracks.isEmpty()) {
-			LogUtils.warnf("Results tracks were empty.");
+			LogUtils.warnf("{Guild ID: %d} Results tracks were empty.", message.getGuild().getLongID());
 			return true;
 		}
 
