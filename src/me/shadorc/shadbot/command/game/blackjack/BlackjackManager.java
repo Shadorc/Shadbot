@@ -83,10 +83,10 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 	}
 
 	private void stopOrShow() {
-		if(players.stream().noneMatch(BlackjackPlayer::isStanding)) {
-			this.show();
-		} else {
+		if(players.stream().allMatch(BlackjackPlayer::isStanding)) {
 			this.stop();
+		} else {
+			this.show();
 		}
 	}
 
