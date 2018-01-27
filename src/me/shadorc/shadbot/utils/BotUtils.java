@@ -61,7 +61,7 @@ public class BotUtils {
 
 	public static RequestFuture<IMessage> sendMessage(MessageBuilder message, int retry) {
 		if(retry == 0) {
-			LogUtils.warnf("{Guild ID: %d} Abort attempt to send message (5 failed requests).", message.getChannel().getGuild());
+			LogUtils.warnf("{Guild ID: %d} Abort attempt to send message (3 failed requests).", message.getChannel().getGuild());
 			return null;
 		}
 
@@ -145,12 +145,7 @@ public class BotUtils {
 	}
 
 	public static boolean hasPermissions(IChannel channel, Permissions... permissions) {
-		try {
-			return PermissionUtils.hasPermissions(channel, channel.getClient().getOurUser(), permissions);
-		} catch (Exception err) {
-			LogUtils.error(err, String.format("An error occurred while checking permissions (Message: %s).", err.getMessage()));
-			return true;
-		}
+		return PermissionUtils.hasPermissions(channel, channel.getClient().getOurUser(), permissions);
 	}
 
 	public static boolean hasPermissions(IGuild guild, Permissions... permissions) {

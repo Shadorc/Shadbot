@@ -49,8 +49,11 @@ public class Shadbot {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
+				LogUtils.infof("Stopping guild music manager...");
 				GuildMusicManager.stop();
+				LogUtils.infof("Stopping shard manager...");
 				ShardManager.stop();
+				LogUtils.infof("Stopping data manager...");
 				DataManager.stop();
 			}
 		});
