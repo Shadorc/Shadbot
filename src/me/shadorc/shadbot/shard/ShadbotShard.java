@@ -20,6 +20,8 @@ public class ShadbotShard {
 	private final AtomicLong lastEvent;
 	private final AtomicLong lastMessage;
 
+	private boolean isRestarting;
+
 	private ThreadPoolExecutor threadPool;
 
 	public ShadbotShard(IShard shard) {
@@ -29,6 +31,7 @@ public class ShadbotShard {
 		this.threadPool = ShardManager.createThreadPool(this);
 		this.lastEvent = new AtomicLong();
 		this.lastMessage = new AtomicLong();
+		this.isRestarting = false;
 	}
 
 	public IShard getShard() {
@@ -51,6 +54,10 @@ public class ShadbotShard {
 		return lastMessage.get();
 	}
 
+	public boolean isRestarting() {
+		return isRestarting;
+	}
+
 	public void queue(MessageBuilder message) {
 		messagesQueue.add(message);
 	}
@@ -69,11 +76,14 @@ public class ShadbotShard {
 	}
 
 	public void restart() {
-		LogUtils.infof("{Shard %d} Logging out.", this.getID());
+		this.isRestarting = true;
+
+		LogUtils.infof("{Shard %d} Logging out...", this.getID());
 		if(shard.isLoggedIn()) {
 			shard.logout();
 		}
 
+		LogUtils.infof("{Shard %d} Shutting down thread pool...", this.getID());
 		threadPool.shutdown();
 		try {
 			if(!threadPool.awaitTermination(10, TimeUnit.SECONDS)) {
@@ -85,9 +95,15 @@ public class ShadbotShard {
 					this.getID(), threadPool.shutdownNow().size());
 		}
 
-		LogUtils.infof("{Shard %d} Logging in.", this.getID());
+		LogUtils.infof("{Shard %d} Logging in...", this.getID());
 		shard.login();
 		LogUtils.infof("{Shard %d} Shard restarted.", this.getID());
 		threadPool = ShardManager.createThreadPool(this);
+
+		// Reset timeout counter
+		this.eventReceived();
+		this.messageReceived();
+
+		this.isRestarting = false;
 	}
 }

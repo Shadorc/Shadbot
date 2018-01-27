@@ -73,6 +73,10 @@ public class ShardManager {
 				if(shardStatus.getShard().getGuilds().size() < 100) {
 					continue;
 				}
+				// Don't restart a shard if it's already restarting
+				if(shardStatus.isRestarting()) {
+					continue;
+				}
 				long lastEventTime = TimeUtils.getMillisUntil(shardStatus.getLastEventTime());
 				long lastMessageTime = TimeUtils.getMillisUntil(shardStatus.getLastMessageTime());
 				if(lastEventTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT) || lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
