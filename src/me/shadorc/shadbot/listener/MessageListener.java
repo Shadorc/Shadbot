@@ -24,7 +24,7 @@ public class MessageListener {
 
 	@EventSubscriber
 	public void onMessageEvent(MessageEvent event) {
-		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
+		ShardManager.execute(event.getGuild(), () -> {
 			if(event instanceof MessageReceivedEvent) {
 				this.onMessageReceivedEvent((MessageReceivedEvent) event);
 			}

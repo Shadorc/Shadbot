@@ -38,14 +38,27 @@ public class ShardManager {
 		return SHARDS_MAP.get(shard);
 	}
 
-	public static ThreadPoolExecutor getThreadPool(IGuild guild) {
+	/**
+	 * @param guild - the guild in which the event happened
+	 * @param runnable - the runnable to execute
+	 * @return true if the runnable could have been executed, false otherwise
+	 */
+	public static boolean execute(IGuild guild, Runnable runnable) {
+		ThreadPoolExecutor threadPool;
+
 		// Private message
 		if(guild == null) {
-			return DEFAUT_THREAD_POOL;
+			threadPool = DEFAUT_THREAD_POOL;
+		} else {
+			SHARDS_MAP.get(guild.getShard()).eventReceived();
+			threadPool = SHARDS_MAP.get(guild.getShard()).getThreadPool();
 		}
 
-		SHARDS_MAP.get(guild.getShard()).eventReceived();
-		return SHARDS_MAP.get(guild.getShard()).getThreadPool();
+		if(threadPool.isShutdown()) {
+			return false;
+		}
+		threadPool.execute(runnable);
+		return true;
 	}
 
 	public static void addShardIfAbsent(IShard shard) {

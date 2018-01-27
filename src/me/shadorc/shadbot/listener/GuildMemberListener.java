@@ -21,7 +21,7 @@ public class GuildMemberListener {
 
 	@EventSubscriber
 	public void onGuildMemberEvent(GuildMemberEvent event) {
-		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
+		ShardManager.execute(event.getGuild(), () -> {
 			if(event instanceof UserJoinEvent) {
 				this.onUserJoinEvent((UserJoinEvent) event);
 			} else if(event instanceof UserLeaveEvent) {

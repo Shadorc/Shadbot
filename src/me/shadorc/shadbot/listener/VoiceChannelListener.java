@@ -13,7 +13,7 @@ public class VoiceChannelListener {
 
 	@EventSubscriber
 	public void onVoiceChannelEvent(VoiceChannelEvent event) {
-		ShardManager.getThreadPool(event.getGuild()).execute(() -> {
+		ShardManager.execute(event.getGuild(), () -> {
 			if(event instanceof VoiceDisconnectedEvent) {
 				this.onVoiceDisconnectedEvent((VoiceDisconnectedEvent) event);
 			}
