@@ -20,9 +20,8 @@ public class ShadbotShard {
 	private final AtomicLong lastEvent;
 	private final AtomicLong lastMessage;
 
-	private boolean isRestarting;
-
 	private ThreadPoolExecutor threadPool;
+	private boolean isRestarting;
 
 	public ShadbotShard(IShard shard) {
 		this.shard = shard;
@@ -84,20 +83,19 @@ public class ShadbotShard {
 		}
 
 		LogUtils.infof("{Shard %d} Shutting down thread pool...", this.getID());
-		threadPool.shutdown();
+		threadPool.shutdownNow();
 		try {
 			if(!threadPool.awaitTermination(10, TimeUnit.SECONDS)) {
-				LogUtils.infof("{Shard %d} Thread pool was abruptly shut down. %d tasks will not be executed.",
-						this.getID(), threadPool.shutdownNow().size());
+				LogUtils.infof("{Shard %d} Thread pool was abruptly shut down.", this.getID());
 			}
 		} catch (InterruptedException e) {
-			LogUtils.infof("{Shard %d} Thread was interrupted, thread pool was abruptly shut down. %d tasks will not be executed.",
-					this.getID(), threadPool.shutdownNow().size());
+			LogUtils.infof("{Shard %d} Thread was interrupted, thread pool was abruptly shut down.", this.getID());
 		}
 
 		LogUtils.infof("{Shard %d} Logging in...", this.getID());
 		shard.login();
 		LogUtils.infof("{Shard %d} Shard restarted.", this.getID());
+
 		threadPool = ShardManager.createThreadPool(this);
 
 		// Reset timeout counter
