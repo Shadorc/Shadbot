@@ -12,7 +12,7 @@ import sx.blah.discord.handle.obj.IChannel;
 
 public class LogUtils {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger("Shadbot-Logger");
+	private static final Logger LOGGER = LoggerFactory.getLogger("Shadbot");
 
 	public static void error(String input, IChannel channel, Throwable err, String msg) {
 		LOGGER.error(String.format("%s (Input: %s)", msg, input), err);

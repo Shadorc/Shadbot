@@ -26,7 +26,7 @@ public class RateLimiter {
 	private final int cooldown;
 
 	public RateLimiter(int max, int cooldown, ChronoUnit unit) {
-		this.scheduledExecutor = new ShadbotScheduledExecutor("Shadbot-RateLimiter-%d");
+		this.scheduledExecutor = new ShadbotScheduledExecutor("RateLimiter-%d");
 		this.guildsLimitedMap = new ConcurrentHashMap<>();
 		this.max = max;
 		this.cooldown = (int) Duration.of(cooldown, unit).toMillis();

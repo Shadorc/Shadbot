@@ -17,7 +17,7 @@ import sx.blah.discord.util.PermissionUtils;
 
 public abstract class AbstractGameManager {
 
-	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("Shadbot-GameManager-%d");
+	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor("GameManager-%d");
 
 	private final String cmdName;
 	private final String prefix;

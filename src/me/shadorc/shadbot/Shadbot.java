@@ -24,8 +24,8 @@ import sx.blah.discord.handle.obj.StatusType;
 
 public class Shadbot {
 
-	private static final ThreadPoolExecutor EVENT_THREAD_POOL = new ShadbotCachedExecutor("Shadbot-EventThreadPool-%d");
-	private static final ScheduledThreadPoolExecutor DEFAULT_SCHEDULER = new ShadbotScheduledExecutor(2, "Shadbot-DefaultScheduler-%d");
+	private static final ThreadPoolExecutor EVENT_THREAD_POOL = new ShadbotCachedExecutor("EventThreadPool-%d");
+	private static final ScheduledThreadPoolExecutor DEFAULT_SCHEDULER = new ShadbotScheduledExecutor(2, "DefaultScheduler-%d");
 
 	private static String version;
 	private static IDiscordClient client;
@@ -62,7 +62,7 @@ public class Shadbot {
 				.withToken(APIKeys.get(APIKey.DISCORD_TOKEN))
 				.withRecommendedShardCount()
 				.withPingTimeout(3)
-				.setMaxMessageCacheCount(0)
+				.setMaxMessageCacheCount(25)
 				.setMaxReconnectAttempts(10)
 				.setPresence(StatusType.IDLE)
 				.build();

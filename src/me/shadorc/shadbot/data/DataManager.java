@@ -18,7 +18,7 @@ public class DataManager {
 
 	public static final File SAVE_DIR = new File("./saves");
 
-	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor(2, "Shadbot-DataManager-%d");
+	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor(2, "DataManager-%d");
 	private static final List<Runnable> SAVE_TASKS = new ArrayList<>();
 
 	public static boolean init() {
