@@ -18,6 +18,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
+import sx.blah.discord.util.RequestBuffer;
 
 public class GuildMusic {
 
@@ -71,7 +72,9 @@ public class GuildMusic {
 	public void leaveVoiceChannel() {
 		IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
 		if(voiceChannel != null && voiceChannel.getShard().isReady()) {
-			voiceChannel.leave();
+			RequestBuffer.request(() -> {
+				voiceChannel.leave();
+			}).get();
 		}
 	}
 

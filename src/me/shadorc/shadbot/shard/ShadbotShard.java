@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.collect.EvictingQueue;
 
+import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import sx.blah.discord.api.IShard;
@@ -76,6 +77,16 @@ public class ShadbotShard {
 
 	public void restart() {
 		this.isRestarting = true;
+
+		LogUtils.infof("{Shard %d} Restarting...", this.getID());
+
+		GuildMusicManager.GUILD_MUSIC_MAP.values().stream()
+				.filter(guildMusic -> guildMusic.getChannel().getShard().equals(this.getShard()))
+				.forEach(guildMusic -> {
+					LogUtils.infof("{Shard %d | Guild ID: %d} Leaving voice channel...",
+							this.getID(), guildMusic.getChannel().getGuild().getLongID());
+					guildMusic.leaveVoiceChannel();
+				});
 
 		LogUtils.infof("{Shard %d} Logging out...", this.getID());
 		if(shard.isLoggedIn()) {

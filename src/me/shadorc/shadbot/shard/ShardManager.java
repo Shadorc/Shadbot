@@ -16,7 +16,7 @@ import sx.blah.discord.handle.obj.IGuild;
 
 public class ShardManager {
 
-	private static final int SHARD_TIMEOUT = 30;
+	private static final int SHARD_TIMEOUT = 60;
 
 	private static final Map<IShard, ShadbotShard> SHARDS_MAP = new HashMap<>();
 	private static final ThreadPoolExecutor DEFAUT_THREAD_POOL = new ShadbotCachedExecutor("Shadbot-DefaultThreadPool-%d");
@@ -69,8 +69,8 @@ public class ShardManager {
 		LogUtils.infof("Checking dead shards...");
 		for(ShadbotShard shardStatus : SHARDS_MAP.values()) {
 			try {
-				// Ignore shards with less than 100 guilds
-				if(shardStatus.getShard().getGuilds().size() < 100) {
+				// Ignore small shards
+				if(shardStatus.getShard().getGuilds().size() < 250) {
 					continue;
 				}
 				// Don't restart a shard if it's already restarting
