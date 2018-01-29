@@ -24,21 +24,31 @@ public class LoadingMessage {
 	}
 
 	public void edit(String content) {
-		RequestBuffer.request(() -> {
-			msgRequest.get().edit(content);
-		});
+		if(msgRequest == null) {
+			BotUtils.sendMessage(content, channel);
+		} else {
+			RequestBuffer.request(() -> {
+				msgRequest.get().edit(content);
+			});
+		}
 	}
 
 	public void edit(EmbedObject embed) {
-		RequestBuffer.request(() -> {
-			msgRequest.get().edit(embed);
-		});
+		if(msgRequest == null) {
+			BotUtils.sendMessage(embed, channel);
+		} else {
+			RequestBuffer.request(() -> {
+				msgRequest.get().edit(embed);
+			});
+		}
 	}
 
 	public void delete() {
-		RequestBuffer.request(() -> {
-			msgRequest.get().delete();
-		});
+		if(msgRequest != null) {
+			RequestBuffer.request(() -> {
+				msgRequest.get().delete();
+			});
+		}
 	}
 
 }
