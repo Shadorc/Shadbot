@@ -64,7 +64,7 @@ public class MessageListener {
 			LogUtils.infof("{Guild ID: %d} %s", message.getGuild().getLongID(), err.getMessage());
 		} catch (Exception err) {
 			BotUtils.sendMessage(Emoji.RED_FLAG + " Sorry, an unknown error occurred. My developer has been warned.", message.getChannel());
-			LogUtils.error(message.getContent(), message.getChannel(), err,
+			LogUtils.error(message.getContent(), err,
 					String.format("{Guild ID: %d} An unknown error occurred while receiving a message.", message.getGuild().getLongID()));
 		}
 	}

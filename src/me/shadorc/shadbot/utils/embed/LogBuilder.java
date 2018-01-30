@@ -5,7 +5,6 @@ import java.awt.Color;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.StringUtils;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class LogBuilder {
@@ -14,22 +13,20 @@ public class LogBuilder {
 	private final String message;
 	private final Throwable err;
 	private final String input;
-	private final IChannel channel;
 
-	public LogBuilder(LogType type, String message, Throwable err, String input, IChannel channel) {
+	public LogBuilder(LogType type, String message, Throwable err, String input) {
 		this.type = type;
 		this.message = message;
 		this.err = err;
 		this.input = input;
-		this.channel = channel;
 	}
 
 	public LogBuilder(LogType type, String message, Throwable err) {
-		this(type, message, err, null, null);
+		this(type, message, err, null);
 	}
 
 	public LogBuilder(LogType type, String message) {
-		this(type, message, null, null, null);
+		this(type, message, null, null);
 	}
 
 	public EmbedObject build() {
@@ -58,8 +55,6 @@ public class LogBuilder {
 		if(input != null) {
 			embed.appendField("Input", input, false);
 		}
-
-		embed.appendField("User warned", Boolean.toString(channel != null), false);
 
 		return embed.build();
 	}

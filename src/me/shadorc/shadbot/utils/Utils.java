@@ -107,14 +107,16 @@ public class Utils {
 		String msg;
 		if(err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
 			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
+			LogUtils.warnf("{Guild ID: %d} Service unavailable while %s.", context.getGuild().getLongID(), action);
 		} else if(err instanceof SocketTimeoutException) {
 			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.",
 					StringUtils.capitalize(action));
+			LogUtils.warnf("{Guild ID: %d} A SocketTimeoutException occurred while %s.", context.getGuild().getLongID(), action);
 		} else {
 			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
+			LogUtils.error(context.getContent(), err, String.format("{Guild ID: %d} %s", context.getGuild().getLongID(), msg));
 		}
 		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, context.getChannel());
-		LogUtils.error(context.getContent(), context.getChannel(), err, String.format("{Guild ID: %d} %s", context.getGuild().getLongID(), msg));
 	}
 
 	public static Integer checkAndGetBet(IChannel channel, IUser user, String betStr, int maxValue) throws IllegalCmdArgumentException {

@@ -8,15 +8,14 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.embed.LogBuilder;
 import me.shadorc.shadbot.utils.embed.LogType;
 import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.IChannel;
 
 public class LogUtils {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("Shadbot");
 
-	public static void error(String input, IChannel channel, Throwable err, String msg) {
+	public static void error(String input, Throwable err, String msg) {
 		LOGGER.error(String.format("%s (Input: %s)", msg, input), err);
-		LogUtils.sendLog(new LogBuilder(LogType.ERROR, msg, err, input, channel));
+		LogUtils.sendLog(new LogBuilder(LogType.ERROR, msg, err, input));
 	}
 
 	public static void error(Throwable err, String msg) {
