@@ -24,29 +24,32 @@ public class LoadingMessage {
 	}
 
 	public void edit(String content) {
-		if(msgRequest == null) {
-			BotUtils.sendMessage(content, channel);
+		IMessage message = msgRequest == null ? null : msgRequest.get();
+		if(message == null) {
+			msgRequest = BotUtils.sendMessage(content, channel);
 		} else {
 			RequestBuffer.request(() -> {
-				msgRequest.get().edit(content);
+				message.edit(content);
 			});
 		}
 	}
 
 	public void edit(EmbedObject embed) {
-		if(msgRequest == null) {
-			BotUtils.sendMessage(embed, channel);
+		IMessage message = msgRequest == null ? null : msgRequest.get();
+		if(message == null) {
+			msgRequest = BotUtils.sendMessage(embed, channel);
 		} else {
 			RequestBuffer.request(() -> {
-				msgRequest.get().edit(embed);
+				message.edit(embed);
 			});
 		}
 	}
 
 	public void delete() {
-		if(msgRequest != null) {
+		IMessage message = msgRequest == null ? null : msgRequest.get();
+		if(message != null) {
 			RequestBuffer.request(() -> {
-				msgRequest.get().delete();
+				message.delete();
 			});
 		}
 	}
