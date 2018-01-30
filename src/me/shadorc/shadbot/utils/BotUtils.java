@@ -66,10 +66,11 @@ public class BotUtils {
 		}
 
 		IGuild guild = message.getChannel().isPrivate() ? null : message.getChannel().getGuild();
-		if(guild != null && !guild.getShard().isReady()) {
-			LogUtils.infof("{Guild ID: %d} A message could not be sent because shard isn't ready, adding it to queue.",
-					guild.getLongID());
-			ShardManager.getShadbotShard(guild.getShard()).queue(message);
+		if(!message.getChannel().getShard().isReady()) {
+			if(guild != null) {
+				LogUtils.infof("{Guild ID: %d} A message couldn't be sent because shard isn't ready, adding it to queue.", guild.getLongID());
+				ShardManager.getShadbotShard(guild.getShard()).queue(message);
+			}
 			return null;
 		}
 
