@@ -83,10 +83,13 @@ public class BotUtils {
 			} catch (DiscordException err) {
 				if(err.getMessage().contains("Message was unable to be sent (Discord didn't return a response)")) {
 					LogUtils.infof("{Guild ID: %d} A message could not be send because Discord didn't return a response, retrying.",
-							message.getChannel().getGuild().getLongID());
+							guild.getLongID());
 					return BotUtils.sendMessage(message, retry - 1).get();
+				} else if(err.getMessage().contains("Failed to make a 400 failed request after 5 tries!")) {
+					LogUtils.warnf("{Guild ID: %d} %s", guild.getLongID(), err.getMessage());
+				} else {
+					LogUtils.error(err, "An error occurred while sending message.");
 				}
-				LogUtils.error(err, "An error occurred while sending message.");
 			}
 			return null;
 		});

@@ -93,8 +93,7 @@ public class ShadbotShard {
 			shard.logout();
 		}
 
-		LogUtils.infof("{Shard %d} Shutting down thread pool...", this.getID());
-		threadPool.shutdownNow();
+		LogUtils.infof("{Shard %d} Thread pool shutdown, %d tasks cancelled.", this.getID(), threadPool.shutdownNow().size());
 		try {
 			if(!threadPool.awaitTermination(10, TimeUnit.SECONDS)) {
 				LogUtils.infof("{Shard %d} Thread pool was abruptly shut down.", this.getID());

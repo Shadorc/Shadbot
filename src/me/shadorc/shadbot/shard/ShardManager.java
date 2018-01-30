@@ -80,7 +80,9 @@ public class ShardManager {
 				long lastEventTime = TimeUtils.getMillisUntil(shardStatus.getLastEventTime());
 				long lastMessageTime = TimeUtils.getMillisUntil(shardStatus.getLastMessageTime());
 				if(lastEventTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT) || lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
-					LogUtils.infof(String.format("Restarting shard %d (Response time: %d ms | Last event: %s ago | Last message: %s ago)",
+					LogUtils.infof(String.format("Restarting shard %d "
+							+ "(Guilds: %d | Response time: %d ms | Last event: %s ago | Last message: %s ago)",
+							shardStatus.getShard().getGuilds().size(),
 							shardStatus.getID(),
 							shardStatus.getShard().getResponseTime(),
 							DurationFormatUtils.formatDurationWords(lastEventTime, true, true),
@@ -88,7 +90,7 @@ public class ShardManager {
 					shardStatus.restart();
 				}
 			} catch (Exception err) {
-				LogUtils.error(err, "An error occurred while restarting a shard.");
+				LogUtils.error(err, String.format("An error occurred while restarting shard %d.", shardStatus.getID()));
 			}
 		}
 		LogUtils.infof("Dead shards checked.");
