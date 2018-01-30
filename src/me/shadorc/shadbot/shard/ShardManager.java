@@ -16,13 +16,13 @@ import sx.blah.discord.handle.obj.IGuild;
 
 public class ShardManager {
 
-	private static final int SHARD_TIMEOUT = 60;
+	private static final int SHARD_TIMEOUT = 120;
 
 	private static final Map<IShard, ShadbotShard> SHARDS_MAP = new HashMap<>();
 	private static final ThreadPoolExecutor DEFAUT_THREAD_POOL = new ShadbotCachedExecutor("DefaultThreadPool-%d");
 
 	public static void start() {
-		Shadbot.getScheduler().scheduleAtFixedRate(() -> ShardManager.check(), 10, 10, TimeUnit.MINUTES);
+		Shadbot.getScheduler().scheduleAtFixedRate(() -> ShardManager.check(), 5, 5, TimeUnit.MINUTES);
 	}
 
 	public static void stop() {
@@ -39,7 +39,7 @@ public class ShardManager {
 	}
 
 	/**
-	 * @param guild - the guild in which the event happened
+	 * @param guild - the guild in which the event happened (can be null)
 	 * @param runnable - the runnable to execute
 	 * @return true if the runnable could have been executed, false otherwise
 	 */

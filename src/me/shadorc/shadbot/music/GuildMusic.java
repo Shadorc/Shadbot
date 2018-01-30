@@ -11,6 +11,7 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
+import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -58,24 +59,26 @@ public class GuildMusic {
 	}
 
 	public void end() {
-		Shadbot.getEventThreadPool().submit(() -> {
-			StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
-			if(!PremiumManager.isPremium(channel.getGuild())) {
-				strBuilder.append(String.format(" If you like me, you can make a donation on **%s**, it will help my creator keeping me alive :heart:",
-						Config.PATREON_URL));
-			}
-			BotUtils.sendMessage(strBuilder.toString(), channel);
-			this.leaveVoiceChannel();
-		});
+		StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
+		if(!PremiumManager.isPremium(channel.getGuild())) {
+			strBuilder.append(String.format(" If you like me, you can make a donation on **%s**, it will help my creator keeping me alive :heart:",
+					Config.PATREON_URL));
+		}
+		BotUtils.sendMessage(strBuilder.toString(), channel);
+		this.leaveVoiceChannel();
 	}
 
 	public void leaveVoiceChannel() {
-		IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
-		if(voiceChannel != null && voiceChannel.getShard().isReady()) {
-			RequestBuffer.request(() -> {
-				voiceChannel.leave();
-			}).get();
-		}
+		// Leaving a voice channel can take up to 30 seconds to be executed
+		// We execute it in a separate thread pool to avoid thread blocking
+		ShardManager.execute(channel.getGuild(), () -> {
+			IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
+			if(voiceChannel != null && voiceChannel.getShard().isReady()) {
+				RequestBuffer.request(() -> {
+					voiceChannel.leave();
+				});
+			}
+		});
 	}
 
 	public void delete() {

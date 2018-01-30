@@ -25,7 +25,7 @@ import sx.blah.discord.handle.obj.StatusType;
 public class Shadbot {
 
 	private static final ThreadPoolExecutor EVENT_THREAD_POOL = new ShadbotCachedExecutor("EventThreadPool-%d");
-	private static final ScheduledThreadPoolExecutor DEFAULT_SCHEDULER = new ShadbotScheduledExecutor(2, "DefaultScheduler-%d");
+	private static final ScheduledThreadPoolExecutor DEFAULT_SCHEDULER = new ShadbotScheduledExecutor(3, "DefaultScheduler-%d");
 
 	private static String version;
 	private static IDiscordClient client;
