@@ -82,8 +82,8 @@ public class ShardManager {
 				if(lastEventTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT) || lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
 					LogUtils.infof(String.format("Restarting shard %d "
 							+ "(Guilds: %d | Response time: %d ms | Last event: %s ago | Last message: %s ago)",
-							shardStatus.getShard().getGuilds().size(),
 							shardStatus.getID(),
+							shardStatus.getShard().getGuilds().size(),
 							shardStatus.getShard().getResponseTime(),
 							DurationFormatUtils.formatDurationWords(lastEventTime, true, true),
 							DurationFormatUtils.formatDurationWords(lastMessageTime, true, true)));
