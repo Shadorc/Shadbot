@@ -1,6 +1,7 @@
 package me.shadorc.shadbot;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -24,22 +25,25 @@ import sx.blah.discord.handle.obj.StatusType;
 
 public class Shadbot {
 
+	public static final String VERSION;
+
 	private static final ThreadPoolExecutor EVENT_THREAD_POOL = new ShadbotCachedExecutor("EventThreadPool-%d");
 	private static final ScheduledThreadPoolExecutor DEFAULT_SCHEDULER = new ShadbotScheduledExecutor(3, "DefaultScheduler-%d");
 
-	private static String version;
 	private static IDiscordClient client;
 
-	public static void main(String[] args) {
-		Locale.setDefault(new Locale("en", "US"));
-
-		try {
-			Properties properties = new Properties();
-			properties.load(Shadbot.class.getClassLoader().getResourceAsStream("project.properties"));
-			version = properties.getProperty("version");
+	static {
+		Properties properties = new Properties();
+		try (InputStream inStream = Shadbot.class.getClassLoader().getResourceAsStream("project.properties")) {
+			properties.load(inStream);
 		} catch (IOException err) {
 			LogUtils.error(err, "An error occurred while getting version.");
 		}
+		VERSION = properties.getProperty("version");
+	}
+
+	public static void main(String[] args) {
+		Locale.setDefault(new Locale("en", "US"));
 
 		// Initialization
 		if(!DataManager.init() || !CommandManager.init()) {
@@ -62,7 +66,7 @@ public class Shadbot {
 				.withToken(APIKeys.get(APIKey.DISCORD_TOKEN))
 				.withRecommendedShardCount()
 				.withPingTimeout(3)
-				//.setMaxMessageCacheCount(25)
+				// .setMaxMessageCacheCount(25)
 				.setMaxReconnectAttempts(25)
 				.setPresence(StatusType.IDLE)
 				.build();
@@ -71,10 +75,6 @@ public class Shadbot {
 
 		client.getDispatcher().registerListeners(Shadbot.getEventThreadPool(), new ReadyListener(), new ShardListener());
 		client.login();
-	}
-
-	public static String getVersion() {
-		return version;
 	}
 
 	public static IDiscordClient getClient() {

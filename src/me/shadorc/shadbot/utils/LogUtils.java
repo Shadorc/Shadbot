@@ -11,7 +11,7 @@ import sx.blah.discord.api.IDiscordClient;
 
 public class LogUtils {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger("Shadbot");
+	private static final Logger LOGGER = LoggerFactory.getLogger(Shadbot.class);
 
 	public static void error(String input, Throwable err, String msg) {
 		LOGGER.error(String.format("%s (Input: %s)", msg, input), err);

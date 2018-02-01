@@ -16,7 +16,7 @@ public class ReadyListener {
 
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
-		LogUtils.infof("Shadbot (Version: %s) is ready.", Shadbot.getVersion());
+		LogUtils.infof("Shadbot (Version: %s) is ready.", Shadbot.VERSION);
 
 		ShardManager.start();
 

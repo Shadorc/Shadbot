@@ -32,7 +32,7 @@ public class LogBuilder {
 	public EmbedObject build() {
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.setLenient(true)
-				.withAuthorName(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Shadbot.getVersion()))
+				.withAuthorName(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Shadbot.VERSION))
 				.withDescription(message);
 
 		switch (type) {

@@ -16,7 +16,7 @@ public class Config {
 	public static final int MAX_COINS = Integer.MAX_VALUE;
 
 	public static final int DEFAULT_TIMEOUT = 20_000;
-	public static final String USER_AGENT = String.format("Shadbot/%s/D4J-DiscordBot (%s)", Shadbot.getVersion(), GITHUB_URL);
+	public static final String USER_AGENT = String.format("Shadbot/%s/D4J-DiscordBot (%s)", Shadbot.VERSION, GITHUB_URL);
 
 	public static final Color BOT_COLOR = new Color(170, 196, 222);
 

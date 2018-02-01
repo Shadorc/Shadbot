@@ -47,7 +47,7 @@ public class InfoCmd extends AbstractCommand {
 				+ String.format("%n%n-= Shadbot Info =-")
 				+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true))
 				+ String.format("%nDeveloper: %s#%s", owner.getName(), owner.getDiscriminator())
-				+ String.format("%nShadbot Version: %s", Shadbot.getVersion())
+				+ String.format("%nShadbot Version: %s", Shadbot.VERSION)
 				+ String.format("%nShard: %d/%d", context.getShadbotShard().getID() + 1, context.getClient().getShardCount())
 				+ String.format("%nServers: %s", FormatUtils.formatNum(context.getClient().getGuilds().size()))
 				+ String.format("%nVoice Channels: %d", context.getClient().getConnectedVoiceChannels().size())
