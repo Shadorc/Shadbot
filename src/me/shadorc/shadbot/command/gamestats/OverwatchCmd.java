@@ -20,11 +20,10 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
 import net.shadorc.overwatch4j.HeroDesc;
 import net.shadorc.overwatch4j.Overwatch4J;
-import net.shadorc.overwatch4j.OverwatchException;
 import net.shadorc.overwatch4j.OverwatchPlayer;
 import net.shadorc.overwatch4j.enums.Platform;
-import net.shadorc.overwatch4j.enums.Region;
 import net.shadorc.overwatch4j.enums.TopHeroesStats;
+import net.shadorc.overwatch4j.exception.OverwatchException;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -44,32 +43,21 @@ public class OverwatchCmd extends AbstractCommand {
 		}
 
 		LoadingMessage loadingMsg = new LoadingMessage("Loading Overwatch profile...", context.getChannel());
-		loadingMsg.send();
 
 		try {
 			OverwatchPlayer player;
 
 			String username = null;
 			Platform platform = null;
-			Region region = null;
-			switch (splitArgs.size()) {
-				case 1:
-					username = splitArgs.get(0);
-					player = new OverwatchPlayer(username);
-					break;
-
-				case 2:
-					platform = this.getPlatform(splitArgs.get(0));
-					username = splitArgs.get(1);
-					player = new OverwatchPlayer(username, platform);
-					break;
-
-				default:
-					platform = this.getPlatform(splitArgs.get(0));
-					region = this.getRegion(splitArgs.get(1));
-					username = splitArgs.get(2);
-					player = new OverwatchPlayer(username, platform, region);
-					break;
+			if(splitArgs.size() == 1) {
+				username = splitArgs.get(0);
+				loadingMsg.send();
+				player = new OverwatchPlayer(username);
+			} else {
+				platform = this.getPlatform(splitArgs.get(0));
+				username = splitArgs.get(1);
+				loadingMsg.send();
+				player = new OverwatchPlayer(username, platform);
 			}
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
@@ -78,8 +66,7 @@ public class OverwatchCmd extends AbstractCommand {
 					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
 					.withUrl(player.getProfileURL())
 					.withThumbnail(player.getIconUrl())
-					.appendDescription(String.format("Stats for user **%s**%s",
-							player.getName(), player.getRegion() == Region.NONE ? "" : " (Region: " + player.getRegion() + ")"))
+					.appendDescription(String.format("Stats for user **%s**", player.getName()))
 					.appendField("Level", Integer.toString(player.getLevel()), true)
 					.appendField("Competitive rank", Integer.toString(player.getRank()), true)
 					.appendField("Wins", Integer.toString(player.getWins()), true)
@@ -89,22 +76,7 @@ public class OverwatchCmd extends AbstractCommand {
 			loadingMsg.edit(embed.build());
 
 		} catch (OverwatchException err) {
-			String msg;
-			switch (err.getType()) {
-				case BLIZZARD_INTERNAL_ERROR:
-					msg = "There's an internal error on the Blizzard side, please try again later.";
-					break;
-				case NO_DATA:
-					msg = "There is no data for this account yet.";
-					break;
-				case USER_NOT_FOUND:
-					msg = "This user doesn't play Overwatch or doesn't exist.";
-					break;
-				default:
-					msg = "An unknown error occurred while getting information from Overwatch profile.";
-					break;
-			}
-			loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " " + msg);
+			loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " " + err.getMessage());
 		} catch (IOException err) {
 			loadingMsg.delete();
 			Utils.handle("getting information from Overwatch profile", context, err);
@@ -125,25 +97,14 @@ public class OverwatchCmd extends AbstractCommand {
 		return platform;
 	}
 
-	private Region getRegion(String str) throws IllegalCmdArgumentException {
-		Region region = Utils.getValueOrNull(Region.class, str.toUpperCase());
-		if(region == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Region. %s",
-					str, FormatUtils.formatOptions(Region.class)));
-		}
-		return region;
-	}
-
 	@Override
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Overwatch.")
 				.addArg("platform", String.format("user's platform (%s)",
-						FormatUtils.format(Utils.removeAndGet(Platform.values(), Platform.NONE), platform -> platform.toString().toLowerCase(), ", ")), true)
-				.addArg("region", String.format("user's region (%s)",
-						FormatUtils.format(Utils.removeAndGet(Region.values(), Region.NONE), region -> region.toString().toLowerCase(), ", ")), true)
+						FormatUtils.format(Platform.values(), platform -> platform.toString().toLowerCase(), ", ")), true)
 				.addArg("battletag#0000", false)
-				.appendField("Info", "**platform** and **region** are automatically detected if nothing is specified.", false)
+				.appendField("Info", "**platform** is automatically detected if nothing is specified.", false)
 				.build();
 	}
 

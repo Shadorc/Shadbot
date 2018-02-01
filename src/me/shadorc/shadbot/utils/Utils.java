@@ -3,7 +3,6 @@ package me.shadorc.shadbot.utils;
 import java.lang.management.ManagementFactory;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -97,10 +96,6 @@ public class Utils {
 						Map.Entry::getValue,
 						(value1, value2) -> value1,
 						LinkedHashMap::new));
-	}
-
-	public static <T> List<T> removeAndGet(T[] array, T elmt) {
-		return Arrays.stream(array).filter(element -> !element.equals(elmt)).collect(Collectors.toList());
 	}
 
 	public static void handle(String action, Context context, Throwable err) {
