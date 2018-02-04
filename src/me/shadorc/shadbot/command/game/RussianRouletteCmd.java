@@ -25,8 +25,8 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 public class RussianRouletteCmd extends AbstractCommand {
 
 	private static final int MAX_BET = 250_000;
-	private static final float WIN_MULTIPLIER = 1.52f;
-	private static final float LOSE_MULTIPLIER = 7.5f;
+	private static final float WIN_MULTIPLIER = 2.025f;
+	private static final float LOSE_MULTIPLIER = 10f;
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
