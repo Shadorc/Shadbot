@@ -11,7 +11,7 @@ import me.shadorc.shadbot.utils.Utils;
 public class ShadbotScheduledExecutor extends ScheduledThreadPoolExecutor {
 
 	public ShadbotScheduledExecutor(int corePoolSize, String name) {
-		super(corePoolSize, Utils.getThreadFactoryNamed(name));
+		super(corePoolSize, Utils.createNamedThreadFactory(name));
 		this.setRemoveOnCancelPolicy(true);
 	}
 

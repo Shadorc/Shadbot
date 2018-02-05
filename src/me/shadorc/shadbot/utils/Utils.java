@@ -32,7 +32,8 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class Utils {
 
-	public static ThreadFactory getThreadFactoryNamed(String name) {
+	public static ThreadFactory createNamedThreadFactory(String name) {
+		// TODO: Use setDaemon(true) ?
 		return new ThreadFactoryBuilder().setNameFormat(name).build();
 	}
 

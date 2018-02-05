@@ -11,7 +11,7 @@ import me.shadorc.shadbot.utils.Utils;
 public class ShadbotCachedExecutor extends ThreadPoolExecutor {
 
 	public ShadbotCachedExecutor(String name) {
-		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), Utils.getThreadFactoryNamed(name));
+		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), Utils.createNamedThreadFactory(name));
 	}
 
 	@Override
