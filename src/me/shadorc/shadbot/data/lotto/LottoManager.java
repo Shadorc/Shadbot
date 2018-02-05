@@ -52,7 +52,7 @@ public class LottoManager {
 		}
 	}
 
-	@DataSave(filePath = FILE_NAME, initialDelay = 10, period = 10, unit = TimeUnit.MINUTES)
+	@DataSave(filePath = FILE_NAME, initialDelay = 30, period = 30, unit = TimeUnit.MINUTES)
 	public static void save() throws JSONException, IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(dataObj.toString(Config.JSON_INDENT_FACTOR));

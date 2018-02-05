@@ -26,7 +26,7 @@ public class ShadbotShard {
 	public ShadbotShard(IShard shard) {
 		this.shard = shard;
 		this.shardID = shard.getInfo()[0];
-		this.messagesQueue = EvictingQueue.create(5);
+		this.messagesQueue = EvictingQueue.create(20);
 		this.threadPool = ShardManager.createThreadPool(this);
 		this.lastEvent = new AtomicLong();
 		this.lastMessage = new AtomicLong();

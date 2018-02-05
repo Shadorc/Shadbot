@@ -39,7 +39,7 @@ public class Database {
 		}
 	}
 
-	@DataSave(filePath = FILE_NAME, initialDelay = 5, period = 5, unit = TimeUnit.MINUTES)
+	@DataSave(filePath = FILE_NAME, initialDelay = 15, period = 15, unit = TimeUnit.MINUTES)
 	public static void save() throws JSONException, IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(dbObject.toString(Config.JSON_INDENT_FACTOR));
