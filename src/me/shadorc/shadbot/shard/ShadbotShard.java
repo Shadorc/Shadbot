@@ -74,7 +74,7 @@ public class ShadbotShard {
 		lastMessage.set(System.currentTimeMillis());
 	}
 
-	public void restart() {
+	public boolean restart() {
 		this.isRestarting = true;
 
 		LogUtils.infof("{Shard %d} Logging out...", this.getID());
@@ -102,5 +102,7 @@ public class ShadbotShard {
 		this.messageReceived();
 
 		this.isRestarting = false;
+
+		return true;
 	}
 }

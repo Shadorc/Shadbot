@@ -2,6 +2,7 @@ package me.shadorc.shadbot.shard;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -73,6 +74,7 @@ public class ShardManager {
 				if(shardStatus.getShard().getGuilds().size() < 250) {
 					continue;
 				}
+
 				// Don't restart a shard if it's already restarting
 				if(shardStatus.isRestarting()) {
 					continue;
@@ -87,7 +89,16 @@ public class ShardManager {
 							shardStatus.getShard().getResponseTime(),
 							DurationFormatUtils.formatDurationWords(lastEventTime, true, true),
 							DurationFormatUtils.formatDurationWords(lastMessageTime, true, true)));
-					shardStatus.restart();
+
+					Future<Boolean> restartFuture = DEFAUT_THREAD_POOL.submit(() -> shardStatus.restart());
+					if(!restartFuture.get(1, TimeUnit.MINUTES)) {
+						LogUtils.infof("Restart task seems stuck. Restart client ?");
+						restartFuture.cancel(true);
+						// Shadbot.getClient().logout();
+						// Shadbot.getClient().login();
+						// break;
+					}
+
 				}
 			} catch (Exception err) {
 				LogUtils.error(err, String.format("An error occurred while restarting shard %d.", shardStatus.getID()));
