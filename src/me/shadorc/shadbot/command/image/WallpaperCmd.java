@@ -18,6 +18,7 @@ import com.ivkos.wallhaven4j.models.misc.Resolution;
 import com.ivkos.wallhaven4j.models.misc.enums.Category;
 import com.ivkos.wallhaven4j.models.misc.enums.Purity;
 import com.ivkos.wallhaven4j.models.wallpaper.Wallpaper;
+import com.ivkos.wallhaven4j.util.exceptions.ConnectionException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -118,23 +119,28 @@ public class WallpaperCmd extends AbstractCommand {
 			queryBuilder.keywords(cmdLine.getOptionValues(KEYWORD));
 		}
 
-		List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
-		if(wallpapers.isEmpty()) {
-			loadingMsg.edit(TextUtils.noResult(context.getMessage().getContent()));
-			return;
+		try {
+			List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
+			if(wallpapers.isEmpty()) {
+				loadingMsg.edit(TextUtils.noResult(context.getMessage().getContent()));
+				return;
+			}
+
+			Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
+
+			String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
+			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
+					.withAuthorName("Wallpaper")
+					.withUrl(wallpaper.getUrl())
+					.withImage(wallpaper.getImageUrl())
+					.appendField("Resolution", wallpaper.getResolution().toString(), false)
+					.appendField("Tags", tags, false);
+
+			loadingMsg.edit(embed.build());
+		} catch (ConnectionException err) {
+			loadingMsg.delete();
+			Utils.handle("getting a wallpaper", context, err.getCause());
 		}
-
-		Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
-
-		String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
-		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-				.withAuthorName("Wallpaper")
-				.withUrl(wallpaper.getUrl())
-				.withImage(wallpaper.getImageUrl())
-				.appendField("Resolution", wallpaper.getResolution().toString(), false)
-				.appendField("Tags", tags, false);
-
-		loadingMsg.edit(embed.build());
 	}
 
 	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) throws IllegalCmdArgumentException {
