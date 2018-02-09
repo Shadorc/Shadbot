@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.image;
 
 import java.awt.Dimension;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -144,7 +143,7 @@ public class WallpaperCmd extends AbstractCommand {
 	}
 
 	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) throws IllegalCmdArgumentException {
-		List<String> sizeList = Arrays.asList(values);
+		List<String> sizeList = List.of(values);
 		if(sizeList.size() != 2) {
 			this.throwInvalidArg(msg, context, name);
 		}

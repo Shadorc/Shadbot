@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
-import java.util.Arrays;
 import java.util.List;
 
 import me.shadorc.shadbot.utils.object.Card;
@@ -24,7 +23,7 @@ public class BlackjackPlayer {
 	}
 
 	public void hit() {
-		this.addCards(Arrays.asList(Card.pick()));
+		this.addCards(List.of(Card.pick()));
 	}
 
 	public void stand() {

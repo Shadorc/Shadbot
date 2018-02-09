@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.fun;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,7 +29,7 @@ import sx.blah.discord.handle.obj.IChannel;
 @Command(category = CommandCategory.FUN, names = { "chat" })
 public class ChatCmd extends AbstractCommand {
 
-	private static final List<String> BOTS_ID = Arrays.asList("efc39100ce34d038", "b0dafd24ee35a477", "ea373c261e3458c6", "b0a6a41a5e345c23");
+	private static final List<String> BOTS_ID = List.of("efc39100ce34d038", "b0dafd24ee35a477", "ea373c261e3458c6", "b0a6a41a5e345c23");
 	private static final int MAX_ERROR_COUNT = 10;
 
 	private static final ConcurrentHashMap<Long, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();

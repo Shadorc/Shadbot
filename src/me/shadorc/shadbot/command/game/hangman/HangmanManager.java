@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.game.hangman;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -29,7 +28,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class HangmanManager extends AbstractGameManager implements MessageListener {
 
-	private static final List<String> IMG_LIST = Arrays.asList(
+	private static final List<String> IMG_LIST = List.of(
 			"https://upload.wikimedia.org/wikipedia/commons/8/8b/Hangman-0.png",
 			"https://upload.wikimedia.org/wikipedia/commons/3/30/Hangman-1.png",
 			"https://upload.wikimedia.org/wikipedia/commons/7/70/Hangman-2.png",

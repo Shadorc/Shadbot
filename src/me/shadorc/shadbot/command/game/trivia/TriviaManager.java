@@ -1,8 +1,6 @@
 package me.shadorc.shadbot.command.game.trivia;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -71,7 +69,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 			answers = Utils.toList(resultObj.getJSONArray("incorrect_answers"), String.class);
 			answers.add(ThreadLocalRandom.current().nextInt(answers.size()), correctAnswer);
 		} else {
-			answers = new ArrayList<>(Arrays.asList("True", "False"));
+			answers = List.of("True", "False");
 		}
 
 		String description = String.format("**%s**%n%s",

@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.utils.embed;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,7 +79,7 @@ public class HelpBuilder {
 	}
 
 	public HelpBuilder addArg(Object[] options, boolean isFacultative) {
-		return this.addArg(Arrays.asList(options), isFacultative);
+		return this.addArg(List.of(options), isFacultative);
 	}
 
 	public HelpBuilder appendField(String name, String value, boolean inline) {

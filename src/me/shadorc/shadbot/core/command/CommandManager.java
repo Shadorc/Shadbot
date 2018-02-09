@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.core.command;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class CommandManager {
 			}
 
 			try {
-				AbstractCommand cmd = (AbstractCommand) cmdClass.newInstance();
+				AbstractCommand cmd = (AbstractCommand) cmdClass.getConstructor().newInstance();
 
 				List<String> names = cmd.getNames();
 				if(!cmd.getAlias().isEmpty()) {
@@ -52,7 +53,7 @@ public class CommandManager {
 						continue;
 					}
 				}
-			} catch (InstantiationException | IllegalAccessException err) {
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException err) {
 				LogUtils.error(err, String.format("An error occurred while initializing command %s.",
 						cmdClass.getDeclaringClass().getSimpleName()));
 				return false;

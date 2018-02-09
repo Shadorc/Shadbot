@@ -97,7 +97,7 @@ public class BotUtils {
 
 	public static RequestFuture<Integer> deleteMessages(IChannel channel, IMessage... messages) {
 		// Only keeps messages that are at most 2 weeks old
-		List<IMessage> toDelete = Arrays.asList(messages).stream()
+		List<IMessage> toDelete = Arrays.stream(messages)
 				.filter(msg -> msg != null && TimeUtils.getMillisUntil(msg.getCreationDate()) < TimeUnit.DAYS.toMillis(7 * 2))
 				.distinct()
 				.collect(Collectors.toList());

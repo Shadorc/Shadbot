@@ -1,6 +1,6 @@
 package me.shadorc.shadbot.command.game.slotmachine;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -42,7 +42,7 @@ public class SlotMachineCmd extends AbstractCommand {
 		SlotOptions slot3 = SLOTS_ARRAY[ThreadLocalRandom.current().nextInt(SLOTS_ARRAY.length)];
 
 		int gains = -PAID_COST;
-		if(Arrays.asList(slot2, slot3).stream().allMatch(slot1::equals)) {
+		if(List.of(slot2, slot3).stream().allMatch(slot1::equals)) {
 			gains = slot1.getGain();
 		}
 
@@ -54,7 +54,7 @@ public class SlotMachineCmd extends AbstractCommand {
 		}
 
 		BotUtils.sendMessage(String.format("%s%nYou %s **%s** !",
-				FormatUtils.format(Arrays.asList(slot1, slot2, slot3), opt -> String.format(":%s:", opt.toString().toLowerCase()), " "),
+				FormatUtils.format(List.of(slot1, slot2, slot3), opt -> String.format(":%s:", opt.toString().toLowerCase()), " "),
 				gains > 0 ? "win" : "have lost", FormatUtils.formatCoins(Math.abs(gains))), context.getChannel());
 	}
 

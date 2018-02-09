@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,13 +43,13 @@ public class SettingsCmd extends AbstractCommand {
 			}
 
 			try {
-				AbstractSetting settingCmd = (AbstractSetting) settingClass.newInstance();
+				AbstractSetting settingCmd = (AbstractSetting) settingClass.getConstructor().newInstance();
 				if(SETTINGS_MAP.putIfAbsent(settingCmd.getSetting(), settingCmd) != null) {
 					LogUtils.error(String.format("Command name collision between %s and %s",
 							settingClass.getSimpleName(), SETTINGS_MAP.get(settingCmd.getSetting()).getClass().getSimpleName()));
 					continue;
 				}
-			} catch (InstantiationException | IllegalAccessException err) {
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException err) {
 				LogUtils.error(err, String.format("An error occurred while initializing setting %s.",
 						settingClass.getDeclaringClass().getSimpleName()));
 			}
