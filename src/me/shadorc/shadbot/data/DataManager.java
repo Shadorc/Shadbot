@@ -67,6 +67,6 @@ public class DataManager {
 
 	public static void stop() {
 		SCHEDULED_EXECUTOR.shutdownNow();
-		SAVE_TASKS.stream().forEach(Runnable::run);
+		SAVE_TASKS.forEach(Runnable::run);
 	}
 }

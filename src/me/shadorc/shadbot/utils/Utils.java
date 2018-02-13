@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 import javax.management.Attribute;
@@ -21,8 +20,6 @@ import javax.management.ReflectionException;
 import org.json.JSONArray;
 import org.jsoup.HttpStatusException;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
@@ -31,11 +28,6 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 public class Utils {
-
-	public static ThreadFactory createNamedThreadFactory(String name) {
-		// TODO: Use setDaemon(true) ?
-		return new ThreadFactoryBuilder().setNameFormat(name).build();
-	}
 
 	public static double getProcessCpuLoad() {
 		double cpuLoad;

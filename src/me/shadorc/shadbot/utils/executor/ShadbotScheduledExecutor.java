@@ -6,12 +6,12 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.utils.LogUtils;
-import me.shadorc.shadbot.utils.Utils;
+import sx.blah.discord.api.internal.DiscordUtils;
 
 public class ShadbotScheduledExecutor extends ScheduledThreadPoolExecutor {
 
-	public ShadbotScheduledExecutor(int corePoolSize, String name) {
-		super(corePoolSize, Utils.createNamedThreadFactory(name));
+	public ShadbotScheduledExecutor(int corePoolSize, String threadName) {
+		super(corePoolSize, DiscordUtils.createDaemonThreadFactory(threadName));
 		this.setRemoveOnCancelPolicy(true);
 	}
 

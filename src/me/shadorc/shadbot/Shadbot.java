@@ -13,8 +13,6 @@ import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.listener.ReadyListener;
 import me.shadorc.shadbot.listener.ShardListener;
-import me.shadorc.shadbot.music.GuildMusicManager;
-import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.executor.ShadbotCachedExecutor;
@@ -53,11 +51,6 @@ public class Shadbot {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				LogUtils.infof("Stopping guild music manager...");
-				GuildMusicManager.stop();
-				LogUtils.infof("Stopping shard manager...");
-				ShardManager.stop();
-				LogUtils.infof("Stopping data manager...");
 				DataManager.stop();
 			}
 		});

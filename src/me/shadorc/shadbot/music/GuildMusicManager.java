@@ -26,8 +26,4 @@ public class GuildMusicManager {
 		return guildMusic;
 	}
 
-	public static void stop() {
-		GUILD_MUSIC_MAP.values().stream().forEach(GuildMusic::leaveVoiceChannel);
-	}
-
 }

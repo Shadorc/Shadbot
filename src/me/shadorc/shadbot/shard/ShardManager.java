@@ -26,11 +26,6 @@ public class ShardManager {
 		Shadbot.getScheduler().scheduleAtFixedRate(() -> ShardManager.check(), 10, 10, TimeUnit.MINUTES);
 	}
 
-	public static void stop() {
-		SHARDS_MAP.values().stream().forEach(shadbotShard -> shadbotShard.getThreadPool().shutdownNow());
-		DEFAUT_THREAD_POOL.shutdownNow();
-	}
-
 	public static ThreadPoolExecutor createThreadPool(ShadbotShard shard) {
 		return new ShadbotCachedExecutor("ShadbotShard-" + shard.getID() + "-%d");
 	}
