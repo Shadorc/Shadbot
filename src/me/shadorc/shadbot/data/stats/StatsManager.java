@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -106,13 +106,13 @@ public class StatsManager {
 		StatsManager.increment(stat, 1);
 	}
 
-	public static Map<String, Integer> get(String key) {
+	public static Map<String, Long> get(String key) {
 		if(!STATS_MAP.containsKey(key.toLowerCase())) {
 			return null;
 		}
 
-		Map<String, Integer> map = new HashMap<>();
-		ConcurrentHashMap<String, AtomicInteger> concurrentMap = STATS_MAP.get(key.toLowerCase()).getMap();
+		Map<String, Long> map = new HashMap<>();
+		ConcurrentHashMap<String, AtomicLong> concurrentMap = STATS_MAP.get(key.toLowerCase()).getMap();
 		concurrentMap.keySet().stream().forEach(concurrentKey -> map.put(concurrentKey, concurrentMap.get(concurrentKey).get()));
 
 		return map;

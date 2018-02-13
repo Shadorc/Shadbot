@@ -47,13 +47,13 @@ public class StatsCmd extends AbstractCommand {
 					context.getArg(), FormatUtils.format(StatsManager.getKeys(), value -> String.format("`%s`", value), ", ")));
 		}
 
-		Map<String, Integer> map = StatsManager.get(context.getArg());
+		Map<String, Long> map = StatsManager.get(context.getArg());
 		if(map == null || map.isEmpty()) {
 			BotUtils.sendMessage(Emoji.INFO + " This category is empty.", context.getChannel());
 			return;
 		}
 
-		Map<String, Integer> sortedMap = Utils.sortByValue(map);
+		Map<String, Long> sortedMap = Utils.sortByValue(map);
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName(String.format("Stats (%s)", context.getArg()))
@@ -66,19 +66,19 @@ public class StatsCmd extends AbstractCommand {
 	}
 
 	private EmbedObject getAverage() {
-		Map<String, Integer> moneyGained = StatsManager.get(MoneyEnum.MONEY_GAINED.toString());
-		Map<String, Integer> commandsUsed = StatsManager.get(CommandEnum.COMMAND_USED.toString());
+		Map<String, Long> moneyGained = StatsManager.get(MoneyEnum.MONEY_GAINED.toString());
+		Map<String, Long> commandsUsed = StatsManager.get(CommandEnum.COMMAND_USED.toString());
 
 		if(moneyGained == null || moneyGained.isEmpty() || commandsUsed == null || commandsUsed.isEmpty()) {
 			return null;
 		}
 
-		Map<String, Integer> moneyLost = StatsManager.get(MoneyEnum.MONEY_LOST.toString());
+		Map<String, Long> moneyLost = StatsManager.get(MoneyEnum.MONEY_LOST.toString());
 
-		Map<String, Pair<Float, Integer>> averageMap = new HashMap<>();
+		Map<String, Pair<Float, Long>> averageMap = new HashMap<>();
 		for(String gameName : moneyGained.keySet()) {
-			float average = ((float) moneyGained.get(gameName) - moneyLost.getOrDefault(gameName, 0)) / commandsUsed.get(gameName);
-			averageMap.put(gameName, new Pair<Float, Integer>(average, commandsUsed.get(gameName)));
+			float average = ((float) moneyGained.get(gameName) - moneyLost.getOrDefault(gameName, 0L)) / commandsUsed.get(gameName);
+			averageMap.put(gameName, new Pair<Float, Long>(average, commandsUsed.get(gameName)));
 		}
 
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
