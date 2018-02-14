@@ -64,7 +64,7 @@ public class OverwatchCmd extends AbstractCommand {
 					.setLenient(true)
 					.withAuthorName("Overwatch Stats")
 					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
-					.withUrl(player.getProfileURL())
+					.withAuthorUrl(player.getProfileURL())
 					.withThumbnail(player.getIconUrl())
 					.appendDescription(String.format("Stats for user **%s**", player.getName()))
 					.appendField("Level", Integer.toString(player.getLevel()), true)

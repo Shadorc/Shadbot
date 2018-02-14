@@ -57,7 +57,7 @@ public class WikiCmd extends AbstractCommand {
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName(String.format("Wikipedia: %s", resultObj.getString("title")))
 					.withAuthorIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mohapedia.png/842px-Mohapedia.png")
-					.withUrl(String.format("https://en.wikipedia.org/wiki/%s", resultObj.getString("title").replace(" ", "_")))
+					.withAuthorUrl(String.format("https://en.wikipedia.org/wiki/%s", resultObj.getString("title").replace(" ", "_")))
 					.appendDescription(extract);
 			BotUtils.sendMessage(embed.build(), context.getChannel());
 

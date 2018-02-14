@@ -51,7 +51,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("SuicideGirls Image")
 					.withAuthorIcon("https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/SuicideGirls_logo.svg/1280px-SuicideGirls_logo.svg.png")
-					.withUrl(url)
+					.withAuthorUrl(url)
 					.appendDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
 					.withImage(imageUrl);
 

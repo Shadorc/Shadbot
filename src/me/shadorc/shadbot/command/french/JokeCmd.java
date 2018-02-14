@@ -46,7 +46,7 @@ public class JokeCmd extends AbstractCommand {
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("Blague")
-					.withUrl("http://www.une-blague.com/")
+					.withAuthorUrl("http://www.une-blague.com/")
 					.appendDescription(joke);
 			loadingMsg.edit(embed.build());
 

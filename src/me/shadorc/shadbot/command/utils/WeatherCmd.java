@@ -59,7 +59,7 @@ public class WeatherCmd extends AbstractCommand {
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("Weather for: " + weather.getCityName())
 					.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
-					.withUrl("http://openweathermap.org/city/" + weather.getCityCode())
+					.withAuthorUrl("http://openweathermap.org/city/" + weather.getCityCode())
 					.appendDescription("Last updated " + dateFormatter.format(weather.getDateTime()))
 					.appendField(Emoji.CLOUD + " Clouds", clouds, true)
 					.appendField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)

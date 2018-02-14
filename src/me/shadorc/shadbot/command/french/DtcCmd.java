@@ -51,7 +51,7 @@ public class DtcCmd extends AbstractCommand {
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("Quote DansTonChat")
-					.withUrl(String.format("https://danstonchat.com/%s.html", quoteObj.getString("id")))
+					.withAuthorUrl(String.format("https://danstonchat.com/%s.html", quoteObj.getString("id")))
 					.withThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
 					.appendDescription(strBuilder.toString());
 			loadingMsg.edit(embed.build());

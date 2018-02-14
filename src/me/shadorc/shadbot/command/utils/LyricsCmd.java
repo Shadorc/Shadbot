@@ -76,7 +76,7 @@ public class LyricsCmd extends AbstractCommand {
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName(String.format("Lyrics (%s - %s)", artist, title))
-					.withUrl(url)
+					.withAuthorUrl(url)
 					.withThumbnail(albumImg)
 					.appendDescription(url + "\n\n" + lyrics);
 			loadingMsg.edit(embed.build());

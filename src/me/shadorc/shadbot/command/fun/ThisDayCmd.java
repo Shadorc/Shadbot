@@ -45,7 +45,7 @@ public class ThisDayCmd extends AbstractCommand {
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName(String.format("On This Day (%s)", date))
-					.withUrl(HOME_URL)
+					.withAuthorUrl(HOME_URL)
 					.withThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
 					.appendDescription(StringUtils.truncate(events, EmbedBuilder.DESCRIPTION_CONTENT_LIMIT));
 

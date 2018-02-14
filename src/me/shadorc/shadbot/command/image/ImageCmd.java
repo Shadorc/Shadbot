@@ -54,7 +54,7 @@ public class ImageCmd extends AbstractCommand {
 
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("DeviantArt (Search: " + context.getArg() + ")")
-					.withUrl(resultObj.getString("url"))
+					.withAuthorUrl(resultObj.getString("url"))
 					.withThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
 					.appendField("Title", resultObj.getString("title"), false)
 					.appendField("Author", resultObj.getJSONObject("author").getString("username"), false)

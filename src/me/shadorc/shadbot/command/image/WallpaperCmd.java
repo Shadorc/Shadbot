@@ -130,7 +130,7 @@ public class WallpaperCmd extends AbstractCommand {
 			String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("Wallpaper")
-					.withUrl(wallpaper.getUrl())
+					.withAuthorUrl(wallpaper.getUrl())
 					.withImage(wallpaper.getImageUrl())
 					.appendField("Resolution", wallpaper.getResolution().toString(), false)
 					.appendField("Tags", tags, false);

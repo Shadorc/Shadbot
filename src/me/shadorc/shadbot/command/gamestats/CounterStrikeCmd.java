@@ -101,7 +101,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.setLenient(true)
 					.withAuthorName("Counter-Strike: Global Offensive Stats")
 					.withAuthorIcon("http://www.icon100.com/up/2841/256/csgo.png")
-					.withUrl("http://steamcommunity.com/profiles/" + steamid)
+					.withAuthorUrl("http://steamcommunity.com/profiles/" + steamid)
 					.withThumbnail(userObj.getString("avatarfull"))
 					.appendDescription(String.format("Stats for **%s**", userObj.getString("personaname")))
 					.appendField("Kills", Integer.toString(this.getValue(statsArray, "total_kills")), true)

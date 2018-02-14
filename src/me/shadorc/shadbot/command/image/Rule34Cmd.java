@@ -78,7 +78,7 @@ public class Rule34Cmd extends AbstractCommand {
 			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 					.setLenient(true)
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
-					.withUrl(postObj.getString("file_url"))
+					.withAuthorUrl(postObj.getString("file_url"))
 					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
 					.appendField("Resolution", String.format("%dx%s", postObj.getInt("width"), postObj.getInt("height")), false)
 					.appendField("Tags", formattedtags, false)
