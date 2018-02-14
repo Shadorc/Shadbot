@@ -66,9 +66,10 @@ public class BotUtils {
 		}
 
 		IGuild guild = message.getChannel().isPrivate() ? null : message.getChannel().getGuild();
+		long guildID = guild == null ? -1 : guild.getLongID();
 		if(!message.getChannel().getShard().isReady()) {
 			if(guild != null) {
-				LogUtils.infof("{Guild ID: %d} A message couldn't be sent because shard isn't ready, adding it to queue.", guild.getLongID());
+				LogUtils.infof("{Guild ID: %d} A message couldn't be sent because shard isn't ready, adding it to queue.", guildID);
 				ShardManager.getShadbotShard(guild.getShard()).queue(message);
 			}
 			return null;
@@ -79,14 +80,13 @@ public class BotUtils {
 				return message.send();
 			} catch (MissingPermissionsException err) {
 				BotUtils.sendMessage(TextUtils.missingPerm(err.getMissingPermissions()), message.getChannel());
-				LogUtils.infof("{Guild ID: %d} %s", guild.getLongID(), err.getMessage());
+				LogUtils.infof("{Guild ID: %d} %s", guildID, err.getMessage());
 			} catch (DiscordException err) {
 				if(err.getMessage().contains("Message was unable to be sent (Discord didn't return a response)")) {
-					LogUtils.infof("{Guild ID: %d} A message could not be send because Discord didn't return a response, retrying.",
-							guild.getLongID());
+					LogUtils.infof("{Guild ID: %d} A message could not be send because Discord didn't return a response, retrying.", guildID);
 					return BotUtils.sendMessage(message, retry - 1).get();
 				} else if(err.getMessage().contains("Failed to make a 400 failed request after 5 tries!")) {
-					LogUtils.warnf("{Guild ID: %d} %s", guild.getLongID(), err.getMessage());
+					LogUtils.warnf("{Guild ID: %d} %s", guildID, err.getMessage());
 				} else {
 					LogUtils.error(err, "An error occurred while sending message.");
 				}
