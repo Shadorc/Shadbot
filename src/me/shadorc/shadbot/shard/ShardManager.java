@@ -23,7 +23,7 @@ public class ShardManager {
 	private static final ThreadPoolExecutor DEFAUT_THREAD_POOL = new ShadbotCachedExecutor("DefaultThreadPool-%d");
 
 	public static void start() {
-		Shadbot.getScheduler().scheduleAtFixedRate(() -> ShardManager.check(), 10, 10, TimeUnit.MINUTES);
+		Shadbot.getScheduler().scheduleAtFixedRate(() -> ShardManager.check(), 30, 30, TimeUnit.MINUTES);
 	}
 
 	public static ThreadPoolExecutor createThreadPool(ShadbotShard shard) {
