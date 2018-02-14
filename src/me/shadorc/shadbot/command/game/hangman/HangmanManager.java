@@ -151,7 +151,7 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 		}
 
 		if(failsCount > 0) {
-			embed.withImage(IMG_LIST.get(failsCount - 1));
+			embed.withImage(IMG_LIST.get(Math.min(IMG_LIST.size(), failsCount) - 1));
 		}
 
 		message.send(embed.build()).get();
