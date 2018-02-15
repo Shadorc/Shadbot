@@ -21,7 +21,7 @@ public class ReadyListener {
 		ShardManager.start();
 
 		Shadbot.getScheduler().scheduleAtFixedRate(() -> LottoCmd.draw(), LottoCmd.getDelay(), TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
-		Shadbot.getScheduler().scheduleAtFixedRate(() -> BotUtils.updatePresence(), 0, 30, TimeUnit.MINUTES);
+		Shadbot.getScheduler().scheduleAtFixedRate(() -> BotUtils.updatePresence(), 1, 30, TimeUnit.MINUTES);
 		Shadbot.getScheduler().scheduleAtFixedRate(() -> NetUtils.postStats(), 2, 2, TimeUnit.HOURS);
 
 		event.getClient().getDispatcher().registerListeners(Shadbot.getEventThreadPool(),
