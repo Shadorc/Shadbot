@@ -60,13 +60,14 @@ public class BotUtils {
 	}
 
 	public static RequestFuture<IMessage> sendMessage(MessageBuilder message, int retry) {
+		IGuild guild = message.getChannel().isPrivate() ? null : message.getChannel().getGuild();
+		long guildID = guild == null ? -1 : guild.getLongID();
+		
 		if(retry == 0) {
-			LogUtils.warnf("{Guild ID: %d} Abort attempt to send message (3 failed requests).", message.getChannel().getGuild());
+			LogUtils.warnf("{Guild ID: %d} Abort attempt to send message (3 failed requests).", guildID);
 			return null;
 		}
 
-		IGuild guild = message.getChannel().isPrivate() ? null : message.getChannel().getGuild();
-		long guildID = guild == null ? -1 : guild.getLongID();
 		if(!message.getChannel().getShard().isReady()) {
 			if(guild != null) {
 				LogUtils.infof("{Guild ID: %d} A message couldn't be sent because shard isn't ready, adding it to queue.", guildID);
