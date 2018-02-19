@@ -46,6 +46,7 @@ public class LoadingMessage {
 		if(!BotUtils.hasPermissions(channel, Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS)) {
 			BotUtils.sendMessage(TextUtils.missingPerm(Permissions.EMBED_LINKS), channel);
 			LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to send embed link.", channel.getGuild().getLongID());
+			return;
 		}
 
 		IMessage message = msgRequest == null ? null : msgRequest.get();
