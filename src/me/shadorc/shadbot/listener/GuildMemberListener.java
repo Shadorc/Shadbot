@@ -8,6 +8,7 @@ import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.member.GuildMemberEvent;
 import sx.blah.discord.handle.impl.events.guild.member.UserJoinEvent;
@@ -16,6 +17,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
+import sx.blah.discord.util.MissingPermissionsException;
 
 public class GuildMemberListener {
 
@@ -42,7 +44,11 @@ public class GuildMemberListener {
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
 		if(BotUtils.hasPermissions(event.getGuild(), Permissions.MANAGE_ROLES) && BotUtils.canInteract(event.getGuild(), event.getUser())) {
-			event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
+			try {
+				event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
+			} catch (MissingPermissionsException err) {
+				LogUtils.warnf("{Guild ID: %d} Shadbot wasn't allowed to interact with user.", event.getGuild().getLongID());
+			}
 		}
 	}
 
