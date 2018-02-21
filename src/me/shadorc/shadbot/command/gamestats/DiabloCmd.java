@@ -82,6 +82,11 @@ public class DiabloCmd extends AbstractCommand {
 						region, NetUtils.encode(battletag), heroesArray.getJSONObject(i).getLong("id"), APIKeys.get(APIKey.BLIZZARD_API_KEY));
 				JSONObject heroObj = new JSONObject(NetUtils.getBody(url));
 
+				if(heroObj.has("code") && heroObj.getString("code").equals("OOPS")) {
+					// There was a problem processing the request.
+					continue;
+				}
+
 				String name = heroObj.getString("name");
 				String heroClass = StringUtils.capitalize(heroObj.getString("class").replace("-", " "));
 				double dps = heroObj.getJSONObject("stats").getDouble("damage");
