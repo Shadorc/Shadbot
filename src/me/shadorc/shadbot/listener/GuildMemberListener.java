@@ -8,7 +8,6 @@ import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.LogUtils;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.member.GuildMemberEvent;
 import sx.blah.discord.handle.impl.events.guild.member.UserJoinEvent;
@@ -48,8 +47,6 @@ public class GuildMemberListener {
 				&& BotUtils.canInteract(event.getGuild(), event.getUser())
 				&& PermissionUtils.hasHierarchicalPermissions(event.getGuild(), event.getClient().getOurUser(), roles)) {
 			event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
-		} else {
-			LogUtils.warnf("{Guild ID: %d} Shadbot wasn't allowed to interact with user.", event.getGuild().getLongID());
 		}
 	}
 
