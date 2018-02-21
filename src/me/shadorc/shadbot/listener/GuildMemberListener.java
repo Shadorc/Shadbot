@@ -17,7 +17,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.PermissionUtils;
 
 public class GuildMemberListener {
 
@@ -43,12 +43,12 @@ public class GuildMemberListener {
 				.map(event.getGuild()::getRoleByID)
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
-		if(BotUtils.hasPermissions(event.getGuild(), Permissions.MANAGE_ROLES) && BotUtils.canInteract(event.getGuild(), event.getUser())) {
-			try {
-				event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
-			} catch (MissingPermissionsException err) {
-				LogUtils.warnf("{Guild ID: %d} Shadbot wasn't allowed to interact with user.", event.getGuild().getLongID());
-			}
+		if(BotUtils.hasPermissions(event.getGuild(), Permissions.MANAGE_ROLES)
+				&& BotUtils.canInteract(event.getGuild(), event.getUser())
+				&& PermissionUtils.hasHierarchicalPermissions(event.getGuild(), event.getClient().getOurUser(), roles)) {
+			event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
+		} else {
+			LogUtils.warnf("{Guild ID: %d} Shadbot wasn't allowed to interact with user.", event.getGuild().getLongID());
 		}
 	}
 
