@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin.setting;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,12 +24,13 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
+import sx.blah.discord.util.PermissionUtils;
 
 @Setting(description = "Manage auto assigned role(s).", setting = SettingEnum.AUTO_ROLE)
 public class AutoRoleSetting extends AbstractSetting {
 
 	private enum Action {
-		SET, REMOVE;
+		ADD, REMOVE;
 	}
 
 	@Override
@@ -54,23 +56,32 @@ public class AutoRoleSetting extends AbstractSetting {
 					splitArgs.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
-		List<IRole> roles = context.getMessage().getRoleMentions();
-		if(roles.isEmpty()) {
+		List<IRole> mentionedRoles = context.getMessage().getRoleMentions();
+		if(mentionedRoles.isEmpty()) {
 			throw new MissingArgumentException();
 		}
 
 		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
-		if(Action.SET.equals(action)) {
-			dbGuild.setSetting(SettingEnum.AUTO_ROLE, new JSONArray(roles.stream().map(IRole::getLongID).collect(Collectors.toList())));
+		List<Long> roles = dbGuild.getAutoRoles();
+
+		if(Action.ADD.equals(action)) {
+			for(IRole role : mentionedRoles) {
+				if(!PermissionUtils.hasHierarchicalPermissions(context.getGuild(), context.getOurUser(), Arrays.asList(role))) {
+					throw new IllegalCmdArgumentException(String.format("%s is a higher role in the role hierarchy than mine, I can't auto-assign it.",
+							role.mention()));
+				}
+			}
+
+			roles.addAll(mentionedRoles.stream().map(IRole::getLongID).collect(Collectors.toList()));
 			BotUtils.sendMessage(String.format("New comers will now have role(s): %s",
-					FormatUtils.format(roles, IRole::mention, ", ")), context.getChannel());
-		} else if(Action.REMOVE.equals(action)) {
-			List<Long> oldRoles = dbGuild.getAutoRoles();
-			oldRoles.removeAll(roles.stream().map(IRole::getLongID).collect(Collectors.toList()));
-			dbGuild.setSetting(SettingEnum.AUTO_ROLE, new JSONArray(oldRoles));
+					FormatUtils.format(roles, role -> context.getGuild().getRoleByID(role).mention(), ", ")), context.getChannel());
+		} else {
+			roles.removeAll(mentionedRoles.stream().map(IRole::getLongID).collect(Collectors.toList()));
 			BotUtils.sendMessage(String.format("%s removed from auto-assigned roles.",
-					FormatUtils.format(roles, IRole::mention, ", ")), context.getChannel());
+					FormatUtils.format(mentionedRoles, IRole::mention, ", ")), context.getChannel());
 		}
+
+		dbGuild.setSetting(SettingEnum.AUTO_ROLE, new JSONArray(roles));
 	}
 
 	@Override
@@ -79,7 +90,7 @@ public class AutoRoleSetting extends AbstractSetting {
 				.appendField("Usage", String.format("`%s%s <action> <@role(s)>`", prefix, this.getCmdName()), false)
 				.appendField("Argument", String.format("**action** - %s",
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/")), false)
-				.appendField("Example", String.format("`%s%s set @newbie`", prefix, this.getCmdName()), false);
+				.appendField("Example", String.format("`%s%s add @newbie`", prefix, this.getCmdName()), false);
 	}
 
 }

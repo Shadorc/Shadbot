@@ -43,6 +43,7 @@ public class GuildMemberListener {
 				.map(event.getGuild()::getRoleByID)
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
+
 		if(BotUtils.hasPermissions(event.getGuild(), Permissions.MANAGE_ROLES)
 				&& BotUtils.canInteract(event.getGuild(), event.getUser())
 				&& PermissionUtils.hasHierarchicalPermissions(event.getGuild(), event.getClient().getOurUser(), roles)) {
