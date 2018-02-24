@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.HttpStatusException;
+import org.jsoup.Jsoup;
 
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -37,7 +39,14 @@ public class GifCmd extends AbstractCommand {
 					APIKeys.get(APIKey.GIPHY_API_KEY),
 					NetUtils.encode(context.getArg()));
 
-			JSONObject mainObj = new JSONObject(NetUtils.getBody(url));
+			String bodyText = NetUtils.getBody(url);
+
+			// If the body is HTML, Giphy did not returned JSON
+			if(!Jsoup.parse(bodyText).text().equals(Jsoup.parse(bodyText).html())) {
+				throw new HttpStatusException("Giphy did not return valid JSON.", 503, url);
+			}
+
+			JSONObject mainObj = new JSONObject(bodyText);
 			if(mainObj.get("data") instanceof JSONArray) {
 				loadingMsg.edit(TextUtils.noResult(context.getArg()));
 				return;
