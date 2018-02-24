@@ -90,7 +90,7 @@ public class BotUtils {
 						return msgRequest.get();
 					}
 				} else if(err.getMessage().contains("Failed to make a 400 failed request after 5 tries!")) {
-					LogUtils.warnf("{Guild ID: %d} %s", guildID, err.getMessage());
+					LogUtils.infof("{Guild ID: %d} %s", guildID, err.getMessage());
 				} else {
 					LogUtils.error(err, "An error occurred while sending message.");
 				}
