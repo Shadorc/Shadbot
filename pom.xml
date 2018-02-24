@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.shadorc.shadbot</groupId>
 	<artifactId>shadbot</artifactId>
-	<version>2.0.20</version>
+	<version>2.0.21</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
