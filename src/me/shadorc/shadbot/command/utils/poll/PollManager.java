@@ -14,8 +14,10 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.UpdateableMessage;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
+import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class PollManager extends AbstractGameManager {
 
@@ -27,7 +29,7 @@ public class PollManager extends AbstractGameManager {
 
 	private long startTime;
 
-	protected PollManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author, int duration, String question, List<String> choicesList) {
+	public PollManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author, int duration, String question, List<String> choicesList) {
 		super(cmd, prefix, channel, author);
 		this.duration = duration;
 		this.question = question;
@@ -85,7 +87,10 @@ public class PollManager extends AbstractGameManager {
 					FormatUtils.formatShortDuration(TimeUnit.SECONDS.toMillis(duration) - TimeUtils.getMillisUntil(startTime))));
 		}
 
-		message.send(embed.build()).get();
+		RequestFuture<IMessage> messageRequest = message.send(embed.build());
+		if(messageRequest != null) {
+			messageRequest.get();
+		}
 	}
 
 	public int getChoicesCount() {

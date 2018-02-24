@@ -23,8 +23,10 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.Pair;
 import me.shadorc.shadbot.utils.object.UpdateableMessage;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
+import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class RouletteManager extends AbstractGameManager {
 
@@ -63,7 +65,11 @@ public class RouletteManager extends AbstractGameManager {
 				.appendField("Place", playersPlace.values().stream().map(Pair::getSecond).collect(Collectors.joining("\n")), true)
 				.appendField("Results", results, false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
-		message.send(embed.build()).get();
+
+		RequestFuture<IMessage> msgRequest = message.send(embed.build());
+		if(msgRequest != null) {
+			msgRequest.get();
+		}
 	}
 
 	@Override

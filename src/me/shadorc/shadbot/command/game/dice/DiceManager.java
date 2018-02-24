@@ -18,8 +18,10 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.UpdateableMessage;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
+import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class DiceManager extends AbstractGameManager {
 
@@ -54,7 +56,11 @@ public class DiceManager extends AbstractGameManager {
 				.appendField("Number", numsPlayers.keySet().stream().map(Object::toString).collect(Collectors.joining("\n")), true)
 				.appendField("Results", results, false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
-		message.send(embed.build()).get();
+
+		RequestFuture<IMessage> msgRequest = message.send(embed.build());
+		if(msgRequest != null) {
+			msgRequest.get();
+		}
 	}
 
 	@Override
@@ -79,7 +85,10 @@ public class DiceManager extends AbstractGameManager {
 			Database.getDBUser(this.getGuild(), user).addCoins(gains);
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getChannel()).get();
+		RequestFuture<IMessage> msgRequest = BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getChannel());
+		if(msgRequest != null) {
+			msgRequest.get();
+		}
 
 		this.results = FormatUtils.format(list, Object::toString, "\n");
 		this.show();

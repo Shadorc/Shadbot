@@ -27,6 +27,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
+import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class BlackjackManager extends AbstractGameManager implements MessageListener {
 
@@ -112,7 +113,10 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 				BlackjackUtils.formatCards(player.getCards()),
 				true));
 
-		message.send(embed.build()).get();
+		RequestFuture<IMessage> msgRequest = message.send(embed.build());
+		if(msgRequest != null) {
+			msgRequest.get();
+		}
 	}
 
 	private void computeResults() {

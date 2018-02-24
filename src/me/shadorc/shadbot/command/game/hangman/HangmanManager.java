@@ -25,6 +25,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
+import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class HangmanManager extends AbstractGameManager implements MessageListener {
 
@@ -154,7 +155,10 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 			embed.withImage(IMG_LIST.get(Math.min(IMG_LIST.size(), failsCount) - 1));
 		}
 
-		message.send(embed.build()).get();
+		RequestFuture<IMessage> msgRequest = message.send(embed.build());
+		if(msgRequest != null) {
+			msgRequest.get();
+		}
 	}
 
 	@Override
