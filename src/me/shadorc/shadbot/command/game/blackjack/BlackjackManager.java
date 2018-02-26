@@ -32,7 +32,7 @@ import sx.blah.discord.util.RequestBuffer.RequestFuture;
 public class BlackjackManager extends AbstractGameManager implements MessageListener {
 
 	private static final int GAME_DURATION = 60;
-	private static final float WIN_MULTIPLIER = 1.085f;
+	private static final float WIN_MULTIPLIER = 1.1f;
 
 	private final RateLimiter rateLimiter;
 	private final List<BlackjackPlayer> players;
