@@ -6,12 +6,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.utils.LogUtils;
-import sx.blah.discord.api.internal.DiscordUtils;
+import me.shadorc.shadbot.utils.Utils;
 
 public class ShadbotCachedExecutor extends ThreadPoolExecutor {
 
 	public ShadbotCachedExecutor(String threadName) {
-		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), DiscordUtils.createDaemonThreadFactory(threadName));
+		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), Utils.createDaemonThreadFactory(threadName));
 	}
 
 	@Override

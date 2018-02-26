@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 import javax.management.Attribute;
@@ -19,6 +20,8 @@ import javax.management.ReflectionException;
 
 import org.json.JSONArray;
 import org.jsoup.HttpStatusException;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
@@ -129,6 +132,10 @@ public class Utils {
 
 	public static boolean isInRange(float nbr, float min, float max) {
 		return nbr >= min && nbr <= max;
+	}
+
+	public static ThreadFactory createDaemonThreadFactory(String threadName) {
+		return new ThreadFactoryBuilder().setNameFormat(threadName).setDaemon(true).build();
 	}
 
 }
