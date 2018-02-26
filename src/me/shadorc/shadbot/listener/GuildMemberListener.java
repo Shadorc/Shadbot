@@ -17,6 +17,7 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.PermissionUtils;
+import sx.blah.discord.util.RequestBuffer;
 
 public class GuildMemberListener {
 
@@ -46,7 +47,9 @@ public class GuildMemberListener {
 		if(BotUtils.hasPermissions(event.getGuild(), Permissions.MANAGE_ROLES)
 				&& BotUtils.canInteract(event.getGuild(), event.getUser())
 				&& PermissionUtils.hasHierarchicalPermissions(event.getGuild(), event.getClient().getOurUser(), roles)) {
-			event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
+			RequestBuffer.request(() -> {
+				event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
+			});
 		}
 	}
 
