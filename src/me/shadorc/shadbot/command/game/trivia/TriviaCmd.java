@@ -71,8 +71,10 @@ public class TriviaCmd extends AbstractCommand {
 			} catch (ParseException err) {
 				BotUtils.sendMessage(Emoji.RED_FLAG + " I can't get a question right now, please try again later.", context.getChannel());
 				LogUtils.infof("{%s} Empty body.", this.getClass().getSimpleName());
+				MANAGERS.remove(context.getChannel().getLongID());
 			} catch (JSONException | IOException err) {
 				Utils.handle("getting a question", context, err);
+				MANAGERS.remove(context.getChannel().getLongID());
 			}
 		} else {
 			BotUtils.sendMessage(Emoji.INFO + " A Trivia game has already been started.", context.getChannel());
