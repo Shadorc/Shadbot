@@ -64,7 +64,7 @@ public class BotUtils {
 		long guildID = guild == null ? -1 : guild.getLongID();
 
 		if(retry == 0) {
-			LogUtils.warnf("{Guild ID: %d} Abort attempt to send message (3 failed requests).", guildID);
+			LogUtils.infof("{Guild ID: %d} Abort attempt to send message (3 failed requests).", guildID);
 			return null;
 		}
 
