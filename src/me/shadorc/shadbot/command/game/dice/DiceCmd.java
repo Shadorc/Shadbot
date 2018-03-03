@@ -25,7 +25,7 @@ public class DiceCmd extends AbstractCommand {
 
 	protected static final ConcurrentHashMap<Long, DiceManager> MANAGERS = new ConcurrentHashMap<>();
 
-	protected static final int MULTIPLIER = 5;
+	protected static final float MULTIPLIER = 4.5f;
 	private static final int MAX_BET = 250_000;
 
 	@Override
