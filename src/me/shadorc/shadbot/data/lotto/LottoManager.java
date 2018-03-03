@@ -59,8 +59,11 @@ public class LottoManager {
 		}
 	}
 
-	public static void reset() {
+	public static void resetUsers() {
 		dataObj.put(USERS, new JSONArray());
+	}
+
+	public static void resetPool() {
 		dataObj.put(POOL, 0);
 	}
 

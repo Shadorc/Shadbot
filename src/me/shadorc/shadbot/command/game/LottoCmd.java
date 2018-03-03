@@ -154,7 +154,10 @@ public class LottoCmd extends AbstractCommand {
 				winningNum, winners.size(), LottoManager.getPool());
 
 		LottoManager.setHistoric(winners.size(), LottoManager.getPool(), winningNum);
-		LottoManager.reset();
+		LottoManager.resetUsers();
+		if(!winners.isEmpty()) {
+			LottoManager.resetPool();
+		}
 	}
 
 	@Override
