@@ -149,7 +149,7 @@ public class LottoCmd extends AbstractCommand {
 			int coins = (int) Math.ceil((double) LottoManager.getPool() / winners.size());
 			Database.getDBUser(guild, user).addCoins(coins);
 			BotUtils.sendMessage(
-					String.format("Congratulations, you have the winning Lotto number! You earn %d coins.", coins), user.getOrCreatePMChannel());
+					String.format("Congratulations, you have the winning Lotto number! You earn %s.", FormatUtils.formatCoins(coins)), user.getOrCreatePMChannel());
 		}
 
 		LogUtils.infof("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
