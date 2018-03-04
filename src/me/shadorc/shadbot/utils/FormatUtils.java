@@ -15,7 +15,10 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import com.google.common.collect.Lists;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+
+import sx.blah.discord.handle.impl.obj.Embed.EmbedField;
 
 public class FormatUtils {
 
@@ -93,6 +96,13 @@ public class FormatUtils {
 				.limit(limit)
 				.map(mapper)
 				.collect(Collectors.joining("\n"));
+	}
+
+	public static List<EmbedField> createColumns(List<String> list, int rowSize) {
+		return Lists.partition(list, rowSize)
+				.stream()
+				.map(sublist -> new EmbedField("\u200C", String.join("\n", sublist), true))
+				.collect(Collectors.toList());
 	}
 
 }

@@ -1,7 +1,9 @@
 package me.shadorc.shadbot.command.owner;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -55,12 +57,15 @@ public class StatsCmd extends AbstractCommand {
 
 		Map<String, Long> sortedMap = Utils.sortByValue(map);
 
-		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-				.withAuthorName(String.format("Stats (%s)", context.getArg()))
-				.appendField("Name", FormatUtils.format(sortedMap.keySet().stream(), Object::toString, "\n"), true)
-				.appendField("Value", FormatUtils.format(sortedMap.values().stream(), key -> FormatUtils.formatNum(key), "\n"), true);
+		List<String> lines = sortedMap.keySet().stream()
+				.map(key -> String.format("%s [%s]", key, FormatUtils.formatNum(sortedMap.get(key))))
+				.collect(Collectors.toList());
 
 		sortedMap.clear();
+
+		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
+				.withAuthorName(String.format("Stats: %s", context.getArg()));
+		FormatUtils.createColumns(lines, 25).stream().forEach(embed::appendField);
 
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
