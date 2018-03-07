@@ -15,7 +15,7 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
-@RateLimited
+@RateLimited(max = 1, cooldown = 1)
 @Command(category = CommandCategory.MUSIC, names = { "skip", "next" })
 public class SkipCmd extends AbstractCommand {
 
