@@ -11,8 +11,8 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.data.stats.Stats.VariousEnum;
-import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.VariousStatsManager;
+import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
 import me.shadorc.shadbot.shard.ShardManager;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.ActivityType;
@@ -38,7 +38,7 @@ public class BotUtils {
 			return null;
 		}
 
-		StatsManager.increment(VariousEnum.MESSAGES_SENT);
+		VariousStatsManager.log(VariousEnum.MESSAGES_SENT);
 
 		return BotUtils.sendMessage(new MessageBuilder(channel.getClient()).withChannel(channel).withContent(content));
 	}
@@ -50,7 +50,7 @@ public class BotUtils {
 			return null;
 		}
 
-		StatsManager.increment(VariousEnum.EMBEDS_SENT);
+		VariousStatsManager.log(VariousEnum.EMBEDS_SENT);
 
 		return BotUtils.sendMessage(new MessageBuilder(channel.getClient()).withChannel(channel).withEmbed(embed));
 	}

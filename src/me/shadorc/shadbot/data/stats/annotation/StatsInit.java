@@ -1,16 +1,14 @@
-package me.shadorc.shadbot.data.annotation;
+package me.shadorc.shadbot.data.stats.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface StatsEnum {
+public @interface StatsInit {
 
 	String name();
-
-	boolean isSubdivided() default false;
 
 }

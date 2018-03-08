@@ -14,8 +14,8 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
-import me.shadorc.shadbot.data.stats.Stats.DatabaseEnum;
-import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
+import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -60,7 +60,7 @@ public class Database {
 
 	public synchronized static void save(DBGuild dbGuild) {
 		dbObject.put(dbGuild.getGuild().getStringID(), dbGuild.toJSON());
-		StatsManager.increment(DatabaseEnum.GUILD_SAVED);
+		DatabaseStatsManager.log(DatabaseEnum.GUILD_SAVED);
 	}
 
 	public synchronized static void save(DBUser dbUser) {
@@ -77,6 +77,6 @@ public class Database {
 				.put(Long.toString(dbUser.getUserID()), dbUser.toJSON());
 
 		dbObject.put(dbUser.getGuild().getStringID(), guildObj);
-		StatsManager.increment(DatabaseEnum.USER_SAVED);
+		DatabaseStatsManager.log(DatabaseEnum.USER_SAVED);
 	}
 }

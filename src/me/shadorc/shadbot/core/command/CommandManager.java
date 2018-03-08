@@ -11,9 +11,10 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.data.stats.Stats.CommandEnum;
-import me.shadorc.shadbot.data.stats.Stats.VariousEnum;
-import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.CommandStatsManager;
+import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
+import me.shadorc.shadbot.data.stats.VariousStatsManager;
+import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -81,23 +82,23 @@ public class CommandManager {
 		}
 
 		if(cmd.getRateLimiter() != null && cmd.getRateLimiter().isLimited(context.getChannel(), context.getAuthor())) {
-			StatsManager.increment(CommandEnum.COMMAND_LIMITED, cmd.getName());
+			CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, cmd);
 			return;
 		}
 
 		try {
 			cmd.execute(context);
-			StatsManager.increment(CommandEnum.COMMAND_USED, cmd.getName());
-			StatsManager.increment(VariousEnum.COMMANDS_EXECUTED);
+			CommandStatsManager.log(CommandEnum.COMMAND_USED, cmd);
+			VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
 		} catch (IllegalCmdArgumentException err) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
-			StatsManager.increment(CommandEnum.COMMAND_ILLEGAL_ARG, cmd.getName());
+			CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, cmd);
 		} catch (MissingArgumentException err) {
 			BotUtils.sendMessage(new MessageBuilder(context.getClient())
 					.withChannel(context.getChannel())
 					.withContent(TextUtils.MISSING_ARG)
 					.withEmbed(cmd.getHelp(context.getPrefix())));
-			StatsManager.increment(CommandEnum.COMMAND_MISSING_ARG, cmd.getName());
+			CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, cmd);
 		}
 	}
 

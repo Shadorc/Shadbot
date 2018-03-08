@@ -4,8 +4,8 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.data.stats.Stats.VariousEnum;
-import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.VariousStatsManager;
+import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.message.MessageManager;
@@ -32,7 +32,7 @@ public class MessageListener {
 	}
 
 	private void onMessageReceivedEvent(MessageReceivedEvent event) {
-		StatsManager.increment(VariousEnum.MESSAGES_RECEIVED);
+		VariousStatsManager.log(VariousEnum.MESSAGES_RECEIVED);
 
 		IMessage message = event.getMessage();
 		try {
@@ -70,7 +70,7 @@ public class MessageListener {
 	}
 
 	private void privateMessageReceived(IMessage message) throws MissingArgumentException, IllegalCmdArgumentException {
-		StatsManager.increment(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
+		VariousStatsManager.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
 
 		if(message.getContent().startsWith(Config.DEFAULT_PREFIX + "help")) {
 			CommandManager.getCommand("help").execute(new Context(Config.DEFAULT_PREFIX, message));

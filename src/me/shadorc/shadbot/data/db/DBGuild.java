@@ -11,8 +11,8 @@ import org.json.JSONObject;
 
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
-import me.shadorc.shadbot.data.stats.Stats.DatabaseEnum;
-import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
+import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
 import me.shadorc.shadbot.utils.Utils;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -34,7 +34,7 @@ public class DBGuild {
 	}
 
 	private void load() {
-		StatsManager.increment(DatabaseEnum.GUILD_LOADED);
+		DatabaseStatsManager.log(DatabaseEnum.GUILD_LOADED);
 
 		JSONObject guildObj = Database.opt(guild.getStringID());
 		if(guildObj == null) {

@@ -13,8 +13,8 @@ import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
-import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.MoneyStatsManager;
+import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -106,10 +106,10 @@ public class RouletteManager extends AbstractGameManager {
 			gains *= multiplier;
 			if(gains > 0) {
 				list.add(0, String.format("**%s** (Gains: **%s**)", user.getName(), FormatUtils.formatCoins(gains)));
-				StatsManager.increment(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
+				MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
 			} else {
 				list.add(String.format("**%s** (Losses: **%s**)", user.getName(), FormatUtils.formatCoins(Math.abs(gains))));
-				StatsManager.increment(MoneyEnum.MONEY_LOST, this.getCmdName(), Math.abs(gains));
+				MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getCmdName(), Math.abs(gains));
 			}
 			Database.getDBUser(this.getGuild(), user).addCoins(gains);
 		}

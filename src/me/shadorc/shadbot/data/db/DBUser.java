@@ -3,8 +3,8 @@ package me.shadorc.shadbot.data.db;
 import org.json.JSONObject;
 
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.stats.Stats.DatabaseEnum;
-import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
+import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
 import sx.blah.discord.handle.obj.IGuild;
 
 public class DBUser {
@@ -24,7 +24,7 @@ public class DBUser {
 	}
 
 	private void load() {
-		StatsManager.increment(DatabaseEnum.USER_LOADED);
+		DatabaseStatsManager.log(DatabaseEnum.USER_LOADED);
 
 		JSONObject guildObj = Database.opt(guild.getStringID());
 		if(guildObj == null) {

@@ -9,8 +9,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
-import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.MoneyStatsManager;
+import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -48,9 +48,9 @@ public class SlotMachineCmd extends AbstractCommand {
 
 		Database.getDBUser(context.getGuild(), context.getAuthor()).addCoins(gains);
 		if(gains > 0) {
-			StatsManager.increment(MoneyEnum.MONEY_GAINED, this.getName(), gains);
+			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
 		} else {
-			StatsManager.increment(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
+			MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
 		}
 
 		BotUtils.sendMessage(String.format("%s%nYou %s **%s** !",

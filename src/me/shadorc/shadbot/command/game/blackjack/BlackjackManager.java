@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.data.stats.Stats.MoneyEnum;
-import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.MoneyStatsManager;
+import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.message.MessageListener;
 import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
@@ -142,7 +142,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 				case 1:
 					gains = (int) Math.ceil(gains * WIN_MULTIPLIER);
 					results.add(0, String.format("**%s** (Gains: **%s**)", username, gainsStr));
-					StatsManager.increment(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
+					MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
 					break;
 				case 0:
 					gains *= 0;
@@ -151,7 +151,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 				case -1:
 					gains *= -1;
 					results.add(results.size(), String.format("**%s** (Losses: **%s**)", username, gainsStr));
-					StatsManager.increment(MoneyEnum.MONEY_LOST, this.getCmdName(), Math.abs(gains));
+					MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getCmdName(), Math.abs(gains));
 					break;
 			}
 
