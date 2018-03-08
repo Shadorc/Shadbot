@@ -137,11 +137,10 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 
 			int gains = player.getBet();
 			String username = player.getUser().getName();
-			String gainsStr = FormatUtils.formatCoins(gains);
 			switch (result) {
 				case 1:
 					gains = (int) Math.ceil(gains * WIN_MULTIPLIER);
-					results.add(0, String.format("**%s** (Gains: **%s**)", username, gainsStr));
+					results.add(0, String.format("**%s** (Gains: **%s**)", username, FormatUtils.formatCoins(gains)));
 					MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
 					break;
 				case 0:
@@ -150,7 +149,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 					break;
 				case -1:
 					gains *= -1;
-					results.add(results.size(), String.format("**%s** (Losses: **%s**)", username, gainsStr));
+					results.add(results.size(), String.format("**%s** (Losses: **%s**)", username, FormatUtils.formatCoins(Math.abs(gains))));
 					MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getCmdName(), Math.abs(gains));
 					break;
 			}
