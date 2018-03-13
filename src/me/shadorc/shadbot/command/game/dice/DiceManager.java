@@ -106,11 +106,13 @@ public class DiceManager extends AbstractGameManager {
 	}
 
 	public boolean addPlayer(IUser user, int num) {
-		if(numsPlayers.putIfAbsent(num, user) == null) {
-			this.show();
-			return true;
+		if(numsPlayers.containsValue(user)) {
+			return false;
 		}
-		return false;
+
+		numsPlayers.putIfAbsent(num, user);
+		this.show();
+		return true;
 	}
 
 	protected boolean isNumBet(int num) {
