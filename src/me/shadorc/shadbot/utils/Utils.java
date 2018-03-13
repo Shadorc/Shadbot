@@ -4,9 +4,11 @@ import java.lang.management.ManagementFactory;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
@@ -83,15 +85,19 @@ public class Utils {
 		return list;
 	}
 
-	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+	public static <K, V> Map<K, V> sortByValue(Map<K, V> map, Comparator<? super Entry<K, V>> comparator) {
 		return map.entrySet()
 				.stream()
-				.sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
+				.sorted(comparator)
 				.collect(Collectors.toMap(
 						Map.Entry::getKey,
 						Map.Entry::getValue,
 						(value1, value2) -> value1,
 						LinkedHashMap::new));
+	}
+
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+		return Utils.sortByValue(map, Map.Entry.comparingByValue(Collections.reverseOrder()));
 	}
 
 	public static void handle(String action, Context context, Throwable err) {

@@ -1,10 +1,13 @@
 package me.shadorc.shadbot.utils.embed;
 
+import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.Map;
 
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.Utils;
 import sx.blah.discord.util.EmbedBuilder;
 
 public class EmbedUtils {
@@ -15,13 +18,18 @@ public class EmbedUtils {
 				.withColor(Config.BOT_COLOR);
 	}
 
-	public static EmbedBuilder getStatsEmbed(Map<?, ?> statsMap, String name) {
+	public static <K, V extends Number> EmbedBuilder getStatsEmbed(Map<K, V> statsMap, String name) {
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed().withAuthorName(String.format("Stats: %s", name.toLowerCase()));
 		if(statsMap == null) {
 			return embed.withDescription("No statistics yet.");
 		}
-		return embed.appendField("Name", FormatUtils.format(statsMap.keySet().stream(), key -> key.toString().toLowerCase(), "\n"), true)
-				.appendField("Value", FormatUtils.format(statsMap.values().stream(), value -> FormatUtils.formatNum(Long.parseLong(value.toString())), "\n"), true);
+
+		Comparator<? super Map.Entry<K, V>> comparator =
+				(v1, v2) -> new BigDecimal(v1.getValue().toString()).compareTo(new BigDecimal(v2.getValue().toString()));
+		Map<K, V> sortedMap = Utils.sortByValue(statsMap, comparator.reversed());
+
+		return embed.appendField("Name", FormatUtils.format(sortedMap.keySet().stream(), key -> key.toString().toLowerCase(), "\n"), true)
+				.appendField("Value", FormatUtils.format(sortedMap.values().stream(), value -> FormatUtils.formatNum(Long.parseLong(value.toString())), "\n"), true);
 	}
 
 }

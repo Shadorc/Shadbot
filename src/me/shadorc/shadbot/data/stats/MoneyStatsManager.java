@@ -2,9 +2,11 @@ package me.shadorc.shadbot.data.stats;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -17,6 +19,7 @@ import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
 import me.shadorc.shadbot.data.stats.annotation.StatsInit;
 import me.shadorc.shadbot.data.stats.annotation.StatsJSON;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Pair;
 import sx.blah.discord.util.EmbedBuilder;
@@ -89,9 +92,12 @@ public class MoneyStatsManager {
 			averageMap.put(gameName, new Pair<Float, Long>(average, usages));
 		}
 
-		return embed.appendField("Name", FormatUtils.format(averageMap.keySet().stream(), Object::toString, "\n"), true)
-				.appendField("Average", FormatUtils.format(averageMap.values().stream().map(Pair::getFirst), num -> FormatUtils.formatNum(num), "\n"), true)
-				.appendField("Count", FormatUtils.format(averageMap.values().stream().map(Pair::getSecond), num -> FormatUtils.formatNum(num), "\n"), true);
+		Comparator<Entry<String, Pair<Float, Long>>> comparator = (v1, v2) -> v1.getValue().getSecond().compareTo(v2.getValue().getSecond());
+		Map<String, Pair<Float, Long>> sortedMap = Utils.sortByValue(averageMap, comparator.reversed());
+
+		return embed.appendField("Name", FormatUtils.format(sortedMap.keySet().stream(), Object::toString, "\n"), true)
+				.appendField("Average", FormatUtils.format(sortedMap.values().stream().map(Pair::getFirst), num -> FormatUtils.formatNum(num.intValue()), "\n"), true)
+				.appendField("Count", FormatUtils.format(sortedMap.values().stream().map(Pair::getSecond), num -> FormatUtils.formatNum(num), "\n"), true);
 	}
 
 	@StatsJSON(name = NAME)
