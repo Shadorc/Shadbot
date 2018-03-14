@@ -78,18 +78,16 @@ public class DiabloCmd extends AbstractCommand {
 			TreeMap<Double, String> heroesMap = new TreeMap<>(Collections.reverseOrder());
 			JSONArray heroesArray = playerObj.getJSONArray("heroes");
 			for(int i = 0; i < heroesArray.length(); i++) {
-				url = String.format("https://%s.api.battle.net/d3/profile/%s/hero/%d?locale=en_GB&apikey=%s",
-						region, NetUtils.encode(battletag), heroesArray.getJSONObject(i).getLong("id"), APIKeys.get(APIKey.BLIZZARD_API_KEY));
-				JSONObject heroObj = new JSONObject(NetUtils.getBody(url));
-
-				if(heroObj.has("code") && heroObj.getString("code").equals("OOPS")) {
-					// There was a problem processing the request.
-					continue;
-				}
+				JSONObject heroObj = heroesArray.getJSONObject(i);
 
 				String name = heroObj.getString("name");
 				String heroClass = StringUtils.capitalize(heroObj.getString("class").replace("-", " "));
-				double dps = heroObj.getJSONObject("stats").getDouble("damage");
+
+				url = String.format("https://%s.api.battle.net/d3/profile/%s/hero/%d?locale=en_GB&apikey=%s",
+						region, NetUtils.encode(battletag), heroObj.getLong("id"), APIKeys.get(APIKey.BLIZZARD_API_KEY));
+				JSONObject statsHeroObj = new JSONObject(NetUtils.getBody(url));
+
+				Double dps = statsHeroObj.has("code") ? Double.NaN : statsHeroObj.getJSONObject("stats").getDouble("damage");
 				heroesMap.put(dps, String.format("**%s** (*%s*)", name, heroClass));
 			}
 
