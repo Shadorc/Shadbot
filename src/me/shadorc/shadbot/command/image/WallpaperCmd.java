@@ -81,7 +81,7 @@ public class WallpaperCmd extends AbstractCommand {
 		try {
 			List<String> args = StringUtils.split(context.getArg());
 			cmdLine = new DefaultParser().parse(options, args.toArray(new String[args.size()]));
-		} catch (UnrecognizedOptionException err) {
+		} catch (UnrecognizedOptionException | org.apache.commons.cli.MissingArgumentException err) {
 			loadingMsg.delete();
 			throw new IllegalCmdArgumentException(String.format("%s. Use `%shelp %s` for more information.",
 					err.getMessage(), context.getPrefix(), this.getName()));
