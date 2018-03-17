@@ -117,14 +117,14 @@ public class CounterStrikeCmd extends AbstractCommand {
 		}
 	}
 
-	private Integer getValue(JSONArray array, String key) {
+	private int getValue(JSONArray array, String key) {
 		for(int i = 0; i < array.length(); i++) {
 			JSONObject obj = array.getJSONObject(i);
 			if(obj.getString("name").equals(key)) {
 				return obj.getInt("value");
 			}
 		}
-		return null;
+		return 0;
 	}
 
 	@Override
