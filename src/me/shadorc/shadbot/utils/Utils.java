@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.utils;
 
 import java.lang.management.ManagementFactory;
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,7 +103,7 @@ public class Utils {
 
 	public static void handle(String action, Context context, Throwable err) {
 		String msg;
-		if(err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
+		if(err instanceof ConnectException || err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
 			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
 			LogUtils.warnf("{Guild ID: %d} Service unavailable while %s.", context.getGuild().getLongID(), action);
 		} else if(err instanceof SocketTimeoutException) {
