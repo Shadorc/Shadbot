@@ -153,15 +153,21 @@ public class BotUtils {
 	}
 
 	public static boolean hasPermissions(IChannel channel, Permissions... permissions) {
-		return PermissionUtils.hasPermissions(channel, channel.getClient().getOurUser(), permissions);
+		return RequestBuffer.request(() -> {
+			return PermissionUtils.hasPermissions(channel, channel.getClient().getOurUser(), permissions);
+		}).get();
 	}
 
 	public static boolean hasPermissions(IGuild guild, Permissions... permissions) {
-		return PermissionUtils.hasPermissions(guild, guild.getClient().getOurUser(), permissions);
+		return RequestBuffer.request(() -> {
+			return PermissionUtils.hasPermissions(guild, guild.getClient().getOurUser(), permissions);
+		}).get();
 	}
 
 	public static boolean canInteract(IGuild guild, IUser user) {
-		return PermissionUtils.isUserHigher(guild, guild.getClient().getOurUser(), user);
+		return RequestBuffer.request(() -> {
+			return PermissionUtils.isUserHigher(guild, guild.getClient().getOurUser(), user);
+		}).get();
 	}
 
 }
