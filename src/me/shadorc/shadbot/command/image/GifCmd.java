@@ -46,6 +46,10 @@ public class GifCmd extends AbstractCommand {
 			}
 
 			JSONObject mainObj = new JSONObject(bodyText);
+			if(!mainObj.has("data")) {
+				throw new HttpStatusException("Giphy did not return valid JSON.", 503, url);
+			}
+
 			if(mainObj.get("data") instanceof JSONArray) {
 				loadingMsg.edit(TextUtils.noResult(context.getArg()));
 				return;
