@@ -176,14 +176,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			}
 		}
 
+		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel
+		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(message.getGuild().getLongID(), guildMusic);
+		guildMusic.joinVoiceChannel(userVoiceChannel);
+
+		// Joining a voice channel can take several seconds to be completed, if in the mean time someone chosen a music, resultsTracks will be empty.
 		if(resultsTracks.isEmpty()) {
 			LogUtils.warnf("{Guild ID: %d} Results tracks were empty.", message.getGuild().getLongID());
 			return true;
 		}
-
-		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel
-		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(message.getGuild().getLongID(), guildMusic);
-		guildMusic.joinVoiceChannel(userVoiceChannel);
 
 		for(int choice : choices) {
 			AudioTrack track = resultsTracks.get(choice - 1);
