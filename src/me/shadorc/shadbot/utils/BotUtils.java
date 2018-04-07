@@ -166,7 +166,7 @@ public class BotUtils {
 
 	public static boolean canInteract(IGuild guild, IUser user) {
 		return RequestBuffer.request(() -> {
-			return PermissionUtils.isUserHigher(guild, guild.getClient().getOurUser(), user);
+			return PermissionUtils.hasHierarchicalPermissions(guild, guild.getClient().getOurUser(), guild.getRolesForUser(user));
 		}).get();
 	}
 
