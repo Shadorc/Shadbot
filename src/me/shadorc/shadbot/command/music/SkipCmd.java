@@ -38,7 +38,10 @@ public class SkipCmd extends AbstractCommand {
 			return;
 		}
 
-		if(!guildMusic.getScheduler().nextTrack()) {
+		if(guildMusic.getScheduler().nextTrack()) {
+			// If the music has been started correctly, we resume it in case the previous music was on pause
+			guildMusic.getScheduler().getAudioPlayer().setPaused(false);
+		} else {
 			guildMusic.end();
 		}
 	}
