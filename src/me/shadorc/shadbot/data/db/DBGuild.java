@@ -88,6 +88,14 @@ public class DBGuild {
 		}
 	}
 
+	public List<Long> getAllowedRoles() {
+		if(settingsMap.containsKey(SettingEnum.PERMISSIONS)) {
+			return Utils.toList((JSONArray) settingsMap.get(SettingEnum.PERMISSIONS), Long.class);
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
 	public String getPrefix() {
 		if(settingsMap.containsKey(SettingEnum.PREFIX)) {
 			return settingsMap.get(SettingEnum.PREFIX).toString();

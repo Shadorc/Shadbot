@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.admin.setting;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,19 +15,15 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.PermissionUtils;
 
-@Setting(description = "Manage auto assigned role(s).", setting = SettingEnum.AUTO_ROLE)
-public class AutoRoleSetting extends AbstractSetting {
+@Setting(description = "Manage role(s) that can interact with Shadbot.", setting = SettingEnum.PERMISSIONS)
+public class PermissionsSetting extends AbstractSetting {
 
 	private enum Action {
 		ADD, REMOVE;
@@ -36,12 +31,6 @@ public class AutoRoleSetting extends AbstractSetting {
 
 	@Override
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!BotUtils.hasPermissions(context.getChannel(), Permissions.MANAGE_ROLES)) {
-			BotUtils.sendMessage(TextUtils.missingPerm(Permissions.MANAGE_ROLES), context.getChannel());
-			LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to manage roles.", context.getGuild().getLongID());
-			return;
-		}
-
 		if(arg == null) {
 			throw new MissingArgumentException();
 		}
@@ -63,26 +52,23 @@ public class AutoRoleSetting extends AbstractSetting {
 		}
 
 		DBGuild dbGuild = Database.getDBGuild(context.getGuild());
-		List<Long> roles = dbGuild.getAutoRoles();
+		List<Long> allowedRoles = dbGuild.getAllowedRoles();
 
 		if(Action.ADD.equals(action)) {
-			for(IRole role : mentionedRoles) {
-				if(!PermissionUtils.hasHierarchicalPermissions(context.getGuild(), context.getOurUser(), Arrays.asList(role))) {
-					throw new IllegalCmdArgumentException(String.format("%s is a higher role in the role hierarchy than mine, I can't auto-assign it.",
-							role.mention()));
-				}
-			}
-
-			roles.addAll(mentionedRoles.stream().map(IRole::getLongID).collect(Collectors.toList()));
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New comers will now have role(s): %s",
-					FormatUtils.format(roles, role -> context.getGuild().getRoleByID(role).mention(), ", ")), context.getChannel());
+			allowedRoles.addAll(mentionedRoles.stream().map(IRole::getLongID).collect(Collectors.toList()));
+			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s will now be able to interact with me.",
+					FormatUtils.format(allowedRoles, role -> context.getGuild().getRoleByID(role).mention(), ", ")), context.getChannel());
 		} else {
-			roles.removeAll(mentionedRoles.stream().map(IRole::getLongID).collect(Collectors.toList()));
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
-					FormatUtils.format(mentionedRoles, IRole::mention, ", ")), context.getChannel());
+			allowedRoles.removeAll(mentionedRoles.stream().map(IRole::getLongID).collect(Collectors.toList()));
+			StringBuilder text = new StringBuilder(String.format(Emoji.CHECK_MARK + " %s will not be able to interact with me anymore.",
+					FormatUtils.format(mentionedRoles, IRole::mention, ", ")));
+			if(allowedRoles.isEmpty()) {
+				text.append("\n" + Emoji.INFO + " There are no more roles set, everyone can now interact with me.");
+			}
+			BotUtils.sendMessage(text.toString(), context.getChannel());
 		}
 
-		dbGuild.setSetting(SettingEnum.AUTO_ROLE, new JSONArray(roles));
+		dbGuild.setSetting(SettingEnum.PERMISSIONS, new JSONArray(allowedRoles));
 	}
 
 	@Override
@@ -91,7 +77,8 @@ public class AutoRoleSetting extends AbstractSetting {
 				.appendField("Usage", String.format("`%s%s <action> <@role(s)>`", prefix, this.getCmdName()), false)
 				.appendField("Argument", String.format("**action** - %s",
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/")), false)
-				.appendField("Example", String.format("`%s%s add @newbie`", prefix, this.getCmdName()), false);
+				.appendField("Example", String.format("`%s%s add @admin`", prefix, this.getCmdName()), false)
+				.appendField("Info", "By default, **administrators** will always be able to interact with Shadbot.", false);
 	}
 
 }

@@ -47,6 +47,10 @@ public class MessageListener {
 
 			ShardManager.getShadbotShard(message.getShard()).messageReceived();
 
+			if(!BotUtils.hasAllowedRole(message.getGuild(), message.getGuild().getRolesForUser(message.getAuthor()))) {
+				return;
+			}
+
 			if(!BotUtils.isChannelAllowed(message.getGuild(), message.getChannel())) {
 				return;
 			}

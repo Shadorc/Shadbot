@@ -63,6 +63,13 @@ public class ServerInfoCmd extends AbstractCommand {
 					.collect(Collectors.toList());
 			settingsStr.append(String.format("%n**Auto-roles:**%n\t%s", FormatUtils.format(roles, IRole::mention, "\n\t")));
 		}
+		if(!dbGuild.getAllowedRoles().isEmpty()) {
+			List<IRole> allowedRoles = dbGuild.getAllowedRoles().stream()
+					.map(guild::getRoleByID)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList());
+			settingsStr.append(String.format("%n**Permissions:**%n\t%s", FormatUtils.format(allowedRoles, IRole::mention, "\n\t")));
+		}
 
 		String creationDate = String.format("%s%n(%s)",
 				TimeUtils.toLocalDate(guild.getCreationDate()).format(dateFormatter),

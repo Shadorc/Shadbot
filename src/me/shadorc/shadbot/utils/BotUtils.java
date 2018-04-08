@@ -143,12 +143,24 @@ public class BotUtils {
 		return allowedChannels.contains(channel.getLongID());
 	}
 
-	public static boolean isCommandAllowed(IGuild guild, AbstractCommand cmd) {
-		List<String> blacklistedCmd = Database.getDBGuild(guild).getBlacklistedCmd();
-		if(blacklistedCmd.isEmpty()) {
+	public static boolean hasAllowedRole(IGuild guild, List<IRole> roles) {
+		if(roles.stream().anyMatch(role -> role.getPermissions().contains(Permissions.ADMINISTRATOR))) {
 			return true;
 		}
 
+		DBGuild dbGuild = Database.getDBGuild(guild);
+		List<Long> allowedRoles = dbGuild.getAllowedRoles();
+
+		// If no permission has been set, allow all roles
+		if(allowedRoles.isEmpty()) {
+			return true;
+		}
+
+		return roles.stream().anyMatch(role -> allowedRoles.contains(role.getLongID()));
+	}
+
+	public static boolean isCommandAllowed(IGuild guild, AbstractCommand cmd) {
+		List<String> blacklistedCmd = Database.getDBGuild(guild).getBlacklistedCmd();
 		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
 	}
 

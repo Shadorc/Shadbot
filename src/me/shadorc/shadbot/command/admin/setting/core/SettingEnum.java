@@ -11,7 +11,8 @@ public enum SettingEnum {
 	MESSAGE_CHANNEL_ID("message_channel_id"),
 	JOIN_MESSAGE("join_message"),
 	LEAVE_MESSAGE("leave_message"),
-	AUTO_ROLE("auto_role");
+	AUTO_ROLE("auto_role"),
+	PERMISSIONS("permissions");
 
 	private final String name;
 
