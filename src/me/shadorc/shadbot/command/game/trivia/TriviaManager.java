@@ -54,12 +54,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 	@Override
 	public void start() throws JSONException, IOException, ParseException {
 		String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", categoryID == null ? "" : categoryID.toString());
-		String jsonStr = NetUtils.getBody(url);
-		if(jsonStr.isEmpty()) {
-			throw new ParseException("Body is empty.");
-		}
-
-		JSONObject resultObj = new JSONObject(jsonStr).getJSONArray("results").getJSONObject(0);
+		JSONObject resultObj = new JSONObject(NetUtils.getJSON(url)).getJSONArray("results").getJSONObject(0);
 
 		String questionType = resultObj.getString("type");
 

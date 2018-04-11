@@ -34,7 +34,7 @@ public class DtcCmd extends AbstractCommand {
 		try {
 			String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", APIKeys.get(APIKey.DTC_API_KEY));
 
-			JSONObject quoteObj = Utils.toList(new JSONArray(NetUtils.getBody(url)), JSONObject.class).stream()
+			JSONObject quoteObj = Utils.toList(new JSONArray(NetUtils.getJSON(url)), JSONObject.class).stream()
 					.filter(obj -> obj.getString("content").length() < 1000).findAny().get();
 
 			String content = quoteObj.getString("content").replace("*", "\\*");

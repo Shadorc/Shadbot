@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,10 +67,6 @@ public class TriviaCmd extends AbstractCommand {
 		if(MANAGERS.putIfAbsent(context.getChannel().getLongID(), triviaManager) == null) {
 			try {
 				triviaManager.start();
-			} catch (ParseException err) {
-				BotUtils.sendMessage(Emoji.RED_FLAG + " I can't get a question right now, please try again later.", context.getChannel());
-				LogUtils.infof("{%s} Empty body.", this.getClass().getSimpleName());
-				MANAGERS.remove(context.getChannel().getLongID());
 			} catch (JSONException | IOException err) {
 				Utils.handle("getting a question", context, err);
 				MANAGERS.remove(context.getChannel().getLongID());
@@ -83,7 +78,7 @@ public class TriviaCmd extends AbstractCommand {
 
 	private void load() {
 		try {
-			JSONObject mainObj = new JSONObject(NetUtils.getBody("https://opentdb.com/api_category.php"));
+			JSONObject mainObj = new JSONObject(NetUtils.getJSON("https://opentdb.com/api_category.php"));
 			JSONArray categoriesArray = mainObj.getJSONArray("trivia_categories");
 			categoriesArray.forEach(obj -> categories.put(((JSONObject) obj).getInt("id"), ((JSONObject) obj).getString("name")));
 		} catch (JSONException | IOException err) {

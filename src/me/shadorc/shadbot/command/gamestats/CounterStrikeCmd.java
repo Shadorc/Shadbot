@@ -57,14 +57,14 @@ public class CounterStrikeCmd extends AbstractCommand {
 			else {
 				String url = String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
 						APIKeys.get(APIKey.STEAM_API_KEY), NetUtils.encode(arg));
-				JSONObject mainObj = new JSONObject(NetUtils.getBody(url));
+				JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
 				JSONObject responseObj = mainObj.getJSONObject("response");
 				steamid = responseObj.optString("steamid");
 			}
 
 			String url = String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
 					APIKeys.get(APIKey.STEAM_API_KEY), steamid);
-			JSONObject mainUserObj = new JSONObject(NetUtils.getBody(url));
+			JSONObject mainUserObj = new JSONObject(NetUtils.getJSON(url));
 
 			// Search users matching the steamID
 			JSONArray players = mainUserObj.getJSONObject("response").getJSONArray("players");
@@ -88,7 +88,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 			url = String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
 					APIKeys.get(APIKey.STEAM_API_KEY), steamid);
-			JSONObject mainStatsObj = new JSONObject(NetUtils.getBody(url));
+			JSONObject mainStatsObj = new JSONObject(NetUtils.getJSON(url));
 
 			if(!mainStatsObj.has("playerstats") || !mainStatsObj.getJSONObject("playerstats").has("stats")) {
 				loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.");

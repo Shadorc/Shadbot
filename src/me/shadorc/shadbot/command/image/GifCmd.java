@@ -38,14 +38,7 @@ public class GifCmd extends AbstractCommand {
 					APIKeys.get(APIKey.GIPHY_API_KEY),
 					NetUtils.encode(context.getArg()));
 
-			String bodyText = NetUtils.getBody(url);
-
-			// If the body is HTML, Giphy did not returned JSON
-			if(bodyText.charAt(0) != '{') {
-				throw new HttpStatusException("Giphy did not return valid JSON.", 503, url);
-			}
-
-			JSONObject mainObj = new JSONObject(bodyText);
+			JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
 			if(!mainObj.has("data")) {
 				throw new HttpStatusException("Giphy did not return valid JSON.", 503, url);
 			}

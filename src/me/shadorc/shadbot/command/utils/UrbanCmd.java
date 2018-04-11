@@ -33,7 +33,7 @@ public class UrbanCmd extends AbstractCommand {
 
 		try {
 			String url = String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(context.getArg()));
-			JSONObject mainObj = new JSONObject(NetUtils.getBody(url));
+			JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
 
 			if(mainObj.getString("result_type").equals("no_results")) {
 				BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());

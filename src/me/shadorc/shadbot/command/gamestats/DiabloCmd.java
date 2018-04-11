@@ -68,7 +68,7 @@ public class DiabloCmd extends AbstractCommand {
 		try {
 			String url = String.format("https://%s.api.battle.net/d3/profile/%s/?locale=en_GB&apikey=%s",
 					region, NetUtils.encode(battletag), APIKeys.get(APIKey.BLIZZARD_API_KEY));
-			JSONObject playerObj = new JSONObject(NetUtils.getBody(url));
+			JSONObject playerObj = new JSONObject(NetUtils.getJSON(url));
 
 			if(playerObj.has("code") && playerObj.getString("code").equals("NOTFOUND")) {
 				loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.");
@@ -85,7 +85,7 @@ public class DiabloCmd extends AbstractCommand {
 
 				url = String.format("https://%s.api.battle.net/d3/profile/%s/hero/%d?locale=en_GB&apikey=%s",
 						region, NetUtils.encode(battletag), heroObj.getLong("id"), APIKeys.get(APIKey.BLIZZARD_API_KEY));
-				JSONObject statsHeroObj = new JSONObject(NetUtils.getBody(url));
+				JSONObject statsHeroObj = new JSONObject(NetUtils.getJSON(url));
 
 				Double dps = statsHeroObj.has("code") ? Double.NaN : statsHeroObj.getJSONObject("stats").getDouble("damage");
 				heroesMap.put(dps, String.format("**%s** (*%s*)", name, heroClass));

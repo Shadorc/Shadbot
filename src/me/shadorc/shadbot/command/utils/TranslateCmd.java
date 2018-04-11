@@ -61,7 +61,7 @@ public class TranslateCmd extends AbstractCommand {
 		try {
 			String url = String.format("https://translate.googleapis.com/translate_a/single?client=gtx&sl=%s&tl=%s&dt=t&q=%s",
 					NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
-			JSONArray result = new JSONArray(NetUtils.getBody(url));
+			JSONArray result = new JSONArray(NetUtils.getJSON(url));
 
 			if(!(result.get(0) instanceof JSONArray)) {
 				throw new IllegalCmdArgumentException(String.format("One of the specified language isn't supported. "

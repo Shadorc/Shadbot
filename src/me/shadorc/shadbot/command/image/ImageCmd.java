@@ -83,7 +83,7 @@ public class ImageCmd extends AbstractCommand {
 					+ "&access_token=%s",
 					encodedSearch, ThreadLocalRandom.current().nextInt(150), this.accessToken);
 
-			JSONObject mainObj = new JSONObject(NetUtils.getBody(url));
+			JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
 
 			List<JSONObject> results = Utils.toList(mainObj.getJSONArray("results"), JSONObject.class).stream()
 					.filter(obj -> obj.has("content")).collect(Collectors.toList());
@@ -103,7 +103,7 @@ public class ImageCmd extends AbstractCommand {
 		String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
 				APIKeys.get(APIKey.DEVIANTART_CLIENT_ID),
 				APIKeys.get(APIKey.DEVIANTART_API_SECRET));
-		JSONObject oauthObj = new JSONObject(NetUtils.getBody(url));
+		JSONObject oauthObj = new JSONObject(NetUtils.getJSON(url));
 		this.accessToken = oauthObj.getString("access_token");
 		this.expiresIn = oauthObj.getInt("expires_in");
 		this.lastTokenGeneration = System.currentTimeMillis();

@@ -33,15 +33,16 @@ public class WikiCmd extends AbstractCommand {
 
 		try {
 			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-			JSONObject mainObj = new JSONObject(NetUtils.getBody("https://en.wikipedia.org/w/api.php?"
+			String url = String.format("https://en.wikipedia.org/w/api.php?"
 					+ "format=json"
 					+ "&action=query"
-					+ "&titles=" + NetUtils.encode(context.getArg())
+					+ "&titles=%s"
 					+ "&redirects=true"
 					+ "&prop=extracts"
 					+ "&explaintext=true"
 					+ "&exintro=true"
-					+ "&exsentences=5"));
+					+ "&exsentences=5", NetUtils.encode(context.getArg()));
+			JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
 
 			JSONObject pagesObj = mainObj.getJSONObject("query").getJSONObject("pages");
 			String pageId = pagesObj.names().getString(0);

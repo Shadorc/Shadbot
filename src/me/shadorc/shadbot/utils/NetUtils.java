@@ -10,6 +10,7 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -39,6 +40,14 @@ public class NetUtils {
 
 	public static String getBody(String url) throws IOException {
 		return NetUtils.getResponse(url).body();
+	}
+
+	public static String getJSON(String url) throws IOException {
+		String json = NetUtils.getBody(url);
+		if(json.isEmpty() || json.charAt(0) != '{' || json.charAt(0) != '[') {
+			throw new HttpStatusException(String.format("%s did not return valid JSON.", url), 503, url);
+		}
+		return json;
 	}
 
 	public static String encode(String str) throws UnsupportedEncodingException {
