@@ -18,9 +18,12 @@ public class UpdateableMessage {
 
 	public RequestFuture<IMessage> send(EmbedObject embed) {
 		if(futureMsg != null) {
-			RequestBuffer.request(() -> {
-				futureMsg.get().delete();
-			}).get();
+			IMessage message = futureMsg.get();
+			if(message != null) {
+				RequestBuffer.request(() -> {
+					message.delete();
+				}).get();
+			}
 		}
 		futureMsg = BotUtils.sendMessage(embed, channel);
 		return futureMsg;
