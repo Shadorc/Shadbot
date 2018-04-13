@@ -109,7 +109,7 @@ public class Utils {
 		} else if(err instanceof SocketTimeoutException) {
 			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.",
 					StringUtils.capitalize(action));
-			LogUtils.warnf("{Guild ID: %d} A SocketTimeoutException occurred while %s.", context.getGuild().getLongID(), action);
+			LogUtils.warnf("{Guild ID: %d} A **SocketTimeoutException** occurred while **%s**.", context.getGuild().getLongID(), action);
 		} else {
 			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
 			LogUtils.error(context.getContent(), err, String.format("{Guild ID: %d} %s", context.getGuild().getLongID(), msg));
