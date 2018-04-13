@@ -44,7 +44,7 @@ public class NetUtils {
 
 	public static String getJSON(String url) throws IOException {
 		String json = NetUtils.getBody(url);
-		if(json.isEmpty() || json.charAt(0) != '{' || json.charAt(0) != '[') {
+		if(json.isEmpty() || json.charAt(0) != '{' && json.charAt(0) != '[') {
 			throw new HttpStatusException(String.format("%s did not return valid JSON.", url), 503, url);
 		}
 		return json;
