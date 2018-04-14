@@ -84,7 +84,7 @@
 		<dependency>
 			<groupId>com.sedmelluq</groupId>
 			<artifactId>lavaplayer</artifactId>
-			<version>1.2.62</version>
+			<version>1.2.63</version>
 		</dependency>
 		<dependency>
 			<groupId>openweathermap</groupId>
