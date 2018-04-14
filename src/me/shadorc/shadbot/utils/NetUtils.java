@@ -2,6 +2,7 @@ package me.shadorc.shadbot.utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -55,11 +56,19 @@ public class NetUtils {
 	}
 
 	public static boolean isValidURL(String url) {
+		HttpURLConnection conn = null;
 		try {
-			new URL(url).openConnection().connect();
+			conn = (HttpURLConnection) new URL(url).openConnection();
+			conn.connect();
 			return true;
+
 		} catch (Exception err) {
 			return false;
+
+		} finally {
+			if(conn != null) {
+				conn.disconnect();
+			}
 		}
 	}
 
