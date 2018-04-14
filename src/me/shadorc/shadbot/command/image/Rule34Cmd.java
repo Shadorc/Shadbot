@@ -51,7 +51,7 @@ public class Rule34Cmd extends AbstractCommand {
 		try {
 			String url = String.format("https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=%s",
 					NetUtils.encode(context.getArg().replace(" ", "_")));
-			JSONObject mainObj = XML.toJSONObject(NetUtils.getJSON(url));
+			JSONObject mainObj = XML.toJSONObject(NetUtils.getBody(url));
 
 			JSONObject postsObj = mainObj.getJSONObject("posts");
 			if(postsObj.getInt("count") == 0) {
