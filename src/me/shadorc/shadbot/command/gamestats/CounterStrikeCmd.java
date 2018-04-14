@@ -88,7 +88,14 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 			url = String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
 					APIKeys.get(APIKey.STEAM_API_KEY), steamid);
-			JSONObject mainStatsObj = new JSONObject(NetUtils.getJSON(url));
+
+			String body = NetUtils.getBody(url);
+			if(body.contains("500 Internal Server Error")) {
+				loadingMsg.edit(Emoji.ACCESS_DENIED + " The game details of this profile are not public.");
+				return;
+			}
+
+			JSONObject mainStatsObj = new JSONObject(body);
 
 			if(!mainStatsObj.has("playerstats") || !mainStatsObj.getJSONObject("playerstats").has("stats")) {
 				loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.");
