@@ -23,6 +23,8 @@ import sx.blah.discord.api.IShard;
 
 public class NetUtils {
 
+	public static final int JSON_ERROR_CODE = 603;
+
 	public static Document getDoc(String url) throws IOException {
 		return Jsoup.connect(url)
 				.userAgent(Config.USER_AGENT)
@@ -46,7 +48,7 @@ public class NetUtils {
 	public static String getJSON(String url) throws IOException {
 		String json = NetUtils.getBody(url);
 		if(json.isEmpty() || json.charAt(0) != '{' && json.charAt(0) != '[') {
-			throw new HttpStatusException(String.format("%s did not return valid JSON: %s", url, json), 503, url);
+			throw new HttpStatusException(String.format("%s did not return valid JSON: %s", url, json), JSON_ERROR_CODE, url);
 		}
 		return json;
 	}

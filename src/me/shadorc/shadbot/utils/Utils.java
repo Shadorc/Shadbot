@@ -22,6 +22,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.jsoup.HttpStatusException;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -102,18 +103,29 @@ public class Utils {
 	}
 
 	public static void handle(String action, Context context, Throwable err) {
+		final long guildID = context.getGuild().getLongID();
+
 		String msg;
-		if(err instanceof ConnectException || err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
+		if(err instanceof JSONException || err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == NetUtils.JSON_ERROR_CODE) {
 			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
-			LogUtils.warnf("{Guild ID: %d} Service unavailable while %s.", context.getGuild().getLongID(), action);
-		} else if(err instanceof SocketTimeoutException) {
-			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.",
-					StringUtils.capitalize(action));
-			LogUtils.warnf("{Guild ID: %d} A **SocketTimeoutException** occurred while **%s**.", context.getGuild().getLongID(), action);
-		} else {
-			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
-			LogUtils.error(context.getContent(), err, String.format("{Guild ID: %d} %s", context.getGuild().getLongID(), msg));
+			LogUtils.warnf("{Guild ID: %d} %s", guildID, err.getMessage());
 		}
+
+		else if(err instanceof ConnectException || err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
+			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
+			LogUtils.warnf("{Guild ID: %d} Service unavailable while %s.", guildID, action);
+		}
+
+		else if(err instanceof SocketTimeoutException) {
+			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.", StringUtils.capitalize(action));
+			LogUtils.warnf("{Guild ID: %d} A **SocketTimeoutException** occurred while **%s**.", guildID, action);
+		}
+
+		else {
+			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
+			LogUtils.error(context.getContent(), err, String.format("{Guild ID: %d} %s", guildID, msg));
+		}
+
 		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, context.getChannel());
 	}
 
