@@ -133,7 +133,7 @@ public class FortniteCmd extends AbstractCommand {
 					+ "```prolog"
 					+ String.format(format, " ", "Solo", "Duo", "Squad")
 					+ String.format(format, "Top 1", statsMap.get(Stats.TOP1_SOLO), statsMap.get(Stats.TOP1_DUO), statsMap.get(Stats.TOP1_SQUAD))
-					+ String.format(format, "K/D season 3", statsMap.get(Stats.KD_S3_SOLO), statsMap.get(Stats.KD_S3_DUO), statsMap.get(Stats.KD_S3_SQUAD))
+					+ String.format(format, "K/D season", statsMap.get(Stats.KD_S3_SOLO), statsMap.get(Stats.KD_S3_DUO), statsMap.get(Stats.KD_S3_SQUAD))
 					+ String.format(format, "K/D lifetime", statsMap.get(Stats.KD_LT_SOLO), statsMap.get(Stats.KD_LT_DUO), statsMap.get(Stats.KD_LT_SQUAD))
 					+ "```";
 
