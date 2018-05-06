@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.shadorc.shadbot</groupId>
@@ -67,9 +68,9 @@
 	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>discord4j</groupId>
-			<artifactId>Discord4J</artifactId>
-			<version>2.12.2</version>
+			<groupId>com.github.discord4J</groupId>
+			<artifactId>Discord4J-core</artifactId>
+			<version>v3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
