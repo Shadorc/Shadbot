@@ -12,7 +12,6 @@ import me.shadorc.shadbot.utils.LogUtils;
 public class GuildListener {
 
 	public static class GuildCreateListener implements Consumer<GuildCreateEvent> {
-
 		@Override
 		public void accept(GuildCreateEvent event) {
 			ShardManager.execute(event.getGuild(), () -> {
@@ -20,11 +19,9 @@ public class GuildListener {
 						event.getGuild().getId().asLong(), event.getGuild().getMemberCount().orElse(0));
 			});
 		}
-
 	}
 
 	public static class GuildDeleteListener implements Consumer<GuildDeleteEvent> {
-
 		@Override
 		public void accept(GuildDeleteEvent event) {
 			Optional<Guild> guild = event.getGuild();
@@ -33,7 +30,5 @@ public class GuildListener {
 						event.getGuildId(), guild.isPresent() ? guild.get().getMemberCount().orElse(0) : -1);
 			});
 		}
-
 	}
-
 }

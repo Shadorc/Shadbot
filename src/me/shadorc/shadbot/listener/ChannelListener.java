@@ -2,32 +2,30 @@ package me.shadorc.shadbot.listener;
 
 import java.util.List;
 
-import org.json.JSONArray;
-
+import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
+import discord4j.core.object.entity.Guild;
+import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.shard.ShardManager;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.channel.ChannelDeleteEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.ChannelEvent;
+import twitter4j.JSONArray;
 
 public class ChannelListener {
 
-	@EventSubscriber
-	public void onChannelEvent(ChannelEvent event) {
-		ShardManager.execute(event.getGuild(), () -> {
-			if(event instanceof ChannelDeleteEvent) {
-				this.onChannelDeleteEvent((ChannelDeleteEvent) event);
-			}
-		});
+	public static class TextChannelDeleteListener implements Consumer<TextChannelDeleteEvent> {
+		@Override
+		public void accept(TextChannelDeleteEvent event) {
+			Guild guild = event.getChannel().getGuild().block();
+			ShardManager.execute(guild, () -> {
+				DBGuild dbGuild = Database.getDBGuild(guild);
+				List<Long> allowedChannelsID = dbGuild.getAllowedChannels();
+				if(allowedChannelsID.remove(event.getChannel().getId().asLong())) {
+					dbGuild.setSetting(SettingEnum.ALLOWED_CHANNELS, new JSONArray(allowedChannelsID));
+				}
+			});
+		}
+
 	}
 
-	private void onChannelDeleteEvent(ChannelDeleteEvent event) {
-		DBGuild dbGuild = Database.getDBGuild(event.getGuild());
-		List<Long> allowedChannelsID = dbGuild.getAllowedChannels();
-		if(allowedChannelsID.remove(event.getChannel().getLongID())) {
-			dbGuild.setSetting(SettingEnum.ALLOWED_CHANNELS, new JSONArray(allowedChannelsID));
-		}
-	}
 }

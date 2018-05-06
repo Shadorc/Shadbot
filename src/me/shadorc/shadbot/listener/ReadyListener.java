@@ -2,20 +2,19 @@ package me.shadorc.shadbot.listener;
 
 import java.util.concurrent.TimeUnit;
 
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
+import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.LottoCmd;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.ReadyEvent;
-import sx.blah.discord.handle.obj.StatusType;
 
-public class ReadyListener {
+public class ReadyListener implements Consumer<ReadyEvent> {
 
-	@EventSubscriber
-	public void onReadyEvent(ReadyEvent event) {
+	@Override
+	public void accept(ReadyEvent event) {
 		LogUtils.infof("Shadbot (Version: %s) is ready.", Shadbot.VERSION);
 
 		ShardManager.start();
@@ -32,7 +31,7 @@ public class ReadyListener {
 				new UserVoiceChannelListener(),
 				new VoiceChannelListener());
 
-		event.getClient().changePresence(StatusType.ONLINE);
+		event.getClient().changePresence(StatusType.ONLINE);		
 	}
 
 }

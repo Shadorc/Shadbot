@@ -21,7 +21,6 @@ import sx.blah.discord.util.RequestBuffer;
 public class GuildMemberListener {
 
 	public static class MemberJoinListener implements Consumer<MemberJoinEvent> {
-
 		@Override
 		public void accept(MemberJoinEvent event) {
 			Guild guild = event.getGuild().block();

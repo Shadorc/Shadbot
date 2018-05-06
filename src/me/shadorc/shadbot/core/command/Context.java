@@ -1,26 +1,27 @@
 package me.shadorc.shadbot.core.command;
 
+import java.security.Permissions;
 import java.util.List;
 
+import discord4j.core.DiscordClient;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import me.shadorc.shadbot.shard.ShadbotShard;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.StringUtils;
-import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.IShard;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
 
 public class Context {
 
-	private final IMessage message;
+	private final Message message;
 	private final String prefix;
 	private final String cmdName;
 	private final String arg;
 
-	public Context(String prefix, IMessage message) {
+	public Context(String prefix, Message message) {
 		this.message = message;
 		this.prefix = prefix;
 
@@ -29,12 +30,12 @@ public class Context {
 		this.arg = splittedMsg.size() > 1 ? splittedMsg.get(1) : "";
 	}
 
-	public IMessage getMessage() {
+	public Message getMessage() {
 		return message;
 	}
 
 	public String getContent() {
-		return message.getContent();
+		return message.getContent().orElse("");
 	}
 
 	public String getPrefix() {
@@ -49,7 +50,7 @@ public class Context {
 		return arg;
 	}
 
-	public IDiscordClient getClient() {
+	public DiscordClient getClient() {
 		return message.getClient();
 	}
 
@@ -65,24 +66,24 @@ public class Context {
 		return message.getShard();
 	}
 
-	public IGuild getGuild() {
-		return message.getGuild();
+	public Guild getGuild() {
+		return message.getGuild().block();
 	}
 
-	public IChannel getChannel() {
-		return message.getChannel();
+	public Channel getChannel() {
+		return message.getChannel().block();
 	}
 
-	public IUser getAuthor() {
-		return message.getAuthor();
+	public User getAuthor() {
+		return message.getAuthor().block();
 	}
 
 	public String getAuthorName() {
-		return this.getAuthor().getName();
+		return this.getAuthor().getUsername();
 	}
 
 	public CommandPermission getAuthorPermission() {
-		if(this.getAuthor().equals(this.getClient().getApplicationOwner())) {
+		if(this.getAuthor().equals(this.getClient().getApplicationInfo().block().getOwner().block())) {
 			return CommandPermission.OWNER;
 		} else if(this.getGuild() == null) {
 			return CommandPermission.ADMIN;
