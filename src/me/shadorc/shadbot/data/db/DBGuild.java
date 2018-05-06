@@ -6,26 +6,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
+import discord4j.core.object.entity.Guild;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
 import me.shadorc.shadbot.utils.Utils;
 import sx.blah.discord.handle.obj.IGuild;
+import twitter4j.JSONArray;
+import twitter4j.JSONObject;
 
 public class DBGuild {
 
 	public static final String USERS_KEY = "users";
 	private static final String SETTINGS_KEY = "settings";
 
-	private final IGuild guild;
+	private final Guild guild;
 	private final Map<SettingEnum, Object> settingsMap;
 	private final Map<Long, DBUser> usersMap;
 
-	public DBGuild(IGuild guild) {
+	public DBGuild(Guild guild) {
 		this.guild = guild;
 		this.settingsMap = new HashMap<>();
 		this.usersMap = new HashMap<>();

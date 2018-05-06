@@ -8,12 +8,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import discord4j.core.object.entity.Guild;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.executor.ShadbotCachedExecutor;
 import sx.blah.discord.api.IShard;
-import sx.blah.discord.handle.obj.IGuild;
 
 public class ShardManager {
 
@@ -39,7 +39,7 @@ public class ShardManager {
 	 * @param runnable - the runnable to execute
 	 * @return true if the runnable could have been executed, false otherwise
 	 */
-	public static boolean execute(IGuild guild, Runnable runnable) {
+	public static boolean execute(Guild guild, Runnable runnable) {
 		ThreadPoolExecutor threadPool;
 
 		// Private message

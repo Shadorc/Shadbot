@@ -1,32 +1,39 @@
 package me.shadorc.shadbot.listener;
 
+import java.util.Optional;
+
+import discord4j.core.event.domain.guild.GuildCreateEvent;
+import discord4j.core.event.domain.guild.GuildDeleteEvent;
+import discord4j.core.object.entity.Guild;
+import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.LogUtils;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
-import sx.blah.discord.handle.impl.events.guild.GuildEvent;
-import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
 
 public class GuildListener {
 
-	@EventSubscriber
-	public void onGuildEvent(GuildEvent event) {
-		ShardManager.execute(event.getGuild(), () -> {
-			if(event instanceof GuildCreateEvent) {
-				this.onGuildCreateEvent((GuildCreateEvent) event);
-			} else if(event instanceof GuildLeaveEvent) {
-				this.onGuildLeaveEvent((GuildLeaveEvent) event);
-			}
-		});
+	public static class GuildCreateListener implements Consumer<GuildCreateEvent> {
+
+		@Override
+		public void accept(GuildCreateEvent event) {
+			ShardManager.execute(event.getGuild(), () -> {
+				LogUtils.infof("Shadbot connected to a guild. (ID: %d | Users: %d)",
+						event.getGuild().getId().asLong(), event.getGuild().getMemberCount().orElse(0));
+			});
+		}
+
 	}
 
-	private void onGuildCreateEvent(GuildCreateEvent event) {
-		LogUtils.infof("Shadbot connected to a guild. (ID: %d | Users: %d)",
-				event.getGuild().getLongID(), event.getGuild().getUsers().size());
+	public static class GuildDeleteListener implements Consumer<GuildDeleteEvent> {
+
+		@Override
+		public void accept(GuildDeleteEvent event) {
+			Optional<Guild> guild = event.getGuild();
+			ShardManager.execute(guild.orElse(null), () -> {
+				LogUtils.infof("Shadbot disconnected from guild. (ID: %d | Users: %d)",
+						event.getGuildId(), guild.isPresent() ? guild.get().getMemberCount().orElse(0) : -1);
+			});
+		}
+
 	}
 
-	private void onGuildLeaveEvent(GuildLeaveEvent event) {
-		LogUtils.infof("Shadbot disconnected from guild. (ID: %d | Users: %d)",
-				event.getGuild().getLongID(), event.getGuild().getUsers().size());
-	}
 }

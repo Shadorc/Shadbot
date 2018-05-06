@@ -1,72 +1,70 @@
 package me.shadorc.shadbot.listener;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
+import discord4j.core.event.domain.guild.MemberJoinEvent;
+import discord4j.core.event.domain.guild.MemberLeaveEvent;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.Snowflake;
+import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.member.GuildMemberEvent;
-import sx.blah.discord.handle.impl.events.guild.member.UserJoinEvent;
-import sx.blah.discord.handle.impl.events.guild.member.UserLeaveEvent;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.PermissionUtils;
 import sx.blah.discord.util.RequestBuffer;
 
 public class GuildMemberListener {
 
-	@EventSubscriber
-	public void onGuildMemberEvent(GuildMemberEvent event) {
-		ShardManager.execute(event.getGuild(), () -> {
-			if(event instanceof UserJoinEvent) {
-				this.onUserJoinEvent((UserJoinEvent) event);
-			} else if(event instanceof UserLeaveEvent) {
-				this.onUserLeaveEvent((UserLeaveEvent) event);
+	public static class MemberJoinListener implements Consumer<MemberJoinEvent> {
+
+		@Override
+		public void accept(MemberJoinEvent event) {
+			Guild guild = event.getGuild().block();
+			DBGuild dbGuild = Database.getDBGuild(guild);
+
+			Long channelID = dbGuild.getMessageChannelID();
+			String joinMsg = dbGuild.getJoinMessage();
+			sendAutoMsg(guild, channelID, joinMsg);
+
+			List<Long> autoRoles = dbGuild.getAutoRoles();
+
+			List<Role> roles = guild.getRoles()
+					.filter(role -> autoRoles.contains(role.getId().asLong()))
+					.collect(Collectors.toList())
+					.block();
+
+			if(BotUtils.hasPermissions(event.getGuild(), Permission.MANAGE_ROLES)
+					&& BotUtils.canInteract(event.getGuild(), event.getMember())
+					&& PermissionUtils.hasHierarchicalPermissions(event.getGuild(), event.getClient().getOurUser(), roles)) {
+				RequestBuffer.request(() -> {
+					event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
+				});
 			}
-		});
-	}
-
-	private void onUserJoinEvent(UserJoinEvent event) {
-		DBGuild dbGuild = Database.getDBGuild(event.getGuild());
-
-		Long channelID = dbGuild.getMessageChannelID();
-		String joinMsg = dbGuild.getJoinMessage();
-		this.sendAutoMsg(event.getGuild(), channelID, joinMsg);
-
-		List<IRole> roles = dbGuild.getAutoRoles().stream()
-				.map(event.getGuild()::getRoleByID)
-				.filter(Objects::nonNull)
-				.collect(Collectors.toList());
-
-		if(BotUtils.hasPermissions(event.getGuild(), Permissions.MANAGE_ROLES)
-				&& BotUtils.canInteract(event.getGuild(), event.getUser())
-				&& PermissionUtils.hasHierarchicalPermissions(event.getGuild(), event.getClient().getOurUser(), roles)) {
-			RequestBuffer.request(() -> {
-				event.getGuild().editUserRoles(event.getUser(), roles.toArray(new IRole[roles.size()]));
-			});
 		}
 	}
 
-	private void onUserLeaveEvent(UserLeaveEvent event) {
-		DBGuild dbGuild = Database.getDBGuild(event.getGuild());
+	public static class MemberLeaverListener implements Consumer<MemberLeaveEvent> {
 
-		Long channelID = dbGuild.getMessageChannelID();
-		String leaveMsg = dbGuild.getLeaveMessage();
-		this.sendAutoMsg(event.getGuild(), channelID, leaveMsg);
+		@Override
+		public void accept(MemberLeaveEvent event) {
+			Guild guild = event.getClient().getGuildById(event.getGuildId()).block();
+			DBGuild dbGuild = Database.getDBGuild(guild);
+			sendAutoMsg(guild, dbGuild.getMessageChannelID(), dbGuild.getLeaveMessage());
+		}
+
 	}
 
-	private void sendAutoMsg(IGuild guild, Long channelID, String msg) {
+	private static void sendAutoMsg(Guild guild, Long channelID, String msg) {
 		if(channelID == null || msg == null) {
 			return;
 		}
 
-		IChannel messageChannel = guild.getChannelByID(channelID);
+		GuildChannel messageChannel = guild.getChannels().filter(channel -> channel.getId().equals(Snowflake.of(channelID))).blockFirst();
 		if(messageChannel == null) {
 			return;
 		}

@@ -68,9 +68,9 @@
 	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>com.github.discord4J</groupId>
+			<groupId>com.github.discord4J.Discord4J</groupId>
 			<artifactId>Discord4J-core</artifactId>
-			<version>v3-SNAPSHOT</version>
+			<version>46df55f5a57aac8c1a29cad6b710a0031974b846</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

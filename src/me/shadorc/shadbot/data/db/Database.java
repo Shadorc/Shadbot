@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
+import discord4j.core.object.entity.Guild;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
@@ -18,6 +15,9 @@ import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
+import twitter4j.JSONException;
+import twitter4j.JSONObject;
+import twitter4j.JSONTokener;
 
 public class Database {
 
@@ -46,7 +46,7 @@ public class Database {
 		}
 	}
 
-	public static DBGuild getDBGuild(IGuild guild) {
+	public static DBGuild getDBGuild(Guild guild) {
 		return new DBGuild(guild);
 	}
 
