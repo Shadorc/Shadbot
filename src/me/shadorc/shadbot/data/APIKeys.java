@@ -39,6 +39,7 @@ public class APIKeys {
 			KEYS_PROPERTIES.load(reader);
 		}
 
+		// Check if all API keys are present
 		for(APIKey key : APIKey.values()) {
 			if(APIKeys.get(key) == null) {
 				throw new ExceptionInInitializerError(String.format("%s not found.", key.toString()));

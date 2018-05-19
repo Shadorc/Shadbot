@@ -15,8 +15,6 @@ import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IUser;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "send" })
 public class SendMessageCmd extends AbstractCommand {
@@ -43,7 +41,7 @@ public class SendMessageCmd extends AbstractCommand {
 			return;
 		}
 
-		if(user.equals(context.getOurUser())) {
+		if(user.equals(context.getSelf())) {
 			throw new IllegalCmdArgumentException("I can't send a private message to myself.");
 		}
 

@@ -12,7 +12,6 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.util.EmbedBuilder;
 
 @Setting(description = "Manage music default volume.", setting = SettingEnum.DEFAULT_VOLUME)
 public class VolumeSetting extends AbstractSetting {
@@ -39,10 +38,10 @@ public class VolumeSetting extends AbstractSetting {
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
-				.appendField("Usage", String.format("`%s%s <volume>`", prefix, this.getCmdName()), false)
-				.appendField("Argument", String.format("**volume** - min: %d / max: %d / default: %d",
+				.addField("Usage", String.format("`%s%s <volume>`", prefix, this.getCmdName()), false)
+				.addField("Argument", String.format("**volume** - min: %d / max: %d / default: %d",
 						MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME), false)
-				.appendField("Example", String.format("`%s%s 42`", prefix, this.getCmdName()), false);
+				.addField("Example", String.format("`%s%s 42`", prefix, this.getCmdName()), false);
 	}
 
 }

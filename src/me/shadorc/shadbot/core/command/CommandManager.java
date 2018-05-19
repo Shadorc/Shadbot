@@ -9,6 +9,8 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.stats.CommandStatsManager;
@@ -22,7 +24,6 @@ import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.util.MessageBuilder;
 
 public class CommandManager {
 
@@ -71,7 +72,7 @@ public class CommandManager {
 			return;
 		}
 
-		if(!BotUtils.isCommandAllowed(context.getGuild(), cmd)) {
+		if(!BotUtils.isCommandAllowed(context.getGuild().get(), cmd)) {
 			return;
 		}
 
@@ -81,7 +82,8 @@ public class CommandManager {
 			return;
 		}
 
-		if(cmd.getRateLimiter() != null && cmd.getRateLimiter().isLimited(context.getChannel(), context.getAuthor())) {
+		if(cmd.getRateLimiter().isPresent() 
+				&& cmd.getRateLimiter().get().isLimited((TextChannel) context.getChannel(), context.getAuthor())) {
 			CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, cmd);
 			return;
 		}
@@ -94,10 +96,9 @@ public class CommandManager {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 			CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, cmd);
 		} catch (MissingArgumentException err) {
-			BotUtils.sendMessage(new MessageBuilder(context.getClient())
-					.withChannel(context.getChannel())
-					.withContent(TextUtils.MISSING_ARG)
-					.withEmbed(cmd.getHelp(context.getPrefix())));
+			BotUtils.sendMessage(new MessageCreateSpec()
+					.setContent(TextUtils.MISSING_ARG)
+					.setEmbed(cmd.getHelp(context.getPrefix())), context.getChannel());
 			CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, cmd);
 		}
 	}

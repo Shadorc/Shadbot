@@ -5,21 +5,21 @@ import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.FUN, names = { "this_day", "this-day", "thisday" }, alias = "td")
@@ -35,30 +35,35 @@ public class ThisDayCmd extends AbstractCommand {
 		try {
 			Document doc = NetUtils.getDoc(HOME_URL);
 
-			String date = doc.getElementsByClass("date-large").first().attr("datetime");
+			String date = doc.getElementsByClass("date-large")
+					.first()
+					.attr("datetime");
 
-			Elements eventsElmt = doc.getElementsByClass("event-list event-list--with-advert").first().getElementsByClass("event-list__item");
+			Elements eventsElmt = doc.getElementsByClass("event-list event-list--with-advert")
+					.first()
+					.getElementsByClass("event-list__item");
 
 			String events = eventsElmt.stream()
-					.map(elmt -> Jsoup.parse(elmt.html().replaceAll("<b>|</b>", "**")).text())
+					.map(Element::html)
+					.map(html -> html.replaceAll("<b>|</b>", "**"))
+					.map(Jsoup::parse)
+					.map(Document::text)
 					.collect(Collectors.joining("\n\n"));
 
-			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-					.withAuthorName(String.format("On This Day (%s)", date))
-					.withAuthorUrl(HOME_URL)
-					.withThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-					.appendDescription(StringUtils.truncate(events, EmbedBuilder.DESCRIPTION_CONTENT_LIMIT));
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("On This Day (%s)", date), HOME_URL)
+					.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
+					.setDescription(StringUtils.truncate(events, EmbedCreateSpec.DESCRIPTION_CONTENT_LIMIT));
 
-			loadingMsg.edit(embed.build());
+			loadingMsg.edit(embed);
 
 		} catch (IOException err) {
 			loadingMsg.delete();
-			Utils.handle("getting events", context, err);
+			ExceptionUtils.handle("getting events", context, err);
 		}
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show significant events of the day.")
 				.setSource(HOME_URL)

@@ -22,11 +22,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.Pair;
 import me.shadorc.shadbot.utils.object.UpdateableMessage;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class RouletteManager extends AbstractGameManager {
 
@@ -60,10 +55,10 @@ public class RouletteManager extends AbstractGameManager {
 						+ "%n%n**Place** is a `number between 1 and 36`, %s",
 						this.getPrefix(), this.getCmdName(),
 						FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
-				.appendField("Player (Bet)", FormatUtils.format(playersPlace.keySet().stream(),
+				.addField("Player (Bet)", FormatUtils.format(playersPlace.keySet().stream(),
 						user -> String.format("**%s** (%s)", user.getName(), FormatUtils.formatCoins(playersPlace.get(user).getFirst())), "\n"), true)
-				.appendField("Place", playersPlace.values().stream().map(Pair::getSecond).collect(Collectors.joining("\n")), true)
-				.appendField("Results", results, false)
+				.addField("Place", playersPlace.values().stream().map(Pair::getSecond).collect(Collectors.joining("\n")), true)
+				.addField("Results", results, false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
 
 		RequestFuture<IMessage> msgRequest = message.send(embed.build());

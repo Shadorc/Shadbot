@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import discord4j.common.json.EmbedFieldEntity;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.utils.FormatUtils;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.obj.Embed.EmbedField;
-import sx.blah.discord.util.EmbedBuilder;
 
 public class HelpBuilder {
 
 	private final String prefix;
 	private final AbstractCommand cmd;
 	private final List<Argument> args;
-	private final List<EmbedField> fields;
+	private final List<EmbedFieldEntity> fields;
 
 	private String thumbnail;
 	private String description;
@@ -82,35 +81,35 @@ public class HelpBuilder {
 		return this.addArg(List.of(options), isFacultative);
 	}
 
-	public HelpBuilder appendField(String name, String value, boolean inline) {
-		fields.add(new EmbedField(name, value, inline));
+	public HelpBuilder addField(String name, String value, boolean inline) {
+		fields.add(new EmbedFieldEntity(name, value, inline));
 		return this;
 	}
 
-	public EmbedObject build() {
-		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-				.setLenient(true)
-				.withAuthorName(String.format("Help for %s command", cmd.getName()))
-				.withDescription(description)
-				.appendField("Usage", this.getUsage(), false)
-				.appendField("Arguments", this.getArguments(), false)
-				.appendField("Example", example, false)
-				.appendField("Gains", gains, false)
-				.appendField("Source", source, false);
+	public EmbedCreateSpec build() {
+		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+				// .setLenient(true)
+				.setAuthor(String.format("Help for %s command", cmd.getName()), null, null)
+				.setDescription(description)
+				.addField("Usage", this.getUsage(), false)
+				.addField("Arguments", this.getArguments(), false)
+				.addField("Example", example, false)
+				.addField("Gains", gains, false)
+				.addField("Source", source, false);
 
 		if(thumbnail != null) {
-			embed.withThumbnail(thumbnail);
+			embed.setThumbnail(thumbnail);
 		}
 
-		for(EmbedField field : fields) {
-			embed.appendField(field);
+		for(EmbedFieldEntity field : fields) {
+			embed.addField(field.getName(), field.getValue(), field.isInline());
 		}
 
 		if(!cmd.getAlias().isEmpty()) {
-			embed.withFooterText(String.format("Alias: %s", cmd.getAlias()));
+			embed.setFooter(String.format("Alias: %s", cmd.getAlias()), null);
 		}
 
-		return embed.build();
+		return embed;
 	}
 
 	private String getUsage() {

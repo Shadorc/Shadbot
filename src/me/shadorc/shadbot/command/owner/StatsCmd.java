@@ -14,8 +14,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "stats" })
 public class StatsCmd extends AbstractCommand {

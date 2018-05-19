@@ -5,15 +5,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import org.apache.commons.lang3.time.DurationFormatUtils;
-
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
+import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
 
 public class RateLimiter {
 
@@ -21,21 +20,21 @@ public class RateLimiter {
 	public static final int GAME_COOLDOWN = 5;
 
 	private final ScheduledThreadPoolExecutor scheduledExecutor;
-	private final ConcurrentHashMap<Long, LimitedGuild> guildsLimitedMap;
+	private final ConcurrentHashMap<Snowflake, LimitedGuild> guildsLimitedMap;
 	private final int max;
 	private final int cooldown;
 
 	public RateLimiter(int max, int cooldown, ChronoUnit unit) {
-		this.scheduledExecutor = new ShadbotScheduledExecutor("RateLimiter-%d");
+		this.scheduledExecutor = new ScheduledWrappedExecutor("RateLimiter-%d");
 		this.guildsLimitedMap = new ConcurrentHashMap<>();
 		this.max = max;
 		this.cooldown = (int) Duration.of(cooldown, unit).toMillis();
 	}
 
-	public boolean isLimited(IChannel channel, IUser user) {
-		guildsLimitedMap.putIfAbsent(channel.getGuild().getLongID(), new LimitedGuild());
+	public boolean isLimited(TextChannel channel, User user) {
+		guildsLimitedMap.putIfAbsent(channel.getGuildId(), new LimitedGuild());
 
-		LimitedGuild limitedGuild = guildsLimitedMap.get(channel.getGuild().getLongID());
+		LimitedGuild limitedGuild = guildsLimitedMap.get(channel.getGuildId());
 		limitedGuild.addUserIfAbsent(user);
 
 		LimitedUser limitedUser = limitedGuild.getUser(user);
@@ -58,9 +57,9 @@ public class RateLimiter {
 		return true;
 	}
 
-	private void warn(IChannel channel, IUser user) {
+	private void warn(TextChannel channel, User user) {
 		BotUtils.sendMessage(String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
-				user.getName(),
+				user.getUsername(),
 				TextUtils.getSpamMessage(),
 				StringUtils.pluralOf(max, "time"),
 				DurationFormatUtils.formatDurationWords(cooldown, true, true)), channel);

@@ -16,10 +16,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.INFO, names = { "userinfo", "user_info", "user-info" })
@@ -44,13 +40,13 @@ public class UserInfoCmd extends AbstractCommand {
 				.setLenient(true)
 				.withAuthorName(String.format("Info about user \"%s\"%s", user.getName(), user.isBot() ? " (Bot)" : ""))
 				.withThumbnail(user.getAvatarURL())
-				.appendField("Display name", user.getDisplayName(context.getGuild()), true)
-				.appendField("User ID", Long.toString(user.getLongID()), true)
-				.appendField("Creation date", creationDate, true)
-				.appendField("Join date", joinDate, true)
-				.appendField("Roles", FormatUtils.format(user.getRolesForGuild(context.getGuild()), IRole::getName, "\n"), true)
-				.appendField("Status", StringUtils.capitalize(user.getPresence().getStatus().toString()), true)
-				.appendField("Playing text", user.getPresence().getText().orElse(null), true);
+				.addField("Display name", user.getDisplayName(context.getGuild()), true)
+				.addField("User ID", Long.toString(user.getLongID()), true)
+				.addField("Creation date", creationDate, true)
+				.addField("Join date", joinDate, true)
+				.addField("Roles", FormatUtils.format(user.getRolesForGuild(context.getGuild()), IRole::getName, "\n"), true)
+				.addField("Status", StringUtils.capitalize(user.getPresence().getStatus().toString()), true)
+				.addField("Playing text", user.getPresence().getText().orElse(null), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 

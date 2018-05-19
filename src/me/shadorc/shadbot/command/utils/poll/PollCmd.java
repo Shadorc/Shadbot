@@ -16,7 +16,6 @@ import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited
 @Command(category = CommandCategory.UTILS, names = { "poll" })
@@ -98,7 +97,7 @@ public class PollCmd extends AbstractCommand {
 				.addArg("choice2", false)
 				.addArg("choiceX", true)
 				.setExample(String.format("`%s%s 120 \"Where do we eat at noon?\" \"White\" \"53\" \"A dog\"`", prefix, this.getName()))
-				.appendField("Restrictions", String.format("**question and choices** - must be in quotation marks"
+				.addField("Restrictions", String.format("**question and choices** - must be in quotation marks"
 						+ "%n**choices** - min: %d, max: %d", MIN_CHOICES_NUM, MAX_CHOICES_NUM), false)
 				.build();
 	}

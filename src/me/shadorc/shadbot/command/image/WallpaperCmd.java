@@ -37,8 +37,6 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.IMAGE, names = { "wallpaper" }, alias = "wp")
@@ -132,8 +130,8 @@ public class WallpaperCmd extends AbstractCommand {
 					.withAuthorName("Wallpaper")
 					.withAuthorUrl(wallpaper.getUrl())
 					.withImage(wallpaper.getImageUrl())
-					.appendField("Resolution", wallpaper.getResolution().toString(), false)
-					.appendField("Tags", tags, false);
+					.addField("Resolution", wallpaper.getResolution().toString(), false)
+					.addField("Tags", tags, false);
 
 			loadingMsg.edit(embed.build());
 		} catch (ConnectionException err) {

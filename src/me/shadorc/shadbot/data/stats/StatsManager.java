@@ -16,17 +16,17 @@ import org.json.JSONTokener;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.data.stats.annotation.StatsInit;
 import me.shadorc.shadbot.data.stats.annotation.StatsJSON;
 import me.shadorc.shadbot.utils.LogUtils;
-import sx.blah.discord.util.EmbedBuilder;
 
 public class StatsManager {
 
-	private static final Map<String, Supplier<EmbedBuilder>> EMBED_MAP = new HashMap<>();
+	private static final Map<String, Supplier<EmbedCreateSpec>> EMBED_MAP = new HashMap<>();
 
 	private static final String FILE_NAME = "stats.json";
 	private static final File FILE = new File(FILE_NAME);
@@ -56,11 +56,11 @@ public class StatsManager {
 		}
 	}
 
-	public static void register(String name, Supplier<EmbedBuilder> supplier) {
+	public static void register(String name, Supplier<EmbedCreateSpec> supplier) {
 		EMBED_MAP.put(name, supplier);
 	}
 
-	public static Map<String, Supplier<EmbedBuilder>> getStats() {
+	public static Map<String, Supplier<EmbedCreateSpec>> getStats() {
 		return EMBED_MAP;
 	}
 

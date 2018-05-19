@@ -3,7 +3,6 @@ package me.shadorc.shadbot.command.game.blackjack;
 import java.util.List;
 
 import me.shadorc.shadbot.utils.object.Card;
-import sx.blah.discord.handle.obj.IUser;
 
 public class BlackjackPlayer {
 

@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.HttpStatusException;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -16,13 +17,11 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.IMAGE, names = { "gif" })
@@ -36,7 +35,7 @@ public class GifCmd extends AbstractCommand {
 		try {
 			String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
 					APIKeys.get(APIKey.GIPHY_API_KEY),
-					NetUtils.encode(context.getArg()));
+					NetUtils.encode(context.getArg().orElse("")));
 
 			JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
 			if(!mainObj.has("data")) {
@@ -44,23 +43,23 @@ public class GifCmd extends AbstractCommand {
 			}
 
 			if(mainObj.get("data") instanceof JSONArray) {
-				loadingMsg.edit(TextUtils.noResult(context.getArg()));
+				loadingMsg.edit(TextUtils.noResult(context.getArg().orElse("")));
 				return;
 			}
 
-			EmbedBuilder embed = new EmbedBuilder()
-					.withColor(Config.BOT_COLOR)
-					.withImage(mainObj.getJSONObject("data").getString("image_url"));
-			loadingMsg.edit(embed.build());
+			EmbedCreateSpec embed = new EmbedCreateSpec()
+					.setColor(Config.BOT_COLOR.getRGB())
+					.setImage(mainObj.getJSONObject("data").getString("image_url"));
+			loadingMsg.edit(embed);
 
 		} catch (JSONException | IOException err) {
 			loadingMsg.delete();
-			Utils.handle("getting a gif", context, err);
+			ExceptionUtils.handle("getting a gif", context, err);
 		}
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show a random gif")
 				.addArg("tag", "the tag to search", true)

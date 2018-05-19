@@ -6,32 +6,30 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.time.DurationFormatUtils;
-
+import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Guild;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.executor.ShadbotCachedExecutor;
-import sx.blah.discord.api.IShard;
+import me.shadorc.shadbot.utils.executor.CachedWrappedExecutor;
 
 public class ShardManager {
 
 	private static final int SHARD_TIMEOUT = 30;
 
-	private static final Map<IShard, ShadbotShard> SHARDS_MAP = new HashMap<>();
-	private static final ThreadPoolExecutor DEFAUT_THREAD_POOL = new ShadbotCachedExecutor("DefaultThreadPool-%d");
+	private static final Map<DiscordClient, CustomShard> SHARDS_MAP = new HashMap<>();
+	private static final ThreadPoolExecutor DEFAUT_THREAD_POOL = new CachedWrappedExecutor("DefaultThreadPool-%d");
 
 	public static void start() {
 		Shadbot.getScheduler().scheduleAtFixedRate(() -> ShardManager.check(), 30, 30, TimeUnit.MINUTES);
 	}
 
-	public static ThreadPoolExecutor createThreadPool(ShadbotShard shard) {
-		return new ShadbotCachedExecutor("ShadbotShard-" + shard.getID() + "-%d");
+	public static ThreadPoolExecutor createThreadPool(CustomShard shard) {
+		return new CachedWrappedExecutor("ShadbotShard-" + shard.getIndex() + "-%d");
 	}
 
-	public static ShadbotShard getShadbotShard(IShard shard) {
-		return SHARDS_MAP.get(shard);
+	public static CustomShard getShadbotShard(DiscordClient client) {
+		return SHARDS_MAP.get(client);
 	}
 
 	/**
@@ -46,8 +44,8 @@ public class ShardManager {
 		if(guild == null) {
 			threadPool = DEFAUT_THREAD_POOL;
 		} else {
-			SHARDS_MAP.get(guild.getShard()).eventReceived();
-			threadPool = SHARDS_MAP.get(guild.getShard()).getThreadPool();
+			SHARDS_MAP.get(guild.getClient()).eventReceived();
+			threadPool = SHARDS_MAP.get(guild.getClient()).getThreadPool();
 		}
 
 		if(threadPool.isShutdown()) {
@@ -57,35 +55,32 @@ public class ShardManager {
 		return true;
 	}
 
-	public static void addShardIfAbsent(IShard shard) {
-		SHARDS_MAP.putIfAbsent(shard, new ShadbotShard(shard));
+	public static void addShardIfAbsent(DiscordClient client) {
+		SHARDS_MAP.putIfAbsent(client, new CustomShard(client));
 	}
 
 	private static void check() {
 		LogUtils.infof("Checking dead shards...");
-		for(ShadbotShard shardStatus : SHARDS_MAP.values()) {
+		for(CustomShard shard : SHARDS_MAP.values()) {
 			try {
 				// Ignore small shards
-				if(shardStatus.getShard().getGuilds().size() < 250) {
+				// TODO: Does getGuilds() return the total number of guilds
+				// or just the one that are connected to the client ?
+				if(shard.getClient().getGuilds().count().block() < 250) {
 					continue;
 				}
 
-				// Don't restart a shard if it's already restarting
-				if(shardStatus.isRestarting()) {
-					continue;
-				}
-				long lastEventTime = TimeUtils.getMillisUntil(shardStatus.getLastEventTime());
-				long lastMessageTime = TimeUtils.getMillisUntil(shardStatus.getLastMessageTime());
+				long lastEventTime = TimeUtils.getMillisUntil(shard.getLastEventTime());
+				long lastMessageTime = TimeUtils.getMillisUntil(shard.getLastMessageTime());
 				if(lastEventTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT) || lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
 					LogUtils.infof(String.format("Restarting shard %d "
-							+ "(Guilds: %d | Response time: %d ms | Last event: %s ago | Last message: %s ago)",
-							shardStatus.getID(),
-							shardStatus.getShard().getGuilds().size(),
-							shardStatus.getShard().getResponseTime(),
+							+ "(Guilds: %d | Last event: %s ago | Last message: %s ago)",
+							shard.getIndex(),
+							shard.getClient().getGuilds().count().block(),
 							DurationFormatUtils.formatDurationWords(lastEventTime, true, true),
 							DurationFormatUtils.formatDurationWords(lastMessageTime, true, true)));
 
-					Future<Boolean> restartFuture = DEFAUT_THREAD_POOL.submit(() -> shardStatus.restart());
+					Future<Void> restartFuture = DEFAUT_THREAD_POOL.submit(() -> shard.getClient().reconnect());
 					if(!restartFuture.get(1, TimeUnit.MINUTES)) {
 						LogUtils.infof("Restart task seems stuck. Restart client ?");
 						restartFuture.cancel(true);
@@ -96,7 +91,7 @@ public class ShardManager {
 
 				}
 			} catch (Exception err) {
-				LogUtils.error(err, String.format("An error occurred while restarting shard %d.", shardStatus.getID()));
+				LogUtils.error(err, String.format("An error occurred while restarting shard %d.", shard.getID()));
 			}
 		}
 		LogUtils.infof("Dead shards checked.");

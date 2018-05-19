@@ -5,32 +5,33 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import sx.blah.discord.handle.obj.IUser;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 
 public class LimitedGuild {
 
-	private final ConcurrentHashMap<Long, LimitedUser> limitedUsersMap;
+	private final ConcurrentHashMap<Snowflake, LimitedUser> limitedUsersMap;
 
 	public LimitedGuild() {
 		this.limitedUsersMap = new ConcurrentHashMap<>();
 	}
 
-	public LimitedUser getUser(IUser user) {
-		return limitedUsersMap.get(user.getLongID());
+	public LimitedUser getUser(User user) {
+		return limitedUsersMap.get(user.getId());
 	}
 
-	public void addUserIfAbsent(IUser user) {
-		limitedUsersMap.putIfAbsent(user.getLongID(), new LimitedUser());
+	public void addUserIfAbsent(User user) {
+		limitedUsersMap.putIfAbsent(user.getId(), new LimitedUser());
 	}
 
-	public void scheduledDeletion(ScheduledThreadPoolExecutor scheduledExecutor, IUser user, int cooldown) {
-		ScheduledFuture<LimitedUser> deletionTask = limitedUsersMap.get(user.getLongID()).getDeletionTask();
+	public void scheduledDeletion(ScheduledThreadPoolExecutor scheduledExecutor, User user, int cooldown) {
+		ScheduledFuture<LimitedUser> deletionTask = limitedUsersMap.get(user.getId()).getDeletionTask();
 		if(deletionTask != null) {
 			deletionTask.cancel(false);
 		}
 
-		deletionTask = scheduledExecutor.schedule(() -> limitedUsersMap.remove(user.getLongID()), cooldown, TimeUnit.MILLISECONDS);
-		limitedUsersMap.get(user.getLongID()).setDeletionTask(deletionTask);
+		deletionTask = scheduledExecutor.schedule(() -> limitedUsersMap.remove(user.getId()), cooldown, TimeUnit.MILLISECONDS);
+		limitedUsersMap.get(user.getId()).setDeletionTask(deletionTask);
 	}
 
 }

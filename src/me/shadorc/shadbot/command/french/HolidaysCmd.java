@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.french;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -7,6 +8,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TwitterUtils;
@@ -14,7 +16,6 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import twitter4j.TwitterException;
 
 @RateLimited
@@ -27,11 +28,9 @@ public class HolidaysCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
-		Zone zone = Utils.getValueOrNull(Zone.class, context.getArg());
+		Zone zone = Utils.getValueOrNull(Zone.class, context.getArg().get());
 		if(zone == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid zone. %s",
 					context.getArg(), FormatUtils.formatOptions(Zone.class)));
@@ -45,12 +44,12 @@ public class HolidaysCmd extends AbstractCommand {
 			loadingMsg.edit(Emoji.BEACH + " " + holidays);
 		} catch (TwitterException err) {
 			loadingMsg.delete();
-			Utils.handle("getting holidays information", context, err.getCause());
+			ExceptionUtils.handle("getting holidays information", context, err.getCause());
 		}
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show the number of remaining days before the next school holidays for the indicated zone.")
 				.addArg(Zone.values(), false)

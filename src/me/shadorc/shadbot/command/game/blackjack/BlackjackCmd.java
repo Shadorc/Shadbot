@@ -13,7 +13,6 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited
 @Command(category = CommandCategory.GAME, names = { "blackjack" }, alias = "bj")
@@ -45,7 +44,7 @@ public class BlackjackCmd extends AbstractCommand {
 
 		if(!blackjackManager.addPlayerIfAbsent(context.getAuthor(), bet)) {
 			BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-					context.getAuthorName()), context.getChannel());
+					context.getUsername()), context.getChannel());
 		}
 	}
 
@@ -54,7 +53,7 @@ public class BlackjackCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Start or join a blackjack game.")
 				.addArg("bet", false)
-				.appendField("Info", "**double down** - increase the initial bet by 100% in exchange for committing to stand"
+				.addField("Info", "**double down** - increase the initial bet by 100% in exchange for committing to stand"
 						+ " after receiving exactly one more card", false)
 				.build();
 	}

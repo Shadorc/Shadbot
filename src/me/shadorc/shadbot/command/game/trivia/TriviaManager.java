@@ -26,10 +26,6 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
 
 public class TriviaManager extends AbstractGameManager implements MessageListener {
 
@@ -75,9 +71,9 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName("Trivia")
 				.appendDescription(description)
-				.appendField("Category", String.format("`%s`", resultObj.getString("category")), true)
-				.appendField("Type", String.format("`%s`", questionType), true)
-				.appendField("Difficulty", String.format("`%s`", resultObj.getString("difficulty")), true)
+				.addField("Category", String.format("`%s`", resultObj.getString("category")), true)
+				.addField("Type", String.format("`%s`", questionType), true)
+				.addField("Difficulty", String.format("`%s`", resultObj.getString("difficulty")), true)
 				.withFooterText(String.format("You have %d seconds to answer.", LIMITED_TIME));
 
 		BotUtils.sendMessage(embed.build(), this.getChannel());

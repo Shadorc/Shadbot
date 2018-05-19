@@ -1,23 +1,25 @@
 package me.shadorc.shadbot.data.lotto;
 
+import discord4j.core.object.util.Snowflake;
+
 public class LottoPlayer {
 
-	private final long guildID;
-	private final long userID;
+	private final Snowflake guildId;
+	private final Snowflake userId;
 	private final int num;
 
-	public LottoPlayer(long guildID, long userID, int num) {
-		this.guildID = guildID;
-		this.userID = userID;
+	public LottoPlayer(Snowflake guildId, Snowflake userId, int num) {
+		this.guildId = guildId;
+		this.userId = userId;
 		this.num = num;
 	}
 
-	public long getGuildID() {
-		return guildID;
+	public Snowflake getGuildId() {
+		return guildId;
 	}
 
-	public long getUserID() {
-		return userID;
+	public Snowflake getUserId() {
+		return userId;
 	}
 
 	public int getNum() {

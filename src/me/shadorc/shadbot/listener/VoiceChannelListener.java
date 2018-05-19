@@ -2,25 +2,11 @@ package me.shadorc.shadbot.listener;
 
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
-import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.LogUtils;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.voice.VoiceChannelEvent;
-import sx.blah.discord.handle.impl.events.guild.voice.VoiceDisconnectedEvent;
 
-@SuppressWarnings("ucd")
 public class VoiceChannelListener {
 
-	@EventSubscriber
-	public void onVoiceChannelEvent(VoiceChannelEvent event) {
-		ShardManager.execute(event.getGuild(), () -> {
-			if(event instanceof VoiceDisconnectedEvent) {
-				this.onVoiceDisconnectedEvent((VoiceDisconnectedEvent) event);
-			}
-		});
-	}
-
-	private void onVoiceDisconnectedEvent(VoiceDisconnectedEvent event) {
+	public static void onVoiceDisconnectedEvent(VoiceDisconnectedEvent event) {
 		GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(event.getGuild().getLongID());
 		if(guildMusic != null) {
 			guildMusic.delete();

@@ -22,8 +22,6 @@ import me.shadorc.shadbot.utils.object.LoadingMessage;
 import net.aksingh.owmjapis.CurrentWeather;
 import net.aksingh.owmjapis.OpenWeatherMap;
 import net.aksingh.owmjapis.OpenWeatherMap.Units;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.UTILS, names = { "weather" })
@@ -61,11 +59,11 @@ public class WeatherCmd extends AbstractCommand {
 					.withThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
 					.withAuthorUrl("http://openweathermap.org/city/" + weather.getCityCode())
 					.appendDescription("Last updated " + dateFormatter.format(weather.getDateTime()))
-					.appendField(Emoji.CLOUD + " Clouds", clouds, true)
-					.appendField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
-					.appendField(Emoji.RAIN + " Rain", rain, true)
-					.appendField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", humidity), true)
-					.appendField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", temperature), true);
+					.addField(Emoji.CLOUD + " Clouds", clouds, true)
+					.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
+					.addField(Emoji.RAIN + " Rain", rain, true)
+					.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", humidity), true)
+					.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", temperature), true);
 
 			loadingMsg.edit(embed.build());
 		} catch (IOException err) {

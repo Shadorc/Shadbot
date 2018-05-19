@@ -20,7 +20,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.util.EmbedBuilder;
 
 @Setting(description = "Manage blacklisted commands.", setting = SettingEnum.BLACKLIST)
 public class BlacklistSettingCmd extends AbstractSetting {
@@ -72,10 +71,10 @@ public class BlacklistSettingCmd extends AbstractSetting {
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
-				.appendField("Usage", String.format("`%s%s <action> <command(s)>`", prefix, this.getCmdName()), false)
-				.appendField("Argument", String.format("**action** - %s",
+				.addField("Usage", String.format("`%s%s <action> <command(s)>`", prefix, this.getCmdName()), false)
+				.addField("Argument", String.format("**action** - %s",
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/")), false)
-				.appendField("Example", String.format("`%s%s add rule34 russian_roulette`", prefix, this.getCmdName()), false);
+				.addField("Example", String.format("`%s%s add rule34 russian_roulette`", prefix, this.getCmdName()), false);
 	}
 
 }

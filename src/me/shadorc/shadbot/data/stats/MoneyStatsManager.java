@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.lotto.LottoManager;
 import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
@@ -22,7 +23,6 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Pair;
-import sx.blah.discord.util.EmbedBuilder;
 
 public class MoneyStatsManager {
 
@@ -66,11 +66,11 @@ public class MoneyStatsManager {
 		MoneyStatsManager.log(key, cmd.getName(), coins);
 	}
 
-	public static EmbedBuilder getAverageEmbed() {
+	public static EmbedCreateSpec getAverageEmbed() {
 		Map<String, AtomicLong> moneyGained = MONEY_STATS_MAP.getOrDefault(MoneyEnum.MONEY_GAINED, Collections.emptyMap());
 		Map<String, AtomicLong> moneyLost = MONEY_STATS_MAP.getOrDefault(MoneyEnum.MONEY_LOST, Collections.emptyMap());
 
-		EmbedBuilder embed = EmbedUtils.getDefaultEmbed().withAuthorName("Stats: average");
+		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Stats: average");
 
 		List<String> gamesName = new ArrayList<>();
 		gamesName.addAll(moneyGained.keySet());
@@ -78,7 +78,7 @@ public class MoneyStatsManager {
 		gamesName = gamesName.stream().distinct().collect(Collectors.toList());
 
 		if(gamesName.isEmpty()) {
-			return embed.withDescription("No statistics yet.");
+			return embed.setDescription("No statistics yet.");
 		}
 
 		Map<String, AtomicInteger> commandsUsed = CommandStatsManager.get(CommandEnum.COMMAND_USED);
@@ -95,9 +95,9 @@ public class MoneyStatsManager {
 		Comparator<Entry<String, Pair<Float, Long>>> comparator = (v1, v2) -> v1.getValue().getSecond().compareTo(v2.getValue().getSecond());
 		Map<String, Pair<Float, Long>> sortedMap = Utils.sortByValue(averageMap, comparator.reversed());
 
-		return embed.appendField("Name", FormatUtils.format(sortedMap.keySet().stream(), Object::toString, "\n"), true)
-				.appendField("Average", FormatUtils.format(sortedMap.values().stream().map(Pair::getFirst), num -> FormatUtils.formatNum(num.intValue()), "\n"), true)
-				.appendField("Count", FormatUtils.format(sortedMap.values().stream().map(Pair::getSecond), num -> FormatUtils.formatNum(num), "\n"), true);
+		return embed.addField("Name", FormatUtils.format(sortedMap.keySet().stream(), Object::toString, "\n"), true)
+				.addField("Average", FormatUtils.format(sortedMap.values().stream().map(Pair::getFirst), num -> FormatUtils.formatNum(num.intValue()), "\n"), true)
+				.addField("Count", FormatUtils.format(sortedMap.values().stream().map(Pair::getSecond), num -> FormatUtils.formatNum(num), "\n"), true);
 	}
 
 	@StatsJSON(name = NAME)

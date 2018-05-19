@@ -13,7 +13,6 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited
 @Command(category = CommandCategory.MUSIC, names = { "name", "current", "np" })

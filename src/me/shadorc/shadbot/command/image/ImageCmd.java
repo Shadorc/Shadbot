@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -17,6 +18,7 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -25,8 +27,6 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.IMAGE, names = { "image" })
@@ -38,34 +38,32 @@ public class ImageCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
 		LoadingMessage loadingMsg = new LoadingMessage("Loading image...", context.getChannel());
 		loadingMsg.send();
 
 		try {
-			JSONObject resultObj = this.getRandomPopularResult(NetUtils.encode(context.getArg()));
+			JSONObject resultObj = this.getRandomPopularResult(NetUtils.encode(context.getArg().get()));
 			if(resultObj == null) {
-				loadingMsg.edit(TextUtils.noResult(context.getArg()));
+				loadingMsg.edit(TextUtils.noResult(context.getArg().get()));
 				return;
 			}
 
-			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-					.withAuthorName("DeviantArt (Search: " + context.getArg() + ")")
-					.withAuthorUrl(resultObj.getString("url"))
-					.withThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
-					.appendField("Title", resultObj.getString("title"), false)
-					.appendField("Author", resultObj.getJSONObject("author").getString("username"), false)
-					.appendField("Category", resultObj.getString("category_path"), false)
-					.withImage(resultObj.getJSONObject("content").getString("src"));
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(
+					String.format("DeviantArt (Search: %s)", context.getArg().get()),
+					resultObj.getString("url"))
+					.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
+					.addField("Title", resultObj.getString("title"), false)
+					.addField("Author", resultObj.getJSONObject("author").getString("username"), false)
+					.addField("Category", resultObj.getString("category_path"), false)
+					.setImage(resultObj.getJSONObject("content").getString("src"));
 
-			loadingMsg.edit(embed.build());
+			loadingMsg.edit(embed);
 
 		} catch (JSONException | IOException err) {
 			loadingMsg.delete();
-			Utils.handle("getting an image", context, err);
+			ExceptionUtils.handle("getting an image", context, err);
 		}
 	}
 
@@ -86,7 +84,8 @@ public class ImageCmd extends AbstractCommand {
 			JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
 
 			List<JSONObject> results = Utils.toList(mainObj.getJSONArray("results"), JSONObject.class).stream()
-					.filter(obj -> obj.has("content")).collect(Collectors.toList());
+					.filter(obj -> obj.has("content"))
+					.collect(Collectors.toList());
 
 			if(results.isEmpty()) {
 				return null;
@@ -99,7 +98,7 @@ public class ImageCmd extends AbstractCommand {
 		}
 	}
 
-	private void generateAccessToken() throws JSONException, IOException {
+	private synchronized void generateAccessToken() throws JSONException, IOException {
 		String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
 				APIKeys.get(APIKey.DEVIANTART_CLIENT_ID),
 				APIKeys.get(APIKey.DEVIANTART_API_SECRET));
@@ -111,7 +110,7 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Search for a random image on DeviantArt.")
 				.addArg("search", false)

@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 
+import discord4j.core.object.entity.VoiceChannel;
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.db.Database;
@@ -15,29 +17,24 @@ import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.IVoiceChannel;
-import sx.blah.discord.util.RequestBuffer;
 
 public class GuildMusic {
 
-	private final IGuild guild;
+	private final Snowflake guildId;
 	private final AudioPlayer audioPlayer;
 	private final AudioProvider audioProvider;
 	private final TrackScheduler trackScheduler;
 
 	private ScheduledFuture<?> leaveTask;
-	private IChannel channel;
-	private IUser userDj;
+	private Snowflake channelId;
+	private Snowflake userDjId;
 	private boolean isWaiting;
 
-	public GuildMusic(IGuild guild, AudioPlayerManager audioPlayerManager) {
-		this.guild = guild;
+	public GuildMusic(Snowflake guildId, AudioPlayerManager audioPlayerManager) {
+		this.guildId = guildId;
 		this.audioPlayer = audioPlayerManager.createPlayer();
 		this.audioProvider = new AudioProvider(audioPlayer);
-		this.trackScheduler = new TrackScheduler(audioPlayer, Database.getDBGuild(guild).getDefaultVol());
+		this.trackScheduler = new TrackScheduler(audioPlayer, Database.getDBGuild(guildId).getDefaultVol());
 		this.audioPlayer.addListener(new AudioEventListener(this));
 	}
 
@@ -51,8 +48,8 @@ public class GuildMusic {
 		}
 	}
 
-	public void joinVoiceChannel(IVoiceChannel voiceChannel) {
-		if(voiceChannel.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel() == null) {
+	public void joinVoiceChannel(VoiceChannel voiceChannel) {
+		if(voiceChannel.getClient().getSelf().getVoiceStateForGuild(guild).getChannel() == null) {
 			voiceChannel.join();
 			LogUtils.infof("{Guild ID: %d} Voice channel joined.", voiceChannel.getGuild().getLongID());
 		}
@@ -72,7 +69,7 @@ public class GuildMusic {
 		// Leaving a voice channel can take up to 30 seconds to be executed
 		// We execute it in a separate thread pool to avoid thread blocking
 		ShardManager.execute(channel.getGuild(), () -> {
-			IVoiceChannel voiceChannel = Shadbot.getClient().getOurUser().getVoiceStateForGuild(guild).getChannel();
+			IVoiceChannel voiceChannel = Shadbot.getClient().getSelf().getVoiceStateForGuild(guild).getChannel();
 			if(voiceChannel != null && voiceChannel.getShard().isReady()) {
 				RequestBuffer.request(() -> {
 					voiceChannel.leave();

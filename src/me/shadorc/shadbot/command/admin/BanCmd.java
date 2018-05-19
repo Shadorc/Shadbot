@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin;
 
+import java.security.Permissions;
 import java.util.List;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -15,12 +16,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.Ban;
-import sx.blah.discord.util.PermissionUtils;
-import sx.blah.discord.util.RequestBuffer;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "ban" })
 public class BanCmd extends AbstractCommand {
@@ -75,7 +70,7 @@ public class BanCmd extends AbstractCommand {
 		for(IUser user : mentionedUsers) {
 			if(!user.isBot()) {
 				BotUtils.sendMessage(String.format(Emoji.INFO + " You were banned from the server **%s** by **%s**. Reason: `%s`",
-						context.getGuild().getName(), context.getAuthorName(), reason), user.getOrCreatePMChannel());
+						context.getGuild().getName(), context.getUsername(), reason), user.getOrCreatePMChannel());
 			}
 			RequestBuffer.request(() -> {
 				context.getGuild().banUser(user, reason.toString(), 7);
@@ -83,7 +78,7 @@ public class BanCmd extends AbstractCommand {
 		}
 
 		BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) **%s** got banned. Reason: `%s`",
-				context.getAuthorName(), FormatUtils.format(mentionedUsers, IUser::getName, ", "), reason), context.getChannel());
+				context.getUsername(), FormatUtils.format(mentionedUsers, IUser::getName, ", "), reason), context.getChannel());
 	}
 
 	@Override

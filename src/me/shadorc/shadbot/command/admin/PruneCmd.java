@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin;
 
+import java.security.Permissions;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,12 +19,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IEmbed;
-import sx.blah.discord.handle.obj.IEmbed.IEmbedField;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" })
 public class PruneCmd extends AbstractCommand {
@@ -69,7 +64,7 @@ public class PruneCmd extends AbstractCommand {
 		try {
 			int deletedMsg = BotUtils.deleteMessages(context.getChannel(), messagesList.toArray(new IMessage[messagesList.size()])).get();
 			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
-					context.getAuthorName(), StringUtils.pluralOf(deletedMsg, "message")),
+					context.getUsername(), StringUtils.pluralOf(deletedMsg, "message")),
 					context.getChannel());
 		} catch (IllegalArgumentException err) {
 			BotUtils.sendMessage(Emoji.INFO + " There is no message to delete.", context.getChannel());
@@ -99,7 +94,7 @@ public class PruneCmd extends AbstractCommand {
 				.addArg("number", "number of messages to delete (max: 100)", true)
 				.setExample(String.format("Delete **15** messages from user **@Shadbot** containing **hi guys**:"
 						+ "%n`%s%s @Shadbot \"hi guys\" 15`", prefix, this.getName()))
-				.appendField("Info", "Messages older than 2 weeks cannot be deleted.", false)
+				.addField("Info", "Messages older than 2 weeks cannot be deleted.", false)
 				.build();
 	}
 

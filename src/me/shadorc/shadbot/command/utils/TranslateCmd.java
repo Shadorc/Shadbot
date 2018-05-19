@@ -23,7 +23,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited
 @Command(category = CommandCategory.UTILS, names = { "translate", "translation", "trans" })
@@ -90,7 +89,7 @@ public class TranslateCmd extends AbstractCommand {
 				.addArg("toLang", "destination language", false)
 				.addArg("text", false)
 				.setExample(String.format("`%s%s en fr How are you ?`", prefix, this.getName()))
-				.appendField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false)
+				.addField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false)
 				.build();
 	}
 }

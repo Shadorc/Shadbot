@@ -14,7 +14,6 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited
 @Command(category = CommandCategory.MUSIC, names = { "pause", "unpause", "resume" })
@@ -32,9 +31,9 @@ public class PauseCmd extends AbstractCommand {
 		AudioPlayer audioPlayer = guildMusic.getScheduler().getAudioPlayer();
 		audioPlayer.setPaused(!audioPlayer.isPaused());
 		if(audioPlayer.isPaused()) {
-			BotUtils.sendMessage(String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getAuthorName()), context.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getUsername()), context.getChannel());
 		} else {
-			BotUtils.sendMessage(String.format(Emoji.PLAY + " Music resumed by **%s**.", context.getAuthorName()), context.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.PLAY + " Music resumed by **%s**.", context.getUsername()), context.getChannel());
 		}
 	}
 

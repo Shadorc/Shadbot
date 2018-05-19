@@ -26,7 +26,6 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
 @Command(category = CommandCategory.GAME, names = { "trivia" })
@@ -45,8 +44,8 @@ public class TriviaCmd extends AbstractCommand {
 		if(context.getArg().equals("categories")) {
 			EmbedObject embed = EmbedUtils.getDefaultEmbed()
 					.withAuthorName("Trivia categories")
-					.appendField("ID", FormatUtils.format(categories.keySet().toArray(), Object::toString, "\n"), true)
-					.appendField("Name", FormatUtils.format(categories.keySet().toArray(), categories::get, "\n"), true)
+					.addField("ID", FormatUtils.format(categories.keySet().toArray(), Object::toString, "\n"), true)
+					.addField("Name", FormatUtils.format(categories.keySet().toArray(), categories::get, "\n"), true)
 					.build();
 			BotUtils.sendMessage(embed, context.getChannel());
 			return;
@@ -91,7 +90,7 @@ public class TriviaCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Start a Trivia game in which everyone can participate.")
 				.addArg("categoryID", "the category ID of the question", true)
-				.appendField("Category", String.format("Use `%s%s categories` to see the list of categories", prefix, this.getName()), false)
+				.addField("Category", String.format("Use `%s%s categories` to see the list of categories", prefix, this.getName()), false)
 				.setGains("The winner gets **%d coins** plus a bonus depending on his speed to answer.", TriviaManager.MIN_GAINS)
 				.build();
 	}

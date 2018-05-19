@@ -17,7 +17,6 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
 @Command(category = CommandCategory.GAME, names = { "slot_machine", "slot-machine", "slotmachine" }, alias = "sm")
@@ -62,7 +61,7 @@ public class SlotMachineCmd extends AbstractCommand {
 	public EmbedObject getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Play slot machine.")
-				.appendField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)
+				.addField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)
 				.build();
 	}
 

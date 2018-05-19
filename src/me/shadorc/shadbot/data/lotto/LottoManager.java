@@ -13,12 +13,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IUser;
 
 public class LottoManager {
 
@@ -76,7 +77,9 @@ public class LottoManager {
 		JSONArray usersArray = dataObj.getJSONArray(USERS);
 		for(int i = 0; i < usersArray.length(); i++) {
 			JSONObject userObj = usersArray.getJSONObject(i);
-			players.add(new LottoPlayer(userObj.getLong(GUILD_ID), userObj.getLong(USER_ID), userObj.getInt(NUM)));
+			Snowflake guildId = Snowflake.of(userObj.getLong(GUILD_ID));
+			Snowflake userId = Snowflake.of(userObj.getLong(USER_ID));
+			players.add(new LottoPlayer(guildId, userId, userObj.getInt(NUM)));
 		}
 		return players;
 	}
@@ -94,10 +97,10 @@ public class LottoManager {
 		dataObj.put(POOL, Math.max(0, Math.min(Config.MAX_COINS, newPool)));
 	}
 
-	public static synchronized void addPlayer(IGuild guild, IUser user, int num) {
+	public static synchronized void addPlayer(Guild guild, User user, int num) {
 		JSONObject playerObj = new JSONObject()
-				.put(GUILD_ID, guild.getLongID())
-				.put(USER_ID, user.getLongID())
+				.put(GUILD_ID, guild.getId().asLong())
+				.put(USER_ID, user.getId().asLong())
 				.put(NUM, num);
 		dataObj.getJSONArray(USERS).put(playerObj);
 	}

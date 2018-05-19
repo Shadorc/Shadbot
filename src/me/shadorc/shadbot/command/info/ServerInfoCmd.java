@@ -20,11 +20,6 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.INFO, names = { "serverinfo", "server_info", "server-info" })
@@ -79,14 +74,14 @@ public class ServerInfoCmd extends AbstractCommand {
 				.setLenient(true)
 				.withAuthorName(String.format("Info about \"%s\"", guild.getName()))
 				.withThumbnail(guild.getIconURL())
-				.appendField("Owner", guild.getOwner().getName(), true)
-				.appendField("Server ID", Long.toString(guild.getLongID()), true)
-				.appendField("Creation date", creationDate, true)
-				.appendField("Region", guild.getRegion().getName(), true)
-				.appendField("Channels", String.format("**Voice:** %d", guild.getVoiceChannels().size())
+				.addField("Owner", guild.getOwner().getName(), true)
+				.addField("Server ID", Long.toString(guild.getLongID()), true)
+				.addField("Creation date", creationDate, true)
+				.addField("Region", guild.getRegion().getName(), true)
+				.addField("Channels", String.format("**Voice:** %d", guild.getVoiceChannels().size())
 						+ String.format("%n**Text:** %d", guild.getChannels().size()), true)
-				.appendField("Members", Integer.toString(guild.getTotalMemberCount()), true)
-				.appendField("Settings", settingsStr.toString(), true);
+				.addField("Members", Integer.toString(guild.getTotalMemberCount()), true)
+				.addField("Settings", settingsStr.toString(), true);
 		BotUtils.sendMessage(embed.build(), context.getChannel());
 	}
 

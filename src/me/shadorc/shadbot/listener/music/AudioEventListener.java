@@ -29,7 +29,8 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**", FormatUtils.formatTrackName(track.getInfo())),
+		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
+				FormatUtils.formatTrackName(track.getInfo())),
 				guildMusic.getChannel());
 	}
 

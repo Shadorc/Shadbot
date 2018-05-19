@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.music;
 
+import java.security.Permissions;
+
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -19,9 +21,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IVoiceChannel;
-import sx.blah.discord.handle.obj.Permissions;
 
 @RateLimited
 @Command(category = CommandCategory.MUSIC, names = { "play", "add", "queue", "playfirst", "addfirst", "queuefirst" })
@@ -33,7 +32,7 @@ public class PlayCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		IVoiceChannel botVoiceChannel = context.getClient().getOurUser().getVoiceStateForGuild(context.getGuild()).getChannel();
+		IVoiceChannel botVoiceChannel = context.getClient().getSelf().getVoiceStateForGuild(context.getGuild()).getChannel();
 		IVoiceChannel userVoiceChannel = context.getAuthor().getVoiceStateForGuild(context.getGuild()).getChannel();
 
 		if(botVoiceChannel != null && !botVoiceChannel.equals(userVoiceChannel)) {
@@ -65,7 +64,7 @@ public class PlayCmd extends AbstractCommand {
 		if(guildMusic != null && guildMusic.isWaiting()) {
 			if(guildMusic.getDj().equals(context.getAuthor())) {
 				throw new IllegalCmdArgumentException(String.format("(**%s**) You're already selecting a music. "
-						+ "Enter a number or use `%scancel` to cancel the selection.", context.getAuthorName(), context.getPrefix()));
+						+ "Enter a number or use `%scancel` to cancel the selection.", context.getUsername(), context.getPrefix()));
 			}
 
 			if(identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH)) {

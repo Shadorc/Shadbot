@@ -23,8 +23,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.GAMESTATS, names = { "cs", "csgo" })
@@ -76,10 +74,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			JSONObject userObj = players.getJSONObject(0);
 
 			/*
-			 * CommunityVisibilityState
-			 * 1: Private
-			 * 2: FriendsOnly
-			 * 3: Public
+			 * CommunityVisibilityState 1: Private 2: FriendsOnly 3: Public
 			 */
 			if(userObj.getInt("communityvisibilitystate") != 3) {
 				loadingMsg.edit(Emoji.ACCESS_DENIED + " This profile is private.");
@@ -111,11 +106,11 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.withAuthorUrl("http://steamcommunity.com/profiles/" + steamid)
 					.withThumbnail(userObj.getString("avatarfull"))
 					.appendDescription(String.format("Stats for **%s**", userObj.getString("personaname")))
-					.appendField("Kills", Integer.toString(this.getValue(statsArray, "total_kills")), true)
-					.appendField("Deaths", Integer.toString(this.getValue(statsArray, "total_deaths")), true)
-					.appendField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills") / this.getValue(statsArray, "total_deaths")), true)
-					.appendField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
-					.appendField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
+					.addField("Kills", Integer.toString(this.getValue(statsArray, "total_kills")), true)
+					.addField("Deaths", Integer.toString(this.getValue(statsArray, "total_deaths")), true)
+					.addField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills") / this.getValue(statsArray, "total_deaths")), true)
+					.addField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
+					.addField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
 			loadingMsg.edit(embed.build());
 
 		} catch (JSONException | IOException err) {

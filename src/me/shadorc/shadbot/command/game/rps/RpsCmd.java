@@ -17,7 +17,6 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
 @Command(category = CommandCategory.GAME, names = { "rps" })
@@ -40,16 +39,16 @@ public class RpsCmd extends AbstractCommand {
 		Handsign botHandsign = Handsign.values()[ThreadLocalRandom.current().nextInt(Handsign.values().length)];
 
 		StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s.%n**Shadbot**: %s.%n",
-				context.getAuthorName(), userHandsign.getRepresentation(), botHandsign.getRepresentation()));
+				context.getUsername(), userHandsign.getRepresentation(), botHandsign.getRepresentation()));
 
 		if(userHandsign.equals(botHandsign)) {
 			strBuilder.append("It's a draw !");
 		} else if(userHandsign.isSuperior(botHandsign)) {
-			strBuilder.append(String.format("%s wins ! Well done, you won **%d coins**.", context.getAuthorName(), GAINS));
+			strBuilder.append(String.format("%s wins ! Well done, you won **%d coins**.", context.getUsername(), GAINS));
 			Database.getDBUser(context.getGuild(), context.getAuthor()).addCoins(GAINS);
 			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
 		} else {
-			strBuilder.append(context.getClient().getOurUser().getName() + " wins !");
+			strBuilder.append(context.getClient().getSelf().getName() + " wins !");
 		}
 
 		BotUtils.sendMessage(strBuilder.toString(), context.getChannel());

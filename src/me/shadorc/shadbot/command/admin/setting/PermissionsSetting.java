@@ -19,8 +19,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.util.EmbedBuilder;
 
 @Setting(description = "Manage role(s) that can interact with Shadbot.", setting = SettingEnum.PERMISSIONS)
 public class PermissionsSetting extends AbstractSetting {
@@ -74,11 +72,11 @@ public class PermissionsSetting extends AbstractSetting {
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
-				.appendField("Usage", String.format("`%s%s <action> <@role(s)>`", prefix, this.getCmdName()), false)
-				.appendField("Argument", String.format("**action** - %s",
+				.addField("Usage", String.format("`%s%s <action> <@role(s)>`", prefix, this.getCmdName()), false)
+				.addField("Argument", String.format("**action** - %s",
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/")), false)
-				.appendField("Example", String.format("`%s%s add @admin`", prefix, this.getCmdName()), false)
-				.appendField("Info", "By default, **administrators** will always be able to interact with Shadbot.", false);
+				.addField("Example", String.format("`%s%s add @admin`", prefix, this.getCmdName()), false)
+				.addField("Info", "By default, **administrators** will always be able to interact with Shadbot.", false);
 	}
 
 }

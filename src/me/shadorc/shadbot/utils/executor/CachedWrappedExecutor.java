@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.Utils;
 
-public class ShadbotCachedExecutor extends ThreadPoolExecutor {
+public class CachedWrappedExecutor extends ThreadPoolExecutor {
 
-	public ShadbotCachedExecutor(String threadName) {
+	public CachedWrappedExecutor(String threadName) {
 		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), Utils.createDaemonThreadFactory(threadName));
 	}
 
@@ -32,7 +32,7 @@ public class ShadbotCachedExecutor extends ThreadPoolExecutor {
 					command.run();
 				} catch (Exception err) {
 					LogUtils.error(err, String.format("{%s} An unknown exception occurred while running a task.",
-							ShadbotCachedExecutor.class.getSimpleName()));
+							CachedWrappedExecutor.class.getSimpleName()));
 					throw new RuntimeException(err);
 				}
 			}

@@ -21,11 +21,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.UpdateableMessage;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class HangmanManager extends AbstractGameManager implements MessageListener {
 
@@ -141,8 +136,8 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 				.withAuthorName("Hangman Game")
 				.withThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")
 				.withDescription("Type letters or enter a word if you think you've guessed it.")
-				.appendField("Word", this.getRepresentation(word), false)
-				.appendField("Misses", FormatUtils.format(missesList, chr -> chr.toString().toUpperCase(), ", "), false);
+				.addField("Word", this.getRepresentation(word), false)
+				.addField("Misses", FormatUtils.format(missesList, chr -> chr.toString().toUpperCase(), ", "), false);
 
 		if(this.isTaskDone()) {
 			embed.withFooterText("Finished.");

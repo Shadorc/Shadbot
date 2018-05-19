@@ -25,8 +25,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.IMAGE, names = { "rule34" }, alias = "r34")
@@ -41,9 +39,7 @@ public class Rule34Cmd extends AbstractCommand {
 			return;
 		}
 
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
 		LoadingMessage loadingMsg = new LoadingMessage("Loading image...", context.getChannel());
 		loadingMsg.send();
@@ -80,8 +76,8 @@ public class Rule34Cmd extends AbstractCommand {
 					.withAuthorName("Rule34 (Search: " + context.getArg() + ")")
 					.withAuthorUrl(postObj.getString("file_url"))
 					.withThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
-					.appendField("Resolution", String.format("%dx%s", postObj.getInt("width"), postObj.getInt("height")), false)
-					.appendField("Tags", formattedtags, false)
+					.addField("Resolution", String.format("%dx%s", postObj.getInt("width"), postObj.getInt("height")), false)
+					.addField("Tags", formattedtags, false)
 					.withImage(postObj.getString("file_url"))
 					.withFooterText("If there is no preview, click on the title to see the media (probably a video)");
 

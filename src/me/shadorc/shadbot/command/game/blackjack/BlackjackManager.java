@@ -23,11 +23,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Card;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.UpdateableMessage;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class BlackjackManager extends AbstractGameManager implements MessageListener {
 
@@ -98,7 +93,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 				.appendDescription(String.format("**Use `%s%s <bet>` to join the game.**"
 						+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
 						this.getPrefix(), this.getCmdName()))
-				.appendField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? dealerCards : dealerCards.subList(0, 1)), true);
+				.addField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? dealerCards : dealerCards.subList(0, 1)), true);
 
 		if(this.isTaskDone()) {
 			embed.withFooterText("Finished");
@@ -107,7 +102,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 			embed.withFooterText(String.format("This game will end automatically in %d seconds.", remainingTime));
 		}
 
-		players.stream().forEach(player -> embed.appendField(
+		players.stream().forEach(player -> embed.addField(
 				String.format("%s's hand%s%s",
 						player.getUser().getName(), player.isStanding() ? " (Stand)" : "", player.isDoubleDown() ? " (Double down)" : ""),
 				BlackjackUtils.formatCards(player.getCards()),

@@ -17,11 +17,6 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.UpdateableMessage;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public class DiceManager extends AbstractGameManager {
 
@@ -52,9 +47,9 @@ public class DiceManager extends AbstractGameManager {
 				.withThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 				.withDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
 						this.getPrefix(), this.getCmdName(), FormatUtils.formatCoins(bet)))
-				.appendField("Player", numsPlayers.values().stream().map(IUser::getName).collect(Collectors.joining("\n")), true)
-				.appendField("Number", numsPlayers.keySet().stream().map(Object::toString).collect(Collectors.joining("\n")), true)
-				.appendField("Results", results, false)
+				.addField("Player", numsPlayers.values().stream().map(IUser::getName).collect(Collectors.joining("\n")), true)
+				.addField("Number", numsPlayers.keySet().stream().map(Object::toString).collect(Collectors.joining("\n")), true)
+				.addField("Results", results, false)
 				.withFooterText(String.format("You have %d seconds to make your bets.", GAME_DURATION));
 
 		RequestFuture<IMessage> msgRequest = message.send(embed.build());

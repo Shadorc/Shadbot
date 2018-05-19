@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin.setting;
 
+import java.security.Permissions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,10 +23,6 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.PermissionUtils;
 
 @Setting(description = "Manage auto assigned role(s).", setting = SettingEnum.AUTO_ROLE)
 public class AutoRoleSetting extends AbstractSetting {
@@ -67,7 +64,7 @@ public class AutoRoleSetting extends AbstractSetting {
 
 		if(Action.ADD.equals(action)) {
 			for(IRole role : mentionedRoles) {
-				if(!PermissionUtils.hasHierarchicalPermissions(context.getGuild(), context.getOurUser(), Arrays.asList(role))) {
+				if(!PermissionUtils.hasHierarchicalPermissions(context.getGuild(), context.getSelf(), Arrays.asList(role))) {
 					throw new IllegalCmdArgumentException(String.format("%s is a higher role in the role hierarchy than mine, I can't auto-assign it.",
 							role.mention()));
 				}
@@ -88,10 +85,10 @@ public class AutoRoleSetting extends AbstractSetting {
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
-				.appendField("Usage", String.format("`%s%s <action> <@role(s)>`", prefix, this.getCmdName()), false)
-				.appendField("Argument", String.format("**action** - %s",
+				.addField("Usage", String.format("`%s%s <action> <@role(s)>`", prefix, this.getCmdName()), false)
+				.addField("Argument", String.format("**action** - %s",
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/")), false)
-				.appendField("Example", String.format("`%s%s add @newbie`", prefix, this.getCmdName()), false);
+				.addField("Example", String.format("`%s%s add @newbie`", prefix, this.getCmdName()), false);
 	}
 
 }

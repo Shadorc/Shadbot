@@ -8,14 +8,14 @@ import java.util.concurrent.TimeUnit;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.Utils;
 
-public class ShadbotScheduledExecutor extends ScheduledThreadPoolExecutor {
+public class ScheduledWrappedExecutor extends ScheduledThreadPoolExecutor {
 
-	public ShadbotScheduledExecutor(int corePoolSize, String threadName) {
+	public ScheduledWrappedExecutor(int corePoolSize, String threadName) {
 		super(corePoolSize, Utils.createDaemonThreadFactory(threadName));
 		this.setRemoveOnCancelPolicy(true);
 	}
 
-	public ShadbotScheduledExecutor(String name) {
+	public ScheduledWrappedExecutor(String name) {
 		this(1, name);
 	}
 
@@ -47,7 +47,7 @@ public class ShadbotScheduledExecutor extends ScheduledThreadPoolExecutor {
 					command.run();
 				} catch (Exception err) {
 					LogUtils.error(err, String.format("{%s} An unknown exception occurred while running a scheduled task.",
-							ShadbotScheduledExecutor.class.getSimpleName()));
+							ScheduledWrappedExecutor.class.getSimpleName()));
 					throw new RuntimeException(err);
 				}
 			}

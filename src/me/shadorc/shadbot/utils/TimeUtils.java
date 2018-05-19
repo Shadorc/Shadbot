@@ -9,55 +9,62 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class TimeUtils {
 
+	/** Return the amount of milliseconds elapsed since {@code instant} */
 	public static long getMillisUntil(Instant instant) {
 		return Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), TimeUtils.toLocalDate(instant)));
 	}
 
+	/** Return the amount of milliseconds elapsed since {@code epochMilli} */
 	public static long getMillisUntil(long epochMilli) {
 		return TimeUtils.getMillisUntil(Instant.ofEpochMilli(epochMilli));
 	}
 
+	/** Convert {@code instant} to {@link LocalDateTime} */
 	public static LocalDateTime toLocalDate(Instant instant) {
 		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}
 
-	public static long parseTime(String text) {
-		Pattern pattern = Pattern.compile("[^a-z]*[a-z]{1}");
-		Matcher matcher = pattern.matcher(text.toLowerCase());
+	/**
+	 * Convert a String {@code text} representing time (example: 1m03s) into seconds. <br>
+	 * Case insensitive. <br>
+	 * Supported units: s, m, h
+	 */
+	public static long parseTime(final String text) {
+		String normalizedText = text.replaceAll(" ", "").toLowerCase();
+
+		Pattern pattern = Pattern.compile("[0-9]+[a-z]{1}");
+		Matcher matcher = pattern.matcher(normalizedText);
 
 		List<String> list = new ArrayList<>();
 		while(matcher.find()) {
 			list.add(matcher.group());
 		}
 
-		if(list.isEmpty() || list.stream().mapToInt(String::length).sum() != text.length()) {
-			throw new IllegalArgumentException("Unit is missing");
+		if(!list.stream().collect(Collectors.joining()).equals(normalizedText)) {
+			throw new IllegalArgumentException(text + " is not a valid time format.");
 		}
 
 		long totalMs = 0;
 
 		for(String str : list) {
+			long time = Long.parseLong(str.replaceAll("[a-z]", ""));
 			String unit = str.replaceAll("[0-9]", "");
-			try {
-				int time = Integer.parseInt(str.replaceAll("[a-zA-Z]", ""));
-				switch (unit) {
-					case "s":
-						totalMs += TimeUnit.SECONDS.toSeconds(time);
-						break;
-					case "m":
-						totalMs += TimeUnit.MINUTES.toSeconds(time);
-						break;
-					case "h":
-						totalMs += TimeUnit.HOURS.toSeconds(time);
-						break;
-					default:
-						throw new IllegalArgumentException("Unknown unit: " + unit);
-				}
-			} catch (NumberFormatException err) {
-				throw new IllegalArgumentException(String.format("Missing number for unit \"%s\"", unit));
+			switch (unit) {
+				case "s":
+					totalMs += TimeUnit.SECONDS.toSeconds(time);
+					break;
+				case "m":
+					totalMs += TimeUnit.MINUTES.toSeconds(time);
+					break;
+				case "h":
+					totalMs += TimeUnit.HOURS.toSeconds(time);
+					break;
+				default:
+					throw new IllegalArgumentException("Unknown unit: " + unit);
 			}
 		}
 

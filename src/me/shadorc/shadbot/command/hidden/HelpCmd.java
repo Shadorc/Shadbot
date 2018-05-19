@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.hidden;
 
 import java.util.stream.Collectors;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -16,8 +17,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.HIDDEN, names = { "help" })
@@ -25,23 +24,23 @@ public class HelpCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(context.hasArg()) {
-			AbstractCommand cmd = CommandManager.getCommand(context.getArg());
+		if(context.getArg().isPresent()) {
+			AbstractCommand cmd = CommandManager.getCommand(context.getArg().get());
 			if(cmd == null) {
 				return;
 			}
 
-			BotUtils.sendMessage(cmd.getHelp(context.getPrefix()), context.getChannel());
 			CommandStatsManager.log(CommandEnum.COMMAND_HELPED, cmd);
+			BotUtils.sendMessage(cmd.getHelp(context.getPrefix()), context.getChannel());
 			return;
 		}
 
-		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-				.setLenient(true)
-				.withAuthorName("Shadbot Help")
-				.appendDescription(String.format("Any issues, questions or suggestions ? Join the [support server.](%s)"
+		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Shadbot Help")
+				// .setLenient(true)
+				.setDescription(String.format("Any issues, questions or suggestions ?"
+						+ " Join the [support server.](%s)"
 						+ "%nGet more information by using `%s%s <command>`.",
-						Config.SUPPORT_SERVER, context.getPrefix(), this.getName()));
+						Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
 
 		for(CommandCategory category : CommandCategory.values()) {
 			if(category.equals(CommandCategory.HIDDEN)) {
@@ -52,18 +51,18 @@ public class HelpCmd extends AbstractCommand {
 					.distinct()
 					.filter(cmd -> cmd.getCategory().equals(category)
 							&& !cmd.getPermission().isSuperior(context.getAuthorPermission())
-							&& (context.getGuild() == null || BotUtils.isCommandAllowed(context.getGuild(), cmd)))
+							&& (!context.getGuild().isPresent() || BotUtils.isCommandAllowed(context.getGuild().get(), cmd)))
 					.map(cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()))
 					.collect(Collectors.joining(" "));
 
-			embed.appendField(String.format("%s Commands", category.toString()), commands, false);
+			embed.addField(String.format("%s Commands", category.toString()), commands, false);
 		}
 
-		BotUtils.sendMessage(embed.build(), context.getChannel());
+		BotUtils.sendMessage(embed, context.getChannel());
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show the list of available commands.")
 				.build();

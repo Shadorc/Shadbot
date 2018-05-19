@@ -16,8 +16,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.util.EmbedBuilder;
 
 @Setting(description = "Manage auto messages on user join/leave.", setting = SettingEnum.AUTO_MESSAGE)
 public class AutoMessageSetting extends AbstractSetting {
@@ -120,8 +118,8 @@ public class AutoMessageSetting extends AbstractSetting {
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
-				.appendField("Usage", String.format("`%s%s <action> <type> [<value>]`", prefix, this.getCmdName()), false)
-				.appendField("Argument", String.format("**action** - %s"
+				.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", prefix, this.getCmdName()), false)
+				.addField("Argument", String.format("**action** - %s"
 						+ "%n**type** - %s"
 						+ "%n**value** - a message for *%s* and *%s* or a @channel for *%s*",
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/"),
@@ -129,8 +127,8 @@ public class AutoMessageSetting extends AbstractSetting {
 						Type.JOIN_MESSAGE.toString().toLowerCase(),
 						Type.LEAVE_MESSAGE.toString().toLowerCase(),
 						Type.CHANNEL.toString().toLowerCase()), false)
-				.appendField("Info", "You don't need to specify *value* to disable a type.", false)
-				.appendField("Example", String.format("`%s%s enable join_message Hello you (:`"
+				.addField("Info", "You don't need to specify *value* to disable a type.", false)
+				.addField("Example", String.format("`%s%s enable join_message Hello you (:`"
 						+ "%n`%s%s disable leave_message`", prefix, this.getCmdName(), prefix, this.getCmdName()), false);
 	}
 }

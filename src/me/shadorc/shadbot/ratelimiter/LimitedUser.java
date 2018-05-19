@@ -16,7 +16,7 @@ public class LimitedUser {
 	}
 
 	public ScheduledFuture<LimitedUser> getDeletionTask() {
-		return this.deletionTask;
+		return deletionTask;
 	}
 
 	public void increment() {

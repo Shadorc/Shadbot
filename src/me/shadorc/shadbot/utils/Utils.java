@@ -1,8 +1,6 @@
 package me.shadorc.shadbot.utils;
 
 import java.lang.management.ManagementFactory;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,17 +20,14 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.jsoup.HttpStatusException;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import me.shadorc.shadbot.core.command.Context;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
 
 public class Utils {
 
@@ -78,11 +73,10 @@ public class Utils {
 
 		List<T> list = new ArrayList<>();
 		for(int i = 0; i < array.length(); i++) {
-			if(listClass.isInstance(array.get(i))) {
-				list.add(listClass.cast(array.get(i)));
-			} else {
+			if(!listClass.isInstance(array.get(i))) {
 				throw new IllegalArgumentException(String.format("Array's elements cannot be casted to %s.", listClass.getSimpleName()));
 			}
+			list.add(listClass.cast(array.get(i)));
 		}
 		return list;
 	}
@@ -102,40 +96,13 @@ public class Utils {
 		return Utils.sortByValue(map, Map.Entry.comparingByValue(Collections.reverseOrder()));
 	}
 
-	public static void handle(String action, Context context, Throwable err) {
-		final long guildID = context.getGuild().getLongID();
-
-		String msg;
-		if(err instanceof JSONException || err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == NetUtils.JSON_ERROR_CODE) {
-			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
-			LogUtils.warnf("{Guild ID: %d} %s", guildID, err.getMessage());
-		}
-
-		else if(err instanceof ConnectException || err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
-			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
-			LogUtils.warnf("{Guild ID: %d} Service unavailable while %s.", guildID, action);
-		}
-
-		else if(err instanceof SocketTimeoutException) {
-			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.", StringUtils.capitalize(action));
-			LogUtils.warnf("{Guild ID: %d} A SocketTimeoutException occurred while %s.", guildID, action);
-		}
-
-		else {
-			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
-			LogUtils.error(context.getContent(), err, String.format("{Guild ID: %d} %s", guildID, msg));
-		}
-
-		BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, context.getChannel());
-	}
-
-	public static Integer checkAndGetBet(IChannel channel, IUser user, String betStr, int maxValue) throws IllegalCmdArgumentException {
+	public static Integer checkAndGetBet(TextChannel channel, User user, String betStr, int maxValue) throws IllegalCmdArgumentException {
 		Integer bet = CastUtils.asPositiveInt(betStr);
 		if(bet == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", betStr));
 		}
 
-		if(Database.getDBUser(channel.getGuild(), user).getCoins() < bet) {
+		if(Database.getDBMember(channel.getGuildId(), user.getId()).getCoins() < bet) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(user), channel);
 			return null;
 		}

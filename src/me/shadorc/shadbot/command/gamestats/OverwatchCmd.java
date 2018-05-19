@@ -24,8 +24,6 @@ import net.shadorc.overwatch4j.OverwatchPlayer;
 import net.shadorc.overwatch4j.enums.Platform;
 import net.shadorc.overwatch4j.enums.TopHeroesStats;
 import net.shadorc.overwatch4j.exception.OverwatchException;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.GAMESTATS, names = { "overwatch" }, alias = "ow")
@@ -67,12 +65,12 @@ public class OverwatchCmd extends AbstractCommand {
 					.withAuthorUrl(player.getProfileURL())
 					.withThumbnail(player.getIconUrl())
 					.appendDescription(String.format("Stats for user **%s**", player.getName()))
-					.appendField("Level", Integer.toString(player.getLevel()), true)
-					.appendField("Competitive rank", Integer.toString(player.getRank()), true)
-					.appendField("Wins", Integer.toString(player.getWins()), true)
-					.appendField("Game time", player.getTimePlayed(), true)
-					.appendField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
-					.appendField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
+					.addField("Level", Integer.toString(player.getLevel()), true)
+					.addField("Competitive rank", Integer.toString(player.getRank()), true)
+					.addField("Wins", Integer.toString(player.getWins()), true)
+					.addField("Game time", player.getTimePlayed(), true)
+					.addField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
+					.addField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
 			loadingMsg.edit(embed.build());
 
 		} catch (OverwatchException err) {
@@ -104,7 +102,7 @@ public class OverwatchCmd extends AbstractCommand {
 				.addArg("platform", String.format("user's platform (%s)",
 						FormatUtils.format(Platform.values(), platform -> platform.toString().toLowerCase(), ", ")), true)
 				.addArg("battletag#0000", false)
-				.appendField("Info", "**platform** is automatically detected if nothing is specified.", false)
+				.addField("Info", "**platform** is automatically detected if nothing is specified.", false)
 				.build();
 	}
 

@@ -9,7 +9,7 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.db.DBGuild;
-import me.shadorc.shadbot.data.db.DBUser;
+import me.shadorc.shadbot.data.db.DBMember;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -18,8 +18,6 @@ import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IGuild;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "database" })
 public class DatabaseCmd extends AbstractCommand {
@@ -56,7 +54,7 @@ public class DatabaseCmd extends AbstractCommand {
 				throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", splitArgs.get(0)));
 			}
 
-			DBUser dbUser = new DBUser(guild, userID);
+			DBMember dbUser = new DBMember(guild, userID);
 			json = dbUser.toJSON().toString(Config.JSON_INDENT_FACTOR);
 		}
 

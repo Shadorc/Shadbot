@@ -2,10 +2,9 @@ package me.shadorc.shadbot.utils.embed;
 
 import java.awt.Color;
 
-import me.shadorc.shadbot.Shadbot;
+import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.StringUtils;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 public class LogBuilder {
 
@@ -29,33 +28,33 @@ public class LogBuilder {
 		this(type, message, null, null);
 	}
 
-	public EmbedObject build() {
-		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-				.setLenient(true)
-				.withAuthorName(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Shadbot.VERSION))
-				.withDescription(message);
+	public EmbedCreateSpec build() {
+		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+				// .setLenient(true)
+				.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Config.VERSION), null, null)
+				.setDescription(message);
 
 		switch (type) {
 			case ERROR:
-				embed.withColor(Color.RED);
+				embed.setColor(Color.RED.getRGB());
 				break;
 			case WARN:
-				embed.withColor(Color.ORANGE);
+				embed.setColor(Color.ORANGE.getRGB());
 				break;
 			case INFO:
-				embed.withColor(Color.GREEN);
+				embed.setColor(Color.GREEN.getRGB());
 				break;
 		}
 
 		if(err != null) {
-			embed.appendField("Error type", err.getClass().getSimpleName(), false);
-			embed.appendField("Error message", err.getMessage(), false);
+			embed.addField("Error type", err.getClass().getSimpleName(), false);
+			embed.addField("Error message", err.getMessage(), false);
 		}
 
 		if(input != null) {
-			embed.appendField("Input", input, false);
+			embed.addField("Input", input, false);
 		}
 
-		return embed.build();
+		return embed;
 	}
 }

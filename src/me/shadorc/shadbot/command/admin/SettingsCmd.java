@@ -25,8 +25,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.MessageBuilder;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "setting", "settings" })
 public class SettingsCmd extends AbstractCommand {
@@ -101,10 +99,10 @@ public class SettingsCmd extends AbstractCommand {
 				.setDescription("Change Shadbot's settings for this server.")
 				.addArg("name", false)
 				.addArg("args", false)
-				.appendField("Additional Help", String.format("`%s%s <name> help`", prefix, this.getName()), false);
+				.addField("Additional Help", String.format("`%s%s <name> help`", prefix, this.getName()), false);
 
 		SETTINGS_MAP.values().stream()
-				.forEach(setting -> embed.appendField(String.format("Name: %s", setting.getName()), setting.getDescription(), false));
+				.forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()), setting.getDescription(), false));
 
 		return embed.build();
 	}

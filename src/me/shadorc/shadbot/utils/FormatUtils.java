@@ -4,7 +4,7 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -13,12 +13,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.time.DurationFormatUtils;
-
 import com.google.common.collect.Lists;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
-import sx.blah.discord.handle.impl.obj.Embed.EmbedField;
+import discord4j.common.json.EmbedFieldEntity;
 
 public class FormatUtils {
 
@@ -26,17 +24,22 @@ public class FormatUtils {
 		return stream.map(mapper).collect(Collectors.joining(delimiter));
 	}
 
+	public static <T> String format(Collection<T> collection, Function<T, String> mapper, String delimiter) {
+		return FormatUtils.format(collection.stream(), mapper, delimiter);
+	}
+
 	public static <T> String format(List<T> list, Function<T, String> mapper, String delimiter) {
-		return FormatUtils.format(list.stream(), mapper, delimiter);
+		return FormatUtils.format(list, mapper, delimiter);
 	}
 
 	public static <T> String format(T[] array, Function<T, String> mapper, String delimiter) {
-		return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
+		return FormatUtils.format(array, mapper, delimiter);
 	}
 
 	public static <T extends Enum<T>> String formatOptions(Class<T> enumClass) {
 		return String.format("Options: %s",
-				FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
+				FormatUtils.format(enumClass.getEnumConstants(),
+						value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
 	}
 
 	public static String formatNum(double num) {
@@ -98,10 +101,10 @@ public class FormatUtils {
 				.collect(Collectors.joining("\n"));
 	}
 
-	public static List<EmbedField> createColumns(List<String> list, int rowSize) {
+	public static List<EmbedFieldEntity> createColumns(List<String> list, int rowSize) {
 		return Lists.partition(list, rowSize)
 				.stream()
-				.map(sublist -> new EmbedField("\u200C", String.join("\n", sublist), true))
+				.map(sublist -> new EmbedFieldEntity("\u200C", String.join("\n", sublist), true))
 				.collect(Collectors.toList());
 	}
 

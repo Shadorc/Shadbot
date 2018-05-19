@@ -2,54 +2,53 @@ package me.shadorc.shadbot.data.db;
 
 import org.json.JSONObject;
 
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
-import sx.blah.discord.handle.obj.IGuild;
 
-public class DBUser {
+public class DBMember {
 
 	private static final String COINS_KEY = "coins";
 
-	private final IGuild guild;
-	private final long userID;
+	private final Snowflake id;
+	private final Snowflake guildId;
 
 	private int coins;
 
-	public DBUser(IGuild guild, long userID) {
-		this.guild = guild;
-		this.userID = userID;
-
+	public DBMember(Snowflake guildId, Snowflake memberId) {
+		this.id = memberId;
+		this.guildId = guildId;
 		this.load();
 	}
 
 	private void load() {
 		DatabaseStatsManager.log(DatabaseEnum.USER_LOADED);
 
-		JSONObject guildObj = Database.opt(guild.getStringID());
+		JSONObject guildObj = Database.opt(guildId.asString());
 		if(guildObj == null) {
 			return;
 		}
 
-		JSONObject usersObj = guildObj.optJSONObject(DBGuild.USERS_KEY);
-		if(usersObj == null) {
+		JSONObject membersObj = guildObj.optJSONObject(DBGuild.USERS_KEY);
+		if(membersObj == null) {
 			return;
 		}
 
-		JSONObject userObj = usersObj.optJSONObject(Long.toString(userID));
-		if(userObj == null) {
+		JSONObject memberObj = membersObj.optJSONObject(id.asString());
+		if(memberObj == null) {
 			return;
 		}
 
-		this.coins = userObj.optInt(COINS_KEY);
+		this.coins = memberObj.optInt(COINS_KEY);
 	}
 
-	public IGuild getGuild() {
-		return guild;
+	public Snowflake getGuildId() {
+		return guildId;
 	}
 
-	public long getUserID() {
-		return userID;
+	public Snowflake getId() {
+		return id;
 	}
 
 	public int getCoins() {
@@ -67,10 +66,10 @@ public class DBUser {
 	}
 
 	public JSONObject toJSON() {
-		JSONObject userObj = new JSONObject();
+		JSONObject memberObj = new JSONObject();
 		if(coins != 0) {
-			userObj.put(COINS_KEY, coins);
+			memberObj.put(COINS_KEY, coins);
 		}
-		return userObj;
+		return memberObj;
 	}
 }

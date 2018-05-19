@@ -12,7 +12,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.data.db.DBUser;
+import me.shadorc.shadbot.data.db.DBMember;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.lotto.LottoHistoric;
 import me.shadorc.shadbot.data.lotto.LottoManager;
@@ -28,10 +28,6 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.GAME, names = { "lotto" })
@@ -48,14 +44,14 @@ public class LottoCmd extends AbstractCommand {
 			return;
 		}
 
-		DBUser dbUser = Database.getDBUser(context.getGuild(), context.getAuthor());
+		DBMember dbUser = Database.getDBUser(context.getGuild(), context.getAuthor());
 		if(dbUser.getCoins() < PAID_COST) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;
 		}
 
 		LottoPlayer player = LottoManager.getPlayers().stream()
-				.filter(lottoPlayer -> lottoPlayer.getUserID() == context.getAuthor().getLongID())
+				.filter(lottoPlayer -> lottoPlayer.getUserId() == context.getAuthor().getLongID())
 				.findAny().orElse(null);
 
 		if(player != null) {
@@ -85,16 +81,16 @@ public class LottoCmd extends AbstractCommand {
 				.withDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
 						FormatUtils.formatCustomDate(LottoCmd.getDelay()),
 						context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
-				.appendField("Number of participants", Integer.toString(players.size()), false)
-				.appendField("Prize pool", FormatUtils.formatCoins(LottoManager.getPool()), false);
+				.addField("Number of participants", Integer.toString(players.size()), false)
+				.addField("Prize pool", FormatUtils.formatCoins(LottoManager.getPool()), false);
 
 		LottoPlayer player = players.stream()
-				.filter(lottoPlayer -> lottoPlayer.getUserID() == context.getAuthor().getLongID())
+				.filter(lottoPlayer -> lottoPlayer.getUserId() == context.getAuthor().getLongID())
 				.findAny().orElse(null);
 
 		if(player != null) {
 			embed.withFooterIcon("https://images.emojiterra.com/twitter/512px/1f39f.png");
-			embed.withFooterText(String.format("%s, you bet on number %d.", context.getAuthorName(), player.getNum()));
+			embed.withFooterText(String.format("%s, you bet on number %d.", context.getUsername(), player.getNum()));
 		}
 
 		LottoHistoric historic = LottoManager.getHistoric();
@@ -111,7 +107,7 @@ public class LottoCmd extends AbstractCommand {
 					people = historic.getWinnersCount() + " people";
 					break;
 			}
-			embed.appendField("Historic",
+			embed.addField("Historic",
 					String.format("Last week, the prize pool contained **%s**, the winning number was **%d** and **%s won**.",
 							FormatUtils.formatCoins(historic.getPool()), historic.getNum(), people),
 					false);
@@ -139,13 +135,13 @@ public class LottoCmd extends AbstractCommand {
 
 		List<LottoPlayer> winners = LottoManager.getPlayers().stream()
 				.filter(player -> player.getNum() == winningNum
-						&& Shadbot.getClient().getGuildByID(player.getGuildID()) != null
-						&& Shadbot.getClient().getUserByID(player.getUserID()) != null)
+						&& Shadbot.getClient().getGuildByID(player.getGuildId()) != null
+						&& Shadbot.getClient().getUserByID(player.getUserId()) != null)
 				.collect(Collectors.toList());
 
 		for(LottoPlayer winner : winners) {
-			IGuild guild = Shadbot.getClient().getGuildByID(winner.getGuildID());
-			IUser user = Shadbot.getClient().getUserByID(winner.getUserID());
+			IGuild guild = Shadbot.getClient().getGuildByID(winner.getGuildId());
+			IUser user = Shadbot.getClient().getUserByID(winner.getUserId());
 			int coins = (int) Math.ceil((double) LottoManager.getPool() / winners.size());
 			Database.getDBUser(guild, user).addCoins(coins);
 			BotUtils.sendMessage(
@@ -167,7 +163,7 @@ public class LottoCmd extends AbstractCommand {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Buy a ticket for the lottery or display the current lottery status.")
 				.addArg("num", String.format("must be between %d and %d", MIN_NUM, MAX_NUM), true)
-				.appendField("Info", "One winner is randomly drawn every Sunday at noon (English time)."
+				.addField("Info", "One winner is randomly drawn every Sunday at noon (English time)."
 						+ "\nIf no one wins, the prize pool is put back into play, "
 						+ "if there are multiple winners, the prize pool is splitted between them.", false)
 				.setGains("The prize pool contains all coins lost at games during the week plus the purchase price of the lottery tickets.")

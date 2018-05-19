@@ -10,7 +10,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.util.EmbedBuilder;
 
 @Setting(description = "Manage Shadbot's prefix.", setting = SettingEnum.PREFIX)
 public class PrefixSetting extends AbstractSetting {
@@ -34,9 +33,9 @@ public class PrefixSetting extends AbstractSetting {
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
-				.appendField("Usage", String.format("`%s%s <prefix>`", prefix, this.getCmdName()), false)
-				.appendField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
-				.appendField("Example", String.format("`%s%s !`", prefix, this.getCmdName()), false);
+				.addField("Usage", String.format("`%s%s <prefix>`", prefix, this.getCmdName()), false)
+				.addField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
+				.addField("Example", String.format("`%s%s !`", prefix, this.getCmdName()), false);
 	}
 
 }

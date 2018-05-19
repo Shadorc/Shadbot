@@ -1,44 +1,37 @@
 package me.shadorc.shadbot;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Consumer;
 
+import discord4j.core.ClientBuilder;
+import discord4j.core.DiscordClient;
+import discord4j.core.event.domain.Event;
+import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.presence.Activity;
+import discord4j.core.object.presence.Presence;
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.data.DataManager;
-import me.shadorc.shadbot.listener.ReadyListener;
-import me.shadorc.shadbot.listener.ShardListener;
+import me.shadorc.shadbot.listener.GatewayLifecycleListener;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.executor.ShadbotCachedExecutor;
-import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
-import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.StatusType;
+import me.shadorc.shadbot.utils.executor.CachedWrappedExecutor;
+import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
+import reactor.core.publisher.Mono;
 
 public class Shadbot {
 
-	public static final String VERSION;
+	private static final ThreadPoolExecutor EVENT_THREAD_POOL = new CachedWrappedExecutor("EventThreadPool-%d");
+	private static final ScheduledThreadPoolExecutor DEFAULT_SCHEDULER = new ScheduledWrappedExecutor(3, "DefaultScheduler-%d");
 
-	private static final ThreadPoolExecutor EVENT_THREAD_POOL = new ShadbotCachedExecutor("EventThreadPool-%d");
-	private static final ScheduledThreadPoolExecutor DEFAULT_SCHEDULER = new ShadbotScheduledExecutor(3, "DefaultScheduler-%d");
-
-	private static IDiscordClient client;
-
-	static {
-		Properties properties = new Properties();
-		try (InputStream inStream = Shadbot.class.getClassLoader().getResourceAsStream("project.properties")) {
-			properties.load(inStream);
-		} catch (IOException err) {
-			LogUtils.error(err, "An error occurred while getting version.");
-		}
-		VERSION = properties.getProperty("version");
-	}
+	private static List<DiscordClient> clients;
 
 	public static void main(String[] args) {
 		Locale.setDefault(new Locale("en", "US"));
@@ -55,23 +48,39 @@ public class Shadbot {
 			}
 		});
 
-		client = new ClientBuilder()
-				.withToken(APIKeys.get(APIKey.DISCORD_TOKEN))
-				.withRecommendedShardCount()
-				.withPingTimeout(10)
-				.setMaxReconnectAttempts(10)
-				.setMaxMessageCacheCount(100)
-				.setPresence(StatusType.IDLE)
-				.build();
+		// TODO: Calculate this by using gateway or guilds / 1000
+		int shardCount = 7;
 
-		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(client.getShardCount(), "shard"));
+		for(int i = 0; i < shardCount; i++) {
+			DiscordClient client = new ClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
+					.setInitialPresence(Presence.idle(Activity.playing("Connecting...")))
+					.setShardIndex(i)
+					.setShardCount(shardCount)
+					.build();
+			clients.add(client);
 
-		client.getDispatcher().registerListeners(Shadbot.getEventThreadPool(), new ReadyListener(), new ShardListener());
-		client.login();
+			LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(shardCount, "shard"));
+
+			Shadbot.registerListener(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
+
+			client.login();
+		}
+		
+		// FIXME: Ugly af
+		while(true);
 	}
 
-	public static IDiscordClient getClient() {
-		return client;
+	public static <T extends Event> void registerListener(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
+		client.getEventDispatcher().on(eventClass)
+				.doOnError(err -> ExceptionUtils.errorOnEvent(err, eventClass))
+				.subscribe(consumer);
+	}
+
+	// TODO: Remove this and use DiscordClient#getSelf when implemented
+	public static Mono<User> getSelf() {
+		// Shadtest ID 352205866889641984
+		// Shadbot ID 331146243596091403
+		return clients.get(0).getUserById(Snowflake.of(352205866889641984L));
 	}
 
 	public static ThreadPoolExecutor getEventThreadPool() {

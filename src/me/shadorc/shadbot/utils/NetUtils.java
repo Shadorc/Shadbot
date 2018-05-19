@@ -5,10 +5,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONObject;
+import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.HttpStatusException;
@@ -19,23 +19,23 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
-import sx.blah.discord.api.IShard;
 
 public class NetUtils {
 
 	public static final int JSON_ERROR_CODE = 603;
 
-	public static Document getDoc(String url) throws IOException {
+	private static Connection getDefaultConnection(String url) {
 		return Jsoup.connect(url)
 				.userAgent(Config.USER_AGENT)
-				.timeout(Config.DEFAULT_TIMEOUT)
-				.get();
+				.timeout(Config.DEFAULT_TIMEOUT);
+	}
+
+	public static Document getDoc(String url) throws IOException {
+		return NetUtils.getDefaultConnection(url).get();
 	}
 
 	public static Response getResponse(String url) throws IOException {
-		return Jsoup.connect(url)
-				.userAgent(Config.USER_AGENT)
-				.timeout(Config.DEFAULT_TIMEOUT)
+		return NetUtils.getDefaultConnection(url)
 				.ignoreContentType(true)
 				.ignoreHttpErrors(true)
 				.execute();
@@ -90,15 +90,11 @@ public class NetUtils {
 					.put("shard_count", shard.getInfo()[1])
 					.put("server_count", shard.getGuilds().size());
 
-			Map<String, String> header = new HashMap<>();
-			header.put("Content-Type", "application/json");
-			header.put("Authorization", APIKeys.get(token));
-
-			String url = String.format("%s/api/bots/%d/stats", homeUrl, shard.getClient().getOurUser().getLongID());
+			String url = String.format("%s/api/bots/%d/stats", homeUrl, shard.getClient().getSelf().getLongID());
 			Jsoup.connect(url)
 					.method(Method.POST)
 					.ignoreContentType(true)
-					.headers(header)
+					.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
 					.requestBody(content.toString())
 					.post();
 		} catch (Exception err) {

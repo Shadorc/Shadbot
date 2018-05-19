@@ -12,13 +12,13 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.utils.LogUtils;
-import me.shadorc.shadbot.utils.executor.ShadbotScheduledExecutor;
+import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
 
 public class DataManager {
 
 	public static final File SAVE_DIR = new File("./saves");
 
-	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ShadbotScheduledExecutor(2, "DataManager-%d");
+	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ScheduledWrappedExecutor(2, "DataManager-%d");
 	private static final List<Runnable> SAVE_TASKS = new ArrayList<>();
 
 	public static boolean init() {

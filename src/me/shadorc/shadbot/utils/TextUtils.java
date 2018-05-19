@@ -3,11 +3,11 @@ package me.shadorc.shadbot.utils;
 import java.util.EnumSet;
 import java.util.concurrent.ThreadLocalRandom;
 
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
 
 public class TextUtils {
 
@@ -15,7 +15,7 @@ public class TextUtils {
 
 	public static final String PLAYLIST_LIMIT_REACHED =
 			String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "
-					+ "You can remove this limit by contributing to Shadbot. More info on **%s**", Config.MAX_PLAYLIST_SIZE, Config.PATREON_URL);
+					+ "You can remove this limit by contributing to Shadbot. More info on **%s**", Config.DEFAULT_PLAYLIST_SIZE, Config.PATREON_URL);
 
 	public static final String NO_PLAYING_MUSIC =
 			Emoji.MUTE + " No currently playing music.";
@@ -28,7 +28,7 @@ public class TextUtils {
 	private static final String[] TIPS_MESSAGES = { String.format("Check %slotto", Config.DEFAULT_PREFIX),
 			String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
 			String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
-			String.format("Support server: %s", Config.SUPPORT_SERVER) };
+			String.format("Support server: %s", Config.SUPPORT_SERVER_URL) };
 
 	public static String getSpamMessage() {
 		return SPAM_MESSAGES[ThreadLocalRandom.current().nextInt(SPAM_MESSAGES.length)];
@@ -38,9 +38,9 @@ public class TextUtils {
 		return TIPS_MESSAGES[ThreadLocalRandom.current().nextInt(TIPS_MESSAGES.length)];
 	}
 
-	public static String notEnoughCoins(IUser user) {
+	public static String notEnoughCoins(User user) {
 		return String.format(Emoji.BANK + " (**%s**) You don't have enough coins. You can get some by playing **RPS**, **Hangman** "
-				+ "or **Trivia**.", user.getName());
+				+ "or **Trivia**.", user.getUsername());
 	}
 
 	public static String noResult(String search) {
@@ -52,11 +52,11 @@ public class TextUtils {
 				prefix, SettingEnum.NSFW);
 	}
 
-	public static String missingPerm(EnumSet<Permissions> permissions) {
-		return TextUtils.missingPerm(permissions.toArray(new Permissions[permissions.size()]));
+	public static String missingPerm(EnumSet<Permission> permissions) {
+		return TextUtils.missingPerm(permissions.toArray(new Permission[permissions.size()]));
 	}
 
-	public static String missingPerm(Permissions... permissions) {
+	public static String missingPerm(Permission... permissions) {
 		return String.format(Emoji.ACCESS_DENIED + " I can't execute this command due to the lack of permission."
 				+ "%nPlease, check my permissions and channel-specific ones to verify that %s %s checked.",
 				FormatUtils.format(permissions, perm -> String.format("**%s**", StringUtils.capitalize(perm.toString().replace("_", " "))), " and "),

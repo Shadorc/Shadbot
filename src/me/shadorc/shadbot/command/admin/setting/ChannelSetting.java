@@ -19,8 +19,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.util.EmbedBuilder;
 
 @Setting(description = "Manage channels allowed to Shadbot.", setting = SettingEnum.ALLOWED_CHANNELS)
 public class ChannelSetting extends AbstractSetting {
@@ -80,11 +78,11 @@ public class ChannelSetting extends AbstractSetting {
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
-				.appendField("Usage", String.format("`%s%s <action> <#channel(s)>`", prefix, this.getCmdName()), false)
-				.appendField("Argument", String.format("**action** - %s%n**channel(s)** - the channel(s) to %s",
+				.addField("Usage", String.format("`%s%s <action> <#channel(s)>`", prefix, this.getCmdName()), false)
+				.addField("Argument", String.format("**action** - %s%n**channel(s)** - the channel(s) to %s",
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/"),
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/")), false)
-				.appendField("Example", String.format("`%s%s add #general`", prefix, this.getCmdName()), false);
+				.addField("Example", String.format("`%s%s add #general`", prefix, this.getCmdName()), false);
 	}
 
 }

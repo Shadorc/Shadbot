@@ -3,7 +3,6 @@ package me.shadorc.shadbot.command.admin.setting.core;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import sx.blah.discord.util.EmbedBuilder;
 
 public abstract class AbstractSetting {
 

@@ -1,33 +1,35 @@
 package me.shadorc.shadbot.core.command;
 
-import java.security.Permissions;
 import java.util.List;
+import java.util.Optional;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
-import me.shadorc.shadbot.shard.ShadbotShard;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.shard.CustomShard;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.StringUtils;
-import sx.blah.discord.api.IShard;
-import sx.blah.discord.handle.obj.IUser;
 
 public class Context {
 
 	private final Message message;
 	private final String prefix;
 	private final String cmdName;
-	private final String arg;
+	private final Optional<String> arg;
 
 	public Context(String prefix, Message message) {
 		this.message = message;
 		this.prefix = prefix;
 
-		List<String> splittedMsg = StringUtils.split(message.getContent(), 2);
+		List<String> splittedMsg = StringUtils.split(this.getContent(), 2);
 		this.cmdName = splittedMsg.get(0).substring(prefix.length()).toLowerCase();
-		this.arg = splittedMsg.size() > 1 ? splittedMsg.get(1) : "";
+		this.arg = Optional.ofNullable(splittedMsg.size() > 1 ? splittedMsg.get(1) : null);
 	}
 
 	public Message getMessage() {
@@ -46,7 +48,8 @@ public class Context {
 		return cmdName;
 	}
 
-	public String getArg() {
+	// TODO: Has been changed from "" to Optional
+	public Optional<String> getArg() {
 		return arg;
 	}
 
@@ -54,23 +57,29 @@ public class Context {
 		return message.getClient();
 	}
 
-	public IUser getOurUser() {
-		return message.getClient().getOurUser();
+	// TODO Keep this ?
+	public User getSelf() {
+		return Shadbot.getSelf().block();
 	}
 
-	public ShadbotShard getShadbotShard() {
+	public CustomShard getShadbotShard() {
 		return ShardManager.getShadbotShard(this.getShard());
 	}
 
-	public IShard getShard() {
-		return message.getShard();
+	public Integer getShardIndex() {
+		return message.getClient().getConfig().getShardIndex();
 	}
 
-	public Guild getGuild() {
-		return message.getGuild().block();
+	// TODO: Check everywhere that this is used, has been replaced by Optional
+	public Optional<Guild> getGuild() {
+		return message.getGuild().blockOptional();
 	}
 
-	public Channel getChannel() {
+	public Snowflake getGuildId() {
+		return this.getGuild().isPresent() ? this.getGuild().get().getId() : null;
+	}
+
+	public MessageChannel getChannel() {
 		return message.getChannel().block();
 	}
 
@@ -78,23 +87,26 @@ public class Context {
 		return message.getAuthor().block();
 	}
 
-	public String getAuthorName() {
+	public String getUsername() {
 		return this.getAuthor().getUsername();
 	}
 
 	public CommandPermission getAuthorPermission() {
 		if(this.getAuthor().equals(this.getClient().getApplicationInfo().block().getOwner().block())) {
 			return CommandPermission.OWNER;
-		} else if(this.getGuild() == null) {
+		} else if(!this.getGuild().isPresent()) {
 			return CommandPermission.ADMIN;
-		} else if(this.getAuthor().getPermissionsForGuild(this.getGuild()).contains(Permissions.ADMINISTRATOR)) {
+		} else if(this.getAuthor().getPermissionsForGuild(this.getGuild()).contains(Permission.ADMINISTRATOR)) {
 			return CommandPermission.ADMIN;
 		} else {
 			return CommandPermission.USER;
 		}
 	}
 
-	public boolean hasArg() {
-		return !arg.isEmpty();
+	public void requireArg() throws MissingArgumentException {
+		if(!this.getArg().isPresent()) {
+			throw new MissingArgumentException();
+		}
 	}
+
 }

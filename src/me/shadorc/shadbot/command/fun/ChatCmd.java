@@ -10,6 +10,8 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.jsoup.nodes.Document;
 
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -22,8 +24,6 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
 
 @RateLimited
 @Command(category = CommandCategory.FUN, names = { "chat" })
@@ -38,14 +38,12 @@ public class ChatCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
 		String response;
 		for(String botID : BOTS_ID) {
 			try {
-				response = this.talk(context.getChannel(), botID, context.getArg());
+				response = this.talk(context.getChannel(), botID, context.getArg().get());
 				BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 				errorCount = 0;
 				return;
@@ -62,18 +60,18 @@ public class ChatCmd extends AbstractCommand {
 		}
 	}
 
-	private String talk(IChannel channel, String botID, String input) throws UnsupportedEncodingException, IOException {
+	private String talk(MessageChannel channel, String botID, String input) throws UnsupportedEncodingException, IOException {
 		String url = String.format("https://www.pandorabots.com/pandora/talk-xml?botid=%s&input=%s&custid=%s",
-				botID, NetUtils.encode(input), CHANNELS_CUSTID.getOrDefault(channel.getLongID(), ""));
+				botID, NetUtils.encode(input), CHANNELS_CUSTID.getOrDefault(channel.getId().asLong(), ""));
 		Document doc = NetUtils.getDoc(url);
 		JSONObject mainObj = XML.toJSONObject(doc.html());
 		JSONObject resultObj = mainObj.getJSONObject("result");
-		CHANNELS_CUSTID.put(channel.getLongID(), resultObj.getString("custid"));
+		CHANNELS_CUSTID.put(channel.getId().asLong(), resultObj.getString("custid"));
 		return StringUtils.normalizeSpace(resultObj.getString("that").replace("<br>", "\n"));
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Chat with an artificial intelligence.")
 				.addArg("message", false)

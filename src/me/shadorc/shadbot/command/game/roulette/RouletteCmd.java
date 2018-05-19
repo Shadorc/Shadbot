@@ -17,7 +17,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
 @Command(category = CommandCategory.GAME, names = { "roulette" })
@@ -61,7 +60,7 @@ public class RouletteCmd extends AbstractCommand {
 
 		if(!rouletteManager.addPlayer(context.getAuthor(), bet, place)) {
 			BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-					context.getAuthorName()), context.getChannel());
+					context.getUsername()), context.getChannel());
 		}
 	}
 
@@ -72,7 +71,7 @@ public class RouletteCmd extends AbstractCommand {
 				.addArg("bet", false)
 				.addArg("place", String.format("number between 1 and 36, %s",
 						FormatUtils.format(Place.values(), value -> value.toString().toLowerCase(), ", ")), false)
-				.appendField("Info", "**low** - numbers between 1 and 18"
+				.addField("Info", "**low** - numbers between 1 and 18"
 						+ "\n**high** - numbers between 19 and 36", false)
 				.build();
 	}

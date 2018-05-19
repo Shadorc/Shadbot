@@ -2,6 +2,9 @@ package me.shadorc.shadbot.command.currency;
 
 import java.util.List;
 
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.User;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -18,8 +21,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IUser;
 
 @RateLimited
 @Command(category = CommandCategory.CURRENCY, names = { "transfer" })
@@ -27,50 +28,54 @@ public class TransferCoinsCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
+		context.requireArg();
+
+		if(!context.getMessage().getUserMentions().hasElements().block()) {
 			throw new MissingArgumentException();
 		}
 
-		if(context.getMessage().getMentions().isEmpty()) {
-			throw new MissingArgumentException();
-		}
-
-		List<String> splitCmd = StringUtils.split(context.getArg(), 2);
+		List<String> splitCmd = StringUtils.split(context.getArg().get(), 2);
 		if(splitCmd.size() != 2) {
 			throw new MissingArgumentException();
 		}
 
-		IUser receiverUser = context.getMessage().getMentions().get(0);
-		IUser senderUser = context.getAuthor();
+		User receiverUser = context.getMessage().getUserMentions().blockFirst();
+		User senderUser = context.getAuthor();
 		if(receiverUser.equals(senderUser)) {
 			throw new IllegalCmdArgumentException("You cannot transfer coins to yourself.");
 		}
 
 		Integer coins = CastUtils.asPositiveInt(splitCmd.get(0));
 		if(coins == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", splitCmd.get(0)));
+			throw new IllegalCmdArgumentException(
+					String.format("`%s` is not a valid amount for coins.", splitCmd.get(0)));
 		}
 
-		if(Database.getDBUser(context.getGuild(), senderUser).getCoins() < coins) {
+		Guild guild = context.getGuild().get();
+
+		if(Database.getDBUser(guild, senderUser).getCoins() < coins) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(context.getAuthor()), context.getChannel());
 			return;
 		}
 
-		if(Database.getDBUser(context.getGuild(), receiverUser).getCoins() + coins >= Config.MAX_COINS) {
-			BotUtils.sendMessage(String.format(Emoji.BANK + " This transfer cannot be done because %s would exceed the maximum coins cap.",
-					receiverUser.getName()), context.getChannel());
+		if(Database.getDBUser(guild, receiverUser).getCoins() + coins >= Config.MAX_COINS) {
+			BotUtils.sendMessage(String.format(Emoji.BANK + " This transfer cannot be done because "
+					+ "%s would exceed the maximum coins cap.",
+					receiverUser.getUsername()), context.getChannel());
 			return;
 		}
 
-		Database.getDBUser(context.getGuild(), senderUser).addCoins(-coins);
-		Database.getDBUser(context.getGuild(), receiverUser).addCoins(coins);
+		Database.getDBUser(guild, senderUser).addCoins(-coins);
+		Database.getDBUser(guild, receiverUser).addCoins(coins);
 
 		BotUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
-				senderUser.mention(), FormatUtils.formatCoins(coins), receiverUser.mention()), context.getChannel());
+				senderUser.getMention(),
+				FormatUtils.formatCoins(coins),
+				receiverUser.getMention()), context.getChannel());
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Transfer coins to the mentioned user.")
 				.addArg("coins", false)

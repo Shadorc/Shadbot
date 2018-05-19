@@ -1,10 +1,15 @@
 package me.shadorc.shadbot.command.info;
 
-import org.apache.commons.lang3.time.DurationFormatUtils;
+import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
-import me.shadorc.shadbot.Shadbot;
+import discord4j.core.object.entity.ApplicationInfo;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.User;
+import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -15,9 +20,6 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import sx.blah.discord.Discord4J;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IUser;
 
 @RateLimited
 @Command(category = CommandCategory.INFO, names = { "info" })
@@ -25,7 +27,7 @@ public class InfoCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) {
-		long ping = TimeUtils.getMillisUntil(context.getMessage().getCreationDate());
+		long ping = TimeUtils.getMillisUntil(context.getMessage().getTimestamp().toEpochMilli());
 		long uptime = TimeUtils.getMillisUntil(Discord4J.getLaunchTime());
 
 		Runtime runtime = Runtime.getRuntime();
@@ -33,7 +35,12 @@ public class InfoCmd extends AbstractCommand {
 		long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / mbUnit;
 		long maxMemory = runtime.maxMemory() / mbUnit;
 
-		IUser owner = context.getClient().getApplicationOwner();
+		User owner = context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner).block();
+		int membersCount = context.getClient()
+				.getGuilds()
+				.map(Guild::getMemberCount)
+				.collect(Collectors.summingInt(OptionalInt::getAsInt))
+				.block();
 
 		String info = new String("```prolog"
 				+ String.format("%n-= Performance Info =-")
@@ -46,20 +53,20 @@ public class InfoCmd extends AbstractCommand {
 				+ String.format("%nLavaPlayer Version: %s", PlayerLibrary.VERSION)
 				+ String.format("%n%n-= Shadbot Info =-")
 				+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true))
-				+ String.format("%nDeveloper: %s#%s", owner.getName(), owner.getDiscriminator())
-				+ String.format("%nShadbot Version: %s", Shadbot.VERSION)
+				+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
+				+ String.format("%nShadbot Version: %s", Config.VERSION)
 				+ String.format("%nShard: %d/%d", context.getShadbotShard().getID() + 1, context.getClient().getShardCount())
-				+ String.format("%nServers: %s", FormatUtils.formatNum(context.getClient().getGuilds().size()))
+				+ String.format("%nServers: %s", FormatUtils.formatNum(context.getClient().getGuilds().count().block()))
 				+ String.format("%nVoice Channels: %d", context.getClient().getConnectedVoiceChannels().size())
-				+ String.format("%nUsers: %s", FormatUtils.formatNum(context.getClient().getUsers().size()))
+				+ String.format("%nUsers: %s", FormatUtils.formatNum(membersCount)))
 				+ String.format("%nPing: %dms", ping)
 				+ "```");
 
-		BotUtils.sendMessage(info, context.getChannel());
+				BotUtils.sendMessage(info, context.getChannel());
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show Shadbot's info.")
 				.build();

@@ -6,18 +6,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
-import discord4j.core.object.entity.Guild;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IUser;
-import twitter4j.JSONException;
-import twitter4j.JSONObject;
-import twitter4j.JSONTokener;
 
 public class Database {
 
@@ -46,12 +45,12 @@ public class Database {
 		}
 	}
 
-	public static DBGuild getDBGuild(Guild guild) {
-		return new DBGuild(guild);
+	public static DBGuild getDBGuild(Snowflake guildId) {
+		return new DBGuild(guildId);
 	}
 
-	public static DBUser getDBUser(IGuild guild, IUser user) {
-		return new DBUser(guild, user.getLongID());
+	public static DBMember getDBMember(Snowflake guildId, Snowflake memberId) {
+		return new DBMember(guildId, memberId);
 	}
 
 	public synchronized static JSONObject opt(String key) {
@@ -59,12 +58,12 @@ public class Database {
 	}
 
 	public synchronized static void save(DBGuild dbGuild) {
-		dbObject.put(dbGuild.getGuild().getStringID(), dbGuild.toJSON());
+		dbObject.put(dbGuild.getId().asString(), dbGuild.toJSON());
 		DatabaseStatsManager.log(DatabaseEnum.GUILD_SAVED);
 	}
 
-	public synchronized static void save(DBUser dbUser) {
-		JSONObject guildObj = dbObject.optJSONObject(dbUser.getGuild().getStringID());
+	public synchronized static void save(DBMember dbUser) {
+		JSONObject guildObj = dbObject.optJSONObject(dbUser.getGuildId().asString());
 		if(guildObj == null) {
 			guildObj = new JSONObject();
 		}
@@ -74,9 +73,9 @@ public class Database {
 		}
 
 		guildObj.getJSONObject(DBGuild.USERS_KEY)
-				.put(Long.toString(dbUser.getUserID()), dbUser.toJSON());
+				.put(dbUser.getId().asString(), dbUser.toJSON());
 
-		dbObject.put(dbUser.getGuild().getStringID(), guildObj);
+		dbObject.put(dbUser.getGuildId().asString(), guildObj);
 		DatabaseStatsManager.log(DatabaseEnum.USER_SAVED);
 	}
 }

@@ -16,7 +16,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "generate_relic" })
 public class GenerateRelicCmd extends AbstractCommand {
@@ -35,7 +34,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 
 		Relic relic = PremiumManager.generateRelic(type);
 		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-				StringUtils.capitalize(type.toString()), relic.getRelicID()), context.getChannel());
+				StringUtils.capitalize(type.toString()), relic.getId()), context.getChannel());
 	}
 
 	@Override

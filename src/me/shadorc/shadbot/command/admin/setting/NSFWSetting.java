@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.admin.setting;
 
+import java.security.Permissions;
+
 import me.shadorc.shadbot.command.admin.setting.core.AbstractSetting;
 import me.shadorc.shadbot.command.admin.setting.core.Setting;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
@@ -13,8 +15,6 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
 
 @Setting(description = "Manage current channel's NSFW state.", setting = SettingEnum.NSFW)
 public class NSFWSetting extends AbstractSetting {
@@ -61,10 +61,10 @@ public class NSFWSetting extends AbstractSetting {
 	@Override
 	public EmbedBuilder getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
-				.appendField("Usage", String.format("`%s%s <action>`", prefix, this.getCmdName()), false)
-				.appendField("Argument", String.format("**action** - %s",
+				.addField("Usage", String.format("`%s%s <action>`", prefix, this.getCmdName()), false)
+				.addField("Argument", String.format("**action** - %s",
 						FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/")), false)
-				.appendField("Example", String.format("`%s%s toggle`", prefix, this.getCmdName()), false);
+				.addField("Example", String.format("`%s%s toggle`", prefix, this.getCmdName()), false);
 	}
 
 }

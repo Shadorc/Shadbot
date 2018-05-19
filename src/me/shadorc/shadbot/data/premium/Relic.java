@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 
@@ -15,21 +16,21 @@ public class Relic {
 	private static final String TYPE = "type";
 	private static final String GUILD_ID = "guildID";
 
-	private final String relicID;
+	private final Snowflake id;
 	private final int duration;
 	private final RelicType type;
 
 	private long activationTime;
-	private long guildID;
+	private Snowflake guildId;
 
-	public Relic(String relicID, int duration, RelicType type) {
-		this.relicID = relicID;
+	public Relic(Snowflake relicId, int duration, RelicType type) {
+		this.id = relicId;
 		this.duration = duration;
 		this.type = type;
 	}
 
 	public Relic(JSONObject relicObj) {
-		this.relicID = relicObj.getString(RELIC_ID);
+		this.id = Snowflake.of(relicObj.getString(RELIC_ID));
 		this.duration = relicObj.getInt(DURATION);
 		this.type = Utils.getValueOrNull(RelicType.class, relicObj.get(TYPE).toString());
 		this.activationTime = relicObj.optLong(ACTIVATION);
@@ -39,8 +40,8 @@ public class Relic {
 		this.activationTime = System.currentTimeMillis();
 	}
 
-	public String getRelicID() {
-		return relicID;
+	public Snowflake getId() {
+		return id;
 	}
 
 	public int getDuration() {
@@ -51,8 +52,8 @@ public class Relic {
 		return type;
 	}
 
-	public Long getGuildID() {
-		return guildID;
+	public Snowflake getGuildId() {
+		return guildId;
 	}
 
 	public long getActivationTime() {
@@ -63,17 +64,17 @@ public class Relic {
 		return TimeUnit.MILLISECONDS.toDays(TimeUtils.getMillisUntil(this.getActivationTime())) >= this.getDuration();
 	}
 
-	public void setGuildID(long guildID) {
-		this.guildID = guildID;
+	public void setGuildId(Snowflake guildId) {
+		this.guildId = guildId;
 	}
 
 	public JSONObject toJSON() {
 		return new JSONObject()
-				.put(RELIC_ID, this.getRelicID())
+				.put(RELIC_ID, this.getId().asLong())
 				.put(DURATION, this.getDuration())
 				.put(TYPE, this.getType())
 				.putOpt(ACTIVATION, this.getActivationTime())
-				.putOpt(GUILD_ID, this.getGuildID());
+				.putOpt(GUILD_ID, this.getGuildId().asLong());
 	}
 
 }

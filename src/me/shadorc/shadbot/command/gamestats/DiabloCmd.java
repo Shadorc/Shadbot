@@ -28,8 +28,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.LoadingMessage;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
 @RateLimited
 @Command(category = CommandCategory.GAMESTATS, names = { "diablo" }, alias = "d3")
@@ -101,8 +99,8 @@ public class DiabloCmd extends AbstractCommand {
 							playerObj.getString("battleTag"), playerObj.getString("guildName"),
 							playerObj.getInt("paragonLevel"), playerObj.getInt("paragonLevelSeasonHardcore"),
 							playerObj.getInt("paragonLevelSeason"), playerObj.getInt("paragonLevelSeasonHardcore")))
-					.appendField("Heroes", FormatUtils.format(heroesMap.values().stream(), Object::toString, "\n"), true)
-					.appendField("Damage", FormatUtils.format(heroesMap.keySet().stream(),
+					.addField("Heroes", FormatUtils.format(heroesMap.values().stream(), Object::toString, "\n"), true)
+					.addField("Damage", FormatUtils.format(heroesMap.keySet().stream(),
 							dps -> String.format("%s DPS", FormatUtils.formatNum(dps)), "\n"), true);
 			loadingMsg.edit(embed.build());
 

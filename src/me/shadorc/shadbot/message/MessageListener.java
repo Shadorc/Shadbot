@@ -1,6 +1,6 @@
 package me.shadorc.shadbot.message;
 
-import sx.blah.discord.handle.obj.IMessage;
+import discord4j.core.object.entity.Message;
 
 public interface MessageListener {
 
@@ -8,6 +8,6 @@ public interface MessageListener {
 	 * @param message - the message received
 	 * @return true if the message has been intercepted blocking the execution of other commands, false otherwise
 	 */
-	boolean intercept(IMessage message);
+	boolean intercept(Message message);
 
 }

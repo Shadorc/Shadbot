@@ -1,71 +1,57 @@
 package me.shadorc.shadbot.utils.object;
 
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.MessageEditSpec;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.RequestBuffer;
-import sx.blah.discord.util.RequestBuffer.RequestFuture;
+import reactor.core.publisher.Mono;
 
 public class LoadingMessage {
 
-	private final String msg;
-	private final IChannel channel;
+	private final String content;
+	private final MessageChannel channel;
 
-	private RequestFuture<IMessage> msgRequest;
+	private Mono<Message> message;
 
-	public LoadingMessage(String msg, IChannel channel) {
-		this.msg = msg;
+	public LoadingMessage(String content, MessageChannel channel) {
+		this.content = content;
 		this.channel = channel;
+		this.message = Mono.empty();
 	}
 
 	public void send() {
-		msgRequest = BotUtils.sendMessage(Emoji.HOURGLASS + " " + msg, channel);
+		message = BotUtils.sendMessage(Emoji.HOURGLASS + " " + content, channel);
 	}
 
 	public void edit(String content) {
-		if(!BotUtils.hasPermissions(channel, Permissions.SEND_MESSAGES)) {
-			LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to send a message.", channel.getGuild().getLongID());
+		if(!BotUtils.hasPermissions(channel, Permission.SEND_MESSAGES)) {
+			LogUtils.infof("{Channel ID: %d} Shadbot wasn't allowed to send a message.", channel.getId().asLong());
 			return;
 		}
 
-		IMessage message = msgRequest == null ? null : msgRequest.get();
-		if(message == null) {
-			msgRequest = BotUtils.sendMessage(content, channel);
-		} else {
-			RequestBuffer.request(() -> {
-				message.edit(content);
-			});
-		}
+		message.switchIfEmpty(BotUtils.sendMessage(content, channel))
+				.block()
+				.edit(new MessageEditSpec().setContent(content));
 	}
 
-	public void edit(EmbedObject embed) {
-		if(!BotUtils.hasPermissions(channel, Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS)) {
-			BotUtils.sendMessage(TextUtils.missingPerm(Permissions.EMBED_LINKS), channel);
-			LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to send embed link.", channel.getGuild().getLongID());
+	public void edit(EmbedCreateSpec embed) {
+		if(!BotUtils.hasPermissions(channel, Permission.SEND_MESSAGES, Permission.EMBED_LINKS)) {
+			BotUtils.sendMessage(TextUtils.missingPerm(Permission.EMBED_LINKS), channel);
+			LogUtils.infof("{Channel ID: %d} Shadbot wasn't allowed to send embed link.", channel.getId().asLong());
 			return;
 		}
 
-		IMessage message = msgRequest == null ? null : msgRequest.get();
-		if(message == null) {
-			msgRequest = BotUtils.sendMessage(embed, channel);
-		} else {
-			RequestBuffer.request(() -> {
-				message.edit(embed);
-			});
-		}
+		message.switchIfEmpty(BotUtils.sendMessage(embed, channel))
+				.block()
+				.edit(new MessageEditSpec().setEmbed(embed));
 	}
 
 	public void delete() {
-		IMessage message = msgRequest == null ? null : msgRequest.get();
-		if(message != null) {
-			RequestBuffer.request(() -> {
-				message.delete();
-			});
-		}
+		message.blockOptional().ifPresent(Message::delete);
 	}
 
 }

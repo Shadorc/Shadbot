@@ -21,9 +21,6 @@ import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "shutdown" })
 public class ShutdownCmd extends AbstractCommand implements MessageListener {
@@ -33,7 +30,7 @@ public class ShutdownCmd extends AbstractCommand implements MessageListener {
 		if(!context.hasArg()) {
 			MessageManager.addListener(context.getChannel(), this);
 			BotUtils.sendMessage(String.format(Emoji.QUESTION + " Do you really want to shutdown %s ? Yes/No",
-					context.getClient().getOurUser().mention()), context.getChannel());
+					context.getClient().getSelf().mention()), context.getChannel());
 			return;
 		}
 
