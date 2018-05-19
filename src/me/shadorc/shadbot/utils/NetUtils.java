@@ -19,6 +19,8 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
+import me.shadorc.shadbot.shard.CustomShard;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class NetUtils {
 
@@ -45,6 +47,11 @@ public class NetUtils {
 		return NetUtils.getResponse(url).body();
 	}
 
+	/**
+	 * @param url - the URL from which to obtain the JSON
+	 * @return A string representing JSON
+	 * @throws HttpStatusException - if the URL returns an invalid JSON
+	 */
 	public static String getJSON(String url) throws IOException {
 		String json = NetUtils.getBody(url);
 		if(json.isEmpty() || json.charAt(0) != '{' && json.charAt(0) != '[') {
@@ -53,10 +60,19 @@ public class NetUtils {
 		return json;
 	}
 
+	/**
+	 * @param str - the string to encode as UTF-8
+	 * @return The string encoded as UTF-8
+	 * @throws UnsupportedEncodingException
+	 */
 	public static String encode(String str) throws UnsupportedEncodingException {
 		return URLEncoder.encode(str, "UTF-8");
 	}
 
+	/**
+	 * @param url - a string representing an URL to check
+	 * @return true if the string is a valid and reachable URL, false otherwise
+	 */
 	public static boolean isValidURL(String url) {
 		HttpURLConnection conn = null;
 		try {
@@ -74,33 +90,26 @@ public class NetUtils {
 		}
 	}
 
-	public static void postStats() {
-		LogUtils.infof("Posting statistics...");
-		for(IShard shard : Shadbot.getClient().getShards()) {
-			NetUtils.postStatsOn("https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN, shard);
-			NetUtils.postStatsOn("https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN, shard);
-		}
-		LogUtils.infof("Statistics posted.");
-	}
-
-	private static void postStatsOn(String homeUrl, APIKey token, IShard shard) {
-		try {
+	public static void postStatsOn(String homeUrl, APIKey token, CustomShard shard) {
+		Shadbot.getSelf().subscribe(self -> {
 			JSONObject content = new JSONObject()
-					.put("shard_id", shard.getInfo()[0])
-					.put("shard_count", shard.getInfo()[1])
-					.put("server_count", shard.getGuilds().size());
+					.put("shard_id", shard.getIndex())
+					.put("shard_count", shard.getShardCount())
+					.put("server_count", shard.getGuildsCount());
 
-			String url = String.format("%s/api/bots/%d/stats", homeUrl, shard.getClient().getSelf().getLongID());
-			Jsoup.connect(url)
-					.method(Method.POST)
-					.ignoreContentType(true)
-					.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
-					.requestBody(content.toString())
-					.post();
-		} catch (Exception err) {
-			LogUtils.infof("An error occurred while posting statistics of shard %d. (%s: %s).",
-					shard.getInfo()[0], err.getClass().getSimpleName(), err.getMessage());
-		}
+			String url = String.format("%s/api/bots/%d/stats", homeUrl, self.getId().asLong());
+			try {
+				Jsoup.connect(url)
+						.method(Method.POST)
+						.ignoreContentType(true)
+						.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
+						.requestBody(content.toString())
+						.post();
+			} catch (IOException err) {
+				LogUtils.infof("An error occurred while posting statistics of shard %d. (%s: %s).",
+						shard.getIndex(), err.getClass().getSimpleName(), err.getMessage());
+			}
+		});
 	}
 
 }

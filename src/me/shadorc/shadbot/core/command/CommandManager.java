@@ -20,9 +20,9 @@ import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
 public class CommandManager {
@@ -72,18 +72,18 @@ public class CommandManager {
 			return;
 		}
 
-		if(!BotUtils.isCommandAllowed(context.getGuild().get(), cmd)) {
+		if(!BotUtils.isCommandAllowed(context.getGuild().block(), cmd)) {
 			return;
 		}
 
 		CommandPermission authorPermission = context.getAuthorPermission();
 		if(cmd.getPermission().isSuperior(authorPermission)) {
-			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel());
+			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel().block());
 			return;
 		}
 
-		if(cmd.getRateLimiter().isPresent() 
-				&& cmd.getRateLimiter().get().isLimited((TextChannel) context.getChannel(), context.getAuthor())) {
+		if(cmd.getRateLimiter().isPresent()
+				&& cmd.getRateLimiter().get().isLimited((TextChannel) context.getChannel().block(), context.getAuthor().block())) {
 			CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, cmd);
 			return;
 		}
@@ -93,12 +93,12 @@ public class CommandManager {
 			CommandStatsManager.log(CommandEnum.COMMAND_USED, cmd);
 			VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
 		} catch (IllegalCmdArgumentException err) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel().block());
 			CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, cmd);
 		} catch (MissingArgumentException err) {
 			BotUtils.sendMessage(new MessageCreateSpec()
 					.setContent(TextUtils.MISSING_ARG)
-					.setEmbed(cmd.getHelp(context.getPrefix())), context.getChannel());
+					.setEmbed(cmd.getHelp(context.getPrefix())), context.getChannel().block());
 			CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, cmd);
 		}
 	}

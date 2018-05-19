@@ -1,18 +1,18 @@
 package me.shadorc.shadbot.core.game;
 
-import java.security.Permissions;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.PermissionUtils;
 import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
 
@@ -42,11 +42,11 @@ public abstract class AbstractGameManager {
 
 	public final boolean isCancelCmd(Message message) {
 		User user = message.getAuthor().block();
-		if(message.getContent().equals(this.getPrefix() + "cancel")
-				&& (memberId.equals(user.getId()) || PermissionUtils.hasPermissions(channel, user, Permissions.ADMINISTRATOR))) {
-			BotUtils.sendMessage(
-					String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", user.getUsername()), 
-					message.getClient().getMessageChannelById(channelId).block());
+		if(message.getContent().orElse("").equals(this.getPrefix() + "cancel")
+				&& (memberId.equals(user.getId()) || PermissionUtils.hasPermissions(message.getChannel(), user, Permission.ADMINISTRATOR))) {
+			message.getClient().getMessageChannelById(channelId)
+					.subscribe(channel -> BotUtils.sendMessage(
+							String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", user.getUsername()), channel));
 			this.stop();
 			return true;
 		}

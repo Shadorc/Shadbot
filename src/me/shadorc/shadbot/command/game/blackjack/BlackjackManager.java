@@ -22,7 +22,7 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Card;
 import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.UpdateableMessage;
+import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 
 public class BlackjackManager extends AbstractGameManager implements MessageListener {
 

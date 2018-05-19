@@ -14,7 +14,7 @@ import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -33,7 +33,7 @@ public class DatabaseCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Long guildID = CastUtils.asPositiveLong(splitArgs.get(0));
+		Long guildID = NumberUtils.asPositiveLong(splitArgs.get(0));
 		if(guildID == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid guild ID.", splitArgs.get(0)));
 		}
@@ -49,7 +49,7 @@ public class DatabaseCmd extends AbstractCommand {
 			json = dbGuild.toJSON().toString(Config.JSON_INDENT_FACTOR);
 
 		} else if(splitArgs.size() == 2) {
-			Long userID = CastUtils.asPositiveLong(splitArgs.get(1));
+			Long userID = NumberUtils.asPositiveLong(splitArgs.get(1));
 			if(userID == null) {
 				throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", splitArgs.get(0)));
 			}

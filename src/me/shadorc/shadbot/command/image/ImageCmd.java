@@ -19,14 +19,14 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
-import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.object.LoadingMessage;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 
 @RateLimited
 @Command(category = CommandCategory.IMAGE, names = { "image" })

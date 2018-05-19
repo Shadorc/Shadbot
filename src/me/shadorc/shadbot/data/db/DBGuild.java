@@ -66,11 +66,12 @@ public class DBGuild {
 		}
 	}
 
-	// TODO: Convert to Snowflake
-	public List<Long> getAllowedChannels() {
+	public List<Snowflake> getAllowedChannels() {
 		return Mono.just(settingsMap.get(SettingEnum.ALLOWED_CHANNELS))
 				.defaultIfEmpty(Collections.emptyList())
-				.map(array -> Utils.toList((JSONArray) array, Long.class))
+				.flatMapIterable(array -> Utils.toList((JSONArray) array, Long.class))
+				.map(Snowflake::of)
+				.collectList()
 				.block();
 	}
 
@@ -81,19 +82,21 @@ public class DBGuild {
 				.block();
 	}
 
-	// TODO: Convert to Snowflake
-	public List<Long> getAutoRoles() {
+	public List<Snowflake> getAutoRoles() {
 		return Mono.just(settingsMap.get(SettingEnum.AUTO_ROLE))
 				.defaultIfEmpty(Collections.emptyList())
-				.map(array -> Utils.toList((JSONArray) array, Long.class))
+				.flatMapIterable(array -> Utils.toList((JSONArray) array, Long.class))
+				.map(Snowflake::of)
+				.collectList()
 				.block();
 	}
 
-	// TODO: Convert to Snowflake
-	public List<Long> getAllowedRoles() {
+	public List<Snowflake> getAllowedRoles() {
 		return Mono.just(settingsMap.get(SettingEnum.PERMISSIONS))
 				.defaultIfEmpty(Collections.emptyList())
-				.map(array -> Utils.toList((JSONArray) array, Long.class))
+				.flatMapIterable(array -> Utils.toList((JSONArray) array, Long.class))
+				.map(Snowflake::of)
+				.collectList()
 				.block();
 	}
 

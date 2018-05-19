@@ -12,7 +12,7 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -34,12 +34,12 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
-		if(!Utils.isInRange(splitArgs.size(), 1, 2)) {
+		if(!Utils.isInInclusiveRange(splitArgs.size(), 1, 2)) {
 			throw new MissingArgumentException();
 		}
 
 		String numStr = splitArgs.get(splitArgs.size() == 1 ? 0 : 1);
-		Integer num = CastUtils.asIntBetween(numStr, 1, 6);
+		Integer num = NumberUtils.asIntBetween(numStr, 1, 6);
 		if(num == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number, must be between 1 and 6.", numStr));
 		}

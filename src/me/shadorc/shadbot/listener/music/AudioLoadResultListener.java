@@ -12,6 +12,9 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.VoiceChannel;
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandManager;
@@ -22,12 +25,12 @@ import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
 public class AudioLoadResultListener implements AudioLoadResultHandler, MessageListener {
@@ -38,18 +41,18 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	private static final int CHOICE_DURATION = 30;
 
 	private final GuildMusic guildMusic;
-	private final IUser userDj;
-	private final IVoiceChannel userVoiceChannel;
+	private final Snowflake djId;
+	private final Snowflake voiceChannelId;
 	private final String identifier;
 	private final boolean putFirst;
 
 	private List<AudioTrack> resultsTracks;
 	private ScheduledFuture<?> stopWaitingTask;
 
-	public AudioLoadResultListener(GuildMusic guildMusic, IUser userDj, IVoiceChannel userVoiceChannel, String identifier, boolean putFirst) {
+	public AudioLoadResultListener(GuildMusic guildMusic, User dj, VoiceChannel voiceChannel, String identifier, boolean putFirst) {
 		this.guildMusic = guildMusic;
-		this.userDj = userDj;
-		this.userVoiceChannel = userVoiceChannel;
+		this.djId = dj.getId();
+		this.voiceChannelId = voiceChannel.getId();
 		this.identifier = identifier;
 		this.putFirst = putFirst;
 	}
@@ -162,7 +165,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 
 		List<Integer> choices = new ArrayList<>();
 		for(String str : content.split(",")) {
-			Integer num = CastUtils.asIntBetween(str, 1, Math.min(5, resultsTracks.size()));
+			Integer num = NumberUtils.asIntBetween(str, 1, Math.min(5, resultsTracks.size()));
 			if(num == null) {
 				return false;
 			}
@@ -210,4 +213,5 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 			guildMusic.leaveVoiceChannel();
 		}
 	}
+
 }

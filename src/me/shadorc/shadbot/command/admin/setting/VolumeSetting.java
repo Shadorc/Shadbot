@@ -9,7 +9,7 @@ import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
@@ -25,7 +25,7 @@ public class VolumeSetting extends AbstractSetting {
 			throw new MissingArgumentException();
 		}
 
-		Integer volume = CastUtils.asIntBetween(arg, MIN_VOLUME, MAX_VOLUME);
+		Integer volume = NumberUtils.asIntBetween(arg, MIN_VOLUME, MAX_VOLUME);
 		if(volume == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number, it must be between %d and %d.",
 					arg, MIN_VOLUME, MAX_VOLUME));

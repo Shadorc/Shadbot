@@ -29,14 +29,14 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.object.LoadingMessage;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 
 @RateLimited
 @Command(category = CommandCategory.IMAGE, names = { "wallpaper" }, alias = "wp")
@@ -145,8 +145,8 @@ public class WallpaperCmd extends AbstractCommand {
 		if(sizeList.size() != 2) {
 			this.throwInvalidArg(msg, context, name);
 		}
-		Integer width = CastUtils.asPositiveInt(sizeList.get(0));
-		Integer height = CastUtils.asPositiveInt(sizeList.get(1));
+		Integer width = NumberUtils.asPositiveInt(sizeList.get(0));
+		Integer height = NumberUtils.asPositiveInt(sizeList.get(1));
 		if(width == null || height == null) {
 			this.throwInvalidArg(msg, context, name);
 		}

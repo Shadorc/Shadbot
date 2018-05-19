@@ -22,7 +22,7 @@ import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.data.stats.annotation.StatsInit;
 import me.shadorc.shadbot.data.stats.annotation.StatsJSON;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class StatsManager {
 

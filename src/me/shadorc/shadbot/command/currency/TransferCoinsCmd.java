@@ -15,8 +15,8 @@ import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -45,7 +45,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 			throw new IllegalCmdArgumentException("You cannot transfer coins to yourself.");
 		}
 
-		Integer coins = CastUtils.asPositiveInt(splitCmd.get(0));
+		Integer coins = NumberUtils.asPositiveInt(splitCmd.get(0));
 		if(coins == null) {
 			throw new IllegalCmdArgumentException(
 					String.format("`%s` is not a valid amount for coins.", splitCmd.get(0)));

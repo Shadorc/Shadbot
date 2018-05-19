@@ -11,8 +11,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
 public class AudioEventListener extends AudioEventAdapter {

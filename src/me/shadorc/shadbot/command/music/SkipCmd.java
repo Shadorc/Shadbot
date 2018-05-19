@@ -10,7 +10,7 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 
@@ -28,7 +28,7 @@ public class SkipCmd extends AbstractCommand {
 		}
 
 		if(context.hasArg()) {
-			Integer num = CastUtils.asIntBetween(context.getArg(), 1, guildMusic.getScheduler().getPlaylist().size());
+			Integer num = NumberUtils.asIntBetween(context.getArg(), 1, guildMusic.getScheduler().getPlaylist().size());
 			if(num == null) {
 				throw new IllegalCmdArgumentException(String.format("Number must be between 1 and %d.",
 						guildMusic.getScheduler().getPlaylist().size()));

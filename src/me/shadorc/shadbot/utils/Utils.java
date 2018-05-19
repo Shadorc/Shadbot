@@ -31,6 +31,9 @@ import me.shadorc.shadbot.utils.object.Emoji;
 
 public class Utils {
 
+	/**
+	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found
+	 */
 	public static double getProcessCpuLoad() {
 		double cpuLoad;
 		try {
@@ -57,6 +60,11 @@ public class Utils {
 		return cpuLoad;
 	}
 
+	/**
+	 * @param enumClass - the enumeration class
+	 * @param value - the value representation of the enumeration
+	 * @return The enumeration corresponding to the {@code value} from {@code enumClass} or null if it does not exist
+	 */
 	public static <T extends Enum<T>> T getValueOrNull(Class<T> enumClass, String value) {
 		for(T enumeration : enumClass.getEnumConstants()) {
 			if(enumeration.toString().equalsIgnoreCase(value)) {
@@ -66,6 +74,11 @@ public class Utils {
 		return null;
 	}
 
+	/**
+	 * @param array - the array to convert
+	 * @param listClass - the class of the elements contained by {@code array}
+	 * @return A list containing the elements of {@code array} converted to {@code listClass} objects
+	 */
 	public static <T> List<T> toList(JSONArray array, Class<T> listClass) {
 		if(array == null) {
 			return null;
@@ -81,6 +94,11 @@ public class Utils {
 		return list;
 	}
 
+	/**
+	 * @param map - the map to sort
+	 * @param comparator - a {@link Comparator} to be used to compare stream elements
+	 * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code comparator}
+	 */
 	public static <K, V> Map<K, V> sortByValue(Map<K, V> map, Comparator<? super Entry<K, V>> comparator) {
 		return map.entrySet()
 				.stream()
@@ -92,12 +110,25 @@ public class Utils {
 						LinkedHashMap::new));
 	}
 
+	/**
+	 * @param map - the map to sort
+	 * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by ascending value
+	 */
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
 		return Utils.sortByValue(map, Map.Entry.comparingByValue(Collections.reverseOrder()));
 	}
 
+	/**
+	 * @param channel - the channel where to send the error message if an error occurred
+	 * @param user - the user who has bet
+	 * @param betStr - the bet value as string
+	 * @param maxValue - the maximum bet value
+	 * @return An Integer representing {@code betStr} converted as an integer if no error occurred or {@code null} otherwise
+	 * @throws IllegalCmdArgumentException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough coins or if
+	 *             the bet value is superior to {code maxValue}
+	 */
 	public static Integer checkAndGetBet(TextChannel channel, User user, String betStr, int maxValue) throws IllegalCmdArgumentException {
-		Integer bet = CastUtils.asPositiveInt(betStr);
+		Integer bet = NumberUtils.asPositiveInt(betStr);
 		if(bet == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", betStr));
 		}
@@ -116,10 +147,10 @@ public class Utils {
 		return bet;
 	}
 
-	public static boolean isInRange(float nbr, float min, float max) {
-		return nbr >= min && nbr <= max;
-	}
-
+	/**
+	 * @param threadName - the naming format to use
+	 * @return A daemon {@link ThreadFactory} with the name format sets as {@code threadName}
+	 */
 	public static ThreadFactory createDaemonThreadFactory(String threadName) {
 		return new ThreadFactoryBuilder().setNameFormat(threadName).setDaemon(true).build();
 	}

@@ -16,10 +16,10 @@ import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "shutdown" })
@@ -39,7 +39,7 @@ public class ShutdownCmd extends AbstractCommand implements MessageListener {
 			throw new MissingArgumentException();
 		}
 
-		Integer delay = CastUtils.asPositiveInt(splitArgs.get(0));
+		Integer delay = NumberUtils.asPositiveInt(splitArgs.get(0));
 		if(delay == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid time.", splitArgs.get(0)));
 		}

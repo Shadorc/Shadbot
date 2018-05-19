@@ -88,7 +88,6 @@ public class HelpBuilder {
 
 	public EmbedCreateSpec build() {
 		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-				// .setLenient(true)
 				.setAuthor(String.format("Help for %s command", cmd.getName()), null, null)
 				.setDescription(description)
 				.addField("Usage", this.getUsage(), false)

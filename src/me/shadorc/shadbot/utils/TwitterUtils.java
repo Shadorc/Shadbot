@@ -16,6 +16,11 @@ public class TwitterUtils {
 		TWITTER.setOAuthAccessToken(new AccessToken(APIKeys.get(APIKey.TWITTER_TOKEN), APIKeys.get(APIKey.TWITTER_TOKEN_SECRET)));
 	}
 
+	/**
+	 * @param user - the screen name of the user for whom to return the last tweet content
+	 * @return The content of the last tweet posted by {@code user}
+	 * @throws TwitterException - when Twitter service or network is unavailable
+	 */
 	public static String getLastTweet(String user) throws TwitterException {
 		return TWITTER.getUserTimeline(user).get(0).getText();
 	}

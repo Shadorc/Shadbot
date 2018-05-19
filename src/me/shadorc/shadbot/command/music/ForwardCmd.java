@@ -12,8 +12,8 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -36,7 +36,7 @@ public class ForwardCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Long num = CastUtils.asPositiveLong(context.getArg());
+		Long num = NumberUtils.asPositiveLong(context.getArg());
 		if(num == null) {
 			try {
 				num = TimeUtils.parseTime(context.getArg());

@@ -6,14 +6,22 @@ import java.util.Map;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 
 public class EmbedUtils {
 
+	// TODO: Improve this shit
+	private static String avatarURL;
+
+	static {
+		Shadbot.getSelf().subscribe(self -> avatarURL = self.getAvatarHash().orElse(""));
+	}
+
 	public static EmbedCreateSpec getDefaultEmbed(String authorName, String authorUrl) {
 		return new EmbedCreateSpec()
-				.setAuthor(authorName, authorUrl, ReadyListener.getSelf().getAvatarHash().orElse(""))
+				.setAuthor(authorName, authorUrl, avatarURL)
 				.setColor(Config.BOT_COLOR.getRGB());
 	}
 

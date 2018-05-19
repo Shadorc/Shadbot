@@ -17,7 +17,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.LoadingMessage;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import net.shadorc.overwatch4j.HeroDesc;
 import net.shadorc.overwatch4j.Overwatch4J;
 import net.shadorc.overwatch4j.OverwatchPlayer;
@@ -36,7 +36,7 @@ public class OverwatchCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		List<String> splitArgs = StringUtils.split(context.getArg());
-		if(!Utils.isInRange(splitArgs.size(), 1, 3)) {
+		if(!Utils.isInInclusiveRange(splitArgs.size(), 1, 3)) {
 			throw new MissingArgumentException();
 		}
 

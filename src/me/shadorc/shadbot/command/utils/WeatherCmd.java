@@ -18,7 +18,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.LoadingMessage;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import net.aksingh.owmjapis.CurrentWeather;
 import net.aksingh.owmjapis.OpenWeatherMap;
 import net.aksingh.owmjapis.OpenWeatherMap.Units;
@@ -75,27 +75,27 @@ public class WeatherCmd extends AbstractCommand {
 	private String getWindDesc(float windSpeed) {
 		if(windSpeed < 1) {
 			return "Calm";
-		} else if(Utils.isInRange(windSpeed, 1, 6)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 1, 6)) {
 			return "Light air";
-		} else if(Utils.isInRange(windSpeed, 6, 12)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 6, 12)) {
 			return "Light breeze";
-		} else if(Utils.isInRange(windSpeed, 12, 20)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 12, 20)) {
 			return "Gentle breeze";
-		} else if(Utils.isInRange(windSpeed, 20, 29)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 20, 29)) {
 			return "Moderate breeze";
-		} else if(Utils.isInRange(windSpeed, 29, 39)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 29, 39)) {
 			return "Fresh breeze";
-		} else if(Utils.isInRange(windSpeed, 39, 50)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 39, 50)) {
 			return "Strong breeze";
-		} else if(Utils.isInRange(windSpeed, 50, 62)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 50, 62)) {
 			return "Near gale";
-		} else if(Utils.isInRange(windSpeed, 62, 75)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 62, 75)) {
 			return "Gale";
-		} else if(Utils.isInRange(windSpeed, 75, 89)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 75, 89)) {
 			return "Strong gale";
-		} else if(Utils.isInRange(windSpeed, 89, 103)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 89, 103)) {
 			return "Storm";
-		} else if(Utils.isInRange(windSpeed, 103, 118)) {
+		} else if(Utils.isInInclusiveRange(windSpeed, 103, 118)) {
 			return "Violent storm";
 		} else {
 			return "Hurricane";

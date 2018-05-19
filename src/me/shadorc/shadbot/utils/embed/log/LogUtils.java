@@ -1,13 +1,11 @@
-package me.shadorc.shadbot.utils;
+package me.shadorc.shadbot.utils.embed.log;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import discord4j.core.DiscordClient;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.utils.embed.LogBuilder;
-import me.shadorc.shadbot.utils.embed.LogType;
+import me.shadorc.shadbot.utils.BotUtils;
 
 public class LogUtils {
 
@@ -38,10 +36,8 @@ public class LogUtils {
 	}
 
 	private static void sendLog(LogBuilder embed) {
-		DiscordClient client = Shadbot.getClient();
-		if(client != null) {
-			BotUtils.sendMessage(embed.build(), client.getMessageChannelById(Config.LOGS_CHANNEL_ID).block());
-		}
+		Shadbot.getClient().getMessageChannelById(Config.LOGS_CHANNEL_ID)
+				.subscribe(channel -> BotUtils.sendMessage(embed.build(), channel));
 	}
 
 }

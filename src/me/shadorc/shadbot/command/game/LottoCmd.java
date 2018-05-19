@@ -20,13 +20,13 @@ import me.shadorc.shadbot.data.lotto.LottoPlayer;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
 @RateLimited
@@ -58,7 +58,7 @@ public class LottoCmd extends AbstractCommand {
 			throw new IllegalCmdArgumentException("You're already participating.");
 		}
 
-		Integer num = CastUtils.asIntBetween(context.getArg(), MIN_NUM, MAX_NUM);
+		Integer num = NumberUtils.asIntBetween(context.getArg(), MIN_NUM, MAX_NUM);
 		if(num == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number, it must be between %d and %d.",
 					context.getArg(), MIN_NUM, MAX_NUM));

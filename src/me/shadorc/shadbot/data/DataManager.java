@@ -11,7 +11,7 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
 
 public class DataManager {

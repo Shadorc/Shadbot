@@ -15,14 +15,14 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.LoadingMessage;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 
 @RateLimited
 @Command(category = CommandCategory.GAMESTATS, names = { "cs", "csgo" })
@@ -48,7 +48,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			}
 
 			// The user directly provided the ID
-			if(CastUtils.isPositiveLong(arg)) {
+			if(NumberUtils.isPositiveLong(arg)) {
 				steamid = arg;
 			}
 			// The user provided a pseudo

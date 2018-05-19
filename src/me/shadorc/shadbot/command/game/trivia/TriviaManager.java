@@ -19,9 +19,9 @@ import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.message.MessageListener;
 import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -103,7 +103,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 		String content = message.getContent();
 
 		// It's a number or a text
-		Integer choice = CastUtils.asIntBetween(content, 1, answers.size());
+		Integer choice = NumberUtils.asIntBetween(content, 1, answers.size());
 
 		// Message is a text and doesn't match any answers, ignore it
 		if(choice == null && !answers.stream().anyMatch(content::equalsIgnoreCase)) {

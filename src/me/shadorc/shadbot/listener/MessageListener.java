@@ -15,8 +15,9 @@ import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.message.MessageManager;
+import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class MessageListener {
 
@@ -36,8 +37,7 @@ public class MessageListener {
 			return;
 		}
 
-		// TODO
-		// ShardManager.getShadbotShard(message.getShard()).messageReceived();
+		ShardManager.getShard(event.getClient()).messageReceived();
 
 		Member member = message.getAuthorAsMember().block();
 		Guild guild = message.getGuild().block();
@@ -81,13 +81,18 @@ public class MessageListener {
 				+ "join my support server : %s",
 				Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-		boolean alreadySent = channel.getMessages(null, null)
-				.map(Message::getContent)
-				.map(content -> content.orElse(""))
-				.any(text::equalsIgnoreCase)
-				.block();
-		if(!alreadySent) {
-			BotUtils.sendMessage(text, channel);
-		}
+		channel.getLastMessageId().ifPresentOrElse(lastMsgId -> {
+			channel.getMessagesBefore(lastMsgId)
+					.map(Message::getContent)
+					.map(content -> content.orElse(""))
+					.any(text::equalsIgnoreCase)
+					.subscribe(alreadySent -> {
+						if(!alreadySent) {
+							BotUtils.sendMessage(text, channel);
+						}
+
+					});
+		}, () -> BotUtils.sendMessage(text, channel));
+
 	}
 }

@@ -12,7 +12,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.CastUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -44,7 +44,7 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		if(pollManager != null) {
-			Integer num = CastUtils.asIntBetween(context.getArg(), 1, pollManager.getChoicesCount());
+			Integer num = NumberUtils.asIntBetween(context.getArg(), 1, pollManager.getChoicesCount());
 			if(num == null) {
 				throw new IllegalCmdArgumentException(String.format("``%s` is not a valid number, must be between 1 and %d.",
 						context.getArg(), pollManager.getChoicesCount()));
@@ -66,7 +66,7 @@ public class PollCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		Integer duration = CastUtils.asIntBetween(splitArgs.get(0), MIN_DURATION, MAX_DURATION);
+		Integer duration = NumberUtils.asIntBetween(splitArgs.get(0), MIN_DURATION, MAX_DURATION);
 		if(duration == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
 					splitArgs.get(0), MIN_DURATION, MAX_DURATION));
@@ -79,7 +79,7 @@ public class PollCmd extends AbstractCommand {
 
 		// Remove duplicate choices
 		List<String> choicesList = substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList());
-		if(!Utils.isInRange(choicesList.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
+		if(!Utils.isInInclusiveRange(choicesList.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
 			throw new IllegalCmdArgumentException(String.format("You must specify between %d and %d different non-empty choices.",
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}

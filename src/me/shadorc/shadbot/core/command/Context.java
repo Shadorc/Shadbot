@@ -15,6 +15,7 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.shard.CustomShard;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.StringUtils;
+import reactor.core.publisher.Mono;
 
 public class Context {
 
@@ -58,37 +59,32 @@ public class Context {
 	}
 
 	// TODO Keep this ?
-	public User getSelf() {
-		return Shadbot.getSelf().block();
+	public Mono<User> getSelf() {
+		return Shadbot.getSelf();
 	}
 
-	public CustomShard getShadbotShard() {
-		return ShardManager.getShadbotShard(this.getShard());
+	public CustomShard getShard() {
+		return ShardManager.getShard(this.getClient());
 	}
 
 	public Integer getShardIndex() {
 		return message.getClient().getConfig().getShardIndex();
 	}
 
-	// TODO: Check everywhere that this is used, has been replaced by Optional
-	public Optional<Guild> getGuild() {
-		return message.getGuild().blockOptional();
+	public Mono<Guild> getGuild() {
+		return message.getGuild();
 	}
 
-	public Snowflake getGuildId() {
-		return this.getGuild().isPresent() ? this.getGuild().get().getId() : null;
+	public Mono<MessageChannel> getChannel() {
+		return message.getChannel();
 	}
 
-	public MessageChannel getChannel() {
-		return message.getChannel().block();
+	public Mono<User> getAuthor() {
+		return message.getAuthor();
 	}
 
-	public User getAuthor() {
-		return message.getAuthor().block();
-	}
-
-	public String getUsername() {
-		return this.getAuthor().getUsername();
+	public Mono<String> getUsername() {
+		return this.getAuthor().map(User::getUsername);
 	}
 
 	public CommandPermission getAuthorPermission() {

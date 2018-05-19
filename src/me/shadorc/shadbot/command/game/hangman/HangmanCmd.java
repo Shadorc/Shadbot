@@ -23,7 +23,7 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.LoadingMessage;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 
 @RateLimited
 @Command(category = CommandCategory.GAME, names = { "hangman" })
@@ -81,7 +81,7 @@ public class HangmanCmd extends AbstractCommand {
 		if(HARD_WORDS.isEmpty()) {
 			String url = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt";
 			HARD_WORDS.addAll(StringUtils.split(NetUtils.getBody(url), "\n").stream()
-					.filter(word -> Utils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
+					.filter(word -> Utils.isInInclusiveRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
 					.limit(500)
 					.collect(Collectors.toList()));
 		}
@@ -89,7 +89,7 @@ public class HangmanCmd extends AbstractCommand {
 		if(EASY_WORDS.isEmpty()) {
 			String url = "https://gist.githubusercontent.com/deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt";
 			EASY_WORDS.addAll(StringUtils.split(NetUtils.getBody(url), "\n").stream()
-					.filter(word -> Utils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
+					.filter(word -> Utils.isInInclusiveRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
 					.limit(500)
 					.collect(Collectors.toList()));
 		}

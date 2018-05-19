@@ -58,7 +58,7 @@ public abstract class AbstractCommand {
 		return permission;
 	}
 
-	//TODO: Has been changed to Optional, check null everywhere
+	// TODO: Has been changed to Optional, check null everywhere
 	public Optional<RateLimiter> getRateLimiter() {
 		return rateLimiter;
 	}

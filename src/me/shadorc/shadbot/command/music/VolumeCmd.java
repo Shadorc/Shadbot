@@ -11,7 +11,7 @@ import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.music.TrackScheduler;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -36,7 +36,7 @@ public class VolumeCmd extends AbstractCommand {
 			return;
 		}
 
-		Integer volume = CastUtils.asPositiveInt(context.getArg());
+		Integer volume = NumberUtils.asPositiveInt(context.getArg());
 		if(volume == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid volume.", context.getArg()));
 		}

@@ -1,10 +1,11 @@
-package me.shadorc.shadbot.utils.embed;
+package me.shadorc.shadbot.utils.embed.log;
 
 import java.awt.Color;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
 
 public class LogBuilder {
 
@@ -30,7 +31,6 @@ public class LogBuilder {
 
 	public EmbedCreateSpec build() {
 		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-				// .setLenient(true)
 				.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Config.VERSION), null, null)
 				.setDescription(message);
 

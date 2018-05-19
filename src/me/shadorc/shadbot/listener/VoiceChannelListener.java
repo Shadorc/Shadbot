@@ -2,7 +2,7 @@ package me.shadorc.shadbot.listener;
 
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class VoiceChannelListener {
 

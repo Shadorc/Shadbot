@@ -12,7 +12,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.object.UpdateableMessage;
+import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 
 public class PollManager extends AbstractGameManager {
 

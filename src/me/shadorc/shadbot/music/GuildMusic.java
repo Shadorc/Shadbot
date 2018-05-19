@@ -15,7 +15,7 @@ import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.LogUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
 public class GuildMusic {

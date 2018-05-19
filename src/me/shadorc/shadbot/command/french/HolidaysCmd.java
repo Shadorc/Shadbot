@@ -15,7 +15,7 @@ import me.shadorc.shadbot.utils.TwitterUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.LoadingMessage;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import twitter4j.TwitterException;
 
 @RateLimited

@@ -18,13 +18,13 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.CastUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
@@ -51,7 +51,7 @@ public class TriviaCmd extends AbstractCommand {
 			return;
 		}
 
-		Integer categoryID = CastUtils.asPositiveInt(context.getArg());
+		Integer categoryID = NumberUtils.asPositiveInt(context.getArg());
 
 		if(context.hasArg() && (categoryID == null || !categories.containsKey(categoryID))) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list "

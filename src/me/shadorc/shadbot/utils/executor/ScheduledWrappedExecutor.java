@@ -5,8 +5,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class ScheduledWrappedExecutor extends ScheduledThreadPoolExecutor {
 
