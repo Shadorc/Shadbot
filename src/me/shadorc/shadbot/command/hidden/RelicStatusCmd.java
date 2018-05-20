@@ -24,7 +24,7 @@ public class RelicStatusCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		List<Relic> relics = PremiumManager.getRelicsForUser(context.getAuthor());
+		List<Relic> relics = PremiumManager.getRelicsForUser(context.getAuthorId());
 		if(relics.isEmpty()) {
 			BotUtils.sendMessage(String.format(Emoji.INFO + " You are not a donator. If you like Shadbot, you can help me keep it alive"
 					+ " by making a donation on **%s**."

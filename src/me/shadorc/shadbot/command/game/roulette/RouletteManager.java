@@ -20,7 +20,6 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.Pair;
 import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 
 public class RouletteManager extends AbstractGameManager {

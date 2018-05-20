@@ -12,6 +12,7 @@ import org.jsoup.Connection.Response;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -21,6 +22,7 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -57,11 +59,9 @@ public class FortniteCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
-		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
+		List<String> splitArgs = StringUtils.split(context.getArg().get(), 2);
 		if(splitArgs.size() != 2) {
 			throw new MissingArgumentException();
 		}
@@ -74,8 +74,7 @@ public class FortniteCmd extends AbstractCommand {
 
 		String epicNickname = splitArgs.get(1);
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading Fortnite stats...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			String url = String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
@@ -95,7 +94,7 @@ public class FortniteCmd extends AbstractCommand {
 			JSONObject mainObj = new JSONObject(response.parse().body().html());
 
 			if("Player Not Found".equals(mainObj.optString("error"))) {
-				loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " This user doesn't play Fortnite on this platform or doesn't exist.");
+				loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Fortnite on this platform or doesn't exist.");
 				return;
 			}
 
@@ -124,10 +123,10 @@ public class FortniteCmd extends AbstractCommand {
 			JSONObject squadSeasonStatsObj = statsObj.optJSONObject(SEASON + SQUAD_STATS);
 			statsMap.put(Stats.KD_S3_SQUAD, this.getKD(squadSeasonStatsObj));
 
-			final int length = 10;
-			final String format = "%n%-" + (length + 5) + "s %-" + length + "s %-" + length + "s %-" + length + "s";
+			int length = 10;
+			String format = "%n%-" + (length + 5) + "s %-" + length + "s %-" + length + "s %-" + length + "s";
 
-			final String description = String.format("Stats for user **%s**%n", epicNickname)
+			String description = String.format("Stats for user **%s**%n", epicNickname)
 					+ "```prolog"
 					+ String.format(format, " ", "Solo", "Duo", "Squad")
 					+ String.format(format, "Top 1", statsMap.get(Stats.TOP1_SOLO), statsMap.get(Stats.TOP1_DUO), statsMap.get(Stats.TOP1_SQUAD))
@@ -135,17 +134,14 @@ public class FortniteCmd extends AbstractCommand {
 					+ String.format(format, "K/D lifetime", statsMap.get(Stats.KD_LT_SOLO), statsMap.get(Stats.KD_LT_DUO), statsMap.get(Stats.KD_LT_SQUAD))
 					+ "```";
 
-			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-					.setLenient(true)
-					.withAuthorName("Fortnite Stats")
-					.withAuthorUrl(String.format("https://fortnitetracker.com/profile/%s/%s", platform.toString().toLowerCase(), NetUtils.encode(epicNickname)))
-					.withThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
-					.appendDescription(description);
-			loadingMsg.edit(embed.build());
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Fortnite Stats",
+					String.format("https://fortnitetracker.com/profile/%s/%s", platform.toString().toLowerCase(), NetUtils.encode(epicNickname)))
+					.setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
+					.setDescription(description);
+			loadingMsg.send(embed);
 
 		} catch (JSONException | IOException err) {
-			loadingMsg.delete();
-			Utils.handle("getting Fortnite stats", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting Fortnite stats", context, err));
 		}
 
 	}
@@ -165,7 +161,7 @@ public class FortniteCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Fortnite.")
 				.addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.values(), region -> region.toString().toLowerCase(), ", ")), false)

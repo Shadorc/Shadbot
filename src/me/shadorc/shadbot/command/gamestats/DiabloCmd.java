@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -19,7 +20,7 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -39,11 +40,9 @@ public class DiabloCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
-		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
+		List<String> splitArgs = StringUtils.split(context.getArg().get(), 2);
 		if(splitArgs.size() != 2) {
 			throw new MissingArgumentException();
 		}
@@ -60,8 +59,7 @@ public class DiabloCmd extends AbstractCommand {
 		}
 		battletag = battletag.replaceAll("#", "-");
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading Diablo 3 stats...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			String url = String.format("https://%s.api.battle.net/d3/profile/%s/?locale=en_GB&apikey=%s",
@@ -69,7 +67,7 @@ public class DiabloCmd extends AbstractCommand {
 			JSONObject playerObj = new JSONObject(NetUtils.getJSON(url));
 
 			if(playerObj.has("code") && playerObj.getString("code").equals("NOTFOUND")) {
-				loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.");
+				loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.");
 				return;
 			}
 
@@ -89,11 +87,9 @@ public class DiabloCmd extends AbstractCommand {
 				heroesMap.put(dps, String.format("**%s** (*%s*)", name, heroClass));
 			}
 
-			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-					.setLenient(true)
-					.withAuthorName("Diablo 3 Stats")
-					.withThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
-					.appendDescription(String.format("Stats for **%s** (Guild: **%s**)"
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Diablo 3 Stats")
+					.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
+					.setDescription(String.format("Stats for **%s** (Guild: **%s**)"
 							+ "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
 							+ "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
 							playerObj.getString("battleTag"), playerObj.getString("guildName"),
@@ -102,19 +98,17 @@ public class DiabloCmd extends AbstractCommand {
 					.addField("Heroes", FormatUtils.format(heroesMap.values().stream(), Object::toString, "\n"), true)
 					.addField("Damage", FormatUtils.format(heroesMap.keySet().stream(),
 							dps -> String.format("%s DPS", FormatUtils.formatNum(dps)), "\n"), true);
-			loadingMsg.edit(embed.build());
+			loadingMsg.send(embed);
 
 		} catch (FileNotFoundException err) {
-			loadingMsg.delete();
-			BotUtils.sendMessage(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.", context.getChannel());
+			loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.");
 		} catch (JSONException | IOException err) {
-			loadingMsg.delete();
-			Utils.handle("getting Diablo 3 stats", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting Diablo 3 stats", context, err));
 		}
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Diablo 3.")
 				.addArg("region", String.format("user's region (%s)", FormatUtils.format(Region.values(), region -> region.toString().toLowerCase(), ", ")), false)

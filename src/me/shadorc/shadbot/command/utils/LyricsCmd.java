@@ -8,12 +8,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.nodes.Element;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -29,17 +31,16 @@ public class LyricsCmd extends AbstractCommand {
 	// Make html() preserve linebreaks and spacing
 	private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
 	private static final String HOME_URL = "https://www.musixmatch.com";
-	private static final int MAX_LYRICS_LENGTH = EmbedBuilder.DESCRIPTION_CONTENT_LIMIT / 4;
+	private static final int MAX_LYRICS_LENGTH = Utils.DESCRIPTION_CONTENT_LIMIT / 4;
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		List<String> args = StringUtils.split(context.getArg(), 2, "-");
+		List<String> args = StringUtils.split(context.getArg().orElse(""), 2, "-");
 		if(args.size() != 2) {
 			throw new MissingArgumentException();
 		}
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading lyrics...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			String artistSrch = NetUtils.encode(args.get(0).replaceAll("[^A-Za-z0-9]", "-"));
@@ -58,7 +59,7 @@ public class LyricsCmd extends AbstractCommand {
 				Document searchDoc = NetUtils.getDoc(url);
 				Element trackListElement = searchDoc.getElementsByClass("tracks list").first();
 				if(trackListElement == null) {
-					loadingMsg.edit(TextUtils.noResult(context.getArg()));
+					loadingMsg.send(TextUtils.noResult(context.getArg().get()));
 					return;
 				}
 				// Find the first element containing "title" (generally the best result) and get its URL
@@ -71,22 +72,18 @@ public class LyricsCmd extends AbstractCommand {
 			String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
 			String lyrics = StringUtils.truncate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
 
-			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-					.setLenient(true)
-					.withAuthorName(String.format("Lyrics (%s - %s)", artist, title))
-					.withAuthorUrl(url)
-					.withThumbnail(albumImg)
-					.appendDescription(url + "\n\n" + lyrics);
-			loadingMsg.edit(embed.build());
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("Lyrics (%s - %s)", artist, title), url)
+					.setThumbnail(albumImg)
+					.setDescription(url + "\n\n" + lyrics);
+			loadingMsg.send(embed);
 
 		} catch (IOException err) {
-			loadingMsg.delete();
-			Utils.handle("getting lyrics", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting lyrics", context, err));
 		}
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show lyrics for a song.")
 				.setUsage("<artist> - <title>")

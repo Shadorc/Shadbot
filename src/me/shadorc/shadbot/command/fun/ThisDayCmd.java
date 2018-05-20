@@ -17,6 +17,7 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
@@ -29,8 +30,7 @@ public class ThisDayCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) {
-		LoadingMessage loadingMsg = new LoadingMessage("Loading information...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			Document doc = NetUtils.getDoc(HOME_URL);
@@ -52,13 +52,12 @@ public class ThisDayCmd extends AbstractCommand {
 
 			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("On This Day (%s)", date), HOME_URL)
 					.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-					.setDescription(StringUtils.truncate(events, EmbedCreateSpec.DESCRIPTION_CONTENT_LIMIT));
+					.setDescription(StringUtils.truncate(events, Utils.DESCRIPTION_CONTENT_LIMIT));
 
-			loadingMsg.edit(embed);
+			loadingMsg.send(embed);
 
 		} catch (IOException err) {
-			loadingMsg.delete();
-			ExceptionUtils.handle("getting events", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting events", context, err));
 		}
 	}
 

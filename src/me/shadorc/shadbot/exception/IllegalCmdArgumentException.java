@@ -1,6 +1,6 @@
 package me.shadorc.shadbot.exception;
 
-public class IllegalCmdArgumentException extends Exception {
+public class IllegalCmdArgumentException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.owner;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -27,14 +28,14 @@ public class ShutdownCmd extends AbstractCommand implements MessageListener {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			MessageManager.addListener(context.getChannel(), this);
-			BotUtils.sendMessage(String.format(Emoji.QUESTION + " Do you really want to shutdown %s ? Yes/No",
-					context.getClient().getSelf().mention()), context.getChannel());
+		if(!context.getArg().isPresent()) {
+			MessageManager.addListener(context.getChannelId(), this);
+			context.getSelf().subscribe(self -> BotUtils.sendMessage(String.format(Emoji.QUESTION + " Do you really want to shutdown %s ? Yes/No",
+					self.getMention()), context.getChannel()));
 			return;
 		}
 
-		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
+		List<String> splitArgs = StringUtils.split(context.getArg().get(), 2);
 		if(splitArgs.size() != 2) {
 			throw new MissingArgumentException();
 		}
@@ -58,7 +59,7 @@ public class ShutdownCmd extends AbstractCommand implements MessageListener {
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Schedule a shutdown after a fixed amount of seconds and send a message to all guilds playing musics.")
 				.addArg("seconds", true)

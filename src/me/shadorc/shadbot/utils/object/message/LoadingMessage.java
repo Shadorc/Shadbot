@@ -1,63 +1,83 @@
 package me.shadorc.shadbot.utils.object.message;
 
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
+import java.time.Duration;
+
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+
+import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
-import discord4j.core.spec.MessageEditSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
-import reactor.core.publisher.Mono;
 
-public class LoadingMessage {
+public class LoadingMessage implements Publisher<Void> {
 
+	private final DiscordClient client;
 	private final Snowflake channelId;
-	private MessageCreateSpec messageSpec;
-	private Snowflake messageId;
+	private final Duration typingTimeout;
 
-	public LoadingMessage(String content, Snowflake channelId) {
-		this.messageSpec = new MessageCreateSpec().setContent(Emoji.HOURGLASS + " " + content);
+	private Subscriber<? super Void> subscriber;
+
+	/**
+	 * @param client - the Discord client
+	 * @param channelId - the Channel ID in which send the message
+	 * @param typingTimeout - the duration before a message is send Start typing until a message is send or the typing timeout have passed
+	 */
+	public LoadingMessage(DiscordClient client, Snowflake channelId, Duration typingTimeout) {
+		this.client = client;
 		this.channelId = channelId;
-		this.messageId = null;
+		this.typingTimeout = typingTimeout;
+
+		this.startTyping();
 	}
 
-	public void send() {
-		this.getChannel()
-				.subscribe(channel -> BotUtils.sendMessage(messageSpec, channel)
-						.subscribe(message -> this.messageId = message.getId()));
+	/**
+	 * @param client - the Discord client
+	 * @param channelId - the Channel ID in which send the message Start typing until a message is send Start typing until a message is send or 30 seconds
+	 *            have passed
+	 */
+	public LoadingMessage(DiscordClient client, Snowflake channelId) {
+		this(client, channelId, Duration.ofSeconds(30));
 	}
 
-	public void edit(String content) {
-		messageSpec.setContent(content);
-
-		// If an error occurred, we send a new message instead of trying to edit the previous one
-		this.getMessage().doOnError(error -> this.send())
-				.subscribe(message -> message.edit(new MessageEditSpec().setContent(content)));
+	/**
+	 * Start typing in the channel until a message is send or the typing timeout seconds have passed
+	 */
+	private void startTyping() {
+		client.getMessageChannelById(channelId).subscribe(channel -> channel.typeUntil(this).timeout(typingTimeout));
 	}
 
-	public void edit(EmbedCreateSpec embed) {
-		messageSpec.setEmbed(embed);
-
-		// If an error occurred, we send a new message instead of trying to edit the previous one
-		this.getMessage().doOnError(error -> this.send())
-				.subscribe(message -> message.edit(new MessageEditSpec().setEmbed(embed)));
+	/**
+	 * Stop typing
+	 */
+	public void stopTyping() {
+		subscriber.onComplete();
 	}
 
-	public void delete() {
-		this.getMessage().subscribe(Message::delete);
+	/**
+	 * Send a message and stop typing when the message has been send or an error occurred
+	 */
+	public void send(String content) {
+		client.getMessageChannelById(channelId)
+				.subscribe(channel -> BotUtils.sendMessage(new MessageCreateSpec().setContent(content), channel)
+						.doAfterTerminate(() -> subscriber.onComplete())
+						.subscribe());
 	}
 
-	private Mono<Message> getMessage() {
-		return Shadbot.getClient().getMessageById(channelId, messageId)
-				.doOnError(err -> LogUtils.error(err, String.format("{%s} An error occurred while getting message.", this.getClass().getSimpleName())));
+	/**
+	 * Send a message and stop typing when the message has been send or an error occurred
+	 */
+	public void send(EmbedCreateSpec embed) {
+		client.getMessageChannelById(channelId)
+				.subscribe(channel -> BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel)
+						.doAfterTerminate(() -> subscriber.onComplete())
+						.subscribe());
 	}
 
-	private Mono<MessageChannel> getChannel() {
-		return Shadbot.getClient().getMessageChannelById(channelId)
-				.doOnError(err -> LogUtils.error(err, String.format("{%s} An error occurred while getting channel.", this.getClass().getSimpleName())));
+	@Override
+	public void subscribe(Subscriber<? super Void> subscriber) {
+		this.subscriber = subscriber;
 	}
 
 }

@@ -16,21 +16,21 @@ public class Relic {
 	private static final String TYPE = "type";
 	private static final String GUILD_ID = "guildID";
 
-	private final Snowflake id;
+	private final String id;
 	private final int duration;
 	private final RelicType type;
 
 	private long activationTime;
 	private Snowflake guildId;
 
-	public Relic(Snowflake relicId, int duration, RelicType type) {
+	public Relic(String relicId, int duration, RelicType type) {
 		this.id = relicId;
 		this.duration = duration;
 		this.type = type;
 	}
 
 	public Relic(JSONObject relicObj) {
-		this.id = Snowflake.of(relicObj.getString(RELIC_ID));
+		this.id = relicObj.getString(RELIC_ID);
 		this.duration = relicObj.getInt(DURATION);
 		this.type = Utils.getValueOrNull(RelicType.class, relicObj.get(TYPE).toString());
 		this.activationTime = relicObj.optLong(ACTIVATION);
@@ -40,7 +40,7 @@ public class Relic {
 		this.activationTime = System.currentTimeMillis();
 	}
 
-	public Snowflake getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -70,7 +70,7 @@ public class Relic {
 
 	public JSONObject toJSON() {
 		return new JSONObject()
-				.put(RELIC_ID, this.getId().asLong())
+				.put(RELIC_ID, this.getId())
 				.put(DURATION, this.getDuration())
 				.put(TYPE, this.getType())
 				.putOpt(ACTIVATION, this.getActivationTime())

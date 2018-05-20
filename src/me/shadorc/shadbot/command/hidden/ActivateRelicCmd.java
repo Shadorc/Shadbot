@@ -19,12 +19,15 @@ public class ActivateRelicCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		context.requireArg();
 
-		try {
-			PremiumManager.activateRelic(context.getGuild().get(), context.getAuthor(), context.getArg().get());
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " Relic successfully activated, enjoy !", context.getChannel());
-		} catch (RelicActivationException err) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + err.getMessage(), context.getChannel());
-		}
+		context.getGuild().subscribe(guild -> {
+			try {
+				PremiumManager.activateRelic(guild.getId(), context.getAuthorId(), context.getArg().get().trim());
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " Relic successfully activated, enjoy !", context.getChannel());
+			} catch (RelicActivationException err) {
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + err.getMessage(), context.getChannel());
+			}
+		});
+
 	}
 
 	@Override

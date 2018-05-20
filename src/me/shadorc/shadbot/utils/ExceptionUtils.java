@@ -12,32 +12,30 @@ import me.shadorc.shadbot.utils.object.Emoji;
 
 public class ExceptionUtils {
 
-	public static void handle(String action, Context context, Throwable err) {
-		context.getChannel().subscribe(channel -> {
-			long channelId = channel.getId().asLong();
+	public static String handleAndGet(String action, Context context, Throwable err) {
+		long channelId = context.getChannelId().asLong();
 
-			String msg;
-			if(isJsonUnavailable(err) || isUnavailable(err)) {
-				msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
-				if(isJsonUnavailable(err)) {
-					LogUtils.warnf("{Channel ID: %d} %s", channelId, err.getMessage());
-				} else {
-					LogUtils.warnf("{Channel ID: %d} Service unavailable while %s.", channelId, action);
-				}
+		String msg;
+		if(isJsonUnavailable(err) || isUnavailable(err)) {
+			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
+			if(isJsonUnavailable(err)) {
+				LogUtils.warnf("{Channel ID: %d} %s", channelId, err.getMessage());
+			} else {
+				LogUtils.warnf("{Channel ID: %d} Service unavailable while %s.", channelId, action);
 			}
+		}
 
-			else if(isUnreacheable(err)) {
-				msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.", StringUtils.capitalize(action));
-				LogUtils.warnf("{Channel ID: %d} A SocketTimeoutException occurred while %s.", channelId, action);
-			}
+		else if(isUnreacheable(err)) {
+			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.", StringUtils.capitalize(action));
+			LogUtils.warnf("{Channel ID: %d} A SocketTimeoutException occurred while %s.", channelId, action);
+		}
 
-			else {
-				msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
-				LogUtils.error(context.getContent(), err, String.format("{Channel ID: %d} %s", channelId, msg));
-			}
+		else {
+			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
+			LogUtils.error(context.getContent(), err, String.format("{Channel ID: %d} %s", channelId, msg));
+		}
 
-			BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, channel);
-		});
+		return Emoji.RED_FLAG + " " + msg;
 	}
 
 	private static boolean isJsonUnavailable(Throwable err) {

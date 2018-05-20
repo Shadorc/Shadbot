@@ -40,13 +40,12 @@ public class ImageCmd extends AbstractCommand {
 	public void execute(Context context) throws MissingArgumentException {
 		context.requireArg();
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading image...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			JSONObject resultObj = this.getRandomPopularResult(NetUtils.encode(context.getArg().get()));
 			if(resultObj == null) {
-				loadingMsg.edit(TextUtils.noResult(context.getArg().get()));
+				loadingMsg.send(TextUtils.noResult(context.getArg().get()));
 				return;
 			}
 
@@ -59,11 +58,10 @@ public class ImageCmd extends AbstractCommand {
 					.addField("Category", resultObj.getString("category_path"), false)
 					.setImage(resultObj.getJSONObject("content").getString("src"));
 
-			loadingMsg.edit(embed);
+			loadingMsg.send(embed);
 
 		} catch (JSONException | IOException err) {
-			loadingMsg.delete();
-			ExceptionUtils.handle("getting an image", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting an image", context, err));
 		}
 	}
 

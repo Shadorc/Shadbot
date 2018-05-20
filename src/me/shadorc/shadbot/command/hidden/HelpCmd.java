@@ -42,23 +42,25 @@ public class HelpCmd extends AbstractCommand {
 						+ "%nGet more information by using `%s%s <command>`.",
 						Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
 
-		for(CommandCategory category : CommandCategory.values()) {
-			if(category.equals(CommandCategory.HIDDEN)) {
-				continue;
+		context.getGuild().defaultIfEmpty(null).subscribe(guild -> {
+			for(CommandCategory category : CommandCategory.values()) {
+				if(category.equals(CommandCategory.HIDDEN)) {
+					continue;
+				}
+
+				String commands = CommandManager.getCommands().values().stream()
+						.distinct()
+						.filter(cmd -> cmd.getCategory().equals(category)
+								&& !cmd.getPermission().isSuperior(context.getAuthorPermission())
+								&& (guild == null || BotUtils.isCommandAllowed(guild, cmd)))
+						.map(cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()))
+						.collect(Collectors.joining(" "));
+
+				embed.addField(String.format("%s Commands", category.toString()), commands, false);
 			}
 
-			String commands = CommandManager.getCommands().values().stream()
-					.distinct()
-					.filter(cmd -> cmd.getCategory().equals(category)
-							&& !cmd.getPermission().isSuperior(context.getAuthorPermission())
-							&& (!context.getGuild().isPresent() || BotUtils.isCommandAllowed(context.getGuild().get(), cmd)))
-					.map(cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()))
-					.collect(Collectors.joining(" "));
-
-			embed.addField(String.format("%s Commands", category.toString()), commands, false);
-		}
-
-		BotUtils.sendMessage(embed, context.getChannel());
+			BotUtils.sendMessage(embed, context.getChannel());
+		});
 	}
 
 	@Override

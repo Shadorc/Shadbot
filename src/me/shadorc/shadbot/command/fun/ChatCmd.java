@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.jsoup.nodes.Document;
 
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -32,7 +32,7 @@ public class ChatCmd extends AbstractCommand {
 	private static final List<String> BOTS_ID = List.of("efc39100ce34d038", "b0dafd24ee35a477", "ea373c261e3458c6", "b0a6a41a5e345c23");
 	private static final int MAX_ERROR_COUNT = 10;
 
-	private static final ConcurrentHashMap<Long, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<Snowflake, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
 
 	private static int errorCount;
 
@@ -41,14 +41,14 @@ public class ChatCmd extends AbstractCommand {
 		context.requireArg();
 
 		String response;
-		for(String botID : BOTS_ID) {
+		for(String botId : BOTS_ID) {
 			try {
-				response = this.talk(context.getChannel(), botID, context.getArg().get());
+				response = this.talk(context.getChannelId(), botId, context.getArg().get());
 				BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel());
 				errorCount = 0;
 				return;
 			} catch (JSONException | IOException err) {
-				LogUtils.infof("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botID);
+				LogUtils.infof("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botId);
 			}
 		}
 
@@ -60,13 +60,13 @@ public class ChatCmd extends AbstractCommand {
 		}
 	}
 
-	private String talk(MessageChannel channel, String botID, String input) throws UnsupportedEncodingException, IOException {
+	private String talk(Snowflake channelId, String botId, String input) throws UnsupportedEncodingException, IOException {
 		String url = String.format("https://www.pandorabots.com/pandora/talk-xml?botid=%s&input=%s&custid=%s",
-				botID, NetUtils.encode(input), CHANNELS_CUSTID.getOrDefault(channel.getId().asLong(), ""));
+				botId, NetUtils.encode(input), CHANNELS_CUSTID.getOrDefault(channelId, ""));
 		Document doc = NetUtils.getDoc(url);
 		JSONObject mainObj = XML.toJSONObject(doc.html());
 		JSONObject resultObj = mainObj.getJSONObject("result");
-		CHANNELS_CUSTID.put(channel.getId().asLong(), resultObj.getString("custid"));
+		CHANNELS_CUSTID.put(channelId, resultObj.getString("custid"));
 		return StringUtils.normalizeSpace(resultObj.getString("that").replace("<br>", "\n"));
 	}
 

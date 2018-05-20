@@ -4,6 +4,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -21,13 +22,11 @@ public class CalcCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
 		try {
 			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
-			String expression = context.getArg();
+			String expression = context.getArg().get();
 			BotUtils.sendMessage(Emoji.TRIANGULAR_RULER + String.format(" %s = %s",
 					expression.replace("*", "\\*"), engine.eval(expression)), context.getChannel());
 		} catch (ScriptException err) {
@@ -36,7 +35,7 @@ public class CalcCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Calculate an expression.")
 				.addArg("expression", false)

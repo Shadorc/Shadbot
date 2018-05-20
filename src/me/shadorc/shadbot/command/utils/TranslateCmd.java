@@ -10,6 +10,7 @@ import org.json.JSONException;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -17,12 +18,12 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 
 @RateLimited
 @Command(category = CommandCategory.UTILS, names = { "translate", "translation", "trans" })
@@ -39,10 +40,12 @@ public class TranslateCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		List<String> args = StringUtils.split(context.getArg(), 3);
+		List<String> args = StringUtils.split(context.getArg().orElse(""), 3);
 		if(args.size() < 2) {
 			throw new MissingArgumentException();
 		}
+
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		if(args.size() == 2) {
 			args.add(0, "auto");
@@ -52,6 +55,7 @@ public class TranslateCmd extends AbstractCommand {
 		String langTo = this.toISO(args.get(1));
 
 		if(langFrom == null || langTo == null) {
+			loadingMsg.stopTyping();
 			throw new IllegalCmdArgumentException(String.format("One of the specified language doesn't exist. "
 					+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 		}
@@ -63,17 +67,18 @@ public class TranslateCmd extends AbstractCommand {
 			JSONArray result = new JSONArray(NetUtils.getJSON(url));
 
 			if(!(result.get(0) instanceof JSONArray)) {
+				loadingMsg.stopTyping();
 				throw new IllegalCmdArgumentException(String.format("One of the specified language isn't supported. "
 						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
 			String translatedText = ((JSONArray) ((JSONArray) result.get(0)).get(0)).get(0).toString();
-			BotUtils.sendMessage(Emoji.MAP + String.format(" **%s** (%s) <=> **%s** (%s)",
+			loadingMsg.send(Emoji.MAP + String.format(" **%s** (%s) <=> **%s** (%s)",
 					sourceText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)),
-					translatedText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo))), context.getChannel());
+					translatedText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo))));
 
 		} catch (JSONException | IOException err) {
-			Utils.handle("getting translation", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting translation", context, err));
 		}
 	}
 
@@ -82,7 +87,7 @@ public class TranslateCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Translate a text from a language to another.")
 				.addArg("fromLang", "source language, by leaving it blank the language will be automatically detected", true)

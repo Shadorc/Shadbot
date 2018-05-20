@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -31,11 +32,11 @@ public class FormatUtils {
 	}
 
 	public static <T> String format(List<T> list, Function<T, String> mapper, String delimiter) {
-		return FormatUtils.format(list, mapper, delimiter);
+		return FormatUtils.format(list.stream(), mapper, delimiter);
 	}
 
 	public static <T> String format(T[] array, Function<T, String> mapper, String delimiter) {
-		return FormatUtils.format(array, mapper, delimiter);
+		return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
 	}
 
 	public static <T extends Enum<T>> String formatOptions(Class<T> enumClass) {

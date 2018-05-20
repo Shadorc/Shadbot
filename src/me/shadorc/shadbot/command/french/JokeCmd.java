@@ -29,8 +29,7 @@ public class JokeCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		LoadingMessage loadingMsg = new LoadingMessage("Loading joke...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d", ThreadLocalRandom.current().nextInt(1, 6));
@@ -46,11 +45,10 @@ public class JokeCmd extends AbstractCommand {
 
 			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Blague", "http://www.une-blague.com/")
 					.setDescription(joke);
-			loadingMsg.edit(embed);
+			loadingMsg.send(embed);
 
 		} catch (IOException err) {
-			loadingMsg.delete();
-			ExceptionUtils.handle("getting a joke", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting a joke", context, err));
 		}
 	}
 

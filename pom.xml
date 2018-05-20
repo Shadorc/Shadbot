@@ -72,11 +72,13 @@
 			<artifactId>Discord4J</artifactId>
 			<version>v3-SNAPSHOT</version>
 		</dependency>
+		<!-- It is needed ?
 		<dependency>
 			<groupId>com.github.Discord4J.Stores</groupId>
 			<artifactId>stores-jdk</artifactId>
 			<version>master-SNAPSHOT</version>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>

@@ -107,7 +107,7 @@ public class DBGuild {
 				.block();
 	}
 
-	public int getDefaultVol() {
+	public Integer getDefaultVol() {
 		return Mono.just(settingsMap.get(SettingEnum.DEFAULT_VOLUME))
 				.defaultIfEmpty(Config.DEFAULT_VOLUME)
 				.map(Object::toString)

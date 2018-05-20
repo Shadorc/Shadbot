@@ -25,7 +25,8 @@ public class MemberListener {
 		if(BotUtils.hasPermissions(event.getGuild(), Permission.MANAGE_ROLES)
 				&& BotUtils.canInteract(event.getGuild(), event.getMember())
 				&& PermissionUtils.hasHierarchicalPermissions(event.getGuild(), event.getClient().getSelf(), autoRoles)) {
-			event.getGuild().editUserRoles(event.getMember(), autoRoles);
+			// TODO
+			// event.getGuild().editUserRoles(event.getMember(), autoRoles);
 		}
 	}
 

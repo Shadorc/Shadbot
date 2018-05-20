@@ -29,8 +29,7 @@ public class DtcCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		LoadingMessage loadingMsg = new LoadingMessage("Loading quote...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", APIKeys.get(APIKey.DTC_API_KEY));
@@ -46,11 +45,10 @@ public class DtcCmd extends AbstractCommand {
 			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Quote DansTonChat", String.format("https://danstonchat.com/%s.html", quoteObj.getString("id")))
 					.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
 					.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"));
-			loadingMsg.edit(embed);
+			loadingMsg.send(embed);
 
 		} catch (JSONException | IOException err) {
-			loadingMsg.delete();
-			ExceptionUtils.handle("getting a quote from DansTonChat.com", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting a quote from DansTonChat.com", context, err));
 		}
 	}
 

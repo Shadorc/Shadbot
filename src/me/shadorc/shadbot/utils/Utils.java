@@ -31,6 +31,10 @@ import me.shadorc.shadbot.utils.object.Emoji;
 
 public class Utils {
 
+	// TODO Remove
+	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
+	public static final int FIELD_CONTENT_LIMIT = 1024;
+
 	/**
 	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found
 	 */

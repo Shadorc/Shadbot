@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -21,7 +22,7 @@ import me.shadorc.shadbot.utils.embed.HelpBuilder;
 @Command(category = CommandCategory.UTILS, names = { "poll" })
 public class PollCmd extends AbstractCommand {
 
-	protected static final ConcurrentHashMap<Long, PollManager> MANAGER = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<Snowflake, PollManager> MANAGER = new ConcurrentHashMap<>();
 
 	private static final int MIN_CHOICES_NUM = 2;
 	private static final int MAX_CHOICES_NUM = 10;
@@ -30,13 +31,11 @@ public class PollCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
-		PollManager pollManager = MANAGER.get(context.getChannel().getLongID());
+		PollManager pollManager = MANAGER.get(context.getChannelId());
 
-		if(context.getArg().matches("stop|cancel")
+		if(context.getArg().get().matches("stop|cancel")
 				&& pollManager != null
 				&& (context.getAuthor().equals(pollManager.getAuthor()) || context.getAuthorPermission().isSuperior(CommandPermission.USER))) {
 			pollManager.stop();
@@ -44,7 +43,7 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		if(pollManager != null) {
-			Integer num = NumberUtils.asIntBetween(context.getArg(), 1, pollManager.getChoicesCount());
+			Integer num = NumberUtils.asIntBetween(context.getArg().get(), 1, pollManager.getChoicesCount());
 			if(num == null) {
 				throw new IllegalCmdArgumentException(String.format("``%s` is not a valid number, must be between 1 and %d.",
 						context.getArg(), pollManager.getChoicesCount()));
@@ -55,7 +54,7 @@ public class PollCmd extends AbstractCommand {
 
 		pollManager = this.createPoll(context);
 
-		if(MANAGER.putIfAbsent(context.getChannel().getLongID(), pollManager) == null) {
+		if(MANAGER.putIfAbsent(context.getChannelId(), pollManager) == null) {
 			pollManager.start();
 		}
 	}

@@ -7,7 +7,9 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.core.publisher.Mono;
@@ -69,8 +71,21 @@ public class Context {
 		return message.getChannel();
 	}
 
+	public Mono<Boolean> isChannelNsfw() {
+		return message.getChannel().map(TextChannel.class::cast).map(TextChannel::isNsfw);
+	}
+
 	public Mono<User> getAuthor() {
 		return message.getAuthor();
+	}
+
+	public Snowflake getChannelId() {
+		return message.getChannelId();
+	}
+
+	// Assume that the author is not a webhook (author ID is null if the message was sent by a webhook)
+	public Snowflake getAuthorId() {
+		return message.getAuthorId().get();
 	}
 
 	public Mono<String> getUsername() {

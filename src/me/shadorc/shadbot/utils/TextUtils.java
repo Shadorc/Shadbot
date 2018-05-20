@@ -52,7 +52,7 @@ public class TextUtils {
 		return String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.", search);
 	}
 
-	public static String mustBeNSFW(String prefix) {
+	public static String mustBeNsfw(String prefix) {
 		return String.format(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",
 				prefix, SettingEnum.NSFW);
 	}

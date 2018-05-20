@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -15,10 +16,10 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -30,15 +31,12 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading CS:GO stats...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			String arg = context.getArg();
+			String arg = context.getArg().get();
 			String steamid = null;
 
 			// The user provided an URL that can contains a pseudo or an ID
@@ -67,7 +65,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			// Search users matching the steamID
 			JSONArray players = mainUserObj.getJSONObject("response").getJSONArray("players");
 			if(players.length() == 0) {
-				loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " User not found.");
+				loadingMsg.send(Emoji.MAGNIFYING_GLASS + " User not found.");
 				return;
 			}
 
@@ -77,7 +75,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			 * CommunityVisibilityState 1: Private 2: FriendsOnly 3: Public
 			 */
 			if(userObj.getInt("communityvisibilitystate") != 3) {
-				loadingMsg.edit(Emoji.ACCESS_DENIED + " This profile is private.");
+				loadingMsg.send(Emoji.ACCESS_DENIED + " This profile is private.");
 				return;
 			}
 
@@ -86,36 +84,33 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 			String body = NetUtils.getBody(url);
 			if(body.contains("500 Internal Server Error")) {
-				loadingMsg.edit(Emoji.ACCESS_DENIED + " The game details of this profile are not public.");
+				loadingMsg.send(Emoji.ACCESS_DENIED + " The game details of this profile are not public.");
 				return;
 			}
 
 			JSONObject mainStatsObj = new JSONObject(body);
 
 			if(!mainStatsObj.has("playerstats") || !mainStatsObj.getJSONObject("playerstats").has("stats")) {
-				loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.");
+				loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.");
 				return;
 			}
 
 			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");
 
-			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-					.setLenient(true)
-					.withAuthorName("Counter-Strike: Global Offensive Stats")
-					.withAuthorIcon("http://www.icon100.com/up/2841/256/csgo.png")
-					.withAuthorUrl("http://steamcommunity.com/profiles/" + steamid)
-					.withThumbnail(userObj.getString("avatarfull"))
-					.appendDescription(String.format("Stats for **%s**", userObj.getString("personaname")))
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Counter-Strike: Global Offensive Stats",
+					"http://www.icon100.com/up/2841/256/csgo.png",
+					"http://steamcommunity.com/profiles/" + steamid)
+					.setThumbnail(userObj.getString("avatarfull"))
+					.setDescription(String.format("Stats for **%s**", userObj.getString("personaname")))
 					.addField("Kills", Integer.toString(this.getValue(statsArray, "total_kills")), true)
 					.addField("Deaths", Integer.toString(this.getValue(statsArray, "total_deaths")), true)
 					.addField("Ratio", String.format("%.2f", (float) this.getValue(statsArray, "total_kills") / this.getValue(statsArray, "total_deaths")), true)
 					.addField("Total wins", Integer.toString(this.getValue(statsArray, "total_wins")), true)
 					.addField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
-			loadingMsg.edit(embed.build());
+			loadingMsg.send(embed);
 
 		} catch (JSONException | IOException err) {
-			loadingMsg.delete();
-			Utils.handle("getting Counter-Strike: Global Offensive stats", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting Counter-Strike: Global Offensive stats", context, err));
 		}
 	}
 
@@ -130,7 +125,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Counter-Strike: Global Offensive.")
 				.addArg("steamID", "steam ID, custom ID or profile URL", false)

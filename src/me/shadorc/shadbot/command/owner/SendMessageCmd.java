@@ -2,7 +2,10 @@ package me.shadorc.shadbot.command.owner;
 
 import java.util.List;
 
-import me.shadorc.shadbot.Shadbot;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -21,40 +24,42 @@ public class SendMessageCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
-		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
+		List<String> splitArgs = StringUtils.split(context.getArg().get(), 2);
 		if(splitArgs.size() != 2) {
 			throw new MissingArgumentException();
 		}
 
-		Long userID = NumberUtils.asPositiveLong(splitArgs.get(0));
-		if(userID == null) {
+		Long userId = NumberUtils.asPositiveLong(splitArgs.get(0));
+		if(userId == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", splitArgs.get(0)));
 		}
 
-		IUser user = Shadbot.getClient().getUserByID(userID);
-		if(user == null) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " User not found.", context.getChannel());
-			return;
-		}
+		context.getClient().getUserById(Snowflake.of(userId)).defaultIfEmpty(null).subscribe(user -> {
+			if(user == null) {
+				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " User not found.", context.getChannel());
+				return;
+			}
 
-		if(user.equals(context.getSelf())) {
-			throw new IllegalCmdArgumentException("I can't send a private message to myself.");
-		}
+			context.getSelf().map(User::getId).subscribe(selfId -> {
+				if(user.getId().equals(selfId)) {
+					throw new IllegalCmdArgumentException("I can't send a private message to myself.");
+				}
 
-		if(user.isBot()) {
-			throw new IllegalCmdArgumentException("I can't send private message to other bots.");
-		}
+				if(user.isBot()) {
+					throw new IllegalCmdArgumentException("I can't send private message to other bots.");
+				}
 
-		context.getClient().getOrCreatePMChannel(user).sendMessage(splitArgs.get(1));
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel());
+				BotUtils.sendMessage(splitArgs.get(1), user.getPrivateChannel().cast(MessageChannel.class));
+				BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel());
+			});
+
+		});
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Send a private message to an user.")
 				.addArg("userID", false)

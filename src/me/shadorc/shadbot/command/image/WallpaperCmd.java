@@ -20,6 +20,7 @@ import com.ivkos.wallhaven4j.models.wallpaper.Wallpaper;
 import com.ivkos.wallhaven4j.util.exceptions.ConnectionException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -29,6 +30,7 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -52,8 +54,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		LoadingMessage loadingMsg = new LoadingMessage("Loading wallpaper...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		if(wallhaven == null) {
 			wallhaven = new Wallhaven(APIKeys.get(APIKey.WALLHAVEN_LOGIN), APIKeys.get(APIKey.WALLHAVEN_PASSWORD));
@@ -77,67 +78,65 @@ public class WallpaperCmd extends AbstractCommand {
 
 		CommandLine cmdLine;
 		try {
-			List<String> args = StringUtils.split(context.getArg());
+			List<String> args = StringUtils.split(context.getArg().orElse(""));
 			cmdLine = new DefaultParser().parse(options, args.toArray(new String[args.size()]));
 		} catch (UnrecognizedOptionException | org.apache.commons.cli.MissingArgumentException err) {
-			loadingMsg.delete();
+			loadingMsg.stopTyping();
 			throw new IllegalCmdArgumentException(String.format("%s. Use `%shelp %s` for more information.",
 					err.getMessage(), context.getPrefix(), this.getName()));
 		} catch (ParseException err) {
-			loadingMsg.delete();
-			Utils.handle("getting a wallpaper", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting a wallpaper", context, err));
 			return;
 		}
 
-		Purity purity = this.parseEnum(loadingMsg, context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
-		if((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !context.getChannel().isNSFW()) {
-			loadingMsg.edit(TextUtils.mustBeNSFW(context.getPrefix()));
-			return;
-		}
-
-		SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
-		queryBuilder.purity(purity);
-
-		if(cmdLine.hasOption(CATEGORY)) {
-			queryBuilder.categories(this.parseEnum(loadingMsg, context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
-		}
-
-		if(cmdLine.hasOption(RATIO)) {
-			Dimension dim = this.parseDim(loadingMsg, context, RATIO, cmdLine.getOptionValues(RATIO));
-			queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
-		}
-
-		if(cmdLine.hasOption(RESOLUTION)) {
-			Dimension dim = this.parseDim(loadingMsg, context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
-			queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
-		}
-
-		if(cmdLine.hasOption(KEYWORD)) {
-			queryBuilder.keywords(cmdLine.getOptionValues(KEYWORD));
-		}
-
-		try {
-			List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
-			if(wallpapers.isEmpty()) {
-				loadingMsg.edit(TextUtils.noResult(context.getMessage().getContent()));
+		context.isChannelNsfw().subscribe(isNsfw -> {
+			Purity purity = this.parseEnum(loadingMsg, context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
+			if((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !isNsfw) {
+				loadingMsg.send(TextUtils.mustBeNsfw(context.getPrefix()));
 				return;
 			}
 
-			Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
+			SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
+			queryBuilder.purity(purity);
 
-			String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
-			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-					.withAuthorName("Wallpaper")
-					.withAuthorUrl(wallpaper.getUrl())
-					.withImage(wallpaper.getImageUrl())
-					.addField("Resolution", wallpaper.getResolution().toString(), false)
-					.addField("Tags", tags, false);
+			if(cmdLine.hasOption(CATEGORY)) {
+				queryBuilder.categories(this.parseEnum(loadingMsg, context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
+			}
 
-			loadingMsg.edit(embed.build());
-		} catch (ConnectionException err) {
-			loadingMsg.delete();
-			Utils.handle("getting a wallpaper", context, err.getCause());
-		}
+			if(cmdLine.hasOption(RATIO)) {
+				Dimension dim = this.parseDim(loadingMsg, context, RATIO, cmdLine.getOptionValues(RATIO));
+				queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
+			}
+
+			if(cmdLine.hasOption(RESOLUTION)) {
+				Dimension dim = this.parseDim(loadingMsg, context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
+				queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
+			}
+
+			if(cmdLine.hasOption(KEYWORD)) {
+				queryBuilder.keywords(cmdLine.getOptionValues(KEYWORD));
+			}
+
+			try {
+				List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
+				if(wallpapers.isEmpty()) {
+					loadingMsg.send(TextUtils.noResult(context.getContent()));
+					return;
+				}
+
+				Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
+
+				String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Wallpaper", wallpaper.getUrl())
+						.setImage(wallpaper.getImageUrl())
+						.addField("Resolution", wallpaper.getResolution().toString(), false)
+						.addField("Tags", tags, false);
+
+				loadingMsg.send(embed);
+			} catch (ConnectionException err) {
+				loadingMsg.send(ExceptionUtils.handleAndGet("getting a wallpaper", context, err.getCause()));
+			}
+		});
 	}
 
 	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) throws IllegalCmdArgumentException {
@@ -161,14 +160,14 @@ public class WallpaperCmd extends AbstractCommand {
 		return enumObj;
 	}
 
-	private void throwInvalidArg(LoadingMessage msg, Context context, String name) throws IllegalCmdArgumentException {
-		msg.delete();
+	private void throwInvalidArg(LoadingMessage loadingMsg, Context context, String name) throws IllegalCmdArgumentException {
+		loadingMsg.stopTyping();
 		throw new IllegalCmdArgumentException(String.format("`%s` value is not valid. Use `%shelp %s` for more information.",
 				name, context.getPrefix(), this.getName()));
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Search for a wallpaper.")
 				.setUsage(String.format("[-p %s] [-c %s] [-rat %s] [-res %s] [-k %s]", PURITY, CATEGORY, RATIO, RESOLUTION, KEYWORD))

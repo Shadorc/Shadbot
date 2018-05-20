@@ -28,22 +28,29 @@ import reactor.core.publisher.Mono;
 
 public class BotUtils {
 
-	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
-		return BotUtils.sendMessage(new MessageCreateSpec().setContent(content), channel);
+	public static void sendMessage(String content, Mono<MessageChannel> channel) {
+		channel.subscribe(msgChannel -> BotUtils.sendMessage(content, msgChannel));
 	}
 
-	public static Mono<Message> sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
+	public static void sendMessage(String content, MessageChannel channel) {
+		BotUtils.sendMessage(new MessageCreateSpec().setContent(content), channel).subscribe();
+	}
+
+	public static void sendMessage(EmbedCreateSpec embed, Mono<MessageChannel> channel) {
+		channel.subscribe(msgChannel -> BotUtils.sendMessage(embed, msgChannel));
+	}
+
+	public static void sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
 		if(!BotUtils.hasPermissions(channel, Permission.EMBED_LINKS)) {
 			BotUtils.sendMessage(TextUtils.missingPerm(Permission.EMBED_LINKS), channel);
 			LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send embed link.", channel.getId().asLong());
-			return Mono.empty();
+			return;
 		}
 
 		VariousStatsManager.log(VariousEnum.EMBEDS_SENT);
-		return BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel);
+		BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel).subscribe();
 	}
 
-	// TODO: if the Mono is never subscribed, #doOnError will never be triggered
 	public static Mono<Message> sendMessage(MessageCreateSpec message, MessageChannel channel) {
 		if(!BotUtils.hasPermissions(channel, Permission.SEND_MESSAGES)) {
 			LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send a message.", channel.getId().asLong());
@@ -57,6 +64,7 @@ public class BotUtils {
 								channel.getId().asLong())));
 	}
 
+	// TODO: This need to be subscribed
 	public static Flux<Snowflake> deleteMessages(TextChannel channel, Message... messages) {
 		switch (messages.length) {
 			case 0:
@@ -71,7 +79,7 @@ public class BotUtils {
 
 	public static void updatePresence(DiscordClient client) {
 		String text = String.format("%shelp | %s", Config.DEFAULT_PREFIX, TextUtils.getTip());
-		client.updatePresence(Presence.online(Activity.playing(text)));
+		client.updatePresence(Presence.online(Activity.playing(text))).subscribe();
 	}
 
 	// TODO

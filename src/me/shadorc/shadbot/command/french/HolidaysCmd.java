@@ -36,15 +36,13 @@ public class HolidaysCmd extends AbstractCommand {
 					context.getArg(), FormatUtils.formatOptions(Zone.class)));
 		}
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading holiday information...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			String holidays = StringUtils.remove(TwitterUtils.getLastTweet("Vacances_Zone" + zone), "#");
-			loadingMsg.edit(Emoji.BEACH + " " + holidays);
+			loadingMsg.send(Emoji.BEACH + " " + holidays);
 		} catch (TwitterException err) {
-			loadingMsg.delete();
-			ExceptionUtils.handle("getting holidays information", context, err.getCause());
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting holidays information", context, err.getCause()));
 		}
 	}
 

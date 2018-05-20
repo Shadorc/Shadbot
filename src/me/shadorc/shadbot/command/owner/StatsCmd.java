@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.owner;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -20,22 +21,20 @@ public class StatsCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
-		Map<String, Supplier<EmbedBuilder>> map = StatsManager.getStats();
+		Map<String, Supplier<EmbedCreateSpec>> map = StatsManager.getStats();
 
-		if(!map.containsKey(context.getArg().toLowerCase())) {
+		if(!map.containsKey(context.getArg().get().toLowerCase())) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid category. Options: %s",
 					context.getArg(), FormatUtils.format(map.keySet().stream(), value -> String.format("`%s`", value), ", ")));
 		}
 
-		BotUtils.sendMessage(map.get(context.getArg().toLowerCase()).get().build(), context.getChannel());
+		BotUtils.sendMessage(map.get(context.getArg().get().toLowerCase()).get(), context.getChannel());
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show statistics for the specified category.")
 				.addArg("category", FormatUtils.format(StatsManager.getStats().keySet().stream(),

@@ -29,8 +29,7 @@ public class GifCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
-		LoadingMessage loadingMsg = new LoadingMessage("Loading gif...", context.getChannel());
-		loadingMsg.send();
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
@@ -39,22 +38,21 @@ public class GifCmd extends AbstractCommand {
 
 			JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
 			if(!mainObj.has("data")) {
-				throw new HttpStatusException("Giphy did not return valid JSON.", 503, url);
+				throw new HttpStatusException("Giphy did not return valid JSON.", NetUtils.JSON_ERROR_CODE, url);
 			}
 
 			if(mainObj.get("data") instanceof JSONArray) {
-				loadingMsg.edit(TextUtils.noResult(context.getArg().orElse("")));
+				loadingMsg.send(TextUtils.noResult(context.getArg().orElse("random search")));
 				return;
 			}
 
 			EmbedCreateSpec embed = new EmbedCreateSpec()
 					.setColor(Config.BOT_COLOR.getRGB())
 					.setImage(mainObj.getJSONObject("data").getString("image_url"));
-			loadingMsg.edit(embed);
+			loadingMsg.send(embed);
 
 		} catch (JSONException | IOException err) {
-			loadingMsg.delete();
-			ExceptionUtils.handle("getting a gif", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting a gif", context, err));
 		}
 	}
 

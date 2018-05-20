@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -16,7 +18,7 @@ import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 
 public class PollManager extends AbstractGameManager {
 
-	private final Map<String, List<IUser>> choicesMap;
+	private final Map<String, List<Snowflake>> choicesMap;
 
 	private final int duration;
 	private final String question;
@@ -24,13 +26,13 @@ public class PollManager extends AbstractGameManager {
 
 	private long startTime;
 
-	public PollManager(AbstractCommand cmd, String prefix, IChannel channel, IUser author, int duration, String question, List<String> choicesList) {
-		super(cmd, prefix, channel, author);
+	public PollManager(AbstractCommand cmd, String prefix, Snowflake guildId, Snowflake channelId, Snowflake authorId, int duration, String question, List<String> choicesList) {
+		super(cmd, prefix, guildId, channelId, authorId);
 		this.duration = duration;
 		this.question = question;
-		this.message = new UpdateableMessage(channel);
+		this.message = new UpdateableMessage(channelId);
 
-		this.choicesMap = new LinkedHashMap<String, List<IUser>>(10);
+		this.choicesMap = new LinkedHashMap<>(10);
 		choicesList.stream().forEach(choice -> choicesMap.put(choice, new ArrayList<>()));
 	}
 
@@ -44,14 +46,14 @@ public class PollManager extends AbstractGameManager {
 	@Override
 	public void stop() {
 		this.cancelScheduledTask();
-		PollCmd.MANAGER.remove(this.getChannel().getLongID());
+		PollCmd.MANAGER.remove(this.getChannelId());
 		choicesMap.clear();
 		this.show();
 	}
 
-	protected synchronized void vote(IUser user, int num) {
-		choicesMap.values().stream().forEach(list -> list.remove(user));
-		choicesMap.get(new ArrayList<>(choicesMap.keySet()).get(num - 1)).add(user);
+	protected synchronized void vote(Snowflake userId, int num) {
+		choicesMap.values().stream().forEach(list -> list.remove(userId));
+		choicesMap.get(new ArrayList<>(choicesMap.keySet()).get(num - 1)).add(userId);
 		this.show();
 	}
 
@@ -59,7 +61,7 @@ public class PollManager extends AbstractGameManager {
 		int count = 1;
 		StringBuilder choicesStr = new StringBuilder();
 		for(String choice : choicesMap.keySet()) {
-			List<IUser> votersList = choicesMap.get(choice);
+			List<Snowflake> votersList = choicesMap.get(choice);
 			choicesStr.append(String.format("%n\t**%d.** %s", count, choice));
 			if(!votersList.isEmpty()) {
 				choicesStr.append(String.format(" *(Vote: %d)*", votersList.size()));
@@ -68,7 +70,7 @@ public class PollManager extends AbstractGameManager {
 			count++;
 		}
 
-		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
+		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 				.withAuthorName(String.format("Poll (Created by: %s)", this.getAuthor().getName()))
 				.withThumbnail(this.getAuthor().getAvatarURL())
 				.appendDescription(String.format("Vote using: `%s%s <choice>`%n%n__**%s**__%s",

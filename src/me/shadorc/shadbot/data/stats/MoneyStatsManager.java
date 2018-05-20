@@ -22,7 +22,8 @@ import me.shadorc.shadbot.data.stats.annotation.StatsJSON;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.object.Pair;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 public class MoneyStatsManager {
 
@@ -83,21 +84,21 @@ public class MoneyStatsManager {
 
 		Map<String, AtomicInteger> commandsUsed = CommandStatsManager.get(CommandEnum.COMMAND_USED);
 
-		Map<String, Pair<Float, Long>> averageMap = new HashMap<>();
+		Map<String, Tuple2<Float, Long>> averageMap = new HashMap<>();
 		for(String gameName : gamesName) {
 			long gains = moneyGained.getOrDefault(gameName, new AtomicLong(0)).get();
 			long losses = moneyLost.getOrDefault(gameName, new AtomicLong(0)).get();
 			long usages = commandsUsed.get(gameName).get();
 			float average = ((float) gains - losses) / usages;
-			averageMap.put(gameName, new Pair<Float, Long>(average, usages));
+			averageMap.put(gameName, Tuples.of(average, usages));
 		}
 
-		Comparator<Entry<String, Pair<Float, Long>>> comparator = (v1, v2) -> v1.getValue().getSecond().compareTo(v2.getValue().getSecond());
-		Map<String, Pair<Float, Long>> sortedMap = Utils.sortByValue(averageMap, comparator.reversed());
+		Comparator<Entry<String, Tuple2<Float, Long>>> comparator = (v1, v2) -> v1.getValue().getT2().compareTo(v2.getValue().getT2());
+		Map<String, Tuple2<Float, Long>> sortedMap = Utils.sortByValue(averageMap, comparator.reversed());
 
 		return embed.addField("Name", FormatUtils.format(sortedMap.keySet().stream(), Object::toString, "\n"), true)
-				.addField("Average", FormatUtils.format(sortedMap.values().stream().map(Pair::getFirst), num -> FormatUtils.formatNum(num.intValue()), "\n"), true)
-				.addField("Count", FormatUtils.format(sortedMap.values().stream().map(Pair::getSecond), num -> FormatUtils.formatNum(num), "\n"), true);
+				.addField("Average", FormatUtils.format(sortedMap.values().stream().map(Tuple2::getT1), num -> FormatUtils.formatNum(num.intValue()), "\n"), true)
+				.addField("Count", FormatUtils.format(sortedMap.values().stream().map(Tuple2::getT2), num -> FormatUtils.formatNum(num), "\n"), true);
 	}
 
 	@StatsJSON(name = NAME)

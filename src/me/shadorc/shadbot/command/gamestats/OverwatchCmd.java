@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.gamestats;
 import java.io.IOException;
 import java.util.List;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -11,7 +12,9 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -35,12 +38,12 @@ public class OverwatchCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		List<String> splitArgs = StringUtils.split(context.getArg());
-		if(!Utils.isInRange(splitArgs.size(), 1, 3)) {
+		List<String> splitArgs = StringUtils.split(context.getArg().orElse(""));
+		if(!NumberUtils.isInRange(splitArgs.size(), 1, 3)) {
 			throw new MissingArgumentException();
 		}
 
-		LoadingMessage loadingMsg = new LoadingMessage("Loading Overwatch profile...", context.getChannel());
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			OverwatchPlayer player;
@@ -49,35 +52,30 @@ public class OverwatchCmd extends AbstractCommand {
 			Platform platform = null;
 			if(splitArgs.size() == 1) {
 				username = splitArgs.get(0);
-				loadingMsg.send();
 				player = new OverwatchPlayer(username);
 			} else {
 				platform = this.getPlatform(splitArgs.get(0));
 				username = splitArgs.get(1);
-				loadingMsg.send();
 				player = new OverwatchPlayer(username, platform);
 			}
 
-			EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-					.setLenient(true)
-					.withAuthorName("Overwatch Stats")
-					.withAuthorIcon("http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png")
-					.withAuthorUrl(player.getProfileURL())
-					.withThumbnail(player.getIconUrl())
-					.appendDescription(String.format("Stats for user **%s**", player.getName()))
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Overwatch Stats",
+					"http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png",
+					player.getProfileURL())
+					.setThumbnail(player.getIconUrl())
+					.setDescription(String.format("Stats for user **%s**", player.getName()))
 					.addField("Level", Integer.toString(player.getLevel()), true)
 					.addField("Competitive rank", Integer.toString(player.getRank()), true)
 					.addField("Wins", Integer.toString(player.getWins()), true)
 					.addField("Game time", player.getTimePlayed(), true)
 					.addField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
 					.addField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
-			loadingMsg.edit(embed.build());
+			loadingMsg.send(embed);
 
 		} catch (OverwatchException err) {
-			loadingMsg.edit(Emoji.MAGNIFYING_GLASS + " " + err.getMessage());
+			loadingMsg.send(Emoji.MAGNIFYING_GLASS + " " + err.getMessage());
 		} catch (IOException err) {
-			loadingMsg.delete();
-			Utils.handle("getting information from Overwatch profile", context, err);
+			loadingMsg.send(ExceptionUtils.handleAndGet("getting information from Overwatch profile", context, err));
 		}
 	}
 
@@ -96,7 +94,7 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show player's stats for Overwatch.")
 				.addArg("platform", String.format("user's platform (%s)",

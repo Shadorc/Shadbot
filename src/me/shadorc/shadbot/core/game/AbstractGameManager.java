@@ -4,9 +4,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -27,12 +25,12 @@ public abstract class AbstractGameManager {
 
 	private ScheduledFuture<?> scheduledTask;
 
-	public AbstractGameManager(AbstractCommand cmd, String prefix, TextChannel channel, Member member) {
+	public AbstractGameManager(AbstractCommand cmd, String prefix, Snowflake guildId, Snowflake channelId, Snowflake userId) {
 		this.cmdName = cmd.getName();
 		this.prefix = prefix;
-		this.guildId = channel.getGuildId();
-		this.channelId = channel.getId();
-		this.userId = member.getId();
+		this.guildId = guildId;
+		this.channelId = channelId;
+		this.userId = userId;
 	}
 
 	public abstract void start() throws Exception;

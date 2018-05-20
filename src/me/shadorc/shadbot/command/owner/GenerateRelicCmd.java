@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.owner;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -22,11 +23,9 @@ public class GenerateRelicCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(!context.hasArg()) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
-		RelicType type = Utils.getValueOrNull(RelicType.class, context.getArg());
+		RelicType type = Utils.getValueOrNull(RelicType.class, context.getArg().get());
 		if(type == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s`in not a valid type. %s",
 					context.getArg(), FormatUtils.formatOptions(RelicType.class)));
@@ -38,7 +37,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Generate a relic.")
 				.addArg(RelicType.values(), false)
