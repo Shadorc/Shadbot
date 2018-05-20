@@ -60,12 +60,12 @@ public class Relic {
 		return activationTime;
 	}
 
-	public boolean isExpired() {
-		return TimeUnit.MILLISECONDS.toDays(TimeUtils.getMillisUntil(this.getActivationTime())) >= this.getDuration();
-	}
-
 	public void setGuildId(Snowflake guildId) {
 		this.guildId = guildId;
+	}
+
+	public boolean isExpired() {
+		return TimeUnit.MILLISECONDS.toDays(TimeUtils.getMillisUntil(this.getActivationTime())) >= this.getDuration();
 	}
 
 	public JSONObject toJSON() {

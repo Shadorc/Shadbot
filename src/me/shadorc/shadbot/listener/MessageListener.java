@@ -15,7 +15,6 @@ import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.message.MessageManager;
-import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
@@ -36,8 +35,6 @@ public class MessageListener {
 			MessageListener.onPrivateMessage(message);
 			return;
 		}
-
-		ShardManager.getShard(event.getClient()).messageReceived();
 
 		Member member = message.getAuthorAsMember().block();
 		Guild guild = message.getGuild().block();

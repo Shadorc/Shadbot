@@ -13,7 +13,6 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
-import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;

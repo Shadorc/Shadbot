@@ -17,8 +17,7 @@ public class TextUtils {
 			String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "
 					+ "You can remove this limit by contributing to Shadbot. More info on **%s**", Config.DEFAULT_PLAYLIST_SIZE, Config.PATREON_URL);
 
-	public static final String NO_PLAYING_MUSIC =
-			Emoji.MUTE + " No currently playing music.";
+	public static final String NO_PLAYING_MUSIC = Emoji.MUTE + " No currently playing music.";
 
 	private static final String[] SPAM_MESSAGES = { "Take it easy, we are not in a hurry !",
 			"Phew.. give me time to rest, you're too fast for me.",
@@ -30,10 +29,16 @@ public class TextUtils {
 			String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
 			String.format("Support server: %s", Config.SUPPORT_SERVER_URL) };
 
+	/**
+	 * @return A string representing a random spam message
+	 */
 	public static String getSpamMessage() {
 		return SPAM_MESSAGES[ThreadLocalRandom.current().nextInt(SPAM_MESSAGES.length)];
 	}
 
+	/**
+	 * @return A string representing a random tip
+	 */
 	public static String getTip() {
 		return TIPS_MESSAGES[ThreadLocalRandom.current().nextInt(TIPS_MESSAGES.length)];
 	}

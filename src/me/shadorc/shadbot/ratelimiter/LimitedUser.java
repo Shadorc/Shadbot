@@ -19,12 +19,12 @@ public class LimitedUser {
 		return deletionTask;
 	}
 
-	public void increment() {
-		this.count++;
-	}
-
 	public void setDeletionTask(ScheduledFuture<LimitedUser> deletionTask) {
 		this.deletionTask = deletionTask;
+	}
+
+	public void increment() {
+		this.count++;
 	}
 
 }

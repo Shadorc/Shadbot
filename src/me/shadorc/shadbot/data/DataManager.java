@@ -25,18 +25,17 @@ public class DataManager {
 		LogUtils.infof("Initializing data files...");
 
 		if(!SAVE_DIR.exists() && !SAVE_DIR.mkdir()) {
-			LogUtils.error("The save folder could not be created.");
+			LogUtils.error("The save directory could not be created.");
 			return false;
 		}
 
 		Reflections reflections = new Reflections(DataManager.class.getPackage().getName(), new MethodAnnotationsScanner());
 		for(Method initMethod : reflections.getMethodsAnnotatedWith(DataInit.class)) {
-
+			String className = initMethod.getDeclaringClass().getSimpleName();
 			try {
 				initMethod.invoke(null);
 			} catch (Exception err) {
-				LogUtils.error(err, String.format("An error occurred while initializing data %s.",
-						initMethod.getDeclaringClass().getSimpleName()));
+				LogUtils.error(err, String.format("An error occurred while initializing data %s.", className));
 				return false;
 			}
 
@@ -46,11 +45,11 @@ public class DataManager {
 					DataSave annotation = method.getAnnotation(DataSave.class);
 					Runnable saveTask = () -> {
 						try {
-							LogUtils.infof("Saving %s...", initMethod.getDeclaringClass().getSimpleName());
+							LogUtils.infof("Saving %s...", className);
 							method.invoke(null);
-							LogUtils.infof("%s saved.", initMethod.getDeclaringClass().getSimpleName());
+							LogUtils.infof("%s saved.", className);
 						} catch (Exception err) {
-							LogUtils.error(err, String.format("An error occurred while saving %s.", annotation.filePath()));
+							LogUtils.error(err, String.format("An error occurred while saving %s.", className));
 						}
 					};
 					SAVE_TASKS.add(saveTask);
@@ -58,7 +57,7 @@ public class DataManager {
 				}
 			}
 
-			LogUtils.infof("%s initialized.", initMethod.getDeclaringClass().getSimpleName());
+			LogUtils.infof("%s initialized.", className);
 		}
 
 		LogUtils.infof("Data files initialized.");

@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.core.command;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,14 +33,15 @@ public class CommandManager {
 
 		Reflections reflections = new Reflections(Shadbot.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
 		for(Class<?> cmdClass : reflections.getTypesAnnotatedWith(Command.class)) {
+			String cmdName = cmdClass.getSimpleName();
 			if(!AbstractCommand.class.isAssignableFrom(cmdClass)) {
-				LogUtils.error(String.format("An error occurred while generating command, %s cannot be cast to AbstractCommand.",
-						cmdClass.getSimpleName()));
+				LogUtils.error(String.format("An error occurred while generating command, %s cannot be casted to %s.",
+						cmdName, AbstractCommand.class.getSimpleName()));
 				continue;
 			}
 
 			try {
-				AbstractCommand cmd = (AbstractCommand) cmdClass.getConstructor().newInstance();
+				AbstractCommand cmd = AbstractCommand.class.cast(cmdClass.getConstructor().newInstance());
 
 				List<String> names = cmd.getNames();
 				if(!cmd.getAlias().isEmpty()) {
@@ -51,21 +51,21 @@ public class CommandManager {
 				for(String name : names) {
 					if(COMMANDS_MAP.putIfAbsent(name, cmd) != null) {
 						LogUtils.error(String.format("Command name collision between %s and %s",
-								cmdClass.getSimpleName(), COMMANDS_MAP.get(name).getClass().getSimpleName()));
+								cmdName, COMMANDS_MAP.get(name).getClass().getSimpleName()));
 						continue;
 					}
 				}
-			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException err) {
-				LogUtils.error(err, String.format("An error occurred while initializing command %s.",
-						cmdClass.getDeclaringClass().getSimpleName()));
+			} catch (Exception err) {
+				LogUtils.error(err, String.format("An error occurred while initializing command %s.", cmdName));
 				return false;
 			}
 		}
 
-		LogUtils.infof("%s initialized.", StringUtils.pluralOf((int) COMMANDS_MAP.values().stream().distinct().count(), "command"));
+		LogUtils.infof("%s initialized.", StringUtils.pluralOf(COMMANDS_MAP.values().stream().distinct().count(), "command"));
 		return true;
 	}
 
+	// TODO: Avoid to block everything
 	public static void execute(Context context) {
 		AbstractCommand cmd = COMMANDS_MAP.get(context.getCommandName());
 		if(cmd == null) {

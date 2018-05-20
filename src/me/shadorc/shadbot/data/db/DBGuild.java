@@ -115,19 +115,16 @@ public class DBGuild {
 				.block();
 	}
 
-	// TODO: Changed from null to Optional
 	public Optional<Snowflake> getMessageChannelId() {
 		return Optional.ofNullable(
 				Snowflake.of((long) settingsMap.get(SettingEnum.MESSAGE_CHANNEL_ID)));
 	}
 
-	// TODO: Changed from null to Optional
 	public Optional<String> getJoinMessage() {
 		return Optional.ofNullable(
 				(String) settingsMap.get(SettingEnum.JOIN_MESSAGE));
 	}
 
-	// TODO: Changed from null to Optional
 	public Optional<String> getLeaveMessage() {
 		return Optional.ofNullable(
 				(String) settingsMap.get(SettingEnum.LEAVE_MESSAGE));
@@ -164,8 +161,8 @@ public class DBGuild {
 		this.loadUsers();
 
 		JSONObject usersObj = new JSONObject();
-		for(Snowflake userID : usersMap.keySet()) {
-			usersObj.put(userID.asString(), usersMap.get(userID).toJSON());
+		for(Snowflake userId : usersMap.keySet()) {
+			usersObj.put(userId.asString(), usersMap.get(userId).toJSON());
 		}
 		guildObj.put(USERS_KEY, usersObj);
 

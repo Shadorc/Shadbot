@@ -17,17 +17,16 @@ public class ExceptionUtils {
 			long channelId = channel.getId().asLong();
 
 			String msg;
-			if(err instanceof JSONException || err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == NetUtils.JSON_ERROR_CODE) {
+			if(isJsonUnavailable(err) || isUnavailable(err)) {
 				msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
-				LogUtils.warnf("{Channel ID: %d} %s", channelId, err.getMessage());
+				if(isJsonUnavailable(err)) {
+					LogUtils.warnf("{Channel ID: %d} %s", channelId, err.getMessage());
+				} else {
+					LogUtils.warnf("{Channel ID: %d} Service unavailable while %s.", channelId, action);
+				}
 			}
 
-			else if(err instanceof ConnectException || err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503) {
-				msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
-				LogUtils.warnf("{Channel ID: %d} Service unavailable while %s.", channelId, action);
-			}
-
-			else if(err instanceof SocketTimeoutException) {
+			else if(isUnreacheable(err)) {
 				msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.", StringUtils.capitalize(action));
 				LogUtils.warnf("{Channel ID: %d} A SocketTimeoutException occurred while %s.", channelId, action);
 			}
@@ -39,6 +38,20 @@ public class ExceptionUtils {
 
 			BotUtils.sendMessage(Emoji.RED_FLAG + " " + msg, channel);
 		});
+	}
+
+	private static boolean isJsonUnavailable(Throwable err) {
+		return err instanceof JSONException
+				|| err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == NetUtils.JSON_ERROR_CODE;
+	}
+
+	private static boolean isUnavailable(Throwable err) {
+		return err instanceof ConnectException
+				|| err instanceof HttpStatusException && ((HttpStatusException) err).getStatusCode() == 503;
+	}
+
+	private static boolean isUnreacheable(Throwable err) {
+		return err instanceof SocketTimeoutException;
 	}
 
 }

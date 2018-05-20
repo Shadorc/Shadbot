@@ -16,26 +16,39 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.core.CustomShard;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.shard.CustomShard;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class NetUtils {
 
 	public static final int JSON_ERROR_CODE = 603;
 
+	/**
+	 * @param url - URL to connect to. The protocol must be http or https
+	 * @return The {@link Connection} corresponding to {@code url} with default user-agent and default timeout
+	 */
 	private static Connection getDefaultConnection(String url) {
 		return Jsoup.connect(url)
 				.userAgent(Config.USER_AGENT)
 				.timeout(Config.DEFAULT_TIMEOUT);
 	}
 
+	/**
+	 * @param url - URL to connect to. The protocol must be http or https
+	 * @return The {@link Document} corresponding to {@code url} with default user-agent and default timeout
+	 * @throws IOException
+	 */
 	public static Document getDoc(String url) throws IOException {
 		return NetUtils.getDefaultConnection(url).get();
 	}
 
+	/**
+	 * @param url - URL to connect to. The protocol must be http or https
+	 * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type and HTTP errors
+	 * @throws IOException
+	 */
 	public static Response getResponse(String url) throws IOException {
 		return NetUtils.getDefaultConnection(url)
 				.ignoreContentType(true)
@@ -43,12 +56,17 @@ public class NetUtils {
 				.execute();
 	}
 
+	/**
+	 * @param url - URL to connect to. The protocol must be http or https
+	 * @return The {@code body} corresponding to the {@code url} with default user-agent and default timeout
+	 * @throws IOException
+	 */
 	public static String getBody(String url) throws IOException {
 		return NetUtils.getResponse(url).body();
 	}
 
 	/**
-	 * @param url - the URL from which to obtain the JSON
+	 * @param url - URL to connect to. The protocol must be http or https
 	 * @return A string representing JSON
 	 * @throws HttpStatusException - if the URL returns an invalid JSON
 	 */
@@ -90,12 +108,17 @@ public class NetUtils {
 		}
 	}
 
+	/**
+	 * @param homeUrl - the statistics site url
+	 * @param token - the API token corresponding to the website
+	 * @param shard - the shard from which to post stats
+	 */
 	public static void postStatsOn(String homeUrl, APIKey token, CustomShard shard) {
-		Shadbot.getSelf().subscribe(self -> {
+		shard.getClient().getSelf().subscribe(self -> {
 			JSONObject content = new JSONObject()
 					.put("shard_id", shard.getIndex())
 					.put("shard_count", shard.getShardCount())
-					.put("server_count", shard.getGuildsCount());
+					.put("server_count", shard.getGuildsCount().block());
 
 			String url = String.format("%s/api/bots/%d/stats", homeUrl, self.getId().asLong());
 			try {

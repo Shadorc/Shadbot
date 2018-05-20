@@ -8,7 +8,6 @@ import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -25,7 +24,7 @@ public class MemberListener {
 
 		if(BotUtils.hasPermissions(event.getGuild(), Permission.MANAGE_ROLES)
 				&& BotUtils.canInteract(event.getGuild(), event.getMember())
-				&& PermissionUtils.hasHierarchicalPermissions(event.getGuild(), Shadbot.getSelf(), autoRoles)) {
+				&& PermissionUtils.hasHierarchicalPermissions(event.getGuild(), event.getClient().getSelf(), autoRoles)) {
 			event.getGuild().editUserRoles(event.getMember(), autoRoles);
 		}
 	}

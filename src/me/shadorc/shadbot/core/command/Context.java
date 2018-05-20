@@ -8,12 +8,7 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Permission;
-import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.shard.CustomShard;
-import me.shadorc.shadbot.shard.ShardManager;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.core.publisher.Mono;
 
@@ -49,7 +44,7 @@ public class Context {
 		return cmdName;
 	}
 
-	// TODO: Has been changed from "" to Optional
+	// TODO: Has been changed from "" to Optional, this need to be checked in commands
 	public Optional<String> getArg() {
 		return arg;
 	}
@@ -58,13 +53,8 @@ public class Context {
 		return message.getClient();
 	}
 
-	// TODO Keep this ?
 	public Mono<User> getSelf() {
-		return Shadbot.getSelf();
-	}
-
-	public CustomShard getShard() {
-		return ShardManager.getShard(this.getClient());
+		return message.getClient().getSelf();
 	}
 
 	public Integer getShardIndex() {
@@ -87,16 +77,18 @@ public class Context {
 		return this.getAuthor().map(User::getUsername);
 	}
 
+	// TODO
 	public CommandPermission getAuthorPermission() {
-		if(this.getAuthor().equals(this.getClient().getApplicationInfo().block().getOwner().block())) {
-			return CommandPermission.OWNER;
-		} else if(!this.getGuild().isPresent()) {
-			return CommandPermission.ADMIN;
-		} else if(this.getAuthor().getPermissionsForGuild(this.getGuild()).contains(Permission.ADMINISTRATOR)) {
-			return CommandPermission.ADMIN;
-		} else {
-			return CommandPermission.USER;
-		}
+		// if(this.getAuthor().equals(this.getClient().getApplicationInfo().block().getOwner().block())) {
+		// return CommandPermission.OWNER;
+		// } else if(!this.getGuild().isPresent()) {
+		// return CommandPermission.ADMIN;
+		// } else if(this.getAuthor().getPermissionsForGuild(this.getGuild()).contains(Permission.ADMINISTRATOR)) {
+		// return CommandPermission.ADMIN;
+		// } else {
+		// return CommandPermission.USER;
+		// }
+		return CommandPermission.USER;
 	}
 
 	public void requireArg() throws MissingArgumentException {

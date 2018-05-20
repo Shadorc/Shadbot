@@ -36,7 +36,7 @@ public class OverwatchCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
 		List<String> splitArgs = StringUtils.split(context.getArg());
-		if(!Utils.isInInclusiveRange(splitArgs.size(), 1, 3)) {
+		if(!Utils.isInRange(splitArgs.size(), 1, 3)) {
 			throw new MissingArgumentException();
 		}
 

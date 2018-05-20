@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.TextChannel;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -24,7 +23,7 @@ public abstract class AbstractGameManager {
 	private final String prefix;
 	private final Snowflake guildId;
 	private final Snowflake channelId;
-	private final Snowflake memberId;
+	private final Snowflake userId;
 
 	private ScheduledFuture<?> scheduledTask;
 
@@ -33,7 +32,7 @@ public abstract class AbstractGameManager {
 		this.prefix = prefix;
 		this.guildId = channel.getGuildId();
 		this.channelId = channel.getId();
-		this.memberId = member.getId();
+		this.userId = member.getId();
 	}
 
 	public abstract void start() throws Exception;
@@ -41,12 +40,18 @@ public abstract class AbstractGameManager {
 	public abstract void stop();
 
 	public final boolean isCancelCmd(Message message) {
-		User user = message.getAuthor().block();
-		if(message.getContent().orElse("").equals(this.getPrefix() + "cancel")
-				&& (memberId.equals(user.getId()) || PermissionUtils.hasPermissions(message.getChannel(), user, Permission.ADMINISTRATOR))) {
-			message.getClient().getMessageChannelById(channelId)
-					.subscribe(channel -> BotUtils.sendMessage(
-							String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", user.getUsername()), channel));
+		if(!message.getContent().isPresent() || !message.getAuthorId().isPresent()) {
+			return false;
+		}
+
+		Snowflake authorId = message.getAuthorId().get();
+		String content = message.getContent().get();
+		if(content.equals(prefix + "cancel")
+				&& (userId.equals(authorId) || PermissionUtils.hasPermissions(message.getChannel(), authorId, Permission.ADMINISTRATOR))) {
+			message.getAuthor()
+					.subscribe(author -> message.getClient().getMessageChannelById(channelId)
+							.subscribe(channel -> BotUtils.sendMessage(
+									String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", author.getUsername()), channel)));
 			this.stop();
 			return true;
 		}
@@ -70,7 +75,7 @@ public abstract class AbstractGameManager {
 	}
 
 	public Snowflake getAuthorId() {
-		return memberId;
+		return userId;
 	}
 
 	public boolean isTaskDone() {

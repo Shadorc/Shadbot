@@ -34,7 +34,7 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		List<String> splitArgs = StringUtils.split(context.getArg(), 2);
-		if(!Utils.isInInclusiveRange(splitArgs.size(), 1, 2)) {
+		if(!Utils.isInRange(splitArgs.size(), 1, 2)) {
 			throw new MissingArgumentException();
 		}
 

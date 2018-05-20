@@ -79,7 +79,7 @@ public class PollCmd extends AbstractCommand {
 
 		// Remove duplicate choices
 		List<String> choicesList = substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList());
-		if(!Utils.isInInclusiveRange(choicesList.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
+		if(!Utils.isInRange(choicesList.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
 			throw new IllegalCmdArgumentException(String.format("You must specify between %d and %d different non-empty choices.",
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}

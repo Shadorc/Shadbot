@@ -6,6 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
+import me.shadorc.shadbot.data.DataManager;
+
+/**
+ * All the methods annoted with this interface will be called periodically depending on parameters from the moment {@link DataManager} is called
+ */
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DataSave {

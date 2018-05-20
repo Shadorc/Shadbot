@@ -82,8 +82,8 @@ public class RouletteManager extends AbstractGameManager {
 			Map<Place, Boolean> testsMap = new HashMap<>();
 			testsMap.put(Place.RED, RED_NUMS.contains(winningPlace));
 			testsMap.put(Place.BLACK, !RED_NUMS.contains(winningPlace));
-			testsMap.put(Place.LOW, Utils.isInInclusiveRange(winningPlace, 1, 19));
-			testsMap.put(Place.HIGH, Utils.isInInclusiveRange(winningPlace, 19, 37));
+			testsMap.put(Place.LOW, Utils.isInRange(winningPlace, 1, 19));
+			testsMap.put(Place.HIGH, Utils.isInRange(winningPlace, 19, 37));
 			testsMap.put(Place.EVEN, winningPlace % 2 == 0);
 			testsMap.put(Place.ODD, winningPlace % 2 != 0);
 
