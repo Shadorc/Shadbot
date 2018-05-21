@@ -51,6 +51,10 @@ public class BotUtils {
 		BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel).subscribe();
 	}
 
+	public static void sendMessage(MessageCreateSpec message, Mono<MessageChannel> channel) {
+		channel.subscribe(msgChannel -> BotUtils.sendMessage(message, msgChannel));
+	}
+
 	public static Mono<Message> sendMessage(MessageCreateSpec message, MessageChannel channel) {
 		if(!BotUtils.hasPermissions(channel, Permission.SEND_MESSAGES)) {
 			LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send a message.", channel.getId().asLong());
@@ -87,28 +91,28 @@ public class BotUtils {
 		// Mono<List<User>> users = message.getUserMentions().collectList();
 		// Mono<List<Role>> roles = message.getRoleMentions().collectList();
 		// //TODO: Do I need to get all members and filter them ?
-		// users.concatWith(message.getGuild().block().getMembers().filter(member -> member.getRoles().has).block()).collectList());
+		// users.concatWith(message.getGuild().getMembers().filter(member -> member.getRoles().has)).collectList());
 		// users = users.stream().distinct().collect(Collectors.toList());
 		// return users;
 		return Collections.emptyList();
 	}
 
-	public static boolean isChannelAllowed(Guild guild, MessageChannel channel) {
-		List<Snowflake> allowedChannels = Database.getDBGuild(guild.getId()).getAllowedChannels();
+	public static boolean isChannelAllowed(Snowflake guildId, Snowflake channelId) {
+		List<Snowflake> allowedChannels = Database.getDBGuild(guildId).getAllowedChannels();
 		// If no permission has been set OR the channel is allowed
-		return allowedChannels.isEmpty() || allowedChannels.contains(channel.getId());
+		return allowedChannels.isEmpty() || allowedChannels.contains(channelId);
 	}
 
-	public static boolean hasAllowedRole(Guild guild, List<Role> roles) {
-		List<Snowflake> allowedRoles = Database.getDBGuild(guild.getId()).getAllowedRoles();
+	public static boolean hasAllowedRole(Snowflake guildId, List<Role> roles) {
+		List<Snowflake> allowedRoles = Database.getDBGuild(guildId).getAllowedRoles();
 		// If the user is an administrator OR no permissions have been set OR the role is allowed
 		return roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
 				|| allowedRoles.isEmpty()
 				|| roles.stream().anyMatch(role -> allowedRoles.contains(role.getId()));
 	}
 
-	public static boolean isCommandAllowed(Guild guild, AbstractCommand cmd) {
-		List<String> blacklistedCmd = Database.getDBGuild(guild.getId()).getBlacklistedCmd();
+	public static boolean isCommandAllowed(Snowflake guildId, AbstractCommand cmd) {
+		List<String> blacklistedCmd = Database.getDBGuild(guildId).getBlacklistedCmd();
 		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
 	}
 

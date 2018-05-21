@@ -2,10 +2,11 @@ package me.shadorc.shadbot.listener;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Channel.Type;
-import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
@@ -21,49 +22,68 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 public class MessageListener {
 
 	public static void onMessageCreate(MessageCreateEvent event) {
+
 		VariousStatsManager.log(VariousEnum.MESSAGES_RECEIVED);
 
 		Message message = event.getMessage();
-		String content = message.getContent().orElse("");
 
-		if(message.getAuthor().block().isBot()) {
+		// The message is a webhook
+		if(!message.getContent().isPresent() || !message.getAuthorId().isPresent()) {
 			return;
 		}
 
-		MessageChannel channel = message.getChannel().block();
-		if(channel.getType().equals(Type.DM)) {
-			MessageListener.onPrivateMessage(message);
-			return;
-		}
+		message.getAuthor().subscribe(author -> {
 
-		Member member = message.getAuthorAsMember().block();
-		Guild guild = message.getGuild().block();
-		if(!BotUtils.hasAllowedRole(guild, member.getRoles().collectList().block())) {
-			return;
-		}
+			// The author is a bot
+			if(author.isBot()) {
+				return;
+			}
 
-		if(!BotUtils.isChannelAllowed(guild, channel)) {
-			return;
-		}
+			message.getChannel().subscribe(channel -> {
 
-		if(MessageManager.intercept(message)) {
-			return;
-		}
+				// The channel is a private channel
+				if(channel.getType().equals(Type.DM)) {
+					MessageListener.onPrivateMessage(channel, message);
+					return;
+				}
 
-		String prefix = Database.getDBGuild(guild.getId()).getPrefix();
-		if(content.startsWith(prefix)) {
-			CommandManager.execute(new Context(prefix, message));
-		}
+				// The channel is not private, it can be casted to TextChannel to get guild ID
+				Snowflake guildId = TextChannel.class.cast(channel).getGuildId();
+
+				// The bot does not have the permission to access this channel
+				if(!BotUtils.isChannelAllowed(guildId, channel.getId())) {
+					return;
+				}
+
+				message.getAuthorAsMember().flatMapMany(Member::getRoles).buffer().subscribe(rolesList -> {
+
+					// The author role is not allowed to access to the bot
+					if(!BotUtils.hasAllowedRole(guildId, rolesList)) {
+						return;
+					}
+
+					// A listener has the priority on this listener and stop the processing
+					if(MessageManager.intercept(message)) {
+						return;
+					}
+
+					// The message content is a command, execute it
+					String prefix = Database.getDBGuild(guildId).getPrefix();
+					if(message.getContent().get().startsWith(prefix)) {
+						CommandManager.execute(new Context(guildId, message, prefix));
+					}
+				});
+			});
+		});
 	}
 
-	private static void onPrivateMessage(Message message) {
+	private static void onPrivateMessage(MessageChannel channel, Message message) {
 		VariousStatsManager.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
 
-		String msgContent = message.getContent().orElse("");
-		MessageChannel channel = message.getChannel().block();
+		String msgContent = message.getContent().get();
 		if(msgContent.startsWith(Config.DEFAULT_PREFIX + "help")) {
 			try {
-				CommandManager.getCommand("help").execute(new Context(Config.DEFAULT_PREFIX, message));
+				CommandManager.getCommand("help").execute(new Context(null, message, Config.DEFAULT_PREFIX));
 			} catch (MissingArgumentException | IllegalCmdArgumentException err) {
 				LogUtils.error(msgContent, err,
 						String.format("{Channel ID: %d} An unknown error occurred while showing help in a private channel.",

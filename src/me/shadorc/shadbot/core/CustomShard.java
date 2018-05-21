@@ -61,19 +61,24 @@ public class CustomShard {
 	}
 
 	private void check() {
-		try {
-			long lastMessageTime = TimeUtils.getMillisUntil(lastMessage.get());
-			if(lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
-				LogUtils.infof(String.format("Restarting shard %d (Guilds: %d | Last message: %s ago)",
-						this.getIndex(),
-						this.getGuildsCount().block(),
-						DurationFormatUtils.formatDurationWords(lastMessageTime, true, true)));
-
-				client.reconnect();
+		this.getGuildsCount().subscribe(guildsCount -> {
+			// Ignore shards containing less than 250 guilds
+			if(guildsCount < 250) {
+				return;
 			}
-		} catch (Exception err) {
-			LogUtils.error(err, String.format("An error occurred while restarting shard %d.", this.getIndex()));
-		}
+
+			try {
+				long lastMessageTime = TimeUtils.getMillisUntil(lastMessage.get());
+				if(lastMessageTime > TimeUnit.SECONDS.toMillis(SHARD_TIMEOUT)) {
+					LogUtils.infof(String.format("Restarting shard %d (Guilds: %d | Last message: %s ago)",
+							this.getIndex(), guildsCount, DurationFormatUtils.formatDurationWords(lastMessageTime, true, true)));
+
+					client.reconnect();
+				}
+			} catch (Exception err) {
+				LogUtils.error(err, String.format("An error occurred while restarting shard %d.", this.getIndex()));
+			}
+		});
 	}
 
 }

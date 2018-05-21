@@ -7,9 +7,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
-import discord4j.core.object.entity.TextChannel;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -33,25 +32,25 @@ public class RateLimiter {
 		this.cooldown = (int) Duration.of(cooldown, unit).toMillis();
 	}
 
-	public boolean isLimited(TextChannel channel, User user) {
-		guildsLimitedMap.putIfAbsent(channel.getGuildId(), new LimitedGuild());
+	public boolean isLimited(Snowflake guildId, Snowflake channelId, Snowflake userId) {
+		guildsLimitedMap.putIfAbsent(guildId, new LimitedGuild());
 
-		LimitedGuild limitedGuild = guildsLimitedMap.get(channel.getGuildId());
-		limitedGuild.addUserIfAbsent(user);
+		LimitedGuild limitedGuild = guildsLimitedMap.get(guildId);
+		limitedGuild.addUserIfAbsent(userId);
 
-		LimitedUser limitedUser = limitedGuild.getUser(user);
+		LimitedUser limitedUser = limitedGuild.getUser(userId);
 		limitedUser.increment();
 
 		// The user has not exceeded the limit yet, he is not limited
 		if(limitedUser.getCount() <= max) {
-			limitedGuild.scheduledDeletion(scheduledExecutor, user, cooldown);
+			limitedGuild.scheduledDeletion(scheduledExecutor, userId, cooldown);
 			return false;
 		}
 
 		// The user has exceeded the limit, he's warned and limited
 		if(limitedUser.getCount() == max + 1) {
-			limitedGuild.scheduledDeletion(scheduledExecutor, user, cooldown);
-			this.warn(channel, user);
+			limitedGuild.scheduledDeletion(scheduledExecutor, userId, cooldown);
+			this.warn(channelId, userId);
 			return true;
 		}
 
@@ -59,12 +58,16 @@ public class RateLimiter {
 		return true;
 	}
 
-	private void warn(TextChannel channel, User user) {
-		BotUtils.sendMessage(String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
-				user.getUsername(),
-				TextUtils.getSpamMessage(),
-				StringUtils.pluralOf(max, "time"),
-				DurationFormatUtils.formatDurationWords(cooldown, true, true)), channel);
+	private void warn(Snowflake channelId, Snowflake userId) {
+		Shadbot.getClient().getMessageChannelById(channelId).subscribe(channel -> {
+			Shadbot.getClient().getUserById(userId).subscribe(user -> {
+				BotUtils.sendMessage(String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
+						user.getUsername(),
+						TextUtils.getSpamMessage(),
+						StringUtils.pluralOf(max, "time"),
+						DurationFormatUtils.formatDurationWords(cooldown, true, true)), channel);
+			});
+		});
 	}
 
 }

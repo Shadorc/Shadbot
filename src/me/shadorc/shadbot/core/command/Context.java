@@ -3,6 +3,8 @@ package me.shadorc.shadbot.core.command;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
@@ -16,12 +18,18 @@ import reactor.core.publisher.Mono;
 
 public class Context {
 
+	private final Optional<Snowflake> guildId;
 	private final Message message;
 	private final String prefix;
 	private final String cmdName;
 	private final Optional<String> arg;
 
-	public Context(String prefix, Message message) {
+	/**
+	 * The message is stored because it does not need to be reactive, a command is received and executed, it does not need to adapt to message
+	 * modifications
+	 */
+	public Context(@Nullable Snowflake guildId, Message message, String prefix) {
+		this.guildId = Optional.ofNullable(guildId);
 		this.message = message;
 		this.prefix = prefix;
 
@@ -32,10 +40,6 @@ public class Context {
 
 	public Message getMessage() {
 		return message;
-	}
-
-	public String getContent() {
-		return message.getContent().orElse("");
 	}
 
 	public String getPrefix() {
@@ -52,49 +56,44 @@ public class Context {
 	}
 
 	public DiscordClient getClient() {
-		return message.getClient();
+		return this.getMessage().getClient();
 	}
 
 	public Mono<User> getSelf() {
-		return message.getClient().getSelf();
+		return this.getClient().getSelf();
 	}
 
-	public Integer getShardIndex() {
-		return message.getClient().getConfig().getShardIndex();
+	public String getContent() {
+		return this.getMessage().getContent().get();
+	}
+
+	public Optional<Snowflake> getGuildId() {
+		return guildId;
 	}
 
 	public Mono<Guild> getGuild() {
-		return message.getGuild();
-	}
-
-	public Mono<MessageChannel> getChannel() {
-		return message.getChannel();
-	}
-
-	public Mono<Boolean> isChannelNsfw() {
-		return message.getChannel().map(TextChannel.class::cast).map(TextChannel::isNsfw);
-	}
-
-	public Mono<User> getAuthor() {
-		return message.getAuthor();
+		return this.getMessage().getGuild();
 	}
 
 	public Snowflake getChannelId() {
-		return message.getChannelId();
+		return this.getMessage().getChannelId();
 	}
 
-	// Assume that the author is not a webhook (author ID is null if the message was sent by a webhook)
+	public Mono<MessageChannel> getChannel() {
+		return this.getMessage().getChannel();
+	}
+
 	public Snowflake getAuthorId() {
-		return message.getAuthorId().get();
+		return this.getMessage().getAuthorId().get();
 	}
 
-	public Mono<String> getUsername() {
-		return this.getAuthor().map(User::getUsername);
+	public Mono<User> getAuthor() {
+		return this.getMessage().getAuthor();
 	}
 
 	// TODO
 	public CommandPermission getAuthorPermission() {
-		// if(this.getAuthor().equals(this.getClient().getApplicationInfo().block().getOwner().block())) {
+		// if(this.getAuthor().equals(this.getClient().getApplicationInfo().getOwner())) {
 		// return CommandPermission.OWNER;
 		// } else if(!this.getGuild().isPresent()) {
 		// return CommandPermission.ADMIN;
@@ -104,6 +103,10 @@ public class Context {
 		// return CommandPermission.USER;
 		// }
 		return CommandPermission.USER;
+	}
+
+	public Mono<Boolean> isChannelNsfw() {
+		return this.getChannel().map(TextChannel.class::cast).map(TextChannel::isNsfw);
 	}
 
 	public void requireArg() throws MissingArgumentException {

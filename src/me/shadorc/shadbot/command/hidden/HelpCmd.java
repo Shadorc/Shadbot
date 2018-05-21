@@ -36,31 +36,28 @@ public class HelpCmd extends AbstractCommand {
 		}
 
 		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Shadbot Help")
-				// .setLenient(true)
 				.setDescription(String.format("Any issues, questions or suggestions ?"
 						+ " Join the [support server.](%s)"
 						+ "%nGet more information by using `%s%s <command>`.",
 						Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
 
-		context.getGuild().defaultIfEmpty(null).subscribe(guild -> {
-			for(CommandCategory category : CommandCategory.values()) {
-				if(category.equals(CommandCategory.HIDDEN)) {
-					continue;
-				}
-
-				String commands = CommandManager.getCommands().values().stream()
-						.distinct()
-						.filter(cmd -> cmd.getCategory().equals(category)
-								&& !cmd.getPermission().isSuperior(context.getAuthorPermission())
-								&& (guild == null || BotUtils.isCommandAllowed(guild, cmd)))
-						.map(cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()))
-						.collect(Collectors.joining(" "));
-
-				embed.addField(String.format("%s Commands", category.toString()), commands, false);
+		for(CommandCategory category : CommandCategory.values()) {
+			if(category.equals(CommandCategory.HIDDEN)) {
+				continue;
 			}
 
-			BotUtils.sendMessage(embed, context.getChannel());
-		});
+			String commands = CommandManager.getCommands().values().stream()
+					.distinct()
+					.filter(cmd -> cmd.getCategory().equals(category)
+							&& !cmd.getPermission().isSuperior(context.getAuthorPermission())
+							&& (!context.getGuildId().isPresent() || BotUtils.isCommandAllowed(context.getGuildId().get(), cmd)))
+					.map(cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()))
+					.collect(Collectors.joining(" "));
+
+			embed.addField(String.format("%s Commands", category.toString()), commands, false);
+		}
+
+		BotUtils.sendMessage(embed, context.getChannel());
 	}
 
 	@Override

@@ -82,6 +82,7 @@ public class Shadbot {
 	public static <T extends Event> void registerListener(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
 		client.getEventDispatcher().on(eventClass)
 				.doOnError(err -> LogUtils.error(err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
+				.retry()
 				.subscribe(consumer);
 	}
 

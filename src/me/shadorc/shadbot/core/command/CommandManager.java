@@ -8,7 +8,6 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
-import discord4j.core.object.entity.TextChannel;
 import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.annotation.Command;
@@ -72,18 +71,18 @@ public class CommandManager {
 			return;
 		}
 
-		if(!BotUtils.isCommandAllowed(context.getGuild().block(), cmd)) {
+		if(!BotUtils.isCommandAllowed(context.getGuildId().get(), cmd)) {
 			return;
 		}
 
 		CommandPermission authorPermission = context.getAuthorPermission();
 		if(cmd.getPermission().isSuperior(authorPermission)) {
-			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel().block());
+			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel());
 			return;
 		}
 
 		if(cmd.getRateLimiter().isPresent()
-				&& cmd.getRateLimiter().get().isLimited((TextChannel) context.getChannel().block(), context.getAuthor().block())) {
+				&& cmd.getRateLimiter().get().isLimited(context.getGuildId().get(), context.getChannelId(), context.getAuthorId())) {
 			CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, cmd);
 			return;
 		}
@@ -93,12 +92,12 @@ public class CommandManager {
 			CommandStatsManager.log(CommandEnum.COMMAND_USED, cmd);
 			VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
 		} catch (IllegalCmdArgumentException err) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel().block());
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 			CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, cmd);
 		} catch (MissingArgumentException err) {
 			BotUtils.sendMessage(new MessageCreateSpec()
 					.setContent(TextUtils.MISSING_ARG)
-					.setEmbed(cmd.getHelp(context.getPrefix())), context.getChannel().block());
+					.setEmbed(cmd.getHelp(context.getPrefix())), context.getChannel());
 			CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, cmd);
 		}
 	}

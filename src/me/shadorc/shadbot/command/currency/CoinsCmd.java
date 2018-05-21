@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.currency;
 
-import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -15,7 +14,6 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import reactor.util.function.Tuples;
 
 @RateLimited
 @Command(category = CommandCategory.CURRENCY, names = { "coins", "coin" })
@@ -24,20 +22,18 @@ public class CoinsCmd extends AbstractCommand {
 	@Override
 	public void execute(Context context) throws MissingArgumentException {
 		context.getMessage().getUserMentions()
-				.switchIfEmpty(context.getAuthor())
 				.single()
-				.flatMap(user -> context.getGuild()
-						.map(guild -> Tuples.of(guild, user)))
-				.subscribe(guildAndUser -> this.execute(context, guildAndUser.getT1(), guildAndUser.getT2()));
+				.switchIfEmpty(context.getAuthor())
+				.subscribe(user -> this.execute(context, user));
 
 	}
 
-	private void execute(Context context, Guild guild, User user) {
-		DBMember dbMember = Database.getDBMember(guild.getId(), user.getId());
+	private void execute(Context context, User user) {
+		DBMember dbMember = Database.getDBMember(context.getGuildId().get(), user.getId());
 		String coins = FormatUtils.formatCoins(dbMember.getCoins());
 		String text;
 		if(user.getId().equals(context.getAuthorId())) {
-			text = String.format("(**%s**) You have **%s**.", context.getUsername(), coins);
+			text = String.format("(**%s**) You have **%s**.", user.getUsername(), coins);
 		} else {
 			text = String.format("**%s** has **%s**.", user.getUsername(), coins);
 		}

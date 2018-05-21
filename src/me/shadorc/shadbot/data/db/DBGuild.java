@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.data.db;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +67,7 @@ public class DBGuild {
 
 	public List<Snowflake> getAllowedChannels() {
 		return Mono.just(settingsMap.get(SettingEnum.ALLOWED_CHANNELS))
-				.defaultIfEmpty(Collections.emptyList())
+				.defaultIfEmpty(new JSONArray())
 				.flatMapIterable(array -> Utils.toList((JSONArray) array, Long.class))
 				.map(Snowflake::of)
 				.collectList()
@@ -77,14 +76,14 @@ public class DBGuild {
 
 	public List<String> getBlacklistedCmd() {
 		return Mono.just(settingsMap.get(SettingEnum.BLACKLIST))
-				.defaultIfEmpty(Collections.emptyList())
+				.defaultIfEmpty(new JSONArray())
 				.map(array -> Utils.toList((JSONArray) array, String.class))
 				.block();
 	}
 
 	public List<Snowflake> getAutoRoles() {
 		return Mono.just(settingsMap.get(SettingEnum.AUTO_ROLE))
-				.defaultIfEmpty(Collections.emptyList())
+				.defaultIfEmpty(new JSONArray())
 				.flatMapIterable(array -> Utils.toList((JSONArray) array, Long.class))
 				.map(Snowflake::of)
 				.collectList()
@@ -93,7 +92,7 @@ public class DBGuild {
 
 	public List<Snowflake> getAllowedRoles() {
 		return Mono.just(settingsMap.get(SettingEnum.PERMISSIONS))
-				.defaultIfEmpty(Collections.emptyList())
+				.defaultIfEmpty(new JSONArray())
 				.flatMapIterable(array -> Utils.toList((JSONArray) array, Long.class))
 				.map(Snowflake::of)
 				.collectList()
