@@ -4,14 +4,16 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.PermissionUtils;
 import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 public abstract class AbstractGameManager {
 
@@ -37,23 +39,28 @@ public abstract class AbstractGameManager {
 
 	public abstract void stop();
 
-	public final boolean isCancelCmd(Message message) {
+	public final Mono<Boolean> isCancelCmd(Message message) {
 		if(!message.getContent().isPresent() || !message.getAuthorId().isPresent()) {
-			return false;
+			return Mono.just(false);
 		}
 
-		Snowflake authorId = message.getAuthorId().get();
-		String content = message.getContent().get();
-		if(content.equals(prefix + "cancel")
-				&& (userId.equals(authorId) || PermissionUtils.hasPermissions(message.getChannel(), authorId, Permission.ADMINISTRATOR))) {
-			message.getAuthor()
-					.subscribe(author -> message.getClient().getMessageChannelById(channelId)
-							.subscribe(channel -> BotUtils.sendMessage(
-									String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", author.getUsername()), channel)));
-			this.stop();
-			return true;
-		}
-		return false;
+		Mono<Boolean> isAdminMono = message.getAuthorAsMember().flatMapMany(Member::getRoles)
+				.flatMapIterable(Role::getPermissions)
+				.any(Permission.ADMINISTRATOR::equals);
+
+		return message.getAuthorAsMember()
+				.zipWith(isAdminMono)
+				.flatMap(authorAndIsAdmin -> {
+					Member author = authorAndIsAdmin.getT1();
+					Boolean isAdmin = authorAndIsAdmin.getT2();
+					String content = message.getContent().get();
+					if(content.equals(prefix + "cancel") && (userId.equals(author.getId()) || isAdmin)) {
+						BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", author.getUsername()), message.getChannel());
+						this.stop();
+						return Mono.just(true);
+					}
+					return Mono.just(false);
+				});
 	}
 
 	public String getCmdName() {

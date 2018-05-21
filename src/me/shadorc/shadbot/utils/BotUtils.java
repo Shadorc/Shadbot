@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
@@ -41,14 +40,12 @@ public class BotUtils {
 	}
 
 	public static void sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
-		if(!BotUtils.hasPermissions(channel, Permission.EMBED_LINKS)) {
-			BotUtils.sendMessage(TextUtils.missingPerm(Permission.EMBED_LINKS), channel);
-			LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send embed link.", channel.getId().asLong());
-			return;
-		}
-
 		VariousStatsManager.log(VariousEnum.EMBEDS_SENT);
-		BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel).subscribe();
+
+		BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel)
+				.doOnError(ExceptionUtils::isForbidden,
+						err -> BotUtils.sendMessage(TextUtils.missingPerm(Permission.EMBED_LINKS), channel))
+				.subscribe();
 	}
 
 	public static void sendMessage(MessageCreateSpec message, Mono<MessageChannel> channel) {
@@ -56,16 +53,13 @@ public class BotUtils {
 	}
 
 	public static Mono<Message> sendMessage(MessageCreateSpec message, MessageChannel channel) {
-		if(!BotUtils.hasPermissions(channel, Permission.SEND_MESSAGES)) {
-			LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send a message.", channel.getId().asLong());
-			return Mono.empty();
-		}
 		VariousStatsManager.log(VariousEnum.MESSAGES_SENT);
 
 		return channel.createMessage(message)
-				.doOnError(err -> LogUtils.error(err,
-						String.format("{Channel ID: %d} An error occurred while sending a message.",
-								channel.getId().asLong())));
+				.doOnError(ExceptionUtils::isForbidden,
+						err -> LogUtils.infof("{Channel ID: %s} Shadbot was not allowed to send a message.", channel.getId()))
+				.doOnError(
+						err -> LogUtils.error(err, String.format("{Channel ID: %s} An error occurred while sending a message.", channel.getId())));
 	}
 
 	// TODO: This need to be subscribed
@@ -86,21 +80,12 @@ public class BotUtils {
 		client.updatePresence(Presence.online(Activity.playing(text))).subscribe();
 	}
 
-	// TODO
-	public static List<User> getUsersFrom(Message message) {
-		// Mono<List<User>> users = message.getUserMentions().collectList();
-		// Mono<List<Role>> roles = message.getRoleMentions().collectList();
-		// //TODO: Do I need to get all members and filter them ?
-		// users.concatWith(message.getGuild().getMembers().filter(member -> member.getRoles().has)).collectList());
-		// users = users.stream().distinct().collect(Collectors.toList());
-		// return users;
-		return Collections.emptyList();
-	}
-
-	public static boolean isChannelAllowed(Snowflake guildId, Snowflake channelId) {
-		List<Snowflake> allowedChannels = Database.getDBGuild(guildId).getAllowedChannels();
-		// If no permission has been set OR the channel is allowed
-		return allowedChannels.isEmpty() || allowedChannels.contains(channelId);
+	public static Flux<User> getUsersFrom(Message message) {
+		return message.getUserMentions()
+				.concatWith(message.getGuild().flatMapMany(Guild::getMembers)
+						.filter(member -> !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()))
+						.map(User.class::cast))
+				.distinct();
 	}
 
 	public static boolean hasAllowedRole(Snowflake guildId, List<Role> roles) {
@@ -111,37 +96,15 @@ public class BotUtils {
 				|| roles.stream().anyMatch(role -> allowedRoles.contains(role.getId()));
 	}
 
+	public static boolean isChannelAllowed(Snowflake guildId, Snowflake channelId) {
+		List<Snowflake> allowedChannels = Database.getDBGuild(guildId).getAllowedChannels();
+		// If no permission has been set OR the channel is allowed
+		return allowedChannels.isEmpty() || allowedChannels.contains(channelId);
+	}
+
 	public static boolean isCommandAllowed(Snowflake guildId, AbstractCommand cmd) {
 		List<String> blacklistedCmd = Database.getDBGuild(guildId).getBlacklistedCmd();
 		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
-	}
-
-	// TODO
-	public static boolean hasPermissions(Channel channel, Permission... permissions) {
-		// return PermissionUtils.hasPermissions(channel, channel.getClient().getOurUser(), permissions);
-		return true;
-	}
-
-	// TODO
-	public static boolean hasPermissions(Guild guild, Permission... permissions) {
-		// return PermissionUtils.hasPermissions(guild, guild.getClient().getOurUser(), permissions);
-		return true;
-	}
-
-	// TODO
-	public static boolean canInteract(Guild guild, User user) {
-		// return PermissionUtils.hasHierarchicalPermissions(guild, guild.getClient().getOurUser(), guild.getRolesForUser(user));
-		return true;
-	}
-
-	// TODO: Delete Placeholder
-	public static boolean hasPermissions(Object... objects) {
-		return true;
-	}
-
-	// TODO: Delete Placeholder
-	public static boolean canInteract(Object... objects) {
-		return true;
 	}
 
 }

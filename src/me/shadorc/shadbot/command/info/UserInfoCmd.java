@@ -4,6 +4,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
+import discord4j.core.object.entity.Role;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -36,22 +38,20 @@ public class UserInfoCmd extends AbstractCommand {
 				TimeUtils.toLocalDate(context.getGuild().getJoinTimeForUser(user)).format(dateFormatter),
 				FormatUtils.formatLongDuration(context.getGuild().getJoinTimeForUser(user)));
 
-		EmbedBuilder embed = EmbedUtils.getDefaultEmbed()
-				.setLenient(true)
-				.withAuthorName(String.format("Info about user \"%s\"%s", user.getName(), user.isBot() ? " (Bot)" : ""))
+		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("Info about user \"%s\"%s", user.getName(), user.isBot() ? " (Bot)" : ""))
 				.withThumbnail(user.getAvatarURL())
 				.addField("Display name", user.getDisplayName(context.getGuild()), true)
 				.addField("User ID", Long.toString(user.getLongID()), true)
 				.addField("Creation date", creationDate, true)
 				.addField("Join date", joinDate, true)
-				.addField("Roles", FormatUtils.format(user.getRolesForGuild(context.getGuild()), IRole::getName, "\n"), true)
+				.addField("Roles", FormatUtils.format(user.getRolesForGuild(context.getGuild()), Role::getName, "\n"), true)
 				.addField("Status", StringUtils.capitalize(user.getPresence().getStatus().toString()), true)
 				.addField("Playing text", user.getPresence().getText().orElse(null), true);
-		BotUtils.sendMessage(embed.build(), context.getChannel());
+		BotUtils.sendMessage(embed, context.getChannel());
 	}
 
 	@Override
-	public EmbedObject getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return new HelpBuilder(this, prefix)
 				.setDescription("Show info about an user.")
 				.addArg("@user", true)

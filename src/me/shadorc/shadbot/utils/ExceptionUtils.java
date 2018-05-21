@@ -6,6 +6,8 @@ import java.net.SocketTimeoutException;
 import org.json.JSONException;
 import org.jsoup.HttpStatusException;
 
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -50,6 +52,10 @@ public class ExceptionUtils {
 
 	private static boolean isUnreacheable(Throwable err) {
 		return err instanceof SocketTimeoutException;
+	}
+
+	public static boolean isForbidden(Throwable err) {
+		return err instanceof ClientException && ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
 	}
 
 }

@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.utils;
 
 import java.lang.management.ManagementFactory;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +26,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -34,6 +36,11 @@ public class Utils {
 	// TODO Remove
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
 	public static final int FIELD_CONTENT_LIMIT = 1024;
+
+	// TODO remove
+	public static Instant getSnowflakeTimeFromID(Snowflake id) {
+		return Instant.ofEpochMilli(1420070400000L + (id.asLong() >>> 22));
+	}
 
 	/**
 	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found

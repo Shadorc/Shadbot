@@ -7,8 +7,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-
 import discord4j.core.ClientBuilder;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
@@ -21,7 +19,6 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.listener.GatewayLifecycleListener;
-import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
@@ -48,7 +45,8 @@ public class Shadbot {
 			}
 		});
 
-		AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
+		// TODO
+		// AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
 
 		// TODO: Calculate this by using gateway or guilds / 1000
 		int shardCount = 7;
