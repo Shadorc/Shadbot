@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.listener;
 
+import java.util.Collections;
+
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Member;
@@ -22,7 +24,6 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 public class MessageListener {
 
 	public static void onMessageCreate(MessageCreateEvent event) {
-
 		VariousStatsManager.log(VariousEnum.MESSAGES_RECEIVED);
 
 		Message message = event.getMessage();
@@ -55,24 +56,28 @@ public class MessageListener {
 					return;
 				}
 
-				message.getAuthorAsMember().flatMapMany(Member::getRoles).buffer().subscribe(rolesList -> {
+				message.getAuthorAsMember()
+						.flatMapMany(Member::getRoles)
+						.buffer()
+						.defaultIfEmpty(Collections.emptyList())
+						.subscribe(rolesList -> {
 
-					// The author role is not allowed to access to the bot
-					if(!BotUtils.hasAllowedRole(guildId, rolesList)) {
-						return;
-					}
+							// The author role is not allowed to access to the bot
+							if(!BotUtils.hasAllowedRole(guildId, rolesList)) {
+								return;
+							}
 
-					// A listener has the priority on this listener and stop the processing
-					if(MessageManager.intercept(message)) {
-						return;
-					}
+							// A listener has the priority on this listener and stop the processing
+							if(MessageManager.intercept(message)) {
+								return;
+							}
 
-					// The message content is a command, execute it
-					String prefix = Database.getDBGuild(guildId).getPrefix();
-					if(message.getContent().get().startsWith(prefix)) {
-						CommandManager.execute(new Context(guildId, message, prefix));
-					}
-				});
+							// The message content is a command, execute it
+							String prefix = Database.getDBGuild(guildId).getPrefix();
+							if(message.getContent().get().startsWith(prefix)) {
+								CommandManager.execute(new Context(guildId, message, prefix));
+							}
+						});
 			});
 		});
 	}

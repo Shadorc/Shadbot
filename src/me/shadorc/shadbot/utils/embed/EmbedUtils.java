@@ -13,14 +13,12 @@ public class EmbedUtils {
 	public static EmbedCreateSpec getDefaultEmbed(String authorName, String authorUrl, String authorIconUrl) {
 		return new EmbedCreateSpec()
 				.setAuthor(authorName, authorUrl, authorIconUrl)
-				.setColor(Config.BOT_COLOR.getRGB());
+				.setColor(Utils.convertColor(Config.BOT_COLOR));
 	}
 
 	// TODO: Get Shadbot avatar url
 	public static EmbedCreateSpec getDefaultEmbed(String authorName, String authorUrl) {
-		return new EmbedCreateSpec()
-				.setAuthor(authorName, authorUrl, null)
-				.setColor(Config.BOT_COLOR.getRGB());
+		return EmbedUtils.getDefaultEmbed(authorName, authorUrl, null);
 	}
 
 	public static EmbedCreateSpec getDefaultEmbed(String authorName) {
@@ -28,7 +26,7 @@ public class EmbedUtils {
 	}
 
 	public static EmbedCreateSpec getDefaultEmbed() {
-		return EmbedUtils.getDefaultEmbed(null);
+		return EmbedUtils.getDefaultEmbed("Empty");
 	}
 
 	public static <K, V extends Number> EmbedCreateSpec getStatsEmbed(Map<K, V> statsMap, String name) {

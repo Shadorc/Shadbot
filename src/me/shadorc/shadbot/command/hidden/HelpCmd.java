@@ -48,13 +48,17 @@ public class HelpCmd extends AbstractCommand {
 
 			String commands = CommandManager.getCommands().values().stream()
 					.distinct()
-					.filter(cmd -> cmd.getCategory().equals(category)
-							&& !cmd.getPermission().isSuperior(context.getAuthorPermission())
-							&& (!context.getGuildId().isPresent() || BotUtils.isCommandAllowed(context.getGuildId().get(), cmd)))
-					.map(cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()))
+					.filter(cmd -> cmd.getCategory().equals(category))
+					.filter(cmd -> !cmd.getPermission().isSuperior(context.getAuthorPermission()))
+					.filter(cmd -> !context.getGuildId().isPresent() || BotUtils.isCommandAllowed(context.getGuildId().get(), cmd))
+					.map(AbstractCommand::getName)
+					.map(cmdName -> String.format("`%s%s`", context.getPrefix(), cmdName))
 					.collect(Collectors.joining(" "));
 
-			embed.addField(String.format("%s Commands", category.toString()), commands, false);
+			// TODO: Set lenient
+			if(!commands.isEmpty()) {
+				embed.addField(String.format("%s Commands", category.toString()), commands, false);
+			}
 		}
 
 		BotUtils.sendMessage(embed, context.getChannel());

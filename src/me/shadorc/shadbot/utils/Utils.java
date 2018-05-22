@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.utils;
 
+import java.awt.Color;
 import java.lang.management.ManagementFactory;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,6 +41,11 @@ public class Utils {
 	// TODO remove
 	public static Instant getSnowflakeTimeFromID(Snowflake id) {
 		return Instant.ofEpochMilli(1420070400000L + (id.asLong() >>> 22));
+	}
+
+	//TODO remove
+	public static int convertColor(Color color) {
+		return ((color.getRed() & 0xFF) << 16) | ((color.getGreen() & 0xFF) << 8) | (color.getBlue() & 0xFF);
 	}
 
 	/**

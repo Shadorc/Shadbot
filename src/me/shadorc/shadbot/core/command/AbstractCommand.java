@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.core.command;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public abstract class AbstractCommand {
 
 	public AbstractCommand() {
 		Command cmdAnnotation = this.getClass().getAnnotation(Command.class);
-		this.names = Arrays.asList(cmdAnnotation.names());
+		this.names = new ArrayList<>(Arrays.asList(cmdAnnotation.names()));
 		this.alias = cmdAnnotation.alias();
 		this.category = cmdAnnotation.category();
 		this.permission = cmdAnnotation.permission();

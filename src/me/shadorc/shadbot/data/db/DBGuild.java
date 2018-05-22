@@ -15,7 +15,6 @@ import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
 import me.shadorc.shadbot.utils.Utils;
-import reactor.core.publisher.Mono;
 
 public class DBGuild {
 
@@ -66,52 +65,42 @@ public class DBGuild {
 	}
 
 	public List<Snowflake> getAllowedChannels() {
-		return Mono.just(settingsMap.get(SettingEnum.ALLOWED_CHANNELS))
-				.defaultIfEmpty(new JSONArray())
-				.flatMapIterable(array -> Utils.toList((JSONArray) array, Long.class))
+		JSONArray array = (JSONArray) Optional.ofNullable(settingsMap.get(SettingEnum.ALLOWED_CHANNELS)).orElse(new JSONArray());
+		return Utils.toList(array, Long.class)
+				.stream()
 				.map(Snowflake::of)
-				.collectList()
-				.block();
+				.collect(Collectors.toList());
 	}
 
 	public List<String> getBlacklistedCmd() {
-		return Mono.just(settingsMap.get(SettingEnum.BLACKLIST))
-				.defaultIfEmpty(new JSONArray())
-				.map(array -> Utils.toList((JSONArray) array, String.class))
-				.block();
+		JSONArray array = (JSONArray) Optional.ofNullable(settingsMap.get(SettingEnum.BLACKLIST)).orElse(new JSONArray());
+		return Utils.toList(array, String.class);
 	}
 
 	public List<Snowflake> getAutoRoles() {
-		return Mono.just(settingsMap.get(SettingEnum.AUTO_ROLE))
-				.defaultIfEmpty(new JSONArray())
-				.flatMapIterable(array -> Utils.toList((JSONArray) array, Long.class))
+		JSONArray array = (JSONArray) Optional.ofNullable(settingsMap.get(SettingEnum.AUTO_ROLE)).orElse(new JSONArray());
+		return Utils.toList(array, Long.class)
+				.stream()
 				.map(Snowflake::of)
-				.collectList()
-				.block();
+				.collect(Collectors.toList());
 	}
 
 	public List<Snowflake> getAllowedRoles() {
-		return Mono.just(settingsMap.get(SettingEnum.PERMISSIONS))
-				.defaultIfEmpty(new JSONArray())
-				.flatMapIterable(array -> Utils.toList((JSONArray) array, Long.class))
+		JSONArray array = (JSONArray) Optional.ofNullable(settingsMap.get(SettingEnum.PERMISSIONS)).orElse(new JSONArray());
+		return Utils.toList(array, Long.class)
+				.stream()
 				.map(Snowflake::of)
-				.collectList()
-				.block();
+				.collect(Collectors.toList());
 	}
 
 	public String getPrefix() {
-		return Mono.just(settingsMap.get(SettingEnum.PREFIX))
-				.defaultIfEmpty(Config.DEFAULT_PREFIX)
-				.map(Object::toString)
-				.block();
+		return Optional.ofNullable(settingsMap.get(SettingEnum.PREFIX)).orElse(Config.DEFAULT_PREFIX).toString();
 	}
 
 	public Integer getDefaultVol() {
-		return Mono.just(settingsMap.get(SettingEnum.DEFAULT_VOLUME))
-				.defaultIfEmpty(Config.DEFAULT_VOLUME)
-				.map(Object::toString)
-				.map(Integer::parseInt)
-				.block();
+		return Integer.parseInt(Optional.ofNullable(settingsMap.get(SettingEnum.DEFAULT_VOLUME))
+				.orElse(Config.DEFAULT_VOLUME)
+				.toString());
 	}
 
 	public Optional<Snowflake> getMessageChannelId() {

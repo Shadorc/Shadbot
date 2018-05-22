@@ -36,8 +36,10 @@ public class LogUtils {
 	}
 
 	private static void sendLog(LogBuilder embed) {
-		Shadbot.getClient().getMessageChannelById(Config.LOGS_CHANNEL_ID)
-				.subscribe(channel -> BotUtils.sendMessage(embed.build(), channel));
+		if(Shadbot.getClient() != null) {
+			Shadbot.getClient().getMessageChannelById(Config.LOGS_CHANNEL_ID)
+					.subscribe(channel -> BotUtils.sendMessage(embed.build(), channel));
+		}
 	}
 
 }
