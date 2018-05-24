@@ -9,6 +9,8 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.ExceptionUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class MemberListener {
 
@@ -17,9 +19,12 @@ public class MemberListener {
 
 		MemberListener.sendAutoMsg(event.getClient(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage());
 
-		// TODO: Implement and add doOnError(ExceptionUtils::isForbidden, err -> { ... })
-		// List<Snowflake> autoRoles = dbGuild.getAutoRoles();
-		// event.getGuild().editUserRoles(event.getMember(), autoRoles);
+		dbGuild.getAutoRoles().forEach(roleId -> event.getMember().addRole(roleId)
+				.doOnError(ExceptionUtils::isForbidden,
+						err -> LogUtils.infof("{Guild ID: %s} Shadbot was not allowed to edit role.", event.getGuildId()))
+				.doOnError(
+						err -> LogUtils.error(err, String.format("{Guild ID: %s} Shadbot was not allowed to edit role.", event.getGuildId())))
+				.subscribe());
 	}
 
 	public static void onMemberLeave(MemberLeaveEvent event) {
@@ -32,6 +37,7 @@ public class MemberListener {
 			return;
 		}
 
-		client.getMessageChannelById(channelId.get()).subscribe(channel -> BotUtils.sendMessage(msg.get(), channel));
+		client.getMessageChannelById(channelId.get())
+				.subscribe(channel -> BotUtils.sendMessage(msg.get(), channel));
 	}
 }

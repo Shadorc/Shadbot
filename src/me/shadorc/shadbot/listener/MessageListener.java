@@ -20,66 +20,49 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.publisher.Mono;
 
 public class MessageListener {
 
 	public static void onMessageCreate(MessageCreateEvent event) {
 		VariousStatsManager.log(VariousEnum.MESSAGES_RECEIVED);
 
-		Message message = event.getMessage();
+		Mono.just(event.getMessage())
+				// Ignore webhook
+				.filter(message -> message.getContent().isPresent() && message.getAuthorId().isPresent())
+				.flatMap(message -> message.getAuthor())
+				// Don't answer to bot
+				.filter(author -> !author.isBot())
+				.flatMap(author -> event.getMessage().getChannel())
+				.subscribe(channel -> {
 
-		// The message is a webhook
-		if(!message.getContent().isPresent() || !message.getAuthorId().isPresent()) {
-			return;
-		}
+					// The channel is a private channel
+					if(channel.getType().equals(Type.DM)) {
+						MessageListener.onPrivateMessage(channel, event.getMessage());
+						return;
+					}
 
-		message.getAuthor().subscribe(author -> {
+					// The channel is not private, it can be casted to TextChannel to get guild ID
+					Snowflake guildId = TextChannel.class.cast(channel).getGuildId();
 
-			// The author is a bot
-			if(author.isBot()) {
-				return;
-			}
+					// The bot does not have the permission to access this channel
+					if(!BotUtils.isChannelAllowed(guildId, channel.getId())) {
+						return;
+					}
 
-			message.getChannel().subscribe(channel -> {
-
-				// The channel is a private channel
-				if(channel.getType().equals(Type.DM)) {
-					MessageListener.onPrivateMessage(channel, message);
-					return;
-				}
-
-				// The channel is not private, it can be casted to TextChannel to get guild ID
-				Snowflake guildId = TextChannel.class.cast(channel).getGuildId();
-
-				// The bot does not have the permission to access this channel
-				if(!BotUtils.isChannelAllowed(guildId, channel.getId())) {
-					return;
-				}
-
-				message.getAuthorAsMember()
-						.flatMapMany(Member::getRoles)
-						.buffer()
-						.defaultIfEmpty(Collections.emptyList())
-						.subscribe(rolesList -> {
-
-							// The author role is not allowed to access to the bot
-							if(!BotUtils.hasAllowedRole(guildId, rolesList)) {
-								return;
-							}
-
-							// A listener has the priority on this listener and stop the processing
-							if(MessageManager.intercept(message)) {
-								return;
-							}
-
-							// The message content is a command, execute it
-							String prefix = Database.getDBGuild(guildId).getPrefix();
-							if(message.getContent().get().startsWith(prefix)) {
-								CommandManager.execute(new Context(guildId, message, prefix));
-							}
-						});
-			});
-		});
+					event.getMessage().getAuthorAsMember()
+							.flatMapMany(Member::getRoles)
+							.buffer()
+							.defaultIfEmpty(Collections.emptyList())
+							// The author role is allowed to access to the bot
+							.filter(roleList -> BotUtils.hasAllowedRole(guildId, roleList))
+							// No listener have the priority on this listener and stopped the process
+							.filter(roleList -> !MessageManager.intercept(event.getMessage()))
+							.map(roleList -> Database.getDBGuild(guildId).getPrefix())
+							// The message content start with the correct prefix
+							.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
+							.subscribe(prefix -> CommandManager.execute(new Context(guildId, event.getMessage(), prefix)));
+				});
 	}
 
 	private static void onPrivateMessage(MessageChannel channel, Message message) {
@@ -91,8 +74,7 @@ public class MessageListener {
 				CommandManager.getCommand("help").execute(new Context(null, message, Config.DEFAULT_PREFIX));
 			} catch (MissingArgumentException | IllegalCmdArgumentException err) {
 				LogUtils.error(msgContent, err,
-						String.format("{Channel ID: %d} An unknown error occurred while showing help in a private channel.",
-								channel.getId().asLong()));
+						String.format("{Channel ID: %s} An unknown error occurred while showing help in a private channel.", channel.getId()));
 			}
 			return;
 		}
@@ -103,18 +85,15 @@ public class MessageListener {
 				+ "join my support server : %s",
 				Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-		channel.getLastMessageId().ifPresentOrElse(lastMsgId -> {
-			channel.getMessagesBefore(lastMsgId)
-					.map(Message::getContent)
-					.map(content -> content.orElse(""))
-					.any(text::equalsIgnoreCase)
-					.subscribe(alreadySent -> {
-						if(!alreadySent) {
-							BotUtils.sendMessage(text, channel);
-						}
-
-					});
-		}, () -> BotUtils.sendMessage(text, channel));
+		if(!channel.getLastMessageId().isPresent()) {
+			BotUtils.sendMessage(text, channel);
+		} else {
+			channel.getMessagesBefore(channel.getLastMessageId().get())
+					// Return true if help text has not already been send
+					.filter(historyMsg -> historyMsg.getContent().map(content -> !text.equalsIgnoreCase(content)).orElse(true))
+					.doOnTerminate(() -> BotUtils.sendMessage(text, channel))
+					.subscribe();
+		}
 
 	}
 }

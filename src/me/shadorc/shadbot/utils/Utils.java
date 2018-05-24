@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.lang.management.ManagementFactory;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -25,12 +26,16 @@ import org.json.JSONArray;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 public class Utils {
 
@@ -43,9 +48,23 @@ public class Utils {
 		return Instant.ofEpochMilli(1420070400000L + (id.asLong() >>> 22));
 	}
 
-	//TODO remove
+	// TODO remove
 	public static int convertColor(Color color) {
 		return ((color.getRed() & 0xFF) << 16) | ((color.getGreen() & 0xFF) << 8) | (color.getBlue() & 0xFF);
+	}
+
+	// TODO remove
+	public static Mono<Boolean> hasPermissions(Mono<Member> member, Permission... permissions) {
+		return member.flatMapMany(Member::getRoles)
+				.map(Role::getPermissions)
+				.map(ArrayList::new)
+				.map(ArrayList::stream)
+				.all(stream -> stream.allMatch(perm -> Arrays.asList(permissions).contains(perm)));
+	}
+
+	// TODO remove
+	public static Mono<Boolean> hasPermissions(Mono<User> member, Snowflake guildId, Permission... permissions) {
+		return Utils.hasPermissions(member.flatMap(user -> user.asMember(guildId)), permissions);
 	}
 
 	/**

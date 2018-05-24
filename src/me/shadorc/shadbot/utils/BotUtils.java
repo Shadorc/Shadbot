@@ -64,7 +64,6 @@ public class BotUtils {
 						});
 	}
 
-	// TODO: This need to be subscribed
 	public static Flux<Snowflake> deleteMessages(TextChannel channel, Message... messages) {
 		switch (messages.length) {
 			case 0:

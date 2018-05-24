@@ -5,9 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import discord4j.core.object.util.Snowflake;
 
 public class Config {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
 
 	public static final Properties PROPERTIES = Config.getProperties();
 
@@ -33,9 +38,11 @@ public class Config {
 	public static Properties getProperties() {
 		Properties properties = new Properties();
 		try (InputStream inputStream = Config.class.getClassLoader().getResourceAsStream("project.properties")) {
-			properties.load(inputStream);
+			if(inputStream != null) {
+				properties.load(inputStream);
+			}
 		} catch (IOException err) {
-			err.printStackTrace();
+			LOGGER.error("An error occurred while loading configuration file. Exiting.", err);
 			System.exit(1);
 		}
 		return properties;

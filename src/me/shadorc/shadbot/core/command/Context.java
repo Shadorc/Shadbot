@@ -6,14 +6,17 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
 import reactor.core.publisher.Mono;
 
 public class Context {
@@ -50,7 +53,6 @@ public class Context {
 		return cmdName;
 	}
 
-	// TODO: Has been changed from "" to Optional, this need to be checked in commands
 	public Optional<String> getArg() {
 		return arg;
 	}
@@ -91,18 +93,32 @@ public class Context {
 		return this.getMessage().getAuthor();
 	}
 
-	// TODO
-	public CommandPermission getAuthorPermission() {
-		// if(this.getAuthor().equals(this.getClient().getApplicationInfo().getOwner())) {
-		// return CommandPermission.OWNER;
-		// } else if(!this.getGuild().isPresent()) {
-		// return CommandPermission.ADMIN;
-		// } else if(this.getAuthor().getPermissionsForGuild(this.getGuild()).contains(Permission.ADMINISTRATOR)) {
-		// return CommandPermission.ADMIN;
-		// } else {
-		// return CommandPermission.USER;
-		// }
-		return CommandPermission.USER;
+	public Mono<CommandPermission> getAuthorPermission() {
+		// Is owner
+		Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
+				.map(ApplicationInfo::getOwnerId)
+				.filter(this.getAuthorId()::equals)
+				.flatMap(bool -> {
+					return Mono.just(CommandPermission.OWNER);
+				});
+
+		// Private message, the author is considered as admin
+		Mono<CommandPermission> dmPerm = Mono.just(this.getGuildId())
+				.filter(guildId -> !guildId.isPresent())
+				.flatMap(guildId -> {
+					return Mono.just(CommandPermission.ADMIN);
+				});
+
+		// The member is an administrator
+		Mono<CommandPermission> adminperm = Utils.hasPermissions(this.getAuthor(), this.getGuildId().get(), Permission.ADMINISTRATOR)
+				.map(bool -> {
+					return CommandPermission.ADMIN;
+				});
+
+		// By default, the member is considered as a basic user
+		Mono<CommandPermission> userPerm = Mono.just(CommandPermission.USER);
+
+		return ownerPerm.switchIfEmpty(dmPerm.switchIfEmpty(adminperm.switchIfEmpty(userPerm)));
 	}
 
 	public Mono<Boolean> isChannelNsfw() {

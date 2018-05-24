@@ -3,11 +3,13 @@ package me.shadorc.shadbot.core.command;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.annotation.Command;
@@ -22,6 +24,7 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 public class CommandManager {
 
@@ -64,42 +67,56 @@ public class CommandManager {
 		return true;
 	}
 
-	// TODO: Avoid to block everything
 	public static void execute(Context context) {
-		AbstractCommand cmd = COMMANDS_MAP.get(context.getCommandName());
-		if(cmd == null) {
+		AbstractCommand command = COMMANDS_MAP.get(context.getCommandName());
+		if(command == null) {
 			return;
 		}
 
-		if(!BotUtils.isCommandAllowed(context.getGuildId().get(), cmd)) {
-			return;
-		}
+		Snowflake guildId = context.getGuildId().get();
+		Snowflake channelId = context.getChannelId();
+		Snowflake authorId = context.getAuthorId();
 
-		CommandPermission authorPermission = context.getAuthorPermission();
-		if(cmd.getPermission().isSuperior(authorPermission)) {
-			BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel());
-			return;
-		}
+		Predicate<? super CommandPermission> permissionTest = userPerm -> {
+			if(command.getPermission().isSuperior(userPerm)) {
+				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel());
+				return false;
+			}
+			return true;
+		};
 
-		if(cmd.getRateLimiter().isPresent()
-				&& cmd.getRateLimiter().get().isLimited(context.getGuildId().get(), context.getChannelId(), context.getAuthorId())) {
-			CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, cmd);
-			return;
-		}
+		Predicate<? super CommandPermission> rateLimitTest = userPerm -> {
+			// Check is the command has a rate limited and if the user is rate limited
+			if(command.getRateLimiter().map(limiter -> limiter.isLimited(guildId, channelId, authorId)).orElse(false)) {
+				CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, command);
+				return false;
+			}
+			return true;
+		};
 
-		try {
-			cmd.execute(context);
-			CommandStatsManager.log(CommandEnum.COMMAND_USED, cmd);
-			VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
-		} catch (IllegalCmdArgumentException err) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
-			CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, cmd);
-		} catch (MissingArgumentException err) {
-			BotUtils.sendMessage(new MessageCreateSpec()
-					.setContent(TextUtils.MISSING_ARG)
-					.setEmbed(cmd.getHelp(context.getPrefix())), context.getChannel());
-			CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, cmd);
-		}
+		Mono.just(command)
+				// The command is allowed in the guild
+				.filter(cmd -> BotUtils.isCommandAllowed(guildId, cmd))
+				.flatMap(cmd -> context.getAuthorPermission())
+				// The author has the permission to execute this command
+				.filter(permissionTest)
+				// The user is not rate limited
+				.filter(rateLimitTest)
+				.doOnError(IllegalCmdArgumentException.class, err -> {
+					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
+					CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
+				})
+				.doOnError(MissingArgumentException.class, err -> {
+					BotUtils.sendMessage(new MessageCreateSpec()
+							.setContent(TextUtils.MISSING_ARG)
+							.setEmbed(command.getHelp(context.getPrefix())), context.getChannel());
+					CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
+				})
+				.subscribe(userPerm -> {
+					command.execute(context);
+					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
+					VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
+				});
 	}
 
 	public static Map<String, AbstractCommand> getCommands() {

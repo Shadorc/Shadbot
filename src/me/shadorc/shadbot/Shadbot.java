@@ -22,7 +22,6 @@ import me.shadorc.shadbot.listener.GatewayLifecycleListener;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
-import reactor.core.publisher.Mono;
 
 public class Shadbot {
 
