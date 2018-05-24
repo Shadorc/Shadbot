@@ -64,15 +64,24 @@ public class BotUtils {
 						});
 	}
 
-	public static Flux<Snowflake> deleteMessages(TextChannel channel, Message... messages) {
-		switch (messages.length) {
+	// TOOD
+	/**
+	 * @param channel
+	 * @param messages
+	 * @return The number of deleted messages
+	 */
+	public static Mono<Long> deleteMessages(TextChannel channel, List<Message> messages) {
+		switch (messages.size()) {
 			case 0:
-				return Flux.empty();
+				return Mono.just(0L);
 			case 1:
-				messages[0].delete();
-				return Flux.just(messages[0].getId());
+				return messages.get(0).delete().flatMap(message -> {
+					return Mono.just(1L);
+				});
 			default:
-				return channel.bulkDelete(Flux.fromArray(messages).map(Message::getId));
+				return channel.bulkDelete(Flux.fromIterable(messages).map(Message::getId)).buffer().single().flatMap(list -> {
+					return Mono.just((long) (messages.size() - list.size()));
+				});
 		}
 	}
 

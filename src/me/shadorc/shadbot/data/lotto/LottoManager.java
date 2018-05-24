@@ -13,8 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.DataManager;
@@ -97,10 +95,10 @@ public class LottoManager {
 		dataObj.put(POOL, Math.max(0, Math.min(Config.MAX_COINS, newPool)));
 	}
 
-	public static synchronized void addPlayer(Guild guild, User user, int num) {
+	public static synchronized void addPlayer(Snowflake guildId, Snowflake userId, int num) {
 		JSONObject playerObj = new JSONObject()
-				.put(GUILD_ID, guild.getId().asLong())
-				.put(USER_ID, user.getId().asLong())
+				.put(GUILD_ID, guildId.asLong())
+				.put(USER_ID, userId.asLong())
 				.put(NUM, num);
 		dataObj.getJSONArray(USERS).put(playerObj);
 	}
