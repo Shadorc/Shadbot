@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.TextChannel;
@@ -91,6 +92,10 @@ public class Context {
 
 	public Mono<User> getAuthor() {
 		return this.getMessage().getAuthor();
+	}
+
+	public Mono<Member> getMember() {
+		return this.getMessage().getAuthor().flatMap(member -> member.asMember(this.getGuildId().get()));
 	}
 
 	public Mono<CommandPermission> getAuthorPermission() {

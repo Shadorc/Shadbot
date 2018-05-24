@@ -102,6 +102,7 @@ public class CommandManager {
 				.filter(permissionTest)
 				// The user is not rate limited
 				.filter(rateLimitTest)
+				.doOnSuccess(perm -> command.execute(context))
 				.doOnError(IllegalCmdArgumentException.class, err -> {
 					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 					CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
@@ -113,7 +114,6 @@ public class CommandManager {
 					CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
 				})
 				.subscribe(userPerm -> {
-					command.execute(context);
 					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
 					VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
 				});

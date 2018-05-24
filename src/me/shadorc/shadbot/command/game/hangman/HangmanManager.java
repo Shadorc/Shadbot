@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.Database;

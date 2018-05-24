@@ -17,6 +17,7 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import reactor.core.publisher.Flux;
 
 @RateLimited
 @Command(category = CommandCategory.HIDDEN, names = { "help" })
@@ -41,27 +42,26 @@ public class HelpCmd extends AbstractCommand {
 						+ "%nGet more information by using `%s%s <command>`.",
 						Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
 
-		for(CommandCategory category : CommandCategory.values()) {
-			if(category.equals(CommandCategory.HIDDEN)) {
-				continue;
+		context.getAuthorPermission().subscribe(authorPerm -> {
+			for(CommandCategory category : CommandCategory.values()) {
+				if(category.equals(CommandCategory.HIDDEN)) {
+					continue;
+				}
+
+				Flux.fromIterable(CommandManager.getCommands().values())
+						.distinct()
+						.filter(cmd -> cmd.getCategory().equals(category))
+						.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
+						.filter(cmd -> !context.getGuildId().isPresent() || BotUtils.isCommandAllowed(context.getGuildId().get(), cmd))
+						.map(AbstractCommand::getName)
+						.map(cmdName -> String.format("`%s%s`", context.getPrefix(), cmdName))
+						.collect(Collectors.joining(" "))
+						.filter(commands -> !commands.isEmpty())
+						.subscribe(commands -> embed.addField(String.format("%s Commands", category.toString()), commands, false));
 			}
 
-			String commands = CommandManager.getCommands().values().stream()
-					.distinct()
-					.filter(cmd -> cmd.getCategory().equals(category))
-					.filter(cmd -> !cmd.getPermission().isSuperior(context.getAuthorPermission()))
-					.filter(cmd -> !context.getGuildId().isPresent() || BotUtils.isCommandAllowed(context.getGuildId().get(), cmd))
-					.map(AbstractCommand::getName)
-					.map(cmdName -> String.format("`%s%s`", context.getPrefix(), cmdName))
-					.collect(Collectors.joining(" "));
-
-			// TODO: Set lenient
-			if(!commands.isEmpty()) {
-				embed.addField(String.format("%s Commands", category.toString()), commands, false);
-			}
-		}
-
-		BotUtils.sendMessage(embed, context.getChannel());
+			BotUtils.sendMessage(embed, context.getChannel());
+		});
 	}
 
 	@Override

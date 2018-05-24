@@ -26,7 +26,7 @@ public class EmbedUtils {
 	}
 
 	public static EmbedCreateSpec getDefaultEmbed() {
-		return EmbedUtils.getDefaultEmbed("Empty");
+		return EmbedUtils.getDefaultEmbed(null);
 	}
 
 	public static <K, V extends Number> EmbedCreateSpec getStatsEmbed(Map<K, V> statsMap, String name) {
