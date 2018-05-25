@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin.setting;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.command.admin.setting.core.AbstractSetting;
 import me.shadorc.shadbot.command.admin.setting.core.Setting;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
@@ -18,20 +19,18 @@ public class PrefixSetting extends AbstractSetting {
 
 	@Override
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(arg == null) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
 		if(arg.length() > MAX_PREFIX_LENGTH) {
 			throw new IllegalCmdArgumentException(String.format("Prefix cannot contain more than %s characters.", MAX_PREFIX_LENGTH));
 		}
 
-		Database.getDBGuild(context.getGuild()).setSetting(this.getSetting(), arg);
+		Database.getDBGuild(context.getGuildId().get()).setSetting(this.getSetting(), arg);
 		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", arg), context.getChannel());
 	}
 
 	@Override
-	public EmbedBuilder getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
 				.addField("Usage", String.format("`%s%s <prefix>`", prefix, this.getCmdName()), false)
 				.addField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)

@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin.setting;
 
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.command.admin.setting.core.AbstractSetting;
 import me.shadorc.shadbot.command.admin.setting.core.Setting;
@@ -21,9 +22,7 @@ public class VolumeSetting extends AbstractSetting {
 
 	@Override
 	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
-		if(arg == null) {
-			throw new MissingArgumentException();
-		}
+		context.requireArg();
 
 		Integer volume = NumberUtils.asIntBetween(arg, MIN_VOLUME, MAX_VOLUME);
 		if(volume == null) {
@@ -31,12 +30,12 @@ public class VolumeSetting extends AbstractSetting {
 					arg, MIN_VOLUME, MAX_VOLUME));
 		}
 
-		Database.getDBGuild(context.getGuild()).setSetting(this.getSetting(), volume);
+		Database.getDBGuild(context.getGuildId().get()).setSetting(this.getSetting(), volume);
 		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), context.getChannel());
 	}
 
 	@Override
-	public EmbedBuilder getHelp(String prefix) {
+	public EmbedCreateSpec getHelp(String prefix) {
 		return EmbedUtils.getDefaultEmbed()
 				.addField("Usage", String.format("`%s%s <volume>`", prefix, this.getCmdName()), false)
 				.addField("Argument", String.format("**volume** - min: %d / max: %d / default: %d",

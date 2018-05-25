@@ -42,6 +42,7 @@ public class Utils {
 	// TODO Remove
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
 	public static final int FIELD_CONTENT_LIMIT = 1024;
+	public static final int MAX_REASON_LENGTH = 512;
 
 	// TODO remove
 	public static Instant getSnowflakeTimeFromID(Snowflake id) {
@@ -62,7 +63,7 @@ public class Utils {
 				.all(stream -> stream.allMatch(perm -> Arrays.asList(permissions).contains(perm)));
 	}
 
-	// TODO remove
+	// TODO remove (This does not take into account custom permissions ?)
 	public static Mono<Boolean> hasPermissions(Mono<User> member, Snowflake guildId, Permission... permissions) {
 		return Utils.hasPermissions(member.flatMap(user -> user.asMember(guildId)), permissions);
 	}
