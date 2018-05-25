@@ -1,6 +1,8 @@
 package me.shadorc.shadbot.utils.object.message;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
@@ -17,7 +19,7 @@ public class LoadingMessage implements Publisher<Void> {
 	private final Snowflake channelId;
 	private final Duration typingTimeout;
 
-	private Subscriber<? super Void> subscriber;
+	private final List<Subscriber<? super Void>> subscribers;
 
 	/**
 	 * @param client - the Discord client
@@ -28,6 +30,8 @@ public class LoadingMessage implements Publisher<Void> {
 		this.client = client;
 		this.channelId = channelId;
 		this.typingTimeout = typingTimeout;
+
+		this.subscribers = new ArrayList<>();
 
 		this.startTyping();
 	}
@@ -45,14 +49,14 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Start typing in the channel until a message is send or the typing timeout seconds have passed
 	 */
 	private void startTyping() {
-		client.getMessageChannelById(channelId).subscribe(channel -> channel.typeUntil(this).timeout(typingTimeout));
+		client.getMessageChannelById(channelId).subscribe(channel -> channel.typeUntil(this).take(typingTimeout).subscribe());
 	}
 
 	/**
 	 * Stop typing
 	 */
 	public void stopTyping() {
-		subscriber.onComplete();
+		subscribers.forEach(Subscriber::onComplete);
 	}
 
 	/**
@@ -61,7 +65,7 @@ public class LoadingMessage implements Publisher<Void> {
 	public void send(String content) {
 		client.getMessageChannelById(channelId)
 				.subscribe(channel -> BotUtils.sendMessage(new MessageCreateSpec().setContent(content), channel)
-						.doAfterTerminate(() -> subscriber.onComplete())
+						.doAfterTerminate(this::stopTyping)
 						.subscribe());
 	}
 
@@ -71,13 +75,13 @@ public class LoadingMessage implements Publisher<Void> {
 	public void send(EmbedCreateSpec embed) {
 		client.getMessageChannelById(channelId)
 				.subscribe(channel -> BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel)
-						.doAfterTerminate(() -> subscriber.onComplete())
+						.doAfterTerminate(this::stopTyping)
 						.subscribe());
 	}
 
 	@Override
 	public void subscribe(Subscriber<? super Void> subscriber) {
-		this.subscriber = subscriber;
+		subscribers.add(subscriber);
 	}
 
 }
