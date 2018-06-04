@@ -3,6 +3,7 @@ package me.shadorc.shadbot.core.command;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.reflections.Reflections;
@@ -13,6 +14,7 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.CommandStatsManager;
 import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
@@ -75,9 +77,9 @@ public class CommandManager {
 
 		Snowflake guildId = context.getGuildId().get();
 		Snowflake channelId = context.getChannelId();
-		Snowflake authorId = context.getAuthorId();
+		Snowflake userId = context.getAuthorId();
 
-		Predicate<? super CommandPermission> permissionTest = userPerm -> {
+		Predicate<? super CommandPermission> hasPermission = userPerm -> {
 			if(command.getPermission().isSuperior(userPerm)) {
 				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel());
 				return false;
@@ -85,13 +87,18 @@ public class CommandManager {
 			return true;
 		};
 
-		Predicate<? super CommandPermission> rateLimitTest = userPerm -> {
-			// Check is the command has a rate limited and if the user is rate limited
-			if(command.getRateLimiter().map(limiter -> limiter.isLimited(guildId, channelId, authorId)).orElse(false)) {
+		Predicate<? super CommandPermission> isNotRateLimited = userPerm -> {
+			Optional<RateLimiter> rateLimiter = command.getRateLimiter();
+			if(!rateLimiter.isPresent()) {
+				return true;
+			}
+
+			if(rateLimiter.get().isLimitedAndWarn(context.getClient(), guildId, channelId, userId)) {
 				CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, command);
 				return false;
+			} else {
+				return true;
 			}
-			return true;
 		};
 
 		Mono.just(command)
@@ -99,9 +106,9 @@ public class CommandManager {
 				.filter(cmd -> BotUtils.isCommandAllowed(guildId, cmd))
 				.flatMap(cmd -> context.getAuthorPermission())
 				// The author has the permission to execute this command
-				.filter(permissionTest)
+				.filter(hasPermission)
 				// The user is not rate limited
-				.filter(rateLimitTest)
+				.filter(isNotRateLimited)
 				.doOnSuccess(perm -> command.execute(context))
 				.doOnError(IllegalCmdArgumentException.class, err -> {
 					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());

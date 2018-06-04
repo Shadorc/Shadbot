@@ -8,12 +8,12 @@ import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
+import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.message.MessageListener;
 import me.shadorc.shadbot.message.MessageManager;
-import me.shadorc.shadbot.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;

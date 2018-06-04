@@ -4,10 +4,8 @@ import java.util.Collections;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Channel.Type;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
@@ -29,29 +27,28 @@ public class MessageListener {
 
 		Mono.just(event.getMessage())
 				// Ignore webhook
-				.filter(message -> message.getContent().isPresent() && message.getAuthorId().isPresent())
+				.filter(message -> message.getContent().isPresent()
+						&& message.getAuthorId().isPresent())
 				.flatMap(message -> message.getAuthor())
-				// Don't answer to bot
+				// Do not answer to bot
 				.filter(author -> !author.isBot())
 				.flatMap(author -> event.getMessage().getChannel())
 				.subscribe(channel -> {
-
 					// The channel is a private channel
 					if(channel.getType().equals(Type.DM)) {
 						MessageListener.onPrivateMessage(channel, event.getMessage());
 						return;
 					}
 
-					// The channel is not private, it can be casted to TextChannel to get guild ID
-					Snowflake guildId = TextChannel.class.cast(channel).getGuildId();
+					final Snowflake guildId = event.getGuildId().get();
 
 					// The bot does not have the permission to access this channel
 					if(!BotUtils.isChannelAllowed(guildId, channel.getId())) {
 						return;
 					}
 
-					event.getMessage().getAuthorAsMember()
-							.flatMapMany(Member::getRoles)
+					event.getMember().get()
+							.getRoles()
 							.buffer()
 							.defaultIfEmpty(Collections.emptyList())
 							// The author role is allowed to access to the bot
@@ -91,6 +88,7 @@ public class MessageListener {
 			channel.getMessagesBefore(channel.getLastMessageId().get())
 					// Return true if help text has not already been send
 					.filter(historyMsg -> historyMsg.getContent().map(content -> !text.equalsIgnoreCase(content)).orElse(true))
+					// Send the message even if an error occured
 					.doOnTerminate(() -> BotUtils.sendMessage(text, channel))
 					.subscribe();
 		}
