@@ -54,7 +54,7 @@ public class MessageListener {
 							// The author role is allowed to access to the bot
 							.filter(roleList -> BotUtils.hasAllowedRole(guildId, roleList))
 							// No listener have the priority on this listener and stopped the process
-							.filter(roleList -> !MessageManager.intercept(event.getMessage()))
+							.filter(roleList -> !MessageManager.intercept(guildId, event.getMessage()))
 							.map(roleList -> Database.getDBGuild(guildId).getPrefix())
 							// The message content start with the correct prefix
 							.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))

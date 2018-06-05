@@ -35,11 +35,11 @@ public class MessageManager {
 	 * @param message - the message received
 	 * @return true if the message has been intercepted, false otherwise
 	 */
-	public static boolean intercept(Message message) {
+	public static boolean intercept(Snowflake guildId, Message message) {
 		List<MessageListener> listeners = CHANNELS_LISTENERS.get(message.getChannelId());
 		if(listeners == null) {
 			return false;
 		}
-		return listeners.stream().map(listener -> listener.intercept(message)).anyMatch(Boolean.TRUE::equals);
+		return listeners.stream().map(listener -> listener.intercept(guildId, message)).anyMatch(Boolean.TRUE::equals);
 	}
 }
