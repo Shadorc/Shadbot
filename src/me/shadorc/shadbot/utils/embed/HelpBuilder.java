@@ -73,11 +73,11 @@ public class HelpBuilder {
 		return this.addArg(name, null, isFacultative);
 	}
 
-	public HelpBuilder addArg(List<?> options, boolean isFacultative) {
+	public <T> HelpBuilder addArg(List<T> options, boolean isFacultative) {
 		return this.addArg(FormatUtils.format(options, Object::toString, "|"), null, isFacultative);
 	}
 
-	public HelpBuilder addArg(Object[] options, boolean isFacultative) {
+	public <T> HelpBuilder addArg(T[] options, boolean isFacultative) {
 		return this.addArg(List.of(options), isFacultative);
 	}
 

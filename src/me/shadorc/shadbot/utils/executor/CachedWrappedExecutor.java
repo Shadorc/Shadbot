@@ -10,6 +10,11 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class CachedWrappedExecutor extends ThreadPoolExecutor {
 
+	/**
+	 * A default cached thread pool with tasks wrapped to catch {@link Exception}
+	 * 
+	 * @param threadName - the thread name
+	 */
 	public CachedWrappedExecutor(String threadName) {
 		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), Utils.createDaemonThreadFactory(threadName));
 	}

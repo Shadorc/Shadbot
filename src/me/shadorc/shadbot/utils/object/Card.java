@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import me.shadorc.shadbot.utils.Utils;
+
 public class Card {
 
 	private final int num;
@@ -36,21 +38,21 @@ public class Card {
 
 	public Card(int num, Sign sign) {
 		this.num = num;
+		this.sign = sign;
 		switch (num) {
-			case 11:
-				this.name = "J";
+			case 13:
+				this.name = "K";
 				break;
 			case 12:
 				this.name = "Q";
 				break;
-			case 13:
-				this.name = "K";
+			case 11:
+				this.name = "J";
 				break;
 			default:
 				this.name = Integer.toString(num);
 				break;
 		}
-		this.sign = sign;
 	}
 
 	public int getNum() {
@@ -66,7 +68,7 @@ public class Card {
 	}
 
 	public static Card pick() {
-		return new Card(ThreadLocalRandom.current().nextInt(1, 14), Sign.values()[ThreadLocalRandom.current().nextInt(Sign.values().length)]);
+		return new Card(ThreadLocalRandom.current().nextInt(1, 14), Utils.randArray(Sign.values()));
 	}
 
 	public static List<Card> pick(int count) {

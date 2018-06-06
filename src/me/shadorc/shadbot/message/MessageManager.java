@@ -32,6 +32,7 @@ public class MessageManager {
 	}
 
 	/**
+	 * @param guildId - the guild ID
 	 * @param message - the message received
 	 * @return true if the message has been intercepted, false otherwise
 	 */
@@ -40,6 +41,7 @@ public class MessageManager {
 		if(listeners == null) {
 			return false;
 		}
-		return listeners.stream().map(listener -> listener.intercept(guildId, message)).anyMatch(Boolean.TRUE::equals);
+		return listeners.stream().map(listener -> listener.intercept(guildId, message))
+				.anyMatch(Boolean.TRUE::equals);
 	}
 }

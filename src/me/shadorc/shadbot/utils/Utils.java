@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import javax.management.Attribute;
@@ -190,6 +191,14 @@ public class Utils {
 	 */
 	public static ThreadFactory createDaemonThreadFactory(String threadName) {
 		return new ThreadFactoryBuilder().setNameFormat(threadName).setDaemon(true).build();
+	}
+
+	/**
+	 * @param array - the array from which to take a random element
+	 * @return A random element from the array
+	 */
+	public static <T> T randArray(T[] array) {
+		return array[ThreadLocalRandom.current().nextInt(array.length)];
 	}
 
 }

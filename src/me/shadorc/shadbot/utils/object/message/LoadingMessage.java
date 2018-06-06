@@ -22,24 +22,26 @@ public class LoadingMessage implements Publisher<Void> {
 	private final List<Subscriber<? super Void>> subscribers;
 
 	/**
+	 * Start typing until a message is send or the typing timeout have passed
+	 * 
 	 * @param client - the Discord client
 	 * @param channelId - the Channel ID in which send the message
-	 * @param typingTimeout - the duration before a message is send Start typing until a message is send or the typing timeout have passed
+	 * @param typingTimeout - the duration before a message is send
 	 */
 	public LoadingMessage(DiscordClient client, Snowflake channelId, Duration typingTimeout) {
 		this.client = client;
 		this.channelId = channelId;
 		this.typingTimeout = typingTimeout;
-
 		this.subscribers = new ArrayList<>();
 
 		this.startTyping();
 	}
 
 	/**
+	 * Start typing until a message is send Start typing until a message is send or 30 seconds have passed
+	 * 
 	 * @param client - the Discord client
-	 * @param channelId - the Channel ID in which send the message Start typing until a message is send Start typing until a message is send or 30 seconds
-	 *            have passed
+	 * @param channelId - the Channel ID in which send the message
 	 */
 	public LoadingMessage(DiscordClient client, Snowflake channelId) {
 		this(client, channelId, Duration.ofSeconds(30));
@@ -49,7 +51,10 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Start typing in the channel until a message is send or the typing timeout seconds have passed
 	 */
 	private void startTyping() {
-		client.getMessageChannelById(channelId).subscribe(channel -> channel.typeUntil(this).take(typingTimeout).subscribe());
+		client.getMessageChannelById(channelId)
+				.subscribe(channel -> channel.typeUntil(this)
+						.take(typingTimeout)
+						.subscribe());
 	}
 
 	/**
