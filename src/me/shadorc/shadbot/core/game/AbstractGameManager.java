@@ -8,8 +8,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
-import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -19,20 +18,11 @@ public abstract class AbstractGameManager {
 
 	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ScheduledWrappedExecutor("GameManager-%d");
 
-	private final String cmdName;
-	private final String prefix;
-	private final Snowflake guildId;
-	private final Snowflake channelId;
-	private final Snowflake userId;
-
+	private final Context context;
 	private ScheduledFuture<?> scheduledTask;
 
-	public AbstractGameManager(AbstractCommand cmd, String prefix, Snowflake guildId, Snowflake channelId, Snowflake userId) {
-		this.cmdName = cmd.getName();
-		this.prefix = prefix;
-		this.guildId = guildId;
-		this.channelId = channelId;
-		this.userId = userId;
+	public AbstractGameManager(Context context) {
+		this.context = context;
 	}
 
 	public abstract void start() throws Exception;
@@ -48,13 +38,12 @@ public abstract class AbstractGameManager {
 				.flatMapIterable(Role::getPermissions)
 				.any(Permission.ADMINISTRATOR::equals);
 
-		return message.getAuthorAsMember()
-				.zipWith(isAdminMono)
+		return Mono.zip(message.getAuthorAsMember(), isAdminMono)
 				.flatMap(authorAndIsAdmin -> {
 					Member author = authorAndIsAdmin.getT1();
 					Boolean isAdmin = authorAndIsAdmin.getT2();
 					String content = message.getContent().get();
-					if(content.equals(prefix + "cancel") && (userId.equals(author.getId()) || isAdmin)) {
+					if(content.equals(context.getPrefix() + "cancel") && (context.getAuthorId().equals(author.getId()) || isAdmin)) {
 						BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", author.getUsername()), message.getChannel());
 						this.stop();
 						return Mono.just(true);
@@ -63,24 +52,8 @@ public abstract class AbstractGameManager {
 				});
 	}
 
-	public String getCmdName() {
-		return cmdName;
-	}
-
-	public String getPrefix() {
-		return prefix;
-	}
-
-	public Snowflake getGuildId() {
-		return guildId;
-	}
-
-	public Snowflake getChannelId() {
-		return channelId;
-	}
-
-	public Snowflake getAuthorId() {
-		return userId;
+	public Context getContext() {
+		return context;
 	}
 
 	public boolean isTaskDone() {
