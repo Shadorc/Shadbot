@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
@@ -52,17 +53,20 @@ public class GuildMusic {
 		}
 	}
 
+	/**
+	 * Join a voice channel only if the bot is not already in a voice channel
+	 * 
+	 * @param voiceChannelId - the voice channel ID to join
+	 */
 	public void joinVoiceChannel(Snowflake voiceChannelId) {
-		client.getSelf()
-				.map(self -> self.asMember(guildId))
-				.subscribe(selfMember -> {
-					// TODO: Check if voice state is null
-					// selfMember.getVoiceState();
-					client.getVoiceChannelById(voiceChannelId).subscribe(voiceChannel -> {
-						this.voiceChannelId = voiceChannelId;
-						// TODO: audioReceiver
-						voiceChannel.join(this.getAudioProvider(), null).subscribe();
-					});
+		// TODO: Change to client.getSelfId()
+		client.getMemberById(guildId, client.getSelf().block().getId())
+				.flatMap(Member::getVoiceState)
+				.filter(voiceState -> !voiceState.getChannelId().isPresent())
+				.flatMap(voiceState -> client.getVoiceChannelById(voiceChannelId))
+				.subscribe(voiceChannel -> {
+					this.voiceChannelId = voiceChannelId;
+					voiceChannel.join();
 				});
 	}
 
