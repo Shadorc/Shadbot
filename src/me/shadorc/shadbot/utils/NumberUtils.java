@@ -15,9 +15,9 @@ public class NumberUtils {
 	}
 
 	/**
-	 * @param str - the string to convert to an integer between {@code min} and {@code max}
+	 * @param str - the string to convert as an integer between {@code min} and {@code max}
 	 * @param min - the minimum value
-	 * @param max - the maximum valie
+	 * @param max - the maximum value
 	 * @return The string converted as an integer or null if the string was not convertible or if it was not in the specified range
 	 */
 	public static Integer asIntBetween(String str, int min, int max) {
@@ -30,6 +30,16 @@ public class NumberUtils {
 		} catch (NumberFormatException err) {
 			return null;
 		}
+	}
+
+	/**
+	 * @param num - the number to convert as an integer between {@code min} and {@code max}
+	 * @param min - the minimum value
+	 * @param max - the maximum value
+	 * @return The number converted as an integer between {@code min} and {@code max}
+	 */
+	public static int between(double num, double min, double max) {
+		return (int) Math.max(min, Math.min(num, max));
 	}
 
 	/**

@@ -70,13 +70,13 @@ public class MessageListener {
 			try {
 				CommandManager.getCommand("help").execute(new Context(null, message, Config.DEFAULT_PREFIX));
 			} catch (MissingArgumentException | IllegalCmdArgumentException err) {
-				LogUtils.error(msgContent, err,
+				LogUtils.error(channel.getClient(), msgContent, err,
 						String.format("{Channel ID: %s} An unknown error occurred while showing help in a private channel.", channel.getId()));
 			}
 			return;
 		}
 
-		String text = String.format("Hello !"
+		final String text = String.format("Hello !"
 				+ "%nCommands only work in a server but you can see help using `%shelp`."
 				+ "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
 				+ "join my support server : %s",

@@ -3,6 +3,10 @@ package me.shadorc.shadbot.utils;
 import java.util.EnumSet;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.jsoup.Jsoup;
+
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.Config;
@@ -66,5 +70,13 @@ public class TextUtils {
 				+ "%nPlease, check my permissions and channel-specific ones to verify that %s %s checked.",
 				FormatUtils.format(permissions, perm -> String.format("**%s**", StringUtils.capitalize(perm.toString().replace("_", " "))), " and "),
 				permissions.length > 1 ? "are" : "is");
+	}
+
+	/**
+	 * @param err - the exception containing the error message to clean
+	 * @return A cleaned version of the error message, without HTML tags and YouTube links
+	 */
+	public static String cleanLavaplayerErr(FriendlyException err) {
+		return Jsoup.parse(StringUtils.remove(err.getMessage(), "Watch on YouTube")).text().trim();
 	}
 }

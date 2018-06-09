@@ -16,7 +16,7 @@ public class ChannelListener {
 		List<Snowflake> allowedChannelIds = dbGuild.getAllowedChannels();
 		// If the channel was an allowed channel...
 		if(allowedChannelIds.remove(event.getChannel().getId())) {
-			// ...update settings with allowed channels without the deleted one
+			// ...update settings to remove the deleted one
 			dbGuild.setSetting(SettingEnum.ALLOWED_CHANNELS, new JSONArray(allowedChannelIds));
 		}
 	}

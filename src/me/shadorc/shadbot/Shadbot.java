@@ -43,9 +43,6 @@ public class Shadbot {
 			}
 		});
 
-		// TODO
-		// AudioSourceManagers.registerRemoteSources(GuildMusicManager.PLAYER_MANAGER);
-
 		// TODO: Calculate this by using gateway or guilds / 1000
 		int shardCount = 1;
 
@@ -72,17 +69,9 @@ public class Shadbot {
 			;
 	}
 
-	// TODO: Find an alternative ?
-	public static DiscordClient getClient() {
-		if(CLIENTS == null || CLIENTS.isEmpty()) {
-			return null;
-		}
-		return CLIENTS.get(0);
-	}
-
 	public static <T extends Event> void registerListener(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
 		client.getEventDispatcher().on(eventClass)
-				.doOnError(err -> LogUtils.error(err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
+				.doOnError(err -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
 				.retry()
 				.subscribe(consumer);
 	}

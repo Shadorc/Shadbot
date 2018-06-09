@@ -56,7 +56,8 @@ public class ChatCmd extends AbstractCommand {
 
 		errorCount++;
 		if(errorCount >= MAX_ERROR_COUNT) {
-			LogUtils.error(String.format("No artificial intelligence is responding (Error count: %d).", errorCount));
+			LogUtils.error(context.getClient(),
+					String.format("No artificial intelligence is responding (Error count: %d).", errorCount));
 		}
 	}
 

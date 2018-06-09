@@ -15,16 +15,18 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 public class MemberListener {
 
 	public static void onMemberJoin(MemberJoinEvent event) {
-		DBGuild dbGuild = Database.getDBGuild(event.getGuildId());
+		final Snowflake guildId = event.getGuildId();
+		DBGuild dbGuild = Database.getDBGuild(guildId);
 
 		MemberListener.sendAutoMsg(event.getClient(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage());
 
-		dbGuild.getAutoRoles().forEach(roleId -> event.getMember().addRole(roleId)
-				.doOnError(ExceptionUtils::isForbidden,
-						err -> LogUtils.infof("{Guild ID: %s} Shadbot was not allowed to edit role.", event.getGuildId()))
-				.doOnError(
-						err -> LogUtils.error(err, String.format("{Guild ID: %s} Shadbot was not allowed to edit role.", event.getGuildId())))
-				.subscribe());
+		dbGuild.getAutoRoles()
+				.forEach(roleId -> event.getMember().addRole(roleId)
+						.doOnError(ExceptionUtils::isForbidden,
+								err -> LogUtils.infof("{Guild ID: %s} Shadbot was not allowed to edit role.", guildId))
+						.doOnError(
+								err -> LogUtils.error(event.getClient(), err, String.format("{Guild ID: %s} An error occured while editing a role.", guildId)))
+						.subscribe());
 	}
 
 	public static void onMemberLeave(MemberLeaveEvent event) {
@@ -37,7 +39,6 @@ public class MemberListener {
 			return;
 		}
 
-		client.getMessageChannelById(channelId.get())
-				.subscribe(channel -> BotUtils.sendMessage(msg.get(), channel));
+		BotUtils.sendMessage(msg.get(), client.getMessageChannelById(channelId.get()));
 	}
 }

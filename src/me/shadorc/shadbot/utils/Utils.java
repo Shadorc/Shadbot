@@ -1,10 +1,7 @@
 package me.shadorc.shadbot.utils;
 
-import java.awt.Color;
 import java.lang.management.ManagementFactory;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -29,45 +26,12 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.entity.Role;
-import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Permission;
-import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 public class Utils {
-
-	// TODO Remove
-	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
-	public static final int FIELD_CONTENT_LIMIT = 1024;
-	public static final int MAX_REASON_LENGTH = 512;
-
-	// TODO remove
-	public static Instant getSnowflakeTimeFromID(Snowflake id) {
-		return Instant.ofEpochMilli(1420070400000L + (id.asLong() >>> 22));
-	}
-
-	// TODO remove
-	public static int convertColor(Color color) {
-		return ((color.getRed() & 0xFF) << 16) | ((color.getGreen() & 0xFF) << 8) | (color.getBlue() & 0xFF);
-	}
-
-	// TODO remove
-	public static Mono<Boolean> hasPermissions(Mono<Member> member, Permission... permissions) {
-		return member.flatMapMany(Member::getRoles)
-				.map(Role::getPermissions)
-				.map(ArrayList::new)
-				.map(ArrayList::stream)
-				.all(stream -> stream.allMatch(perm -> Arrays.asList(permissions).contains(perm)));
-	}
-
-	// TODO remove (This does not take into account custom permissions ?)
-	public static Mono<Boolean> hasPermissions(Mono<User> member, Snowflake guildId, Permission... permissions) {
-		return Utils.hasPermissions(member.flatMap(user -> user.asMember(guildId)), permissions);
-	}
 
 	/**
 	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found
@@ -100,7 +64,7 @@ public class Utils {
 
 	/**
 	 * @param enumClass - the enumeration class
-	 * @param value - the value representation of the enumeration
+	 * @param value - the string representation of the enumeration, case insensitive
 	 * @return The enumeration corresponding to the {@code value} from {@code enumClass} or null if it does not exist
 	 */
 	public static <T extends Enum<T>> T getValueOrNull(Class<T> enumClass, String value) {

@@ -18,6 +18,7 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
+import me.shadorc.shadbot.utils.NumberUtils;
 
 public class LottoManager {
 
@@ -92,7 +93,7 @@ public class LottoManager {
 
 	public static synchronized void addToPool(int coins) {
 		int newPool = dataObj.optInt(POOL) + (int) Math.ceil(coins / 100f);
-		dataObj.put(POOL, Math.max(0, Math.min(Config.MAX_COINS, newPool)));
+		dataObj.put(POOL, NumberUtils.between(newPool, 0, Config.MAX_COINS));
 	}
 
 	public static synchronized void addPlayer(Snowflake guildId, Snowflake userId, int num) {

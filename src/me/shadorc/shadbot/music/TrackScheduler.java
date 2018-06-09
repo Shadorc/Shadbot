@@ -12,8 +12,13 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
+import me.shadorc.shadbot.utils.NumberUtils;
 
 public class TrackScheduler {
+
+	public enum RepeatMode {
+		NONE, SONG, PLAYLIST;
+	}
 
 	private final AudioPlayer audioPlayer;
 	private final BlockingDeque<AudioTrack> queue;
@@ -29,12 +34,12 @@ public class TrackScheduler {
 	}
 
 	/**
-	 * @return true if the music has been started, false if it was added to the queue
+	 * @return {@code true} if the track was started, {@code false} if it was added to the queue
 	 */
 	public boolean startOrQueue(AudioTrack track, boolean first) {
+		// TODO: This should not be logged here
 		VariousStatsManager.log(VariousEnum.MUSICS_LOADED);
 
-		// The track has been started
 		if(audioPlayer.startTrack(track.makeClone(), true)) {
 			this.currentTrack = track;
 			return true;
@@ -46,6 +51,9 @@ public class TrackScheduler {
 		return false;
 	}
 
+	/**
+	 * @return {@code true} if the track was started, {@code false} otherwise
+	 */
 	public boolean nextTrack() {
 		switch (repeatMode) {
 			case PLAYLIST:
@@ -70,9 +78,9 @@ public class TrackScheduler {
 	}
 
 	public long changePosition(long time) {
-		long newPosition = audioPlayer.getPlayingTrack().getPosition() + time;
-		newPosition = Math.max(0, Math.min(audioPlayer.getPlayingTrack().getDuration(), newPosition));
-		audioPlayer.getPlayingTrack().setPosition(newPosition);
+		final AudioTrack track = audioPlayer.getPlayingTrack();
+		long newPosition = track.getPosition() + time;
+		track.setPosition(NumberUtils.between(newPosition, 0, track.getDuration()));
 		return newPosition;
 	}
 
@@ -84,6 +92,11 @@ public class TrackScheduler {
 	}
 
 	public void clearPlaylist() {
+		queue.clear();
+	}
+
+	public void destroy() {
+		audioPlayer.destroy();
 		queue.clear();
 	}
 
@@ -108,7 +121,7 @@ public class TrackScheduler {
 	}
 
 	public void setVolume(int volume) {
-		audioPlayer.setVolume(Math.max(0, Math.min(100, volume)));
+		audioPlayer.setVolume(NumberUtils.between(volume, 0, 100));
 	}
 
 	public void setRepeatMode(RepeatMode repeatMode) {

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 
@@ -13,7 +14,7 @@ public class EmbedUtils {
 	public static EmbedCreateSpec getDefaultEmbed(String authorName, String authorUrl, String authorIconUrl) {
 		return new EmbedCreateSpec()
 				.setAuthor(authorName, authorUrl, authorIconUrl)
-				.setColor(Utils.convertColor(Config.BOT_COLOR));
+				.setColor(DiscordUtils.convertColor(Config.BOT_COLOR));
 	}
 
 	// TODO: Get Shadbot avatar url

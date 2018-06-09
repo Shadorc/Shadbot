@@ -76,13 +76,13 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 				.addField("Difficulty", String.format("`%s`", resultObj.getString("difficulty")), true)
 				.withFooterText(String.format("You have %d seconds to answer.", LIMITED_TIME));
 
-		BotUtils.sendMessage(embed.build(), this.getChannel());
+		BotUtils.sendMessage(embed.build(), this.getMessageChannel());
 
-		MessageManager.addListener(this.getChannel(), this);
+		MessageManager.addListener(this.getMessageChannel(), this);
 
 		startTime = System.currentTimeMillis();
 		this.schedule(() -> {
-			BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer), this.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer), this.getMessageChannel());
 			this.stop();
 		}, LIMITED_TIME, TimeUnit.SECONDS);
 	}
@@ -90,8 +90,8 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 	@Override
 	public void stop() {
 		this.cancelScheduledTask();
-		MessageManager.removeListener(this.getChannel(), this);
-		TriviaCmd.MANAGERS.remove(this.getChannel().getLongID());
+		MessageManager.removeListener(this.getMessageChannel(), this);
+		TriviaCmd.MANAGERS.remove(this.getMessageChannel().getLongID());
 	}
 
 	@Override
@@ -121,13 +121,13 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 
 		if(alreadyAnswered.containsKey(author)) {
 			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.", author.getName()),
-					this.getChannel());
+					this.getMessageChannel());
 			alreadyAnswered.put(author, true);
 		} else if(answer.equalsIgnoreCase(correctAnswer)) {
-			this.win(message.getChannel(), message.getAuthor());
+			this.win(message.getMessageChannel(), message.getAuthor());
 
 		} else {
-			BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.", message.getAuthor().getName()), this.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.", message.getAuthor().getName()), this.getMessageChannel());
 			alreadyAnswered.put(author, false);
 		}
 

@@ -16,8 +16,8 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.Utils;
 import reactor.core.publisher.Mono;
 
 public class Context {
@@ -115,7 +115,7 @@ public class Context {
 				});
 
 		// The member is an administrator
-		Mono<CommandPermission> adminperm = Utils.hasPermissions(this.getAuthor(), this.getGuildId().get(), Permission.ADMINISTRATOR)
+		Mono<CommandPermission> adminperm = DiscordUtils.hasPermissions(this.getAuthor(), this.getGuildId().get(), Permission.ADMINISTRATOR)
 				.map(bool -> {
 					return CommandPermission.ADMIN;
 				});

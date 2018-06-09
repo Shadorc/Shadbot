@@ -12,11 +12,11 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
@@ -53,7 +53,7 @@ public class WikiCmd extends AbstractCommand {
 				return;
 			}
 
-			String extract = StringUtils.truncate(resultObj.getString("extract"), Utils.DESCRIPTION_CONTENT_LIMIT);
+			String extract = StringUtils.truncate(resultObj.getString("extract"), DiscordUtils.DESCRIPTION_CONTENT_LIMIT);
 
 			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("Wikipedia: %s", resultObj.getString("title")),
 					"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mohapedia.png/842px-Mohapedia.png",

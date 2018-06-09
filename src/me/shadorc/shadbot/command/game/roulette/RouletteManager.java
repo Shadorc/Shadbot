@@ -9,7 +9,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.Database;
@@ -21,6 +20,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
+import twitter4j.Place;
 
 public class RouletteManager extends AbstractGameManager {
 
@@ -110,13 +110,13 @@ public class RouletteManager extends AbstractGameManager {
 
 		BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
 				winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"),
-				this.getChannel()).get();
+				this.getMessageChannel()).get();
 
 		this.results = FormatUtils.format(list, Object::toString, ", ");
 		this.show();
 
 		playersPlace.clear();
-		RouletteCmd.MANAGERS.remove(this.getChannel().getLongID());
+		RouletteCmd.MANAGERS.remove(this.getMessageChannel().getLongID());
 	}
 
 	protected boolean addPlayer(IUser user, Integer bet, String place) {

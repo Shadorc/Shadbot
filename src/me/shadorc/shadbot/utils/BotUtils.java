@@ -60,7 +60,7 @@ public class BotUtils {
 						err -> LogUtils.infof("{Channel ID: %s} Shadbot was not allowed to send a message.", channel.getId()))
 				.doOnError(
 						err -> {
-							LogUtils.error(err, String.format("{Channel ID: %s} An error occurred while sending a message.", channel.getId()));
+							LogUtils.error(channel.getClient(), err, String.format("{Channel ID: %s} An error occurred while sending a message.", channel.getId()));
 						});
 	}
 

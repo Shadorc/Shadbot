@@ -14,10 +14,10 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
@@ -52,7 +52,7 @@ public class ThisDayCmd extends AbstractCommand {
 
 			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("On This Day (%s)", date), HOME_URL)
 					.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-					.setDescription(StringUtils.truncate(events, Utils.DESCRIPTION_CONTENT_LIMIT));
+					.setDescription(StringUtils.truncate(events, DiscordUtils.DESCRIPTION_CONTENT_LIMIT));
 
 			loadingMsg.send(embed);
 

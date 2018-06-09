@@ -76,7 +76,7 @@ public class CustomShard {
 					client.reconnect();
 				}
 			} catch (Exception err) {
-				LogUtils.error(err, String.format("An error occurred while restarting shard %d.", this.getIndex()));
+				LogUtils.error(client, err, String.format("An error occurred while restarting shard %d.", this.getIndex()));
 			}
 		});
 	}

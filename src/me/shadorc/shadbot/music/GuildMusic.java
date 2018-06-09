@@ -15,7 +15,6 @@ import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
@@ -23,23 +22,23 @@ public class GuildMusic {
 
 	private final DiscordClient client;
 	private final Snowflake guildId;
-	private final AudioPlayer audioPlayer;
 	private final AudioProvider audioProvider;
 	private final TrackScheduler trackScheduler;
 
 	private ScheduledFuture<?> leaveTask;
 	private Snowflake voiceChannelId;
-	private Snowflake channelId;
+	private Snowflake messageChannelId;
 	private Snowflake djId;
 	private boolean isWaiting;
 
 	public GuildMusic(DiscordClient client, Snowflake guildId, AudioPlayerManager audioPlayerManager) {
 		this.client = client;
 		this.guildId = guildId;
-		this.audioPlayer = audioPlayerManager.createPlayer();
-		this.audioProvider = new IshAudioProvider(audioPlayer);
+
+		AudioPlayer audioPlayer = audioPlayerManager.createPlayer();
+		audioPlayer.addListener(new AudioEventListener(this));
+		this.audioProvider = new MusicProvider(audioPlayer);
 		this.trackScheduler = new TrackScheduler(audioPlayer, Database.getDBGuild(guildId).getDefaultVol());
-		this.audioPlayer.addListener(new AudioEventListener(this));
 	}
 
 	public void scheduleLeave() {
@@ -63,7 +62,6 @@ public class GuildMusic {
 						this.voiceChannelId = voiceChannelId;
 						// TODO: audioReceiver
 						voiceChannel.join(this.getAudioProvider(), null).subscribe();
-						LogUtils.infof("{Guild ID: %s} Voice channel joined.", guildId);
 					});
 				});
 	}
@@ -81,15 +79,14 @@ public class GuildMusic {
 					+ "it will help my creator keeping me alive :heart:",
 					Config.PATREON_URL));
 		}
-		BotUtils.sendMessage(strBuilder.toString(), client.getMessageChannelById(channelId));
+		BotUtils.sendMessage(strBuilder.toString(), client.getMessageChannelById(messageChannelId));
 		this.leaveVoiceChannel();
 	}
 
-	public void delete() {
+	public void destroy() {
 		this.cancelLeave();
 		GuildMusicManager.GUILD_MUSIC_MAP.remove(guildId);
-		audioPlayer.destroy();
-		trackScheduler.clearPlaylist();
+		trackScheduler.destroy();
 	}
 
 	public DiscordClient getClient() {
@@ -100,12 +97,12 @@ public class GuildMusic {
 		return guildId;
 	}
 
-	public Snowflake getChannelId() {
-		return channelId;
+	public Snowflake getMessageChannelId() {
+		return messageChannelId;
 	}
 
-	public Mono<MessageChannel> getChannel() {
-		return client.getMessageChannelById(channelId);
+	public Mono<MessageChannel> getMessageChannel() {
+		return client.getMessageChannelById(messageChannelId);
 	}
 
 	public Snowflake getDjId() {
@@ -129,7 +126,7 @@ public class GuildMusic {
 	}
 
 	public void setChannel(Snowflake channelId) {
-		this.channelId = channelId;
+		this.messageChannelId = channelId;
 	}
 
 	public void setDj(Snowflake djId) {

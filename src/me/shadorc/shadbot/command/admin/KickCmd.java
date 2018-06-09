@@ -15,6 +15,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -38,16 +39,16 @@ public class KickCmd extends AbstractCommand {
 
 		Snowflake guildId = context.getGuildId().get();
 
-		Utils.hasPermissions(context.getAuthor(), guildId, Permission.KICK_MEMBERS).subscribe(canUserKick -> {
+		DiscordUtils.hasPermissions(context.getAuthor(), guildId, Permission.KICK_MEMBERS).subscribe(canUserKick -> {
 
 			if(!canUserKick) {
 				throw new IllegalArgumentException("You don't have permission to kick.");
 			}
 
-			Utils.hasPermissions(context.getSelf(), guildId, Permission.KICK_MEMBERS).subscribe(canBotKick -> {
+			DiscordUtils.hasPermissions(context.getSelf(), guildId, Permission.KICK_MEMBERS).subscribe(canBotKick -> {
 
 				if(!canBotKick) {
-					BotUtils.sendMessage(TextUtils.missingPerm(Permission.KICK_MEMBERS), context.getChannel());
+					BotUtils.sendMessage(TextUtils.missingPerm(Permission.KICK_MEMBERS), context.getMessageChannel());
 					return;
 				}
 
@@ -94,7 +95,7 @@ public class KickCmd extends AbstractCommand {
 								// TODO: Add reason
 								context.getMember()
 										.doOnError(ExceptionUtils::isForbidden, err -> {
-											BotUtils.sendMessage(TextUtils.missingPerm(Permission.KICK_MEMBERS), context.getChannel());
+											BotUtils.sendMessage(TextUtils.missingPerm(Permission.KICK_MEMBERS), context.getMessageChannel());
 											LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to kick a member.", guildId);
 										})
 										.subscribe(member -> {
@@ -105,7 +106,7 @@ public class KickCmd extends AbstractCommand {
 							BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) **%s** got kicked. Reason: `%s`",
 									authorName,
 									FormatUtils.format(mentionedUsers, User::getUsername, ", "),
-									reason), context.getChannel());
+									reason), context.getMessageChannel());
 						});
 					});
 				});

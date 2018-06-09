@@ -54,7 +54,7 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 
 	@Override
 	public void start() {
-		MessageManager.addListener(this.getChannel(), this);
+		MessageManager.addListener(this.getMessageChannel(), this);
 		this.show();
 		this.schedule(() -> this.stop(), IDLE_MIN, TimeUnit.MINUTES);
 	}
@@ -62,8 +62,8 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 	@Override
 	public void stop() {
 		this.cancelScheduledTask();
-		MessageManager.removeListener(this.getChannel(), this);
-		HangmanCmd.MANAGERS.remove(this.getChannel().getLongID());
+		MessageManager.removeListener(this.getMessageChannel(), this);
+		HangmanCmd.MANAGERS.remove(this.getMessageChannel().getLongID());
 	}
 
 	private void showResultAndStop(boolean win) {
@@ -71,11 +71,11 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 		if(win) {
 			int gains = (int) Math.ceil(MIN_GAINS + ((float) MAX_BONUS / IMG_LIST.size()) * ((float) IMG_LIST.size() - failsCount));
 			BotUtils.sendMessage(String.format(Emoji.PURSE + " Well played **%s**, you found the word ! You won **%s**.",
-					this.getAuthor().getName(), FormatUtils.formatCoins(gains)), this.getChannel());
+					this.getAuthor().getName(), FormatUtils.formatCoins(gains)), this.getMessageChannel());
 			Database.getDBUser(this.getGuild(), this.getAuthor()).addCoins(gains);
 			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
 		} else {
-			BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " You lose, the word to guess was **%s** !", word), this.getChannel());
+			BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " You lose, the word to guess was **%s** !", word), this.getMessageChannel());
 		}
 		this.stop();
 	}
@@ -172,9 +172,9 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 			return false;
 		}
 
-		if(content.length() == 1 && !rateLimiter.isLimited(this.getChannel(), message.getAuthor())) {
+		if(content.length() == 1 && !rateLimiter.isLimited(this.getMessageChannel(), message.getAuthor())) {
 			this.checkLetter(content);
-		} else if(content.length() == word.length() && !rateLimiter.isLimited(this.getChannel(), message.getAuthor())) {
+		} else if(content.length() == word.length() && !rateLimiter.isLimited(this.getMessageChannel(), message.getAuthor())) {
 			this.checkWord(content);
 		}
 

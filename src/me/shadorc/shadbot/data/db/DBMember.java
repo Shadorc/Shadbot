@@ -6,6 +6,7 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
 import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
+import me.shadorc.shadbot.utils.NumberUtils;
 
 public class DBMember {
 
@@ -56,7 +57,7 @@ public class DBMember {
 	}
 
 	public void addCoins(int gains) {
-		this.coins = (int) Math.max(0, Math.min(Config.MAX_COINS, (long) this.getCoins() + gains));
+		this.coins = NumberUtils.between(this.getCoins() + gains, 0, Config.MAX_COINS);
 		Database.save(this);
 	}
 

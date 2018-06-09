@@ -1,8 +1,8 @@
 package me.shadorc.shadbot.listener;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
@@ -20,8 +20,9 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 public class GatewayLifecycleListener {
 
 	public static void onGatewayLifecycleEvent(GatewayLifecycleEvent event) {
-		Optional<Integer> shardIndex = Optional.ofNullable(event.getClient().getConfig().getShardIndex());
-		LogUtils.infof("{Shard %d} %s", shardIndex.orElse(0), event.toString());
+		LogUtils.infof("{Shard %d} %s",
+				event.getClient().getConfig().getShardIndex(),
+				event.toString());
 	}
 
 	public static void onReady(ReadyEvent event) {
@@ -33,7 +34,7 @@ public class GatewayLifecycleListener {
 		Shadbot.registerListener(event.getClient(), MemberJoinEvent.class, MemberListener::onMemberJoin);
 		Shadbot.registerListener(event.getClient(), MemberLeaveEvent.class, MemberListener::onMemberLeave);
 		Shadbot.registerListener(event.getClient(), MessageCreateEvent.class, MessageListener::onMessageCreate);
-		// TODO: UserVoiceChannelListener, VoiceChannelListener
+		Shadbot.registerListener(event.getClient(), VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 
 		new CustomShard(event.getClient());
 

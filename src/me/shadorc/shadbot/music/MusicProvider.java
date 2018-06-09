@@ -5,13 +5,12 @@ import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 
 import discord4j.voice.AudioProvider;
 
-//TODO Better name
-public class IshAudioProvider implements AudioProvider {
+public class MusicProvider implements AudioProvider {
 
 	private final AudioPlayer audioPlayer;
 	private AudioFrame lastFrame;
 
-	public IshAudioProvider(AudioPlayer audioPlayer) {
+	public MusicProvider(AudioPlayer audioPlayer) {
 		this.audioPlayer = audioPlayer;
 	}
 

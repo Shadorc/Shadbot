@@ -51,7 +51,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 			this.dealerCards.add(Card.pick());
 		}
 
-		MessageManager.addListener(this.getChannel(), this);
+		MessageManager.addListener(this.getMessageChannel(), this);
 		this.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
 		startTime = System.currentTimeMillis();
 	}
@@ -59,8 +59,8 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 	@Override
 	public void stop() {
 		this.cancelScheduledTask();
-		MessageManager.removeListener(this.getChannel(), this);
-		BlackjackCmd.MANAGERS.remove(this.getChannel().getLongID());
+		MessageManager.removeListener(this.getMessageChannel(), this);
+		BlackjackCmd.MANAGERS.remove(this.getMessageChannel().getLongID());
 
 		this.show();
 		this.computeResults();
@@ -152,7 +152,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 			Database.getDBUser(this.getGuild(), player.getUser()).addCoins(gains);
 		}
 
-		BotUtils.sendMessage(Emoji.DICE + " __Results:__ " + FormatUtils.format(results, str -> str, ", "), this.getChannel());
+		BotUtils.sendMessage(Emoji.DICE + " __Results:__ " + FormatUtils.format(results, str -> str, ", "), this.getMessageChannel());
 	}
 
 	@Override
@@ -165,21 +165,21 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 			return false;
 		}
 
-		if(rateLimiter.isLimited(message.getChannel(), message.getAuthor())) {
+		if(rateLimiter.isLimited(message.getMessageChannel(), message.getAuthor())) {
 			return false;
 		}
 
 		BlackjackPlayer player = players.stream().filter(playerItr -> playerItr.getUser().equals(message.getAuthor())).findAny().get();
 		if(player.isStanding()) {
 			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't play anymore.",
-					this.getAuthor().getName()), message.getChannel());
+					this.getAuthor().getName()), message.getMessageChannel());
 			return false;
 		}
 
 		String content = message.getContent().toLowerCase().trim();
 		if("double down".equals(content) && player.getCards().size() != 2) {
 			BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a maximum of 2 cards to use `double down`.",
-					player.getUser().getName()), message.getChannel());
+					player.getUser().getName()), message.getMessageChannel());
 			return true;
 		}
 

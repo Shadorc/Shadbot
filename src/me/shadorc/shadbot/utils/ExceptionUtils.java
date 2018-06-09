@@ -21,20 +21,20 @@ public class ExceptionUtils {
 		if(isJsonUnavailable(err) || isUnavailable(err)) {
 			msg = "Mmmh... This service is currently unavailable... This is not my fault, I promise ! Try again later.";
 			if(isJsonUnavailable(err)) {
-				LogUtils.warnf("{Channel ID: %d} %s", channelId, err.getMessage());
+				LogUtils.warnf(context.getClient(), "{Channel ID: %d} %s", channelId, err.getMessage());
 			} else {
-				LogUtils.warnf("{Channel ID: %d} Service unavailable while %s.", channelId, action);
+				LogUtils.warnf(context.getClient(), "{Channel ID: %d} Service unavailable while %s.", channelId, action);
 			}
 		}
 
 		else if(isUnreacheable(err)) {
 			msg = String.format("Mmmh... %s takes too long... This is not my fault, I promise ! Try again later.", StringUtils.capitalize(action));
-			LogUtils.warnf("{Channel ID: %d} A SocketTimeoutException occurred while %s.", channelId, action);
+			LogUtils.warnf(context.getClient(), "{Channel ID: %d} A SocketTimeoutException occurred while %s.", channelId, action);
 		}
 
 		else {
 			msg = String.format("Sorry, something went wrong while %s... My developer has been warned.", action);
-			LogUtils.error(context.getContent(), err, String.format("{Channel ID: %d} %s", channelId, msg));
+			LogUtils.error(context.getClient(), context.getContent(), err, String.format("{Channel ID: %d} %s", channelId, msg));
 		}
 
 		return Emoji.RED_FLAG + " " + msg;

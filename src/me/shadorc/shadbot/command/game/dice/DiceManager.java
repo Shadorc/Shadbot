@@ -80,7 +80,7 @@ public class DiceManager extends AbstractGameManager {
 			Database.getDBUser(this.getGuild(), user).addCoins(gains);
 		}
 
-		RequestFuture<IMessage> msgRequest = BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getChannel());
+		RequestFuture<IMessage> msgRequest = BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getMessageChannel());
 		if(msgRequest != null) {
 			msgRequest.get();
 		}
@@ -89,7 +89,7 @@ public class DiceManager extends AbstractGameManager {
 		this.show();
 
 		numsPlayers.clear();
-		DiceCmd.MANAGERS.remove(this.getChannel().getLongID());
+		DiceCmd.MANAGERS.remove(this.getMessageChannel().getLongID());
 	}
 
 	public int getBet() {
