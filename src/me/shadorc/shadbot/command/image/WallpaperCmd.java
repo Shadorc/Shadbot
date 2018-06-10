@@ -29,7 +29,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -53,7 +52,7 @@ public class WallpaperCmd extends AbstractCommand {
 	private Wallhaven wallhaven;
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+	public void execute(Context context) {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		if(wallhaven == null) {
@@ -139,7 +138,7 @@ public class WallpaperCmd extends AbstractCommand {
 		});
 	}
 
-	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) throws IllegalCmdArgumentException {
+	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) {
 		List<String> sizeList = List.of(values);
 		if(sizeList.size() != 2) {
 			this.throwInvalidArg(msg, context, name);
@@ -152,7 +151,7 @@ public class WallpaperCmd extends AbstractCommand {
 		return new Dimension(width, height);
 	}
 
-	private <T extends Enum<T>> T parseEnum(LoadingMessage msg, Context context, Class<T> enumClass, String name, String value) throws IllegalCmdArgumentException {
+	private <T extends Enum<T>> T parseEnum(LoadingMessage msg, Context context, Class<T> enumClass, String name, String value) {
 		T enumObj = Utils.getValueOrNull(enumClass, value);
 		if(enumObj == null) {
 			this.throwInvalidArg(msg, context, name);
@@ -160,7 +159,7 @@ public class WallpaperCmd extends AbstractCommand {
 		return enumObj;
 	}
 
-	private void throwInvalidArg(LoadingMessage loadingMsg, Context context, String name) throws IllegalCmdArgumentException {
+	private void throwInvalidArg(LoadingMessage loadingMsg, Context context, String name) {
 		loadingMsg.stopTyping();
 		throw new IllegalCmdArgumentException(String.format("`%s` value is not valid. Use `%shelp %s` for more information.",
 				name, context.getPrefix(), this.getName()));

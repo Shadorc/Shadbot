@@ -13,7 +13,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -30,7 +29,7 @@ public class PollCmd extends AbstractCommand {
 	private static final int MAX_DURATION = 3600;
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+	public void execute(Context context) {
 		context.requireArg();
 		context.getAuthorPermission().subscribe(perm -> {
 			PollManager pollManager = MANAGER.get(context.getChannelId());
@@ -66,23 +65,20 @@ public class PollCmd extends AbstractCommand {
 		return pollManager != null && isCancelMsg && (isAuthor || isAdmin);
 	}
 
-	private PollManager createPoll(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		List<String> splitArgs = StringUtils.split(context.getArg().get(), 2);
-		if(splitArgs.size() != 2) {
-			throw new MissingArgumentException();
-		}
+	private PollManager createPoll(Context context) {
+		List<String> args = context.requireArgs(2);
 
 		PollCreateSpec spec = new PollCreateSpec();
 
-		Integer duration = NumberUtils.asIntBetween(splitArgs.get(0), MIN_DURATION, MAX_DURATION);
+		Integer duration = NumberUtils.asIntBetween(args.get(0), MIN_DURATION, MAX_DURATION);
 		if(duration == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
-					splitArgs.get(0), MIN_DURATION, MAX_DURATION));
+					args.get(0), MIN_DURATION, MAX_DURATION));
 		}
 		spec.setDuration(duration);
 
-		List<String> substrings = StringUtils.getQuotedWords(splitArgs.get(1));
-		if(substrings.isEmpty() || StringUtils.countMatches(splitArgs.get(1), "\"") % 2 != 0) {
+		List<String> substrings = StringUtils.getQuotedWords(args.get(1));
+		if(substrings.isEmpty() || StringUtils.countMatches(args.get(1), "\"") % 2 != 0) {
 			throw new IllegalCmdArgumentException("Question and choices cannot be empty and must be enclosed in quotation marks.");
 		}
 		spec.setQuestion(substrings.get(0));

@@ -25,7 +25,7 @@
 // }
 //
 // @Override
-// public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context, String arg) {
 // if(!BotUtils.hasPermissions(context.getChannel(), Permissions.MANAGE_CHANNELS)) {
 // BotUtils.sendMessage(TextUtils.missingPerm(Permissions.MANAGE_CHANNEL), context.getChannel());
 // LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to manage channel.", context.getGuild().getLongID());

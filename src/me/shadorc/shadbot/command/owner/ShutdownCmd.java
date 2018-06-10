@@ -25,7 +25,7 @@
 // public class ShutdownCmd extends AbstractCommand implements MessageListener {
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // if(!context.getArg().isPresent()) {
 // MessageManager.addListener(context.getChannelId(), this);
 // context.getSelf().subscribe(self -> BotUtils.sendMessage(String.format(Emoji.QUESTION + " Do you really want to shutdown %s ? Yes/No",
@@ -33,10 +33,7 @@
 // return;
 // }
 //
-// List<String> splitArgs = StringUtils.split(context.getArg().get(), 2);
-// if(splitArgs.size() != 2) {
-// throw new MissingArgumentException();
-// }
+// List<String> args = context.requireArgs(2);
 //
 // Integer delay = NumberUtils.asPositiveInt(splitArgs.get(0));
 // if(delay == null) {

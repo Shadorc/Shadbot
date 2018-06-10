@@ -12,7 +12,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -32,7 +31,7 @@ public class WeatherCmd extends AbstractCommand {
 	private final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Locale.ENGLISH);
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) {
 		context.requireArg();
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());

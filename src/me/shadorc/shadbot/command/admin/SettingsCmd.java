@@ -22,7 +22,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -57,21 +56,18 @@ public class SettingsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		List<String> splitArgs = StringUtils.split(context.getArg().orElse(""), 2);
-		if(splitArgs.isEmpty()) {
-			throw new MissingArgumentException();
-		}
+	public void execute(Context context) {
+		List<String> args = context.requireArgs(2);
 
-		SettingEnum settingEnum = Utils.getValueOrNull(SettingEnum.class, splitArgs.get(0));
+		SettingEnum settingEnum = Utils.getValueOrNull(SettingEnum.class, args.get(0));
 		if(settingEnum == null || !SETTINGS_MAP.containsKey(settingEnum)) {
 			throw new IllegalCmdArgumentException(String.format("Setting `%s` does not exist. Use `%shelp %s` to see all available settings.",
-					splitArgs.get(0), context.getPrefix(), this.getName()));
+					args.get(0), context.getPrefix(), this.getName()));
 		}
 
 		AbstractSetting setting = SETTINGS_MAP.get(settingEnum);
 
-		String arg = splitArgs.size() == 2 ? splitArgs.get(1) : null;
+		String arg = args.size() == 2 ? args.get(1) : null;
 		if("help".equals(arg)) {
 			BotUtils.sendMessage(this.getHelp(context.getPrefix(), setting), context.getChannel());
 			return;

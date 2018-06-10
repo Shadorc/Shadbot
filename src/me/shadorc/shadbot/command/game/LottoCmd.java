@@ -38,7 +38,7 @@
 // private static final int MAX_NUM = 100;
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // if(!context.hasArg()) {
 // this.show(context);
 // return;

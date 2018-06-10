@@ -30,7 +30,7 @@
 // }
 //
 // @Override
-// public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context, String arg) {
 // context.requireArg();
 //
 // List<String> splitArgs = StringUtils.split(arg, 3);
@@ -63,7 +63,7 @@
 // }
 // }
 //
-// private void channel(Context context, Action action) throws MissingArgumentException {
+// private void channel(Context context, Action action) {
 // List<IChannel> channelsMentioned = context.getMessage().getChannelMentions();
 // if(channelsMentioned.size() != 1) {
 // throw new MissingArgumentException();
@@ -82,7 +82,7 @@
 // }
 // }
 //
-// private void updateJoinMessage(Context context, Action action, List<String> args) throws MissingArgumentException {
+// private void updateJoinMessage(Context context, Action action, List<String> args) {
 // DBGuild dbGuild = Database.getDBGuild(context.getGuildId().get());
 // if(Action.ENABLE.equals(action)) {
 // if(args.size() < 3) {
@@ -98,7 +98,7 @@
 // }
 // }
 //
-// private void updateLeaveMessage(Context context, Action action, List<String> args) throws MissingArgumentException {
+// private void updateLeaveMessage(Context context, Action action, List<String> args) {
 // DBGuild dbGuild = Database.getDBGuild(context.getGuild());
 // if(Action.ENABLE.equals(action)) {
 // if(args.size() < 3) {

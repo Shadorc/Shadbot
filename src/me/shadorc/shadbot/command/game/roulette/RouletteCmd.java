@@ -32,11 +32,8 @@
 // private static final int MAX_BET = 250_000;
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-// List<String> splitArgs = StringUtils.split(context.getArg());
-// if(splitArgs.size() != 2) {
-// throw new MissingArgumentException();
-// }
+// public void execute(Context context) {
+// List<String> args = context.requireArgs(2);
 //
 // Integer bet = Utils.checkAndGetBet(context.getChannel(), context.getAuthor(), splitArgs.get(0), MAX_BET);
 // if(bet == null) {

@@ -42,7 +42,7 @@
 // protected static final List<String> EASY_WORDS = new ArrayList<>();
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // Difficulty difficulty = Utils.getValueOrNull(Difficulty.class, context.getArg());
 //
 // if(context.hasArg() && difficulty == null) {

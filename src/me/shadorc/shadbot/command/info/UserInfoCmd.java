@@ -26,7 +26,7 @@
 // private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException {
+// public void execute(Context context) {
 // List<IUser> mentions = context.getMessage().getMentions();
 // IUser user = mentions.isEmpty() ? context.getAuthor() : mentions.get(0);
 //

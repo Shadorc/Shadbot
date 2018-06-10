@@ -14,10 +14,8 @@ import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.DBMember;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 
@@ -25,17 +23,12 @@ import me.shadorc.shadbot.utils.object.Emoji;
 public class DatabaseCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		context.requireArg();
+	public void execute(Context context) {
+		List<String> args = context.requireArgs(2);
 
-		List<String> splitArgs = StringUtils.split(context.getArg().get());
-		if(splitArgs.size() > 2) {
-			throw new MissingArgumentException();
-		}
-
-		Long guildId = NumberUtils.asPositiveLong(splitArgs.get(0));
+		Long guildId = NumberUtils.asPositiveLong(args.get(0));
 		if(guildId == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid guild ID.", splitArgs.get(0)));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid guild ID.", args.get(0)));
 		}
 
 		context.getClient().getGuildById(Snowflake.of(guildId)).defaultIfEmpty(null).subscribe(guild -> {
@@ -44,14 +37,14 @@ public class DatabaseCmd extends AbstractCommand {
 			}
 
 			String json = null;
-			if(splitArgs.size() == 1) {
+			if(args.size() == 1) {
 				DBGuild dbGuild = Database.getDBGuild(guild.getId());
 				json = dbGuild.toJSON().toString(Config.JSON_INDENT_FACTOR);
 
-			} else if(splitArgs.size() == 2) {
-				Long userId = NumberUtils.asPositiveLong(splitArgs.get(1));
+			} else if(args.size() == 2) {
+				Long userId = NumberUtils.asPositiveLong(args.get(1));
 				if(userId == null) {
-					throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", splitArgs.get(0)));
+					throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", args.get(0)));
 				}
 
 				DBMember dbUser = new DBMember(guild.getId(), Snowflake.of(userId));

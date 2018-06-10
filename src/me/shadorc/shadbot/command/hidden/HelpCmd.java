@@ -12,8 +12,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.stats.CommandStatsManager;
 import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -24,7 +22,7 @@ import reactor.core.publisher.Flux;
 public class HelpCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+	public void execute(Context context) {
 		if(context.getArg().isPresent()) {
 			AbstractCommand cmd = CommandManager.getCommand(context.getArg().get());
 			if(cmd == null) {

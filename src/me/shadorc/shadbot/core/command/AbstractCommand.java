@@ -9,8 +9,6 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 
 public abstract class AbstractCommand {
 
@@ -35,7 +33,7 @@ public abstract class AbstractCommand {
 		}
 	}
 
-	public abstract void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException;
+	public abstract void execute(Context context);
 
 	public abstract EmbedCreateSpec getHelp(String prefix);
 

@@ -17,7 +17,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -37,7 +36,7 @@ public class ImageCmd extends AbstractCommand {
 	private long lastTokenGeneration;
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) {
 		context.requireArg();
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());

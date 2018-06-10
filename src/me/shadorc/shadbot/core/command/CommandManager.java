@@ -21,6 +21,7 @@ import me.shadorc.shadbot.data.stats.VariousStatsManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.exception.NoPlayingMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -119,6 +120,9 @@ public class CommandManager {
 							.setContent(TextUtils.MISSING_ARG)
 							.setEmbed(command.getHelp(context.getPrefix())), context.getChannel());
 					CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
+				})
+				.doOnError(NoPlayingMusicException.class, err -> {
+					BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
 				})
 				.subscribe(userPerm -> {
 					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);

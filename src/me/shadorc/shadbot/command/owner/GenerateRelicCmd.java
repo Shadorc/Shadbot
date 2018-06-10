@@ -10,7 +10,6 @@ import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.RelicType;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -22,7 +21,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 public class GenerateRelicCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+	public void execute(Context context) {
 		context.requireArg();
 
 		RelicType type = Utils.getValueOrNull(RelicType.class, context.getArg().get());

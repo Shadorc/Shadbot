@@ -19,7 +19,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -39,23 +38,18 @@ public class DiabloCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		context.requireArg();
+	public void execute(Context context) {
+		List<String> args = context.requireArgs(2);
 
-		List<String> splitArgs = StringUtils.split(context.getArg().get(), 2);
-		if(splitArgs.size() != 2) {
-			throw new MissingArgumentException();
-		}
-
-		Region region = Utils.getValueOrNull(Region.class, splitArgs.get(0));
+		Region region = Utils.getValueOrNull(Region.class, args.get(0));
 		if(region == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Region. %s",
-					splitArgs.get(0), FormatUtils.formatOptions(Region.class)));
+					args.get(0), FormatUtils.formatOptions(Region.class)));
 		}
 
-		String battletag = splitArgs.get(1);
+		String battletag = args.get(1);
 		if(!battletag.matches("(\\p{L}*)#[0-9]*")) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Battletag.", splitArgs.get(1)));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Battletag.", args.get(1)));
 		}
 		battletag = battletag.replaceAll("#", "-");
 

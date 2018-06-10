@@ -13,11 +13,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.message.MessageManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
 public class MessageListener {
@@ -67,12 +64,7 @@ public class MessageListener {
 
 		String msgContent = message.getContent().get();
 		if(msgContent.startsWith(Config.DEFAULT_PREFIX + "help")) {
-			try {
-				CommandManager.getCommand("help").execute(new Context(null, message, Config.DEFAULT_PREFIX));
-			} catch (MissingArgumentException | IllegalCmdArgumentException err) {
-				LogUtils.error(channel.getClient(), msgContent, err,
-						String.format("{Channel ID: %s} An unknown error occurred while showing help in a private channel.", channel.getId()));
-			}
+			CommandManager.getCommand("help").execute(new Context(null, message, Config.DEFAULT_PREFIX));
 			return;
 		}
 

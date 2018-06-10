@@ -2,8 +2,6 @@ package me.shadorc.shadbot.command.admin.setting.core;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 
 public abstract class AbstractSetting {
 
@@ -16,7 +14,7 @@ public abstract class AbstractSetting {
 		this.setting = settingAnnot.setting();
 	}
 
-	public abstract void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException;
+	public abstract void execute(Context context, String arg);
 
 	public abstract EmbedCreateSpec getHelp(String prefix);
 

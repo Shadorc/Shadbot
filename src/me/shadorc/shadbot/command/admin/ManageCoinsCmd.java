@@ -11,11 +11,9 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -28,21 +26,18 @@ public class ManageCoinsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		List<String> splitArgs = StringUtils.split(context.getArg().orElse(""));
-		if(!NumberUtils.isInRange(splitArgs.size(), 2, 3)) {
-			throw new MissingArgumentException();
-		}
+	public void execute(Context context) {
+		List<String> args = context.requireArgs(2, 3);
 
-		Action action = Utils.getValueOrNull(Action.class, splitArgs.get(0));
+		Action action = Utils.getValueOrNull(Action.class, args.get(0));
 		if(action == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. %s",
-					splitArgs.get(0), FormatUtils.formatOptions(Action.class)));
+					args.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
-		Integer coins = NumberUtils.asInt(splitArgs.get(1));
+		Integer coins = NumberUtils.asInt(args.get(1));
 		if(coins == null && !Action.RESET.equals(action)) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", splitArgs.get(1)));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", args.get(1)));
 		}
 
 		if(context.getMessage().getUserMentionIds().isEmpty() && context.getMessage().getRoleMentionIds().isEmpty()) {

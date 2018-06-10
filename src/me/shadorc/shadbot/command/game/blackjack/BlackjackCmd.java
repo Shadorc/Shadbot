@@ -24,7 +24,7 @@
 // private static final int MAX_BET = 250_000;
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // if(!context.hasArg()) {
 // throw new MissingArgumentException();
 // }

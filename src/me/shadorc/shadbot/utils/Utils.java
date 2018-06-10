@@ -129,7 +129,7 @@ public class Utils {
 	 * @throws IllegalCmdArgumentException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough coins or if
 	 *             the bet value is superior to {code maxValue}
 	 */
-	public static Integer checkAndGetBet(Mono<MessageChannel> channel, Member member, String betStr, int maxValue) throws IllegalCmdArgumentException {
+	public static Integer checkAndGetBet(Mono<MessageChannel> channel, Member member, String betStr, int maxValue) {
 		Integer bet = NumberUtils.asPositiveInt(betStr);
 		if(bet == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", betStr));

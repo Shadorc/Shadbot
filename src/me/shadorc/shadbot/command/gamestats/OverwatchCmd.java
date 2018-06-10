@@ -11,11 +11,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -37,11 +34,8 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		List<String> splitArgs = StringUtils.split(context.getArg().orElse(""));
-		if(!NumberUtils.isInRange(splitArgs.size(), 1, 3)) {
-			throw new MissingArgumentException();
-		}
+	public void execute(Context context) {
+		List<String> args = context.requireArgs(1, 3);
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
@@ -50,12 +44,12 @@ public class OverwatchCmd extends AbstractCommand {
 
 			String username = null;
 			Platform platform = null;
-			if(splitArgs.size() == 1) {
-				username = splitArgs.get(0);
+			if(args.size() == 1) {
+				username = args.get(0);
 				player = new OverwatchPlayer(username);
 			} else {
-				platform = this.getPlatform(splitArgs.get(0));
-				username = splitArgs.get(1);
+				platform = this.getPlatform(args.get(0));
+				username = args.get(1);
 				player = new OverwatchPlayer(username, platform);
 			}
 
@@ -84,7 +78,7 @@ public class OverwatchCmd extends AbstractCommand {
 				count, heroesList.get(count - 1).getName(), heroesList.get(count - 1).getDesc()));
 	}
 
-	private Platform getPlatform(String str) throws IllegalCmdArgumentException {
+	private Platform getPlatform(String str) {
 		Platform platform = Utils.getValueOrNull(Platform.class, str.toUpperCase());
 		if(platform == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Platform. %s",

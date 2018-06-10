@@ -21,7 +21,7 @@
 // public class SoftBanCmd extends AbstractCommand {
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // if(!context.hasArg()) {
 // throw new MissingArgumentException();
 // }

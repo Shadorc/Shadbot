@@ -21,11 +21,9 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -58,21 +56,16 @@ public class FortniteCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		context.requireArg();
+	public void execute(Context context) {
+		List<String> args = context.requireArgs(2);
 
-		List<String> splitArgs = StringUtils.split(context.getArg().get(), 2);
-		if(splitArgs.size() != 2) {
-			throw new MissingArgumentException();
-		}
-
-		Platform platform = Utils.getValueOrNull(Platform.class, splitArgs.get(0));
+		Platform platform = Utils.getValueOrNull(Platform.class, args.get(0));
 		if(platform == null) {
 			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Platform. %s",
-					splitArgs.get(0), FormatUtils.formatOptions(Platform.class)));
+					args.get(0), FormatUtils.formatOptions(Platform.class)));
 		}
 
-		String epicNickname = splitArgs.get(1);
+		String epicNickname = args.get(1);
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 

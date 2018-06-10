@@ -28,7 +28,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 public class BanCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+	public void execute(Context context) {
 		context.requireArg();
 
 		Set<Snowflake> mentionedUserIds = context.getMessage().getUserMentionIds();

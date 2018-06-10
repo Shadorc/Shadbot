@@ -10,7 +10,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -24,7 +23,7 @@ import reactor.util.function.Tuples;
 public class LeaderboardCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) {
 		context.getGuild().subscribe(guild -> {
 			Flux.fromStream(Database.getDBGuild(guild.getId()).getUsers().stream())
 					.filter(dbMember -> dbMember.getCoins() > 0)

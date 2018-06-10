@@ -14,7 +14,6 @@ import me.shadorc.shadbot.data.db.DBMember;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -32,7 +31,7 @@ public class SlotMachineCmd extends AbstractCommand {
 			SlotOptions.GIFT }; // Winning chance : 0.2%
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) {
 		DBMember dbMember = Database.getDBMember(context.getGuildId().get(), context.getAuthorId());
 		if(dbMember.getCoins() < PAID_COST) {
 			context.getAuthor().subscribe(author -> BotUtils.sendMessage(TextUtils.notEnoughCoins(author), context.getChannel()));

@@ -34,7 +34,7 @@ public class LyricsCmd extends AbstractCommand {
 	private static final int MAX_LYRICS_LENGTH = DiscordUtils.DESCRIPTION_CONTENT_LIMIT / 4;
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) {
 		List<String> args = StringUtils.split(context.getArg().orElse(""), 2, "-");
 		if(args.size() != 2) {
 			throw new MissingArgumentException();

@@ -37,7 +37,7 @@
 // private final Map<Integer, String> categories = new TreeMap<>();
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // if(categories.isEmpty()) {
 // this.load();
 // }

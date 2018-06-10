@@ -8,7 +8,6 @@ import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -21,7 +20,7 @@ public class VolumeSetting extends AbstractSetting {
 	private static final int MAX_VOLUME = 75;
 
 	@Override
-	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+	public void execute(Context context, String arg) {
 		context.requireArg();
 
 		Integer volume = NumberUtils.asIntBetween(arg, MIN_VOLUME, MAX_VOLUME);

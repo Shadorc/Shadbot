@@ -25,7 +25,7 @@
 // private static final int GAINS = 170;
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // if(!context.hasArg()) {
 // throw new MissingArgumentException();
 // }

@@ -29,15 +29,12 @@
 // private static final int MAX_BET = 250_000;
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // if(!context.hasArg()) {
 // throw new MissingArgumentException();
 // }
 //
-// List<String> splitArgs = StringUtils.split(context.getArg(), 2);
-// if(!Utils.isInRange(splitArgs.size(), 1, 2)) {
-// throw new MissingArgumentException();
-// }
+// List<String> args = context.requireArgs(1, 2);
 //
 // String numStr = splitArgs.get(splitArgs.size() == 1 ? 0 : 1);
 // Integer num = NumberUtils.asIntBetween(numStr, 1, 6);

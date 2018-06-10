@@ -7,7 +7,6 @@ import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -18,7 +17,7 @@ public class PrefixSetting extends AbstractSetting {
 	private static final int MAX_PREFIX_LENGTH = 5;
 
 	@Override
-	public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+	public void execute(Context context, String arg) {
 		context.requireArg();
 
 		if(arg.length() > MAX_PREFIX_LENGTH) {

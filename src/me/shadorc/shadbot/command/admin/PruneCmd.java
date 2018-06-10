@@ -26,7 +26,7 @@
 // private static final int MESSAGE_COUNT = 300;
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // if(!BotUtils.hasPermissions(context.getChannel(), Permissions.MANAGE_MESSAGES, Permissions.READ_MESSAGE_HISTORY)) {
 // LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to manage messages/read message history.", context.getGuild().getLongID());
 // BotUtils.sendMessage(TextUtils.missingPerm(Permissions.MANAGE_MESSAGES, Permissions.READ_MESSAGE_HISTORY), context.getChannel());

@@ -12,7 +12,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.RelicType;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -23,7 +22,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 public class RelicStatusCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) {
 		List<Relic> relics = PremiumManager.getRelicsForUser(context.getAuthorId());
 		if(relics.isEmpty()) {
 			BotUtils.sendMessage(String.format(Emoji.INFO + " You are not a donator. If you like Shadbot, you can help me keep it alive"

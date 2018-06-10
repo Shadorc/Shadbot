@@ -30,7 +30,7 @@
 // private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException {
+// public void execute(Context context) {
 //
 // DBGuild dbGuild = Database.getDBGuild(context.getGuildId().get());
 //

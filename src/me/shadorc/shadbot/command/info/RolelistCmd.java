@@ -24,7 +24,7 @@
 // public class RolelistCmd extends AbstractCommand {
 //
 // @Override
-// public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context) {
 // Flux<Role> roles = context.getMessage().getRoleMentions();
 // if(!roles.hasElements().block()) {
 // throw new MissingArgumentException();

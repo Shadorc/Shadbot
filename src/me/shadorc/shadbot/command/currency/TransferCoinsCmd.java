@@ -18,7 +18,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -28,15 +27,10 @@ import me.shadorc.shadbot.utils.object.Emoji;
 public class TransferCoinsCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		context.requireArg();
+	public void execute(Context context) {
+		List<String> args = context.requireArg(2);
 
 		if(context.getMessage().getUserMentionIds().isEmpty()) {
-			throw new MissingArgumentException();
-		}
-
-		List<String> splitCmd = StringUtils.split(context.getArg().get(), 2);
-		if(splitCmd.size() != 2) {
 			throw new MissingArgumentException();
 		}
 
@@ -46,10 +40,10 @@ public class TransferCoinsCmd extends AbstractCommand {
 			throw new IllegalCmdArgumentException("You cannot transfer coins to yourself.");
 		}
 
-		Integer coins = NumberUtils.asPositiveInt(splitCmd.get(0));
+		Integer coins = NumberUtils.asPositiveInt(args.get(0));
 		if(coins == null) {
 			throw new IllegalCmdArgumentException(
-					String.format("`%s` is not a valid amount for coins.", splitCmd.get(0)));
+					String.format("`%s` is not a valid amount for coins.", args.get(0)));
 		}
 
 		context.getGuild().subscribe(guild -> {

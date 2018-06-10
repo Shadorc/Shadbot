@@ -11,10 +11,8 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 
@@ -22,17 +20,12 @@ import me.shadorc.shadbot.utils.object.Emoji;
 public class SendMessageCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException, IllegalCmdArgumentException {
-		context.requireArg();
+	public void execute(Context context) {
+		List<String> args = context.requireArgs(2);
 
-		List<String> splitArgs = StringUtils.split(context.getArg().get(), 2);
-		if(splitArgs.size() != 2) {
-			throw new MissingArgumentException();
-		}
-
-		Long userId = NumberUtils.asPositiveLong(splitArgs.get(0));
+		Long userId = NumberUtils.asPositiveLong(args.get(0));
 		if(userId == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", splitArgs.get(0)));
+			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", args.get(0)));
 		}
 
 		context.getClient().getUserById(Snowflake.of(userId)).defaultIfEmpty(null).subscribe(user -> {
@@ -49,7 +42,7 @@ public class SendMessageCmd extends AbstractCommand {
 				throw new IllegalCmdArgumentException("I can't send private message to other bots.");
 			}
 
-			BotUtils.sendMessage(splitArgs.get(1), user.getPrivateChannel().cast(MessageChannel.class));
+			BotUtils.sendMessage(args.get(1), user.getPrivateChannel().cast(MessageChannel.class));
 			BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel());
 
 		});

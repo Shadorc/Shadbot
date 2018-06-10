@@ -13,7 +13,6 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -28,7 +27,7 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 public class SuicideGirlsCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) throws MissingArgumentException {
+	public void execute(Context context) {
 		context.isChannelNsfw().subscribe(isNsfw -> {
 			if(!isNsfw) {
 				BotUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), context.getChannel());

@@ -29,7 +29,7 @@
 // }
 //
 // @Override
-// public void execute(Context context, String arg) throws MissingArgumentException, IllegalCmdArgumentException {
+// public void execute(Context context, String arg) {
 // context.requireArg();
 //
 // List<String> splitArgs = StringUtils.split(arg);

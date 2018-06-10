@@ -16,7 +16,11 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.exception.NoPlayingMusicException;
+import me.shadorc.shadbot.music.GuildMusic;
+import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.core.publisher.Mono;
 
@@ -134,10 +138,32 @@ public class Context {
 		return this.getChannel().map(TextChannel.class::cast).map(TextChannel::isNsfw);
 	}
 
-	public void requireArg() throws MissingArgumentException {
+	public String requireArg() {
 		if(!this.getArg().isPresent()) {
 			throw new MissingArgumentException();
 		}
+		return this.getArg().get();
+	}
+
+	public List<String> requireArgs(int count) {
+		return this.requireArgs(count, count);
+	}
+
+	public List<String> requireArgs(int min, int max) {
+		this.requireArg();
+		List<String> args = StringUtils.split(this.getArg().get(), max);
+		if(!NumberUtils.isInRange(args.size(), min, max)) {
+			throw new MissingArgumentException();
+		}
+		return args;
+	}
+
+	public GuildMusic requireGuildMusic() {
+		GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(this.getGuildId().get());
+		if(guildMusic == null || guildMusic.getScheduler().isStopped()) {
+			throw new NoPlayingMusicException();
+		}
+		return guildMusic;
 	}
 
 }
