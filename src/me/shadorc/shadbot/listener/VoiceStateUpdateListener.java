@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 public class VoiceStateUpdateListener {
 
 	public static void onVoiceStateUpdateEvent(VoiceStateUpdateEvent event) {
-		final Snowflake selfId = null; // TODO: event.getClient().getSelfId()
+		final Snowflake selfId = event.getClient().getSelfId().get();
 		// TODO: Improve this in Discord4J
 		final Snowflake userId = event.getOld()
 				.map(VoiceState::getUserId)
@@ -48,7 +48,7 @@ public class VoiceStateUpdateListener {
 		final Snowflake guildId = event.getOld()
 				.map(VoiceState::getGuildId)
 				.orElse(event.getCurrent().getGuildId());
-		final Snowflake selfId = null; // TODO: Change to event.getClient().getSelfId()
+		final Snowflake selfId = event.getClient().getSelfId().get();
 
 		check(event.getClient().getMemberById(guildId, selfId));
 	}

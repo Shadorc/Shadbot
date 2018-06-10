@@ -66,6 +66,10 @@ public class Context {
 		return this.getClient().getSelf();
 	}
 
+	public Snowflake getSelfId() {
+		return this.getClient().getSelfId().get();
+	}
+
 	public String getContent() {
 		return this.getMessage().getContent().get();
 	}

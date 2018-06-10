@@ -115,25 +115,23 @@ public class NetUtils {
 	 */
 	public static void postStatsOn(String homeUrl, APIKey token, CustomShard shard) {
 		shard.getGuildsCount().subscribe(guildsCount -> {
-			JSONObject content = new JSONObject()
+			final JSONObject content = new JSONObject()
 					.put("shard_id", shard.getIndex())
 					.put("shard_count", shard.getShardCount())
 					.put("server_count", guildsCount);
-
-			shard.getClient().getSelf().subscribe(self -> {
-				String url = String.format("%s/api/bots/%d/stats", homeUrl, self.getId().asLong());
-				try {
-					Jsoup.connect(url)
-							.method(Method.POST)
-							.ignoreContentType(true)
-							.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
-							.requestBody(content.toString())
-							.post();
-				} catch (IOException err) {
-					LogUtils.infof("An error occurred while posting statistics of shard %d. (%s: %s).",
-							shard.getIndex(), err.getClass().getSimpleName(), err.getMessage());
-				}
-			});
+			final long selfId = shard.getClient().getSelfId().get().asLong();
+			final String url = String.format("%s/api/bots/%d/stats", homeUrl, selfId);
+			try {
+				Jsoup.connect(url)
+						.method(Method.POST)
+						.ignoreContentType(true)
+						.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
+						.requestBody(content.toString())
+						.post();
+			} catch (IOException err) {
+				LogUtils.infof("An error occurred while posting statistics of shard %d. (%s: %s).",
+						shard.getIndex(), err.getClass().getSimpleName(), err.getMessage());
+			}
 		});
 	}
 

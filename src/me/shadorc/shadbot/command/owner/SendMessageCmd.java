@@ -3,7 +3,6 @@ package me.shadorc.shadbot.command.owner;
 import java.util.List;
 
 import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -42,18 +41,16 @@ public class SendMessageCmd extends AbstractCommand {
 				return;
 			}
 
-			context.getSelf().map(User::getId).subscribe(selfId -> {
-				if(user.getId().equals(selfId)) {
-					throw new IllegalCmdArgumentException("I can't send a private message to myself.");
-				}
+			if(user.getId().equals(context.getSelfId())) {
+				throw new IllegalCmdArgumentException("I can't send a private message to myself.");
+			}
 
-				if(user.isBot()) {
-					throw new IllegalCmdArgumentException("I can't send private message to other bots.");
-				}
+			if(user.isBot()) {
+				throw new IllegalCmdArgumentException("I can't send private message to other bots.");
+			}
 
-				BotUtils.sendMessage(splitArgs.get(1), user.getPrivateChannel().cast(MessageChannel.class));
-				BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel());
-			});
+			BotUtils.sendMessage(splitArgs.get(1), user.getPrivateChannel().cast(MessageChannel.class));
+			BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel());
 
 		});
 	}

@@ -59,8 +59,7 @@ public class GuildMusic {
 	 * @param voiceChannelId - the voice channel ID to join
 	 */
 	public void joinVoiceChannel(Snowflake voiceChannelId) {
-		// TODO: Change to client.getSelfId()
-		client.getMemberById(guildId, client.getSelf().block().getId())
+		client.getMemberById(guildId, client.getSelfId().get())
 				.flatMap(Member::getVoiceState)
 				.filter(voiceState -> !voiceState.getChannelId().isPresent())
 				.flatMap(voiceState -> client.getVoiceChannelById(voiceChannelId))
