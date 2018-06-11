@@ -28,7 +28,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) {
-		List<String> args = context.requireArg(2);
+		List<String> args = context.requireArgs(2);
 
 		if(context.getMessage().getUserMentionIds().isEmpty()) {
 			throw new MissingArgumentException();
