@@ -121,7 +121,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageL
 	public void loadFailed(FriendlyException err) {
 		String errMessage = TextUtils.cleanLavaplayerErr(err);
 		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), guildMusic.getMessageChannel());
-		LogUtils.infof("{Guild ID: %s} Load failed: %s", guildMusic.getGuildId(), errMessage);
+		LogUtils.infof("{Guild ID: %d} Load failed: %s", guildMusic.getGuildId().asLong(), errMessage);
 		this.leaveIfStopped();
 	}
 

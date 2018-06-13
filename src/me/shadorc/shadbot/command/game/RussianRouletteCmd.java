@@ -28,10 +28,10 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 	@Override
 	public void execute(Context context) {
-		context.requireArg();
+		final String arg = context.requireArg();
 
 		context.getMember().subscribe(member -> {
-			Integer bet = Utils.checkAndGetBet(context.getChannel(), member, context.getArg().get(), MAX_BET);
+			Integer bet = Utils.checkAndGetBet(context.getChannel(), member, arg, MAX_BET);
 			if(bet == null) {
 				return;
 			}

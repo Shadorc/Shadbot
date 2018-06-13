@@ -57,12 +57,12 @@ public class AudioEventListener extends AudioEventAdapter {
 			BotUtils.sendMessage(
 					Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until I find a music that can be played.",
 					guildMusic.getMessageChannel());
-			LogUtils.infof("{Guild ID: %s} Too many errors in a row. They will be ignored until a music can be played.",
-					guildMusic.getGuildId());
+			LogUtils.infof("{Guild ID: %d} Too many errors in a row. They will be ignored until a music can be played.",
+					guildMusic.getGuildId().asLong());
 		}
 
-		LogUtils.infof("{Guild ID: %s} %sTrack exception: %s",
-				guildMusic.getGuildId(), errorCount > 3 ? "(Ignored) " : "", errMessage);
+		LogUtils.infof("{Guild ID: %d} %sTrack exception: %s",
+				guildMusic.getGuildId().asLong(), errorCount > 3 ? "(Ignored) " : "", errMessage);
 
 		this.nextOrEnd();
 	}

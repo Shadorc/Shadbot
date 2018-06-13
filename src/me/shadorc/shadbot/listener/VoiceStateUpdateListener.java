@@ -39,7 +39,7 @@ public class VoiceStateUpdateListener {
 			GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guildId);
 			if(guildMusic != null) {
 				guildMusic.destroy();
-				LogUtils.infof("{Guild ID: %s} Voice channel left.", guildId);
+				LogUtils.infof("{Guild ID: %d} Voice channel left.", guildId.asLong());
 			}
 		}
 	}

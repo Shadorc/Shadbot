@@ -23,9 +23,9 @@ public class MemberListener {
 		dbGuild.getAutoRoles()
 				.forEach(roleId -> event.getMember().addRole(roleId)
 						.doOnError(ExceptionUtils::isForbidden,
-								err -> LogUtils.infof("{Guild ID: %s} Shadbot was not allowed to edit role.", guildId))
+								err -> LogUtils.infof("{Guild ID: %d} Shadbot was not allowed to edit role.", guildId.asLong()))
 						.doOnError(
-								err -> LogUtils.error(event.getClient(), err, String.format("{Guild ID: %s} An error occured while editing a role.", guildId)))
+								err -> LogUtils.error(event.getClient(), err, String.format("{Guild ID: %d} An error occured while editing a role.", guildId.asLong())))
 						.subscribe());
 	}
 

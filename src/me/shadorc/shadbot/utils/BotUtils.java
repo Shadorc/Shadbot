@@ -49,7 +49,7 @@ public class BotUtils {
 	}
 
 	public static void sendMessage(MessageCreateSpec message, Mono<MessageChannel> channel) {
-		channel.subscribe(msgChannel -> BotUtils.sendMessage(message, msgChannel).subscribe());
+		channel.flatMap(msgChannel -> BotUtils.sendMessage(message, msgChannel)).subscribe();
 	}
 
 	public static Mono<Message> sendMessage(MessageCreateSpec message, MessageChannel channel) {
@@ -57,10 +57,10 @@ public class BotUtils {
 
 		return channel.createMessage(message)
 				.doOnError(ExceptionUtils::isForbidden,
-						err -> LogUtils.infof("{Channel ID: %s} Shadbot was not allowed to send a message.", channel.getId()))
+						err -> LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send a message.", channel.getId().asLong()))
 				.doOnError(
 						err -> {
-							LogUtils.error(channel.getClient(), err, String.format("{Channel ID: %s} An error occurred while sending a message.", channel.getId()));
+							LogUtils.error(channel.getClient(), err, String.format("{Channel ID: %d} An error occurred while sending a message.", channel.getId().asLong()));
 						});
 	}
 

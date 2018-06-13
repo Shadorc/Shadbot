@@ -11,15 +11,15 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 public class GuildListener {
 
 	public static void onGuildCreate(GuildCreateEvent event) {
-		LogUtils.infof("Shadbot connected to a guild. (ID: %s | Users: %d)",
-				event.getGuild().getId(),
+		LogUtils.infof("Shadbot connected to a guild. (ID: %d | Users: %d)",
+				event.getGuild().getId().asLong(),
 				event.getGuild().getMemberCount().orElse(-1));
 	}
 
 	public static void onGuildDelete(GuildDeleteEvent event) {
 		Optional<Guild> guild = event.getGuild();
-		LogUtils.infof("Shadbot disconnected from a guild. (ID: %s | Users: %d)",
-				event.getGuildId(),
+		LogUtils.infof("Shadbot disconnected from a guild. (ID: %d | Users: %d)",
+				event.getGuildId().asLong(),
 				guild.map(Guild::getMemberCount).orElse(OptionalInt.of(-1)).getAsInt());
 	}
 }
