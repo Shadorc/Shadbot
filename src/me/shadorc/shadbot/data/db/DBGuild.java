@@ -104,8 +104,8 @@ public class DBGuild {
 	}
 
 	public Optional<Snowflake> getMessageChannelId() {
-		return Optional.ofNullable(
-				Snowflake.of((long) settingsMap.get(SettingEnum.MESSAGE_CHANNEL_ID)));
+		return Optional.ofNullable((Long) settingsMap.get(SettingEnum.MESSAGE_CHANNEL_ID))
+				.map(Snowflake::of);
 	}
 
 	public Optional<String> getJoinMessage() {
