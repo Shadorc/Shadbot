@@ -88,12 +88,27 @@ public class HelpBuilder {
 
 	public EmbedCreateSpec build() {
 		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("Help for %s command", cmd.getName()))
-				.setDescription(description)
-				.addField("Usage", this.getUsage(), false)
-				.addField("Arguments", this.getArguments(), false)
-				.addField("Example", example, false)
-				.addField("Gains", gains, false)
-				.addField("Source", source, false);
+				.addField("Usage", this.getUsage(), false);
+
+		if(!this.getArguments().isEmpty()) {
+			embed.addField("Arguments", this.getArguments(), false);
+		}
+
+		if(example != null) {
+			embed.addField("Example", example, false);
+		}
+
+		if(gains != null) {
+			embed.addField("Gains", gains, false);
+		}
+
+		if(source != null) {
+			embed.addField("Source", source, false);
+		}
+
+		if(description != null) {
+			embed.setDescription(description);
+		}
 
 		if(thumbnail != null) {
 			embed.setThumbnail(thumbnail);
