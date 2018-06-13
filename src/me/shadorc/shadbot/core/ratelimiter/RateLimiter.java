@@ -10,6 +10,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.ConsumptionProbe;
+import io.github.bucket4j.Refill;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -29,7 +30,7 @@ public class RateLimiter {
 		this.guildsLimitedMap = new ConcurrentHashMap<>();
 		this.max = max;
 		this.duration = Duration.of(cooldown, unit);
-		this.bandwidth = Bandwidth.simple(max, duration);
+		this.bandwidth = Bandwidth.classic(max, Refill.intervally(max, duration));
 	}
 
 	public boolean isLimitedAndWarn(DiscordClient client, Snowflake guildId, Snowflake channelId, Snowflake userId) {
@@ -38,12 +39,24 @@ public class RateLimiter {
 				.getUserBucket(userId)
 				.tryConsumeAndReturnRemaining(1);
 
-		if(probe.getRemainingTokens() == 0) {
+		/* TODO: Send warn message
+		previous : 2, remaining : 1, is consumed : true
+		not ratelimited
+		previous : 1, remaining : 0, is consumed : true
+		not ratelimited
+		previous : 0, remaining : 0, is consumed : false
+		ratelimited
+		previous : 0, remaining : 0, is consumed : false
+		ratelimited
+		 */
+
+		if(probe.getRemainingTokens() == 0 && probe.isConsumed()) {
 			this.sendWarningMessage(client, channelId, userId);
-			return true;
+			return false;
 		}
 
-		if(probe.isConsumed()) {
+		// The token could not been consumed, the user is limited
+		if(!probe.isConsumed()) {
 			return true;
 		}
 

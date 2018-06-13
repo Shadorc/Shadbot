@@ -88,18 +88,17 @@ public class CommandManager {
 			return true;
 		};
 
-		Predicate<? super CommandPermission> isNotRateLimited = userPerm -> {
+		Predicate<? super CommandPermission> isRateLimited = userPerm -> {
 			Optional<RateLimiter> rateLimiter = command.getRateLimiter();
 			if(!rateLimiter.isPresent()) {
-				return true;
+				return false;
 			}
 
 			if(rateLimiter.get().isLimitedAndWarn(context.getClient(), guildId, channelId, userId)) {
 				CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, command);
-				return false;
-			} else {
 				return true;
 			}
+			return false;
 		};
 
 		Mono.just(command)
@@ -109,8 +108,7 @@ public class CommandManager {
 				// The author has the permission to execute this command
 				.filter(hasPermission)
 				// The user is not rate limited
-				.filter(isNotRateLimited)
-				.doOnSuccess(perm -> command.execute(context))
+				.filter(isRateLimited.negate())
 				.doOnError(IllegalCmdArgumentException.class, err -> {
 					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 					CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
@@ -125,6 +123,7 @@ public class CommandManager {
 					BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
 				})
 				.subscribe(userPerm -> {
+					command.execute(context);
 					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
 					VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
 				});
