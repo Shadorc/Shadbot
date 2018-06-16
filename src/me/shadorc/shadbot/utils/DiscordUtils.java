@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
+import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
@@ -37,6 +39,12 @@ public class DiscordUtils {
 
 	public static Mono<Boolean> hasPermissions(Mono<User> member, Snowflake guildId, Permission... permissions) {
 		return DiscordUtils.hasPermissions(member.flatMap(user -> user.asMember(guildId)), permissions);
+	}
+	
+	public static Mono<Optional<Snowflake>> getVoiceChannelId(Mono<Member> member) {
+		return member.flatMap(Member::getVoiceState)
+				.map(VoiceState::getChannelId)
+				.defaultIfEmpty(Optional.empty());
 	}
 
 }
