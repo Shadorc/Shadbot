@@ -109,24 +109,33 @@ public class CommandManager {
 				.filter(hasPermission)
 				// The user is not rate limited
 				.filter(isRateLimited.negate())
-				.doOnError(IllegalCmdArgumentException.class, err -> {
-					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
-					CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
-				})
-				.doOnError(MissingArgumentException.class, err -> {
-					BotUtils.sendMessage(new MessageCreateSpec()
-							.setContent(TextUtils.MISSING_ARG)
-							.setEmbed(command.getHelp(context.getPrefix())), context.getChannel());
-					CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
-				})
-				.doOnError(NoPlayingMusicException.class, err -> {
-					BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
-				})
-				.subscribe(userPerm -> {
-					command.execute(context);
-					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
-					VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
+				.subscribe(perm -> {
+					try {
+						command.execute(context);
+						CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
+						VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
+					} catch (RuntimeException err) {
+						CommandManager.onError(context, command, err);
+					}
 				});
+	}
+
+	private static void onError(Context context, AbstractCommand command, RuntimeException exception) {
+		Throwable err = exception.getCause() == null ? exception : exception.getCause();
+		if(err instanceof IllegalCmdArgumentException) {
+			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
+			CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
+		} else if(err instanceof MissingArgumentException) {
+			BotUtils.sendMessage(new MessageCreateSpec()
+					.setContent(TextUtils.MISSING_ARG)
+					.setEmbed(command.getHelp(context.getPrefix())), context.getChannel());
+			CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
+		} else if(err instanceof NoPlayingMusicException) {
+			BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
+		} else {
+			LogUtils.error(context.getClient(), context.getContent(), err,
+					String.format("{Guild ID: %d} An unknown error occurred while executing a command.", context.getGuildId().get()));
+		}
 	}
 
 	public static Map<String, AbstractCommand> getCommands() {
