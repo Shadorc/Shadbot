@@ -7,8 +7,9 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Member;
+import discord4j.core.VoiceConnectionController;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import me.shadorc.shadbot.Config;
@@ -27,10 +28,12 @@ public class GuildMusic {
 	private final TrackScheduler trackScheduler;
 
 	private ScheduledFuture<?> leaveTask;
-	private Snowflake voiceChannelId;
 	private Snowflake messageChannelId;
 	private Snowflake djId;
 	private boolean isWaiting;
+
+	//TODO: Is it safe to store this ?
+	private volatile VoiceConnectionController controller;
 
 	public GuildMusic(DiscordClient client, Snowflake guildId, AudioPlayerManager audioPlayerManager) {
 		this.client = client;
@@ -59,20 +62,21 @@ public class GuildMusic {
 	 * @param voiceChannelId - the voice channel ID to join
 	 */
 	public void joinVoiceChannel(Snowflake voiceChannelId) {
-		client.getMemberById(guildId, client.getSelfId().get())
-				.flatMap(Member::getVoiceState)
-				.filter(voiceState -> !voiceState.getChannelId().isPresent())
-				.flatMap(voiceState -> client.getVoiceChannelById(voiceChannelId))
-				.subscribe(voiceChannel -> {
-					this.voiceChannelId = voiceChannelId;
-					voiceChannel.join();
-				});
+		if(controller == null) {
+			client.getVoiceChannelById(voiceChannelId)
+			.flatMap(VoiceChannel::join)
+			.subscribe(controller -> {
+				this.controller = controller;
+				controller.connect(audioProvider, null);
+			});
+		}
 	}
 
 	public void leaveVoiceChannel() {
-		client.getVoiceChannelById(voiceChannelId).subscribe(voiceChannel -> {
-			// TODO: Leave voice channel
-		});
+		if(controller != null) {
+			controller.disconnect();
+			controller = null;
+		}
 	}
 
 	public void end() {
