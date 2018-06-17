@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.core;
+package me.shadorc.shadbot.core.shard;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -14,6 +14,7 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
+//TODO: Is this class useful ?
 public class CustomShard {
 
 	private static final long SHARD_TIMEOUT = TimeUnit.MINUTES.toSeconds(1);

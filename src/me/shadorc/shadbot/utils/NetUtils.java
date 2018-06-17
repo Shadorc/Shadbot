@@ -16,7 +16,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.core.CustomShard;
+import me.shadorc.shadbot.core.shard.CustomShard;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;

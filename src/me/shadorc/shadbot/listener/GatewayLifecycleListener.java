@@ -13,7 +13,7 @@ import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.CustomShard;
+import me.shadorc.shadbot.core.shard.CustomShard;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
