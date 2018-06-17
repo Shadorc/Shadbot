@@ -65,6 +65,14 @@ public class Context {
 	public DiscordClient getClient() {
 		return this.getMessage().getClient();
 	}
+	
+	public int getShardIndex() {
+		return this.getClient().getConfig().getShardIndex();
+	}
+	
+	public int getShardCount() {
+		return this.getClient().getConfig().getShardCount();
+	}
 
 	public Mono<User> getSelf() {
 		return this.getClient().getSelf();

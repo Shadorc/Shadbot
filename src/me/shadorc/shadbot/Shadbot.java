@@ -1,5 +1,6 @@
 package me.shadorc.shadbot;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -24,6 +25,8 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
 
 public class Shadbot {
+	
+	private static final Instant LAUNCH_TIME = Instant.now();
 
 	private static final ScheduledThreadPoolExecutor SCHEDULER = new ScheduledWrappedExecutor(3, "ShadbotScheduler-%d");
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
@@ -67,6 +70,15 @@ public class Shadbot {
 		// TODO: create a mono and wait for it
 		while(true)
 			;
+	}
+	
+	/**
+	 * Gets the time when this class was loaded.
+	 *
+	 * @return The time when this class was loaded.
+	 */
+	public static Instant getLaunchTime() {
+		return LAUNCH_TIME;
 	}
 
 	public static <T extends Event> void registerListener(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
