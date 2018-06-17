@@ -36,11 +36,11 @@ public class PlayCmd extends AbstractCommand {
 		final String arg = context.requireArg();
 		final Snowflake guildId = context.getGuildId().get();
 
-		Mono<Optional<Snowflake>> monoAuthorChannelId = 
+		Mono<Optional<Snowflake>> monoAuthorChannelId =
 				DiscordUtils.getVoiceChannelId(context.getAuthor()
 						.flatMap(user -> user.asMember(guildId)));
 
-		Mono<Optional<Snowflake>> monoSelfChannelId = 
+		Mono<Optional<Snowflake>> monoSelfChannelId =
 				DiscordUtils.getVoiceChannelId(context.getSelf()
 						.flatMap(user -> user.asMember(guildId)));
 

@@ -25,7 +25,7 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
 
 public class Shadbot {
-	
+
 	private static final Instant LAUNCH_TIME = Instant.now();
 
 	private static final ScheduledThreadPoolExecutor SCHEDULER = new ScheduledWrappedExecutor(3, "ShadbotScheduler-%d");
@@ -71,7 +71,7 @@ public class Shadbot {
 		while(true)
 			;
 	}
-	
+
 	/**
 	 * Gets the time when this class was loaded.
 	 *

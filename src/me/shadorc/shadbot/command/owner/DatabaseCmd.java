@@ -40,7 +40,7 @@ public class DatabaseCmd extends AbstractCommand {
 					if(!optGuild.isPresent()) {
 						throw new IllegalCmdArgumentException("Guild not found.");
 					}
-					
+
 					final Guild guild = optGuild.get();
 
 					String json = null;
