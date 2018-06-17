@@ -95,6 +95,7 @@ public class VoiceStateUpdateListener {
 				.filter(member -> !member.isBot())
 				.flatMap(Member::getVoiceState)
 				.map(VoiceState::getChannelId)
+				.defaultIfEmpty(Optional.empty())
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.filter(voiceChannelId::equals)
