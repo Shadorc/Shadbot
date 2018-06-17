@@ -39,44 +39,47 @@ public class InfoCmd extends AbstractCommand {
 		long maxMemory = runtime.maxMemory() / mbUnit;
 
 		context.getClient().getApplicationInfo()
-		.flatMap(ApplicationInfo::getOwner)
-		.subscribe(owner -> {
+				.flatMap(ApplicationInfo::getOwner)
+				.subscribe(owner -> {
 
-			context.getClient().getGuilds()
-			.map(Guild::getMemberCount)
-			.collect(Collectors.summingInt(OptionalInt::getAsInt))
-			.subscribe(membersCount -> {
+					context.getClient().getGuilds()
+							.map(Guild::getMemberCount)
+							.collect(Collectors.summingInt(OptionalInt::getAsInt))
+							.subscribe(membersCount -> {
 
-				context.getClient()
-				.getGuilds()
-				.count()
-				.subscribe(guildsCount -> {
+								context.getClient()
+										.getGuilds()
+										.count()
+										.subscribe(guildsCount -> {
 
-					String info = new String("```prolog"
-							+ String.format("%n-= Performance Info =-")
-							+ String.format("%nMemory: %s/%s MB", FormatUtils.formatNum(usedMemory), FormatUtils.formatNum(maxMemory))
-							+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
-							+ String.format("%nThreads Count: %s", FormatUtils.formatNum(Thread.activeCount()))
-							+ String.format("%n%n-= APIs Info =-")
-							+ String.format("%nJava Version: %s", System.getProperty("java.version"))
-							 + String.format("%n%s Version: %s", VersionUtil.APPLICATION_NAME, VersionUtil.APPLICATION_VERSION)
-							+ String.format("%nLavaPlayer Version: %s", PlayerLibrary.VERSION)
-							+ String.format("%n%n-= Shadbot Info =-")
-							+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true))
-							+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
-							+ String.format("%nShadbot Version: %s", Config.VERSION)
-							+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
-							+ String.format("%nServers: %s", FormatUtils.formatNum(guildsCount))
-							//TODO
-							// + String.format("%nVoice Channels: %d", context.getClient().getConnectedVoiceChannels().size())
-							+ String.format("%nUsers: %s", FormatUtils.formatNum(membersCount))
-							+ String.format("%nPing: %dms", ping)
-							+ "```");
+											final String d4jName = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_NAME);
+											final String d4jVersion = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_VERSION);
 
-					BotUtils.sendMessage(info, context.getChannel());
+											String info = new String("```prolog"
+													+ String.format("%n-= Performance Info =-")
+													+ String.format("%nMemory: %s/%s MB", FormatUtils.formatNum(usedMemory), FormatUtils.formatNum(maxMemory))
+													+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
+													+ String.format("%nThreads Count: %s", FormatUtils.formatNum(Thread.activeCount()))
+													+ String.format("%n%n-= APIs Info =-")
+													+ String.format("%nJava Version: %s", System.getProperty("java.version"))
+													+ String.format("%n%s Version: %s", d4jName, d4jVersion)
+													+ String.format("%nLavaPlayer Version: %s", PlayerLibrary.VERSION)
+													+ String.format("%n%n-= Shadbot Info =-")
+													+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'days,' HH 'hours and' mm 'minutes'", true))
+													+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
+													+ String.format("%nShadbot Version: %s", Config.VERSION)
+													+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
+													+ String.format("%nServers: %s", FormatUtils.formatNum(guildsCount))
+											// TODO
+											// + String.format("%nVoice Channels: %d", context.getClient().getConnectedVoiceChannels().size())
+													+ String.format("%nUsers: %s", FormatUtils.formatNum(membersCount))
+													+ String.format("%nPing: %dms", ping)
+													+ "```");
+
+											BotUtils.sendMessage(info, context.getChannel());
+										});
+							});
 				});
-			});
-		});
 	}
 
 	@Override
