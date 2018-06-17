@@ -105,7 +105,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Start a Hangman game.")
 // .addArg("difficulty", String.format("%s. The difficulty of the word to find",
 // FormatUtils.format(Difficulty.values(), value -> value.toString().toLowerCase(), "/")), true)

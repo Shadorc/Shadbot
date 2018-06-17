@@ -10,6 +10,7 @@ import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.MUSIC, names = { "clear" })
@@ -23,8 +24,8 @@ public class ClearCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Clear current playlist.")
 				.build();
 	}

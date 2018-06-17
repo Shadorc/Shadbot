@@ -21,6 +21,24 @@ public class DiscordUtils {
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
 
+	private static final String AVATARS = "https://cdn.discordapp.com/avatars/%s/%s.%s";
+	public static final String DEFAULT_AVATAR = "https://cdn.discordapp.com/embed/avatars/%d.png";
+
+	public static String getAvatarUrl(User user) {
+		if(user.getAvatarHash().isPresent()) {
+			return String.format(AVATARS, user.getId().asLong(),
+					user.getAvatarHash().get(),
+					user.getAvatarHash().get().startsWith("a_") ? "gif" : "webp");
+		} else {
+			return String.format(DEFAULT_AVATAR,
+					Integer.parseInt(user.getDiscriminator()) % 5);
+		}
+	}
+
+	public static Mono<String> getAvatarUrl(Mono<User> monoUser) {
+		return monoUser.map(DiscordUtils::getAvatarUrl);
+	}
+
 	public static Instant getSnowflakeTimeFromID(Snowflake id) {
 		return Instant.ofEpochMilli(1420070400000L + (id.asLong() >>> 22));
 	}
@@ -40,7 +58,7 @@ public class DiscordUtils {
 	public static Mono<Boolean> hasPermissions(Mono<User> member, Snowflake guildId, Permission... permissions) {
 		return DiscordUtils.hasPermissions(member.flatMap(user -> user.asMember(guildId)), permissions);
 	}
-	
+
 	public static Mono<Optional<Snowflake>> getVoiceChannelId(Mono<Member> member) {
 		return member.flatMap(Member::getVoiceState)
 				.map(VoiceState::getChannelId)

@@ -54,7 +54,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Show a list of members with specific role(s).")
 // .addArg("@role(s)", false)
 // .build();

@@ -15,6 +15,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.publisher.Mono;
 import twitter4j.TwitterException;
 
 @RateLimited
@@ -46,8 +47,8 @@ public class HolidaysCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show the number of remaining days before the next school holidays for the indicated zone.")
 				.addArg(Zone.values(), false)
 				.build();

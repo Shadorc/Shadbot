@@ -10,6 +10,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.INFO, names = { "ping" })
@@ -22,8 +23,8 @@ public class PingCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show Shadbot's ping.")
 				.build();
 	}

@@ -29,6 +29,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.GAMESTATS, names = { "fortnite" })
@@ -154,12 +155,12 @@ public class FortniteCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Fortnite.")
 				.addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.values(), region -> region.toString().toLowerCase(), ", ")), false)
 				.addArg("epic-nickname", false)
-				.setExample(String.format("`%s%s pc Shadbot`", prefix, this.getName()))
+				.setExample(String.format("`%s%s pc Shadbot`", context.getPrefix(), this.getName()))
 				.build();
 	}
 

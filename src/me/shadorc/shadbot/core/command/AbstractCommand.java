@@ -9,6 +9,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import reactor.core.publisher.Mono;
 
 public abstract class AbstractCommand {
 
@@ -35,7 +36,7 @@ public abstract class AbstractCommand {
 
 	public abstract void execute(Context context);
 
-	public abstract EmbedCreateSpec getHelp(String prefix);
+	public abstract Mono<EmbedCreateSpec> getHelp(Context context);
 
 	public List<String> getNames() {
 		return names;

@@ -14,6 +14,7 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.UTILS, names = { "calc", "math" })
@@ -34,11 +35,11 @@ public class CalcCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Calculate an expression.")
 				.addArg("expression", false)
-				.setExample(String.format("`%s%s 3+3*3+3`", prefix, this.getName()))
+				.setExample(String.format("`%s%s 3+3*3+3`", context.getPrefix(), this.getName()))
 				.build();
 	}
 

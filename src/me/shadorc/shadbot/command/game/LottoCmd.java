@@ -160,7 +160,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Buy a ticket for the lottery or display the current lottery status.")
 // .addArg("num", String.format("must be between %d and %d", MIN_NUM, MAX_NUM), true)
 // .addField("Info", "One winner is randomly drawn every Sunday at noon (English time)."

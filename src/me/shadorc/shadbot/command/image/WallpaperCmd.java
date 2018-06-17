@@ -38,6 +38,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.IMAGE, names = { "wallpaper" }, alias = "wp")
@@ -166,8 +167,8 @@ public class WallpaperCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Search for a wallpaper.")
 				.setUsage(String.format("[-p %s] [-c %s] [-rat %s] [-res %s] [-k %s]", PURITY, CATEGORY, RATIO, RESOLUTION, KEYWORD))
 				.addArg(PURITY, FormatUtils.format(Purity.values(), purity -> purity.toString().toLowerCase(), ", "), true)
@@ -176,7 +177,7 @@ public class WallpaperCmd extends AbstractCommand {
 				.addArg(RESOLUTION, "image resolution (e.g. 1920x1080)", true)
 				.addArg(KEYWORD, "keywords (e.g. doom,game)", true)
 				.setExample(String.format("Search a *SFW* wallpaper in category *Anime*, with a *16x9* ratio :"
-						+ "%n`%s%s -p sfw -c anime -rat 16x9`", prefix, this.getName()))
+						+ "%n`%s%s -p sfw -c anime -rat 16x9`", context.getPrefix(), this.getName()))
 				.setSource("https://alpha.wallhaven.cc")
 				.build();
 	}

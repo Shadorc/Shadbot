@@ -26,6 +26,7 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "setting", "settings" })
 public class SettingsCmd extends AbstractCommand {
@@ -89,13 +90,14 @@ public class SettingsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		HelpBuilder embed = new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		HelpBuilder embed = new HelpBuilder(this, context)
 				.setThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
 				.setDescription("Change Shadbot's settings for this server.")
 				.addArg("name", false)
 				.addArg("args", false)
-				.addField("Additional Help", String.format("`%s%s <name> help`", prefix, this.getName()), false);
+				.addField("Additional Help", String.format("`%s%s <name> help`",
+						context.getPrefix(), this.getName()), false);
 
 		SETTINGS_MAP.values().stream()
 				.forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()), setting.getDescription(), false));

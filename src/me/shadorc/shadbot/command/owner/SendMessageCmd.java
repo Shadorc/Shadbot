@@ -15,6 +15,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "send" })
 public class SendMessageCmd extends AbstractCommand {
@@ -49,8 +50,8 @@ public class SendMessageCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Send a private message to an user.")
 				.addArg("userID", false)
 				.addArg("message", false)

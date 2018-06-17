@@ -21,6 +21,7 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.IMAGE, names = { "gif" })
@@ -56,8 +57,8 @@ public class GifCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show a random gif")
 				.addArg("tag", "the tag to search", true)
 				.setSource("https://giphy.com")

@@ -23,6 +23,7 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.UTILS, names = { "translate", "translation", "trans" })
@@ -83,13 +84,13 @@ public class TranslateCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Translate a text from a language to another.")
 				.addArg("fromLang", "source language, by leaving it blank the language will be automatically detected", true)
 				.addArg("toLang", "destination language", false)
 				.addArg("text", false)
-				.setExample(String.format("`%s%s en fr How are you ?`", prefix, this.getName()))
+				.setExample(String.format("`%s%s en fr How are you ?`", context.getPrefix(), this.getName()))
 				.addField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false)
 				.build();
 	}

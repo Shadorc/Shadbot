@@ -23,6 +23,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.GAMESTATS, names = { "cs", "csgo" })
@@ -124,8 +125,8 @@ public class CounterStrikeCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Counter-Strike: Global Offensive.")
 				.addArg("steamID", "steam ID, custom ID or profile URL", false)
 				.build();

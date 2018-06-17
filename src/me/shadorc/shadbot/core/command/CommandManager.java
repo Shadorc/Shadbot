@@ -126,10 +126,12 @@ public class CommandManager {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 			CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
 		} else if(err instanceof MissingArgumentException) {
-			BotUtils.sendMessage(new MessageCreateSpec()
-					.setContent(TextUtils.MISSING_ARG)
-					.setEmbed(command.getHelp(context.getPrefix())), context.getChannel());
-			CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
+			command.getHelp(context).subscribe(helpEmbed -> {
+				BotUtils.sendMessage(new MessageCreateSpec()
+						.setContent(TextUtils.MISSING_ARG)
+						.setEmbed(helpEmbed), context.getChannel());
+				CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
+			});
 		} else if(err instanceof NoPlayingMusicException) {
 			BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
 		} else {

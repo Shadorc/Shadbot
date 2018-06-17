@@ -20,6 +20,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "database" })
 public class DatabaseCmd extends AbstractCommand {
@@ -67,8 +68,8 @@ public class DatabaseCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Return raw database JSON about an user / a guild.")
 				.addArg("guildID", false)
 				.addArg("userID", true)

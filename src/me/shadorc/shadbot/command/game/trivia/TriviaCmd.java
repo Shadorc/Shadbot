@@ -88,7 +88,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Start a Trivia game in which everyone can participate.")
 // .addArg("categoryID", "the category ID of the question", true)
 // .addField("Category", String.format("Use `%s%s categories` to see the list of categories", prefix, this.getName()), false)

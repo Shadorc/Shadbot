@@ -17,6 +17,7 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.HIDDEN, names = { "contributor_status", "donator_status", "relic_status" })
 public class RelicStatusCmd extends AbstractCommand {
@@ -60,8 +61,8 @@ public class RelicStatusCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show your contributor status.")
 				.build();
 	}

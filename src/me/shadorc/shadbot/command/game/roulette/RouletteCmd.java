@@ -64,7 +64,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Play a roulette game in which everyone can participate.")
 // .addArg("bet", false)
 // .addArg("place", String.format("number between 1 and 36, %s",

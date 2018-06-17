@@ -54,8 +54,8 @@
 // }
 //
 // @Override
-// public EmbedCreateSpec getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// public Mono<EmbedCreateSpec> getHelp(Context context) {
+// return new HelpBuilder(this, context)
 // .setDescription("Schedule a shutdown after a fixed amount of seconds and send a message to all guilds playing musics.")
 // .addArg("seconds", true)
 // .addArg("message", true)

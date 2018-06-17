@@ -16,6 +16,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.HIDDEN, names = { "help" })
@@ -30,7 +31,8 @@ public class HelpCmd extends AbstractCommand {
 			}
 
 			CommandStatsManager.log(CommandEnum.COMMAND_HELPED, cmd);
-			BotUtils.sendMessage(cmd.getHelp(context.getPrefix()), context.getChannel());
+			cmd.getHelp(context)
+					.subscribe(embedHelp -> BotUtils.sendMessage(embedHelp, context.getChannel()));
 			return;
 		}
 
@@ -63,8 +65,8 @@ public class HelpCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show the list of available commands.")
 				.build();
 	}

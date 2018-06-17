@@ -16,6 +16,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.MUSIC, names = { "playlist" })
@@ -53,8 +54,8 @@ public class PlaylistCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show current playlist.")
 				.build();
 	}

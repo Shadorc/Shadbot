@@ -21,6 +21,7 @@ import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.CURRENCY, names = { "transfer" })
@@ -77,8 +78,8 @@ public class TransferCoinsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Transfer coins to the mentioned user.")
 				.addArg("coins", false)
 				.addArg("@user", false)

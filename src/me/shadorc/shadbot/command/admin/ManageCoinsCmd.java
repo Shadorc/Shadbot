@@ -17,6 +17,7 @@ import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "manage_coins", "manage-coins", "managecoins" })
 public class ManageCoinsCmd extends AbstractCommand {
@@ -67,13 +68,14 @@ public class ManageCoinsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Manage user(s) coins.")
 				.addArg("action", FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), " / "), false)
 				.addArg("coins", "can be positive or negative", true)
 				.addArg("@user(s)/@role(s)", false)
-				.setExample(String.format("`%s%s add 150 @Shadbot`%n`%s%s reset @Shadbot`", prefix, this.getName(), prefix, this.getName()))
+				.setExample(String.format("`%s%s add 150 @Shadbot`%n`%s%s reset @Shadbot`",
+						context.getPrefix(), this.getName(), context.getPrefix(), this.getName()))
 				.build();
 	}
 }

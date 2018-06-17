@@ -27,15 +27,14 @@ import reactor.core.publisher.Mono;
 public class Context {
 
 	private final Optional<Snowflake> guildId;
+	// The message is stored because it does not need to be reactive,
+	// a command is received and executed, it does not need to adapt to message
+	// modifications
 	private final Message message;
 	private final String prefix;
 	private final String cmdName;
 	private final Optional<String> arg;
 
-	/**
-	 * The message is stored because it does not need to be reactive, a command is received and executed, it does not need to adapt to message
-	 * modifications
-	 */
 	public Context(@Nullable Snowflake guildId, Message message, String prefix) {
 		this.guildId = Optional.ofNullable(guildId);
 		this.message = message;
@@ -65,11 +64,11 @@ public class Context {
 	public DiscordClient getClient() {
 		return this.getMessage().getClient();
 	}
-	
+
 	public int getShardIndex() {
 		return this.getClient().getConfig().getShardIndex();
 	}
-	
+
 	public int getShardCount() {
 		return this.getClient().getConfig().getShardCount();
 	}
@@ -108,6 +107,10 @@ public class Context {
 
 	public Mono<User> getAuthor() {
 		return this.getMessage().getAuthor();
+	}
+
+	public Mono<String> getAuthorAvatarUrl() {
+		return DiscordUtils.getAvatarUrl(this.getAuthor());
 	}
 
 	public Mono<Member> getMember() {

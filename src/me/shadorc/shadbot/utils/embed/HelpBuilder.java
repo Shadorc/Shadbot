@@ -7,11 +7,13 @@ import java.util.stream.Collectors;
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.FormatUtils;
+import reactor.core.publisher.Mono;
 
 public class HelpBuilder {
 
-	private final String prefix;
+	private final Context context;
 	private final AbstractCommand cmd;
 	private final List<Argument> args;
 	private final List<EmbedFieldEntity> fields;
@@ -23,8 +25,8 @@ public class HelpBuilder {
 	private String gains;
 	private String source;
 
-	public HelpBuilder(AbstractCommand cmd, String prefix) {
-		this.prefix = prefix;
+	public HelpBuilder(AbstractCommand cmd, Context context) {
+		this.context = context;
 		this.cmd = cmd;
 		this.args = new ArrayList<>();
 		this.fields = new ArrayList<>();
@@ -46,7 +48,7 @@ public class HelpBuilder {
 	}
 
 	public HelpBuilder setUsage(String usage) {
-		return this.setFullUsage(String.format("%s%s %s", prefix, cmd.getName(), usage));
+		return this.setFullUsage(String.format("%s%s %s", context.getPrefix(), cmd.getName(), usage));
 	}
 
 	public HelpBuilder setExample(String example) {
@@ -86,43 +88,47 @@ public class HelpBuilder {
 		return this;
 	}
 
-	public EmbedCreateSpec build() {
-		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("Help for %s command", cmd.getName()))
-				.addField("Usage", this.getUsage(), false);
+	public Mono<EmbedCreateSpec> build() {
+		return context.getAuthorAvatarUrl()
+				.map(avatarUrl -> {
+					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+							.setAuthor(String.format("Help for %s command", cmd.getName()), null, avatarUrl)
+							.addField("Usage", this.getUsage(), false);
 
-		if(!this.getArguments().isEmpty()) {
-			embed.addField("Arguments", this.getArguments(), false);
-		}
+					if(!this.getArguments().isEmpty()) {
+						embed.addField("Arguments", this.getArguments(), false);
+					}
 
-		if(example != null) {
-			embed.addField("Example", example, false);
-		}
+					if(example != null) {
+						embed.addField("Example", example, false);
+					}
 
-		if(gains != null) {
-			embed.addField("Gains", gains, false);
-		}
+					if(gains != null) {
+						embed.addField("Gains", gains, false);
+					}
 
-		if(source != null) {
-			embed.addField("Source", source, false);
-		}
+					if(source != null) {
+						embed.addField("Source", source, false);
+					}
 
-		if(description != null) {
-			embed.setDescription(description);
-		}
+					if(description != null) {
+						embed.setDescription(description);
+					}
 
-		if(thumbnail != null) {
-			embed.setThumbnail(thumbnail);
-		}
+					if(thumbnail != null) {
+						embed.setThumbnail(thumbnail);
+					}
 
-		for(EmbedFieldEntity field : fields) {
-			embed.addField(field.getName(), field.getValue(), field.isInline());
-		}
+					for(EmbedFieldEntity field : fields) {
+						embed.addField(field.getName(), field.getValue(), field.isInline());
+					}
 
-		if(!cmd.getAlias().isEmpty()) {
-			embed.setFooter(String.format("Alias: %s", cmd.getAlias()), null);
-		}
+					if(!cmd.getAlias().isEmpty()) {
+						embed.setFooter(String.format("Alias: %s", cmd.getAlias()), null);
+					}
 
-		return embed;
+					return embed;
+				});
 	}
 
 	private String getUsage() {
@@ -131,7 +137,7 @@ public class HelpBuilder {
 		}
 
 		return String.format("`%s%s %s`",
-				prefix, cmd.getName(),
+				context.getPrefix(), cmd.getName(),
 				FormatUtils.format(args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), " "));
 	}
 

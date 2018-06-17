@@ -24,6 +24,7 @@ import net.shadorc.overwatch4j.OverwatchPlayer;
 import net.shadorc.overwatch4j.enums.Platform;
 import net.shadorc.overwatch4j.enums.TopHeroesStats;
 import net.shadorc.overwatch4j.exception.OverwatchException;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.GAMESTATS, names = { "overwatch" }, alias = "ow")
@@ -88,8 +89,8 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Overwatch.")
 				.addArg("platform", String.format("user's platform (%s)",
 						FormatUtils.format(Platform.values(), platform -> platform.toString().toLowerCase(), ", ")), true)

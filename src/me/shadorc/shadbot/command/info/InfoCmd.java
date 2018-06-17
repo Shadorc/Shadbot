@@ -23,6 +23,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.INFO, names = { "info" })
@@ -83,8 +84,8 @@ public class InfoCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show Shadbot's info.")
 				.build();
 	}

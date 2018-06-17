@@ -18,6 +18,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import reactor.core.publisher.Mono;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
 @Command(category = CommandCategory.GAME, names = { "slot_machine", "slot-machine", "slotmachine" }, alias = "sm")
@@ -60,8 +61,8 @@ public class SlotMachineCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Play slot machine.")
 				.addField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)
 				.build();

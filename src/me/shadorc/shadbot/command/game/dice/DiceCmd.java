@@ -89,7 +89,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Start a dice game with a common bet.")
 // .addArg("bet", false)
 // .addArg("num", "number between 1 and 6\nYou can't bet on a number that has already been chosen by another player.", false)

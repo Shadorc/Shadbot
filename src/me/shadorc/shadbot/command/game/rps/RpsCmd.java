@@ -56,7 +56,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Play a Rock–paper–scissors game.")
 // .addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)
 // .setGains("The winner gets **%d coins**.", GAINS)

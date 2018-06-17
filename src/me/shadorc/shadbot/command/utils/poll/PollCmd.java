@@ -16,6 +16,7 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.UTILS, names = { "poll" })
@@ -95,15 +96,17 @@ public class PollCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Create a poll.")
-				.addArg("duration", String.format("in seconds, must be between %ds and %ds (1 hour)", MIN_DURATION, MAX_DURATION), false)
+				.addArg("duration", String.format("in seconds, must be between %ds and %ds (1 hour)",
+						MIN_DURATION, MAX_DURATION), false)
 				.addArg("\"question\"", false)
 				.addArg("choice1", false)
 				.addArg("choice2", false)
 				.addArg("choiceX", true)
-				.setExample(String.format("`%s%s 120 \"Where do we eat at noon?\" \"White\" \"53\" \"A dog\"`", prefix, this.getName()))
+				.setExample(String.format("`%s%s 120 \"Where do we eat at noon?\" \"White\" \"53\" \"A dog\"`",
+						context.getPrefix(), this.getName()))
 				.addField("Restrictions", String.format("**question and choices** - must be in quotation marks"
 						+ "%n**choices** - min: %d, max: %d", MIN_CHOICES_NUM, MAX_CHOICES_NUM), false)
 				.build();

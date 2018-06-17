@@ -14,6 +14,7 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "stats" })
 public class StatsCmd extends AbstractCommand {
@@ -33,8 +34,8 @@ public class StatsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Show statistics for the specified category.")
 				.addArg("category", FormatUtils.format(StatsManager.getStats().keySet().stream(),
 						name -> String.format("`%s`", name.toString().toLowerCase()), ", "), false)

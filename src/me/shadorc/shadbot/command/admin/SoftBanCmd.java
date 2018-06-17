@@ -86,7 +86,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Ban and instantly unban user(s).\nIt's like kicking him/them but it also deletes his/their messages "
 // + "from the last 7 days.")
 // .addArg("@user(s)", false)

@@ -87,7 +87,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Delete messages.")
 // .addArg("@user(s)", "from these users", true)
 // .addArg("\"words\"", "containing these words", true)

@@ -2,8 +2,6 @@ package me.shadorc.shadbot.command.music;
 
 import java.util.Optional;
 
-import discord4j.core.object.VoiceState;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -116,14 +114,14 @@ public class PlayCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Play the music(s) from the url, search terms or playlist.")
-				.setFullUsage(String.format("%s%s[first] [soundcloud] <url>", prefix, this.getName()))
+				.setFullUsage(String.format("%s%s[first] [soundcloud] <url>", context.getPrefix(), this.getName()))
 				.addArg("first", "add the song at the top of the playlist", true)
 				.addArg("soundcloud", "search on SoundCloud instead of YouTube", true)
 				.setExample(String.format("`%splayfirst soundcloud At Doom's gate`"
-						+ "%n`%splay E1M8`", prefix, prefix))
+						+ "%n`%splay E1M8`", context.getPrefix(), context.getPrefix()))
 				.build();
 	}
 }

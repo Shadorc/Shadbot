@@ -10,6 +10,7 @@ import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import reactor.core.publisher.Mono;
 
 @RateLimited(max = 1, cooldown = 1)
 @Command(category = CommandCategory.MUSIC, names = { "skip", "next" })
@@ -39,8 +40,8 @@ public class SkipCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Skip current music and play the next one if it exists."
 						+ "\nYou can also directly skip to a music in the playlist by specifying its number.")
 				.addArg("num", "the number of the music in the playlist to play", true)

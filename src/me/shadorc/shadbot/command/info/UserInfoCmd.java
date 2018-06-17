@@ -51,8 +51,8 @@
 // }
 //
 // @Override
-// public EmbedCreateSpec getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// public Mono<EmbedCreateSpec> getHelp(Context context) {
+// return new HelpBuilder(this, context)
 // .setDescription("Show info about an user.")
 // .addArg("@user", true)
 // .build();

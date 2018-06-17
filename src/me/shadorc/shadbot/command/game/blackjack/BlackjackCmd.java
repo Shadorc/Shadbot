@@ -51,7 +51,7 @@
 //
 // @Override
 // public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, prefix)
+// return new HelpBuilder(this, context)
 // .setDescription("Start or join a blackjack game.")
 // .addArg("bet", false)
 // .addField("Info", "**double down** - increase the initial bet by 100% in exchange for committing to stand"

@@ -17,6 +17,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
 @Command(category = CommandCategory.GAME, names = { "russian_roulette", "russian-roulette", "russianroulette" }, alias = "rr")
@@ -55,8 +56,8 @@ public class RussianRouletteCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Play Russian roulette.")
 				.addArg("bet", String.format("You can't bet more than **%s**.", FormatUtils.formatCoins(MAX_BET)), false)
 				.setGains("You have a **5-in-6** chance to win **%.1f times** your bet and a **1-in-6** chance to lose **%.1f times** your bet.",

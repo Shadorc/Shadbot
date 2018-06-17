@@ -16,6 +16,7 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "generate_relic" })
 public class GenerateRelicCmd extends AbstractCommand {
@@ -36,8 +37,8 @@ public class GenerateRelicCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Generate a relic.")
 				.addArg(RelicType.values(), false)
 				.build();

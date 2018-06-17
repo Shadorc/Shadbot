@@ -10,6 +10,7 @@ import me.shadorc.shadbot.exception.RelicActivationException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.HIDDEN, names = { "activate_relic", "activate" })
 public class ActivateRelicCmd extends AbstractCommand {
@@ -30,8 +31,8 @@ public class ActivateRelicCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Activate a relic.")
 				.addArg("key", false)
 				.build();

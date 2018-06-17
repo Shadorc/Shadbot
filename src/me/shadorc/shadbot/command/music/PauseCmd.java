@@ -13,6 +13,7 @@ import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.MUSIC, names = { "pause", "unpause", "resume" })
@@ -35,8 +36,8 @@ public class PauseCmd extends AbstractCommand {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(String prefix) {
-		return new HelpBuilder(this, prefix)
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
 				.setDescription("Pause current music. Use this command again to resume.")
 				.build();
 	}
