@@ -33,31 +33,34 @@ public class RelicStatusCmd extends AbstractCommand {
 			return;
 		}
 
-		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Contributor status")
-				.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
+		context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					.setAuthor("Contributor status", null, avatarUrl)
+					.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
 
-		for(Relic relic : relics) {
-			StringBuilder contentBld = new StringBuilder();
-			contentBld.append(String.format("**ID:** %s", relic.getId()));
-			if(relic.getType().equals(RelicType.GUILD)) {
-				contentBld.append(String.format("%n**Guild ID:** %d", relic.getGuildId().asLong()));
+			for(Relic relic : relics) {
+				StringBuilder contentBld = new StringBuilder();
+				contentBld.append(String.format("**ID:** %s", relic.getId()));
+				if(relic.getType().equals(RelicType.GUILD)) {
+					contentBld.append(String.format("%n**Guild ID:** %d", relic.getGuildId().asLong()));
+				}
+				contentBld.append(String.format("%n**Duration:** %d days", relic.getDuration()));
+				if(!relic.isExpired()) {
+					long daysLeft = relic.getDuration() - TimeUnit.MILLISECONDS.toDays(TimeUtils.getMillisUntil(relic.getActivationTime()));
+					contentBld.append(String.format("%n**Expires in:** %d days", daysLeft));
+				}
+
+				StringBuilder titleBld = new StringBuilder();
+				if(relic.getType().equals(RelicType.GUILD)) {
+					titleBld.append("Legendary ");
+				}
+				titleBld.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));
+
+				embed.addField(titleBld.toString(), contentBld.toString(), false);
 			}
-			contentBld.append(String.format("%n**Duration:** %d days", relic.getDuration()));
-			if(!relic.isExpired()) {
-				long daysLeft = relic.getDuration() - TimeUnit.MILLISECONDS.toDays(TimeUtils.getMillisUntil(relic.getActivationTime()));
-				contentBld.append(String.format("%n**Expires in:** %d days", daysLeft));
-			}
 
-			StringBuilder titleBld = new StringBuilder();
-			if(relic.getType().equals(RelicType.GUILD)) {
-				titleBld.append("Legendary ");
-			}
-			titleBld.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));
-
-			embed.addField(titleBld.toString(), contentBld.toString(), false);
-		}
-
-		BotUtils.sendMessage(embed, context.getChannel());
+			BotUtils.sendMessage(embed, context.getChannel());
+		});
 	}
 
 	@Override

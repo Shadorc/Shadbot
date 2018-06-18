@@ -71,7 +71,9 @@ public class MoneyStatsManager {
 		Map<String, AtomicLong> moneyGained = MONEY_STATS_MAP.getOrDefault(MoneyEnum.MONEY_GAINED, Collections.emptyMap());
 		Map<String, AtomicLong> moneyLost = MONEY_STATS_MAP.getOrDefault(MoneyEnum.MONEY_LOST, Collections.emptyMap());
 
-		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Stats: average");
+		// TODO Add avatar icon
+		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+				.setAuthor("Stats: average", null, null);
 
 		List<String> gamesName = new ArrayList<>();
 		gamesName.addAll(moneyGained.keySet());

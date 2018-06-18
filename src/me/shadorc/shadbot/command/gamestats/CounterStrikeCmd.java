@@ -97,9 +97,10 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 			JSONArray statsArray = mainStatsObj.getJSONObject("playerstats").getJSONArray("stats");
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Counter-Strike: Global Offensive Stats",
-					"http://www.icon100.com/up/2841/256/csgo.png",
-					"http://steamcommunity.com/profiles/" + steamid)
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					.setAuthor("Counter-Strike: Global Offensive Stats",
+							"http://www.icon100.com/up/2841/256/csgo.png",
+							"http://steamcommunity.com/profiles/" + steamid)
 					.setThumbnail(userObj.getString("avatarfull"))
 					.setDescription(String.format("Stats for **%s**", userObj.getString("personaname")))
 					.addField("Kills", Integer.toString(this.getValue(statsArray, "total_kills")), true)

@@ -44,13 +44,17 @@ public class UrbanCmd extends AbstractCommand {
 			String definition = StringUtils.truncate(resultObj.getString("definition"), DiscordUtils.DESCRIPTION_CONTENT_LIMIT);
 			String example = StringUtils.truncate(resultObj.getString("example"), DiscordUtils.FIELD_CONTENT_LIMIT);
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Urban Dictionary: " + resultObj.getString("word"),
-					resultObj.getString("permalink"))
-					.setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
-					.setDescription(definition)
-					.addField("Example", example, false);
+			context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor("Urban Dictionary: " + resultObj.getString("word"),
+								resultObj.getString("permalink"),
+								avatarUrl)
+						.setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
+						.setDescription(definition)
+						.addField("Example", example, false);
 
-			loadingMsg.send(embed);
+				loadingMsg.send(embed);
+			});
 
 		} catch (JSONException | IOException err) {
 			loadingMsg.send(ExceptionUtils.handleAndGet("getting Urban Dictionary definition", context, err));

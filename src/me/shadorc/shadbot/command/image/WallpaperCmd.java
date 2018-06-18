@@ -125,14 +125,16 @@ public class WallpaperCmd extends AbstractCommand {
 				}
 
 				Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
+				context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+					String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
+					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+							.setAuthor("Wallpaper", wallpaper.getUrl(), avatarUrl)
+							.setImage(wallpaper.getImageUrl())
+							.addField("Resolution", wallpaper.getResolution().toString(), false)
+							.addField("Tags", tags, false);
 
-				String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
-				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Wallpaper", wallpaper.getUrl())
-						.setImage(wallpaper.getImageUrl())
-						.addField("Resolution", wallpaper.getResolution().toString(), false)
-						.addField("Tags", tags, false);
-
-				loadingMsg.send(embed);
+					loadingMsg.send(embed);
+				});
 			} catch (ConnectionException err) {
 				loadingMsg.send(ExceptionUtils.handleAndGet("getting a wallpaper", context, err.getCause()));
 			}

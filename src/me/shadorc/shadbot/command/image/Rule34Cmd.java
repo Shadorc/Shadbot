@@ -71,21 +71,26 @@ public class Rule34Cmd extends AbstractCommand {
 					return;
 				}
 
-				String formattedtags = StringUtils.truncate(
-						FormatUtils.format(tags, tag -> String.format("`%s`", tag.toString()), " "), MAX_TAGS_LENGTH);
-				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Rule34 (Search: " + context.getArg() + ")", postObj.getString("file_url"))
-						.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
-						.addField("Resolution", String.format("%dx%s", postObj.getInt("width"), postObj.getInt("height")), false)
-						.addField("Tags", formattedtags, false)
-						.setImage(postObj.getString("file_url"))
-						.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
+				context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+					final String formattedtags = StringUtils.truncate(
+							FormatUtils.format(tags, tag -> String.format("`%s`", tag.toString()), " "), MAX_TAGS_LENGTH);
+					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+							.setAuthor(String.format("Rule34 (Search: %s)", context.getArg().get()),
+									postObj.getString("file_url"),
+									avatarUrl)
+							.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
+							.addField("Resolution", String.format("%dx%s", postObj.getInt("width"), postObj.getInt("height")), false)
+							.addField("Tags", formattedtags, false)
+							.setImage(postObj.getString("file_url"))
+							.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
 
-				String source = postObj.get("source").toString();
-				if(!source.isEmpty()) {
-					embed.setDescription(String.format("%n[**Source**](%s)", source));
-				}
+					String source = postObj.get("source").toString();
+					if(!source.isEmpty()) {
+						embed.setDescription(String.format("%n[**Source**](%s)", source));
+					}
 
-				loadingMsg.send(embed);
+					loadingMsg.send(embed);
+				});
 
 			} catch (JSONException | IOException err) {
 				loadingMsg.send(ExceptionUtils.handleAndGet("getting an image from Rule34", context, err));

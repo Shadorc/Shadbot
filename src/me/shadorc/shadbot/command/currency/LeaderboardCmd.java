@@ -38,20 +38,23 @@ public class LeaderboardCmd extends AbstractCommand {
 	}
 
 	private void execute(Context context, List<Tuple2<User, Integer>> list) {
-		String leaderboard = FormatUtils.numberedList(10, list.size(),
-				count -> String.format("%d. **%s** - %s",
-						count,
-						list.get(count - 1).getT1().getUsername(),
-						FormatUtils.formatCoins(list.get(count - 1).getT2())));
+		context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+			String leaderboard = FormatUtils.numberedList(10, list.size(),
+					count -> String.format("%d. **%s** - %s",
+							count,
+							list.get(count - 1).getT1().getUsername(),
+							FormatUtils.formatCoins(list.get(count - 1).getT2())));
 
-		if(leaderboard.isEmpty()) {
-			leaderboard = "\nEveryone is poor here.";
-		}
+			if(leaderboard.isEmpty()) {
+				leaderboard = "\nEveryone is poor here.";
+			}
 
-		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Leaderboard")
-				.setDescription(leaderboard);
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					.setAuthor("Leaderboard", null, avatarUrl)
+					.setDescription(leaderboard);
 
-		BotUtils.sendMessage(embed, context.getChannel());
+			BotUtils.sendMessage(embed, context.getChannel());
+		});
 	}
 
 	@Override

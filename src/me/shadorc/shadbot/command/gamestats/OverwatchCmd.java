@@ -54,9 +54,10 @@ public class OverwatchCmd extends AbstractCommand {
 				player = new OverwatchPlayer(username, platform);
 			}
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Overwatch Stats",
-					"http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png",
-					player.getProfileURL())
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					.setAuthor("Overwatch Stats",
+							"http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png",
+							player.getProfileURL())
 					.setThumbnail(player.getIconUrl())
 					.setDescription(String.format("Stats for user **%s**", player.getName()))
 					.addField("Level", Integer.toString(player.getLevel()), true)

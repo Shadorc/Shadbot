@@ -11,27 +11,14 @@ import me.shadorc.shadbot.utils.Utils;
 
 public class EmbedUtils {
 
-	public static EmbedCreateSpec getDefaultEmbed(String authorName, String authorUrl, String authorIconUrl) {
+	public static EmbedCreateSpec getDefaultEmbed() {
 		return new EmbedCreateSpec()
-				.setAuthor(authorName, authorUrl, authorIconUrl)
 				.setColor(DiscordUtils.convertColor(Config.BOT_COLOR));
 	}
 
-	// TODO: Get Shadbot avatar url
-	public static EmbedCreateSpec getDefaultEmbed(String authorName, String authorUrl) {
-		return EmbedUtils.getDefaultEmbed(authorName, authorUrl, null);
-	}
-
-	public static EmbedCreateSpec getDefaultEmbed(String authorName) {
-		return EmbedUtils.getDefaultEmbed(authorName, null);
-	}
-
-	public static EmbedCreateSpec getDefaultEmbed() {
-		return EmbedUtils.getDefaultEmbed(null);
-	}
-
 	public static <K, V extends Number> EmbedCreateSpec getStatsEmbed(Map<K, V> statsMap, String name) {
-		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("Stats: %s", name.toLowerCase()));
+		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed();
+		embed.setAuthor(String.format("Stats: %s", name.toLowerCase()), null, null);
 		if(statsMap == null) {
 			return embed.setDescription("No statistics yet.");
 		}

@@ -31,25 +31,30 @@ public class DtcCmd extends AbstractCommand {
 	public void execute(Context context) {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		try {
-			String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", APIKeys.get(APIKey.DTC_API_KEY));
+		context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+			try {
+				String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", APIKeys.get(APIKey.DTC_API_KEY));
 
-			JSONArray array = new JSONArray(NetUtils.getJSON(url));
-			JSONObject quoteObj = Utils.toList(array, JSONObject.class).stream()
-					.filter(obj -> obj.getString("content").length() < 1000)
-					.findAny()
-					.get();
+				JSONArray array = new JSONArray(NetUtils.getJSON(url));
+				JSONObject quoteObj = Utils.toList(array, JSONObject.class).stream()
+						.filter(obj -> obj.getString("content").length() < 1000)
+						.findAny()
+						.get();
 
-			String content = quoteObj.getString("content").replace("*", "\\*");
+				String content = quoteObj.getString("content").replace("*", "\\*");
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Quote DansTonChat", String.format("https://danstonchat.com/%s.html", quoteObj.getString("id")))
-					.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-					.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"));
-			loadingMsg.send(embed);
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor("Quote DansTonChat",
+								String.format("https://danstonchat.com/%s.html", quoteObj.getString("id")),
+								avatarUrl)
+						.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+						.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"));
+				loadingMsg.send(embed);
 
-		} catch (JSONException | IOException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting a quote from DansTonChat.com", context, err));
-		}
+			} catch (JSONException | IOException err) {
+				loadingMsg.send(ExceptionUtils.handleAndGet("getting a quote from DansTonChat.com", context, err));
+			}
+		});
 	}
 
 	private String format(String line) {

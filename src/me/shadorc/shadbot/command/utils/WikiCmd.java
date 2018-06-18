@@ -55,11 +55,14 @@ public class WikiCmd extends AbstractCommand {
 
 			String extract = StringUtils.truncate(resultObj.getString("extract"), DiscordUtils.DESCRIPTION_CONTENT_LIMIT);
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("Wikipedia: %s", resultObj.getString("title")),
-					"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mohapedia.png/842px-Mohapedia.png",
-					String.format("https://en.wikipedia.org/wiki/%s", resultObj.getString("title").replace(" ", "_")))
-					.setDescription(extract);
-			loadingMsg.send(embed);
+			context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor(String.format("Wikipedia: %s", resultObj.getString("title")),
+								"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mohapedia.png/842px-Mohapedia.png",
+								String.format("https://en.wikipedia.org/wiki/%s", resultObj.getString("title").replace(" ", "_")))
+						.setDescription(extract);
+				loadingMsg.send(embed);
+			});
 
 		} catch (JSONException | IOException err) {
 			loadingMsg.send(ExceptionUtils.handleAndGet("getting Wikipedia information", context, err));

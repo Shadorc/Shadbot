@@ -70,73 +70,77 @@ public class FortniteCmd extends AbstractCommand {
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		try {
-			String url = String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
-					platform.toString().toLowerCase(), epicNickname);
+		context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+			try {
+				String url = String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
+						platform.toString().toLowerCase(), epicNickname);
 
-			Response response = Jsoup.connect(url)
-					.method(Method.GET)
-					.ignoreContentType(true)
-					.ignoreHttpErrors(true)
-					.header("TRN-Api-Key", APIKeys.get(APIKey.FORTNITE_API_KEY))
-					.execute();
+				Response response = Jsoup.connect(url)
+						.method(Method.GET)
+						.ignoreContentType(true)
+						.ignoreHttpErrors(true)
+						.header("TRN-Api-Key", APIKeys.get(APIKey.FORTNITE_API_KEY))
+						.execute();
 
-			if(response.statusCode() != 200) {
-				throw new HttpStatusException("Fortnite API did not return a valid status code.", 503, url);
+				if(response.statusCode() != 200) {
+					throw new HttpStatusException("Fortnite API did not return a valid status code.", 503, url);
+				}
+
+				JSONObject mainObj = new JSONObject(response.parse().body().html());
+
+				if("Player Not Found".equals(mainObj.optString("error"))) {
+					loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Fortnite on this platform or doesn't exist.");
+					return;
+				}
+
+				JSONObject statsObj = mainObj.getJSONObject("stats");
+
+				Map<Stats, String> statsMap = new HashMap<>();
+
+				JSONObject soloStatsObj = statsObj.optJSONObject(SOLO_STATS);
+				statsMap.put(Stats.TOP1_SOLO, this.getTop1(soloStatsObj));
+				statsMap.put(Stats.KD_LT_SOLO, this.getKD(soloStatsObj));
+
+				JSONObject duoStatsObj = statsObj.optJSONObject(DUO_STATS);
+				statsMap.put(Stats.TOP1_DUO, this.getTop1(duoStatsObj));
+				statsMap.put(Stats.KD_LT_DUO, this.getKD(duoStatsObj));
+
+				JSONObject squadStatsObj = statsObj.optJSONObject(SQUAD_STATS);
+				statsMap.put(Stats.TOP1_SQUAD, this.getTop1(squadStatsObj));
+				statsMap.put(Stats.KD_LT_SQUAD, this.getKD(squadStatsObj));
+
+				JSONObject soloSeasonStatsObj = statsObj.optJSONObject(SEASON + SOLO_STATS);
+				statsMap.put(Stats.KD_S3_SOLO, this.getKD(soloSeasonStatsObj));
+
+				JSONObject duoSeasonStatsObj = statsObj.optJSONObject(SEASON + DUO_STATS);
+				statsMap.put(Stats.KD_S3_DUO, this.getKD(duoSeasonStatsObj));
+
+				JSONObject squadSeasonStatsObj = statsObj.optJSONObject(SEASON + SQUAD_STATS);
+				statsMap.put(Stats.KD_S3_SQUAD, this.getKD(squadSeasonStatsObj));
+
+				int length = 10;
+				String format = "%n%-" + (length + 5) + "s %-" + length + "s %-" + length + "s %-" + length + "s";
+
+				String description = String.format("Stats for user **%s**%n", epicNickname)
+						+ "```prolog"
+						+ String.format(format, " ", "Solo", "Duo", "Squad")
+						+ String.format(format, "Top 1", statsMap.get(Stats.TOP1_SOLO), statsMap.get(Stats.TOP1_DUO), statsMap.get(Stats.TOP1_SQUAD))
+						+ String.format(format, "K/D season", statsMap.get(Stats.KD_S3_SOLO), statsMap.get(Stats.KD_S3_DUO), statsMap.get(Stats.KD_S3_SQUAD))
+						+ String.format(format, "K/D lifetime", statsMap.get(Stats.KD_LT_SOLO), statsMap.get(Stats.KD_LT_DUO), statsMap.get(Stats.KD_LT_SQUAD))
+						+ "```";
+
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor("Fortnite Stats",
+								String.format("https://fortnitetracker.com/profile/%s/%s", platform.toString().toLowerCase(), NetUtils.encode(epicNickname)),
+								avatarUrl)
+						.setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
+						.setDescription(description);
+				loadingMsg.send(embed);
+
+			} catch (JSONException | IOException err) {
+				loadingMsg.send(ExceptionUtils.handleAndGet("getting Fortnite stats", context, err));
 			}
-
-			JSONObject mainObj = new JSONObject(response.parse().body().html());
-
-			if("Player Not Found".equals(mainObj.optString("error"))) {
-				loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Fortnite on this platform or doesn't exist.");
-				return;
-			}
-
-			JSONObject statsObj = mainObj.getJSONObject("stats");
-
-			Map<Stats, String> statsMap = new HashMap<>();
-
-			JSONObject soloStatsObj = statsObj.optJSONObject(SOLO_STATS);
-			statsMap.put(Stats.TOP1_SOLO, this.getTop1(soloStatsObj));
-			statsMap.put(Stats.KD_LT_SOLO, this.getKD(soloStatsObj));
-
-			JSONObject duoStatsObj = statsObj.optJSONObject(DUO_STATS);
-			statsMap.put(Stats.TOP1_DUO, this.getTop1(duoStatsObj));
-			statsMap.put(Stats.KD_LT_DUO, this.getKD(duoStatsObj));
-
-			JSONObject squadStatsObj = statsObj.optJSONObject(SQUAD_STATS);
-			statsMap.put(Stats.TOP1_SQUAD, this.getTop1(squadStatsObj));
-			statsMap.put(Stats.KD_LT_SQUAD, this.getKD(squadStatsObj));
-
-			JSONObject soloSeasonStatsObj = statsObj.optJSONObject(SEASON + SOLO_STATS);
-			statsMap.put(Stats.KD_S3_SOLO, this.getKD(soloSeasonStatsObj));
-
-			JSONObject duoSeasonStatsObj = statsObj.optJSONObject(SEASON + DUO_STATS);
-			statsMap.put(Stats.KD_S3_DUO, this.getKD(duoSeasonStatsObj));
-
-			JSONObject squadSeasonStatsObj = statsObj.optJSONObject(SEASON + SQUAD_STATS);
-			statsMap.put(Stats.KD_S3_SQUAD, this.getKD(squadSeasonStatsObj));
-
-			int length = 10;
-			String format = "%n%-" + (length + 5) + "s %-" + length + "s %-" + length + "s %-" + length + "s";
-
-			String description = String.format("Stats for user **%s**%n", epicNickname)
-					+ "```prolog"
-					+ String.format(format, " ", "Solo", "Duo", "Squad")
-					+ String.format(format, "Top 1", statsMap.get(Stats.TOP1_SOLO), statsMap.get(Stats.TOP1_DUO), statsMap.get(Stats.TOP1_SQUAD))
-					+ String.format(format, "K/D season", statsMap.get(Stats.KD_S3_SOLO), statsMap.get(Stats.KD_S3_DUO), statsMap.get(Stats.KD_S3_SQUAD))
-					+ String.format(format, "K/D lifetime", statsMap.get(Stats.KD_LT_SOLO), statsMap.get(Stats.KD_LT_DUO), statsMap.get(Stats.KD_LT_SQUAD))
-					+ "```";
-
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Fortnite Stats",
-					String.format("https://fortnitetracker.com/profile/%s/%s", platform.toString().toLowerCase(), NetUtils.encode(epicNickname)))
-					.setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
-					.setDescription(description);
-			loadingMsg.send(embed);
-
-		} catch (JSONException | IOException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting Fortnite stats", context, err));
-		}
+		});
 
 	}
 

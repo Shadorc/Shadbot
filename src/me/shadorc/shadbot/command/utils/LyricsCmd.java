@@ -73,10 +73,15 @@ public class LyricsCmd extends AbstractCommand {
 			String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
 			String lyrics = StringUtils.truncate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("Lyrics (%s - %s)", artist, title), url)
-					.setThumbnail(albumImg)
-					.setDescription(url + "\n\n" + lyrics);
-			loadingMsg.send(embed);
+			context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor(String.format("Lyrics (%s - %s)", artist, title),
+								url,
+								avatarUrl)
+						.setThumbnail(albumImg)
+						.setDescription(url + "\n\n" + lyrics);
+				loadingMsg.send(embed);
+			});
 
 		} catch (IOException err) {
 			loadingMsg.send(ExceptionUtils.handleAndGet("getting lyrics", context, err));

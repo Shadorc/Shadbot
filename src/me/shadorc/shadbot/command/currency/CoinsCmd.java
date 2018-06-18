@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.currency;
 
-import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -24,20 +23,18 @@ public class CoinsCmd extends AbstractCommand {
 		context.getMessage().getUserMentions()
 				.single()
 				.switchIfEmpty(context.getAuthor())
-				.subscribe(user -> this.execute(context, user));
+				.subscribe(user -> {
+					DBMember dbMember = Database.getDBMember(context.getGuildId().get(), user.getId());
+					String coins = FormatUtils.formatCoins(dbMember.getCoins());
+					String text;
+					if(user.getId().equals(context.getAuthorId())) {
+						text = String.format("(**%s**) You have **%s**.", user.getUsername(), coins);
+					} else {
+						text = String.format("**%s** has **%s**.", user.getUsername(), coins);
+					}
+					BotUtils.sendMessage(Emoji.PURSE + " " + text, context.getChannel());
+				});
 
-	}
-
-	private void execute(Context context, User user) {
-		DBMember dbMember = Database.getDBMember(context.getGuildId().get(), user.getId());
-		String coins = FormatUtils.formatCoins(dbMember.getCoins());
-		String text;
-		if(user.getId().equals(context.getAuthorId())) {
-			text = String.format("(**%s**) You have **%s**.", user.getUsername(), coins);
-		} else {
-			text = String.format("**%s** has **%s**.", user.getUsername(), coins);
-		}
-		BotUtils.sendMessage(Emoji.PURSE + " " + text, context.getChannel());
 	}
 
 	@Override

@@ -36,31 +36,34 @@ public class HelpCmd extends AbstractCommand {
 			return;
 		}
 
-		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Shadbot Help")
-				.setDescription(String.format("Any issues, questions or suggestions ?"
-						+ " Join the [support server.](%s)"
-						+ "%nGet more information by using `%s%s <command>`.",
-						Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
+		context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					.setAuthor("Shadbot Help", null, avatarUrl)
+					.setDescription(String.format("Any issues, questions or suggestions ?"
+							+ " Join the [support server.](%s)"
+							+ "%nGet more information by using `%s%s <command>`.",
+							Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
 
-		context.getAuthorPermission().subscribe(authorPerm -> {
-			for(CommandCategory category : CommandCategory.values()) {
-				if(category.equals(CommandCategory.HIDDEN)) {
-					continue;
+			context.getAuthorPermission().subscribe(authorPerm -> {
+				for(CommandCategory category : CommandCategory.values()) {
+					if(category.equals(CommandCategory.HIDDEN)) {
+						continue;
+					}
+
+					Flux.fromIterable(CommandManager.getCommands().values())
+							.distinct()
+							.filter(cmd -> cmd.getCategory().equals(category))
+							.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
+							.filter(cmd -> !context.getGuildId().isPresent() || BotUtils.isCommandAllowed(context.getGuildId().get(), cmd))
+							.map(AbstractCommand::getName)
+							.map(cmdName -> String.format("`%s%s`", context.getPrefix(), cmdName))
+							.collect(Collectors.joining(" "))
+							.filter(commands -> !commands.isEmpty())
+							.subscribe(commands -> embed.addField(String.format("%s Commands", category.toString()), commands, false));
 				}
 
-				Flux.fromIterable(CommandManager.getCommands().values())
-						.distinct()
-						.filter(cmd -> cmd.getCategory().equals(category))
-						.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
-						.filter(cmd -> !context.getGuildId().isPresent() || BotUtils.isCommandAllowed(context.getGuildId().get(), cmd))
-						.map(AbstractCommand::getName)
-						.map(cmdName -> String.format("`%s%s`", context.getPrefix(), cmdName))
-						.collect(Collectors.joining(" "))
-						.filter(commands -> !commands.isEmpty())
-						.subscribe(commands -> embed.addField(String.format("%s Commands", category.toString()), commands, false));
-			}
-
-			BotUtils.sendMessage(embed, context.getChannel());
+				BotUtils.sendMessage(embed, context.getChannel());
+			});
 		});
 	}
 

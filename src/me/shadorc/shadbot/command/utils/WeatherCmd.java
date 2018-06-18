@@ -12,10 +12,10 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -23,6 +23,7 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import net.aksingh.owmjapis.CurrentWeather;
 import net.aksingh.owmjapis.OpenWeatherMap;
 import net.aksingh.owmjapis.OpenWeatherMap.Units;
+import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.UTILS, names = { "weather" })
@@ -40,29 +41,34 @@ public class WeatherCmd extends AbstractCommand {
 			OpenWeatherMap owm = new OpenWeatherMap(Units.METRIC, APIKeys.get(APIKey.OPENWEATHERMAP_API_KEY));
 			CurrentWeather weather = owm.currentWeatherByCityName(context.getArg().get());
 
-			if(!weather.isValid()) {
-				loadingMsg.send(TextUtils.noResult(context.getArg().get()));
-				return;
-			}
+			context.getAuthor().subscribe(author -> {
+				if(!weather.isValid()) {
+					loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
+							author.getUsername(), context.getArg().get()));
+					return;
+				}
 
-			String clouds = StringUtils.capitalize(weather.getWeatherInstance(0).getWeatherDescription());
-			float windSpeed = weather.getWindInstance().getWindSpeed() * 3.6f;
-			String windDesc = this.getWindDesc(windSpeed);
-			String rain = weather.hasRainInstance() ? String.format("%.1f mm/h", weather.getRainInstance().getRain3h()) : "None";
-			float humidity = weather.getMainInstance().getHumidity();
-			float temperature = weather.getMainInstance().getTemperature();
+				String clouds = StringUtils.capitalize(weather.getWeatherInstance(0).getWeatherDescription());
+				float windSpeed = weather.getWindInstance().getWindSpeed() * 3.6f;
+				String windDesc = this.getWindDesc(windSpeed);
+				String rain = weather.hasRainInstance() ? String.format("%.1f mm/h", weather.getRainInstance().getRain3h()) : "None";
+				float humidity = weather.getMainInstance().getHumidity();
+				float temperature = weather.getMainInstance().getTemperature();
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Weather for: " + weather.getCityName(),
-					"http://openweathermap.org/city/" + weather.getCityCode())
-					.setThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
-					.setDescription("Last updated " + dateFormatter.format(weather.getDateTime()))
-					.addField(Emoji.CLOUD + " Clouds", clouds, true)
-					.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
-					.addField(Emoji.RAIN + " Rain", rain, true)
-					.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", humidity), true)
-					.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", temperature), true);
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor(String.format("Weather for: %s", weather.getCityName()),
+								String.format("http://openweathermap.org/city/%d", weather.getCityCode()),
+								DiscordUtils.getAvatarUrl(author))
+						.setThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
+						.setDescription("Last updated " + dateFormatter.format(weather.getDateTime()))
+						.addField(Emoji.CLOUD + " Clouds", clouds, true)
+						.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
+						.addField(Emoji.RAIN + " Rain", rain, true)
+						.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", humidity), true)
+						.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", temperature), true);
 
-			loadingMsg.send(embed);
+				loadingMsg.send(embed);
+			});
 		} catch (IOException err) {
 			loadingMsg.send(ExceptionUtils.handleAndGet("getting weather information", context, err));
 		}

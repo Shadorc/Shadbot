@@ -26,10 +26,13 @@ public class PlaylistCmd extends AbstractCommand {
 	public void execute(Context context) {
 		GuildMusic guildMusic = context.requireGuildMusic();
 
-		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Playlist")
-				.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-				.setDescription(this.formatPlaylist(guildMusic.getScheduler().getPlaylist()));
-		BotUtils.sendMessage(embed, context.getChannel());
+		context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					.setAuthor("Playlist", null, avatarUrl)
+					.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
+					.setDescription(this.formatPlaylist(guildMusic.getScheduler().getPlaylist()));
+			BotUtils.sendMessage(embed, context.getChannel());
+		});
 	}
 
 	private String formatPlaylist(BlockingQueue<AudioTrack> queue) {

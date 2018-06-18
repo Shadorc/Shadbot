@@ -49,16 +49,19 @@ public class ImageCmd extends AbstractCommand {
 				return;
 			}
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(
-					String.format("DeviantArt (Search: %s)", context.getArg().get()),
-					resultObj.getString("url"))
-					.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
-					.addField("Title", resultObj.getString("title"), false)
-					.addField("Author", resultObj.getJSONObject("author").getString("username"), false)
-					.addField("Category", resultObj.getString("category_path"), false)
-					.setImage(resultObj.getJSONObject("content").getString("src"));
+			context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor(String.format("DeviantArt (Search: %s)", context.getArg().get()),
+								resultObj.getString("url"),
+								avatarUrl)
+						.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
+						.addField("Title", resultObj.getString("title"), false)
+						.addField("Author", resultObj.getJSONObject("author").getString("username"), false)
+						.addField("Category", resultObj.getString("category_path"), false)
+						.setImage(resultObj.getJSONObject("content").getString("src"));
 
-			loadingMsg.send(embed);
+				loadingMsg.send(embed);
+			});
 
 		} catch (JSONException | IOException err) {
 			loadingMsg.send(ExceptionUtils.handleAndGet("getting an image", context, err));

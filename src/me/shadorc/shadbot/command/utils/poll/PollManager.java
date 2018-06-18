@@ -9,6 +9,7 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
@@ -55,8 +56,12 @@ class PollManager extends AbstractGameManager {
 	}
 
 	protected void show() {
+		// FIXME: Is the author always the creator ?
 		this.getContext().getAuthor().subscribe(author -> {
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("Poll (Created by: %s)", author.getUsername()))
+			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					.setAuthor(String.format("Poll (Created by: %s)", author.getUsername()),
+							null,
+							DiscordUtils.getAvatarUrl(author))
 					.setThumbnail(author.getAvatarHash().get())
 					.setDescription(String.format("Vote using: `%s%s <choice>`%n%n__**%s**__%s",
 							this.getContext().getPrefix(), this.getContext().getCommandName(),

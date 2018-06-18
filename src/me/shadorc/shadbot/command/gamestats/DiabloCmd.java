@@ -82,18 +82,21 @@ public class DiabloCmd extends AbstractCommand {
 				heroesMap.put(dps, String.format("**%s** (*%s*)", name, heroClass));
 			}
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Diablo 3 Stats")
-					.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
-					.setDescription(String.format("Stats for **%s** (Guild: **%s**)"
-							+ "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
-							+ "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
-							playerObj.getString("battleTag"), playerObj.getString("guildName"),
-							playerObj.getInt("paragonLevel"), playerObj.getInt("paragonLevelSeasonHardcore"),
-							playerObj.getInt("paragonLevelSeason"), playerObj.getInt("paragonLevelSeasonHardcore")))
-					.addField("Heroes", FormatUtils.format(heroesMap.values().stream(), Object::toString, "\n"), true)
-					.addField("Damage", FormatUtils.format(heroesMap.keySet().stream(),
-							dps -> String.format("%s DPS", FormatUtils.formatNum(dps)), "\n"), true);
-			loadingMsg.send(embed);
+			context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor("Diablo 3 Stats", null, avatarUrl)
+						.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
+						.setDescription(String.format("Stats for **%s** (Guild: **%s**)"
+								+ "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
+								+ "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
+								playerObj.getString("battleTag"), playerObj.getString("guildName"),
+								playerObj.getInt("paragonLevel"), playerObj.getInt("paragonLevelSeasonHardcore"),
+								playerObj.getInt("paragonLevelSeason"), playerObj.getInt("paragonLevelSeasonHardcore")))
+						.addField("Heroes", FormatUtils.format(heroesMap.values().stream(), Object::toString, "\n"), true)
+						.addField("Damage", FormatUtils.format(heroesMap.keySet().stream(),
+								dps -> String.format("%s DPS", FormatUtils.formatNum(dps)), "\n"), true);
+				loadingMsg.send(embed);
+			});
 
 		} catch (FileNotFoundException err) {
 			loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.");

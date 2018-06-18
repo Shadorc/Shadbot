@@ -51,11 +51,14 @@ public class ThisDayCmd extends AbstractCommand {
 					.map(Document::text)
 					.collect(Collectors.joining("\n\n"));
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed(String.format("On This Day (%s)", date), HOME_URL)
-					.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-					.setDescription(StringUtils.truncate(events, DiscordUtils.DESCRIPTION_CONTENT_LIMIT));
+			context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor(String.format("On This Day (%s)", date), HOME_URL, avatarUrl)
+						.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
+						.setDescription(StringUtils.truncate(events, DiscordUtils.DESCRIPTION_CONTENT_LIMIT));
 
-			loadingMsg.send(embed);
+				loadingMsg.send(embed);
+			});
 
 		} catch (IOException err) {
 			loadingMsg.send(ExceptionUtils.handleAndGet("getting events", context, err));

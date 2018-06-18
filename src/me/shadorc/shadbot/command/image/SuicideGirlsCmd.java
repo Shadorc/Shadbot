@@ -47,9 +47,10 @@ public class SuicideGirlsCmd extends AbstractCommand {
 				String imageUrl = girl.select("noscript").attr("data-retina");
 				String url = girl.getElementsByClass("facebook-share").attr("href");
 
-				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("SuicideGirls Image",
-						"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/SuicideGirls_logo.svg/1280px-SuicideGirls_logo.svg.png",
-						url)
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor("SuicideGirls Image",
+								"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/SuicideGirls_logo.svg/1280px-SuicideGirls_logo.svg.png",
+								url)
 						.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
 						.setImage(imageUrl);
 

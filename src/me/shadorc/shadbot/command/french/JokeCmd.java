@@ -31,25 +31,28 @@ public class JokeCmd extends AbstractCommand {
 	public void execute(Context context) {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		try {
-			String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d", ThreadLocalRandom.current().nextInt(1, 6));
-			Document doc = NetUtils.getDoc(url);
+		context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
+			try {
+				String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d", ThreadLocalRandom.current().nextInt(1, 6));
+				Document doc = NetUtils.getDoc(url);
 
-			List<String> jokes = doc.getElementsByClass("texte ").stream()
-					.map(Element::html)
-					.filter(elmt -> elmt.length() < 1000)
-					.collect(Collectors.toList());
+				List<String> jokes = doc.getElementsByClass("texte ").stream()
+						.map(Element::html)
+						.filter(elmt -> elmt.length() < 1000)
+						.collect(Collectors.toList());
 
-			String jokeHtml = jokes.get(ThreadLocalRandom.current().nextInt(jokes.size()));
-			String joke = FormatUtils.format(jokeHtml.split("<br>"), line -> Jsoup.parse(line).text().trim(), "\n");
+				String jokeHtml = jokes.get(ThreadLocalRandom.current().nextInt(jokes.size()));
+				String joke = FormatUtils.format(jokeHtml.split("<br>"), line -> Jsoup.parse(line).text().trim(), "\n");
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed("Blague", "http://www.une-blague.com/")
-					.setDescription(joke);
-			loadingMsg.send(embed);
+				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+						.setAuthor("Blague", "http://www.une-blague.com/", avatarUrl)
+						.setDescription(joke);
+				loadingMsg.send(embed);
 
-		} catch (IOException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting a joke", context, err));
-		}
+			} catch (IOException err) {
+				loadingMsg.send(ExceptionUtils.handleAndGet("getting a joke", context, err));
+			}
+		});
 	}
 
 	@Override
