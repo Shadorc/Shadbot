@@ -10,7 +10,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -26,7 +26,7 @@ public class SendMessageCmd extends AbstractCommand {
 
 		Long userId = NumberUtils.asPositiveLong(args.get(0));
 		if(userId == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", args.get(0)));
+			throw new CommandException(String.format("`%s` is not a valid user ID.", args.get(0)));
 		}
 
 		context.getClient().getUserById(Snowflake.of(userId)).defaultIfEmpty(null).subscribe(user -> {
@@ -36,11 +36,11 @@ public class SendMessageCmd extends AbstractCommand {
 			}
 
 			if(user.getId().equals(context.getSelfId())) {
-				throw new IllegalCmdArgumentException("I can't send a private message to myself.");
+				throw new CommandException("I can't send a private message to myself.");
 			}
 
 			if(user.isBot()) {
-				throw new IllegalCmdArgumentException("I can't send private message to other bots.");
+				throw new CommandException("I can't send private message to other bots.");
 			}
 
 			BotUtils.sendMessage(args.get(1), user.getPrivateChannel().cast(MessageChannel.class));

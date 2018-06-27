@@ -8,7 +8,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -32,7 +32,7 @@ public class BackwardCmd extends AbstractCommand {
 			try {
 				num = TimeUtils.parseTime(arg);
 			} catch (IllegalArgumentException err) {
-				throw new IllegalCmdArgumentException(String.format("`%s` is not a valid number / time.", arg));
+				throw new CommandException(String.format("`%s` is not a valid number / time.", arg));
 			}
 		}
 

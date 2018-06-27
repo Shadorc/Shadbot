@@ -9,7 +9,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.RelicType;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -27,7 +27,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 
 		RelicType type = Utils.getValueOrNull(RelicType.class, context.getArg().get());
 		if(type == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s`in not a valid type. %s",
+			throw new CommandException(String.format("`%s`in not a valid type. %s",
 					context.getArg(), FormatUtils.formatOptions(RelicType.class)));
 		}
 

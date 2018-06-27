@@ -10,7 +10,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -30,7 +30,7 @@ public class CalcCmd extends AbstractCommand {
 			BotUtils.sendMessage(Emoji.TRIANGULAR_RULER + String.format(" %s = %s",
 					expression.replace("*", "\\*"), engine.eval(expression)), context.getChannel());
 		} catch (ScriptException err) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid expression.", context.getArg()));
+			throw new CommandException(String.format("`%s` is not a valid expression.", context.getArg()));
 		}
 	}
 

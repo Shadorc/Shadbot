@@ -27,7 +27,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
@@ -126,13 +126,13 @@ public class Utils {
 	 * @param betStr - the bet value as string
 	 * @param maxValue - the maximum bet value
 	 * @return An Integer representing {@code betStr} converted as an integer if no error occurred or {@code null} otherwise
-	 * @throws IllegalCmdArgumentException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough coins or if
-	 *             the bet value is superior to {code maxValue}
+	 * @throws CommandException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough coins or if the bet value
+	 *             is superior to {code maxValue}
 	 */
 	public static Integer checkAndGetBet(Mono<MessageChannel> channel, Member member, String betStr, int maxValue) {
 		Integer bet = NumberUtils.asPositiveInt(betStr);
 		if(bet == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", betStr));
+			throw new CommandException(String.format("`%s` is not a valid amount for coins.", betStr));
 		}
 
 		if(Database.getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {

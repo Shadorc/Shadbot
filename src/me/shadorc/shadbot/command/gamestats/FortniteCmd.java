@@ -20,7 +20,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -62,7 +62,7 @@ public class FortniteCmd extends AbstractCommand {
 
 		Platform platform = Utils.getValueOrNull(Platform.class, args.get(0));
 		if(platform == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Platform. %s",
+			throw new CommandException(String.format("`%s` is not a valid Platform. %s",
 					args.get(0), FormatUtils.formatOptions(Platform.class)));
 		}
 

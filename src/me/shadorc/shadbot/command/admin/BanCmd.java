@@ -12,7 +12,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -55,14 +55,14 @@ public class BanCmd extends AbstractCommand {
 								}
 
 								if(mentionedUserIds.contains(context.getAuthorId())) {
-									throw new IllegalCmdArgumentException("You cannot ban yourself.");
+									throw new CommandException("You cannot ban yourself.");
 								}
 
 								context.getMessage().getUserMentions().buffer().subscribe(mentionedUsers -> {
 									StringBuilder reason = new StringBuilder();
 									reason.append(StringUtils.remove(context.getArg().get(), FormatUtils.format(mentionedUsers, User::getMention, " ")).trim());
 									if(reason.length() > DiscordUtils.MAX_REASON_LENGTH) {
-										throw new IllegalCmdArgumentException(String.format("Reason cannot exceed **%d characters**.", DiscordUtils.MAX_REASON_LENGTH));
+										throw new CommandException(String.format("Reason cannot exceed **%d characters**.", DiscordUtils.MAX_REASON_LENGTH));
 									}
 
 									if(reason.length() == 0) {

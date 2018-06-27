@@ -19,7 +19,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -62,7 +62,7 @@ public class SettingsCmd extends AbstractCommand {
 
 		SettingEnum settingEnum = Utils.getValueOrNull(SettingEnum.class, args.get(0));
 		if(settingEnum == null || !SETTINGS_MAP.containsKey(settingEnum)) {
-			throw new IllegalCmdArgumentException(String.format("Setting `%s` does not exist. Use `%shelp %s` to see all available settings.",
+			throw new CommandException(String.format("Setting `%s` does not exist. Use `%shelp %s` to see all available settings.",
 					args.get(0), context.getPrefix(), this.getName()));
 		}
 

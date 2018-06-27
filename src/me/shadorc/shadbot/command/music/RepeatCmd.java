@@ -6,7 +6,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.TrackScheduler;
 import me.shadorc.shadbot.music.TrackScheduler.RepeatMode;
@@ -28,7 +28,7 @@ public class RepeatCmd extends AbstractCommand {
 		if(context.getArg().isPresent()) {
 			mode = Utils.getValueOrNull(RepeatMode.class, context.getArg().get());
 			if(mode == null) {
-				throw new IllegalCmdArgumentException(String.format("`%s` is not a valid mode.", context.getArg().get()));
+				throw new CommandException(String.format("`%s` is not a valid mode.", context.getArg().get()));
 			}
 		}
 		// By default, modifications are made on song repeat mode

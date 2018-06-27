@@ -10,7 +10,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -83,7 +83,7 @@ public class OverwatchCmd extends AbstractCommand {
 	private Platform getPlatform(String str) {
 		Platform platform = Utils.getValueOrNull(Platform.class, str.toUpperCase());
 		if(platform == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Platform. %s",
+			throw new CommandException(String.format("`%s` is not a valid Platform. %s",
 					str, FormatUtils.formatOptions(Platform.class)));
 		}
 		return platform;

@@ -10,7 +10,7 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -26,7 +26,7 @@ public class StatsCmd extends AbstractCommand {
 		Map<String, Supplier<EmbedCreateSpec>> map = StatsManager.getStats();
 
 		if(!map.containsKey(context.getArg().get().toLowerCase())) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid category. Options: %s",
+			throw new CommandException(String.format("`%s` is not a valid category. Options: %s",
 					context.getArg(), FormatUtils.format(map.keySet().stream(), value -> String.format("`%s`", value), ", ")));
 		}
 

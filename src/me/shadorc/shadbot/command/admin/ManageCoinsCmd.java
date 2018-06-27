@@ -10,7 +10,7 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -32,17 +32,17 @@ public class ManageCoinsCmd extends AbstractCommand {
 
 		Action action = Utils.getValueOrNull(Action.class, args.get(0));
 		if(action == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. %s",
+			throw new CommandException(String.format("`%s` is not a valid action. %s",
 					args.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
 		Integer coins = NumberUtils.asInt(args.get(1));
 		if(coins == null && !Action.RESET.equals(action)) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid amount for coins.", args.get(1)));
+			throw new CommandException(String.format("`%s` is not a valid amount for coins.", args.get(1)));
 		}
 
 		if(context.getMessage().getUserMentionIds().isEmpty() && context.getMessage().getRoleMentionIds().isEmpty()) {
-			throw new IllegalCmdArgumentException("You must specify at least one user / role.");
+			throw new CommandException("You must specify at least one user / role.");
 		}
 
 		BotUtils.getUsersFrom(context.getMessage()).buffer().subscribe(users -> {

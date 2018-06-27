@@ -6,7 +6,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.TrackScheduler;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -34,7 +34,7 @@ public class VolumeCmd extends AbstractCommand {
 		final String arg = context.getArg().get();
 		Integer volume = NumberUtils.asPositiveInt(arg);
 		if(volume == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid volume.", arg));
+			throw new CommandException(String.format("`%s` is not a valid volume.", arg));
 		}
 
 		scheduler.setVolume(volume);

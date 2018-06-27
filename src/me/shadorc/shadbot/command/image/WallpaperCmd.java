@@ -28,7 +28,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -82,7 +82,7 @@ public class WallpaperCmd extends AbstractCommand {
 			cmdLine = new DefaultParser().parse(options, args.toArray(new String[args.size()]));
 		} catch (UnrecognizedOptionException | org.apache.commons.cli.MissingArgumentException err) {
 			loadingMsg.stopTyping();
-			throw new IllegalCmdArgumentException(String.format("%s. Use `%shelp %s` for more information.",
+			throw new CommandException(String.format("%s. Use `%shelp %s` for more information.",
 					err.getMessage(), context.getPrefix(), this.getName()));
 		} catch (ParseException err) {
 			loadingMsg.send(ExceptionUtils.handleAndGet("getting a wallpaper", context, err));
@@ -164,7 +164,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 	private void throwInvalidArg(LoadingMessage loadingMsg, Context context, String name) {
 		loadingMsg.stopTyping();
-		throw new IllegalCmdArgumentException(String.format("`%s` value is not valid. Use `%shelp %s` for more information.",
+		throw new CommandException(String.format("`%s` value is not valid. Use `%shelp %s` for more information.",
 				name, context.getPrefix(), this.getName()));
 	}
 

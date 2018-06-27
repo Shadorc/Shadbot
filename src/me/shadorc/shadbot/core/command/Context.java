@@ -16,7 +16,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.NoPlayingMusicException;
+import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -172,7 +172,7 @@ public class Context {
 	public GuildMusic requireGuildMusic() {
 		GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(this.getGuildId().get());
 		if(guildMusic == null || guildMusic.getScheduler().isStopped()) {
-			throw new NoPlayingMusicException();
+			throw new NoMusicException();
 		}
 		return guildMusic;
 	}

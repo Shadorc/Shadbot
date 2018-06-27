@@ -6,7 +6,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -32,7 +32,7 @@ public class HolidaysCmd extends AbstractCommand {
 
 		Zone zone = Utils.getValueOrNull(Zone.class, context.getArg().get());
 		if(zone == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid zone. %s",
+			throw new CommandException(String.format("`%s` is not a valid zone. %s",
 					context.getArg(), FormatUtils.formatOptions(Zone.class)));
 		}
 

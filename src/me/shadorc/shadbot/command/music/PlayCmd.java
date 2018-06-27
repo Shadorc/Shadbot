@@ -12,7 +12,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.premium.PremiumManager;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
@@ -51,13 +51,13 @@ public class PlayCmd extends AbstractCommand {
 					// If the bot is in a voice channel and the user is not in a channel or not in the same
 					if(botChannelId.isPresent() && !authorChannelId.map(botChannelId.get()::equals).orElse(false)) {
 						context.getClient().getVoiceChannelById(botChannelId.get()).subscribe(voiceChannel -> {
-							throw new IllegalCmdArgumentException(String.format("I'm currently playing music in voice channel %s"
+							throw new CommandException(String.format("I'm currently playing music in voice channel %s"
 									+ ", join me before using this command.", voiceChannel.getName())); // TODO: change getName to getMention
 						});
 					}
 
 					if(!authorChannelId.isPresent()) {
-						throw new IllegalCmdArgumentException("Join a voice channel before using this command.");
+						throw new CommandException("Join a voice channel before using this command.");
 					}
 
 					/*
@@ -83,7 +83,7 @@ public class PlayCmd extends AbstractCommand {
 					} else if(guildMusic.isWaiting()) {
 						if(guildMusic.getDjId().equals(context.getAuthorId())) {
 							context.getAuthor().map(User::getUsername).subscribe(username -> {
-								throw new IllegalCmdArgumentException(String.format("(**%s**) You're already selecting a music. "
+								throw new CommandException(String.format("(**%s**) You're already selecting a music. "
 										+ "Enter a number or use `%scancel` to cancel the selection.",
 										username, context.getPrefix()));
 							});

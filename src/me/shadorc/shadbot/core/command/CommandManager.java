@@ -19,9 +19,9 @@ import me.shadorc.shadbot.data.stats.CommandStatsManager;
 import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.NoPlayingMusicException;
+import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -122,7 +122,7 @@ public class CommandManager {
 
 	private static void onError(Context context, AbstractCommand command, RuntimeException exception) {
 		Throwable err = exception.getCause() == null ? exception : exception.getCause();
-		if(err instanceof IllegalCmdArgumentException) {
+		if(err instanceof CommandException) {
 			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
 			CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
 		} else if(err instanceof MissingArgumentException) {
@@ -132,7 +132,7 @@ public class CommandManager {
 						.setEmbed(helpEmbed), context.getChannel());
 				CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
 			});
-		} else if(err instanceof NoPlayingMusicException) {
+		} else if(err instanceof NoMusicException) {
 			BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
 		} else {
 			LogUtils.error(context.getClient(), context.getContent(), err,

@@ -16,7 +16,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -53,7 +53,7 @@ public class TranslateCmd extends AbstractCommand {
 
 		if(langFrom == null || langTo == null) {
 			loadingMsg.stopTyping();
-			throw new IllegalCmdArgumentException(String.format("One of the specified language doesn't exist. "
+			throw new CommandException(String.format("One of the specified language doesn't exist. "
 					+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 		}
 
@@ -65,7 +65,7 @@ public class TranslateCmd extends AbstractCommand {
 
 			if(!(result.get(0) instanceof JSONArray)) {
 				loadingMsg.stopTyping();
-				throw new IllegalCmdArgumentException(String.format("One of the specified language isn't supported. "
+				throw new CommandException(String.format("One of the specified language isn't supported. "
 						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 

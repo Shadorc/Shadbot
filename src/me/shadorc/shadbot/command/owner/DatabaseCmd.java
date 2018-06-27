@@ -15,7 +15,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.DBMember;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -31,7 +31,7 @@ public class DatabaseCmd extends AbstractCommand {
 
 		final Long guildId = NumberUtils.asPositiveLong(args.get(0));
 		if(guildId == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid guild ID.", args.get(0)));
+			throw new CommandException(String.format("`%s` is not a valid guild ID.", args.get(0)));
 		}
 
 		context.getClient().getGuildById(Snowflake.of(guildId))
@@ -39,7 +39,7 @@ public class DatabaseCmd extends AbstractCommand {
 				.defaultIfEmpty(Optional.empty())
 				.subscribe(optGuild -> {
 					if(!optGuild.isPresent()) {
-						throw new IllegalCmdArgumentException("Guild not found.");
+						throw new CommandException("Guild not found.");
 					}
 
 					final Guild guild = optGuild.get();
@@ -52,7 +52,7 @@ public class DatabaseCmd extends AbstractCommand {
 					} else if(args.size() == 2) {
 						Long userId = NumberUtils.asPositiveLong(args.get(1));
 						if(userId == null) {
-							throw new IllegalCmdArgumentException(String.format("`%s` is not a valid user ID.", args.get(0)));
+							throw new CommandException(String.format("`%s` is not a valid user ID.", args.get(0)));
 						}
 
 						DBMember dbUser = new DBMember(guild.getId(), Snowflake.of(userId));

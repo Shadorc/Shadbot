@@ -13,7 +13,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.DBMember;
 import me.shadorc.shadbot.data.db.Database;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -38,12 +38,12 @@ public class TransferCoinsCmd extends AbstractCommand {
 		Snowflake senderUserId = context.getAuthorId();
 		Snowflake receiverUserId = new ArrayList<>(context.getMessage().getUserMentionIds()).get(0);
 		if(receiverUserId.equals(senderUserId)) {
-			throw new IllegalCmdArgumentException("You cannot transfer coins to yourself.");
+			throw new CommandException("You cannot transfer coins to yourself.");
 		}
 
 		Integer coins = NumberUtils.asPositiveInt(args.get(0));
 		if(coins == null) {
-			throw new IllegalCmdArgumentException(
+			throw new CommandException(
 					String.format("`%s` is not a valid amount for coins.", args.get(0)));
 		}
 

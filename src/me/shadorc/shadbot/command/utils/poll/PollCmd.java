@@ -12,7 +12,7 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -44,7 +44,7 @@ public class PollCmd extends AbstractCommand {
 			else if(pollManager != null) {
 				Integer num = NumberUtils.asIntBetween(context.getArg().get(), 1, pollManager.getChoicesCount());
 				if(num == null) {
-					throw new IllegalCmdArgumentException(String.format("``%s` is not a valid number, must be between 1 and %d.",
+					throw new CommandException(String.format("``%s` is not a valid number, must be between 1 and %d.",
 							context.getArg(), pollManager.getChoicesCount()));
 				}
 				pollManager.vote(context.getAuthorId(), num);
@@ -73,21 +73,21 @@ public class PollCmd extends AbstractCommand {
 
 		Integer duration = NumberUtils.asIntBetween(args.get(0), MIN_DURATION, MAX_DURATION);
 		if(duration == null) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
+			throw new CommandException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
 					args.get(0), MIN_DURATION, MAX_DURATION));
 		}
 		spec.setDuration(duration);
 
 		List<String> substrings = StringUtils.getQuotedWords(args.get(1));
 		if(substrings.isEmpty() || StringUtils.countMatches(args.get(1), "\"") % 2 != 0) {
-			throw new IllegalCmdArgumentException("Question and choices cannot be empty and must be enclosed in quotation marks.");
+			throw new CommandException("Question and choices cannot be empty and must be enclosed in quotation marks.");
 		}
 		spec.setQuestion(substrings.get(0));
 
 		// Remove duplicate choices
 		List<String> choices = substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList());
 		if(!NumberUtils.isInRange(choices.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
-			throw new IllegalCmdArgumentException(String.format("You must specify between %d and %d different non-empty choices.",
+			throw new CommandException(String.format("You must specify between %d and %d different non-empty choices.",
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}
 		spec.setChoices(choices);
