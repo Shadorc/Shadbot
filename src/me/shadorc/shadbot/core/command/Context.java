@@ -3,9 +3,8 @@ package me.shadorc.shadbot.core.command;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 import discord4j.core.DiscordClient;
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
@@ -26,27 +25,18 @@ import reactor.core.publisher.Mono;
 
 public class Context {
 
-	private final Optional<Snowflake> guildId;
-	// The message is stored because it does not need to be reactive,
-	// a command is received and executed, it does not need to adapt to message
-	// modifications
-	private final Message message;
+	private final MessageCreateEvent event;// The event is stored because it does not need to be reactive
 	private final String prefix;
 	private final String cmdName;
 	private final Optional<String> arg;
 
-	public Context(@Nullable Snowflake guildId, Message message, String prefix) {
-		this.guildId = Optional.ofNullable(guildId);
-		this.message = message;
+	public Context(MessageCreateEvent event, String prefix) {
+		this.event = event;
 		this.prefix = prefix;
 
 		List<String> splittedMsg = StringUtils.split(this.getContent(), 2);
 		this.cmdName = splittedMsg.get(0).substring(prefix.length()).toLowerCase();
 		this.arg = Optional.ofNullable(splittedMsg.size() > 1 ? splittedMsg.get(1) : null);
-	}
-
-	public Message getMessage() {
-		return message;
 	}
 
 	public String getPrefix() {
@@ -62,7 +52,7 @@ public class Context {
 	}
 
 	public DiscordClient getClient() {
-		return this.getMessage().getClient();
+		return event.getClient();
 	}
 
 	public int getShardIndex() {
@@ -81,16 +71,20 @@ public class Context {
 		return this.getClient().getSelfId().get();
 	}
 
+	public Message getMessage() {
+		return event.getMessage();
+	}
+
 	public String getContent() {
 		return this.getMessage().getContent().get();
 	}
 
 	public Optional<Snowflake> getGuildId() {
-		return guildId;
+		return event.getGuildId();
 	}
 
 	public Mono<Guild> getGuild() {
-		return this.getMessage().getGuild();
+		return event.getGuild();
 	}
 
 	public Snowflake getChannelId() {
@@ -113,8 +107,8 @@ public class Context {
 		return DiscordUtils.getAvatarUrl(this.getAuthor());
 	}
 
-	public Mono<Member> getMember() {
-		return this.getMessage().getAuthor().flatMap(member -> member.asMember(this.getGuildId().get()));
+	public Optional<Member> getMember() {
+		return event.getMember();
 	}
 
 	public Mono<CommandPermission> getAuthorPermission() {

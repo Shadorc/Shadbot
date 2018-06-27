@@ -25,30 +25,30 @@ public class MessageListener {
 		final Optional<Snowflake> guildId = event.getGuildId();
 
 		Mono.just(event.getMessage())
-			.filter(msg -> msg.getContent().isPresent() && msg.getAuthorId().isPresent())
-			.flatMap(Message::getAuthor)
-			.filter(user -> !user.isBot())
-			.flatMap(author -> event.getMessage().getChannel())
-			.filter(chnl -> chnl.getType().equals(Type.DM))
-			.switchIfEmpty(Mono.fromRunnable(() -> MessageListener.onPrivateMessage(event.getMessage())))
-			.filter(chnl -> BotUtils.isChannelAllowed(guildId.get(), chnl.getId()))
-			.flatMapMany(channel -> event.getMember().get().getRoles().buffer())
-			.defaultIfEmpty(Collections.emptyList())
-			.single()
-			.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
-			.filter(roles -> !MessageManager.intercept(guildId.get(), event.getMessage()))
-			.map(roles -> Database.getDBGuild(guildId.get()).getPrefix())
-			.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
-			.doOnSuccess(prefix -> CommandManager.execute(new Context(guildId.get(), event.getMessage(), prefix)))
-			.subscribe();
+				.filter(msg -> msg.getContent().isPresent() && msg.getAuthorId().isPresent())
+				.flatMap(Message::getAuthor)
+				.filter(user -> !user.isBot())
+				.flatMap(author -> event.getMessage().getChannel())
+				.filter(chnl -> chnl.getType().equals(Type.DM))
+				.switchIfEmpty(Mono.fromRunnable(() -> MessageListener.onPrivateMessage(event)))
+				.filter(chnl -> BotUtils.isChannelAllowed(guildId.get(), chnl.getId()))
+				.flatMapMany(channel -> event.getMember().get().getRoles().buffer())
+				.defaultIfEmpty(Collections.emptyList())
+				.single()
+				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
+				.filter(roles -> !MessageManager.intercept(guildId.get(), event.getMessage()))
+				.map(roles -> Database.getDBGuild(guildId.get()).getPrefix())
+				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
+				.doOnSuccess(prefix -> CommandManager.execute(new Context(event, prefix)))
+				.subscribe();
 	}
 
-	private static Mono<Void> onPrivateMessage(Message message) {
+	private static Mono<Void> onPrivateMessage(MessageCreateEvent event) {
 		VariousStatsManager.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
 
-		String msgContent = message.getContent().get();
+		String msgContent = event.getMessage().getContent().get();
 		if(msgContent.startsWith(Config.DEFAULT_PREFIX + "help")) {
-			CommandManager.getCommand("help").execute(new Context(null, message, Config.DEFAULT_PREFIX));
+			CommandManager.getCommand("help").execute(new Context(event, Config.DEFAULT_PREFIX));
 			return Mono.empty();
 		}
 
@@ -58,7 +58,8 @@ public class MessageListener {
 				+ "join my support server : %s",
 				Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-		return message.getChannel()
+		return event.getMessage()
+				.getChannel()
 				.flatMap(channel -> {
 					if(!channel.getLastMessageId().isPresent()) {
 						BotUtils.sendMessage(text, channel);
