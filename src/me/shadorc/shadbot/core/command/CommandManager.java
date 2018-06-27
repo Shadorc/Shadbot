@@ -76,68 +76,64 @@ public class CommandManager {
 			return;
 		}
 
-		Snowflake guildId = context.getGuildId().get();
-		Snowflake channelId = context.getChannelId();
-		Snowflake userId = context.getAuthorId();
+		final Snowflake guildId = context.getGuildId().get();
 
 		Predicate<? super CommandPermission> hasPermission = userPerm -> {
 			if(command.getPermission().isSuperior(userPerm)) {
-				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel());
+				context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", channel))
+						.subscribe();
 				return false;
 			}
 			return true;
 		};
 
-		Predicate<? super CommandPermission> isRateLimited = userPerm -> {
-			Optional<RateLimiter> rateLimiter = command.getRateLimiter();
+		Predicate<? super AbstractCommand> isRateLimited = cmd -> {
+			Optional<RateLimiter> rateLimiter = cmd.getRateLimiter();
 			if(!rateLimiter.isPresent()) {
 				return false;
 			}
 
-			if(rateLimiter.get().isLimitedAndWarn(context.getClient(), guildId, channelId, userId)) {
-				CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, command);
+			if(rateLimiter.get().isLimitedAndWarn(context.getClient(), guildId, context.getChannelId(), context.getAuthorId())) {
+				CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, cmd);
 				return true;
 			}
 			return false;
 		};
 
-		Mono.just(command)
-				// The command is allowed in the guild
-				.filter(cmd -> BotUtils.isCommandAllowed(guildId, cmd))
-				.flatMap(cmd -> context.getAuthorPermission())
+		context.getAuthorPermission()
 				// The author has the permission to execute this command
 				.filter(hasPermission)
+				.flatMap(perm -> Mono.just(command))
+				// The command is allowed in the guild
+				.filter(cmd -> BotUtils.isCommandAllowed(guildId, cmd))
 				// The user is not rate limited
 				.filter(isRateLimited.negate())
-				.subscribe(perm -> {
-					try {
-						command.execute(context);
-						CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
-						VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
-					} catch (RuntimeException err) {
-						CommandManager.onError(context, command, err);
-					}
-				});
-	}
-
-	private static void onError(Context context, AbstractCommand command, RuntimeException exception) {
-		Throwable err = exception.getCause() == null ? exception : exception.getCause();
-		if(err instanceof CommandException) {
-			BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel());
-			CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
-		} else if(err instanceof MissingArgumentException) {
-			command.getHelp(context).subscribe(helpEmbed -> {
-				BotUtils.sendMessage(new MessageCreateSpec()
-						.setContent(TextUtils.MISSING_ARG)
-						.setEmbed(helpEmbed), context.getChannel());
-				CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
-			});
-		} else if(err instanceof NoMusicException) {
-			BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
-		} else {
-			LogUtils.error(context.getClient(), context.getContent(), err,
-					String.format("{Guild ID: %d} An unknown error occurred while executing a command.", context.getGuildId().get()));
-		}
+				.map(cmd -> cmd.execute(context))
+				.doOnError(CommandException.class, err -> {
+					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel()).subscribe();
+					CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
+				})
+				.doOnError(MissingArgumentException.class, err -> {
+					command.getHelp(context)
+							.flatMap(embed -> BotUtils.sendMessage(new MessageCreateSpec()
+									.setContent(TextUtils.MISSING_ARG)
+									.setEmbed(embed), context.getChannel()))
+							.subscribe();
+					CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
+				})
+				.doOnError(NoMusicException.class, err -> {
+					BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel()).subscribe();
+				})
+				.doOnError(err -> {
+					LogUtils.error(context.getClient(), context.getContent(), err,
+							String.format("{Guild ID: %d} An unknown error occurred while executing a command.", context.getGuildId().get()));
+				})
+				.doOnSuccess(perm -> {
+					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
+					VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
+				})
+				.subscribe();
 	}
 
 	public static Map<String, AbstractCommand> getCommands() {

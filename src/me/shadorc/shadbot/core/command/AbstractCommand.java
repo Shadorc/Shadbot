@@ -34,7 +34,7 @@ public abstract class AbstractCommand {
 		}
 	}
 
-	public abstract void execute(Context context);
+	public abstract Mono<Void> execute(Context context);
 
 	public abstract Mono<EmbedCreateSpec> getHelp(Context context);
 
