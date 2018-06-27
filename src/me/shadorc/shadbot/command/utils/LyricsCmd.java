@@ -55,9 +55,9 @@ public class LyricsCmd extends AbstractCommand {
 
 			// If the direct search found nothing
 			if(response.statusCode() == 404 || response.parse().text().contains("Oops! We couldn't find that page.")) {
-				url = String.format("%s/search/%s-%s?", HOME_URL, artistSrch, titleSrch);
+				final String searchUrl = String.format("%s/search/%s-%s?", HOME_URL, artistSrch, titleSrch);
 				// Make a search request on the site
-				Document searchDoc = NetUtils.getDoc(url);
+				Document searchDoc = NetUtils.getDoc(searchUrl);
 				Element trackListElement = searchDoc.getElementsByClass("tracks list").first();
 				if(trackListElement == null) {
 					loadingMsg.send(TextUtils.noResult(context.getArg().get()));
@@ -67,19 +67,20 @@ public class LyricsCmd extends AbstractCommand {
 				url = HOME_URL + trackListElement.getElementsByClass("title").attr("href");
 				doc = NetUtils.getDoc(url).outputSettings(PRESERVE_FORMAT);
 			}
-
-			String artist = doc.getElementsByClass("mxm-track-title__artist").html();
-			String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
-			String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
-			String lyrics = StringUtils.truncate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
+			
+			final String artist = doc.getElementsByClass("mxm-track-title__artist").html();
+			final String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
+			final String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
+			final String lyrics = StringUtils.truncate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
+			final String finalUrl = url;
 
 			context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
 				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 						.setAuthor(String.format("Lyrics (%s - %s)", artist, title),
-								url,
+								finalUrl,
 								avatarUrl)
 						.setThumbnail(albumImg)
-						.setDescription(url + "\n\n" + lyrics);
+						.setDescription(finalUrl + "\n\n" + lyrics);
 				loadingMsg.send(embed);
 			});
 
