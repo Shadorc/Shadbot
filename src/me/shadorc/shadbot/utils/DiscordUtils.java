@@ -57,7 +57,7 @@ public class DiscordUtils {
 
 	public static Mono<Boolean> hasPermissions(Mono<User> user, Snowflake guildId, Permission... permissions) {
 		return user.flatMap(usr -> usr.asMember(guildId))
-			.flatMap(member -> DiscordUtils.hasPermissions(member, permissions));
+				.flatMap(member -> DiscordUtils.hasPermissions(member, permissions));
 	}
 
 	public static Mono<Optional<Snowflake>> getVoiceChannelId(Mono<Member> member) {

@@ -67,7 +67,7 @@ public class LyricsCmd extends AbstractCommand {
 				url = HOME_URL + trackListElement.getElementsByClass("title").attr("href");
 				doc = NetUtils.getDoc(url).outputSettings(PRESERVE_FORMAT);
 			}
-			
+
 			final String artist = doc.getElementsByClass("mxm-track-title__artist").html();
 			final String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
 			final String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");

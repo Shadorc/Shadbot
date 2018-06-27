@@ -57,7 +57,6 @@ public class CommandManager {
 					if(COMMANDS_MAP.putIfAbsent(name, cmd) != null) {
 						LogUtils.error(String.format("Command name collision between %s and %s",
 								cmdName, COMMANDS_MAP.get(name).getClass().getSimpleName()));
-						continue;
 					}
 				}
 			} catch (Exception err) {
