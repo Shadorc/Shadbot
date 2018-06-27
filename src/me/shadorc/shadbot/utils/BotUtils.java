@@ -27,41 +27,40 @@ import reactor.core.publisher.Mono;
 
 public class BotUtils {
 
-	public static void sendMessage(String content, Mono<MessageChannel> channel) {
-		channel.subscribe(msgChannel -> BotUtils.sendMessage(content, msgChannel));
+	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
+		return BotUtils.sendMessage(new MessageCreateSpec().setContent(content), channel);
 	}
 
-	public static void sendMessage(String content, MessageChannel channel) {
-		BotUtils.sendMessage(new MessageCreateSpec().setContent(content), channel).subscribe();
+	public static Mono<Message> sendMessage(EmbedCreateSpec embed, Mono<MessageChannel> channel) {
+		return channel.flatMap(chnl -> BotUtils.sendMessage(embed, chnl));
 	}
 
-	public static void sendMessage(EmbedCreateSpec embed, Mono<MessageChannel> channel) {
-		channel.subscribe(msgChannel -> BotUtils.sendMessage(embed, msgChannel));
+	public static Mono<Message> sendMessage(String content, Mono<MessageChannel> channel) {
+		return channel.flatMap(chnl -> BotUtils.sendMessage(content, chnl));
 	}
 
-	public static void sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
-		VariousStatsManager.log(VariousEnum.EMBEDS_SENT);
-
-		BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel)
+	public static Mono<Message> sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
+		return BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel)
+				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.EMBEDS_SENT))
 				.doOnError(ExceptionUtils::isForbidden,
-						err -> BotUtils.sendMessage(TextUtils.missingPerm(Permission.EMBED_LINKS), channel))
-				.subscribe();
+						err -> {
+							BotUtils.sendMessage(TextUtils.missingPerm(Permission.EMBED_LINKS), channel);
+							LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send an embed.", channel.getId().asLong());
+						});
 	}
 
-	public static void sendMessage(MessageCreateSpec message, Mono<MessageChannel> channel) {
-		channel.flatMap(msgChannel -> BotUtils.sendMessage(message, msgChannel)).subscribe();
+	public static Mono<Message> sendMessage(MessageCreateSpec message, Mono<MessageChannel> channel) {
+		return channel.flatMap(chnl -> BotUtils.sendMessage(message, chnl));
 	}
 
 	public static Mono<Message> sendMessage(MessageCreateSpec message, MessageChannel channel) {
-		VariousStatsManager.log(VariousEnum.MESSAGES_SENT);
-
 		return channel.createMessage(message)
+				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT))
 				.doOnError(ExceptionUtils::isForbidden,
 						err -> LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send a message.", channel.getId().asLong()))
 				.doOnError(
-						err -> {
-							LogUtils.error(channel.getClient(), err, String.format("{Channel ID: %d} An error occurred while sending a message.", channel.getId().asLong()));
-						});
+						err -> LogUtils.error(channel.getClient(), err,
+								String.format("{Channel ID: %d} An error occurred while sending a message.", channel.getId().asLong())));
 	}
 
 	// TOOD
