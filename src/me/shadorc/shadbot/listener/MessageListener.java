@@ -1,11 +1,11 @@
 package me.shadorc.shadbot.listener;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
@@ -22,50 +22,34 @@ public class MessageListener {
 	public static void onMessageCreate(MessageCreateEvent event) {
 		VariousStatsManager.log(VariousEnum.MESSAGES_RECEIVED);
 
+		final Optional<Snowflake> guildId = event.getGuildId();
+
 		Mono.just(event.getMessage())
-				// Ignore webhook
-				.filter(message -> message.getContent().isPresent()
-						&& message.getAuthorId().isPresent())
-				.flatMap(message -> message.getAuthor())
-				// Do not answer to bot
-				.filter(author -> !author.isBot())
-				.flatMap(author -> event.getMessage().getChannel())
-				.subscribe(channel -> {
-					// The channel is a private channel
-					if(channel.getType().equals(Type.DM)) {
-						MessageListener.onPrivateMessage(channel, event.getMessage());
-						return;
-					}
-
-					final Snowflake guildId = event.getGuildId().get();
-
-					// The bot does not have the permission to access this channel
-					if(!BotUtils.isChannelAllowed(guildId, channel.getId())) {
-						return;
-					}
-
-					event.getMember().get()
-							.getRoles()
-							.buffer()
-							.defaultIfEmpty(Collections.emptyList())
-							// The author role is allowed to access to the bot
-							.filter(roleList -> BotUtils.hasAllowedRole(guildId, roleList))
-							// No listener have the priority on this listener and stopped the process
-							.filter(roleList -> !MessageManager.intercept(guildId, event.getMessage()))
-							.map(roleList -> Database.getDBGuild(guildId).getPrefix())
-							// The message content start with the correct prefix
-							.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
-							.subscribe(prefix -> CommandManager.execute(new Context(guildId, event.getMessage(), prefix)));
-				});
+			.filter(msg -> msg.getContent().isPresent() && msg.getAuthorId().isPresent())
+			.flatMap(Message::getAuthor)
+			.filter(user -> !user.isBot())
+			.flatMap(author -> event.getMessage().getChannel())
+			.filter(chnl -> chnl.getType().equals(Type.DM))
+			.switchIfEmpty(Mono.fromRunnable(() -> MessageListener.onPrivateMessage(event.getMessage())))
+			.filter(chnl -> BotUtils.isChannelAllowed(guildId.get(), chnl.getId()))
+			.flatMapMany(channel -> event.getMember().get().getRoles().buffer())
+			.defaultIfEmpty(Collections.emptyList())
+			.single()
+			.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
+			.filter(roles -> !MessageManager.intercept(guildId.get(), event.getMessage()))
+			.map(roles -> Database.getDBGuild(guildId.get()).getPrefix())
+			.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
+			.doOnSuccess(prefix -> CommandManager.execute(new Context(guildId.get(), event.getMessage(), prefix)))
+			.subscribe();
 	}
 
-	private static void onPrivateMessage(MessageChannel channel, Message message) {
+	private static Mono<Void> onPrivateMessage(Message message) {
 		VariousStatsManager.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
 
 		String msgContent = message.getContent().get();
 		if(msgContent.startsWith(Config.DEFAULT_PREFIX + "help")) {
 			CommandManager.getCommand("help").execute(new Context(null, message, Config.DEFAULT_PREFIX));
-			return;
+			return Mono.empty();
 		}
 
 		final String text = String.format("Hello !"
@@ -74,16 +58,20 @@ public class MessageListener {
 				+ "join my support server : %s",
 				Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-		if(!channel.getLastMessageId().isPresent()) {
-			BotUtils.sendMessage(text, channel);
-		} else {
-			channel.getMessagesBefore(channel.getLastMessageId().get())
-					// Return true if help text has not already been send
-					.filter(historyMsg -> historyMsg.getContent().map(content -> !text.equalsIgnoreCase(content)).orElse(true))
-					// Send the message even if an error occured
-					.doOnTerminate(() -> BotUtils.sendMessage(text, channel))
-					.subscribe();
-		}
-
+		return message.getChannel()
+				.flatMap(channel -> {
+					if(!channel.getLastMessageId().isPresent()) {
+						BotUtils.sendMessage(text, channel);
+						return Mono.empty();
+					} else {
+						return channel.getMessagesBefore(channel.getLastMessageId().get())
+								// Return true if help text has not already been send
+								.filter(historyMsg -> historyMsg.getContent().map(content -> !text.equalsIgnoreCase(content)).orElse(true))
+								// Send the message even if an error t is re
+								.doOnTerminate(() -> BotUtils.sendMessage(text, channel))
+								.single();
+					}
+				})
+				.then();
 	}
 }
