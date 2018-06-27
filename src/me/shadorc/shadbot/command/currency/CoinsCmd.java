@@ -19,21 +19,25 @@ import reactor.core.publisher.Mono;
 public class CoinsCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		context.getMessage().getUserMentions()
+	public Mono<Void> execute(Context context) {
+		return context.getMessage()
+				.getUserMentions()
 				.single()
 				.switchIfEmpty(context.getAuthor())
-				.subscribe(user -> {
-					DBMember dbMember = Database.getDBMember(context.getGuildId().get(), user.getId());
-					String coins = FormatUtils.formatCoins(dbMember.getCoins());
+				.map(user -> {
+					final DBMember dbMember = Database.getDBMember(context.getGuildId().get(), user.getId());
+					final String coins = FormatUtils.formatCoins(dbMember.getCoins());
+
 					String text;
 					if(user.getId().equals(context.getAuthorId())) {
 						text = String.format("(**%s**) You have **%s**.", user.getUsername(), coins);
 					} else {
 						text = String.format("**%s** has **%s**.", user.getUsername(), coins);
 					}
-					BotUtils.sendMessage(Emoji.PURSE + " " + text, context.getChannel());
-				});
+
+					return BotUtils.sendMessage(Emoji.PURSE + " " + text, context.getChannel());
+				})
+				.then();
 
 	}
 
