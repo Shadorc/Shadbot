@@ -40,7 +40,7 @@ public class KickCmd extends AbstractCommand {
 
 		Snowflake guildId = context.getGuildId().get();
 
-		DiscordUtils.hasPermissions(context.getMember(), Permission.KICK_MEMBERS)
+		DiscordUtils.hasPermissions(context.getMember().get(), Permission.KICK_MEMBERS)
 				.subscribe(canUserKick -> {
 
 					if(!canUserKick) {

@@ -47,16 +47,17 @@ public class DiscordUtils {
 		return ((color.getRed() & 0xFF) << 16) | ((color.getGreen() & 0xFF) << 8) | (color.getBlue() & 0xFF);
 	}
 
-	public static Mono<Boolean> hasPermissions(Mono<Member> member, Permission... permissions) {
-		return member.flatMapMany(Member::getRoles)
+	public static Mono<Boolean> hasPermissions(Member member, Permission... permissions) {
+		return member.getRoles()
 				.map(Role::getPermissions)
 				.map(ArrayList::new)
 				.map(ArrayList::stream)
 				.all(stream -> stream.allMatch(perm -> Arrays.asList(permissions).contains(perm)));
 	}
 
-	public static Mono<Boolean> hasPermissions(Mono<User> member, Snowflake guildId, Permission... permissions) {
-		return DiscordUtils.hasPermissions(member.flatMap(user -> user.asMember(guildId)), permissions);
+	public static Mono<Boolean> hasPermissions(Mono<User> user, Snowflake guildId, Permission... permissions) {
+		return user.flatMap(usr -> usr.asMember(guildId))
+			.flatMap(member -> DiscordUtils.hasPermissions(member, permissions));
 	}
 
 	public static Mono<Optional<Snowflake>> getVoiceChannelId(Mono<Member> member) {

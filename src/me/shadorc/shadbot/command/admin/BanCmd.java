@@ -37,7 +37,7 @@ public class BanCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		DiscordUtils.hasPermissions(context.getMember(), Permission.BAN_MEMBERS)
+		DiscordUtils.hasPermissions(context.getMember().get(), Permission.BAN_MEMBERS)
 				.subscribe(canUserBan -> {
 
 					if(!canUserBan) {
