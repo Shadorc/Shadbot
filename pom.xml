@@ -6,6 +6,15 @@
 	<groupId>me.shadorc.shadbot</groupId>
 	<artifactId>shadbot</artifactId>
 	<version>2.2.2</version>
+	<name>Shadbot</name>
+	<url>https://github.com/Shadorc/Shadbot</url>
+	<description>Discord bot using Discord4J that plays musics, executes useful, admin and fun commands, play games and more.</description>
+	<licenses>
+		<license>
+			<name>GNU General Public License v3.0</name>
+			<url>https://www.gnu.org/licenses/gpl.html</url>
+		</license>
+	</licenses>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
