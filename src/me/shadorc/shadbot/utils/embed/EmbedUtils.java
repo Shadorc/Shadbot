@@ -5,7 +5,6 @@ import java.util.Map;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 
@@ -13,7 +12,7 @@ public class EmbedUtils {
 
 	public static EmbedCreateSpec getDefaultEmbed() {
 		return new EmbedCreateSpec()
-				.setColor(DiscordUtils.convertColor(Config.BOT_COLOR));
+				.setColor(Config.BOT_COLOR);
 	}
 
 	public static <K, V extends Number> EmbedCreateSpec getStatsEmbed(Map<K, V> statsMap, String name) {

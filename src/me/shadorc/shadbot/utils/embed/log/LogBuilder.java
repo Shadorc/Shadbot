@@ -36,13 +36,13 @@ public class LogBuilder {
 
 		switch (type) {
 			case ERROR:
-				embed.setColor(Color.RED.getRGB());
+				embed.setColor(Color.RED);
 				break;
 			case WARN:
-				embed.setColor(Color.ORANGE.getRGB());
+				embed.setColor(Color.ORANGE);
 				break;
 			case INFO:
-				embed.setColor(Color.GREEN.getRGB());
+				embed.setColor(Color.GREEN);
 				break;
 		}
 

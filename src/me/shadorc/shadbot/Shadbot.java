@@ -8,8 +8,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import discord4j.core.ClientBuilder;
 import discord4j.core.DiscordClient;
+import discord4j.core.DiscordClientBuilder;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
@@ -52,7 +52,7 @@ public class Shadbot {
 		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(shardCount, "shard"));
 
 		for(int i = 0; i < shardCount; i++) {
-			DiscordClient client = new ClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
+			DiscordClient client = new DiscordClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
 					.setInitialPresence(Presence.idle(Activity.playing("Connecting...")))
 					.setShardIndex(i)
 					.setShardCount(shardCount)

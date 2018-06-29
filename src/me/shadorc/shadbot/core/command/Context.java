@@ -12,6 +12,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Image;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -104,7 +105,7 @@ public class Context {
 	}
 
 	public Mono<String> getAuthorAvatarUrl() {
-		return DiscordUtils.getAvatarUrl(this.getAuthor());
+		return this.getAuthor().map(User::getDefaultAvatar).map(Image::getUrl);
 	}
 
 	public Optional<Member> getMember() {
