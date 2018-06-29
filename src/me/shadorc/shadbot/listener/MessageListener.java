@@ -25,19 +25,27 @@ public class MessageListener {
 		final Optional<Snowflake> guildId = event.getGuildId();
 
 		Mono.just(event.getMessage())
-				.filter(msg -> msg.getContent().isPresent() && msg.getAuthorId().isPresent())
+				// The content is not a Webhook
+				.filter(message -> message.getContent().isPresent() && message.getAuthorId().isPresent())
 				.flatMap(Message::getAuthor)
-				.filter(user -> !user.isBot())
+				// the author is not a bot
+				.filter(author -> !author.isBot())
 				.flatMap(author -> event.getMessage().getChannel())
-				.filter(chnl -> chnl.getType().equals(Type.DM))
+				// This is not a private message...
+				.filter(channel -> !channel.getType().equals(Type.DM))
+				// ... else switch to #onPrivateMessage
 				.switchIfEmpty(Mono.fromRunnable(() -> MessageListener.onPrivateMessage(event)))
-				.filter(chnl -> BotUtils.isChannelAllowed(guildId.get(), chnl.getId()))
+				// The channel is allowed
+				.filter(channel -> BotUtils.isChannelAllowed(guildId.get(), channel.getId()))
 				.flatMapMany(channel -> event.getMember().get().getRoles().buffer())
 				.defaultIfEmpty(Collections.emptyList())
 				.single()
+				// The role is allowed
 				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
+				// The message has not been intercepted
 				.filter(roles -> !MessageManager.intercept(guildId.get(), event.getMessage()))
 				.map(roles -> Database.getDBGuild(guildId.get()).getPrefix())
+				// The message starts with the correct prefix
 				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
 				.doOnSuccess(prefix -> CommandManager.execute(new Context(event, prefix)))
 				.subscribe();
