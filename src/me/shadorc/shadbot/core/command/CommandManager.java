@@ -69,19 +69,17 @@ public class CommandManager {
 		return true;
 	}
 
-	public static void execute(Context context) {
+	public static Mono<Void> execute(Context context) {
 		AbstractCommand command = COMMANDS_MAP.get(context.getCommandName());
 		if(command == null) {
-			return;
+			return Mono.empty();
 		}
 
 		final Snowflake guildId = context.getGuildId().get();
 
 		Predicate<? super CommandPermission> hasPermission = userPerm -> {
 			if(command.getPermission().isSuperior(userPerm)) {
-				context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", channel))
-						.subscribe();
+				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel()).subscribe();
 				return false;
 			}
 			return true;
@@ -100,7 +98,7 @@ public class CommandManager {
 			return false;
 		};
 
-		context.getAuthorPermission()
+		return context.getAuthorPermission()
 				// The author has the permission to execute this command
 				.filter(hasPermission)
 				.flatMap(perm -> Mono.just(command))
@@ -108,7 +106,7 @@ public class CommandManager {
 				.filter(cmd -> BotUtils.isCommandAllowed(guildId, cmd))
 				// The user is not rate limited
 				.filter(isRateLimited.negate())
-				.map(cmd -> cmd.execute(context))
+				.flatMap(cmd -> cmd.execute(context))
 				.doOnError(CommandException.class, err -> {
 					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel()).subscribe();
 					CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
@@ -131,8 +129,7 @@ public class CommandManager {
 				.doOnSuccess(perm -> {
 					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
 					VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
-				})
-				.subscribe();
+				});
 	}
 
 	public static Map<String, AbstractCommand> getCommands() {

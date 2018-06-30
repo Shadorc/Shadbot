@@ -47,7 +47,7 @@ public class MessageListener {
 				.map(roles -> Database.getDBGuild(guildId.get()).getPrefix())
 				// The message starts with the correct prefix
 				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
-				.doOnSuccess(prefix -> CommandManager.execute(new Context(event, prefix)))
+				.flatMap(prefix -> CommandManager.execute(new Context(event, prefix)))
 				.subscribe();
 	}
 
@@ -56,8 +56,7 @@ public class MessageListener {
 
 		String msgContent = event.getMessage().getContent().get();
 		if(msgContent.startsWith(Config.DEFAULT_PREFIX + "help")) {
-			CommandManager.getCommand("help").execute(new Context(event, Config.DEFAULT_PREFIX));
-			return Mono.empty();
+			return CommandManager.getCommand("help").execute(new Context(event, Config.DEFAULT_PREFIX));
 		}
 
 		final String text = String.format("Hello !"
