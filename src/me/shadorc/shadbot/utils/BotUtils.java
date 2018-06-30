@@ -27,16 +27,16 @@ import reactor.core.publisher.Mono;
 
 public class BotUtils {
 
+	public static Mono<Message> sendMessage(String content, Mono<MessageChannel> channel) {
+		return channel.flatMap(chnl -> BotUtils.sendMessage(content, chnl));
+	}
+
 	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
 		return BotUtils.sendMessage(new MessageCreateSpec().setContent(content), channel);
 	}
 
 	public static Mono<Message> sendMessage(EmbedCreateSpec embed, Mono<MessageChannel> channel) {
 		return channel.flatMap(chnl -> BotUtils.sendMessage(embed, chnl));
-	}
-
-	public static Mono<Message> sendMessage(String content, Mono<MessageChannel> channel) {
-		return channel.flatMap(chnl -> BotUtils.sendMessage(content, chnl));
 	}
 
 	public static Mono<Message> sendMessage(EmbedCreateSpec embed, MessageChannel channel) {

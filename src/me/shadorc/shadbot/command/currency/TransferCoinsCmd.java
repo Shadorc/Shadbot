@@ -69,7 +69,8 @@ public class TransferCoinsCmd extends AbstractCommand {
 		dbSender.addCoins(-coins);
 		dbReceiver.addCoins(coins);
 
-		return context.getAuthor().map(User::getMention)
+		return context.getAuthor()
+				.map(User::getMention)
 				.zipWith(context.getClient().getUserById(senderUserId).map(User::getMention))
 				.flatMap(senderAndReceiver -> {
 					return BotUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
