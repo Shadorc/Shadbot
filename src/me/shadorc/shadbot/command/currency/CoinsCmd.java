@@ -22,9 +22,9 @@ public class CoinsCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		return context.getMessage()
 				.getUserMentions()
-				.single()
 				.switchIfEmpty(context.getAuthor())
-				.map(user -> {
+				.single()
+				.flatMap(user -> {
 					final DBMember dbMember = Database.getDBMember(context.getGuildId().get(), user.getId());
 					final String coins = FormatUtils.formatCoins(dbMember.getCoins());
 

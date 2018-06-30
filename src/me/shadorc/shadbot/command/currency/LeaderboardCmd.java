@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.currency;
 
+import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -13,6 +14,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 @RateLimited
 @Command(category = CommandCategory.CURRENCY, names = { "leaderboard" })
@@ -27,20 +29,17 @@ public class LeaderboardCmd extends AbstractCommand {
 				.flatMap(dbMember -> context.getClient().getUserById(dbMember.getId())
 						.zipWith(Mono.just(dbMember.getCoins())))
 				.buffer()
-				.single()
+				.singleOrEmpty()
 				.map(list -> {
-					String leaderboard = FormatUtils.numberedList(10, list.size(),
-							count -> String.format("%d. **%s** - %s",
-									count,
-									list.get(count - 1).getT1().getUsername(),
-									FormatUtils.formatCoins(list.get(count - 1).getT2())));
-
-					if(leaderboard.isEmpty()) {
-						leaderboard = "\nEveryone is poor here.";
-					}
-
-					return leaderboard;
+					return FormatUtils.numberedList(10, list.size(),
+							count -> {
+								final Tuple2<User, Integer> userAndCoins = list.get(count - 1);
+								final String username = userAndCoins.getT1().getUsername();
+								final String coins = FormatUtils.formatCoins(userAndCoins.getT2());
+								return String.format("%d. **%s** - %s", count, username, coins);
+							});
 				})
+				.defaultIfEmpty("\nEveryone is poor here.")
 				.flatMap(str -> {
 					return context.getAuthorAvatarUrl().map(avatarUrl -> {
 						return EmbedUtils.getDefaultEmbed()
