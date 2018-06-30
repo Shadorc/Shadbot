@@ -4,7 +4,6 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.utils.BotUtils;
 
 public class UpdateableMessage {
@@ -35,9 +34,9 @@ public class UpdateableMessage {
 		client.getMessageById(channelId, messageId)
 				.subscribe(Message::delete);
 		// Send the new one and store its messageId
-		client.getMessageChannelById(channelId)
-				.subscribe(channel -> BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel)
-						.subscribe(message -> this.messageId = message.getId()));
+		BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
+				.map(Message::getId)
+				.subscribe(messageId -> this.messageId = messageId);
 	}
 
 }

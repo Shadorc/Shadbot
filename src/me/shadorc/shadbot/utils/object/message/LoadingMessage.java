@@ -10,7 +10,6 @@ import org.reactivestreams.Subscriber;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.utils.BotUtils;
 
 public class LoadingMessage implements Publisher<Void> {
@@ -52,9 +51,9 @@ public class LoadingMessage implements Publisher<Void> {
 	 */
 	private void startTyping() {
 		client.getMessageChannelById(channelId)
-				.subscribe(channel -> channel.typeUntil(this)
-						.take(typingTimeout)
-						.subscribe());
+				.flatMapMany(channel -> channel.typeUntil(this))
+				.take(typingTimeout)
+				.subscribe();
 	}
 
 	/**
@@ -68,20 +67,18 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
 	public void send(String content) {
-		client.getMessageChannelById(channelId)
-				.subscribe(channel -> BotUtils.sendMessage(new MessageCreateSpec().setContent(content), channel)
-						.doAfterTerminate(this::stopTyping)
-						.subscribe());
+		BotUtils.sendMessage(content, client.getMessageChannelById(channelId))
+				.doAfterTerminate(this::stopTyping)
+				.subscribe();
 	}
 
 	/**
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
 	public void send(EmbedCreateSpec embed) {
-		client.getMessageChannelById(channelId)
-				.subscribe(channel -> BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel)
-						.doAfterTerminate(this::stopTyping)
-						.subscribe());
+		BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
+				.doAfterTerminate(this::stopTyping)
+				.subscribe();
 	}
 
 	@Override
