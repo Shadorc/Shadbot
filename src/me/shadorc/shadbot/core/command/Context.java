@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 
 public class Context {
 
-	private final MessageCreateEvent event;// The event is stored because it does not need to be reactive
+	private final MessageCreateEvent event; // The event is stored because it does not need to be reactive
 	private final String prefix;
 	private final String cmdName;
 	private final Optional<String> arg;
@@ -81,28 +81,28 @@ public class Context {
 		return this.getMessage().getContent().get();
 	}
 
-	public Optional<Snowflake> getGuildId() {
-		return event.getGuildId();
-	}
-
 	public Mono<Guild> getGuild() {
 		return event.getGuild();
 	}
 
-	public Snowflake getChannelId() {
-		return this.getMessage().getChannelId();
+	public Optional<Snowflake> getGuildId() {
+		return event.getGuildId();
 	}
 
 	public Mono<MessageChannel> getChannel() {
 		return this.getMessage().getChannel();
 	}
 
-	public Snowflake getAuthorId() {
-		return this.getMessage().getAuthorId().get();
+	public Snowflake getChannelId() {
+		return this.getMessage().getChannelId();
 	}
 
 	public Mono<User> getAuthor() {
 		return this.getMessage().getAuthor();
+	}
+
+	public Snowflake getAuthorId() {
+		return this.getMessage().getAuthorId().get();
 	}
 
 	public Mono<String> getAuthorAvatarUrl() {
@@ -118,31 +118,31 @@ public class Context {
 	}
 
 	public Mono<CommandPermission> getAuthorPermission() {
-		// Is owner
+		// The author is the bot's owner
 		Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
 				.map(ApplicationInfo::getOwnerId)
 				.filter(this.getAuthorId()::equals)
-				.flatMap(bool -> {
-					return Mono.just(CommandPermission.OWNER);
+				.map(bool -> {
+					return CommandPermission.OWNER;
 				});
 
-		// Private message, the author is considered as admin
+		// Private message, the author is considered as an administrator
 		Mono<CommandPermission> dmPerm = Mono.just(this.getGuildId())
 				.filter(guildId -> !guildId.isPresent())
-				.flatMap(guildId -> {
-					return Mono.just(CommandPermission.ADMIN);
+				.map(guildId -> {
+					return CommandPermission.ADMIN;
 				});
 
 		// The member is an administrator
-		Mono<CommandPermission> adminperm = DiscordUtils.hasPermissions(this.getAuthor(), this.getGuildId().get(), Permission.ADMINISTRATOR)
+		Mono<CommandPermission> adminPerm = DiscordUtils.hasPermissions(this.getAuthor(), this.getGuildId().get(), Permission.ADMINISTRATOR)
 				.map(bool -> {
 					return CommandPermission.ADMIN;
 				});
 
-		// By default, the member is considered as a basic user
-		Mono<CommandPermission> userPerm = Mono.just(CommandPermission.USER);
-
-		return ownerPerm.switchIfEmpty(dmPerm.switchIfEmpty(adminperm.switchIfEmpty(userPerm)));
+		return ownerPerm
+				.switchIfEmpty(dmPerm)
+				.switchIfEmpty(adminPerm)
+				.defaultIfEmpty(CommandPermission.USER);
 	}
 
 	public Mono<Boolean> isChannelNsfw() {

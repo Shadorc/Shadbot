@@ -9,6 +9,9 @@ import org.jsoup.HttpStatusException;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
@@ -56,6 +59,10 @@ public class ExceptionUtils {
 
 	public static boolean isForbidden(Throwable err) {
 		return err instanceof ClientException && ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
+	}
+
+	public static boolean isUnknown(Throwable err) {
+		return !(err instanceof CommandException || err instanceof MissingArgumentException || err instanceof NoMusicException);
 	}
 
 }

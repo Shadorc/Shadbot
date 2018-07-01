@@ -1,15 +1,17 @@
 package me.shadorc.shadbot.core.ratelimiter;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import io.github.bucket4j.Bucket;
 
 public class LimitedUser {
 
 	private final Bucket bucket;
-	private boolean isWarned;
+	private AtomicBoolean isWarned;
 
 	public LimitedUser(Bucket bucket) {
 		this.bucket = bucket;
-		this.isWarned = false;
+		this.isWarned = new AtomicBoolean(false);
 	}
 
 	public Bucket getBucket() {
@@ -17,15 +19,15 @@ public class LimitedUser {
 	}
 
 	public boolean isWarned() {
-		return isWarned;
+		return isWarned.get();
 	}
 
 	public void warn() {
-		this.isWarned = true;
+		isWarned.set(true);
 	}
 
 	public void unwarn() {
-		this.isWarned = false;
+		isWarned.set(false);
 	}
 
 }

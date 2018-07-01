@@ -11,7 +11,6 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
 import discord4j.core.object.util.Snowflake;
-import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
@@ -23,6 +22,7 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -77,7 +77,7 @@ public class CommandManager {
 
 		final Snowflake guildId = context.getGuildId().get();
 
-		Predicate<? super CommandPermission> hasPermission = userPerm -> {
+		final Predicate<? super CommandPermission> hasPermission = userPerm -> {
 			if(command.getPermission().isSuperior(userPerm)) {
 				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel()).subscribe();
 				return false;
@@ -85,7 +85,7 @@ public class CommandManager {
 			return true;
 		};
 
-		Predicate<? super AbstractCommand> isRateLimited = cmd -> {
+		final Predicate<? super AbstractCommand> isRateLimited = cmd -> {
 			Optional<RateLimiter> rateLimiter = cmd.getRateLimiter();
 			if(!rateLimiter.isPresent()) {
 				return false;
@@ -108,21 +108,19 @@ public class CommandManager {
 				.filter(isRateLimited.negate())
 				.flatMap(cmd -> cmd.execute(context))
 				.doOnError(CommandException.class, err -> {
-					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + err.getMessage(), context.getChannel()).subscribe();
+					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + err.getMessage(), context.getChannel()).subscribe();
 					CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
 				})
 				.doOnError(MissingArgumentException.class, err -> {
 					command.getHelp(context)
-							.flatMap(embed -> BotUtils.sendMessage(new MessageCreateSpec()
-									.setContent(TextUtils.MISSING_ARG)
-									.setEmbed(embed), context.getChannel()))
+							.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, context.getChannel()))
 							.subscribe();
 					CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
 				})
 				.doOnError(NoMusicException.class, err -> {
 					BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel()).subscribe();
 				})
-				.doOnError(err -> {
+				.doOnError(ExceptionUtils::isUnknown, err -> {
 					LogUtils.error(context.getClient(), context.getContent(), err,
 							String.format("{Guild ID: %d} An unknown error occurred while executing a command.", context.getGuildId().get()));
 				})

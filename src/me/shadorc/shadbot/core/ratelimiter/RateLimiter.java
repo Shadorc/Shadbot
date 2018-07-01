@@ -40,9 +40,10 @@ public class RateLimiter {
 
 		// The token could not been consumed, the user is limited
 		if(!limitedUser.getBucket().tryConsume(1)) {
+			// The user has not yet been warned
 			if(!limitedUser.isWarned()) {
-				limitedUser.warn();
 				this.sendWarningMessage(client, channelId, userId);
+				limitedUser.warn();
 			}
 			return true;
 		}
@@ -52,16 +53,18 @@ public class RateLimiter {
 	}
 
 	private void sendWarningMessage(DiscordClient client, Snowflake channelId, Snowflake userId) {
-		client.getUserById(userId).subscribe(author -> {
-			String username = author.getUsername();
-			String message = TextUtils.getSpamMessage();
-			String maxNum = StringUtils.pluralOf(max, "time");
-			String durationStr = DurationFormatUtils.formatDurationWords(duration.toMillis(), true, true);
-			String text = String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
-					username, message, maxNum, durationStr);
+		client.getUserById(userId)
+				.flatMap(author -> {
+					final String username = author.getUsername();
+					final String message = TextUtils.getSpamMessage();
+					final String maxNum = StringUtils.pluralOf(max, "time");
+					final String durationStr = DurationFormatUtils.formatDurationWords(duration.toMillis(), true, true);
+					final String text = String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
+							username, message, maxNum, durationStr);
 
-			BotUtils.sendMessage(text, client.getMessageChannelById(channelId));
-		});
+					return BotUtils.sendMessage(text, client.getMessageChannelById(channelId));
+				})
+				.subscribe();
 	}
 
 }

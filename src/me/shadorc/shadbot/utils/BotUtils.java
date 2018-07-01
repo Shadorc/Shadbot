@@ -49,11 +49,11 @@ public class BotUtils {
 						});
 	}
 
-	public static Mono<Message> sendMessage(MessageCreateSpec message, Mono<MessageChannel> channel) {
-		return channel.flatMap(chnl -> BotUtils.sendMessage(message, chnl));
+	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, Mono<MessageChannel> channel) {
+		return channel.flatMap(chnl -> BotUtils.sendMessage(new MessageCreateSpec().setContent(content).setEmbed(embed), chnl));
 	}
 
-	public static Mono<Message> sendMessage(MessageCreateSpec message, MessageChannel channel) {
+	private static Mono<Message> sendMessage(MessageCreateSpec message, MessageChannel channel) {
 		return channel.createMessage(message)
 				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT))
 				.doOnError(ExceptionUtils::isForbidden,
