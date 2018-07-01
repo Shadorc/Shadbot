@@ -15,8 +15,8 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import discord4j.core.DiscordClient;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.core.shard.CustomShard;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -109,18 +109,29 @@ public class NetUtils {
 	}
 
 	/**
-	 * @param homeUrl - the statistics site url
-	 * @param token - the API token corresponding to the website
-	 * @param shard - the shard from which to post stats
+	 * @param client - the client from which to post statistics
 	 */
-	public static void postStatsOn(String homeUrl, APIKey token, CustomShard shard) {
-		shard.getGuildsCount().subscribe(guildsCount -> {
+	public static void postStats(DiscordClient client) {
+		LogUtils.infof("{Shard %d} Posting statistics...", client.getConfig().getShardIndex());
+		NetUtils.postStatsOn("https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN, client);
+		NetUtils.postStatsOn("https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN, client);
+		LogUtils.infof("{Shard %d} Statistics posted.", client.getConfig().getShardIndex());
+	}
+
+	/**
+	 * @param homeUrl - the statistics site URL
+	 * @param token - the API token corresponding to the website
+	 * @param client - the client from which to post statistics
+	 */
+	private static void postStatsOn(String homeUrl, APIKey token, DiscordClient client) {
+		client.getGuilds().count().subscribe(guildsCount -> {
+
 			final JSONObject content = new JSONObject()
-					.put("shard_id", shard.getIndex())
-					.put("shard_count", shard.getShardCount())
+					.put("shard_id", client.getConfig().getShardIndex())
+					.put("shard_count", client.getConfig().getShardCount())
 					.put("server_count", guildsCount);
-			final long selfId = shard.getClient().getSelfId().get().asLong();
-			final String url = String.format("%s/api/bots/%d/stats", homeUrl, selfId);
+			final String url = String.format("%s/api/bots/%d/stats", homeUrl, client.getSelfId().get().asLong());
+
 			try {
 				Jsoup.connect(url)
 						.method(Method.POST)
@@ -130,7 +141,7 @@ public class NetUtils {
 						.post();
 			} catch (IOException err) {
 				LogUtils.infof("An error occurred while posting statistics of shard %d. (%s: %s).",
-						shard.getIndex(), err.getClass().getSimpleName(), err.getMessage());
+						client.getConfig().getShardIndex(), err.getClass().getSimpleName(), err.getMessage());
 			}
 		});
 	}

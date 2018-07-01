@@ -13,8 +13,8 @@ import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.shard.CustomShard;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class GatewayLifecycleListener {
@@ -36,8 +36,7 @@ public class GatewayLifecycleListener {
 		Shadbot.registerListener(event.getClient(), MessageCreateEvent.class, MessageListener::onMessageCreate);
 		Shadbot.registerListener(event.getClient(), VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 
-		new CustomShard(event.getClient());
-
+		Shadbot.scheduleAtFixedRate(() -> NetUtils.postStats(event.getClient()), 2, 2, TimeUnit.HOURS);
 		Shadbot.scheduleAtFixedRate(() -> BotUtils.updatePresence(event.getClient()), 0, 30, TimeUnit.MINUTES);
 	}
 
