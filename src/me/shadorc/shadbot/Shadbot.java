@@ -23,11 +23,11 @@ import me.shadorc.shadbot.listener.GatewayLifecycleListener;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
+import reactor.core.publisher.Flux;
 
 public class Shadbot {
 
 	private static final Instant LAUNCH_TIME = Instant.now();
-
 	private static final ScheduledThreadPoolExecutor SCHEDULER = new ScheduledWrappedExecutor(3, "ShadbotScheduler-%d");
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 
@@ -61,15 +61,12 @@ public class Shadbot {
 
 			Shadbot.registerListener(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
 			Shadbot.registerListener(client, ReadyEvent.class, GatewayLifecycleListener::onReady);
-
-			client.login().subscribe();
 		}
 
 		// Shadbot.scheduleAtFixedRate(LottoCmd::draw, LottoCmd.getDelay(), TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
 
-		// TODO: create a mono and wait for it
-		while(true)
-			;
+		// Initiate login and block
+		Flux.merge(Flux.fromIterable(CLIENTS)).flatMap(DiscordClient::login).blockLast();
 	}
 
 	/**
@@ -90,6 +87,10 @@ public class Shadbot {
 
 	public static void scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
 		SCHEDULER.scheduleAtFixedRate(command, initialDelay, period, unit);
+	}
+	
+	public static void logout() {
+		CLIENTS.forEach(DiscordClient::logout);
 	}
 
 }
