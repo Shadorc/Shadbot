@@ -3,111 +3,38 @@ package me.shadorc.shadbot.data.lotto;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
-import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
-import me.shadorc.shadbot.utils.NumberUtils;
+import me.shadorc.shadbot.utils.Utils;
 
 public class LottoManager {
-
-	private static final String HISTORIC = "historic";
-	private static final String WINNERS_COUNT = "winnerCount";
-	private static final String POOL = "pool";
-
-	private static final String USERS = "users";
-	private static final String NUM = "num";
-	private static final String USER_ID = "userID";
-	private static final String GUILD_ID = "guildID";
 
 	private static final String FILE_NAME = "lotto_data.json";
 	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
 
-	private static JSONObject dataObj;
+	private static Lotto lotto;
 
 	@DataInit
-	public static void init() throws JSONException, IOException {
-		if(!FILE.exists()) {
-			try (FileWriter writer = new FileWriter(FILE)) {
-				JSONObject defaultObj = new JSONObject()
-						.put(USERS, new JSONArray())
-						.put(POOL, 0);
-				writer.write(defaultObj.toString(Config.JSON_INDENT_FACTOR));
-			}
-		}
-
-		try (InputStream stream = FILE.toURI().toURL().openStream()) {
-			dataObj = new JSONObject(new JSONTokener(stream));
-		}
+	public static void init() throws JsonParseException, JsonMappingException, IOException {
+		lotto = Utils.MAPPER.readValue(FILE, Lotto.class);
 	}
 
 	@DataSave(filePath = FILE_NAME, initialDelay = 30, period = 30, unit = TimeUnit.MINUTES)
-	public static void save() throws JSONException, IOException {
+	public static void save() throws JsonProcessingException, IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
-			writer.write(dataObj.toString(Config.JSON_INDENT_FACTOR));
+			writer.write(Utils.MAPPER.writeValueAsString(lotto));
 		}
 	}
 
-	public static void resetUsers() {
-		dataObj.put(USERS, new JSONArray());
+	public static Lotto getLotto() {
+		return lotto;
 	}
 
-	public static void resetPool() {
-		dataObj.put(POOL, 0);
-	}
-
-	public static int getPool() {
-		return dataObj.getInt(POOL);
-	}
-
-	public static List<LottoPlayer> getPlayers() {
-		List<LottoPlayer> players = new ArrayList<>();
-		JSONArray usersArray = dataObj.getJSONArray(USERS);
-		for(int i = 0; i < usersArray.length(); i++) {
-			JSONObject userObj = usersArray.getJSONObject(i);
-			Snowflake guildId = Snowflake.of(userObj.getLong(GUILD_ID));
-			Snowflake userId = Snowflake.of(userObj.getLong(USER_ID));
-			players.add(new LottoPlayer(guildId, userId, userObj.getInt(NUM)));
-		}
-		return players;
-	}
-
-	public static LottoHistoric getHistoric() {
-		JSONObject historicObj = dataObj.optJSONObject(HISTORIC);
-		if(historicObj == null) {
-			return null;
-		}
-		return new LottoHistoric(historicObj.getInt(POOL), historicObj.getInt(WINNERS_COUNT), historicObj.getInt(NUM));
-	}
-
-	public static synchronized void addToPool(int coins) {
-		int newPool = dataObj.optInt(POOL) + (int) Math.ceil(coins / 100f);
-		dataObj.put(POOL, NumberUtils.between(newPool, 0, Config.MAX_COINS));
-	}
-
-	public static synchronized void addPlayer(Snowflake guildId, Snowflake userId, int num) {
-		JSONObject playerObj = new JSONObject()
-				.put(GUILD_ID, guildId.asLong())
-				.put(USER_ID, userId.asLong())
-				.put(NUM, num);
-		dataObj.getJSONArray(USERS).put(playerObj);
-	}
-
-	public static void setHistoric(int winnersCount, int pool, int num) {
-		dataObj.put(HISTORIC, new JSONObject()
-				.put(WINNERS_COUNT, winnersCount)
-				.put(POOL, pool)
-				.put(NUM, num));
-	}
 }
