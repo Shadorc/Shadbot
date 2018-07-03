@@ -49,7 +49,7 @@ public class DiabloCmd extends AbstractCommand {
 		}
 
 		String battletag = args.get(1);
-		if(!battletag.matches("(\\p{L}*)#[0-9]*")) {
+		if(!battletag.matches("[\\p{L}0-9]*#[0-9]*")) {
 			throw new CommandException(String.format("`%s` is not a valid Battletag.", args.get(1)));
 		}
 		battletag = battletag.replaceAll("#", "-");
