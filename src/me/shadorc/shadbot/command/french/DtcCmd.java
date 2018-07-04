@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.api.dtc.QuoteResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -28,33 +29,42 @@ import reactor.core.publisher.Mono;
 public class DtcCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
+	public Mono<Void> execute(Context context) {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
-			try {
-				String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", APIKeys.get(APIKey.DTC_API_KEY));
+		return context.getAuthorAvatarUrl()
+				.map(avatarUrl -> {
+					try {
+						final String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", 
+								APIKeys.get(APIKey.DTC_API_KEY));
+						final JSONArray quoteObjs = new JSONArray(NetUtils.getJSON(url));
 
-				JSONArray array = new JSONArray(NetUtils.getJSON(url));
-				JSONObject quoteObj = Utils.toList(array, JSONObject.class).stream()
-						.filter(obj -> obj.getString("content").length() < 1000)
-						.findAny()
-						.get();
+						for(JSONObject quoteObj : Utils.toList(quoteObjs, JSONObject.class)) {
+							QuoteResponse quote = Utils.MAPPER.readValue(quoteObj.toString(), QuoteResponse.class);
+							if(quote.getContent().length() < 1000) {
+								final String content = quote.getContent().replace("*", "\\*");
 
-				String content = quoteObj.getString("content").replace("*", "\\*");
+								return EmbedUtils.getDefaultEmbed()
+										.setAuthor("Quote DansTonChat",
+												String.format("https://danstonchat.com/%s.html", quote.getId()),
+												avatarUrl)
+										.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+										.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"));
+							}
+						}
 
-				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-						.setAuthor("Quote DansTonChat",
-								String.format("https://danstonchat.com/%s.html", quoteObj.getString("id")),
-								avatarUrl)
-						.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-						.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"));
-				loadingMsg.send(embed);
+						return EmbedUtils.getDefaultEmbed()
+								.setAuthor("Quote DansTonChat", null, avatarUrl)
+								.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+								.setDescription("Sorry, no quote were found.");
 
-			} catch (JSONException | IOException err) {
-				loadingMsg.send(ExceptionUtils.handleAndGet("getting a quote from DansTonChat.com", context, err));
-			}
-		});
+					} catch (JSONException | IOException err) {
+						loadingMsg.send(ExceptionUtils.handleAndGet("getting a quote from DansTonChat.com", context, err));
+					}
+					return Mono.empty();
+				})
+				.doOnSuccess(embed -> loadingMsg.send((EmbedCreateSpec) embed))
+				.then();
 	}
 
 	private String format(String line) {
