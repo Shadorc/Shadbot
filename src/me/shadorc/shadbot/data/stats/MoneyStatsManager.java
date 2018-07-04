@@ -56,7 +56,7 @@ public class MoneyStatsManager {
 
 	public static void log(MoneyEnum key, String cmd, int coins) {
 		if(MoneyEnum.MONEY_LOST.equals(key)) {
-			LottoManager.addToPool(coins);
+			LottoManager.getLotto().addToJackpot(coins);
 		}
 
 		MONEY_STATS_MAP.computeIfAbsent(key, k -> new HashMap<>());
