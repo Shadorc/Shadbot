@@ -16,11 +16,11 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -52,7 +52,8 @@ public class GifCmd extends AbstractCommand {
 			loadingMsg.send(embed);
 
 		} catch (JSONException | IOException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting a gif", context, err));
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
 		}
 	}
 
