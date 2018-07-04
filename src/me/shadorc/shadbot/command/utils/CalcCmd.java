@@ -1,8 +1,6 @@
 package me.shadorc.shadbot.command.utils;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import com.fathzer.soft.javaluator.DoubleEvaluator;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -20,17 +18,19 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.UTILS, names = { "calc", "math" })
 public class CalcCmd extends AbstractCommand {
 
+	private static final DoubleEvaluator EVALUATOR = new DoubleEvaluator();
+
 	@Override
-	public void execute(Context context) {
-		context.requireArg();
+	public Mono<Void> execute(Context context) {
+		final String arg = context.requireArg();
 
 		try {
-			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
-			String expression = context.getArg().get();
-			BotUtils.sendMessage(Emoji.TRIANGULAR_RULER + String.format(" %s = %s",
-					expression.replace("*", "\\*"), engine.eval(expression)), context.getChannel());
-		} catch (ScriptException err) {
-			throw new CommandException(String.format("`%s` is not a valid expression.", context.getArg()));
+			return BotUtils.sendMessage(
+					String.format(Emoji.TRIANGULAR_RULER + " %s = %s", arg.replace("*", "\\*"), EVALUATOR.evaluate(arg)),
+					context.getChannel())
+					.then();
+		} catch (IllegalArgumentException err) {
+			throw new CommandException(err.getMessage());
 		}
 	}
 
