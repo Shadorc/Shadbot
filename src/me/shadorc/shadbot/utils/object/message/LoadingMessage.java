@@ -8,9 +8,12 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.utils.BotUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class LoadingMessage implements Publisher<Void> {
 
@@ -33,7 +36,7 @@ public class LoadingMessage implements Publisher<Void> {
 		this.typingTimeout = typingTimeout;
 		this.subscribers = new ArrayList<>();
 
-		this.startTyping();
+		this.startTyping().subscribe();
 	}
 
 	/**
@@ -49,11 +52,10 @@ public class LoadingMessage implements Publisher<Void> {
 	/**
 	 * Start typing in the channel until a message is send or the typing timeout seconds have passed
 	 */
-	private void startTyping() {
-		client.getMessageChannelById(channelId)
+	private Flux<Long> startTyping() {
+		return client.getMessageChannelById(channelId)
 				.flatMapMany(channel -> channel.typeUntil(this))
-				.take(typingTimeout)
-				.subscribe();
+				.take(typingTimeout);
 	}
 
 	/**
@@ -66,19 +68,17 @@ public class LoadingMessage implements Publisher<Void> {
 	/**
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
-	public void send(String content) {
-		BotUtils.sendMessage(content, client.getMessageChannelById(channelId))
-				.doAfterTerminate(this::stopTyping)
-				.subscribe();
+	public Mono<Message> send(String content) {
+		return BotUtils.sendMessage(content, client.getMessageChannelById(channelId))
+				.doAfterTerminate(this::stopTyping);
 	}
 
 	/**
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
-	public void send(EmbedCreateSpec embed) {
-		BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
-				.doAfterTerminate(this::stopTyping)
-				.subscribe();
+	public Mono<Message> send(EmbedCreateSpec embed) {
+		return BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
+				.doAfterTerminate(this::stopTyping);
 	}
 
 	@Override
