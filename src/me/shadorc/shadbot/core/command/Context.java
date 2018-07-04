@@ -105,6 +105,10 @@ public class Context {
 		return this.getMessage().getAuthorId().get();
 	}
 
+	public Mono<String> getAuthorName() {
+		return this.getAuthor().map(User::getUsername);
+	}
+
 	public Mono<String> getAuthorAvatarUrl() {
 		return this.getAuthor()
 				.map(user -> user.getAvatar(Format.JPEG))

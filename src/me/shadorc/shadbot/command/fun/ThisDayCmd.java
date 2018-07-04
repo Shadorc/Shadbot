@@ -30,38 +30,39 @@ public class ThisDayCmd extends AbstractCommand {
 	private static final String HOME_URL = "http://www.onthisday.com/";
 
 	@Override
-	public void execute(Context context) {
+	public Mono<Void> execute(Context context) {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			Document doc = NetUtils.getDoc(HOME_URL);
 
-			String date = doc.getElementsByClass("date-large")
+			final String date = doc.getElementsByClass("date-large")
 					.first()
 					.attr("datetime");
 
-			Elements eventsElmt = doc.getElementsByClass("event-list event-list--with-advert")
+			final Elements eventsElmt = doc.getElementsByClass("event-list event-list--with-advert")
 					.first()
 					.getElementsByClass("event-list__item");
 
-			String events = eventsElmt.stream()
+			final String events = eventsElmt.stream()
 					.map(Element::html)
 					.map(html -> html.replaceAll("<b>|</b>", "**"))
 					.map(Jsoup::parse)
 					.map(Document::text)
 					.collect(Collectors.joining("\n\n"));
 
-			context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
-				EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-						.setAuthor(String.format("On This Day (%s)", date), HOME_URL, avatarUrl)
-						.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-						.setDescription(StringUtils.truncate(events, DiscordUtils.DESCRIPTION_CONTENT_LIMIT));
-
-				loadingMsg.send(embed);
-			});
+			return context.getAuthorAvatarUrl()
+					.map(avatarUrl -> {
+						return EmbedUtils.getDefaultEmbed()
+								.setAuthor(String.format("On This Day (%s)", date), HOME_URL, avatarUrl)
+								.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
+								.setDescription(StringUtils.truncate(events, DiscordUtils.DESCRIPTION_CONTENT_LIMIT));
+					})
+					.map(loadingMsg::send)
+					.then();
 
 		} catch (IOException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting events", context, err));
+			return loadingMsg.send(ExceptionUtils.handleAndGet("getting events", context, err)).then();
 		}
 	}
 

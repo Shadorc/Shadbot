@@ -21,6 +21,7 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
@@ -35,7 +36,7 @@ public class DtcCmd extends AbstractCommand {
 		return context.getAuthorAvatarUrl()
 				.map(avatarUrl -> {
 					try {
-						final String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json", 
+						final String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json",
 								APIKeys.get(APIKey.DTC_API_KEY));
 						final JSONArray quoteObjs = new JSONArray(NetUtils.getJSON(url));
 
@@ -44,26 +45,25 @@ public class DtcCmd extends AbstractCommand {
 							if(quote.getContent().length() < 1000) {
 								final String content = quote.getContent().replace("*", "\\*");
 
-								return EmbedUtils.getDefaultEmbed()
+								return loadingMsg.send(EmbedUtils.getDefaultEmbed()
 										.setAuthor("Quote DansTonChat",
 												String.format("https://danstonchat.com/%s.html", quote.getId()),
 												avatarUrl)
 										.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-										.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"));
+										.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n")));
 							}
 						}
 
-						return EmbedUtils.getDefaultEmbed()
+						LogUtils.warnf(context.getClient(), "{%s} No quotes were found.", this.getClass().getSimpleName());
+						return loadingMsg.send(EmbedUtils.getDefaultEmbed()
 								.setAuthor("Quote DansTonChat", null, avatarUrl)
 								.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-								.setDescription("Sorry, no quote were found.");
+								.setDescription("Sorry, no quotes were found."));
 
 					} catch (JSONException | IOException err) {
-						loadingMsg.send(ExceptionUtils.handleAndGet("getting a quote from DansTonChat.com", context, err));
+						return loadingMsg.send(ExceptionUtils.handleAndGet("getting a quote from DansTonChat.com", context, err));
 					}
-					return Mono.empty();
 				})
-				.doOnSuccess(embed -> loadingMsg.send((EmbedCreateSpec) embed))
 				.then();
 	}
 

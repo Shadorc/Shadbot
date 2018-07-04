@@ -18,10 +18,11 @@ import reactor.core.publisher.Mono;
 public class NameCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
-		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
-				FormatUtils.formatTrackName(guildMusic.getScheduler().getAudioPlayer().getPlayingTrack().getInfo())), context.getChannel());
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
+		return BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
+				FormatUtils.formatTrackName(guildMusic.getScheduler().getAudioPlayer().getPlayingTrack().getInfo())), context.getChannel())
+				.then();
 	}
 
 	@Override

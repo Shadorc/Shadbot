@@ -82,7 +82,7 @@ public class PlayCmd extends AbstractCommand {
 						guildMusic = GuildMusicManager.createGuildMusic(context.getClient(), guildId);
 					} else if(guildMusic.isWaiting()) {
 						if(guildMusic.getDjId().equals(context.getAuthorId())) {
-							context.getAuthor().map(User::getUsername).subscribe(username -> {
+							context.getAuthorName().subscribe(username -> {
 								throw new CommandException(String.format("(**%s**) You're already selecting a music. "
 										+ "Enter a number or use `%scancel` to cancel the selection.",
 										username, context.getPrefix()));

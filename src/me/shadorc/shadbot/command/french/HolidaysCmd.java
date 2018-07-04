@@ -27,10 +27,10 @@ public class HolidaysCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) {
-		context.requireArg();
+	public Mono<Void> execute(Context context) {
+		final String arg = context.requireArg();
 
-		Zone zone = Utils.getValueOrNull(Zone.class, context.getArg().get());
+		final Zone zone = Utils.getValueOrNull(Zone.class, arg);
 		if(zone == null) {
 			throw new CommandException(String.format("`%s` is not a valid zone. %s",
 					context.getArg(), FormatUtils.formatOptions(Zone.class)));
@@ -39,10 +39,10 @@ public class HolidaysCmd extends AbstractCommand {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			String holidays = StringUtils.remove(TwitterUtils.getLastTweet("Vacances_Zone" + zone), "#");
-			loadingMsg.send(Emoji.BEACH + " " + holidays);
+			final String holidays = StringUtils.remove(TwitterUtils.getLastTweet("Vacances_Zone" + zone), "#");
+			return loadingMsg.send(Emoji.BEACH + " " + holidays).then();
 		} catch (TwitterException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting holidays information", context, err.getCause()));
+			return loadingMsg.send(ExceptionUtils.handleAndGet("getting holidays information", context, err.getCause())).then();
 		}
 	}
 

@@ -17,10 +17,15 @@ import reactor.core.publisher.Mono;
 public class ShuffleCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
 		guildMusic.getScheduler().shufflePlaylist();
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist shuffled.", context.getChannel());
+
+		return context.getAuthorName()
+				.flatMap(username -> {
+					return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Playlist shuffled by **%s**.", username), context.getChannel());
+				})
+				.then();
 	}
 
 	@Override

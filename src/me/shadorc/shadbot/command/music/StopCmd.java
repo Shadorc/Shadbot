@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.music;
 
-import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -18,10 +17,15 @@ import reactor.core.publisher.Mono;
 public class StopCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
 		guildMusic.leaveVoiceChannel();
-		context.getAuthor().map(User::getUsername).subscribe(username -> BotUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.", username), context.getChannel()));
+
+		return context.getAuthorName()
+				.flatMap(username -> {
+					return BotUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.", username), context.getChannel());
+				})
+				.then();
 	}
 
 	@Override

@@ -17,10 +17,14 @@ import reactor.core.publisher.Mono;
 public class ClearCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
 		guildMusic.getScheduler().clearPlaylist();
-		BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist cleared.", context.getChannel());
+		return context.getAuthorName()
+				.flatMap(username -> {
+					return BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist cleared by **%s**.", context.getChannel());
+				})
+				.then();
 	}
 
 	@Override

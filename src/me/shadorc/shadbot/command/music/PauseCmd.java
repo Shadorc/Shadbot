@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
-import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -20,19 +19,23 @@ import reactor.core.publisher.Mono;
 public class PauseCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
-		AudioPlayer audioPlayer = guildMusic.getScheduler().getAudioPlayer();
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
+		final AudioPlayer audioPlayer = guildMusic.getScheduler().getAudioPlayer();
 		audioPlayer.setPaused(!audioPlayer.isPaused());
-		context.getAuthor().map(User::getUsername).subscribe(username -> {
-			if(audioPlayer.isPaused()) {
-				BotUtils.sendMessage(String.format(Emoji.PAUSE + " Music paused by **%s**.",
-						username), context.getChannel());
-			} else {
-				BotUtils.sendMessage(String.format(Emoji.PLAY + " Music resumed by **%s**.",
-						username), context.getChannel());
-			}
-		});
+
+		return context.getAuthorName()
+				.map(username -> {
+					if(audioPlayer.isPaused()) {
+						return String.format(Emoji.PAUSE + " Music paused by **%s**.", username);
+					} else {
+						return String.format(Emoji.PLAY + " Music resumed by **%s**.", username);
+					}
+				})
+				.flatMap(message -> {
+					return BotUtils.sendMessage(message, context.getChannel());
+				})
+				.then();
 	}
 
 	@Override

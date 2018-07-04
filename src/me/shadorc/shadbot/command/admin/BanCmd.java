@@ -70,7 +70,7 @@ public class BanCmd extends AbstractCommand {
 									}
 
 									context.getGuild().subscribe(guild -> {
-										context.getAuthor().map(User::getUsername).subscribe(authorName -> {
+										context.getAuthorName().subscribe(authorName -> {
 
 											for(User user : mentionedUsers) {
 												if(!user.isBot()) {

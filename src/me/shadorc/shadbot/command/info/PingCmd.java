@@ -17,9 +17,10 @@ import reactor.core.publisher.Mono;
 public class PingCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		BotUtils.sendMessage(String.format(Emoji.GEAR + " Ping: %dms",
-				TimeUtils.getMillisUntil(context.getMessage().getTimestamp())), context.getChannel());
+	public Mono<Void> execute(Context context) {
+		return BotUtils.sendMessage(String.format(Emoji.GEAR + " Ping: %dms",
+				TimeUtils.getMillisUntil(context.getMessage().getTimestamp())), context.getChannel())
+				.then();
 	}
 
 	@Override

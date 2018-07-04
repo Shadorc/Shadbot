@@ -23,23 +23,26 @@ import reactor.core.publisher.Mono;
 public class BackwardCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
-		String arg = context.requireArg();
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
+		final String arg = context.requireArg();
 
+		// If the argument is a number of seconds...
 		Long num = NumberUtils.asPositiveLong(arg);
 		if(num == null) {
 			try {
+				// ... else, try to parse it
 				num = TimeUtils.parseTime(arg);
 			} catch (IllegalArgumentException err) {
 				throw new CommandException(String.format("`%s` is not a valid number / time.", arg));
 			}
 		}
 
-		long newPosition = guildMusic.getScheduler().changePosition(-TimeUnit.SECONDS.toMillis(num));
-		BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New position: **%s**",
+		final long newPosition = guildMusic.getScheduler().changePosition(-TimeUnit.SECONDS.toMillis(num));
+		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New position: **%s**",
 				FormatUtils.formatShortDuration(newPosition)),
-				context.getChannel());
+				context.getChannel())
+				.then();
 	}
 
 	@Override

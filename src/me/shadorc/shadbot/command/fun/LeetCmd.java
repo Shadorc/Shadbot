@@ -16,12 +16,10 @@ import reactor.core.publisher.Mono;
 public class LeetCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		context.requireArg();
+	public Mono<Void> execute(Context context) {
+		final String arg = context.requireArg();
 
-		String text = context.getArg()
-				.get()
-				.toUpperCase()
+		final String text = arg.toUpperCase()
 				.replace("A", "4")
 				.replace("B", "8")
 				.replace("E", "3")
@@ -31,7 +29,7 @@ public class LeetCmd extends AbstractCommand {
 				.replace("S", "5")
 				.replace("T", "7");
 
-		BotUtils.sendMessage(Emoji.KEYBOARD + " " + text, context.getChannel());
+		return BotUtils.sendMessage(Emoji.KEYBOARD + " " + text, context.getChannel()).then();
 	}
 
 	@Override
