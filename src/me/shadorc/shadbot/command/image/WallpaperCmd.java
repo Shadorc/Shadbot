@@ -29,7 +29,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -38,6 +37,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -85,8 +85,8 @@ public class WallpaperCmd extends AbstractCommand {
 			throw new CommandException(String.format("%s. Use `%shelp %s` for more information.",
 					err.getMessage(), context.getPrefix(), this.getName()));
 		} catch (ParseException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting a wallpaper", context, err));
-			return;
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
 		}
 
 		context.isChannelNsfw().subscribe(isNsfw -> {
@@ -136,7 +136,8 @@ public class WallpaperCmd extends AbstractCommand {
 					loadingMsg.send(embed);
 				});
 			} catch (ConnectionException err) {
-				loadingMsg.send(ExceptionUtils.handleAndGet("getting a wallpaper", context, err.getCause()));
+				loadingMsg.stopTyping();
+				throw Exceptions.propagate(err);
 			}
 		});
 	}

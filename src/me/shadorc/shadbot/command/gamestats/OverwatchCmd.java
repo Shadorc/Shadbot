@@ -11,7 +11,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -24,6 +23,7 @@ import net.shadorc.overwatch4j.OverwatchPlayer;
 import net.shadorc.overwatch4j.enums.Platform;
 import net.shadorc.overwatch4j.enums.TopHeroesStats;
 import net.shadorc.overwatch4j.exception.OverwatchException;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -71,7 +71,8 @@ public class OverwatchCmd extends AbstractCommand {
 		} catch (OverwatchException err) {
 			loadingMsg.send(Emoji.MAGNIFYING_GLASS + " " + err.getMessage());
 		} catch (IOException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting information from Overwatch profile", context, err));
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
 		}
 	}
 

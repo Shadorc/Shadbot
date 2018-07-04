@@ -17,12 +17,12 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -75,7 +75,8 @@ public class TranslateCmd extends AbstractCommand {
 					translatedText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo))));
 
 		} catch (JSONException | IOException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting translation", context, err));
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
 		}
 	}
 

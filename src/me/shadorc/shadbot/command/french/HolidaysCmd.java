@@ -7,7 +7,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TwitterUtils;
@@ -15,6 +14,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import twitter4j.TwitterException;
 
@@ -42,7 +42,8 @@ public class HolidaysCmd extends AbstractCommand {
 			final String holidays = StringUtils.remove(TwitterUtils.getLastTweet("Vacances_Zone" + zone), "#");
 			return loadingMsg.send(Emoji.BEACH + " " + holidays).then();
 		} catch (TwitterException err) {
-			return loadingMsg.send(ExceptionUtils.handleAndGet("getting holidays information", context, err.getCause())).then();
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
 		}
 	}
 

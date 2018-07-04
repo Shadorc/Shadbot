@@ -21,7 +21,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -29,6 +28,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -101,7 +101,8 @@ public class DiabloCmd extends AbstractCommand {
 		} catch (FileNotFoundException err) {
 			loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.");
 		} catch (JSONException | IOException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting Diablo 3 stats", context, err));
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
 		}
 
 		return Mono.empty();

@@ -15,7 +15,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -23,6 +22,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -54,14 +54,15 @@ public class DtcCmd extends AbstractCommand {
 							}
 						}
 
-						LogUtils.warnf(context.getClient(), "{%s} No quotes were found.", this.getClass().getSimpleName());
+						LogUtils.warn(context.getClient(), String.format("{%s} No quotes were found.", this.getClass().getSimpleName()));
 						return loadingMsg.send(EmbedUtils.getDefaultEmbed()
 								.setAuthor("Quote DansTonChat", null, avatarUrl)
 								.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
 								.setDescription("Sorry, no quotes were found."));
 
 					} catch (JSONException | IOException err) {
-						return loadingMsg.send(ExceptionUtils.handleAndGet("getting a quote from DansTonChat.com", context, err));
+						loadingMsg.stopTyping();
+						throw Exceptions.propagate(err);
 					}
 				})
 				.then();

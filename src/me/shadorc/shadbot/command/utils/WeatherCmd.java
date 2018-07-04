@@ -13,7 +13,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -23,6 +22,7 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import net.aksingh.owmjapis.CurrentWeather;
 import net.aksingh.owmjapis.OpenWeatherMap;
 import net.aksingh.owmjapis.OpenWeatherMap.Units;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -70,7 +70,8 @@ public class WeatherCmd extends AbstractCommand {
 				loadingMsg.send(embed);
 			});
 		} catch (IOException err) {
-			loadingMsg.send(ExceptionUtils.handleAndGet("getting weather information", context, err));
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
 		}
 	}
 
