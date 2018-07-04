@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
@@ -22,8 +23,6 @@ import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class NetUtils {
-
-	public static final int JSON_ERROR_CODE = 603;
 
 	/**
 	 * @param url - URL to connect to. The protocol must be http or https
@@ -73,7 +72,10 @@ public class NetUtils {
 	public static String getJSON(String url) throws IOException {
 		String json = NetUtils.getBody(url);
 		if(json.isEmpty() || json.charAt(0) != '{' && json.charAt(0) != '[') {
-			throw new HttpStatusException(String.format("%s did not return valid JSON: %s", url, json), JSON_ERROR_CODE, url);
+			throw new HttpStatusException(
+					String.format("%s did not return valid JSON: %s", url, json.isEmpty() ? "Empty" : json),
+					HttpStatus.SC_SERVICE_UNAVAILABLE,
+					url);
 		}
 		return json;
 	}
