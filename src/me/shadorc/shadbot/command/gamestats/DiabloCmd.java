@@ -56,11 +56,7 @@ public class DiabloCmd extends AbstractCommand {
 					splitArgs.get(0), FormatUtils.formatOptions(Region.class)));
 		}
 
-		String battletag = splitArgs.get(1);
-		if(!battletag.matches("(\\p{L}*)#[0-9]*")) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid Battletag.", splitArgs.get(1)));
-		}
-		battletag = battletag.replaceAll("#", "-");
+		String battletag = splitArgs.get(1).replaceAll("#", "-");
 
 		LoadingMessage loadingMsg = new LoadingMessage("Loading Diablo 3 stats...", context.getChannel());
 		loadingMsg.send();
