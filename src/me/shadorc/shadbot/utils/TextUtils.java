@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.utils;
 
 import java.util.EnumSet;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.jsoup.Jsoup;
 
@@ -37,14 +36,14 @@ public class TextUtils {
 	 * @return A string representing a random spam message
 	 */
 	public static String getSpamMessage() {
-		return SPAM_MESSAGES[ThreadLocalRandom.current().nextInt(SPAM_MESSAGES.length)];
+		return Utils.randArray(SPAM_MESSAGES);
 	}
 
 	/**
 	 * @return A string representing a random tip
 	 */
 	public static String getTip() {
-		return TIPS_MESSAGES[ThreadLocalRandom.current().nextInt(TIPS_MESSAGES.length)];
+		return Utils.randArray(TIPS_MESSAGES);
 	}
 
 	public static String notEnoughCoins(User user) {

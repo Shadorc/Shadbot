@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import me.shadorc.shadbot.data.DataManager;
 
 /**
- * All the methods annoted with this interface will be loaded when calling {@link DataManager} initialization
+ * All the methods annotated with this interface will be loaded when calling {@link DataManager} initialization
  */
 
 @Target(ElementType.METHOD)

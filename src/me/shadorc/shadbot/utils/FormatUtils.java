@@ -31,10 +31,6 @@ public class FormatUtils {
 		return FormatUtils.format(collection.stream(), mapper, delimiter);
 	}
 
-	public static <T> String format(List<T> list, Function<T, String> mapper, String delimiter) {
-		return FormatUtils.format(list.stream(), mapper, delimiter);
-	}
-
 	public static <T> String format(T[] array, Function<T, String> mapper, String delimiter) {
 		return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
 	}
@@ -84,13 +80,13 @@ public class FormatUtils {
 		if("Unknown artist".equals(info.author)) {
 			strBuilder.append(info.title);
 		} else {
-			strBuilder.append(info.author + " - " + info.title);
+			strBuilder.append(String.format("%s - %s", info.author, info.title));
 		}
 
 		if(info.isStream) {
 			strBuilder.append(" (Stream)");
 		} else {
-			strBuilder.append(" (" + FormatUtils.formatShortDuration(info.length) + ")");
+			strBuilder.append(String.format(" (%s)", FormatUtils.formatShortDuration(info.length)));
 		}
 
 		return strBuilder.toString();

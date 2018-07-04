@@ -12,7 +12,7 @@ public class LottoGambler {
 	private Snowflake userId;
 	@JsonProperty("number")
 	private int number;
-	
+
 	public LottoGambler(Snowflake guildId, Snowflake userId, int number) {
 		this.guildId = guildId;
 		this.userId = userId;

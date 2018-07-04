@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import me.shadorc.shadbot.data.DataManager;
 
 /**
- * All the methods annoted with this interface will be called periodically depending on parameters from the moment {@link DataManager} is called
+ * All the methods annotated with this interface will be called periodically depending on parameters from the moment {@link DataManager} is called
  */
 
 @Target(ElementType.METHOD)

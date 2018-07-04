@@ -46,7 +46,7 @@ public class Shadbot {
 			}
 		});
 
-		// TODO: Calculate this by using gateway or guilds / 1000
+		// TODO: Replace it with #withRecommendedShardCount
 		int shardCount = 1;
 
 		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(shardCount, "shard"));
@@ -70,8 +70,6 @@ public class Shadbot {
 	}
 
 	/**
-	 * Gets the time when this class was loaded.
-	 *
 	 * @return The time when this class was loaded.
 	 */
 	public static Instant getLaunchTime() {
@@ -88,7 +86,7 @@ public class Shadbot {
 	public static void scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
 		SCHEDULER.scheduleAtFixedRate(command, initialDelay, period, unit);
 	}
-	
+
 	public static void logout() {
 		CLIENTS.forEach(DiscordClient::logout);
 	}
