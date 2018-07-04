@@ -68,7 +68,7 @@ public class Card {
 	}
 
 	public static Card pick() {
-		return new Card(ThreadLocalRandom.current().nextInt(1, 14), Utils.randArray(Sign.values()));
+		return new Card(ThreadLocalRandom.current().nextInt(1, 14), Utils.randValue(Sign.values()));
 	}
 
 	public static List<Card> pick(int count) {

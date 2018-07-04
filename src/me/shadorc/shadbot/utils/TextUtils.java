@@ -36,14 +36,14 @@ public class TextUtils {
 	 * @return A string representing a random spam message
 	 */
 	public static String getSpamMessage() {
-		return Utils.randArray(SPAM_MESSAGES);
+		return Utils.randValue(SPAM_MESSAGES);
 	}
 
 	/**
 	 * @return A string representing a random tip
 	 */
 	public static String getTip() {
-		return Utils.randArray(TIPS_MESSAGES);
+		return Utils.randValue(TIPS_MESSAGES);
 	}
 
 	public static String notEnoughCoins(User user) {

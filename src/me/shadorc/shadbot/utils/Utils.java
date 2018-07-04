@@ -158,11 +158,19 @@ public class Utils {
 	}
 
 	/**
+	 * @param list - the list from which to take a random element
+	 * @return A random element from the list
+	 */
+	public static <T> T randValue(List<T> list) {
+		return list.get(ThreadLocalRandom.current().nextInt(list.size()));
+	}
+
+	/**
 	 * @param array - the array from which to take a random element
 	 * @return A random element from the array
 	 */
-	public static <T> T randArray(T[] array) {
-		return array[ThreadLocalRandom.current().nextInt(array.length)];
+	public static <T> T randValue(T[] array) {
+		return Utils.randValue(Arrays.asList(array));
 	}
 
 }
