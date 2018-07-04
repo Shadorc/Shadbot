@@ -1,8 +1,6 @@
 package me.shadorc.shadbot.command.utils;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import com.fathzer.soft.javaluator.DoubleEvaluator;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -27,12 +25,11 @@ public class CalcCmd extends AbstractCommand {
 		}
 
 		try {
-			ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 			String expression = context.getArg();
 			BotUtils.sendMessage(Emoji.TRIANGULAR_RULER + String.format(" %s = %s",
-					expression.replace("*", "\\*"), engine.eval(expression)), context.getChannel());
-		} catch (ScriptException err) {
-			throw new IllegalCmdArgumentException(String.format("`%s` is not a valid expression.", context.getArg()));
+					expression.replace("*", "\\*"), new DoubleEvaluator().evaluate(expression)), context.getChannel());
+		} catch (IllegalArgumentException err) {
+			throw new IllegalCmdArgumentException(err.getMessage());
 		}
 	}
 
