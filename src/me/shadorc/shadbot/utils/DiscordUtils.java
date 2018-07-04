@@ -24,6 +24,10 @@ public class DiscordUtils {
 		return Instant.ofEpochMilli(1420070400000L + (id.asLong() >>> 22));
 	}
 
+	public static Mono<Boolean> hasPermissions(Mono<Member> member, Permission... permissions) {
+		return member.flatMap(user -> DiscordUtils.hasPermissions(user, permissions));
+	}
+
 	public static Mono<Boolean> hasPermissions(Member member, Permission... permissions) {
 		return member.getRoles()
 				.map(Role::getPermissions)
