@@ -14,10 +14,10 @@ public @interface Command {
 
 	String[] names();
 
+	String alias() default "";
+
 	CommandCategory category();
 
 	CommandPermission permission() default CommandPermission.USER;
-
-	String alias() default "";
 
 }

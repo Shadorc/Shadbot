@@ -140,13 +140,13 @@ public class Utils {
 		}
 
 		if(Database.getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
-			BotUtils.sendMessage(TextUtils.notEnoughCoins(member), channel);
+			BotUtils.sendMessage(TextUtils.notEnoughCoins(member), channel).subscribe();
 			return null;
 		}
 
 		if(bet > maxValue) {
 			BotUtils.sendMessage(String.format(Emoji.BANK + " Sorry, you can't bet more than **%s**.",
-					FormatUtils.formatCoins(maxValue)), channel);
+					FormatUtils.formatCoins(maxValue)), channel).subscribe();
 			return null;
 		}
 

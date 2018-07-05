@@ -12,8 +12,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Image;
-import discord4j.core.object.util.Image.Format;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -110,11 +108,7 @@ public class Context {
 	}
 
 	public Mono<String> getAuthorAvatarUrl() {
-		return this.getAuthor()
-				.map(user -> user.getAvatar(Format.JPEG))
-				.map(image -> image.map(Image::getUrl))
-				.map(url -> url.orElse("https://avatars0.githubusercontent.com/u/6373756?s=460&v=4"));
-
+		return DiscordUtils.getAuthorAvatarUrl(this.getAuthor());
 	}
 
 	public Optional<Member> getMember() {
@@ -126,22 +120,16 @@ public class Context {
 		Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
 				.map(ApplicationInfo::getOwnerId)
 				.filter(this.getAuthorId()::equals)
-				.map(bool -> {
-					return CommandPermission.OWNER;
-				});
+				.map(bool -> CommandPermission.OWNER);
 
 		// Private message, the author is considered as an administrator
 		Mono<CommandPermission> dmPerm = Mono.just(this.getGuildId())
 				.filter(guildId -> !guildId.isPresent())
-				.map(guildId -> {
-					return CommandPermission.ADMIN;
-				});
+				.map(guildId -> CommandPermission.ADMIN);
 
 		// The member is an administrator
 		Mono<CommandPermission> adminPerm = DiscordUtils.hasPermissions(this.getAuthor(), this.getGuildId().get(), Permission.ADMINISTRATOR)
-				.map(bool -> {
-					return CommandPermission.ADMIN;
-				});
+				.map(bool -> CommandPermission.ADMIN);
 
 		return ownerPerm
 				.switchIfEmpty(dmPerm)
@@ -150,7 +138,9 @@ public class Context {
 	}
 
 	public Mono<Boolean> isChannelNsfw() {
-		return this.getChannel().map(TextChannel.class::cast).map(TextChannel::isNsfw);
+		return this.getChannel()
+				.map(TextChannel.class::cast)
+				.map(TextChannel::isNsfw);
 	}
 
 	public String requireArg() {
@@ -165,8 +155,7 @@ public class Context {
 	}
 
 	public List<String> requireArgs(int min, int max) {
-		this.requireArg();
-		List<String> args = StringUtils.split(this.getArg().get(), max);
+		List<String> args = StringUtils.split(this.requireArg(), max);
 		if(!NumberUtils.isInRange(args.size(), min, max)) {
 			throw new MissingArgumentException();
 		}

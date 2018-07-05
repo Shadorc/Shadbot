@@ -76,13 +76,13 @@ public class VoiceStateUpdateListener {
 						if(isAlone && !guildMusic.isLeavingScheduled()) {
 							BotUtils.sendMessage(Emoji.INFO + " Nobody is listening anymore, music paused. "
 									+ "I will leave the voice channel in 1 minute.",
-									guildMusic.getMessageChannel());
+									guildMusic.getMessageChannel()).subscribe();
 							guildMusic.getScheduler().getAudioPlayer().setPaused(true);
 							guildMusic.scheduleLeave();
 
 						} else if(!isAlone && guildMusic.isLeavingScheduled()) {
 							BotUtils.sendMessage(Emoji.INFO + " Somebody joined me, music resumed.",
-									guildMusic.getMessageChannel());
+									guildMusic.getMessageChannel()).subscribe();
 							guildMusic.getScheduler().getAudioPlayer().setPaused(false);
 							guildMusic.cancelLeave();
 						}

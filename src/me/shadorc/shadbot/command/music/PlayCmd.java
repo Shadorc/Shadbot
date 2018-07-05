@@ -104,7 +104,7 @@ public class PlayCmd extends AbstractCommand {
 						return;
 					}
 
-					guildMusic.setChannel(context.getChannelId());
+					guildMusic.setMessageChannel(context.getChannelId());
 
 					final boolean putFirst = context.getCommandName().endsWith("first");
 					AudioLoadResultListener resultListener = new AudioLoadResultListener(

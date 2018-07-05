@@ -26,11 +26,11 @@ public abstract class AbstractCommand {
 		this.category = cmdAnnotation.category();
 		this.permission = cmdAnnotation.permission();
 
-		RateLimited limiter = this.getClass().getAnnotation(RateLimited.class);
-		if(limiter == null) {
+		RateLimited limiterAnnotation = this.getClass().getAnnotation(RateLimited.class);
+		if(limiterAnnotation == null) {
 			this.rateLimiter = Optional.empty();
 		} else {
-			this.rateLimiter = Optional.of(new RateLimiter(limiter.max(), limiter.cooldown(), limiter.unit()));
+			this.rateLimiter = Optional.of(new RateLimiter(limiterAnnotation.max(), limiterAnnotation.cooldown(), limiterAnnotation.unit()));
 		}
 	}
 

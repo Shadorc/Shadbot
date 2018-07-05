@@ -33,72 +33,6 @@ public class TrackScheduler {
 		this.setVolume(defaultVolume);
 	}
 
-	/**
-	 * @return {@code true} if the track was started, {@code false} if it was added to the queue
-	 */
-	public boolean startOrQueue(AudioTrack track, boolean first) {
-		VariousStatsManager.log(VariousEnum.MUSICS_LOADED);
-
-		if(audioPlayer.startTrack(track.makeClone(), true)) {
-			this.currentTrack = track;
-			return true;
-		} else if(first) {
-			queue.offerFirst(track);
-		} else {
-			queue.offerLast(track);
-		}
-		return false;
-	}
-
-	/**
-	 * @return {@code true} if the track was started, {@code false} otherwise
-	 */
-	public boolean nextTrack() {
-		switch (repeatMode) {
-			case PLAYLIST:
-				queue.offer(currentTrack.makeClone());
-			case NONE:
-				this.currentTrack = queue.poll();
-				return audioPlayer.startTrack(currentTrack, false);
-			case SONG:
-				audioPlayer.playTrack(currentTrack.makeClone());
-				break;
-		}
-		return true;
-	}
-
-	public void skipTo(int num) {
-		AudioTrack track = null;
-		for(int i = 0; i < num; i++) {
-			track = queue.poll();
-		}
-		audioPlayer.playTrack(track.makeClone());
-		this.currentTrack = track;
-	}
-
-	public long changePosition(long time) {
-		final AudioTrack track = audioPlayer.getPlayingTrack();
-		long newPosition = track.getPosition() + time;
-		track.setPosition(NumberUtils.between(newPosition, 0, track.getDuration()));
-		return newPosition;
-	}
-
-	public void shufflePlaylist() {
-		List<AudioTrack> tempList = new ArrayList<>(queue);
-		Collections.shuffle(tempList);
-		queue.clear();
-		queue.addAll(tempList);
-	}
-
-	public void clearPlaylist() {
-		queue.clear();
-	}
-
-	public void destroy() {
-		audioPlayer.destroy();
-		queue.clear();
-	}
-
 	public BlockingQueue<AudioTrack> getPlaylist() {
 		return queue;
 	}
@@ -125,5 +59,71 @@ public class TrackScheduler {
 
 	public void setRepeatMode(RepeatMode repeatMode) {
 		this.repeatMode = repeatMode;
+	}
+
+	/**
+	 * @return {@code true} if the track was started, {@code false} if it was added to the queue
+	 */
+	public boolean startOrQueue(AudioTrack track, boolean first) {
+		VariousStatsManager.log(VariousEnum.MUSICS_LOADED);
+
+		if(audioPlayer.startTrack(track.makeClone(), true)) {
+			this.currentTrack = track;
+			return true;
+		} else if(first) {
+			queue.offerFirst(track);
+		} else {
+			queue.offerLast(track);
+		}
+		return false;
+	}
+
+	/**
+	 * @return {@code true} if the track was started, {@code false} otherwise
+	 */
+	public boolean nextTrack() {
+		switch (repeatMode) {
+			case PLAYLIST:
+				queue.offer(currentTrack);
+			case NONE:
+				this.currentTrack = queue.poll();
+				return audioPlayer.startTrack(currentTrack.makeClone(), false);
+			case SONG:
+				audioPlayer.playTrack(currentTrack.makeClone());
+				break;
+		}
+		return true;
+	}
+
+	public void skipTo(int num) {
+		AudioTrack track = null;
+		for(int i = 0; i < num; i++) {
+			track = queue.poll();
+		}
+		audioPlayer.playTrack(track.makeClone());
+		this.currentTrack = track;
+	}
+
+	public long changePosition(long time) {
+		final AudioTrack track = audioPlayer.getPlayingTrack();
+		final long newPosition = track.getPosition() + time;
+		track.setPosition(NumberUtils.between(newPosition, 0, track.getDuration()));
+		return newPosition;
+	}
+
+	public void shufflePlaylist() {
+		List<AudioTrack> tempList = new ArrayList<>(queue);
+		Collections.shuffle(tempList);
+		queue.clear();
+		queue.addAll(tempList);
+	}
+
+	public void clearPlaylist() {
+		queue.clear();
+	}
+
+	public void destroy() {
+		audioPlayer.destroy();
+		this.clearPlaylist();
 	}
 }

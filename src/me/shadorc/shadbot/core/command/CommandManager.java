@@ -40,13 +40,13 @@ public class CommandManager {
 		for(Class<?> cmdClass : reflections.getTypesAnnotatedWith(Command.class)) {
 			String cmdName = cmdClass.getSimpleName();
 			if(!AbstractCommand.class.isAssignableFrom(cmdClass)) {
-				LogUtils.error(String.format("An error occurred while generating command, %s cannot be casted to %s.",
+				LogUtils.error(String.format("An error occurred while generating command: %s cannot be casted to %s.",
 						cmdName, AbstractCommand.class.getSimpleName()));
 				continue;
 			}
 
 			try {
-				AbstractCommand cmd = AbstractCommand.class.cast(cmdClass.getConstructor().newInstance());
+				AbstractCommand cmd = (AbstractCommand) cmdClass.getConstructor().newInstance();
 
 				List<String> names = cmd.getNames();
 				if(!cmd.getAlias().isEmpty()) {
@@ -55,7 +55,7 @@ public class CommandManager {
 
 				for(String name : names) {
 					if(COMMANDS_MAP.putIfAbsent(name, cmd) != null) {
-						LogUtils.error(String.format("Command name collision between %s and %s",
+						LogUtils.error(String.format("Command name collision between %s and %s.",
 								cmdName, COMMANDS_MAP.get(name).getClass().getSimpleName()));
 					}
 				}
@@ -156,6 +156,6 @@ public class CommandManager {
 	}
 
 	public static AbstractCommand getCommand(String name) {
-		return COMMANDS_MAP.get(name);
+		return CommandManager.getCommands().get(name);
 	}
 }

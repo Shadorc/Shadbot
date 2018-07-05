@@ -19,6 +19,8 @@ import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.SchedulerUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
@@ -50,12 +52,11 @@ public class GuildMusic {
 	}
 
 	public void scheduleLeave() {
-		leaveTask = GuildMusicManager.VOICE_LEAVE_SCHEDULER
-				.schedule(this::leaveVoiceChannel, 1, TimeUnit.MINUTES);
+		leaveTask = SchedulerUtils.schedule(this::leaveVoiceChannel, 1, TimeUnit.MINUTES);
 	}
 
 	public void cancelLeave() {
-		if(leaveTask != null) {
+		if(this.isLeavingScheduled()) {
 			leaveTask.cancel(false);
 		}
 	}
@@ -69,11 +70,18 @@ public class GuildMusic {
 		if(!isInVoiceChannel.get()) {
 			client.getVoiceChannelById(voiceChannelId)
 					.flatMap(VoiceChannel::join)
-					.subscribe(controller -> {
-						this.controller = controller;
-						controller.connect(audioProvider, audioReceiver);
-						isInVoiceChannel.set(true);
-					});
+					.map(controller -> this.controller = controller)
+					.flatMap(controller -> controller.connect(audioProvider, audioReceiver))
+					.doOnError(err -> {
+						BotUtils.sendMessage(Emoji.RED_FLAG + "Sorry, something went wrong during the connection to the voice channel... "
+								+ "My developer has been warned.",
+								this.getMessageChannel())
+								.subscribe();
+						LogUtils.error(client, err,
+								String.format("{%d} An unknown error occurred while joining a voice channel.", guildId.asLong()));
+					})
+					.doOnSuccess((Void) -> isInVoiceChannel.set(true))
+					.subscribe();
 		}
 	}
 
@@ -91,7 +99,7 @@ public class GuildMusic {
 					+ "it will help my creator keeping me alive :heart:",
 					Config.PATREON_URL));
 		}
-		BotUtils.sendMessage(strBuilder.toString(), client.getMessageChannelById(messageChannelId));
+		BotUtils.sendMessage(strBuilder.toString(), client.getMessageChannelById(messageChannelId)).subscribe();
 		this.leaveVoiceChannel();
 	}
 
@@ -137,8 +145,8 @@ public class GuildMusic {
 		return isWaiting;
 	}
 
-	public void setChannel(Snowflake channelId) {
-		this.messageChannelId = channelId;
+	public void setMessageChannel(Snowflake messageChannelId) {
+		this.messageChannelId = messageChannelId;
 	}
 
 	public void setDj(Snowflake djId) {
