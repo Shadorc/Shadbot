@@ -2,6 +2,7 @@ package me.shadorc.shadbot.utils;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -22,6 +23,7 @@ import javax.management.ReflectionException;
 
 import org.json.JSONArray;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import discord4j.core.object.entity.Member;
@@ -32,6 +34,8 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 public class Utils {
+
+	public static final ObjectMapper MAPPER = new ObjectMapper();
 
 	/**
 	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found

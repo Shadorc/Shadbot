@@ -58,11 +58,9 @@ public class TransferCoinsCmd extends AbstractCommand {
 		DBMember dbReceiver = Database.getDBMember(context.getGuildId().get(), receiverUserId);
 		if(dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
 			return context.getClient().getUserById(receiverUserId)
-					.flatMap(user -> {
-						return BotUtils.sendMessage(String.format(
-								Emoji.BANK + " This transfer cannot be done because %s would exceed the maximum coins cap.",
-								user.getUsername()), context.getChannel());
-					})
+					.flatMap(user -> BotUtils.sendMessage(String.format(
+							Emoji.BANK + " This transfer cannot be done because %s would exceed the maximum coins cap.",
+							user.getUsername()), context.getChannel()))
 					.then();
 		}
 
@@ -72,13 +70,9 @@ public class TransferCoinsCmd extends AbstractCommand {
 		return context.getAuthor()
 				.map(User::getMention)
 				.zipWith(context.getClient().getUserById(senderUserId).map(User::getMention))
-				.flatMap(senderAndReceiver -> {
-					return BotUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
-							senderAndReceiver.getT1(),
-							FormatUtils.formatCoins(coins),
-							senderAndReceiver.getT2()),
-							context.getChannel());
-				})
+				.flatMap(senderAndReceiver -> BotUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
+						senderAndReceiver.getT1(), FormatUtils.formatCoins(coins), senderAndReceiver.getT2()),
+						context.getChannel()))
 				.then();
 	}
 

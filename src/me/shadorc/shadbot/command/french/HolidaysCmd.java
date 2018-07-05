@@ -32,8 +32,7 @@ public class HolidaysCmd extends AbstractCommand {
 
 		final Zone zone = Utils.getValueOrNull(Zone.class, arg);
 		if(zone == null) {
-			throw new CommandException(String.format("`%s` is not a valid zone. %s",
-					context.getArg(), FormatUtils.formatOptions(Zone.class)));
+			throw new CommandException(String.format("`%s` is not a valid zone. %s", arg, FormatUtils.formatOptions(Zone.class)));
 		}
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());

@@ -30,26 +30,19 @@ public class LeaderboardCmd extends AbstractCommand {
 						.zipWith(Mono.just(dbMember.getCoins())))
 				.buffer()
 				.singleOrEmpty()
-				.map(list -> {
-					return FormatUtils.numberedList(10, list.size(),
-							count -> {
-								final Tuple2<User, Integer> userAndCoins = list.get(count - 1);
-								final String username = userAndCoins.getT1().getUsername();
-								final String coins = FormatUtils.formatCoins(userAndCoins.getT2());
-								return String.format("%d. **%s** - %s", count, username, coins);
-							});
-				})
+				.map(list -> FormatUtils.numberedList(10, list.size(),
+						count -> {
+							final Tuple2<User, Integer> userAndCoins = list.get(count - 1);
+							final String username = userAndCoins.getT1().getUsername();
+							final String coins = FormatUtils.formatCoins(userAndCoins.getT2());
+							return String.format("%d. **%s** - %s", count, username, coins);
+						}))
 				.defaultIfEmpty("\nEveryone is poor here.")
-				.flatMap(str -> {
-					return context.getAuthorAvatarUrl().map(avatarUrl -> {
-						return EmbedUtils.getDefaultEmbed()
-								.setAuthor("Leaderboard", null, avatarUrl)
-								.setDescription(str);
-					});
-				})
-				.flatMap(embed -> {
-					return BotUtils.sendMessage(embed, context.getChannel());
-				})
+				.zipWith(context.getAuthorAvatarUrl())
+				.map(msgAndAvatar -> EmbedUtils.getDefaultEmbed()
+						.setAuthor("Leaderboard", null, msgAndAvatar.getT2())
+						.setDescription(msgAndAvatar.getT1()))
+				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
 				.then();
 	}
 
