@@ -27,12 +27,17 @@ public class ExceptionUtils {
 		return err instanceof ClientException && ((ClientException) err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
 	}
 
+	public static boolean isNotForbidden(Throwable err) {
+		return !ExceptionUtils.isForbidden(err);
+	}
+
 	public static boolean isUnknown(Throwable err) {
 		return !(err instanceof CommandException)
 				&& !(err instanceof MissingArgumentException)
 				&& !(err instanceof NoMusicException)
 				&& !ExceptionUtils.isUnavailable(err)
-				&& !ExceptionUtils.isUnreacheable(err);
+				&& !ExceptionUtils.isUnreacheable(err)
+				&& !ExceptionUtils.isForbidden(err);
 	}
 
 }

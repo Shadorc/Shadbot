@@ -11,34 +11,33 @@ import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.publisher.Flux;
 
 public class MemberListener {
 
 	public static void onMemberJoin(MemberJoinEvent event) {
 		final Snowflake guildId = event.getGuildId();
-		DBGuild dbGuild = Database.getDBGuild(guildId);
+		final DBGuild dbGuild = Database.getDBGuild(guildId);
 
 		MemberListener.sendAutoMsg(event.getClient(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage());
 
-		dbGuild.getAutoRoles()
-				.forEach(roleId -> event.getMember().addRole(roleId)
-						.doOnError(ExceptionUtils::isForbidden,
-								err -> LogUtils.infof("{Guild ID: %d} Shadbot was not allowed to edit role.", guildId.asLong()))
-						.doOnError(
-								err -> LogUtils.error(event.getClient(), err, String.format("{Guild ID: %d} An error occured while editing a role.", guildId.asLong())))
-						.subscribe());
+		Flux.fromIterable(dbGuild.getAutoRoles())
+				.flatMap(roleId -> event.getMember().addRole(roleId))
+				.doOnError(ExceptionUtils::isForbidden,
+						err -> LogUtils.infof("{Guild ID: %d} Shadbot was not allowed to edit role.", guildId.asLong()))
+				.doOnError(ExceptionUtils::isNotForbidden,
+						err -> LogUtils.error(event.getClient(), err, String.format("{Guild ID: %d} An error occurred while editing a role.", guildId.asLong())))
+				.subscribe();
 	}
 
 	public static void onMemberLeave(MemberLeaveEvent event) {
-		DBGuild dbGuild = Database.getDBGuild(event.getGuildId());
+		final DBGuild dbGuild = Database.getDBGuild(event.getGuildId());
 		MemberListener.sendAutoMsg(event.getClient(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage());
 	}
 
 	private static void sendAutoMsg(DiscordClient client, Optional<Snowflake> channelId, Optional<String> msg) {
-		if(!channelId.isPresent() || !msg.isPresent()) {
-			return;
+		if(channelId.isPresent() && msg.isPresent()) {
+			BotUtils.sendMessage(msg.get(), client.getMessageChannelById(channelId.get())).subscribe();
 		}
-
-		BotUtils.sendMessage(msg.get(), client.getMessageChannelById(channelId.get()));
 	}
 }
