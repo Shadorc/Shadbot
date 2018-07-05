@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.listener;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -65,21 +66,17 @@ public class MessageListener {
 				+ "join my support server : %s",
 				Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-		return event.getMessage()
-				.getChannel()
-				.flatMap(channel -> {
-					if(!channel.getLastMessageId().isPresent()) {
-						BotUtils.sendMessage(text, channel);
-						return Mono.empty();
-					} else {
-						return channel.getMessagesBefore(channel.getLastMessageId().get())
-								// Return true if help text has not already been send
-								.filter(historyMsg -> historyMsg.getContent().map(content -> !text.equalsIgnoreCase(content)).orElse(true))
-								// Send the message even if an error t is re
-								.doOnTerminate(() -> BotUtils.sendMessage(text, channel))
-								.single();
-					}
-				})
+		return event.getMessage().getChannel()
+				.flatMapMany(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now())))
+				.map(Message::getContent)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.take(25)
+				.buffer()
+				.map(list -> !list.stream().anyMatch(text::equalsIgnoreCase))
+				.defaultIfEmpty(true)
+				.flatMap(send -> send ? BotUtils.sendMessage(text, event.getMessage().getChannel()) : Mono.empty())
+				.doOnError(err -> BotUtils.sendMessage(text, event.getMessage().getChannel()).subscribe())
 				.then();
 	}
 }
