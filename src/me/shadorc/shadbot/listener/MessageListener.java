@@ -14,7 +14,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
-import me.shadorc.shadbot.message.MessageManager;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import reactor.core.publisher.Mono;
 
@@ -44,7 +44,7 @@ public class MessageListener {
 				// The role is allowed
 				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
 				// The message has not been intercepted
-				.filter(roles -> !MessageManager.intercept(guildId.get(), event.getMessage()))
+				.filter(roles -> !MessageInterceptorManager.isIntercepted(event))
 				.map(roles -> Database.getDBGuild(guildId.get()).getPrefix())
 				// The message starts with the correct prefix
 				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
