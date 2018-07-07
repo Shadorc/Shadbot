@@ -23,16 +23,16 @@ import reactor.core.publisher.Mono;
 public class PlaylistCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
 
-		context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-					.setAuthor("Playlist", null, avatarUrl)
-					.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-					.setDescription(this.formatPlaylist(guildMusic.getScheduler().getPlaylist()));
-			BotUtils.sendMessage(embed, context.getChannel());
-		});
+		return context.getAuthorAvatarUrl()
+				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+						.setAuthor("Playlist", null, avatarUrl)
+						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
+						.setDescription(this.formatPlaylist(guildMusic.getScheduler().getPlaylist())))
+				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.then();
 	}
 
 	private String formatPlaylist(BlockingQueue<AudioTrack> queue) {

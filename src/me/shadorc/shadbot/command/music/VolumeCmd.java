@@ -20,15 +20,15 @@ import reactor.core.publisher.Mono;
 public class VolumeCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
 
-		TrackScheduler scheduler = guildMusic.getScheduler();
+		final TrackScheduler scheduler = guildMusic.getScheduler();
 		if(!context.getArg().isPresent()) {
-			BotUtils.sendMessage(String.format(Emoji.SOUND + " Current volume level: **%d%%**",
+			return BotUtils.sendMessage(String.format(Emoji.SOUND + " Current volume level: **%d%%**",
 					scheduler.getAudioPlayer().getVolume()),
-					context.getChannel());
-			return;
+					context.getChannel())
+					.then();
 		}
 
 		final String arg = context.getArg().get();
@@ -38,9 +38,10 @@ public class VolumeCmd extends AbstractCommand {
 		}
 
 		scheduler.setVolume(volume);
-		BotUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%**",
+		return BotUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%**",
 				scheduler.getAudioPlayer().getVolume()),
-				context.getChannel());
+				context.getChannel())
+				.then();
 	}
 
 	@Override

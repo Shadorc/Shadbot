@@ -32,9 +32,7 @@ public class PauseCmd extends AbstractCommand {
 						return String.format(Emoji.PLAY + " Music resumed by **%s**.", username);
 					}
 				})
-				.flatMap(message -> {
-					return BotUtils.sendMessage(message, context.getChannel());
-				})
+				.flatMap(message -> BotUtils.sendMessage(message, context.getChannel()))
 				.then();
 	}
 

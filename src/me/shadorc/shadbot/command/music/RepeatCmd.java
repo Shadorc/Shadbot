@@ -21,8 +21,8 @@ import reactor.core.publisher.Mono;
 public class RepeatCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
 
 		RepeatMode mode;
 		if(context.getArg().isPresent()) {
@@ -36,14 +36,16 @@ public class RepeatCmd extends AbstractCommand {
 			mode = RepeatMode.SONG;
 		}
 
-		TrackScheduler scheduler = guildMusic.getScheduler();
+		final TrackScheduler scheduler = guildMusic.getScheduler();
 
-		// TODO this is not readable holy shit
 		scheduler.setRepeatMode(scheduler.getRepeatMode().equals(mode) ? RepeatMode.NONE : mode);
-		BotUtils.sendMessage(String.format("%s %sRepetition %s",
-				scheduler.getRepeatMode().equals(RepeatMode.NONE) ? Emoji.PLAY : Emoji.REPEAT,
-				RepeatMode.PLAYLIST.equals(mode) ? "Playlist " : "",
-				scheduler.getRepeatMode().equals(RepeatMode.NONE) ? "disabled" : "enabled"), context.getChannel());
+
+		final Emoji emoji = scheduler.getRepeatMode().equals(RepeatMode.NONE) ? Emoji.PLAY : Emoji.REPEAT;
+		final String playlistRepetition = RepeatMode.PLAYLIST.equals(mode) ? "Playlist " : "";
+		final String modeStr = scheduler.getRepeatMode().equals(RepeatMode.NONE) ? "disabled" : "enabled";
+
+		return BotUtils.sendMessage(String.format("%s %sRepetition %s", emoji, playlistRepetition, modeStr), context.getChannel())
+				.then();
 	}
 
 	@Override

@@ -17,26 +17,29 @@ import reactor.core.publisher.Mono;
 public class SkipCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		GuildMusic guildMusic = context.requireGuildMusic();
+	public Mono<Void> execute(Context context) {
+		final GuildMusic guildMusic = context.requireGuildMusic();
 
 		if(context.getArg().isPresent()) {
-			int playlistSize = guildMusic.getScheduler().getPlaylist().size();
+			final int playlistSize = guildMusic.getScheduler().getPlaylist().size();
 			Integer num = NumberUtils.asIntBetween(context.getArg().get(), 1, playlistSize);
 			if(num == null) {
 				throw new CommandException(String.format("Number must be between 1 and %d.", playlistSize));
 			}
 			guildMusic.getScheduler().skipTo(num);
-			return;
 		}
 
-		if(guildMusic.getScheduler().nextTrack()) {
-			// If the music has been started correctly, we resume it in case the previous music was on pause
-			guildMusic.getScheduler().getAudioPlayer().setPaused(false);
-		} else {
-			// There is no more music, this is the end
-			guildMusic.end();
+		else {
+			if(guildMusic.getScheduler().nextTrack()) {
+				// If the music has been started correctly, we resume it in case the previous music was on pause
+				guildMusic.getScheduler().getAudioPlayer().setPaused(false);
+			} else {
+				// There is no more music, this is the end
+				guildMusic.end();
+			}
 		}
+
+		return Mono.empty();
 	}
 
 	@Override

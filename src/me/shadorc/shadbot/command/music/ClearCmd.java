@@ -21,9 +21,7 @@ public class ClearCmd extends AbstractCommand {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 		guildMusic.getScheduler().clearPlaylist();
 		return context.getAuthorName()
-				.flatMap(username -> {
-					return BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist cleared by **%s**.", context.getChannel());
-				})
+				.flatMap(username -> BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist cleared by **%s**.", context.getChannel()))
 				.then();
 	}
 
