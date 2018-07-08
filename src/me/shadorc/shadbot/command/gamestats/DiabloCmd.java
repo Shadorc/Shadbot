@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.json.JSONException;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.diablo.HeroResponse;
 import me.shadorc.shadbot.api.diablo.ProfileHeroResponse;
@@ -95,12 +93,12 @@ public class DiabloCmd extends AbstractCommand {
 								.addField("Damage", FormatUtils.format(heroResponses,
 										hero -> String.format("%s DPS", FormatUtils.formatNum(hero.getStats().getDamage())), "\n"), true);
 					})
-					.doOnSuccess(embed -> loadingMsg.send(embed))
+					.doOnSuccess(loadingMsg::send)
 					.then();
 
 		} catch (FileNotFoundException err) {
 			loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.");
-		} catch (JSONException | IOException err) {
+		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

@@ -14,8 +14,8 @@ import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
-import me.shadorc.shadbot.message.MessageListener;
-import me.shadorc.shadbot.message.MessageManager;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
@@ -24,7 +24,7 @@ import me.shadorc.shadbot.utils.object.Card;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 
-public class BlackjackManager extends AbstractGameManager implements MessageListener {
+public class BlackjackManager extends AbstractGameManager implements MessageInterceptor {
 
 	private static final int GAME_DURATION = 60;
 	private static final float WIN_MULTIPLIER = 1.15f;
@@ -51,7 +51,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 			this.dealerCards.add(Card.pick());
 		}
 
-		MessageManager.addListener(this.getMessageChannel(), this);
+		MessageInterceptorManager.addInterceptor(this.getMessageChannel(), this);
 		this.schedule(() -> this.stop(), GAME_DURATION, TimeUnit.SECONDS);
 		startTime = System.currentTimeMillis();
 	}
@@ -59,7 +59,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageList
 	@Override
 	public void stop() {
 		this.cancelScheduledTask();
-		MessageManager.removeListener(this.getMessageChannel(), this);
+		MessageInterceptorManager.removeInterceptor(this.getMessageChannel(), this);
 		BlackjackCmd.MANAGERS.remove(this.getMessageChannel().getLongID());
 
 		this.show();

@@ -32,18 +32,18 @@ public class VoiceStateUpdateListener {
 		}
 	}
 
-	//TODO
+	// TODO
 	private static synchronized void onUserEvent(VoiceStateUpdateEvent event) {
-		//If the bot is in a voice channel...
+		// If the bot is in a voice channel...
 		// ...and the guild music for this guild is not null...
 		// if(isAlone && !guildMusic.isLeavingScheduled()) {
-		//		guildMusic.getScheduler().getAudioPlayer().setPaused(true);
-		//		guildMusic.scheduleLeave();
-		//		return Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.";
+		// guildMusic.getScheduler().getAudioPlayer().setPaused(true);
+		// guildMusic.scheduleLeave();
+		// return Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.";
 		// } else if(!isAlone && guildMusic.isLeavingScheduled()) {
-		//		guildMusic.getScheduler().getAudioPlayer().setPaused(false);
-		//		guildMusic.cancelLeave();
-		//		return Emoji.INFO + " Somebody joined me, music resumed.";
+		// guildMusic.getScheduler().getAudioPlayer().setPaused(false);
+		// guildMusic.cancelLeave();
+		// return Emoji.INFO + " Somebody joined me, music resumed.";
 		// }
 	}
 

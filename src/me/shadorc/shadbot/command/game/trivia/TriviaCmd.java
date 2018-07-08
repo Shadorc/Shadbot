@@ -67,7 +67,7 @@
 // if(MANAGERS.putIfAbsent(context.getChannel().getLongID(), triviaManager) == null) {
 // try {
 // triviaManager.start();
-// } catch (JSONException | IOException err) {
+// } catch (IOException err) {
 // Utils.handle("getting a question", context, err);
 // MANAGERS.remove(context.getChannel().getLongID());
 // }
@@ -81,7 +81,7 @@
 // JSONObject mainObj = new JSONObject(NetUtils.getJSON("https://opentdb.com/api_category.php"));
 // JSONArray categoriesArray = mainObj.getJSONArray("trivia_categories");
 // categoriesArray.forEach(obj -> categories.put(((JSONObject) obj).getInt("id"), ((JSONObject) obj).getString("name")));
-// } catch (JSONException | IOException err) {
+// } catch (IOException err) {
 // LogUtils.error(err, "An error occurred while getting Trivia categories.");
 // }
 // }

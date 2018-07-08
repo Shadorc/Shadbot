@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 
@@ -45,7 +44,7 @@ public class ChatCmd extends AbstractCommand {
 				String response = this.talk(context.getChannelId(), botId, arg);
 				ERROR_COUNT.set(0);
 				return BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel()).then();
-			} catch (JSONException | IOException err) {
+			} catch (IOException err) {
 				LogUtils.infof("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botId);
 			}
 		}

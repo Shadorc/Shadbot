@@ -3,7 +3,6 @@ package me.shadorc.shadbot.command.french;
 import java.io.IOException;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -60,7 +59,7 @@ public class DtcCmd extends AbstractCommand {
 								.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
 								.setDescription("Sorry, no quotes were found."));
 
-					} catch (JSONException | IOException err) {
+					} catch (IOException err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(err);
 					}

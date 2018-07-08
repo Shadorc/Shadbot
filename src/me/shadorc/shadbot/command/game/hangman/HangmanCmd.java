@@ -59,7 +59,7 @@
 // loadingMsg.send();
 // try {
 // this.load();
-// } catch (JSONException | IOException err) {
+// } catch (IOException err) {
 // Utils.handle("getting words list", context, err);
 // }
 // loadingMsg.delete();

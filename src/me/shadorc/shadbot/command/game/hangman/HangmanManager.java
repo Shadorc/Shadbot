@@ -12,8 +12,8 @@ import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
-import me.shadorc.shadbot.message.MessageListener;
-import me.shadorc.shadbot.message.MessageManager;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -21,7 +21,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 
-public class HangmanManager extends AbstractGameManager implements MessageListener {
+public class HangmanManager extends AbstractGameManager implements MessageInterceptor {
 
 	private static final List<String> IMG_LIST = List.of(
 			"https://upload.wikimedia.org/wikipedia/commons/8/8b/Hangman-0.png",
@@ -54,7 +54,7 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 
 	@Override
 	public void start() {
-		MessageManager.addListener(this.getMessageChannel(), this);
+		MessageInterceptorManager.addInterceptor(this.getMessageChannel(), this);
 		this.show();
 		this.schedule(() -> this.stop(), IDLE_MIN, TimeUnit.MINUTES);
 	}
@@ -62,7 +62,7 @@ public class HangmanManager extends AbstractGameManager implements MessageListen
 	@Override
 	public void stop() {
 		this.cancelScheduledTask();
-		MessageManager.removeListener(this.getMessageChannel(), this);
+		MessageInterceptorManager.removeInterceptor(this.getMessageChannel(), this);
 		HangmanCmd.MANAGERS.remove(this.getMessageChannel().getLongID());
 	}
 

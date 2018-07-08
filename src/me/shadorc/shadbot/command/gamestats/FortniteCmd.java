@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
@@ -137,7 +136,7 @@ public class FortniteCmd extends AbstractCommand {
 						.setDescription(description);
 				loadingMsg.send(embed);
 
-			} catch (JSONException | IOException err) {
+			} catch (IOException err) {
 				loadingMsg.stopTyping();
 				throw Exceptions.propagate(err);
 			}

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -110,7 +109,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 					.addField("Total MVP", Integer.toString(this.getValue(statsArray, "total_mvps")), true);
 			loadingMsg.send(embed);
 
-		} catch (JSONException | IOException err) {
+		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

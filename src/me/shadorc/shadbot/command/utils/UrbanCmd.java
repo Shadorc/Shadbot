@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.utils;
 
 import java.io.IOException;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -56,7 +55,7 @@ public class UrbanCmd extends AbstractCommand {
 				loadingMsg.send(embed);
 			});
 
-		} catch (JSONException | IOException err) {
+		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

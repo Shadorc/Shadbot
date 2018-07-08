@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -74,7 +73,7 @@ public class TranslateCmd extends AbstractCommand {
 					sourceText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)),
 					translatedText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo))));
 
-		} catch (JSONException | IOException err) {
+		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

@@ -16,8 +16,8 @@ import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
-import me.shadorc.shadbot.message.MessageListener;
-import me.shadorc.shadbot.message.MessageManager;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -27,7 +27,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 
-public class TriviaManager extends AbstractGameManager implements MessageListener {
+public class TriviaManager extends AbstractGameManager implements MessageInterceptor {
 
 	protected static final int MIN_GAINS = 100;
 	protected static final int MAX_BONUS = 100;
@@ -78,7 +78,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 
 		BotUtils.sendMessage(embed.build(), this.getMessageChannel());
 
-		MessageManager.addListener(this.getMessageChannel(), this);
+		MessageInterceptorManager.addInterceptor(this.getMessageChannel(), this);
 
 		startTime = System.currentTimeMillis();
 		this.schedule(() -> {
@@ -90,7 +90,7 @@ public class TriviaManager extends AbstractGameManager implements MessageListene
 	@Override
 	public void stop() {
 		this.cancelScheduledTask();
-		MessageManager.removeListener(this.getMessageChannel(), this);
+		MessageInterceptorManager.removeInterceptor(this.getMessageChannel(), this);
 		TriviaCmd.MANAGERS.remove(this.getMessageChannel().getLongID());
 	}
 

@@ -47,6 +47,7 @@ public class Context {
 		return cmdName;
 	}
 
+	// TODO: Comment this to see everywhere it's used to check that it use correctly optional
 	public Optional<String> getArg() {
 		return arg;
 	}
