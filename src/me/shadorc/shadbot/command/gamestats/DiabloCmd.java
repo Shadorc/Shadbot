@@ -78,21 +78,19 @@ public class DiabloCmd extends AbstractCommand {
 			Collections.reverse(heroResponses);
 
 			return context.getAuthorAvatarUrl()
-					.map(avatarUrl -> {
-						return EmbedUtils.getDefaultEmbed()
-								.setAuthor("Diablo 3 Stats", null, avatarUrl)
-								.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
-								.setDescription(String.format("Stats for **%s** (Guild: **%s**)"
-										+ "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
-										+ "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
-										profile.getBattleTag(), profile.getGuildName(),
-										profile.getParagonLevel(), profile.getParagonLevelSeasonHardcore(),
-										profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
-								.addField("Heroes", FormatUtils.format(heroResponses,
-										hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
-								.addField("Damage", FormatUtils.format(heroResponses,
-										hero -> String.format("%s DPS", FormatUtils.formatNum(hero.getStats().getDamage())), "\n"), true);
-					})
+					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+							.setAuthor("Diablo 3 Stats", null, avatarUrl)
+							.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
+							.setDescription(String.format("Stats for **%s** (Guild: **%s**)"
+									+ "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
+									+ "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
+									profile.getBattleTag(), profile.getGuildName(),
+									profile.getParagonLevel(), profile.getParagonLevelSeasonHardcore(),
+									profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
+							.addField("Heroes", FormatUtils.format(heroResponses,
+									hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
+							.addField("Damage", FormatUtils.format(heroResponses,
+									hero -> String.format("%s DPS", FormatUtils.formatNum(hero.getStats().getDamage())), "\n"), true))
 					.doOnSuccess(loadingMsg::send)
 					.then();
 

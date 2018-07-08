@@ -35,8 +35,8 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) {
-		List<String> args = context.requireArgs(1, 3);
+	public Mono<Void> execute(Context context) {
+		final List<String> args = context.requireArgs(1, 3);
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
@@ -66,10 +66,11 @@ public class OverwatchCmd extends AbstractCommand {
 					.addField("Game time", player.getTimePlayed(), true)
 					.addField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
 					.addField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
-			loadingMsg.send(embed);
+
+			return loadingMsg.send(embed).then();
 
 		} catch (OverwatchException err) {
-			loadingMsg.send(Emoji.MAGNIFYING_GLASS + " " + err.getMessage());
+			return loadingMsg.send(Emoji.MAGNIFYING_GLASS + " " + err.getMessage()).then();
 		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
@@ -77,8 +78,10 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	private String getTopThreeHeroes(List<HeroDesc> heroesList) {
-		return FormatUtils.numberedList(3, heroesList.size(), count -> String.format("**%s**. %s (%s)",
-				count, heroesList.get(count - 1).getName(), heroesList.get(count - 1).getDesc()));
+		return FormatUtils.numberedList(3, heroesList.size(), count -> {
+			final HeroDesc hero = heroesList.get(count - 1);
+			return String.format("**%s**. %s (%s)", count, hero.getName(), hero.getDesc());
+		});
 	}
 
 	private Platform getPlatform(String str) {

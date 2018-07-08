@@ -1,16 +1,16 @@
-package me.shadorc.shadbot.api.diablo;
+package me.shadorc.shadbot.api.steam;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProfileHeroResponse {
+public class SteamIdResponse {
 
-	@JsonProperty("id")
-	private long id;
+	@JsonProperty("steamid")
+	private String steamId;
 
-	public long getId() {
-		return id;
+	public String getSteamId() {
+		return steamId;
 	}
 
 }
