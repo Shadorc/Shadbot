@@ -38,6 +38,7 @@ public class GuildMusic {
 	private Snowflake messageChannelId;
 	private Snowflake djId;
 	private boolean isWaiting;
+	private boolean isDone;
 
 	public GuildMusic(DiscordClient client, Snowflake guildId, AudioPlayerManager audioPlayerManager) {
 		this.client = client;
@@ -46,7 +47,7 @@ public class GuildMusic {
 
 		AudioPlayer audioPlayer = audioPlayerManager.createPlayer();
 		audioPlayer.addListener(new AudioEventListener(this));
-		this.audioProvider = new MusicProvider(audioPlayer);
+		this.audioProvider = new MusicProvider(audioPlayer, this);
 		this.audioReceiver = new MusicReceiver();
 		this.trackScheduler = new TrackScheduler(audioPlayer, Database.getDBGuild(guildId).getDefaultVol());
 	}
@@ -71,7 +72,10 @@ public class GuildMusic {
 			client.getVoiceChannelById(voiceChannelId)
 					.flatMap(VoiceChannel::join)
 					.map(controller -> this.controller = controller)
-					.flatMap(controller -> controller.connect(audioProvider, audioReceiver))
+					.flatMap(controller -> {
+						isInVoiceChannel.set(true);
+						return controller.connect(audioProvider, audioReceiver);
+					})
 					.doOnError(err -> {
 						BotUtils.sendMessage(Emoji.RED_FLAG + "Sorry, something went wrong during the connection to the voice channel... "
 								+ "My developer has been warned.",
@@ -79,14 +83,16 @@ public class GuildMusic {
 								.subscribe();
 						LogUtils.error(client, err,
 								String.format("{%d} An unknown error occurred while joining a voice channel.", guildId.asLong()));
+						// FIXME: this does not work
+						this.leaveVoiceChannel();
 					})
-					.doOnSuccess((Void) -> isInVoiceChannel.set(true))
 					.subscribe();
 		}
 	}
 
 	public void leaveVoiceChannel() {
 		if(isInVoiceChannel.get()) {
+			isDone = true;
 			controller.disconnect();
 			isInVoiceChannel.set(false);
 		}
@@ -143,6 +149,10 @@ public class GuildMusic {
 
 	public boolean isWaiting() {
 		return isWaiting;
+	}
+
+	public boolean isDone() {
+		return isDone;
 	}
 
 	public void setMessageChannel(Snowflake messageChannelId) {
