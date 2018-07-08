@@ -108,7 +108,10 @@ public class CommandManager {
 				.filter(isRateLimited.negate())
 				.flatMap(cmd -> cmd.execute(context))
 				.doOnError(CommandException.class, err -> {
-					BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + err.getMessage(), context.getChannel()).subscribe();
+					context.getAuthorName()
+							.flatMap(username -> BotUtils.sendMessage(
+									String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s", username, err.getMessage()), context.getChannel()))
+							.subscribe();
 					CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
 				})
 				.doOnError(MissingArgumentException.class, err -> {
