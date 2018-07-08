@@ -23,6 +23,7 @@ import javax.management.ReflectionException;
 
 import org.json.JSONArray;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -35,7 +36,8 @@ import reactor.core.publisher.Mono;
 
 public class Utils {
 
-	public static final ObjectMapper MAPPER = new ObjectMapper();
+	public static final ObjectMapper MAPPER = new ObjectMapper()
+			.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
 	/**
 	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found

@@ -1,14 +1,14 @@
 package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
+import java.net.URL;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.apache.http.HttpStatus;
 import org.jsoup.HttpStatusException;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.api.image.giphy.GiphyResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -18,6 +18,7 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
@@ -28,30 +29,29 @@ import reactor.core.publisher.Mono;
 public class GifCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
+	public Mono<Void> execute(Context context) {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
-					APIKeys.get(APIKey.GIPHY_API_KEY),
-					NetUtils.encode(context.getArg().orElse("")));
+			final URL url = new URL(String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
+					APIKeys.get(APIKey.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse(""))));
 
-			JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
-			if(!mainObj.has("data")) {
-				throw new HttpStatusException("Giphy did not return valid JSON.", NetUtils.JSON_ERROR_CODE, url);
+			GiphyResponse giphy = Utils.MAPPER.readValue(url, GiphyResponse.class);
+
+			if(giphy.getData() == null) {
+				throw new HttpStatusException("Giphy did not return valid JSON.", HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
 			}
 
-			if(mainObj.get("data") instanceof JSONArray) {
-				loadingMsg.send(TextUtils.noResult(context.getArg().orElse("random search")));
-				return;
+			if(giphy.getData().isEmpty()) {
+				return loadingMsg.send(TextUtils.noResult(context.getArg().orElse("random search"))).then();
 			}
 
 			EmbedCreateSpec embed = new EmbedCreateSpec()
-					.setColor(Config.BOT_COLOR.getRGB())
-					.setImage(mainObj.getJSONObject("data").getString("image_url"));
-			loadingMsg.send(embed);
+					.setColor(Config.BOT_COLOR)
+					.setImage(giphy.getData().get(0).getImageUrl());
+			return loadingMsg.send(embed).then();
 
-		} catch (JSONException | IOException err) {
+		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

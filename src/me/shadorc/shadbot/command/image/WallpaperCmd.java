@@ -44,6 +44,8 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.IMAGE, names = { "wallpaper" }, alias = "wp")
 public class WallpaperCmd extends AbstractCommand {
 
+	// TODO: I don't like this class at all, this is a fucking mess
+
 	private final static String PURITY = "purity";
 	private final static String CATEGORY = "category";
 	private final static String RATIO = "ratio";
@@ -53,7 +55,7 @@ public class WallpaperCmd extends AbstractCommand {
 	private Wallhaven wallhaven;
 
 	@Override
-	public void execute(Context context) {
+	public Mono<Void> execute(Context context) {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		if(wallhaven == null) {
@@ -89,57 +91,56 @@ public class WallpaperCmd extends AbstractCommand {
 			throw Exceptions.propagate(err);
 		}
 
-		context.isChannelNsfw().subscribe(isNsfw -> {
-			Purity purity = this.parseEnum(loadingMsg, context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
-			if((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !isNsfw) {
-				loadingMsg.send(TextUtils.mustBeNsfw(context.getPrefix()));
-				return;
-			}
+		return context.isChannelNsfw()
+				.flatMap(isNsfw -> {
+					Purity purity = this.parseEnum(loadingMsg, context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
+					if((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !isNsfw) {
+						return loadingMsg.send(TextUtils.mustBeNsfw(context.getPrefix())).then();
+					}
 
-			SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
-			queryBuilder.purity(purity);
+					SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
+					queryBuilder.purity(purity);
 
-			if(cmdLine.hasOption(CATEGORY)) {
-				queryBuilder.categories(this.parseEnum(loadingMsg, context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
-			}
+					if(cmdLine.hasOption(CATEGORY)) {
+						queryBuilder.categories(this.parseEnum(loadingMsg, context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
+					}
 
-			if(cmdLine.hasOption(RATIO)) {
-				Dimension dim = this.parseDim(loadingMsg, context, RATIO, cmdLine.getOptionValues(RATIO));
-				queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
-			}
+					if(cmdLine.hasOption(RATIO)) {
+						Dimension dim = this.parseDim(loadingMsg, context, RATIO, cmdLine.getOptionValues(RATIO));
+						queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
+					}
 
-			if(cmdLine.hasOption(RESOLUTION)) {
-				Dimension dim = this.parseDim(loadingMsg, context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
-				queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
-			}
+					if(cmdLine.hasOption(RESOLUTION)) {
+						Dimension dim = this.parseDim(loadingMsg, context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
+						queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
+					}
 
-			if(cmdLine.hasOption(KEYWORD)) {
-				queryBuilder.keywords(cmdLine.getOptionValues(KEYWORD));
-			}
+					if(cmdLine.hasOption(KEYWORD)) {
+						queryBuilder.keywords(cmdLine.getOptionValues(KEYWORD));
+					}
 
-			try {
-				List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
-				if(wallpapers.isEmpty()) {
-					loadingMsg.send(TextUtils.noResult(context.getContent()));
-					return;
-				}
+					try {
+						List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
+						if(wallpapers.isEmpty()) {
+							return loadingMsg.send(TextUtils.noResult(context.getContent())).then();
+						}
 
-				Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
-				context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
-					String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Wallpaper", wallpaper.getUrl(), avatarUrl)
-							.setImage(wallpaper.getImageUrl())
-							.addField("Resolution", wallpaper.getResolution().toString(), false)
-							.addField("Tags", tags, false);
+						Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
+						String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 
-					loadingMsg.send(embed);
+						return context.getAuthorAvatarUrl()
+								.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+										.setAuthor("Wallpaper", wallpaper.getUrl(), avatarUrl)
+										.setImage(wallpaper.getImageUrl())
+										.addField("Resolution", wallpaper.getResolution().toString(), false)
+										.addField("Tags", tags, false))
+								.flatMap(loadingMsg::send)
+								.then();
+					} catch (ConnectionException err) {
+						loadingMsg.stopTyping();
+						throw Exceptions.propagate(err);
+					}
 				});
-			} catch (ConnectionException err) {
-				loadingMsg.stopTyping();
-				throw Exceptions.propagate(err);
-			}
-		});
 	}
 
 	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) {
