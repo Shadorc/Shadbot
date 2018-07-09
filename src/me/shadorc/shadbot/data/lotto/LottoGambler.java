@@ -6,9 +6,9 @@ import discord4j.core.object.util.Snowflake;
 
 public class LottoGambler {
 
-	@JsonProperty("guildId")
+	@JsonProperty("guild_id")
 	private Snowflake guildId;
-	@JsonProperty("userId")
+	@JsonProperty("user_id")
 	private Snowflake userId;
 	@JsonProperty("number")
 	private int number;

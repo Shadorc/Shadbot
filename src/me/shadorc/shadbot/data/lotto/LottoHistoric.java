@@ -6,16 +6,10 @@ public class LottoHistoric {
 
 	@JsonProperty("jackpot")
 	private int jackpot;
-	@JsonProperty("winnersCount")
+	@JsonProperty("winners_count")
 	private int winnersCount;
 	@JsonProperty("number")
 	private int number;
-
-	public LottoHistoric(int jackpot, int winnersCount, int number) {
-		this.jackpot = jackpot;
-		this.winnersCount = winnersCount;
-		this.number = number;
-	}
 
 	public int getJackpot() {
 		return jackpot;

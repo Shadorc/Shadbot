@@ -15,9 +15,7 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
-import me.shadorc.shadbot.data.premium.json.Relic;
-import me.shadorc.shadbot.data.premium.json.Relic.RelicType;
-import me.shadorc.shadbot.data.premium.json.RelicsJson;
+import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.exception.RelicActivationException;
 import me.shadorc.shadbot.utils.Utils;
 
@@ -26,11 +24,11 @@ public class PremiumManager {
 	private static final String FILE_NAME = "premium_data.json";
 	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
 
-	private static RelicsJson relics;
+	private static Relics relics;
 
 	@DataInit
 	public static void init() throws IOException {
-		relics = FILE.exists() ? Utils.MAPPER.readValue(FILE, RelicsJson.class) : new RelicsJson();
+		relics = FILE.exists() ? Utils.MAPPER.readValue(FILE, Relics.class) : new Relics();
 	}
 
 	@DataSave(filePath = FILE_NAME, initialDelay = 1, period = 1, unit = TimeUnit.HOURS)

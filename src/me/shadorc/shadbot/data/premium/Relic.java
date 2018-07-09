@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.data.premium.json;
+package me.shadorc.shadbot.data.premium;
 
 import java.util.Optional;
 import java.util.OptionalLong;

@@ -5,10 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
@@ -22,12 +18,12 @@ public class LottoManager {
 	private static Lotto lotto;
 
 	@DataInit
-	public static void init() throws JsonParseException, JsonMappingException, IOException {
-		lotto = Utils.MAPPER.readValue(FILE, Lotto.class);
+	public static void init() throws IOException {
+		lotto = FILE.exists() ? Utils.MAPPER.readValue(FILE, Lotto.class) : new Lotto();
 	}
 
 	@DataSave(filePath = FILE_NAME, initialDelay = 30, period = 30, unit = TimeUnit.MINUTES)
-	public static void save() throws JsonProcessingException, IOException {
+	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(Utils.MAPPER.writeValueAsString(lotto));
 		}

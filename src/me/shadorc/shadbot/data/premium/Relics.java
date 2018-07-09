@@ -1,16 +1,16 @@
-package me.shadorc.shadbot.data.premium.json;
+package me.shadorc.shadbot.data.premium;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RelicsJson {
+public class Relics {
 
 	@JsonProperty("relics")
 	private List<Relic> relics;
 
-	public RelicsJson() {
+	public Relics() {
 		this.relics = new ArrayList<>();
 	}
 
