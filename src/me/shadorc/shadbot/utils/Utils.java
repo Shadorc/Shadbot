@@ -31,13 +31,14 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
 import me.shadorc.shadbot.data.db.Database;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.command.Emoji;
 import reactor.core.publisher.Mono;
 
 public class Utils {
 
 	public static final ObjectMapper MAPPER = new ObjectMapper()
-			.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+			.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	/**
 	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found
