@@ -65,6 +65,7 @@ public class Shadbot {
 
 	public static void logout() {
 		CLIENTS.forEach(DiscordClient::logout);
+		System.exit(0);
 	}
 
 	/**
