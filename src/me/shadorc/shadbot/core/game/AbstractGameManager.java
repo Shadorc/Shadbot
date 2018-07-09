@@ -10,7 +10,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.SchedulerUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.command.Emoji;
 import reactor.core.publisher.Mono;
 
 public abstract class AbstractGameManager {

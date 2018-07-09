@@ -17,9 +17,9 @@ import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
+import me.shadorc.shadbot.utils.message.UpdateableMessage;
 import twitter4j.Place;
 
 public class RouletteManager extends AbstractGameManager {

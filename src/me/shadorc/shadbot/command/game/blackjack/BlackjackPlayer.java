@@ -2,7 +2,7 @@ package me.shadorc.shadbot.command.game.blackjack;
 
 import java.util.List;
 
-import me.shadorc.shadbot.utils.object.Card;
+import me.shadorc.shadbot.utils.command.Card;
 
 public class BlackjackPlayer {
 

@@ -20,7 +20,7 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 

@@ -12,8 +12,8 @@ import me.shadorc.shadbot.music.TrackScheduler;
 import me.shadorc.shadbot.music.TrackScheduler.RepeatMode;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 @RateLimited

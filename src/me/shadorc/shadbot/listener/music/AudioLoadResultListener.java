@@ -28,9 +28,9 @@ import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.SchedulerUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
 
 public class AudioLoadResultListener implements AudioLoadResultHandler, MessageInterceptor {
 

@@ -14,9 +14,9 @@ import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
+import me.shadorc.shadbot.utils.message.UpdateableMessage;
 
 public class DiceManager extends AbstractGameManager {
 

@@ -1,6 +1,6 @@
 package me.shadorc.shadbot.command.game.rps;
 
-import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.command.Emoji;
 
 public enum Handsign {
 	ROCK("Rock", Emoji.GEM),

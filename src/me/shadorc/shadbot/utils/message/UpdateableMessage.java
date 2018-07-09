@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils.object.message;
+package me.shadorc.shadbot.utils.message;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;

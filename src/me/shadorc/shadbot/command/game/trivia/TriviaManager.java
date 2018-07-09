@@ -24,8 +24,8 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
 
 public class TriviaManager extends AbstractGameManager implements MessageInterceptor {
 

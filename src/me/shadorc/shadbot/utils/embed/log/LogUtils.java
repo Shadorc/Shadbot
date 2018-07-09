@@ -7,6 +7,7 @@ import discord4j.core.DiscordClient;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.embed.log.LogBuilder.LogType;
 
 public class LogUtils {
 

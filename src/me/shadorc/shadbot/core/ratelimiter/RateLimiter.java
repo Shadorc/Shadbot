@@ -13,7 +13,7 @@ import io.github.bucket4j.Refill;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.command.Emoji;
 
 public class RateLimiter {
 

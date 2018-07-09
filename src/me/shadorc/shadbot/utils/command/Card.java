@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils.object;
+package me.shadorc.shadbot.utils.command;
 
 import java.awt.Color;
 import java.util.ArrayList;

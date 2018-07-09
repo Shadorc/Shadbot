@@ -14,7 +14,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
+import me.shadorc.shadbot.utils.message.UpdateableMessage;
 import reactor.core.publisher.Flux;
 
 class PollManager extends AbstractGameManager {

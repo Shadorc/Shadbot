@@ -21,8 +21,8 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 @RateLimited

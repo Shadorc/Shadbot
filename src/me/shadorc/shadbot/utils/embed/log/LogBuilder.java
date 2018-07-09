@@ -9,6 +9,10 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 
 public class LogBuilder {
 
+	public enum LogType {
+		INFO, WARN, ERROR;
+	}
+
 	private final LogType type;
 	private final String message;
 	private final Throwable err;
