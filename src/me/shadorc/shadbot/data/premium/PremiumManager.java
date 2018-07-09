@@ -3,111 +3,76 @@ package me.shadorc.shadbot.data.premium;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
+import me.shadorc.shadbot.data.premium.json.Relic;
+import me.shadorc.shadbot.data.premium.json.Relic.RelicType;
+import me.shadorc.shadbot.data.premium.json.RelicsJson;
 import me.shadorc.shadbot.exception.RelicActivationException;
 import me.shadorc.shadbot.utils.Utils;
 
 public class PremiumManager {
 
-	private static final String DONATORS = "donators";
-	private static final String UNUSED_RELICS = "unusedRelics";
-
 	private static final String FILE_NAME = "premium_data.json";
 	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
 
-	private static final Map<String, Relic> UNUSED_RELICS_MAP = new HashMap<>();
-
-	private static JSONObject premiumObj;
+	private static RelicsJson relics;
 
 	@DataInit
-	public static void init() throws JSONException, IOException {
-		if(!FILE.exists()) {
-			try (FileWriter writer = new FileWriter(FILE)) {
-				JSONObject defaultObj = new JSONObject()
-						.put(DONATORS, new JSONObject())
-						.put(UNUSED_RELICS, new JSONArray());
-
-				writer.write(defaultObj.toString(Config.JSON_INDENT_FACTOR));
-			}
-		}
-
-		try (InputStream stream = FILE.toURI().toURL().openStream()) {
-			premiumObj = new JSONObject(new JSONTokener(stream));
-		}
-
-		Utils.toList(premiumObj.getJSONArray(UNUSED_RELICS), JSONObject.class)
-				.stream()
-				.map(Relic::new)
-				.forEach(relic -> UNUSED_RELICS_MAP.put(relic.getId(), relic));
+	public static void init() throws IOException {
+		relics = FILE.exists() ? Utils.MAPPER.readValue(FILE, RelicsJson.class) : new RelicsJson();
 	}
 
 	@DataSave(filePath = FILE_NAME, initialDelay = 1, period = 1, unit = TimeUnit.HOURS)
-	public static void save() throws JSONException, IOException {
-		premiumObj.put(UNUSED_RELICS, new JSONArray(UNUSED_RELICS_MAP.values()));
+	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
-			writer.write(premiumObj.toString(Config.JSON_INDENT_FACTOR));
+			writer.write(Utils.MAPPER.writeValueAsString(relics));
 		}
 	}
 
 	public static Relic generateRelic(RelicType type) {
-		Relic relic = new Relic(UUID.randomUUID().toString(), 180, type);
-		UNUSED_RELICS_MAP.put(relic.getId(), relic);
+		Relic relic = new Relic(UUID.randomUUID().toString(), TimeUnit.DAYS.toMillis(180), type);
+		relics.addRelic(relic);
 		return relic;
 	}
 
 	public static void activateRelic(@Nullable Snowflake guildId, Snowflake userId, String relicId) throws RelicActivationException {
-		if(!UNUSED_RELICS_MAP.containsKey(relicId)) {
+		Optional<Relic> relicOpt = relics.getRelics().stream()
+				.filter(relicItr -> relicItr.getId().equals(relicId))
+				.findFirst();
+
+		if(!relicOpt.isPresent()) {
 			throw new RelicActivationException("This key is already activated or doesn't exist.");
 		}
 
-		Relic relic = UNUSED_RELICS_MAP.get(relicId);
-		if(relic.getType().equals(RelicType.GUILD) && guildId == null) {
+		final Relic relic = relicOpt.get();
+
+		if(relic.getType().equals(RelicType.GUILD.toString()) && guildId == null) {
 			throw new RelicActivationException("You must activate a Legendary Relic in the desired server.");
 		}
 
-		relic.activate();
-		if(relic.getType().equals(RelicType.GUILD)) {
+		relic.activate(userId);
+
+		if(relic.getType().equals(RelicType.GUILD.toString())) {
 			relic.setGuildId(guildId);
 		}
-
-		JSONArray userKeys = premiumObj.getJSONObject(DONATORS).optJSONArray(userId.asString());
-		if(userKeys == null) {
-			userKeys = new JSONArray();
-		}
-
-		userKeys.put(relic.toJSON());
-		UNUSED_RELICS_MAP.remove(relic.getId());
-
-		premiumObj.getJSONObject(DONATORS).put(userId.asString(), userKeys);
 	}
 
 	public static List<Relic> getRelicsForUser(Snowflake userId) {
-		List<Relic> relics = new ArrayList<>();
-		JSONObject donatorsObj = premiumObj.getJSONObject(DONATORS);
-		JSONArray donatorRelics = donatorsObj.optJSONArray(userId.asString());
-		if(donatorRelics != null) {
-			donatorRelics.forEach(relicObj -> relics.add(new Relic((JSONObject) relicObj)));
-		}
-		return relics;
+		return relics.getRelics().stream()
+				.filter(relic -> relic.getUserId().isPresent())
+				.filter(relic -> relic.getUserId().get().equals(userId))
+				.collect(Collectors.toList());
 	}
 
 	public static boolean isPremium(Snowflake guildId, Snowflake userId) {
@@ -115,31 +80,19 @@ public class PremiumManager {
 	}
 
 	public static boolean isGuildPremium(Snowflake guildId) {
-		JSONObject donatorsObj = premiumObj.getJSONObject(DONATORS);
-		for(String userKey : donatorsObj.keySet()) {
-			JSONArray keysArray = donatorsObj.getJSONArray(userKey);
-			for(int i = 0; i < keysArray.length(); i++) {
-				Relic relic = new Relic(keysArray.getJSONObject(i));
-				if(PremiumManager.isValid(relic, RelicType.GUILD) && relic.getGuildId().equals(guildId)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return relics.getRelics().stream()
+				.filter(relic -> relic.getGuildId().isPresent())
+				.filter(relic -> relic.getGuildId().get().equals(guildId))
+				.anyMatch(relic -> !relic.isExpired());
 	}
 
 	public static boolean isUserPremium(Snowflake userId) {
-		List<Relic> relics = PremiumManager.getRelicsForUser(userId);
-		if(relics.isEmpty()) {
-			return false;
-		}
-
-		return relics.stream().anyMatch(relic -> PremiumManager.isValid(relic, RelicType.USER));
+		return PremiumManager.getRelicsForUser(userId).stream()
+				.anyMatch(relic -> PremiumManager.isValid(relic, RelicType.USER));
 	}
 
 	private static boolean isValid(Relic relic, RelicType type) {
-		return relic.getType().equals(type) && relic.getActivationTime() != 0 && !relic.isExpired();
+		return relic.getType().equals(type.toString()) && !relic.isExpired();
 	}
 
 }
