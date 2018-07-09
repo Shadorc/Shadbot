@@ -36,7 +36,7 @@ public class Context {
 
 		List<String> splittedMsg = StringUtils.split(this.getContent(), 2);
 		this.cmdName = splittedMsg.get(0).substring(prefix.length()).toLowerCase();
-		this.arg = Optional.ofNullable(splittedMsg.size() > 1 ? splittedMsg.get(1) : null);
+		this.arg = Optional.ofNullable(splittedMsg.size() > 1 ? splittedMsg.get(1).trim() : null);
 	}
 
 	public String getPrefix() {
