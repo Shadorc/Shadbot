@@ -2,12 +2,10 @@ package me.shadorc.shadbot.api.diablo;
 
 import javax.annotation.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import me.shadorc.shadbot.utils.StringUtils;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class HeroResponse {
 
 	@Nullable

@@ -2,10 +2,8 @@ package me.shadorc.shadbot.api.image.r34;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class R34Response {
 
 	@JsonProperty("posts")

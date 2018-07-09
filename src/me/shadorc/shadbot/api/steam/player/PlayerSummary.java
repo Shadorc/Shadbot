@@ -1,10 +1,8 @@
-package me.shadorc.shadbot.api.steam;
+package me.shadorc.shadbot.api.steam.player;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class PlayerResponse {
+public class PlayerSummary {
 
 	@JsonProperty("communityvisibilitystate")
 	private int communityVisibilityState;
@@ -14,7 +12,7 @@ public class PlayerResponse {
 	private String personaName;
 
 	/**
-	 * 1: Private 2: FriendsOnly 3: Public
+	 * @return 1: Private 2: FriendsOnly 3: Public
 	 */
 	public int getCommunityVisibilityState() {
 		return communityVisibilityState;
@@ -27,5 +25,4 @@ public class PlayerResponse {
 	public String getPersonaName() {
 		return personaName;
 	}
-
 }

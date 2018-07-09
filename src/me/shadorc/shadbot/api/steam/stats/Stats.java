@@ -1,8 +1,8 @@
-package me.shadorc.shadbot.api.steam;
+package me.shadorc.shadbot.api.steam.stats;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class StatResponse {
+public class Stats {
 
 	@JsonProperty("name")
 	private String name;

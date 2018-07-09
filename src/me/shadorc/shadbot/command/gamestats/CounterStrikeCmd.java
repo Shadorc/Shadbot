@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.api.steam.PlayerResponse;
-import me.shadorc.shadbot.api.steam.PlayerSummaryResponse;
-import me.shadorc.shadbot.api.steam.ResolveVanityUrlResponse;
-import me.shadorc.shadbot.api.steam.StatResponse;
-import me.shadorc.shadbot.api.steam.UserStatsForGameResponse;
+import me.shadorc.shadbot.api.steam.player.PlayerSummariesResponse;
+import me.shadorc.shadbot.api.steam.player.PlayerSummary;
+import me.shadorc.shadbot.api.steam.resolver.ResolveVanityUrlResponse;
+import me.shadorc.shadbot.api.steam.stats.Stats;
+import me.shadorc.shadbot.api.steam.stats.UserStatsForGameResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -66,15 +66,15 @@ public class CounterStrikeCmd extends AbstractCommand {
 			URL url = new URL(String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
 					APIKeys.get(APIKey.STEAM_API_KEY), steamid));
 
-			PlayerSummaryResponse playerSummary = Utils.MAPPER.readValue(url, PlayerSummaryResponse.class);
+			PlayerSummariesResponse playerSummary = Utils.MAPPER.readValue(url, PlayerSummariesResponse.class);
 
 			// Search users matching the steamId
-			List<PlayerResponse> players = playerSummary.getResponse().getPlayers();
+			List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
 			if(players.isEmpty()) {
 				return loadingMsg.send(Emoji.MAGNIFYING_GLASS + " User not found.").then();
 			}
 
-			final PlayerResponse player = players.get(0);
+			final PlayerSummary player = players.get(0);
 			if(player.getCommunityVisibilityState() != 3) {
 				return loadingMsg.send(Emoji.ACCESS_DENIED + " This profile is private, more info here: " + PRIVACY_HELP_URL).then();
 			}
@@ -94,7 +94,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 				return loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.").then();
 			}
 
-			final List<StatResponse> stats = userStats.getPlayerStats().getStats();
+			final List<Stats> stats = userStats.getPlayerStats().getStats();
 
 			final Map<String, Integer> statsMap = new HashMap<>();
 			stats.forEach(stat -> statsMap.put(stat.getName(), stat.getValue()));
