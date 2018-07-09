@@ -7,11 +7,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class R34Response {
 
 	@JsonProperty("posts")
-	private List<PostReponse> posts;
+	private List<R34Post> posts;
 	@JsonProperty("count")
 	private int count;
 
-	public List<PostReponse> getPosts() {
+	public List<R34Post> getPosts() {
 		return posts;
 	}
 

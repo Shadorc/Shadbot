@@ -2,12 +2,12 @@ package me.shadorc.shadbot.api.image.deviantart;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ResultResponse {
+public class Image {
 
 	@JsonProperty("content")
-	private ContentResponse content;
+	private Content content;
 	@JsonProperty("author")
-	private AuthorResponse author;
+	private Author author;
 	@JsonProperty("url")
 	private String url;
 	@JsonProperty("title")
@@ -15,11 +15,11 @@ public class ResultResponse {
 	@JsonProperty("category_path")
 	private String categoryPath;
 
-	public ContentResponse getContent() {
+	public Content getContent() {
 		return content;
 	}
 
-	public AuthorResponse getAuthor() {
+	public Author getAuthor() {
 		return author;
 	}
 

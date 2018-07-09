@@ -2,7 +2,7 @@ package me.shadorc.shadbot.api.image.deviantart;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AuthorResponse {
+public class Author {
 
 	@JsonProperty("username")
 	private String username;

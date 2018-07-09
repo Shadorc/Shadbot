@@ -2,7 +2,7 @@ package me.shadorc.shadbot.api.diablo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class HeroStatsResponse {
+public class HeroStats {
 
 	@JsonProperty("damage")
 	private double damage;

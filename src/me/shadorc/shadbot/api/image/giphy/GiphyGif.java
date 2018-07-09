@@ -2,7 +2,7 @@ package me.shadorc.shadbot.api.image.giphy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GifResponse {
+public class GiphyGif {
 
 	@JsonProperty("image_url")
 	private String imageUrl;

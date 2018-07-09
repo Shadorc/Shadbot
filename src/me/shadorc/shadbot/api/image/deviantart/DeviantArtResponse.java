@@ -7,9 +7,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class DeviantArtResponse {
 
 	@JsonProperty("results")
-	private List<ResultResponse> results;
+	private List<Image> results;
 
-	public List<ResultResponse> getResults() {
+	public List<Image> getResults() {
 		return results;
 	}
 

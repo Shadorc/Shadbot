@@ -24,7 +24,7 @@ public class ProfileResponse {
 	@JsonProperty("guildName")
 	private String guildName;
 	@JsonProperty("heroes")
-	private List<ProfileHeroResponse> heroes;
+	private List<HeroId> heroeIds;
 
 	public String getCode() {
 		return code;
@@ -54,8 +54,8 @@ public class ProfileResponse {
 		return guildName;
 	}
 
-	public List<ProfileHeroResponse> getHeroes() {
-		return heroes;
+	public List<HeroId> getHeroeIds() {
+		return heroeIds;
 	}
 
 }

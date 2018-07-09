@@ -6,7 +6,7 @@ import java.util.List;
 import org.json.XML;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.api.image.r34.PostReponse;
+import me.shadorc.shadbot.api.image.r34.R34Post;
 import me.shadorc.shadbot.api.image.r34.R34Response;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -52,7 +52,7 @@ public class Rule34Cmd extends AbstractCommand {
 							return loadingMsg.send(TextUtils.noResult(arg));
 						}
 
-						PostReponse post = Utils.randValue(r34.getPosts());
+						R34Post post = Utils.randValue(r34.getPosts());
 
 						List<String> tags = StringUtils.split(post.getTags(), " ");
 						if(post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {

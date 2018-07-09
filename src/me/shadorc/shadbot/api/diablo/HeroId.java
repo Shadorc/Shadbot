@@ -2,7 +2,7 @@ package me.shadorc.shadbot.api.diablo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ProfileHeroResponse {
+public class HeroId {
 
 	@JsonProperty("id")
 	private long id;

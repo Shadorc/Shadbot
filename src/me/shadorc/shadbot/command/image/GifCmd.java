@@ -38,17 +38,17 @@ public class GifCmd extends AbstractCommand {
 
 			GiphyResponse giphy = Utils.MAPPER.readValue(url, GiphyResponse.class);
 
-			if(giphy.getData() == null) {
+			if(giphy.getGifs() == null) {
 				throw new HttpStatusException("Giphy did not return valid JSON.", HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
 			}
 
-			if(giphy.getData().isEmpty()) {
+			if(giphy.getGifs().isEmpty()) {
 				return loadingMsg.send(TextUtils.noResult(context.getArg().orElse("random search"))).then();
 			}
 
 			EmbedCreateSpec embed = new EmbedCreateSpec()
 					.setColor(Config.BOT_COLOR)
-					.setImage(giphy.getData().get(0).getImageUrl());
+					.setImage(giphy.getGifs().get(0).getImageUrl());
 			return loadingMsg.send(embed).then();
 
 		} catch (IOException err) {

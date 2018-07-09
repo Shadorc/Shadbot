@@ -2,7 +2,7 @@ package me.shadorc.shadbot.api.image.r34;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class PostReponse {
+public class R34Post {
 
 	@JsonProperty("tags")
 	private String tags;

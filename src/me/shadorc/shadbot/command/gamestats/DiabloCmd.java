@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.api.diablo.HeroId;
 import me.shadorc.shadbot.api.diablo.HeroResponse;
-import me.shadorc.shadbot.api.diablo.ProfileHeroResponse;
 import me.shadorc.shadbot.api.diablo.ProfileResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -63,9 +63,9 @@ public class DiabloCmd extends AbstractCommand {
 			}
 
 			List<HeroResponse> heroResponses = new ArrayList<>();
-			for(ProfileHeroResponse profileHero : profile.getHeroes()) {
+			for(HeroId heroId : profile.getHeroeIds()) {
 				final URL heroUrl = new URL(String.format("https://%s.api.battle.net/d3/profile/%s/hero/%d?locale=en_GB&apikey=%s",
-						region, NetUtils.encode(battletag), profileHero.getId(), APIKeys.get(APIKey.BLIZZARD_API_KEY)));
+						region, NetUtils.encode(battletag), heroId.getId(), APIKeys.get(APIKey.BLIZZARD_API_KEY)));
 
 				HeroResponse hero = Utils.MAPPER.readValue(heroUrl, HeroResponse.class);
 				if(hero.getCode() == null) {

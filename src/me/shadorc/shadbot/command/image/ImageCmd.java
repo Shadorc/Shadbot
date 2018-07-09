@@ -9,7 +9,7 @@ import org.json.JSONException;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.image.deviantart.DeviantArtResponse;
-import me.shadorc.shadbot.api.image.deviantart.ResultResponse;
+import me.shadorc.shadbot.api.image.deviantart.Image;
 import me.shadorc.shadbot.api.image.deviantart.TokenResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -43,19 +43,19 @@ public class ImageCmd extends AbstractCommand {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			ResultResponse result = this.getRandomPopularResult(NetUtils.encode(arg));
-			if(result == null) {
+			Image image = this.getRandomPopularImage(NetUtils.encode(arg));
+			if(image == null) {
 				return loadingMsg.send(TextUtils.noResult(context.getArg().get())).then();
 			}
 
 			context.getAuthorAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("DeviantArt (Search: %s)", arg), result.getUrl(), avatarUrl)
+							.setAuthor(String.format("DeviantArt (Search: %s)", arg), image.getUrl(), avatarUrl)
 							.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
-							.addField("Title", result.getTitle(), false)
-							.addField("Author", result.getAuthor().getUsername(), false)
-							.addField("Category", result.getCategoryPath(), false)
-							.setImage(result.getContent().getSource()))
+							.addField("Title", image.getTitle(), false)
+							.addField("Author", image.getAuthor().getUsername(), false)
+							.addField("Category", image.getCategoryPath(), false)
+							.setImage(image.getContent().getSource()))
 					.flatMap(loadingMsg::send)
 					.then();
 
@@ -67,7 +67,7 @@ public class ImageCmd extends AbstractCommand {
 		return Mono.empty();
 	}
 
-	private ResultResponse getRandomPopularResult(String encodedSearch) throws IOException {
+	private Image getRandomPopularImage(String encodedSearch) throws IOException {
 		try {
 			if(TimeUtils.getMillisUntil(lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(token.getExpiresIn())) {
 				this.generateAccessToken();

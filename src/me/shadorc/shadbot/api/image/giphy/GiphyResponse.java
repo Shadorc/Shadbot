@@ -10,10 +10,10 @@ public class GiphyResponse {
 
 	@Nullable
 	@JsonProperty("data")
-	private List<GifResponse> data;
+	private List<GiphyGif> gifs;
 
-	public List<GifResponse> getData() {
-		return data;
+	public List<GiphyGif> getGifs() {
+		return gifs;
 	}
 
 }

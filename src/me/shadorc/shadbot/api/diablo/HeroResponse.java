@@ -18,7 +18,7 @@ public class HeroResponse {
 	@JsonProperty("level")
 	private int level;
 	@JsonProperty("stats")
-	private HeroStatsResponse stats;
+	private HeroStats stats;
 
 	public String getCode() {
 		return code;
@@ -36,7 +36,7 @@ public class HeroResponse {
 		return level;
 	}
 
-	public HeroStatsResponse getStats() {
+	public HeroStats getStats() {
 		return stats;
 	}
 
