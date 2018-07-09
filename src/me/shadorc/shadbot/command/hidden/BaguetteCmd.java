@@ -16,11 +16,11 @@ import reactor.core.publisher.Mono;
 public class BaguetteCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
+	public Mono<Void> execute(Context context) {
 		EmbedCreateSpec embed = new EmbedCreateSpec()
-				.setColor(Config.BOT_COLOR.getRGB())
+				.setColor(Config.BOT_COLOR)
 				.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg");
-		BotUtils.sendMessage(embed, context.getChannel());
+		return BotUtils.sendMessage(embed, context.getChannel()).then();
 	}
 
 	@Override

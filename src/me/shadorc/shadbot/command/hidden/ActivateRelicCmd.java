@@ -16,17 +16,19 @@ import reactor.core.publisher.Mono;
 public class ActivateRelicCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
-		context.requireArg();
+	public Mono<Void> execute(Context context) {
+		final String arg = context.requireArg();
 
-		context.getGuild().subscribe(guild -> {
-			try {
-				PremiumManager.activateRelic(guild.getId(), context.getAuthorId(), context.getArg().get().trim());
-				BotUtils.sendMessage(Emoji.CHECK_MARK + " Relic successfully activated, enjoy !", context.getChannel());
-			} catch (RelicActivationException err) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + err.getMessage(), context.getChannel());
-			}
-		});
+		return context.getGuild()
+				.flatMap(guild -> {
+					try {
+						PremiumManager.activateRelic(guild.getId(), context.getAuthorId(), arg);
+						return BotUtils.sendMessage(Emoji.CHECK_MARK + " Relic successfully activated, enjoy !", context.getChannel());
+					} catch (RelicActivationException err) {
+						return BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " " + err.getMessage(), context.getChannel());
+					}
+				})
+				.then();
 
 	}
 

@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 public class SendMessageCmd extends AbstractCommand {
 
 	@Override
-	public void execute(Context context) {
+	public Mono<Void> execute(Context context) {
 		List<String> args = context.requireArgs(2);
 
 		Long userId = NumberUtils.asPositiveLong(args.get(0));
@@ -29,24 +29,23 @@ public class SendMessageCmd extends AbstractCommand {
 			throw new CommandException(String.format("`%s` is not a valid user ID.", args.get(0)));
 		}
 
-		context.getClient().getUserById(Snowflake.of(userId)).defaultIfEmpty(null).subscribe(user -> {
-			if(user == null) {
-				BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " User not found.", context.getChannel());
-				return;
-			}
+		return context.getClient()
+				.getUserById(Snowflake.of(userId))
+				.flatMap(user -> {
+					if(user.getId().equals(context.getSelfId())) {
+						throw new CommandException("I can't send a private message to myself.");
+					}
 
-			if(user.getId().equals(context.getSelfId())) {
-				throw new CommandException("I can't send a private message to myself.");
-			}
+					if(user.isBot()) {
+						throw new CommandException("I can't send private message to other bots.");
+					}
 
-			if(user.isBot()) {
-				throw new CommandException("I can't send private message to other bots.");
-			}
+					return BotUtils.sendMessage(args.get(1), user.getPrivateChannel().cast(MessageChannel.class));
 
-			BotUtils.sendMessage(args.get(1), user.getPrivateChannel().cast(MessageChannel.class));
-			BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel());
-
-		});
+				})
+				.then(BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel()))
+				.switchIfEmpty(BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " User not found.", context.getChannel()))
+				.then();
 	}
 
 	@Override
