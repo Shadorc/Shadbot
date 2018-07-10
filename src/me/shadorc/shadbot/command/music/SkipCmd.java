@@ -8,7 +8,9 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.music.GuildMusic;
+import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
 
@@ -39,7 +41,9 @@ public class SkipCmd extends AbstractCommand {
 			}
 		}
 
-		return Mono.empty();
+		return context.getAuthorName()
+				.flatMap(username -> BotUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.", username), context.getChannel()))
+				.then();
 	}
 
 	@Override

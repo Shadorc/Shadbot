@@ -54,23 +54,24 @@ public class OverwatchCmd extends AbstractCommand {
 				player = new OverwatchPlayer(username, platform);
 			}
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-					.setAuthor("Overwatch Stats",
-							"http://vignette4.wikia.nocookie.net/overwatch/images/b/bd/Overwatch_line_art_logo_symbol-only.png",
-							player.getProfileURL())
-					.setThumbnail(player.getIconUrl())
-					.setDescription(String.format("Stats for user **%s**", player.getName()))
-					.addField("Level", Integer.toString(player.getLevel()), true)
-					.addField("Competitive rank", Integer.toString(player.getRank()), true)
-					.addField("Wins", Integer.toString(player.getWins()), true)
-					.addField("Game time", player.getTimePlayed(), true)
-					.addField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
-					.addField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true);
-
-			return loadingMsg.send(embed).then();
+			return context.getAuthorAvatarUrl()
+					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+							.setAuthor("Overwatch Stats", player.getProfileURL(), avatarUrl)
+							.setThumbnail(player.getIconUrl())
+							.setDescription(String.format("Stats for user **%s**", player.getName()))
+							.addField("Level", Integer.toString(player.getLevel()), true)
+							.addField("Competitive rank", Integer.toString(player.getRank()), true)
+							.addField("Wins", Integer.toString(player.getWins()), true)
+							.addField("Game time", player.getTimePlayed(), true)
+							.addField("Top hero (Time played)", this.getTopThreeHeroes(player.getList(TopHeroesStats.TIME_PLAYED)), true)
+							.addField("Top hero (Eliminations per life)", this.getTopThreeHeroes(player.getList(TopHeroesStats.ELIMINATIONS_PER_LIFE)), true))
+					.flatMap(loadingMsg::send)
+					.then();
 
 		} catch (OverwatchException err) {
-			return loadingMsg.send(Emoji.MAGNIFYING_GLASS + " " + err.getMessage()).then();
+			return context.getAuthorName()
+					.flatMap(username -> loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) %s", username, err.getMessage())))
+					.then();
 		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);

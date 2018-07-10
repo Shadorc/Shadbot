@@ -38,40 +38,44 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		String arg = context.requireArg();
+		final String arg = context.requireArg();
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			String steamid = null;
+			String identificator = arg;
 
 			// The user provided an URL that can contains a pseudo or an ID
 			if(arg.contains("/")) {
 				List<String> splittedURl = StringUtils.split(arg, "/");
-				arg = splittedURl.get(splittedURl.size() - 1);
+				identificator = splittedURl.get(splittedURl.size() - 1);
 			}
 
+			final String steamId;
 			// The user directly provided the ID
-			if(NumberUtils.isPositiveLong(arg)) {
-				steamid = arg;
+			if(NumberUtils.isPositiveLong(identificator)) {
+				steamId = identificator;
 			}
 			// The user provided a pseudo
 			else {
-				final URL url = new URL(String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
-						APIKeys.get(APIKey.STEAM_API_KEY), NetUtils.encode(arg)));
-				ResolveVanityUrlResponse response = Utils.MAPPER.readValue(url, ResolveVanityUrlResponse.class);
-				steamid = response.getResponse().getSteamId();
+				final URL resolveVanityUrl = new URL(String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
+						APIKeys.get(APIKey.STEAM_API_KEY), NetUtils.encode(identificator)));
+				ResolveVanityUrlResponse response = Utils.MAPPER.readValue(resolveVanityUrl, ResolveVanityUrlResponse.class);
+				steamId = response.getResponse().getSteamId();
 			}
 
-			URL url = new URL(String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
-					APIKeys.get(APIKey.STEAM_API_KEY), steamid));
+			final URL playerSummariesUrl = new URL(String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
+					APIKeys.get(APIKey.STEAM_API_KEY), steamId));
 
-			PlayerSummariesResponse playerSummary = Utils.MAPPER.readValue(url, PlayerSummariesResponse.class);
+			PlayerSummariesResponse playerSummary = Utils.MAPPER.readValue(playerSummariesUrl, PlayerSummariesResponse.class);
 
 			// Search users matching the steamId
 			List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
 			if(players.isEmpty()) {
-				return loadingMsg.send(Emoji.MAGNIFYING_GLASS + " User not found.").then();
+				return context.getAuthorName()
+						.flatMap(username -> loadingMsg.send(
+								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.", username)))
+						.then();
 			}
 
 			final PlayerSummary player = players.get(0);
@@ -79,16 +83,16 @@ public class CounterStrikeCmd extends AbstractCommand {
 				return loadingMsg.send(Emoji.ACCESS_DENIED + " This profile is private, more info here: " + PRIVACY_HELP_URL).then();
 			}
 
-			url = new URL(String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
-					APIKeys.get(APIKey.STEAM_API_KEY), steamid));
+			final URL userStatsUrl = new URL(String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
+					APIKeys.get(APIKey.STEAM_API_KEY), steamId));
 
-			final String body = NetUtils.getBody(url.toString());
+			final String body = NetUtils.getBody(userStatsUrl.toString());
 			if(body.contains("500 Internal Server Error")) {
 				return loadingMsg.send(Emoji.ACCESS_DENIED + " The game details of this profile are not public, more info here: " + PRIVACY_HELP_URL)
 						.then();
 			}
 
-			UserStatsForGameResponse userStats = Utils.MAPPER.readValue(url, UserStatsForGameResponse.class);
+			UserStatsForGameResponse userStats = Utils.MAPPER.readValue(userStatsUrl, UserStatsForGameResponse.class);
 
 			if(userStats.getPlayerStats() == null || userStats.getPlayerStats().getStats() == null) {
 				return loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.").then();
@@ -99,19 +103,20 @@ public class CounterStrikeCmd extends AbstractCommand {
 			final Map<String, Integer> statsMap = new HashMap<>();
 			stats.forEach(stat -> statsMap.put(stat.getName(), stat.getValue()));
 
-			EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-					.setAuthor("Counter-Strike: Global Offensive Stats",
-							"http://www.icon100.com/up/2841/256/csgo.png",
-							"http://steamcommunity.com/profiles/" + steamid)
-					.setThumbnail(player.getAvatarFull())
-					.setDescription(String.format("Stats for **%s**", player.getPersonaName()))
-					.addField("Kills", statsMap.get("total_kills").toString(), true)
-					.addField("Deaths", statsMap.get("total_deaths").toString(), true)
-					.addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), true)
-					.addField("Total wins", statsMap.get("total_wins").toString(), true)
-					.addField("Total MVP", statsMap.get("total_mvps").toString(), true);
-
-			return loadingMsg.send(embed).then();
+			return context.getAuthorAvatarUrl()
+					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+							.setAuthor("Counter-Strike: Global Offensive Stats",
+									"http://steamcommunity.com/profiles/" + steamId,
+									avatarUrl)
+							.setThumbnail(player.getAvatarFull())
+							.setDescription(String.format("Stats for **%s**", player.getPersonaName()))
+							.addField("Kills", statsMap.get("total_kills").toString(), true)
+							.addField("Deaths", statsMap.get("total_deaths").toString(), true)
+							.addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), true)
+							.addField("Total wins", statsMap.get("total_wins").toString(), true)
+							.addField("Total MVP", statsMap.get("total_mvps").toString(), true))
+					.flatMap(loadingMsg::send)
+					.then();
 
 		} catch (IOException err) {
 			loadingMsg.stopTyping();

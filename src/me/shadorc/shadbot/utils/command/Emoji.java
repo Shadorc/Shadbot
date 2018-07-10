@@ -39,6 +39,7 @@ public enum Emoji {
 	MAP("map"),
 
 	MUSICAL_NOTE("musical_note"),
+	TRACK_NEXT("track_next"),
 	PLAY("arrow_forward"),
 	PAUSE("pause_button"),
 	REPEAT("repeat"),

@@ -136,7 +136,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	}
 
 	private void onNoMatches() {
-		BotUtils.sendMessage(TextUtils.noResult(StringUtils.remove(identifier, YT_SEARCH, SC_SEARCH)), guildMusic.getMessageChannel()).subscribe();
+		BotUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
+				StringUtils.remove(identifier, YT_SEARCH, SC_SEARCH)), guildMusic.getMessageChannel())
+				.subscribe();
 		LogUtils.infof("{Guild ID: %d} No matches: %s", guildMusic.getGuildId().asLong(), identifier);
 		this.leaveIfStopped();
 	}

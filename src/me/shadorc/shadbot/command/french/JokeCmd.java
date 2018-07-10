@@ -32,7 +32,7 @@ public class JokeCmd extends AbstractCommand {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.getAuthorAvatarUrl()
-				.map(avatarUrl -> {
+				.flatMap(avatarUrl -> {
 					try {
 						final String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d",
 								ThreadLocalRandom.current().nextInt(1, 6));
@@ -61,7 +61,7 @@ public class JokeCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random French joke.")
-				.setSource("http://www.une-blague.com")
+				.setSource("https://www.une-blague.com/")
 				.build();
 	}
 }

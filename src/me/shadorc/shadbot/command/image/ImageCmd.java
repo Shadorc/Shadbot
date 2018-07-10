@@ -19,9 +19,9 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -45,10 +45,13 @@ public class ImageCmd extends AbstractCommand {
 		try {
 			Image image = this.getRandomPopularImage(NetUtils.encode(arg));
 			if(image == null) {
-				return loadingMsg.send(TextUtils.noResult(context.getArg().get())).then();
+				return context.getAuthorName()
+						.flatMap(username -> loadingMsg.send(
+								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`", username, arg)))
+						.then();
 			}
 
-			context.getAuthorAvatarUrl()
+			return context.getAuthorAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("DeviantArt (Search: %s)", arg), image.getUrl(), avatarUrl)
 							.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
@@ -63,13 +66,11 @@ public class ImageCmd extends AbstractCommand {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}
-
-		return Mono.empty();
 	}
 
 	private Image getRandomPopularImage(String encodedSearch) throws IOException {
 		try {
-			if(TimeUtils.getMillisUntil(lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(token.getExpiresIn())) {
+			if(token == null || TimeUtils.getMillisUntil(lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(token.getExpiresIn())) {
 				this.generateAccessToken();
 			}
 
@@ -102,7 +103,7 @@ public class ImageCmd extends AbstractCommand {
 		return new HelpBuilder(this, context)
 				.setDescription("Search for a random image on DeviantArt.")
 				.addArg("search", false)
-				.setSource("https://www.deviantart.com")
+				.setSource("https://www.deviantart.com/")
 				.build();
 	}
 }

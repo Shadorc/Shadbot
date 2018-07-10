@@ -32,7 +32,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 
 		return context.isChannelNsfw()
 				.filter(Boolean.TRUE::equals)
-				.map(isNsfw -> {
+				.flatMap(isNsfw -> {
 					try {
 						final Document doc = NetUtils.getDoc("https://www.suicidegirls.com/photos/sg/recent/all/");
 
@@ -41,12 +41,11 @@ public class SuicideGirlsCmd extends AbstractCommand {
 						final String imageUrl = girl.select("noscript").attr("data-retina");
 						final String url = girl.getElementsByClass("facebook-share").attr("href");
 
-						return EmbedUtils.getDefaultEmbed()
-								.setAuthor("SuicideGirls Image",
-										"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/SuicideGirls_logo.svg/1280px-SuicideGirls_logo.svg.png",
-										url)
-								.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
-								.setImage(imageUrl);
+						return context.getAuthorAvatarUrl()
+								.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+										.setAuthor("SuicideGirls Image", url, avatarUrl)
+										.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
+										.setImage(imageUrl));
 					} catch (IOException err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(err);
@@ -60,7 +59,8 @@ public class SuicideGirlsCmd extends AbstractCommand {
 	@Override
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
-				.setDescription("Show a random image from SuicideGirls website.")
+				.setDescription("Show a random Suicide Girl image.")
+				.setSource("https://www.suicidegirls.com/")
 				.build();
 	}
 

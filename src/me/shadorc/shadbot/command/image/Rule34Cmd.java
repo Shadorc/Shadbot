@@ -49,7 +49,10 @@ public class Rule34Cmd extends AbstractCommand {
 						R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
 
 						if(r34.getCount() == 0) {
-							return loadingMsg.send(TextUtils.noResult(arg));
+							return context.getAuthorName()
+									.flatMap(username -> loadingMsg.send(
+											String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`", username, arg)))
+									.then();
 						}
 
 						R34Post post = Utils.randValue(r34.getPosts());
@@ -93,6 +96,7 @@ public class Rule34Cmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random image corresponding to a tag from Rule34 website.")
+				.setSource("https://www.rule34.xxx/")
 				.addArg("tag", false)
 				.build();
 	}

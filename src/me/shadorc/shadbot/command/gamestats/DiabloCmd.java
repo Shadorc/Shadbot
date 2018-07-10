@@ -58,8 +58,7 @@ public class DiabloCmd extends AbstractCommand {
 			ProfileResponse profile = Utils.MAPPER.readValue(url, ProfileResponse.class);
 
 			if("NOTFOUND".equals(profile.getCode())) {
-				loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.");
-				return Mono.empty();
+				throw new FileNotFoundException();
 			}
 
 			List<HeroResponse> heroResponses = new ArrayList<>();
@@ -91,17 +90,18 @@ public class DiabloCmd extends AbstractCommand {
 									hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
 							.addField("Damage", FormatUtils.format(heroResponses,
 									hero -> String.format("%s DPS", FormatUtils.formatNum(hero.getStats().getDamage())), "\n"), true))
-					.doOnSuccess(loadingMsg::send)
+					.flatMap(loadingMsg::send)
 					.then();
 
 		} catch (FileNotFoundException err) {
-			loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Diablo 3 or doesn't exist.");
+			return context.getAuthorName()
+					.flatMap(username -> loadingMsg.send(
+							String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.", username)))
+					.then();
 		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}
-
-		return Mono.empty();
 	}
 
 	@Override

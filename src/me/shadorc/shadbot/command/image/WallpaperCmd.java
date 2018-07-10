@@ -34,6 +34,7 @@ import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
@@ -122,7 +123,11 @@ public class WallpaperCmd extends AbstractCommand {
 					try {
 						List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
 						if(wallpapers.isEmpty()) {
-							return loadingMsg.send(TextUtils.noResult(context.getContent())).then();
+							return context.getAuthorName()
+									.flatMap(username -> loadingMsg.send(
+											String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
+													username, context.getContent())))
+									.then();
 						}
 
 						Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
@@ -182,7 +187,7 @@ public class WallpaperCmd extends AbstractCommand {
 				.addArg(KEYWORD, "keywords (e.g. doom,game)", true)
 				.setExample(String.format("Search a *SFW* wallpaper in category *Anime*, with a *16x9* ratio :"
 						+ "%n`%s%s -p sfw -c anime -rat 16x9`", context.getPrefix(), this.getName()))
-				.setSource("https://alpha.wallhaven.cc")
+				.setSource("https://alpha.wallhaven.cc/")
 				.build();
 	}
 }

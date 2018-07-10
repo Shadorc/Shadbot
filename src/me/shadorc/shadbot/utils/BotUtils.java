@@ -58,7 +58,7 @@ public class BotUtils {
 				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT))
 				.doOnError(ExceptionUtils::isForbidden,
 						err -> LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send a message.", channel.getId().asLong()))
-				.doOnError(
+				.doOnError(ExceptionUtils::isNotForbidden,
 						err -> LogUtils.error(channel.getClient(), err,
 								String.format("{Channel ID: %d} An error occurred while sending a message.", channel.getId().asLong())));
 	}

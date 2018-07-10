@@ -56,7 +56,7 @@ public class ThisDayCmd extends AbstractCommand {
 							.setAuthor(String.format("On This Day (%s)", date), HOME_URL, avatarUrl)
 							.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
 							.setDescription(StringUtils.truncate(events, DiscordUtils.DESCRIPTION_CONTENT_LIMIT)))
-					.map(loadingMsg::send)
+					.flatMap(loadingMsg::send)
 					.then();
 
 		} catch (IOException err) {

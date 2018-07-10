@@ -33,7 +33,7 @@ public class DtcCmd extends AbstractCommand {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.getAuthorAvatarUrl()
-				.map(avatarUrl -> {
+				.flatMap(avatarUrl -> {
 					try {
 						final String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json",
 								APIKeys.get(APIKey.DTC_API_KEY));
@@ -80,7 +80,7 @@ public class DtcCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random quote from DansTonChat.com")
-				.setSource("https://danstonchat.com")
+				.setSource("https://www.danstonchat.com/")
 				.build();
 	}
 }

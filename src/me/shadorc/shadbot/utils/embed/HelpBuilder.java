@@ -95,6 +95,14 @@ public class HelpBuilder {
 							.setAuthor(String.format("Help for %s command", cmd.getName()), null, avatarUrl)
 							.addField("Usage", this.getUsage(), false);
 
+					if(description != null) {
+						embed.setDescription(description);
+					}
+
+					if(thumbnail != null) {
+						embed.setThumbnail(thumbnail);
+					}
+
 					if(!this.getArguments().isEmpty()) {
 						embed.addField("Arguments", this.getArguments(), false);
 					}
@@ -109,14 +117,6 @@ public class HelpBuilder {
 
 					if(source != null) {
 						embed.addField("Source", source, false);
-					}
-
-					if(description != null) {
-						embed.setDescription(description);
-					}
-
-					if(thumbnail != null) {
-						embed.setThumbnail(thumbnail);
 					}
 
 					for(EmbedFieldEntity field : fields) {

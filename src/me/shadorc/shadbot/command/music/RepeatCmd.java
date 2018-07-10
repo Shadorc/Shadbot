@@ -44,7 +44,9 @@ public class RepeatCmd extends AbstractCommand {
 		final String playlistRepetition = RepeatMode.PLAYLIST.equals(mode) ? "Playlist " : "";
 		final String modeStr = scheduler.getRepeatMode().equals(RepeatMode.NONE) ? "disabled" : "enabled";
 
-		return BotUtils.sendMessage(String.format("%s %sRepetition %s", emoji, playlistRepetition, modeStr), context.getChannel())
+		return context.getAuthorName()
+				.flatMap(username -> BotUtils.sendMessage(String.format("%s %sRepetition %s by **%s**.",
+						emoji, playlistRepetition, modeStr, username), context.getChannel()))
 				.then();
 	}
 

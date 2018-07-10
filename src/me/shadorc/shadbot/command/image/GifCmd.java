@@ -17,8 +17,8 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
 import reactor.core.Exceptions;
@@ -43,7 +43,11 @@ public class GifCmd extends AbstractCommand {
 			}
 
 			if(giphy.getGifs().isEmpty()) {
-				return loadingMsg.send(TextUtils.noResult(context.getArg().orElse("random search"))).then();
+				return context.getAuthorName()
+						.flatMap(username -> loadingMsg.send(
+								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
+										username, context.getArg().orElse("random search"))))
+						.then();
 			}
 
 			EmbedCreateSpec embed = new EmbedCreateSpec()
@@ -62,7 +66,7 @@ public class GifCmd extends AbstractCommand {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random gif")
 				.addArg("tag", "the tag to search", true)
-				.setSource("https://giphy.com")
+				.setSource("https://www.giphy.com/")
 				.build();
 	}
 

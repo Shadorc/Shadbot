@@ -2,7 +2,7 @@ package me.shadorc.shadbot.command.fun;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,7 +29,8 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.FUN, names = { "chat" })
 public class ChatCmd extends AbstractCommand {
 
-	private static final List<String> BOTS_ID = List.of("efc39100ce34d038", "b0dafd24ee35a477", "ea373c261e3458c6", "b0a6a41a5e345c23");
+	private static final Map<String, String> BOTS = Map.of("Marvin", "efc39100ce34d038", "Chomsky", "b0dafd24ee35a477",
+			"R.I.V.K.A", "ea373c261e3458c6", "Lisa", "b0a6a41a5e345c23");
 	private static final int MAX_ERROR_COUNT = 10;
 
 	private static final ConcurrentHashMap<Snowflake, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
@@ -39,13 +40,13 @@ public class ChatCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		for(String botId : BOTS_ID) {
+		for(String botName : BOTS.keySet()) {
 			try {
-				String response = this.talk(context.getChannelId(), botId, arg);
+				String response = this.talk(context.getChannelId(), BOTS.get(botName), arg);
 				ERROR_COUNT.set(0);
-				return BotUtils.sendMessage(Emoji.SPEECH + " " + response, context.getChannel()).then();
+				return BotUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", botName, response), context.getChannel()).then();
 			} catch (IOException err) {
-				LogUtils.infof("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botId);
+				LogUtils.infof("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botName);
 			}
 		}
 
@@ -73,7 +74,7 @@ public class ChatCmd extends AbstractCommand {
 		return new HelpBuilder(this, context)
 				.setDescription("Chat with an artificial intelligence.")
 				.addArg("message", false)
-				.setSource("https://pandorabots.com/"
+				.setSource("https://www.pandorabots.com/"
 						+ "\n**Marvin** (ID: efc39100ce34d038)"
 						+ "\n**Chomsky** (ID: b0dafd24ee35a477)"
 						+ "\n**R.I.V.K.A** (ID: ea373c261e3458c6)"
