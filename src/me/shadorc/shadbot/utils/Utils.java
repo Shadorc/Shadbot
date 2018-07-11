@@ -38,8 +38,8 @@ import reactor.core.publisher.Mono;
 public class Utils {
 
 	public static final ObjectMapper MAPPER = new ObjectMapper()
+			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 			.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-			.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 			.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
 			.setSerializationInclusion(Include.NON_NULL);
 
