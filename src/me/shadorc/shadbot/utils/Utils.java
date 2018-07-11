@@ -23,6 +23,7 @@ import javax.management.ReflectionException;
 
 import org.json.JSONArray;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -38,7 +39,9 @@ public class Utils {
 
 	public static final ObjectMapper MAPPER = new ObjectMapper()
 			.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+			.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+			.setSerializationInclusion(Include.NON_NULL);
 
 	/**
 	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found

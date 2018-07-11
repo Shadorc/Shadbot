@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.data.lotto;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,6 +18,12 @@ public class Lotto {
 	private AtomicInteger jackpot;
 	@JsonProperty("gamblers")
 	private List<LottoGambler> gamblers;
+	
+	public Lotto() {
+		this.historic = null;
+		this.jackpot = new AtomicInteger(0);
+		this.gamblers = new CopyOnWriteArrayList<>();
+	}
 
 	public LottoHistoric getHistoric() {
 		return historic;
