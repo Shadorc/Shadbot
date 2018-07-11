@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -26,7 +25,7 @@ public class Database {
 	private static JSONObject dbObject;
 
 	@DataInit
-	public static void init() throws JSONException, IOException {
+	public static void init() throws IOException {
 		if(!FILE.exists()) {
 			try (FileWriter writer = new FileWriter(FILE)) {
 				writer.write(new JSONObject().toString(Config.JSON_INDENT_FACTOR));
@@ -39,7 +38,7 @@ public class Database {
 	}
 
 	@DataSave(filePath = FILE_NAME, initialDelay = 15, period = 15, unit = TimeUnit.MINUTES)
-	public static void save() throws JSONException, IOException {
+	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(dbObject.toString(Config.JSON_INDENT_FACTOR));
 		}

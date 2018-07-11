@@ -7,7 +7,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.ParseException;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
@@ -48,7 +47,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 
 	// Trivia API doc : https://opentdb.com/api_config.php
 	@Override
-	public void start() throws JSONException, IOException, ParseException {
+	public void start() throws IOException, ParseException {
 		String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", categoryID == null ? "" : categoryID.toString());
 		JSONObject resultObj = new JSONObject(NetUtils.getJSON(url)).getJSONArray("results").getJSONObject(0);
 

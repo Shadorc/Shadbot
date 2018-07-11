@@ -5,8 +5,6 @@ import java.net.URL;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import org.json.JSONException;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.image.deviantart.DeviantArtResponse;
 import me.shadorc.shadbot.api.image.deviantart.Image;
@@ -90,7 +88,7 @@ public class ImageCmd extends AbstractCommand {
 		}
 	}
 
-	private synchronized void generateAccessToken() throws JSONException, IOException {
+	private synchronized void generateAccessToken() throws IOException {
 		final URL url = new URL(String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
 				APIKeys.get(APIKey.DEVIANTART_CLIENT_ID), APIKeys.get(APIKey.DEVIANTART_API_SECRET)));
 		this.token = Utils.MAPPER.readValue(url, TokenResponse.class);

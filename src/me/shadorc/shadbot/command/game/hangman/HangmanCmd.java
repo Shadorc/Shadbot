@@ -78,7 +78,7 @@
 // }
 // }
 //
-// private void load() throws JSONException, IOException {
+// private void load() throws IOException {
 // if(HARD_WORDS.isEmpty()) {
 // String url = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt";
 // HARD_WORDS.addAll(StringUtils.split(NetUtils.getBody(url), "\n").stream()

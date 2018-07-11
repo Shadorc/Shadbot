@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.reflections.Reflections;
@@ -65,7 +64,7 @@ public class StatsManager {
 	}
 
 	@DataSave(filePath = FILE_NAME, initialDelay = 10, period = 10, unit = TimeUnit.MINUTES)
-	public static void save() throws JSONException, IOException {
+	public static void save() throws IOException {
 		JSONObject mainObj = new JSONObject();
 
 		Reflections reflections = new Reflections(StatsManager.class.getPackage().getName(), new MethodAnnotationsScanner());
