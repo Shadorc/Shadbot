@@ -18,7 +18,7 @@ public class Lotto {
 	private AtomicInteger jackpot;
 	@JsonProperty("gamblers")
 	private List<LottoGambler> gamblers;
-	
+
 	public Lotto() {
 		this.historic = null;
 		this.jackpot = new AtomicInteger(0);
