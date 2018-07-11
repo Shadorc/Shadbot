@@ -40,4 +40,14 @@ public class HeroResponse {
 		return stats;
 	}
 
+	@Override
+	public String toString() {
+		return "HeroResponse [code=" + code
+				+ ", name=" + name
+				+ ", className=" + className
+				+ ", level=" + level
+				+ ", stats=" + stats
+				+ "]";
+	}
+
 }

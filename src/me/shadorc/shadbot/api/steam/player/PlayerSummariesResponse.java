@@ -11,4 +11,9 @@ public class PlayerSummariesResponse {
 		return response;
 	}
 
+	@Override
+	public String toString() {
+		return "PlayerSummariesResponse [response=" + response + "]";
+	}
+
 }

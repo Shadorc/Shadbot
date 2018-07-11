@@ -19,4 +19,11 @@ public class R34Response {
 		return count;
 	}
 
+	@Override
+	public String toString() {
+		return "R34Response [posts=" + posts
+				+ ", count=" + count
+				+ "]";
+	}
+
 }

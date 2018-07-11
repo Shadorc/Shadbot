@@ -14,4 +14,9 @@ public class UserStatsForGameResponse {
 		return playerStats;
 	}
 
+	@Override
+	public String toString() {
+		return "UserStatsForGameResponse [playerStats=" + playerStats + "]";
+	}
+
 }

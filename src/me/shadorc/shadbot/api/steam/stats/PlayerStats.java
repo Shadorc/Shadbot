@@ -16,4 +16,9 @@ public class PlayerStats {
 		return stats;
 	}
 
+	@Override
+	public String toString() {
+		return "PlayerStats [stats=" + stats + "]";
+	}
+
 }

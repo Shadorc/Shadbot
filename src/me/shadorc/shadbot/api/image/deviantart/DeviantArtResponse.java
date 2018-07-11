@@ -13,4 +13,9 @@ public class DeviantArtResponse {
 		return results;
 	}
 
+	@Override
+	public String toString() {
+		return "DeviantArtResponse [results=" + results + "]";
+	}
+
 }

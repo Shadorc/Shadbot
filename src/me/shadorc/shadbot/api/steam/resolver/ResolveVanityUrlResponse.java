@@ -10,4 +10,9 @@ public class ResolveVanityUrlResponse {
 	public SteamId getResponse() {
 		return response;
 	}
+
+	@Override
+	public String toString() {
+		return "ResolveVanityUrlResponse [response=" + response + "]";
+	}
 }

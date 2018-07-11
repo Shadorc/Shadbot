@@ -11,4 +11,9 @@ public class HeroStats {
 		return damage;
 	}
 
+	@Override
+	public String toString() {
+		return "HeroStats [damage=" + damage + "]";
+	}
+
 }

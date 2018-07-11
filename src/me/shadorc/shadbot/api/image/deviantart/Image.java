@@ -35,4 +35,14 @@ public class Image {
 		return categoryPath;
 	}
 
+	@Override
+	public String toString() {
+		return "Image [content=" + content
+				+ ", author=" + author
+				+ ", url=" + url
+				+ ", title=" + title
+				+ ", categoryPath=" + categoryPath
+				+ "]";
+	}
+
 }

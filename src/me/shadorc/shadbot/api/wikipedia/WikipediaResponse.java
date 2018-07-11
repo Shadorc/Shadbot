@@ -11,4 +11,9 @@ public class WikipediaResponse {
 		return query;
 	}
 
+	@Override
+	public String toString() {
+		return "WikipediaResponse [query=" + query + "]";
+	}
+
 }

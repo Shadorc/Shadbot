@@ -13,4 +13,9 @@ public class PlayerSummaries {
 		return players;
 	}
 
+	@Override
+	public String toString() {
+		return "PlayerSummaries [players=" + players + "]";
+	}
+
 }

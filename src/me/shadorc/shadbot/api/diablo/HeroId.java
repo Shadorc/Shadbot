@@ -11,4 +11,9 @@ public class HeroId {
 		return id;
 	}
 
+	@Override
+	public String toString() {
+		return "HeroId [id=" + id + "]";
+	}
+
 }

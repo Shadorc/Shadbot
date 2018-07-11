@@ -17,4 +17,11 @@ public class QuoteResponse {
 		return id;
 	}
 
+	@Override
+	public String toString() {
+		return "QuoteResponse [content=" + content
+				+ ", id=" + id
+				+ "]";
+	}
+
 }

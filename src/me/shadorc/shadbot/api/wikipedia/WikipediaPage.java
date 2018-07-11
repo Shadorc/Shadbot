@@ -17,4 +17,11 @@ public class WikipediaPage {
 		return extract;
 	}
 
+	@Override
+	public String toString() {
+		return "WikipediaPage [title=" + title
+				+ ", extract=" + extract
+				+ "]";
+	}
+
 }

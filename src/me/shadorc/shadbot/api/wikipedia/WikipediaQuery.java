@@ -13,4 +13,9 @@ public class WikipediaQuery {
 		return pages;
 	}
 
+	@Override
+	public String toString() {
+		return "WikipediaQuery [pages=" + pages + "]";
+	}
+
 }

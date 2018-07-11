@@ -41,4 +41,15 @@ public class R34Post {
 		return hasChildren;
 	}
 
+	@Override
+	public String toString() {
+		return "R34Post [tags=" + tags
+				+ ", fileUrl=" + fileUrl
+				+ ", source=" + source
+				+ ", width=" + width
+				+ ", height=" + height
+				+ ", hasChildren=" + hasChildren
+				+ "]";
+	}
+
 }

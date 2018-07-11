@@ -17,4 +17,11 @@ public class Stats {
 		return value;
 	}
 
+	@Override
+	public String toString() {
+		return "Stats [name=" + name
+				+ ", value=" + value
+				+ "]";
+	}
+
 }

@@ -11,4 +11,9 @@ public class Content {
 		return source;
 	}
 
+	@Override
+	public String toString() {
+		return "Content [source=" + source + "]";
+	}
+
 }

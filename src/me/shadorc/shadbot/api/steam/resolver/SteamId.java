@@ -11,4 +11,9 @@ public class SteamId {
 		return steamId;
 	}
 
+	@Override
+	public String toString() {
+		return "SteamId [steamId=" + steamId + "]";
+	}
+
 }

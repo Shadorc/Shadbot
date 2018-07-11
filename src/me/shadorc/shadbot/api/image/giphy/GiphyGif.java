@@ -11,4 +11,9 @@ public class GiphyGif {
 		return imageUrl;
 	}
 
+	@Override
+	public String toString() {
+		return "GiphyGif [imageUrl=" + imageUrl + "]";
+	}
+
 }

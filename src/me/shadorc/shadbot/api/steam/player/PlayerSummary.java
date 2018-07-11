@@ -25,4 +25,12 @@ public class PlayerSummary {
 	public String getPersonaName() {
 		return personaName;
 	}
+
+	@Override
+	public String toString() {
+		return "PlayerSummary [communityVisibilityState=" + communityVisibilityState
+				+ ", avatarFull=" + avatarFull
+				+ ", personaName=" + personaName
+				+ "]";
+	}
 }

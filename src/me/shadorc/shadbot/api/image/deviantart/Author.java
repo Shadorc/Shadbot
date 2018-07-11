@@ -11,4 +11,9 @@ public class Author {
 		return username;
 	}
 
+	@Override
+	public String toString() {
+		return "Author [username=" + username + "]";
+	}
+
 }

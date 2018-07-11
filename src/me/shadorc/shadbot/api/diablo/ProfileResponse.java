@@ -58,4 +58,17 @@ public class ProfileResponse {
 		return heroeIds;
 	}
 
+	@Override
+	public String toString() {
+		return "ProfileResponse [code=" + code
+				+ ", battleTag=" + battleTag
+				+ ", paragonLevel=" + paragonLevel
+				+ ", paragonLevelHardcore=" + paragonLevelHardcore
+				+ ", paragonLevelSeason=" + paragonLevelSeason
+				+ ", paragonLevelSeasonHardcore=" + paragonLevelSeasonHardcore
+				+ ", guildName=" + guildName
+				+ ", heroeIds=" + heroeIds
+				+ "]";
+	}
+
 }

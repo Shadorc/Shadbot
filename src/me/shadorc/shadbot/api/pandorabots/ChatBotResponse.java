@@ -37,4 +37,14 @@ public class ChatBotResponse {
 		return status;
 	}
 
+	@Override
+	public String toString() {
+		return "ChatBotResponse [input=" + input
+				+ ", response=" + response
+				+ ", custid=" + custid
+				+ ", botid=" + botid
+				+ ", status=" + status
+				+ "]";
+	}
+
 }

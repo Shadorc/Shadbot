@@ -16,4 +16,9 @@ public class GiphyResponse {
 		return gifs;
 	}
 
+	@Override
+	public String toString() {
+		return "GiphyResponse [gifs=" + gifs + "]";
+	}
+
 }

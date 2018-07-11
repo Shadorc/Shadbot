@@ -17,4 +17,11 @@ public class TokenResponse {
 		return expiresIn;
 	}
 
+	@Override
+	public String toString() {
+		return "TokenResponse [accessToken=" + accessToken
+				+ ", expiresIn=" + expiresIn
+				+ "]";
+	}
+
 }
