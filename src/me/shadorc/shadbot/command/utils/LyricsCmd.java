@@ -1,102 +1,107 @@
-// TODO
-// package me.shadorc.shadbot.command.utils;
-//
-// import java.io.IOException;
-// import java.util.List;
-//
-// import org.jsoup.Connection.Response;
-// import org.jsoup.nodes.Document;
-// import org.jsoup.nodes.Document.OutputSettings;
-// import org.jsoup.nodes.Element;
-//
-// import discord4j.core.spec.EmbedCreateSpec;
-// import me.shadorc.shadbot.core.command.AbstractCommand;
-// import me.shadorc.shadbot.core.command.CommandCategory;
-// import me.shadorc.shadbot.core.command.Context;
-// import me.shadorc.shadbot.core.command.annotation.Command;
-// import me.shadorc.shadbot.core.command.annotation.RateLimited;
-// import me.shadorc.shadbot.exception.MissingArgumentException;
-// import me.shadorc.shadbot.utils.DiscordUtils;
-// import me.shadorc.shadbot.utils.NetUtils;
-// import me.shadorc.shadbot.utils.StringUtils;
-// import me.shadorc.shadbot.utils.TextUtils;
-// import me.shadorc.shadbot.utils.embed.EmbedUtils;
-// import me.shadorc.shadbot.utils.embed.HelpBuilder;
-// import me.shadorc.shadbot.utils.message.LoadingMessage;
-// import reactor.core.Exceptions;
-// import reactor.core.publisher.Mono;
-//
-// @RateLimited
-// @Command(category = CommandCategory.UTILS, names = { "lyrics" })
-// public class LyricsCmd extends AbstractCommand {
-//
-// // Make html() preserve linebreaks and spacing
-// private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
-// private static final String HOME_URL = "https://www.musixmatch.com";
-// private static final int MAX_LYRICS_LENGTH = DiscordUtils.DESCRIPTION_CONTENT_LIMIT / 4;
-//
-// @Override
-// public void execute(Context context) {
-// List<String> args = StringUtils.split(context.getArg().orElse(""), 2, "-");
-// if(args.size() != 2) {
-// throw new MissingArgumentException();
-// }
-//
-// LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-//
-// try {
-// String artistSrch = NetUtils.encode(args.get(0).replaceAll("[^A-Za-z0-9]", "-"));
-// String titleSrch = NetUtils.encode(args.get(1).replaceAll("[^A-Za-z0-9]", "-"));
-//
-// // Make a direct search with the artist and the title
-// String url = String.format("%s/lyrics/%s/%s", HOME_URL, artistSrch, titleSrch);
-//
-// Response response = NetUtils.getResponse(url);
-// Document doc = NetUtils.getResponse(url).parse().outputSettings(PRESERVE_FORMAT);
-//
-// // If the direct search found nothing
-// if(response.statusCode() == 404 || response.parse().text().contains("Oops! We couldn't find that page.")) {
-// final String searchUrl = String.format("%s/search/%s-%s?", HOME_URL, artistSrch, titleSrch);
-// // Make a search request on the site
-// Document searchDoc = NetUtils.getDoc(searchUrl);
-// Element trackListElement = searchDoc.getElementsByClass("tracks list").first();
-// if(trackListElement == null) {
-// loadingMsg.send(TextUtils.noResult(context.getArg().get()));
-// return;
-// }
-// // Find the first element containing "title" (generally the best result) and get its URL
-// url = HOME_URL + trackListElement.getElementsByClass("title").attr("href");
-// doc = NetUtils.getDoc(url).outputSettings(PRESERVE_FORMAT);
-// }
-//
-// final String artist = doc.getElementsByClass("mxm-track-title__artist").html();
-// final String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
-// final String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
-// final String lyrics = StringUtils.truncate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
-// final String finalUrl = url;
-//
-// context.getAuthorAvatarUrl().subscribe(avatarUrl -> {
-// EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-// .setAuthor(String.format("Lyrics (%s - %s)", artist, title),
-// finalUrl,
-// avatarUrl)
-// .setThumbnail(albumImg)
-// .setDescription(finalUrl + "\n\n" + lyrics);
-// loadingMsg.send(embed);
-// });
-//
-// } catch (IOException err) {
-// loadingMsg.stopTyping();
-// throw Exceptions.propagate(err);
-// }
-// }
-//
-// @Override
-// public Mono<EmbedCreateSpec> getHelp(Context context) {
-// return new HelpBuilder(this, context)
-// .setDescription("Show lyrics for a song.")
-// .setUsage("<artist> - <title>")
-// .setSource(HOME_URL)
-// .build();
-// }
-// }
+package me.shadorc.shadbot.command.utils;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.http.HttpStatus;
+import org.jsoup.Connection.Response;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.jsoup.nodes.Element;
+
+import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.CommandCategory;
+import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.message.LoadingMessage;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
+
+@RateLimited
+@Command(category = CommandCategory.UTILS, names = { "lyrics" })
+public class LyricsCmd extends AbstractCommand {
+
+	// Make html() preserve linebreaks and spacing
+	private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
+	private static final String HOME_URL = "https://www.musixmatch.com";
+	private static final int MAX_LYRICS_LENGTH = DiscordUtils.DESCRIPTION_CONTENT_LIMIT / 4;
+
+	@Override
+	public Mono<Void> execute(Context context) {
+		List<String> args = StringUtils.split(context.getArg().orElse(""), 2, "-");
+		if(args.size() != 2) {
+			throw new MissingArgumentException();
+		}
+
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+
+		try {
+			final String artistSrch = NetUtils.encode(args.get(0).replaceAll("[^A-Za-z0-9]", "-"));
+			final String titleSrch = NetUtils.encode(args.get(1).replaceAll("[^A-Za-z0-9]", "-"));
+
+			// Make a direct search with the artist and the title
+			String url = String.format("%s/lyrics/%s/%s", HOME_URL, artistSrch, titleSrch);
+
+			Response response = NetUtils.getResponse(url);
+			Document doc = NetUtils.getResponse(url).parse().outputSettings(PRESERVE_FORMAT);
+
+			// If the direct search found nothing
+			if(response.statusCode() == HttpStatus.SC_NOT_FOUND || response.parse().text().contains("Oops! We couldn't find that page.")) {
+
+				final String searchUrl = String.format("%s/search/%s-%s?", HOME_URL, artistSrch, titleSrch);
+
+				// Make a search request on the site
+				Document searchDoc = NetUtils.getDoc(searchUrl);
+				Element trackListElement = searchDoc.getElementsByClass("tracks list").first();
+				if(trackListElement == null) {
+					return context.getAuthorName()
+							.flatMap(username -> loadingMsg.send(
+									String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`", username, context.getArg().get())))
+							.then();
+				}
+
+				// Find the first element containing "title" (generally the best result) and get its URL
+				url = HOME_URL + trackListElement.getElementsByClass("title").attr("href");
+				doc = NetUtils.getDoc(url).outputSettings(PRESERVE_FORMAT);
+			}
+
+			final String artist = doc.getElementsByClass("mxm-track-title__artist").html();
+			final String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
+			final String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
+			final String lyrics = StringUtils.truncate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
+			final String finalUrl = url;
+
+			return context.getAuthorAvatarUrl()
+					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+							.setAuthor(String.format("Lyrics (%s - %s)", artist, title),
+									finalUrl,
+									avatarUrl)
+							.setThumbnail(albumImg)
+							.setDescription(finalUrl + "\n\n" + lyrics))
+					.flatMap(loadingMsg::send)
+					.then();
+
+		} catch (IOException err) {
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
+		}
+	}
+
+	@Override
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
+				.setDescription("Show lyrics for a song.")
+				.setUsage("<artist> - <title>")
+				.setSource(HOME_URL)
+				.build();
+	}
+}
