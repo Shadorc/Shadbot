@@ -141,7 +141,7 @@ public class CommandManager {
 				})
 				.doOnError(ExceptionUtils::isUnknown, err -> {
 					BotUtils.sendMessage(
-							String.format(Emoji.RED_FLAG + "Sorry, something went wrong while executing `%s%s`... My developer has been warned.",
+							String.format(Emoji.RED_FLAG + "Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
 									context.getPrefix(), context.getCommandName()), context.getChannel()).subscribe();
 					LogUtils.error(context.getClient(),
 							err,
