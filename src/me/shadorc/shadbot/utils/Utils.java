@@ -139,24 +139,24 @@ public class Utils {
 	 * @throws CommandException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough coins or if the bet value
 	 *             is superior to {code maxValue}
 	 */
-	public static Integer checkAndGetBet(Mono<MessageChannel> channel, Member member, String betStr, int maxValue) {
+	public static Mono<Integer> checkAndGetBet(Mono<MessageChannel> channel, Member member, String betStr, int maxValue) {
 		Integer bet = NumberUtils.asPositiveInt(betStr);
 		if(bet == null) {
 			throw new CommandException(String.format("`%s` is not a valid amount for coins.", betStr));
 		}
 
 		if(DatabaseManager.getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
-			BotUtils.sendMessage(TextUtils.notEnoughCoins(member), channel).subscribe();
-			return null;
+			return BotUtils.sendMessage(TextUtils.notEnoughCoins(member), channel)
+					.then(Mono.empty());
 		}
 
 		if(bet > maxValue) {
-			BotUtils.sendMessage(String.format(Emoji.BANK + " Sorry, you can't bet more than **%s**.",
-					FormatUtils.formatCoins(maxValue)), channel).subscribe();
-			return null;
+			return BotUtils.sendMessage(String.format(Emoji.BANK + " Sorry, you can't bet more than **%s**.",
+					FormatUtils.formatCoins(maxValue)), channel)
+					.then(Mono.empty());
 		}
 
-		return bet;
+		return Mono.just(bet);
 	}
 
 	/**

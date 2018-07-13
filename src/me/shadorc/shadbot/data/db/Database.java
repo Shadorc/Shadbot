@@ -9,7 +9,7 @@ public class Database {
 
 	@JsonProperty("guilds")
 	private final List<DBGuild> guilds;
-	
+
 	public Database() {
 		this.guilds = new ArrayList<>();
 	}

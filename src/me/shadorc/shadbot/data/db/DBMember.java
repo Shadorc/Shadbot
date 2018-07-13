@@ -16,11 +16,11 @@ public class DBMember {
 	private final Long id;
 	@JsonProperty("coins")
 	private final AtomicInteger coins;
-	
+
 	public DBMember() {
 		this(Snowflake.of(0), Snowflake.of(0));
 	}
-	
+
 	public DBMember(Snowflake guildId, Snowflake id) {
 		this.guildId = guildId.asLong();
 		this.id = id.asLong();

@@ -26,11 +26,11 @@ public class DBGuild {
 	private final List<DBMember> members;
 	@JsonProperty("settings")
 	private final Map<String, Object> settings;
-	
+
 	public DBGuild() {
 		this(Snowflake.of(0));
 	}
-	
+
 	public DBGuild(Snowflake id) {
 		this.id = id.asLong();
 		this.members = new ArrayList<>();
