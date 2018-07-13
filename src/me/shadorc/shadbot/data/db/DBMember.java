@@ -2,6 +2,7 @@ package me.shadorc.shadbot.data.db;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
@@ -10,20 +11,33 @@ import me.shadorc.shadbot.utils.NumberUtils;
 
 public class DBMember {
 
-	private Snowflake guildId;
+	private final Long guildId;
 	@JsonProperty("id")
-	private Snowflake id;
+	private final Long id;
 	@JsonProperty("coins")
-	private AtomicInteger coins;
+	private final AtomicInteger coins;
+	
+	public DBMember() {
+		this(Snowflake.of(0), Snowflake.of(0));
+	}
+	
+	public DBMember(Snowflake guildId, Snowflake id) {
+		this.guildId = guildId.asLong();
+		this.id = id.asLong();
+		this.coins = new AtomicInteger(0);
+	}
 
+	@JsonIgnore
 	public Snowflake getGuildId() {
-		return guildId;
+		return Snowflake.of(guildId);
 	}
 
+	@JsonIgnore
 	public Snowflake getId() {
-		return id;
+		return Snowflake.of(id);
 	}
 
+	@JsonIgnore
 	public int getCoins() {
 		return coins.get();
 	}
