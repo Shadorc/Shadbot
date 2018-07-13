@@ -15,7 +15,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
@@ -93,7 +93,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 									+ "\nExample: 1,3,4"
 									+ "\n\n" + choices)
 							.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-									Database.getDBGuild(guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
+									DatabaseManager.getDBGuild(guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
 					.flatMap(embed -> BotUtils.sendMessage(embed, guildMusic.getMessageChannel()))
 					.subscribe();
 
@@ -165,7 +165,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			return false;
 		}
 
-		final String prefix = Database.getDBGuild(guildMusic.getGuildId()).getPrefix();
+		final String prefix = DatabaseManager.getDBGuild(guildMusic.getGuildId()).getPrefix();
 		if(content.equals(prefix + "cancel")) {
 			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled is choice.", event.getMember().get().getUsername()),
 					guildMusic.getMessageChannel())

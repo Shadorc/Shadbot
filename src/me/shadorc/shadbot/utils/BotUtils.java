@@ -18,7 +18,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -98,7 +98,7 @@ public class BotUtils {
 	}
 
 	public static boolean hasAllowedRole(Snowflake guildId, List<Role> roles) {
-		List<Snowflake> allowedRoles = Database.getDBGuild(guildId).getAllowedRoles();
+		List<Snowflake> allowedRoles = DatabaseManager.getDBGuild(guildId).getAllowedRoles();
 		// If the user is an administrator OR no permissions have been set OR the role is allowed
 		return roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
 				|| allowedRoles.isEmpty()
@@ -106,13 +106,13 @@ public class BotUtils {
 	}
 
 	public static boolean isChannelAllowed(Snowflake guildId, Snowflake channelId) {
-		List<Snowflake> allowedChannels = Database.getDBGuild(guildId).getAllowedChannels();
+		List<Snowflake> allowedChannels = DatabaseManager.getDBGuild(guildId).getAllowedChannels();
 		// If no permission has been set OR the channel is allowed
 		return allowedChannels.isEmpty() || allowedChannels.contains(channelId);
 	}
 
 	public static boolean isCommandAllowed(Snowflake guildId, AbstractCommand cmd) {
-		List<String> blacklistedCmd = Database.getDBGuild(guildId).getBlacklistedCmd();
+		List<String> blacklistedCmd = DatabaseManager.getDBGuild(guildId).getBlacklistedCmd();
 		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
 	}
 

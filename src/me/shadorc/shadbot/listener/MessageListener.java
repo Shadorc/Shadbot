@@ -11,7 +11,7 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
@@ -45,7 +45,7 @@ public class MessageListener {
 				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
 				// The message has not been intercepted
 				.filter(roles -> !MessageInterceptorManager.isIntercepted(event))
-				.map(roles -> Database.getDBGuild(guildId.get()).getPrefix())
+				.map(roles -> DatabaseManager.getDBGuild(guildId.get()).getPrefix())
 				// The message starts with the correct prefix
 				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
 				.flatMap(prefix -> CommandManager.execute(new Context(event, prefix)))

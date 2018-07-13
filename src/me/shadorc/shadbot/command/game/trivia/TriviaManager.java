@@ -12,7 +12,7 @@ import org.jsoup.Jsoup;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
@@ -139,7 +139,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
 
 		BotUtils.sendMessage(Emoji.CLAP + " Correct ! **" + user.getName() + "**, you won **" + gains + " coins**.", channel);
-		Database.getDBUser(channel.getGuild(), user).addCoins(gains);
+		DatabaseManager.getDBUser(channel.getGuild(), user).addCoins(gains);
 		MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
 
 		this.stop();

@@ -7,7 +7,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -22,7 +22,7 @@ public class LeaderboardCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		return Flux.fromIterable(Database.getDBGuild(context.getGuildId().get()).getUsers())
+		return Flux.fromIterable(DatabaseManager.getDBGuild(context.getGuildId().get()).getMembers())
 				.filter(dbMember -> dbMember.getCoins() > 0)
 				.sort((user1, user2) -> Integer.compare(user1.getCoins(), user2.getCoins()))
 				.take(10)

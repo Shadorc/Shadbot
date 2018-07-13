@@ -7,7 +7,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.DBMember;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
@@ -25,7 +25,7 @@ public class CoinsCmd extends AbstractCommand {
 				.switchIfEmpty(context.getAuthor())
 				.single()
 				.flatMap(user -> {
-					final DBMember dbMember = Database.getDBMember(context.getGuildId().get(), user.getId());
+					final DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId().get(), user.getId());
 					final String coins = FormatUtils.formatCoins(dbMember.getCoins());
 
 					String text;

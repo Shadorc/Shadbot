@@ -1,48 +1,20 @@
 package me.shadorc.shadbot.data.db;
 
-import org.json.JSONObject;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.stats.DatabaseStatsManager;
-import me.shadorc.shadbot.data.stats.DatabaseStatsManager.DatabaseEnum;
 import me.shadorc.shadbot.utils.NumberUtils;
 
 public class DBMember {
 
-	private static final String COINS_KEY = "coins";
-
-	private final Snowflake id;
-	private final Snowflake guildId;
-
-	private int coins;
-
-	public DBMember(Snowflake guildId, Snowflake memberId) {
-		this.id = memberId;
-		this.guildId = guildId;
-		this.load();
-	}
-
-	private void load() {
-		DatabaseStatsManager.log(DatabaseEnum.USER_LOADED);
-
-		JSONObject guildObj = Database.opt(guildId.asString());
-		if(guildObj == null) {
-			return;
-		}
-
-		JSONObject membersObj = guildObj.optJSONObject(DBGuild.USERS_KEY);
-		if(membersObj == null) {
-			return;
-		}
-
-		JSONObject memberObj = membersObj.optJSONObject(id.asString());
-		if(memberObj == null) {
-			return;
-		}
-
-		this.coins = memberObj.optInt(COINS_KEY);
-	}
+	private Snowflake guildId;
+	@JsonProperty("id")
+	private Snowflake id;
+	@JsonProperty("coins")
+	private AtomicInteger coins;
 
 	public Snowflake getGuildId() {
 		return guildId;
@@ -53,24 +25,15 @@ public class DBMember {
 	}
 
 	public int getCoins() {
-		return coins;
+		return coins.get();
 	}
 
 	public void addCoins(int gains) {
-		this.coins = NumberUtils.between(this.getCoins() + gains, 0, Config.MAX_COINS);
-		Database.save(this);
+		coins.set(NumberUtils.between(this.getCoins() + gains, 0, Config.MAX_COINS));
 	}
 
 	public void resetCoins() {
-		this.coins = 0;
-		Database.save(this);
+		coins.set(0);
 	}
 
-	public JSONObject toJSON() {
-		JSONObject memberObj = new JSONObject();
-		if(coins != 0) {
-			memberObj.put(COINS_KEY, coins);
-		}
-		return memberObj;
-	}
 }

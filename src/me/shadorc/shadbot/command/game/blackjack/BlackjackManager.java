@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
@@ -149,7 +149,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 					break;
 			}
 
-			Database.getDBUser(this.getGuild(), player.getUser()).addCoins(gains);
+			DatabaseManager.getDBUser(this.getGuild(), player.getUser()).addCoins(gains);
 		}
 
 		BotUtils.sendMessage(Emoji.DICE + " __Results:__ " + FormatUtils.format(results, str -> str, ", "), this.getMessageChannel());

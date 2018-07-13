@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -105,7 +105,7 @@ public class RouletteManager extends AbstractGameManager {
 				list.add(String.format("**%s** (Losses: **%s**)", user.getName(), FormatUtils.formatCoins(Math.abs(gains))));
 				MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getCmdName(), Math.abs(gains));
 			}
-			Database.getDBUser(this.getGuild(), user).addCoins(gains);
+			DatabaseManager.getDBUser(this.getGuild(), user).addCoins(gains);
 		}
 
 		BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",

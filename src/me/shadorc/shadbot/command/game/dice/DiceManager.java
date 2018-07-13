@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -77,7 +77,7 @@ public class DiceManager extends AbstractGameManager {
 			}
 			list.add(gains > 0 ? 0 : list.size(), String.format("%s (**%s**)", user.getName(), FormatUtils.formatCoins(gains)));
 
-			Database.getDBUser(this.getGuild(), user).addCoins(gains);
+			DatabaseManager.getDBUser(this.getGuild(), user).addCoins(gains);
 		}
 
 		RequestFuture<IMessage> msgRequest = BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getMessageChannel());

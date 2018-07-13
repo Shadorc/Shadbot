@@ -15,7 +15,7 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.AudioReceiver;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -49,7 +49,7 @@ public class GuildMusic {
 		audioPlayer.addListener(new AudioEventListener(this));
 		this.audioProvider = new MusicProvider(audioPlayer, this);
 		this.audioReceiver = new MusicReceiver();
-		this.trackScheduler = new TrackScheduler(audioPlayer, Database.getDBGuild(guildId).getDefaultVol());
+		this.trackScheduler = new TrackScheduler(audioPlayer, DatabaseManager.getDBGuild(guildId).getDefaultVol());
 	}
 
 	public void scheduleLeave() {

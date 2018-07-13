@@ -13,7 +13,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.DBMember;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -48,14 +48,14 @@ public class TransferCoinsCmd extends AbstractCommand {
 					String.format("`%s` is not a valid amount for coins.", args.get(0)));
 		}
 
-		DBMember dbSender = Database.getDBMember(context.getGuildId().get(), senderUserId);
+		DBMember dbSender = DatabaseManager.getDBMember(context.getGuildId().get(), senderUserId);
 		if(dbSender.getCoins() < coins) {
 			return context.getAuthor()
 					.flatMap(author -> BotUtils.sendMessage(TextUtils.notEnoughCoins(author), context.getChannel()))
 					.then();
 		}
 
-		DBMember dbReceiver = Database.getDBMember(context.getGuildId().get(), receiverUserId);
+		DBMember dbReceiver = DatabaseManager.getDBMember(context.getGuildId().get(), receiverUserId);
 		if(dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
 			return context.getClient().getUserById(receiverUserId)
 					.flatMap(user -> BotUtils.sendMessage(String.format(

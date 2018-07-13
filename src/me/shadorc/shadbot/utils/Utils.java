@@ -30,7 +30,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.command.Emoji;
 import reactor.core.publisher.Mono;
@@ -145,7 +145,7 @@ public class Utils {
 			throw new CommandException(String.format("`%s` is not a valid amount for coins.", betStr));
 		}
 
-		if(Database.getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
+		if(DatabaseManager.getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
 			BotUtils.sendMessage(TextUtils.notEnoughCoins(member), channel).subscribe();
 			return null;
 		}

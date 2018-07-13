@@ -6,13 +6,13 @@ import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 import me.shadorc.shadbot.data.db.DBGuild;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import twitter4j.JSONArray;
 
 public class ChannelListener {
 
 	public static void onTextChannelDelete(TextChannelDeleteEvent event) {
-		DBGuild dbGuild = Database.getDBGuild(event.getChannel().getGuildId());
+		DBGuild dbGuild = DatabaseManager.getDBGuild(event.getChannel().getGuildId());
 		List<Snowflake> allowedChannelIds = dbGuild.getAllowedChannels();
 		// If the channel was an allowed channel...
 		if(allowedChannelIds.remove(event.getChannel().getId())) {

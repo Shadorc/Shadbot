@@ -7,7 +7,7 @@ import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.db.DBGuild;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -17,7 +17,7 @@ public class MemberListener {
 
 	public static void onMemberJoin(MemberJoinEvent event) {
 		final Snowflake guildId = event.getGuildId();
-		final DBGuild dbGuild = Database.getDBGuild(guildId);
+		final DBGuild dbGuild = DatabaseManager.getDBGuild(guildId);
 
 		MemberListener.sendAutoMsg(event.getClient(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage());
 
@@ -31,7 +31,7 @@ public class MemberListener {
 	}
 
 	public static void onMemberLeave(MemberLeaveEvent event) {
-		final DBGuild dbGuild = Database.getDBGuild(event.getGuildId());
+		final DBGuild dbGuild = DatabaseManager.getDBGuild(event.getGuildId());
 		MemberListener.sendAutoMsg(event.getClient(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage());
 	}
 

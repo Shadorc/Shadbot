@@ -9,7 +9,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -49,17 +49,17 @@ public class ManageCoinsCmd extends AbstractCommand {
 			String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(users, User::getUsername, ", ");
 			switch (action) {
 				case ADD:
-					users.stream().forEach(user -> Database.getDBMember(context.getGuildId().get(), user.getId()).addCoins(coins));
+					users.stream().forEach(user -> DatabaseManager.getDBMember(context.getGuildId().get(), user.getId()).addCoins(coins));
 					BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** received **%s**.",
 							mentionsStr, FormatUtils.formatCoins(coins)), context.getChannel());
 					break;
 				case REMOVE:
-					users.stream().forEach(user -> Database.getDBMember(context.getGuildId().get(), user.getId()).addCoins(-coins));
+					users.stream().forEach(user -> DatabaseManager.getDBMember(context.getGuildId().get(), user.getId()).addCoins(-coins));
 					BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.",
 							mentionsStr, FormatUtils.formatCoins(coins)), context.getChannel());
 					break;
 				case RESET:
-					users.stream().forEach(user -> Database.getDBMember(context.getGuildId().get(), user.getId()).resetCoins());
+					users.stream().forEach(user -> DatabaseManager.getDBMember(context.getGuildId().get(), user.getId()).resetCoins());
 					BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.",
 							mentionsStr, users.size() == 1 ? "his" : "their"), context.getChannel());
 					break;

@@ -20,7 +20,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.db.DBGuild;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -39,7 +39,7 @@ public class ServerInfoCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 
-		final DBGuild dbGuild = Database.getDBGuild(context.getGuildId().get());
+		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId().get());
 
 		StringBuilder settingsStr = new StringBuilder();
 

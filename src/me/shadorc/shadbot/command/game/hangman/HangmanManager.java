@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import me.shadorc.shadbot.data.db.Database;
+import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
@@ -72,7 +72,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 			int gains = (int) Math.ceil(MIN_GAINS + ((float) MAX_BONUS / IMG_LIST.size()) * ((float) IMG_LIST.size() - failsCount));
 			BotUtils.sendMessage(String.format(Emoji.PURSE + " Well played **%s**, you found the word ! You won **%s**.",
 					this.getAuthor().getName(), FormatUtils.formatCoins(gains)), this.getMessageChannel());
-			Database.getDBUser(this.getGuild(), this.getAuthor()).addCoins(gains);
+			DatabaseManager.getDBUser(this.getGuild(), this.getAuthor()).addCoins(gains);
 			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getCmdName(), gains);
 		} else {
 			BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " You lose, the word to guess was **%s** !", word), this.getMessageChannel());
