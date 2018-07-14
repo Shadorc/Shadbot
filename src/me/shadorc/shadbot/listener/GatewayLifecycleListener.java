@@ -11,6 +11,7 @@ import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.event.domain.message.MessageUpdateEvent;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -35,6 +36,7 @@ public class GatewayLifecycleListener {
 		DiscordUtils.registerListener(event.getClient(), MemberJoinEvent.class, MemberListener::onMemberJoin);
 		DiscordUtils.registerListener(event.getClient(), MemberLeaveEvent.class, MemberListener::onMemberLeave);
 		DiscordUtils.registerListener(event.getClient(), MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
+		DiscordUtils.registerListener(event.getClient(), MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
 		DiscordUtils.registerListener(event.getClient(), VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 
 		SchedulerUtils.scheduleAtFixedRate(() -> NetUtils.postStats(event.getClient()), 2, 2, TimeUnit.HOURS);
