@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.jsoup.Connection.Response;
+import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.nodes.Element;
@@ -22,6 +23,7 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
@@ -51,11 +53,27 @@ public class LyricsCmd extends AbstractCommand {
 			// Make a direct search with the artist and the title
 			String url = String.format("%s/lyrics/%s/%s", HOME_URL, artistSrch, titleSrch);
 
-			Response response = NetUtils.getResponse(url);
-			Document doc = NetUtils.getResponse(url).parse().outputSettings(PRESERVE_FORMAT);
+			// Sometimes musixmatch redirects to a wrong page, check it and reload it if necessary
+			int retryCount = 0;
+			Response response = null;
+			do {
+				if(response != null) {
+					retryCount++;
+					if(retryCount == 3) {
+						LogUtils.warn(context.getClient(), String.format("[%s] %d retries, abort attempt to reload page.",
+								this.getClass().getSimpleName(), retryCount));
+						throw new HttpStatusException("musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
+					}
+					LogUtils.infof("[%s] URLs do not match (%s / %s), reloading page.",
+							this.getClass().getSimpleName(), response.url().toString(), url);
+				}
+				response = NetUtils.getResponse(url);
+			} while(!response.url().toString().equalsIgnoreCase(url));
+
+			Document doc = response.parse().outputSettings(PRESERVE_FORMAT);
 
 			// If the direct search found nothing
-			if(response.statusCode() == HttpStatus.SC_NOT_FOUND || response.parse().text().contains("Oops! We couldn't find that page.")) {
+			if(response.statusCode() == HttpStatus.SC_NOT_FOUND || doc.text().contains("Oops! We couldn't find that page.")) {
 
 				final String searchUrl = String.format("%s/search/%s-%s?", HOME_URL, artistSrch, titleSrch);
 
