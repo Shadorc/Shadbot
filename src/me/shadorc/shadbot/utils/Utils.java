@@ -26,6 +26,7 @@ import org.json.JSONArray;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import discord4j.core.object.entity.Member;
@@ -41,7 +42,8 @@ public class Utils {
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 			.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 			.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-			.setSerializationInclusion(Include.NON_NULL);
+			.enable(SerializationFeature.INDENT_OUTPUT)
+			.setSerializationInclusion(Include.NON_EMPTY);
 
 	/**
 	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found

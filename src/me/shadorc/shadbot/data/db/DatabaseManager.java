@@ -3,8 +3,12 @@ package me.shadorc.shadbot.data.db;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import com.fasterxml.jackson.databind.JavaType;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.DataManager;
@@ -17,22 +21,23 @@ public class DatabaseManager {
 	private static final String FILE_NAME = "database.json";
 	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
 
-	private static Database database;
+	private static List<DBGuild> guilds;
 
 	@DataInit
 	public static void init() throws IOException {
-		database = FILE.exists() ? Utils.MAPPER.readValue(FILE, Database.class) : new Database();
+		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, DBGuild.class);
+		guilds = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new ArrayList<>();
 	}
 
 	@DataSave(filePath = FILE_NAME, initialDelay = 15, period = 15, unit = TimeUnit.MINUTES)
 	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
-			writer.write(Utils.MAPPER.writeValueAsString(database));
+			writer.write(Utils.MAPPER.writeValueAsString(guilds));
 		}
 	}
 
 	public static DBGuild getDBGuild(Snowflake guildId) {
-		Optional<DBGuild> dbGuildOpt = database.getGuilds().stream()
+		Optional<DBGuild> dbGuildOpt = guilds.stream()
 				.filter(guild -> guild.getId().equals(guildId))
 				.findFirst();
 
@@ -41,7 +46,7 @@ public class DatabaseManager {
 		}
 
 		final DBGuild dbGuild = new DBGuild(guildId);
-		database.addGuild(dbGuild);
+		DatabaseManager.addGuild(dbGuild);
 		return dbGuild;
 	}
 
@@ -59,6 +64,10 @@ public class DatabaseManager {
 		final DBMember dbMember = new DBMember(guildId, memberId);
 		DatabaseManager.getDBGuild(guildId).addMember(dbMember);
 		return dbMember;
+	}
+
+	private static void addGuild(DBGuild dbGuild) {
+		guilds.add(dbGuild);
 	}
 
 }
