@@ -58,8 +58,16 @@ public class TranslateCmd extends AbstractCommand {
 
 		final String sourceText = args.get(2);
 		try {
-			final String url = String.format("https://translate.googleapis.com/translate_a/single?client=gtx&sl=%s&tl=%s&dt=t&q=%s",
+			final String url = String.format("https://translate.googleapis.com/translate_a/single?"
+					+ "client=gtx"
+					+ "&ie=UTF-8"
+					+ "&oe=UTF-8"
+					+ "&sl=%s"
+					+ "&tl=%s"
+					+ "&dt=t"
+					+ "&q=%s",
 					NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
+
 			JSONArray result = new JSONArray(NetUtils.getJSON(url));
 
 			if(!(result.get(0) instanceof JSONArray)) {
