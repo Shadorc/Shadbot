@@ -3,6 +3,7 @@ package me.shadorc.shadbot.core.ratelimiter;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
@@ -10,10 +11,10 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.message.TemporaryMessage;
 
 public class RateLimiter {
 
@@ -62,7 +63,7 @@ public class RateLimiter {
 					final String text = String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
 							username, message, maxNum, durationStr);
 
-					return BotUtils.sendMessage(text, client.getMessageChannelById(channelId));
+					return new TemporaryMessage(client, channelId, 10, TimeUnit.SECONDS).send(text);
 				})
 				.subscribe();
 	}
