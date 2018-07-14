@@ -32,8 +32,13 @@ public class RussianRouletteCmd extends AbstractCommand {
 		final String arg = context.requireArg();
 
 		return Utils.checkAndGetBet(context.getChannel(), context.getMember().get(), arg, MAX_BET)
-				.map(bet -> {
-					StringBuilder strBuilder = new StringBuilder(Emoji.DICE + " You break a sweat, you pull the trigger... ");
+				.zipWith(context.getAuthorName())
+				.map(betAndUsername -> {
+					final int bet = betAndUsername.getT1();
+					final String username = betAndUsername.getT2();
+					
+					StringBuilder strBuilder = new StringBuilder(
+							String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", username));
 
 					int gains;
 					if(ThreadLocalRandom.current().nextInt(6) == 0) {

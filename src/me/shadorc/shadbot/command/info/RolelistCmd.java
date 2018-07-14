@@ -43,8 +43,7 @@ public class RolelistCmd extends AbstractCommand {
 				.filter(member -> !Collections.disjoint(member.getRoleIds(), roleIds))
 				.map(User::getUsername)
 				.buffer()
-				.single()
-				.zipWith(roles.buffer().single())
+				.zipWith(roles.buffer())
 				.map(membersAndRoles -> {
 					FormatUtils.createColumns(membersAndRoles.getT1(), 25).stream()
 							.forEach(field -> embed.addField(field.getName(), field.getValue(), false));
