@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.admin;
 import java.util.List;
 
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -27,7 +28,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void execute(Context context) {
+	public Mono<Void> execute(Context context) {
 		List<String> args = context.requireArgs(2, 3);
 
 		Action action = Utils.getValueOrNull(Action.class, args.get(0));
@@ -45,26 +46,28 @@ public class ManageCoinsCmd extends AbstractCommand {
 			throw new CommandException("You must specify at least one user / role.");
 		}
 
-		BotUtils.getUsersFrom(context.getMessage()).buffer().subscribe(users -> {
-			String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(users, User::getUsername, ", ");
-			switch (action) {
-				case ADD:
-					users.stream().forEach(user -> DatabaseManager.getDBMember(context.getGuildId().get(), user.getId()).addCoins(coins));
-					BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** received **%s**.",
-							mentionsStr, FormatUtils.formatCoins(coins)), context.getChannel());
-					break;
-				case REMOVE:
-					users.stream().forEach(user -> DatabaseManager.getDBMember(context.getGuildId().get(), user.getId()).addCoins(-coins));
-					BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.",
-							mentionsStr, FormatUtils.formatCoins(coins)), context.getChannel());
-					break;
-				case RESET:
-					users.stream().forEach(user -> DatabaseManager.getDBMember(context.getGuildId().get(), user.getId()).resetCoins());
-					BotUtils.sendMessage(String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.",
-							mentionsStr, users.size() == 1 ? "his" : "their"), context.getChannel());
-					break;
-			}
-		});
+		final Snowflake guildId = context.getGuildId().get();
+
+		return BotUtils.getUsersFrom(context.getMessage())
+				.buffer()
+				.map(users -> {
+					String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(users, User::getUsername, ", ");
+					switch (action) {
+						case ADD:
+							users.stream().forEach(user -> DatabaseManager.getDBMember(guildId, user.getId()).addCoins(coins));
+							return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.formatCoins(coins));
+						case REMOVE:
+							users.stream().forEach(user -> DatabaseManager.getDBMember(guildId, user.getId()).addCoins(-coins));
+							return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.formatCoins(coins));
+						case RESET:
+							users.stream().forEach(user -> DatabaseManager.getDBMember(guildId, user.getId()).resetCoins());
+							return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, users.size() == 1 ? "his" : "their");
+					}
+
+					return null;
+				})
+				.flatMap(text -> BotUtils.sendMessage(text, context.getChannel()))
+				.then();
 	}
 
 	@Override
