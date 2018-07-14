@@ -67,7 +67,7 @@ public class NetUtils {
 	/**
 	 * @param url - URL to connect to. The protocol must be http or https
 	 * @return A string representing JSON
-	 * @throws HttpStatusException - if the URL returns an invalid JSON
+	 * @throws HttpStatusException if the URL returns an invalid JSON
 	 */
 	public static String getJSON(String url) throws IOException {
 		String json = NetUtils.getBody(url);

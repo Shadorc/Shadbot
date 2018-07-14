@@ -36,7 +36,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 				.map(betAndUsername -> {
 					final int bet = betAndUsername.getT1();
 					final String username = betAndUsername.getT2();
-					
+
 					StringBuilder strBuilder = new StringBuilder(
 							String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", username));
 

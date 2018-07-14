@@ -125,27 +125,27 @@ public class CommandManager {
 				})
 				.doOnError(ExceptionUtils::isUnavailable, err -> {
 					BotUtils.sendMessage(
-							String.format(Emoji.RED_FLAG + "Mmmh... `%s%s` is currently unavailable... This is not my fault, I promise ! Try again later.",
+							String.format(Emoji.RED_FLAG + " Mmmh... `%s%s` is currently unavailable... This is not my fault, I promise ! Try again later.",
 									context.getPrefix(), context.getCommandName()), context.getChannel()).subscribe();
 					LogUtils.warn(context.getClient(),
-							String.format("{%s} Service unavailable.", command.getClass().getSimpleName()),
+							String.format("[%s] Service unavailable.", command.getClass().getSimpleName()),
 							context.getContent());
 				})
 				.doOnError(ExceptionUtils::isUnreacheable, err -> {
 					BotUtils.sendMessage(
-							String.format(Emoji.RED_FLAG + "Mmmh... `%s%s` takes too long to be executed... This is not my fault, I promise ! Try again later.",
+							String.format(Emoji.RED_FLAG + " Mmmh... `%s%s` takes too long to be executed... This is not my fault, I promise ! Try again later.",
 									context.getPrefix(), context.getCommandName()), context.getChannel()).subscribe();
 					LogUtils.warn(context.getClient(),
-							String.format("{%s}Service unreachable.", command.getClass().getSimpleName()),
+							String.format("[%s] Service unreachable.", command.getClass().getSimpleName()),
 							context.getContent());
 				})
 				.doOnError(ExceptionUtils::isUnknown, err -> {
 					BotUtils.sendMessage(
-							String.format(Emoji.RED_FLAG + "Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
+							String.format(Emoji.RED_FLAG + " Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
 									context.getPrefix(), context.getCommandName()), context.getChannel()).subscribe();
 					LogUtils.error(context.getClient(),
 							err,
-							String.format("{%s} An unknown error occurred.", command.getClass().getSimpleName()),
+							String.format("[%s] An unknown error occurred.", command.getClass().getSimpleName()),
 							context.getContent());
 				})
 				.doOnSuccess(perm -> {

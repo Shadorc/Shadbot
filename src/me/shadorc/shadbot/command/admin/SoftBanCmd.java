@@ -1,4 +1,4 @@
-//TODO
+// TODO
 // package me.shadorc.shadbot.command.admin;
 //
 // import java.security.Permissions;
