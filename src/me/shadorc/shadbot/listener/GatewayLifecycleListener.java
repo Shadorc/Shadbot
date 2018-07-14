@@ -34,7 +34,7 @@ public class GatewayLifecycleListener {
 		DiscordUtils.registerListener(event.getClient(), GuildDeleteEvent.class, GuildListener::onGuildDelete);
 		DiscordUtils.registerListener(event.getClient(), MemberJoinEvent.class, MemberListener::onMemberJoin);
 		DiscordUtils.registerListener(event.getClient(), MemberLeaveEvent.class, MemberListener::onMemberLeave);
-		DiscordUtils.registerListener(event.getClient(), MessageCreateEvent.class, MessageListener::onMessageCreate);
+		DiscordUtils.registerListener(event.getClient(), MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
 		DiscordUtils.registerListener(event.getClient(), VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 
 		SchedulerUtils.scheduleAtFixedRate(() -> NetUtils.postStats(event.getClient()), 2, 2, TimeUnit.HOURS);

@@ -18,7 +18,7 @@ import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import reactor.core.publisher.Mono;
 
-public class MessageListener {
+public class MessageCreateListener {
 
 	public static void onMessageCreate(MessageCreateEvent event) {
 		VariousStatsManager.log(VariousEnum.MESSAGES_RECEIVED);
@@ -35,7 +35,7 @@ public class MessageListener {
 				// This is not a private message...
 				.filter(channel -> !channel.getType().equals(Type.DM))
 				// ... else switch to #onPrivateMessage
-				.switchIfEmpty(Mono.fromRunnable(() -> MessageListener.onPrivateMessage(event)))
+				.switchIfEmpty(Mono.fromRunnable(() -> MessageCreateListener.onPrivateMessage(event)))
 				// The channel is allowed
 				.filter(channel -> BotUtils.isChannelAllowed(guildId.get(), channel.getId()))
 				.flatMapMany(channel -> event.getMember().get().getRoles().buffer())
