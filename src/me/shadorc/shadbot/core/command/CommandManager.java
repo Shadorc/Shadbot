@@ -12,19 +12,15 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.CommandStatsManager;
 import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
-import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.ExceptionUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
@@ -107,47 +103,7 @@ public class CommandManager {
 				// The user is not rate limited
 				.filter(isRateLimited.negate())
 				.flatMap(cmd -> cmd.execute(context))
-				.doOnError(CommandException.class, err -> {
-					context.getAuthorName()
-							.flatMap(username -> BotUtils.sendMessage(
-									String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s", username, err.getMessage()), context.getChannel()))
-							.subscribe();
-					CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
-				})
-				.doOnError(MissingArgumentException.class, err -> {
-					command.getHelp(context)
-							.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, context.getChannel()))
-							.subscribe();
-					CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
-				})
-				.doOnError(NoMusicException.class, err -> {
-					BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel()).subscribe();
-				})
-				.doOnError(ExceptionUtils::isUnavailable, err -> {
-					BotUtils.sendMessage(
-							String.format(Emoji.RED_FLAG + " Mmmh... `%s%s` is currently unavailable... This is not my fault, I promise ! Try again later.",
-									context.getPrefix(), context.getCommandName()), context.getChannel()).subscribe();
-					LogUtils.warn(context.getClient(),
-							String.format("[%s] Service unavailable.", command.getClass().getSimpleName()),
-							context.getContent());
-				})
-				.doOnError(ExceptionUtils::isUnreacheable, err -> {
-					BotUtils.sendMessage(
-							String.format(Emoji.RED_FLAG + " Mmmh... `%s%s` takes too long to be executed... This is not my fault, I promise ! Try again later.",
-									context.getPrefix(), context.getCommandName()), context.getChannel()).subscribe();
-					LogUtils.warn(context.getClient(),
-							String.format("[%s] Service unreachable.", command.getClass().getSimpleName()),
-							context.getContent());
-				})
-				.doOnError(ExceptionUtils::isUnknown, err -> {
-					BotUtils.sendMessage(
-							String.format(Emoji.RED_FLAG + " Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
-									context.getPrefix(), context.getCommandName()), context.getChannel()).subscribe();
-					LogUtils.error(context.getClient(),
-							err,
-							String.format("[%s] An unknown error occurred.", command.getClass().getSimpleName()),
-							context.getContent());
-				})
+				.doOnError(err -> new ExceptionHandler(err, command, context).handle())
 				.doOnSuccess(perm -> {
 					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
 					VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
