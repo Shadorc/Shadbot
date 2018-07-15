@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
@@ -25,6 +27,7 @@ public class Lotto {
 		this.gamblers = new CopyOnWriteArrayList<>();
 	}
 
+	@Nullable
 	public LottoHistoric getHistoric() {
 		return historic;
 	}

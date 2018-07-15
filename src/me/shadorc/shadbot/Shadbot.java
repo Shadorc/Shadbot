@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -11,12 +12,14 @@ import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import me.shadorc.shadbot.command.game.LottoCmd;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.listener.GatewayLifecycleListener;
 import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.SchedulerUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
@@ -57,7 +60,7 @@ public class Shadbot {
 			DiscordUtils.registerListener(client, ReadyEvent.class, GatewayLifecycleListener::onReady);
 		}
 
-		// Shadbot.scheduleAtFixedRate(LottoCmd::draw, LottoCmd.getDelay(), TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
+		SchedulerUtils.scheduleAtFixedRate(() -> LottoCmd.draw(CLIENTS.get(0)), LottoCmd.getDelay(), TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
 
 		// Initiate login and block
 		Flux.merge(Flux.fromIterable(CLIENTS)).flatMap(DiscordClient::login).blockLast();
