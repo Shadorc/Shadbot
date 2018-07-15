@@ -49,28 +49,28 @@ public class ExceptionHandler {
 	}
 
 	private boolean isCommandException() {
-		return err.getClass().isInstance(CommandException.class);
+		return err instanceof CommandException;
 	}
 
 	private boolean isMissingArgumentException() {
-		return err.getClass().isInstance(MissingArgumentException.class);
+		return err instanceof MissingArgumentException;
 	}
 
 	private boolean isNoMusicException() {
-		return err.getClass().isInstance(NoMusicException.class);
+		return err instanceof NoMusicException;
 	}
 
 	private boolean isUnavailable() {
-		return err.getClass().isInstance(ConnectException.class)
-				|| err.getClass().isInstance(HttpStatusException.class) && HttpStatusException.class.cast(err).getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE;
+		return err instanceof ConnectException
+				|| err instanceof HttpStatusException && HttpStatusException.class.cast(err).getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE;
 	}
 
 	private boolean isUnreacheable() {
-		return err.getClass().isInstance(SocketTimeoutException.class);
+		return err instanceof SocketTimeoutException;
 	}
 
 	public static boolean isForbidden(Throwable err) {
-		return err.getClass().isInstance(ClientException.class)
+		return err instanceof ClientException
 				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
 	}
 
