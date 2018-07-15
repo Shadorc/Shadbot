@@ -14,7 +14,7 @@ public class MessageUpdateListener {
 		if(!event.isContentChanged() || !event.getOld().isPresent() || !event.getGuildId().isPresent()) {
 			return;
 		}
-		
+
 		final Message oldMessage = event.getOld().get();
 
 		// If the message has been sent more than 30 seconds ago, ignore it

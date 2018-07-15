@@ -29,13 +29,12 @@ public class SendMessageCmd extends AbstractCommand {
 			throw new CommandException(String.format("`%s` is not a valid user ID.", args.get(0)));
 		}
 
-		return context.getClient()
-				.getUserById(Snowflake.of(userId))
-				.flatMap(user -> {
-					if(user.getId().equals(context.getSelfId())) {
-						throw new CommandException("I can't send a private message to myself.");
-					}
+		if(Snowflake.of(userId).equals(context.getSelfId())) {
+			throw new CommandException("I can't send a private message to myself.");
+		}
 
+		return context.getClient().getUserById(Snowflake.of(userId))
+				.flatMap(user -> {
 					if(user.isBot()) {
 						throw new CommandException("I can't send private message to other bots.");
 					}

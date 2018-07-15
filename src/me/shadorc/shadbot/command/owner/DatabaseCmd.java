@@ -1,3 +1,4 @@
+// TODO
 // package me.shadorc.shadbot.command.owner;
 //
 // import java.util.List;
@@ -7,7 +8,6 @@
 // import discord4j.core.object.util.Snowflake;
 // import discord4j.core.spec.EmbedCreateSpec;
 // import me.shadorc.shadbot.Config;
-// TODO
 // import me.shadorc.shadbot.core.command.AbstractCommand;
 // import me.shadorc.shadbot.core.command.CommandCategory;
 // import me.shadorc.shadbot.core.command.CommandPermission;
