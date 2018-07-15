@@ -1,8 +1,6 @@
 package me.shadorc.shadbot.command.game.slotmachine;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Stream;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -18,6 +16,7 @@ import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
 
@@ -42,14 +41,8 @@ public class SlotMachineCmd extends AbstractCommand {
 					.then();
 		}
 
-		final SlotOptions slot1 = SLOTS_ARRAY[ThreadLocalRandom.current().nextInt(SLOTS_ARRAY.length)];
-		final SlotOptions slot2 = SLOTS_ARRAY[ThreadLocalRandom.current().nextInt(SLOTS_ARRAY.length)];
-		final SlotOptions slot3 = SLOTS_ARRAY[ThreadLocalRandom.current().nextInt(SLOTS_ARRAY.length)];
-
-		int gains = -PAID_COST;
-		if(Stream.of(slot1, slot2, slot3).distinct().count() == 1) {
-			gains = slot1.getGain();
-		}
+		final List<SlotOptions> slots = List.of(Utils.randValue(SLOTS_ARRAY), Utils.randValue(SLOTS_ARRAY), Utils.randValue(SLOTS_ARRAY));
+		final int gains = slots.stream().distinct().count() == 1 ? slots.get(0).getGain() : -PAID_COST;
 
 		dbMember.addCoins(gains);
 		if(gains > 0) {
@@ -58,9 +51,10 @@ public class SlotMachineCmd extends AbstractCommand {
 			MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
 		}
 
-		return BotUtils.sendMessage(String.format("%s%nYou %s **%s** !",
-				FormatUtils.format(List.of(slot1, slot2, slot3), SlotOptions::getEmoji, " "),
-				gains > 0 ? "win" : "have lost", FormatUtils.formatCoins(Math.abs(gains))), context.getChannel())
+		return context.getAuthorName()
+				.flatMap(username -> BotUtils.sendMessage(String.format("%s%n(**%s**) You %s **%s** !",
+						FormatUtils.format(slots, SlotOptions::getEmoji, " "), username,
+						gains > 0 ? "win" : "lose", FormatUtils.formatCoins(Math.abs(gains))), context.getChannel()))
 				.then();
 	}
 
