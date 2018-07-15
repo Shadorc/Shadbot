@@ -15,4 +15,8 @@ public enum SlotOptions {
 	public int getGain() {
 		return gain;
 	}
+
+	public String getEmoji() {
+		return String.format(":%s:", this.toString().toLowerCase());
+	}
 }
