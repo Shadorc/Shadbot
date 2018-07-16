@@ -18,7 +18,7 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
 import reactor.core.Exceptions;
@@ -82,10 +82,13 @@ public class TranslateCmd extends AbstractCommand {
 				translatedText.append(translations.getJSONArray(i).getString(0));
 			}
 
-			return context.getAuthorName()
-					.flatMap(username -> loadingMsg.send(String.format(Emoji.MAP + " (**%s**) **%s** (%s) <=> **%s** (%s)",
-							username, sourceText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)),
-							translatedText.toString(), StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)))))
+			return context.getAuthorAvatarUrl()
+					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+							.setAuthor("Translation", null, avatarUrl)
+							.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
+									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)), sourceText,
+									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)), translatedText.toString())))
+					.flatMap(embed -> loadingMsg.send(embed))
 					.then();
 
 		} catch (IOException err) {
