@@ -76,11 +76,16 @@ public class TranslateCmd extends AbstractCommand {
 						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
-			final String translatedText = ((JSONArray) ((JSONArray) result.get(0)).get(0)).get(0).toString();
+			StringBuilder translatedText = new StringBuilder();
+			JSONArray translations = result.getJSONArray(0);
+			for(int i = 0; i < translations.length(); i++) {
+				translatedText.append(translations.getJSONArray(i).getString(0));
+			}
+
 			return context.getAuthorName()
 					.flatMap(username -> loadingMsg.send(String.format(Emoji.MAP + " (**%s**) **%s** (%s) <=> **%s** (%s)",
 							username, sourceText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)),
-							translatedText, StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)))))
+							translatedText.toString(), StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)))))
 					.then();
 
 		} catch (IOException err) {
