@@ -8,6 +8,8 @@ import com.google.common.collect.Multimaps;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class MessageInterceptorManager {
 
@@ -29,10 +31,10 @@ public class MessageInterceptorManager {
 	 * @param event - the event to intercept
 	 * @return true if the event has been intercepted (blocking the execution of other commands), false otherwise
 	 */
-	public static boolean isIntercepted(MessageCreateEvent event) {
-		return CHANNELS_INTERCEPTORS.get(event.getMessage().getChannelId())
-				.stream()
-				.map(interceptor -> interceptor.isIntercepted(event))
-				.anyMatch(Boolean.TRUE::equals);
+	public static Mono<Boolean> isIntercepted(MessageCreateEvent event) {
+		return Flux.fromIterable(CHANNELS_INTERCEPTORS.get(event.getMessage().getChannelId()))
+				.flatMap(interceptor -> interceptor.isIntercepted(event))
+				.filter(Boolean.TRUE::equals)
+				.hasElements();
 	}
 }

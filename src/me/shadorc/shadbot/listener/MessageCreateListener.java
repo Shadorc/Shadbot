@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Message;
@@ -44,7 +46,7 @@ public class MessageCreateListener {
 				// The role is allowed
 				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
 				// The message has not been intercepted
-				.filter(roles -> !MessageInterceptorManager.isIntercepted(event))
+				.filterWhen(roles -> MessageInterceptorManager.isIntercepted(event).map(BooleanUtils::negate))
 				.map(roles -> DatabaseManager.getDBGuild(guildId.get()).getPrefix())
 				// The message starts with the correct prefix
 				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
