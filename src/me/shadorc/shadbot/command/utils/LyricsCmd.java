@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.utils;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.jsoup.Connection.Response;
 import org.jsoup.HttpStatusException;
@@ -19,7 +20,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -39,7 +39,7 @@ public class LyricsCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = StringUtils.split(context.getArg().orElse(""), 2, "-");
+		List<String> args = me.shadorc.shadbot.utils.StringUtils.split(context.getArg().orElse(""), 2, "-");
 		if(args.size() != 2) {
 			throw new MissingArgumentException();
 		}
@@ -95,7 +95,7 @@ public class LyricsCmd extends AbstractCommand {
 			final String artist = doc.getElementsByClass("mxm-track-title__artist").html();
 			final String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
 			final String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
-			final String lyrics = StringUtils.truncate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
+			final String lyrics = StringUtils.abbreviate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
 			final String finalUrl = url;
 
 			return context.getAuthorAvatarUrl()

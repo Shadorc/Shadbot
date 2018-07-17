@@ -30,7 +30,7 @@ public class HolidaysCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		final Zone zone = Utils.getValueOrNull(Zone.class, arg);
+		final Zone zone = Utils.getEnum(Zone.class, arg);
 		if(zone == null) {
 			throw new CommandException(String.format("`%s` is not a valid zone. %s", arg, FormatUtils.formatOptions(Zone.class)));
 		}

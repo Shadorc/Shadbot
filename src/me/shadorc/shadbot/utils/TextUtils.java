@@ -63,7 +63,7 @@ public class TextUtils {
 	public static String missingPerm(Permission... permissions) {
 		return String.format(Emoji.ACCESS_DENIED + " I can't execute this command due to the lack of permission."
 				+ "%nPlease, check my permissions and channel-specific ones to verify that %s %s checked.",
-				FormatUtils.format(permissions, perm -> String.format("**%s**", StringUtils.capitalize(perm.toString().replace("_", " "))), " and "),
+				FormatUtils.format(permissions, perm -> String.format("**%s**", StringUtils.capitalizeFully(perm.toString().replace("_", " "))), " and "),
 				permissions.length > 1 ? "are" : "is");
 	}
 

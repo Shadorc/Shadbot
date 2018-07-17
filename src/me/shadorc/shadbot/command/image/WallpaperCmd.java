@@ -162,7 +162,7 @@ public class WallpaperCmd extends AbstractCommand {
 	}
 
 	private <T extends Enum<T>> T parseEnum(LoadingMessage msg, Context context, Class<T> enumClass, String name, String value) {
-		T enumObj = Utils.getValueOrNull(enumClass, value);
+		T enumObj = Utils.getEnum(enumClass, value);
 		if(enumObj == null) {
 			this.throwInvalidArg(msg, context, name);
 		}

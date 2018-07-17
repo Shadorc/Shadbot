@@ -41,7 +41,7 @@ public class DiabloCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		List<String> args = context.requireArgs(2);
 
-		final Region region = Utils.getValueOrNull(Region.class, args.get(0));
+		final Region region = Utils.getEnum(Region.class, args.get(0));
 		if(region == null) {
 			throw new CommandException(String.format("`%s` is not a valid Region. %s",
 					args.get(0), FormatUtils.formatOptions(Region.class)));

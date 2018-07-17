@@ -1,10 +1,7 @@
 package me.shadorc.shadbot.utils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -52,17 +49,14 @@ public class StringUtils {
 	}
 
 	/**
-	 * @param str - the string to capitalize
-	 * @return The string capitalized
+	 * @param str - the String to capitalize, may be null
+	 * @return The capitalized String, null if null String input
 	 */
-	public static String capitalize(String str) {
-		switch (str.length()) {
-			case 0:
-			case 1:
-				return str.toUpperCase();
-			default:
-				return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+	public static String capitalizeFully(String str) {
+		if(str == null || str.isEmpty()) {
+			return str;
 		}
+		return str.substring(0, 1).toUpperCase() + str.toLowerCase().substring(1);
 	}
 
 	/**
@@ -78,20 +72,6 @@ public class StringUtils {
 	}
 
 	/**
-	 * @param str - the string to truncate if necessary
-	 * @param size - the maximum size of the string
-	 * @return The string truncated to {@code size} characters with '...' at the end if its length is superior to {@code size}, str otherwise
-	 */
-	public static String truncate(String str, int size) {
-		if(str.length() <= size) {
-			return str;
-		}
-
-		String truncatedStr = str.substring(0, size - 3);
-		return truncatedStr.substring(0, truncatedStr.lastIndexOf(' ')) + "...";
-	}
-
-	/**
 	 * @param str - the string from which to remove patterns
 	 * @param toRemove - the strings to be substituted for each match
 	 * @return The resulting {@code String}
@@ -101,37 +81,6 @@ public class StringUtils {
 				.filter(replacement -> !replacement.isEmpty())
 				.map(Pattern::quote)
 				.collect(Collectors.joining("|")), "");
-	}
-
-	/**
-	 * @param str - the string from which to normalize spaces
-	 * @return The string corresponding to {@code str} trimmed with every spaces replaced by a single one
-	 */
-	public static String normalizeSpace(String str) {
-		return str.trim().replaceAll(" +", " ");
-	}
-
-	/**
-	 * @param str - the string from which to count matches
-	 * @param toMatch - the string to match
-	 * @return The number of occurrences of {@code toMatch} in {@code str}
-	 */
-	public static int countMatches(String str, String toMatch) {
-		return str.length() - str.replace(toMatch, "").length();
-	}
-
-	/**
-	 * @param str - the string from which to extract words in quotation marks
-	 * @return A {@link List} containing all the matched words or phrases in quotation marks
-	 */
-	public static List<String> getQuotedWords(String str) {
-		List<String> matches = new ArrayList<>();
-		Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(str);
-		while(matcher.find()) {
-			matches.add(matcher.group(1));
-		}
-		matches.removeAll(Collections.singleton(""));
-		return matches;
 	}
 
 }

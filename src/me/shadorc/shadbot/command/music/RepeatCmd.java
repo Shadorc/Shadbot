@@ -26,7 +26,7 @@ public class RepeatCmd extends AbstractCommand {
 
 		RepeatMode mode;
 		if(context.getArg().isPresent()) {
-			mode = Utils.getValueOrNull(RepeatMode.class, context.getArg().get());
+			mode = Utils.getEnum(RepeatMode.class, context.getArg().get());
 			if(mode == null) {
 				throw new CommandException(String.format("`%s` is not a valid mode.", context.getArg().get()));
 			}

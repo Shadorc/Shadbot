@@ -47,7 +47,7 @@ public class WeatherCmd extends AbstractCommand {
 						.then();
 			}
 
-			final String clouds = StringUtils.capitalize(weather.getWeatherInstance(0).getWeatherDescription());
+			final String clouds = StringUtils.capitalizeFully(weather.getWeatherInstance(0).getWeatherDescription());
 			final float windSpeed = weather.getWindInstance().getWindSpeed() * 3.6f;
 			final String windDesc = this.getWindDesc(windSpeed);
 			final String rain = weather.hasRainInstance() ? String.format("%.1f mm/h", weather.getRainInstance().getRain3h()) : "None";

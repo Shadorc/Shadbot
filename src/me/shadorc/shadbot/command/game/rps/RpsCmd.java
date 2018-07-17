@@ -27,7 +27,7 @@ public class RpsCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		final Handsign userHandsign = Utils.getValueOrNull(Handsign.class, arg);
+		final Handsign userHandsign = Utils.getEnum(Handsign.class, arg);
 		if(userHandsign == null) {
 			throw new CommandException(String.format("`%s` is not a valid handsign. %s.", arg, FormatUtils.formatOptions(Handsign.class)));
 		}

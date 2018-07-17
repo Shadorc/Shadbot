@@ -25,7 +25,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		RelicType type = Utils.getValueOrNull(RelicType.class, context.getArg().get());
+		RelicType type = Utils.getEnum(RelicType.class, context.getArg().get());
 		if(type == null) {
 			throw new CommandException(String.format("`%s`in not a valid type. %s",
 					arg, FormatUtils.formatOptions(RelicType.class)));
@@ -33,7 +33,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 
 		Relic relic = PremiumManager.generateRelic(type);
 		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-				StringUtils.capitalize(type.toString()), relic.getId()), context.getChannel())
+				StringUtils.capitalizeFully(type.toString()), relic.getId()), context.getChannel())
 				.then();
 	}
 

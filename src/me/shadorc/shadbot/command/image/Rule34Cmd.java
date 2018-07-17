@@ -62,7 +62,7 @@ public class Rule34Cmd extends AbstractCommand {
 							return loadingMsg.send(Emoji.WARNING + " Sorry, I don't display images containing children or tagged with `loli` or `shota`.");
 						}
 
-						final String formattedtags = StringUtils.truncate(
+						final String formattedtags = org.apache.commons.lang3.StringUtils.abbreviate(
 								FormatUtils.format(tags, tag -> String.format("`%s`", tag), " "), MAX_TAGS_LENGTH);
 
 						return context.getAuthorAvatarUrl()

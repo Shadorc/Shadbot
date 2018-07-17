@@ -93,7 +93,7 @@ public class NetUtils {
 	 * @param url - a string representing an URL to check
 	 * @return true if the string is a valid and reachable URL, false otherwise
 	 */
-	public static boolean isValidURL(String url) {
+	public static boolean isValidUrl(String url) {
 		HttpURLConnection conn = null;
 		try {
 			conn = (HttpURLConnection) new URL(url).openConnection();

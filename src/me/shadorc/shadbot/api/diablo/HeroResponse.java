@@ -29,7 +29,7 @@ public class HeroResponse {
 	}
 
 	public String getClassName() {
-		return StringUtils.capitalize(className.replace("-", " "));
+		return StringUtils.capitalizeFully(className.replace("-", " "));
 	}
 
 	public int getLevel() {

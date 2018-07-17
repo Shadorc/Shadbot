@@ -86,7 +86,7 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	private Platform getPlatform(String str) {
-		Platform platform = Utils.getValueOrNull(Platform.class, str.toUpperCase());
+		Platform platform = Utils.getEnum(Platform.class, str.toUpperCase());
 		if(platform == null) {
 			throw new CommandException(String.format("`%s` is not a valid Platform. %s",
 					str, FormatUtils.formatOptions(Platform.class)));

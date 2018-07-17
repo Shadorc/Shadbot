@@ -31,7 +31,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		List<String> args = context.requireArgs(2, 3);
 
-		Action action = Utils.getValueOrNull(Action.class, args.get(0));
+		Action action = Utils.getEnum(Action.class, args.get(0));
 		if(action == null) {
 			throw new CommandException(String.format("`%s` is not a valid action. %s",
 					args.get(0), FormatUtils.formatOptions(Action.class)));

@@ -76,10 +76,10 @@ public class Utils {
 
 	/**
 	 * @param enumClass - the enumeration class
-	 * @param value - the string representation of the enumeration, case insensitive
+	 * @param value - the string representing the enumeration, case insensitive
 	 * @return The enumeration corresponding to the {@code value} from {@code enumClass} or null if it does not exist
 	 */
-	public static <T extends Enum<T>> T getValueOrNull(Class<T> enumClass, String value) {
+	public static <T extends Enum<T>> T getEnum(Class<T> enumClass, String value) {
 		for(T enumeration : enumClass.getEnumConstants()) {
 			if(enumeration.toString().equalsIgnoreCase(value)) {
 				return enumeration;

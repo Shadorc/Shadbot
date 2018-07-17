@@ -63,7 +63,7 @@ public class PlayCmd extends AbstractCommand {
 					String identifier;
 					if(arg.startsWith("soundcloud ")) {
 						identifier = AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");
-					} else if(NetUtils.isValidURL(arg)) {
+					} else if(NetUtils.isValidUrl(arg)) {
 						identifier = arg;
 					} else {
 						identifier = AudioLoadResultListener.YT_SEARCH + arg;

@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.fun;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,7 +17,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
@@ -55,7 +55,7 @@ public class ThisDayCmd extends AbstractCommand {
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("On This Day (%s)", date), HOME_URL, avatarUrl)
 							.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-							.setDescription(StringUtils.truncate(events, DiscordUtils.DESCRIPTION_CONTENT_LIMIT)))
+							.setDescription(StringUtils.abbreviate(events, DiscordUtils.DESCRIPTION_CONTENT_LIMIT)))
 					.flatMap(loadingMsg::send)
 					.then();
 

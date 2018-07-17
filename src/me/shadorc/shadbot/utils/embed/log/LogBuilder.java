@@ -39,7 +39,7 @@ public class LogBuilder {
 
 	public EmbedCreateSpec build() {
 		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-				.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalize(type.toString()), Config.VERSION), null, null)
+				.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeFully(type.toString()), Config.VERSION), null, null)
 				.setDescription(message);
 
 		switch (type) {

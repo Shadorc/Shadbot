@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.wikipedia.WikipediaPage;
 import me.shadorc.shadbot.api.wikipedia.WikipediaResponse;
@@ -14,7 +16,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -58,7 +59,7 @@ public class WikiCmd extends AbstractCommand {
 						.then();
 			}
 
-			final String extract = StringUtils.truncate(page.getExtract(), DiscordUtils.DESCRIPTION_CONTENT_LIMIT);
+			final String extract = StringUtils.abbreviate(page.getExtract(), DiscordUtils.DESCRIPTION_CONTENT_LIMIT);
 
 			return context.getAuthorAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
