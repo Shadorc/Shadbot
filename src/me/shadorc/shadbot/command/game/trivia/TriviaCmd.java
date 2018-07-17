@@ -1,98 +1,86 @@
-// TODO
-// package me.shadorc.shadbot.command.game.trivia;
-//
-// import java.io.IOException;
-// import java.util.Map;
-// import java.util.TreeMap;
-// import java.util.concurrent.ConcurrentHashMap;
-//
-// import org.json.JSONArray;
-// import org.json.JSONException;
-// import org.json.JSONObject;
-//
-// import me.shadorc.shadbot.core.command.AbstractCommand;
-// import me.shadorc.shadbot.core.command.CommandCategory;
-// import me.shadorc.shadbot.core.command.Context;
-// import me.shadorc.shadbot.core.command.annotation.Command;
-// import me.shadorc.shadbot.core.command.annotation.RateLimited;
-// import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-// import me.shadorc.shadbot.exception.MissingArgumentException;
-// import me.shadorc.shadbot.ratelimiter.RateLimiter;
-// import me.shadorc.shadbot.utils.BotUtils;
-// import me.shadorc.shadbot.utils.FormatUtils;
-// import me.shadorc.shadbot.utils.NetUtils;
-// import me.shadorc.shadbot.utils.NumberUtils;
-// import me.shadorc.shadbot.utils.Utils;
-// import me.shadorc.shadbot.utils.embed.EmbedUtils;
-// import me.shadorc.shadbot.utils.embed.HelpBuilder;
-// import me.shadorc.shadbot.utils.embed.log.LogUtils;
-// import me.shadorc.shadbot.utils.object.Emoji;
-//
-// @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
-// @Command(category = CommandCategory.GAME, names = { "trivia" })
-// public class TriviaCmd extends AbstractCommand {
-//
-// protected static final ConcurrentHashMap<Long, TriviaManager> MANAGERS = new ConcurrentHashMap<>();
-//
-// private final Map<Integer, String> categories = new TreeMap<>();
-//
-// @Override
-// public void execute(Context context) {
-// if(categories.isEmpty()) {
-// this.load();
-// }
-//
-// if(context.getArg().equals("categories")) {
-// EmbedObject embed = EmbedUtils.getDefaultEmbed()
-// .withAuthorName("Trivia categories")
-// .addField("ID", FormatUtils.format(categories.keySet().toArray(), Object::toString, "\n"), true)
-// .addField("Name", FormatUtils.format(categories.keySet().toArray(), categories::get, "\n"), true)
-// .build();
-// BotUtils.sendMessage(embed, context.getChannel());
-// return;
-// }
-//
-// Integer categoryID = NumberUtils.asPositiveInt(context.getArg());
-//
-// if(context.hasArg() && (categoryID == null || !categories.containsKey(categoryID))) {
-// throw new IllegalCmdArgumentException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list "
-// + "of categories.", context.getArg(), context.getPrefix(), this.getName()));
-// }
-//
-// TriviaManager triviaManager = MANAGERS.get(context.getChannel().getLongID());
-// if(triviaManager == null) {
-// triviaManager = new TriviaManager(this, context.getPrefix(), context.getChannel(), context.getAuthor(), categoryID);
-// }
-//
-// if(MANAGERS.putIfAbsent(context.getChannel().getLongID(), triviaManager) == null) {
-// try {
-// triviaManager.start();
-// } catch (IOException err) {
-// Utils.handle("getting a question", context, err);
-// MANAGERS.remove(context.getChannel().getLongID());
-// }
-// } else {
-// BotUtils.sendMessage(Emoji.INFO + " A Trivia game has already been started.", context.getChannel());
-// }
-// }
-//
-// private void load() {
-// try {
-// JSONObject mainObj = new JSONObject(NetUtils.getJSON("https://opentdb.com/api_category.php"));
-// JSONArray categoriesArray = mainObj.getJSONArray("trivia_categories");
-// categoriesArray.forEach(obj -> categories.put(((JSONObject) obj).getInt("id"), ((JSONObject) obj).getString("name")));
-// } catch (IOException err) {
-// LogUtils.error(err, "An error occurred while getting Trivia categories.");
-// }
-// }
-//
-// @Override
-// public EmbedObject getHelp(String prefix) {
-// return new HelpBuilder(this, context)
-// .setDescription("Start a Trivia game in which everyone can participate.")
-// .addArg("categoryID", "the category ID of the question", true)
-// .addField("Category", String.format("Use `%s%s categories` to see the list of categories", prefix, this.getName()), false)
-// .setGains("The winner gets **%d coins** plus a bonus depending on his speed to answer.", TriviaManager.MIN_GAINS)
-// .build();
-// }
-// }
+package me.shadorc.shadbot.command.game.trivia;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.Nullable;
+
+import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.api.trivia.category.TriviaCategoriesResponse;
+import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.CommandCategory;
+import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
+import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
+
+@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
+@Command(category = CommandCategory.GAME, names = { "trivia" })
+public class TriviaCmd extends AbstractCommand {
+
+	protected static final ConcurrentHashMap<Snowflake, TriviaManager> MANAGERS = new ConcurrentHashMap<>();
+
+	private TriviaCategoriesResponse categories;
+
+	@Override
+	public Mono<Void> execute(Context context) {
+		if(categories == null) {
+			try {
+				URL url = new URL("https://opentdb.com/api_category.php");
+				this.categories = Utils.MAPPER.readValue(url, TriviaCategoriesResponse.class);
+			} catch (IOException err) {
+				throw Exceptions.propagate(err);
+			}
+		}
+
+		if(context.getArg().isPresent() && context.getArg().get().equals("categories")) {
+			return context.getAuthorAvatarUrl()
+					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+							.setAuthor("Trivia categories", null, avatarUrl)
+							.addField("ID", FormatUtils.format(categories.getIds(), id -> Integer.toString(id), "\n"), true)
+							.addField("Name", FormatUtils.format(categories.getNames(), Object::toString, "\n"), true))
+					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+					.then();
+		}
+
+		@Nullable
+		Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
+
+		if(context.getArg().isPresent() && (categoryId == null || !categories.getIds().contains(categoryId))) {
+			throw new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list "
+					+ "of categories.", context.getArg().get(), context.getPrefix(), this.getName()));
+		}
+
+		TriviaManager triviaManager = new TriviaManager(context, categoryId);
+		if(MANAGERS.putIfAbsent(context.getChannelId(), triviaManager) == null) {
+			return triviaManager.start();
+		} else {
+			return context.getAuthorName()
+					.flatMap(username -> BotUtils.sendMessage(
+							String.format(Emoji.INFO + " (**%s**) A Trivia game has already been started.", username), context.getChannel()))
+					.then();
+		}
+	}
+
+	@Override
+	public Mono<EmbedCreateSpec> getHelp(Context context) {
+		return new HelpBuilder(this, context)
+				.setDescription("Start a Trivia game in which everyone can participate.")
+				.addArg("categoryID", "the category ID of the question", true)
+				.addField("Category", String.format("Use `%s%s categories` to see the list of categories", context.getPrefix(), this.getName()), false)
+				.setGains("The winner gets **%d coins** plus a bonus depending on his speed to answer.", TriviaManager.MIN_GAINS)
+				.build();
+	}
+}
