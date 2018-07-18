@@ -122,25 +122,8 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-
-		final Message message = event.getMessage();
-
-		if(!event.getMember().isPresent() || !message.getContent().isPresent()) {
-			return Mono.just(false);
-		}
-
 		final Member member = event.getMember().get();
-
-		final Mono<Boolean> gameCancelled =
-				this.isCancelCmd(message)
-						.filter(Boolean.TRUE::equals)
-						.flatMap(ignored -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.",
-								member.getUsername()), event.getMessage().getChannel()))
-						.flatMap(ignored -> this.stop())
-						// The message is intercepted, return true
-						.map(ignored -> Boolean.TRUE);
-
-		final Mono<Boolean> execution = Mono.just(message.getContent().get())
+		return this.process(event.getMessage(), Mono.just(event.getMessage().getContent().get())
 				.flatMap(content -> {
 					// It's a number or a text
 					Integer choice = NumberUtils.asIntBetween(content, 1, answers.size());
@@ -160,21 +143,19 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 					Mono<Message> monoMessage;
 					if(alreadyAnswered.containsKey(member.getId())) {
 						monoMessage = BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
-								member.getUsername()), message.getChannel());
+								member.getUsername()), event.getMessage().getChannel());
 						alreadyAnswered.put(member.getId(), true);
 					} else if(answer.equalsIgnoreCase(correctAnswer)) {
 						monoMessage = this.win(member);
 
 					} else {
 						monoMessage = BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
-								member.getUsername()), message.getChannel());
+								member.getUsername()), event.getMessage().getChannel());
 						alreadyAnswered.put(member.getId(), false);
 					}
 
 					return monoMessage.thenReturn(true);
-				});
-
-		return gameCancelled.switchIfEmpty(execution);
+				}));
 	}
 
 }
