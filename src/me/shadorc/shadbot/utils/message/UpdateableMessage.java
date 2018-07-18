@@ -1,10 +1,13 @@
 package me.shadorc.shadbot.utils.message;
 
+import java.util.Optional;
+
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.utils.BotUtils;
+import reactor.core.publisher.Mono;
 
 public class UpdateableMessage {
 
@@ -29,14 +32,12 @@ public class UpdateableMessage {
 	 * 
 	 * @param embed - the embed to send
 	 */
-	public void send(EmbedCreateSpec embed) {
-		// Delete the previous message
-		client.getMessageById(channelId, messageId)
-				.subscribe(Message::delete);
-		// Send the new one and store its messageId
-		BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
-				.map(Message::getId)
-				.subscribe(messageId -> this.messageId = messageId);
+	public Mono<Message> send(EmbedCreateSpec embed) {
+		return Mono.justOrEmpty(Optional.ofNullable(messageId))
+				.flatMap(messageId -> client.getMessageById(channelId, messageId))
+				.flatMap(Message::delete)
+				.then(BotUtils.sendMessage(embed, client.getMessageChannelById(channelId)))
+				.doOnSuccess(message -> this.messageId = message.getId());
 	}
 
 }
