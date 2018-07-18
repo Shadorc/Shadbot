@@ -69,11 +69,8 @@ public class BotUtils {
 			default:
 				return channel.bulkDelete(Flux.fromIterable(messages)
 						.map(Message::getId))
-						.buffer()
-						.single()
-						.flatMap(list -> {
-							return Mono.just((long) (messages.size() - list.size()));
-						});
+						.collectList()
+						.flatMap(list -> Mono.just((long) (messages.size() - list.size())));
 		}
 	}
 

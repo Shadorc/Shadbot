@@ -21,10 +21,7 @@ dependency-reduced-pom.xml
 Thumbs.db
 
 # Project Files
-api_keys.json
-lotto_data.json
-user_data.json
-premium_data.json
+saves/
 stats.json
 Shadbot.log
 clean.bat

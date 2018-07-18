@@ -44,7 +44,7 @@ public class InfoCmd extends AbstractCommand {
 		final String d4jVersion = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_VERSION);
 
 		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
-				context.getClient().getGuilds().buffer().single())
+				context.getClient().getGuilds().collectList())
 				.map(ownerAndGuilds -> {
 
 					final User owner = ownerAndGuilds.getT1();

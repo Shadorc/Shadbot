@@ -84,7 +84,7 @@ public class ServerInfoCmd extends AbstractCommand {
 				.then(autoRolesStr)
 				.then(permissionsStr)
 				.then(context.getGuild())
-				.flatMap(guild -> Mono.zip(context.getGuild(), guild.getOwner(), guild.getChannels().buffer().single(), guild.getRegion()))
+				.flatMap(guild -> Mono.zip(context.getGuild(), guild.getOwner(), guild.getChannels().collectList(), guild.getRegion()))
 				.map(tuple4 -> {
 					final Guild guild = tuple4.getT1();
 					final Member owner = tuple4.getT2();
