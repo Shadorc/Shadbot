@@ -30,8 +30,6 @@ public class CommandManager {
 	private static final Map<String, AbstractCommand> COMMANDS_MAP = new HashMap<>();
 
 	public static boolean init() {
-		LogUtils.infof("Initializing commands...");
-
 		Reflections reflections = new Reflections(Shadbot.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
 		for(Class<?> cmdClass : reflections.getTypesAnnotatedWith(Command.class)) {
 			String cmdName = cmdClass.getSimpleName();

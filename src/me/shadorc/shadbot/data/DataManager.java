@@ -22,8 +22,6 @@ public class DataManager {
 	private static final List<Runnable> SAVE_TASKS = new ArrayList<>();
 
 	public static boolean init() {
-		LogUtils.infof("Initializing data files...");
-
 		if(!SAVE_DIR.exists() && !SAVE_DIR.mkdir()) {
 			LogUtils.error("The save directory could not be created.");
 			return false;
@@ -45,7 +43,6 @@ public class DataManager {
 					DataSave annotation = method.getAnnotation(DataSave.class);
 					Runnable saveTask = () -> {
 						try {
-							LogUtils.infof("Saving %s...", className);
 							method.invoke(null);
 							LogUtils.infof("%s saved.", className);
 						} catch (Exception err) {
@@ -56,8 +53,6 @@ public class DataManager {
 					SCHEDULED_EXECUTOR.scheduleAtFixedRate(saveTask, annotation.initialDelay(), annotation.period(), annotation.unit());
 				}
 			}
-
-			LogUtils.infof("%s initialized.", className);
 		}
 
 		LogUtils.infof("Data files initialized.");
