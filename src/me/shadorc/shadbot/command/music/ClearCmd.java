@@ -20,8 +20,8 @@ public class ClearCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 		guildMusic.getScheduler().clearPlaylist();
-		return context.getAuthorName()
-				.flatMap(username -> BotUtils.sendMessage(Emoji.CHECK_MARK + " Playlist cleared by **%s**.", context.getChannel()))
+		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Playlist cleared by **%s**.",
+				context.getUsername()), context.getChannel())
 				.then();
 	}
 

@@ -82,7 +82,7 @@ public class TranslateCmd extends AbstractCommand {
 				translatedText.append(translations.getJSONArray(i).getString(0));
 			}
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Translation", null, avatarUrl)
 							.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",

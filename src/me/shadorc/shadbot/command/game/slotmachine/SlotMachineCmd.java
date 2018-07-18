@@ -33,7 +33,7 @@ public class SlotMachineCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId().get(), context.getAuthorId());
+		DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId());
 
 		if(dbMember.getCoins() < PAID_COST) {
 			return context.getAuthor()
@@ -51,10 +51,9 @@ public class SlotMachineCmd extends AbstractCommand {
 			MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
 		}
 
-		return context.getAuthorName()
-				.flatMap(username -> BotUtils.sendMessage(String.format("%s%n(**%s**) You %s **%s** !",
-						FormatUtils.format(slots, SlotOptions::getEmoji, " "), username,
-						gains > 0 ? "win" : "lose", FormatUtils.formatCoins(Math.abs(gains))), context.getChannel()))
+		return BotUtils.sendMessage(String.format("%s%n(**%s**) You %s **%s** !",
+				FormatUtils.format(slots, SlotOptions::getEmoji, " "), context.getUsername(),
+				gains > 0 ? "win" : "lose", FormatUtils.formatCoins(Math.abs(gains))), context.getChannel())
 				.then();
 	}
 

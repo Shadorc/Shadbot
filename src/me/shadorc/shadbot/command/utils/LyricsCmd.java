@@ -81,9 +81,8 @@ public class LyricsCmd extends AbstractCommand {
 				Document searchDoc = NetUtils.getDoc(searchUrl);
 				Element trackListElement = searchDoc.getElementsByClass("tracks list").first();
 				if(trackListElement == null) {
-					return context.getAuthorName()
-							.flatMap(username -> loadingMsg.send(
-									String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`", username, context.getArg().get())))
+					return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+							context.getUsername(), context.getArg().get()))
 							.then();
 				}
 
@@ -98,7 +97,7 @@ public class LyricsCmd extends AbstractCommand {
 			final String lyrics = StringUtils.abbreviate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
 			final String finalUrl = url;
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Lyrics (%s - %s)", artist, title),
 									finalUrl,

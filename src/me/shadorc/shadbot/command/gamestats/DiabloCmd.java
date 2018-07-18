@@ -76,7 +76,7 @@ public class DiabloCmd extends AbstractCommand {
 			heroResponses.sort((hero1, hero2) -> Double.compare(hero1.getStats().getDamage(), hero2.getStats().getDamage()));
 			Collections.reverse(heroResponses);
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Diablo 3 Stats", null, avatarUrl)
 							.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
@@ -94,9 +94,8 @@ public class DiabloCmd extends AbstractCommand {
 					.then();
 
 		} catch (FileNotFoundException err) {
-			return context.getAuthorName()
-					.flatMap(username -> loadingMsg.send(
-							String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.", username)))
+			return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
+					context.getUsername()))
 					.then();
 		} catch (IOException err) {
 			loadingMsg.stopTyping();

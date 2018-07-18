@@ -41,7 +41,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 						final String imageUrl = girl.select("noscript").attr("data-retina");
 						final String url = girl.getElementsByClass("facebook-share").attr("href");
 
-						return context.getAuthorAvatarUrl()
+						return context.getAvatarUrl()
 								.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 										.setAuthor("SuicideGirls Image", url, avatarUrl)
 										.setDescription(String.format("Name: **%s**", StringUtils.capitalizeFully(name)))

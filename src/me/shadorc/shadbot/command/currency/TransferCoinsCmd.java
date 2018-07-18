@@ -48,14 +48,14 @@ public class TransferCoinsCmd extends AbstractCommand {
 					String.format("`%s` is not a valid amount for coins.", args.get(0)));
 		}
 
-		DBMember dbSender = DatabaseManager.getDBMember(context.getGuildId().get(), senderUserId);
+		DBMember dbSender = DatabaseManager.getDBMember(context.getGuildId(), senderUserId);
 		if(dbSender.getCoins() < coins) {
 			return context.getAuthor()
 					.flatMap(author -> BotUtils.sendMessage(TextUtils.notEnoughCoins(author), context.getChannel()))
 					.then();
 		}
 
-		DBMember dbReceiver = DatabaseManager.getDBMember(context.getGuildId().get(), receiverUserId);
+		DBMember dbReceiver = DatabaseManager.getDBMember(context.getGuildId(), receiverUserId);
 		if(dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
 			return context.getClient().getUserById(receiverUserId)
 					.flatMap(user -> BotUtils.sendMessage(String.format(

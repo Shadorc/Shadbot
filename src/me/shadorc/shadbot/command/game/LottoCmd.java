@@ -48,7 +48,7 @@ public class LottoCmd extends AbstractCommand {
 
 		final String arg = context.requireArg();
 
-		final DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId().get(), context.getAuthorId());
+		final DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId());
 		if(dbMember.getCoins() < PAID_COST) {
 			return context.getAuthor()
 					.flatMap(author -> BotUtils.sendMessage(TextUtils.notEnoughCoins(author), context.getChannel()))
@@ -72,7 +72,7 @@ public class LottoCmd extends AbstractCommand {
 
 		dbMember.addCoins(-PAID_COST);
 
-		LottoManager.getLotto().addGambler(context.getGuildId().get(), context.getAuthorId(), num);
+		LottoManager.getLotto().addGambler(context.getGuildId(), context.getAuthorId(), num);
 
 		return BotUtils.sendMessage(String.format(Emoji.TICKET + " You bought a lottery ticket and bet on number **%d**. Good luck !", num),
 				context.getChannel())
@@ -82,12 +82,8 @@ public class LottoCmd extends AbstractCommand {
 	private Mono<Message> show(Context context) {
 		List<LottoGambler> gamblers = LottoManager.getLotto().getGamblers();
 
-		return context.getAuthorAvatarUrl()
-				.zipWith(context.getAuthorName())
-				.map(avatarUrlAndUsername -> {
-					final String avatarUrl = avatarUrlAndUsername.getT1();
-					final String username = avatarUrlAndUsername.getT2();
-
+		return context.getAvatarUrl()
+				.map(avatarUrl -> {
 					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Lotto", null, avatarUrl)
 							.setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
@@ -103,7 +99,7 @@ public class LottoCmd extends AbstractCommand {
 							.orElse(null);
 
 					if(gambler != null) {
-						embed.setFooter(String.format("%s, you bet on number %d.", username, gambler.getNumber()),
+						embed.setFooter(String.format("%s, you bet on number %d.", context.getUsername(), gambler.getNumber()),
 								"https://images.emojiterra.com/twitter/512px/1f39f.png");
 					}
 

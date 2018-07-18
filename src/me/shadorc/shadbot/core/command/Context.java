@@ -25,11 +25,12 @@ import reactor.core.publisher.Mono;
 
 public class Context {
 
-	private final MessageCreateEvent event; // The event is stored because it does not need to be reactive
+	private final MessageCreateEvent event;
 	private final String prefix;
 	private final String cmdName;
 	private final Optional<String> arg;
 
+	// Note: The message is considered to be from a member, so all optional values should be accessible
 	public Context(MessageCreateEvent event, String prefix) {
 		this.event = event;
 		this.prefix = prefix;
@@ -37,6 +38,10 @@ public class Context {
 		List<String> splittedMsg = StringUtils.split(this.getContent(), 2);
 		this.cmdName = splittedMsg.get(0).substring(prefix.length()).toLowerCase();
 		this.arg = Optional.ofNullable(splittedMsg.size() > 1 ? splittedMsg.get(1).trim() : null);
+	}
+
+	public MessageCreateEvent getEvent() {
+		return event;
 	}
 
 	public String getPrefix() {
@@ -56,6 +61,22 @@ public class Context {
 		return event.getClient();
 	}
 
+	public Mono<Guild> getGuild() {
+		return event.getGuild();
+	}
+
+	public Snowflake getGuildId() {
+		return event.getGuildId().get();
+	}
+
+	public Member getMember() {
+		return event.getMember().get();
+	}
+
+	public Message getMessage() {
+		return event.getMessage();
+	}
+
 	public int getShardIndex() {
 		return this.getClient().getConfig().getShardIndex();
 	}
@@ -72,20 +93,8 @@ public class Context {
 		return this.getClient().getSelfId().get();
 	}
 
-	public Message getMessage() {
-		return event.getMessage();
-	}
-
 	public String getContent() {
 		return this.getMessage().getContent().get();
-	}
-
-	public Mono<Guild> getGuild() {
-		return event.getGuild();
-	}
-
-	public Optional<Snowflake> getGuildId() {
-		return event.getGuildId();
 	}
 
 	public Mono<MessageChannel> getChannel() {
@@ -104,19 +113,15 @@ public class Context {
 		return this.getMessage().getAuthorId().get();
 	}
 
-	public Mono<String> getAuthorName() {
-		return this.getAuthor().map(User::getUsername);
+	public String getUsername() {
+		return this.getMember().getUsername();
 	}
 
-	public Mono<String> getAuthorAvatarUrl() {
+	public Mono<String> getAvatarUrl() {
 		return DiscordUtils.getAuthorAvatarUrl(this.getAuthor());
 	}
 
-	public Optional<Member> getMember() {
-		return event.getMember();
-	}
-
-	public Mono<CommandPermission> getAuthorPermission() {
+	public Mono<CommandPermission> getPermission() {
 		// The author is the bot's owner
 		Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
 				.map(ApplicationInfo::getOwnerId)
@@ -124,12 +129,12 @@ public class Context {
 				.map(bool -> CommandPermission.OWNER);
 
 		// Private message, the author is considered as an administrator
-		Mono<CommandPermission> dmPerm = Mono.just(this.getGuildId())
+		Mono<CommandPermission> dmPerm = Mono.just(event.getGuildId())
 				.filter(guildId -> !guildId.isPresent())
 				.map(guildId -> CommandPermission.ADMIN);
 
 		// The member is an administrator
-		Mono<CommandPermission> adminPerm = DiscordUtils.hasPermissions(this.getAuthor(), this.getGuildId().get(), Permission.ADMINISTRATOR)
+		Mono<CommandPermission> adminPerm = DiscordUtils.hasPermissions(this.getAuthor(), this.getGuildId(), Permission.ADMINISTRATOR)
 				.map(bool -> CommandPermission.ADMIN);
 
 		return ownerPerm
@@ -164,7 +169,7 @@ public class Context {
 	}
 
 	public GuildMusic requireGuildMusic() {
-		GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(this.getGuildId().get());
+		final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(this.getGuildId());
 		if(guildMusic == null || guildMusic.getScheduler().isStopped()) {
 			throw new NoMusicException();
 		}

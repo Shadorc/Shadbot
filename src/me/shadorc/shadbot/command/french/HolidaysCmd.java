@@ -39,9 +39,7 @@ public class HolidaysCmd extends AbstractCommand {
 
 		try {
 			final String holidays = StringUtils.remove(TwitterUtils.getLastTweet("Vacances_Zone" + zone), "#");
-			return context.getAuthorName()
-					.flatMap(username -> loadingMsg.send(String.format(Emoji.BEACH + " (**%s**) %s", username, holidays)))
-					.then();
+			return loadingMsg.send(String.format(Emoji.BEACH + " (**%s**) %s", context.getUsername(), holidays)).then();
 		} catch (TwitterException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);

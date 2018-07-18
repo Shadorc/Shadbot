@@ -17,12 +17,10 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
 import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,12 +40,7 @@ public class BotUtils {
 
 	public static Mono<Message> sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
 		return BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel)
-				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.EMBEDS_SENT))
-				.doOnError(ExceptionHandler::isForbidden,
-						err -> {
-							BotUtils.sendMessage(TextUtils.missingPerm(Permission.EMBED_LINKS), channel);
-							LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send an embed.", channel.getId().asLong());
-						});
+				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.EMBEDS_SENT));
 	}
 
 	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, Mono<MessageChannel> channel) {
@@ -56,15 +49,10 @@ public class BotUtils {
 
 	private static Mono<Message> sendMessage(MessageCreateSpec message, MessageChannel channel) {
 		return channel.createMessage(message)
-				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT))
-				.doOnError(ExceptionHandler::isForbidden,
-						err -> LogUtils.infof("{Channel ID: %d} Shadbot was not allowed to send a message.", channel.getId().asLong()))
-				.doOnError(ExceptionHandler::isNotForbidden,
-						err -> LogUtils.error(channel.getClient(), err,
-								String.format("{Channel ID: %d} An error occurred while sending a message.", channel.getId().asLong())));
+				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT));
 	}
 
-	// TOOD
+	// TODO: Documentation
 	/**
 	 * @param channel
 	 * @param messages

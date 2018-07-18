@@ -123,17 +123,16 @@ public class WallpaperCmd extends AbstractCommand {
 					try {
 						List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
 						if(wallpapers.isEmpty()) {
-							return context.getAuthorName()
-									.flatMap(username -> loadingMsg.send(
-											String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
-													username, context.getContent())))
+							return loadingMsg.send(
+									String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
+											context.getUsername(), context.getContent()))
 									.then();
 						}
 
 						Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
 						String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 
-						return context.getAuthorAvatarUrl()
+						return context.getAvatarUrl()
 								.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 										.setAuthor("Wallpaper", wallpaper.getUrl(), avatarUrl)
 										.setImage(wallpaper.getImageUrl())

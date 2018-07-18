@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Nullable;
-
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.trivia.category.TriviaCategoriesResponse;
@@ -38,7 +36,7 @@ public class TriviaCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		if(categories == null) {
 			try {
-				URL url = new URL("https://opentdb.com/api_category.php");
+				final URL url = new URL("https://opentdb.com/api_category.php");
 				this.categories = Utils.MAPPER.readValue(url, TriviaCategoriesResponse.class);
 			} catch (IOException err) {
 				throw Exceptions.propagate(err);
@@ -46,7 +44,7 @@ public class TriviaCmd extends AbstractCommand {
 		}
 
 		if(context.getArg().isPresent() && context.getArg().get().equals("categories")) {
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Trivia categories", null, avatarUrl)
 							.addField("ID", FormatUtils.format(categories.getIds(), id -> Integer.toString(id), "\n"), true)
@@ -55,7 +53,6 @@ public class TriviaCmd extends AbstractCommand {
 					.then();
 		}
 
-		@Nullable
 		Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
 
 		if(context.getArg().isPresent() && (categoryId == null || !categories.getIds().contains(categoryId))) {
@@ -67,9 +64,8 @@ public class TriviaCmd extends AbstractCommand {
 		if(MANAGERS.putIfAbsent(context.getChannelId(), triviaManager) == null) {
 			return triviaManager.start();
 		} else {
-			return context.getAuthorName()
-					.flatMap(username -> BotUtils.sendMessage(
-							String.format(Emoji.INFO + " (**%s**) A Trivia game has already been started.", username), context.getChannel()))
+			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Trivia game has already been started.",
+					context.getUsername()), context.getChannel())
 					.then();
 		}
 	}

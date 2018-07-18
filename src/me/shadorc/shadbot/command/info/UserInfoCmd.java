@@ -35,12 +35,12 @@ public class UserInfoCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 
-		final Member member = context.getMember().get();
+		final Member member = context.getMember();
 
 		return Mono.zip(context.getMessage().getUserMentions().switchIfEmpty(context.getAuthor()).single(),
 				member.getPresence(),
 				member.getRoles().buffer().singleOrEmpty().defaultIfEmpty(Collections.emptyList()),
-				context.getAuthorAvatarUrl())
+				context.getAvatarUrl())
 				.map(tuple4 -> {
 					final User user = tuple4.getT1();
 					final Presence presence = tuple4.getT2();

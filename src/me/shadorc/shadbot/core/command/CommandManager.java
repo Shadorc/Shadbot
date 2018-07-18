@@ -71,7 +71,7 @@ public class CommandManager {
 			return Mono.empty();
 		}
 
-		final Snowflake guildId = context.getGuildId().get();
+		final Snowflake guildId = context.getGuildId();
 
 		final Predicate<? super CommandPermission> hasPermission = userPerm -> {
 			if(command.getPermission().isSuperior(userPerm)) {
@@ -94,7 +94,7 @@ public class CommandManager {
 			return false;
 		};
 
-		return context.getAuthorPermission()
+		return context.getPermission()
 				// The author has the permission to execute this command
 				.filter(hasPermission)
 				.flatMap(perm -> Mono.just(command))
@@ -103,7 +103,7 @@ public class CommandManager {
 				// The user is not rate limited
 				.filter(isRateLimited.negate())
 				.flatMap(cmd -> cmd.execute(context))
-				.doOnError(err -> new ExceptionHandler(err, command, context).handle())
+				.doOnError(err -> new ExceptionHandler(err, command, context).handle().subscribe())
 				.doOnSuccess(perm -> {
 					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
 					VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);

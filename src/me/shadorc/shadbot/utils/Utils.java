@@ -30,11 +30,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.MessageChannel;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.command.Emoji;
-import reactor.core.publisher.Mono;
 
 public class Utils {
 
@@ -133,32 +131,29 @@ public class Utils {
 	}
 
 	/**
-	 * @param channel - the channel where to send the error message if an error occurred
-	 * @param member - the member who has bet
-	 * @param betStr - the bet value as string
+	 * @param member - the member who bet
+	 * @param betStr - the string representing the bet
 	 * @param maxValue - the maximum bet value
-	 * @return An Integer representing {@code betStr} converted as an integer if no error occurred or {@code null} otherwise
+	 * @return An Integer representing {@code betStr} converted as an integer
 	 * @throws CommandException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough coins or if the bet value
 	 *             is superior to {code maxValue}
 	 */
-	public static Mono<Integer> checkAndGetBet(Mono<MessageChannel> channel, Member member, String betStr, int maxValue) {
+	public static int requireBet(Member member, String betStr, int maxValue) {
 		Integer bet = NumberUtils.asPositiveInt(betStr);
 		if(bet == null) {
 			throw new CommandException(String.format("`%s` is not a valid amount for coins.", betStr));
 		}
 
 		if(DatabaseManager.getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
-			return BotUtils.sendMessage(TextUtils.notEnoughCoins(member), channel)
-					.then(Mono.empty());
+			throw new CommandException(TextUtils.notEnoughCoins(member));
 		}
 
 		if(bet > maxValue) {
-			return BotUtils.sendMessage(String.format(Emoji.BANK + " Sorry, you can't bet more than **%s**.",
-					FormatUtils.formatCoins(maxValue)), channel)
-					.then(Mono.empty());
+			throw new CommandException(String.format(Emoji.BANK + " Sorry, you can't bet more than **%s**.",
+					FormatUtils.formatCoins(maxValue)));
 		}
 
-		return Mono.just(bet);
+		return bet;
 	}
 
 	/**

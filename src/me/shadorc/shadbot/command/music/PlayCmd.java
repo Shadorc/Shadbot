@@ -32,9 +32,9 @@ public class PlayCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
-		final Snowflake guildId = context.getGuildId().get();
+		final Snowflake guildId = context.getGuildId();
 
-		return DiscordUtils.getVoiceChannelId(context.getMember().get())
+		return DiscordUtils.getVoiceChannelId(context.getMember())
 				.zipWith(DiscordUtils.getVoiceChannelId(context.getSelf().flatMap(user -> user.asMember(guildId))))
 				.flatMap(authorAndSelf -> {
 
@@ -75,19 +75,16 @@ public class PlayCmd extends AbstractCommand {
 						guildMusic = GuildMusicManager.createGuildMusic(context.getClient(), guildId);
 					} else if(guildMusic.isWaiting()) {
 						if(guildMusic.getDjId().equals(context.getAuthorId())) {
-							return context.getAuthorName().map(username -> {
-								throw new CommandException(String.format("You're already selecting a music. "
-										+ "Enter a number or use `%scancel` to cancel the selection.", context.getPrefix()));
-							});
+							throw new CommandException(String.format("You're already selecting a music. "
+									+ "Enter a number or use `%scancel` to cancel the selection.", context.getPrefix()));
 						}
 
 						if(identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH)) {
 							return context.getClient().getUserById(guildMusic.getDjId())
 									.map(User::getUsername)
-									.zipWith(context.getAuthorName())
-									.flatMap(djAndAuthor -> BotUtils.sendMessage(
+									.flatMap(djName -> BotUtils.sendMessage(
 											String.format(Emoji.HOURGLASS + " (**%s**) **%s** is already selecting a music, please wait for him to finish.",
-													djAndAuthor.getT2(), djAndAuthor.getT1()), context.getChannel()))
+													context.getUsername(), djName), context.getChannel()))
 									.then();
 						}
 					}

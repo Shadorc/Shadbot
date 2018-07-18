@@ -31,7 +31,7 @@ public class JokeCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		return context.getAuthorAvatarUrl()
+		return context.getAvatarUrl()
 				.flatMap(avatarUrl -> {
 					try {
 						final String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d",

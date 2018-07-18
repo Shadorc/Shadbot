@@ -53,15 +53,14 @@ public class WikiCmd extends AbstractCommand {
 			final WikipediaPage page = pages.get(pageId);
 
 			if("-1".equals(pageId) || page.getExtract() == null) {
-				return context.getAuthorName()
-						.flatMap(username -> loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia resultats found for `%s`",
-								username, arg)))
+				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia resultats found for `%s`",
+						context.getUsername(), arg))
 						.then();
 			}
 
 			final String extract = StringUtils.abbreviate(page.getExtract(), DiscordUtils.DESCRIPTION_CONTENT_LIMIT);
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
 									String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),

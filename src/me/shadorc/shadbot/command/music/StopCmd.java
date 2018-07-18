@@ -21,9 +21,7 @@ public class StopCmd extends AbstractCommand {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 		guildMusic.leaveVoiceChannel();
 
-		return context.getAuthorName()
-				.flatMap(username -> BotUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.", username), context.getChannel()))
-				.then();
+		return BotUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.", context.getUsername()), context.getChannel()).then();
 	}
 
 	@Override

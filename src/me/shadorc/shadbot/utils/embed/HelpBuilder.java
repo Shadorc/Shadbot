@@ -89,7 +89,7 @@ public class HelpBuilder {
 	}
 
 	public Mono<EmbedCreateSpec> build() {
-		return context.getAuthorAvatarUrl()
+		return context.getAvatarUrl()
 				.map(avatarUrl -> {
 					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Help for %s command", cmd.getName()), null, avatarUrl)

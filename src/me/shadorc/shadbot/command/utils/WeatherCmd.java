@@ -41,9 +41,8 @@ public class WeatherCmd extends AbstractCommand {
 			CurrentWeather weather = owm.currentWeatherByCityName(arg);
 
 			if(!weather.isValid()) {
-				return context.getAuthorName()
-						.flatMap(username -> loadingMsg.send(
-								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.", username, arg)))
+				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
+						context.getUsername(), arg))
 						.then();
 			}
 
@@ -54,7 +53,7 @@ public class WeatherCmd extends AbstractCommand {
 			final float humidity = weather.getMainInstance().getHumidity();
 			final float temperature = weather.getMainInstance().getTemperature();
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Weather for: %s", weather.getCityName()),
 									String.format("http://openweathermap.org/city/%d", weather.getCityCode()),

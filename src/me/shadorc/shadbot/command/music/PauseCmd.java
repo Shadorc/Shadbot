@@ -24,16 +24,14 @@ public class PauseCmd extends AbstractCommand {
 		final AudioPlayer audioPlayer = guildMusic.getScheduler().getAudioPlayer();
 		audioPlayer.setPaused(!audioPlayer.isPaused());
 
-		return context.getAuthorName()
-				.map(username -> {
-					if(audioPlayer.isPaused()) {
-						return String.format(Emoji.PAUSE + " Music paused by **%s**.", username);
-					} else {
-						return String.format(Emoji.PLAY + " Music resumed by **%s**.", username);
-					}
-				})
-				.flatMap(message -> BotUtils.sendMessage(message, context.getChannel()))
-				.then();
+		String message;
+		if(audioPlayer.isPaused()) {
+			message = String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getUsername());
+		} else {
+			message = String.format(Emoji.PLAY + " Music resumed by **%s**.", context.getUsername());
+		}
+
+		return BotUtils.sendMessage(message, context.getChannel()).then();
 	}
 
 	@Override

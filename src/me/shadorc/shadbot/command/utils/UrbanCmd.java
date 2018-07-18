@@ -39,9 +39,8 @@ public class UrbanCmd extends AbstractCommand {
 			UrbanDictionaryResponse urbanDictionary = Utils.MAPPER.readValue(url, UrbanDictionaryResponse.class);
 
 			if(urbanDictionary.getResultType().equals("no_results")) {
-				return context.getAuthorName()
-						.flatMap(username -> loadingMsg.send(
-								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`", username, arg)))
+				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",
+						context.getUsername(), arg))
 						.then();
 			}
 
@@ -50,7 +49,7 @@ public class UrbanCmd extends AbstractCommand {
 			final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(), DiscordUtils.DESCRIPTION_CONTENT_LIMIT);
 			final String example = StringUtils.abbreviate(urbanDefinition.getExample(), DiscordUtils.FIELD_CONTENT_LIMIT);
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Urban Dictionary: " + urbanDefinition.getWord(), urbanDefinition.getPermalink(), avatarUrl)
 							.setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")

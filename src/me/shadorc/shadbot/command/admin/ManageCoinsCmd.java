@@ -46,7 +46,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 			throw new CommandException("You must specify at least one user / role.");
 		}
 
-		final Snowflake guildId = context.getGuildId().get();
+		final Snowflake guildId = context.getGuildId();
 
 		return BotUtils.getUsersFrom(context.getMessage())
 				.buffer()

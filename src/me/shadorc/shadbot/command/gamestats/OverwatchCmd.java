@@ -54,7 +54,7 @@ public class OverwatchCmd extends AbstractCommand {
 				player = new OverwatchPlayer(username, platform);
 			}
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Overwatch Stats", player.getProfileURL(), avatarUrl)
 							.setThumbnail(player.getIconUrl())
@@ -69,9 +69,7 @@ public class OverwatchCmd extends AbstractCommand {
 					.then();
 
 		} catch (OverwatchException err) {
-			return context.getAuthorName()
-					.flatMap(username -> loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) %s", username, err.getMessage())))
-					.then();
+			return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) %s", context.getUsername(), err.getMessage())).then();
 		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);

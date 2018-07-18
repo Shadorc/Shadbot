@@ -43,10 +43,8 @@ public class GifCmd extends AbstractCommand {
 			}
 
 			if(giphy.getGifs().isEmpty()) {
-				return context.getAuthorName()
-						.flatMap(username -> loadingMsg.send(
-								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
-										username, context.getArg().orElse("random search"))))
+				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
+						context.getUsername(), context.getArg().orElse("random search")))
 						.then();
 			}
 

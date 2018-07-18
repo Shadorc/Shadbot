@@ -33,7 +33,7 @@ public class RolelistCmd extends AbstractCommand {
 		}
 
 		final Flux<Role> roles = Flux.fromIterable(roleIds)
-				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId().get(), roleId));
+				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId));
 
 		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 				.setAuthor("Role List", null, null);

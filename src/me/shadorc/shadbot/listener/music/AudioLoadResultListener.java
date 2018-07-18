@@ -31,6 +31,7 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.publisher.Mono;
 
 public class AudioLoadResultListener implements AudioLoadResultHandler, MessageInterceptor {
 
@@ -150,28 +151,27 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	}
 
 	@Override
-	public boolean isIntercepted(MessageCreateEvent event) {
+	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		final Message message = event.getMessage();
 
 		// Ignore webhooks and embeds
 		if(!message.getAuthorId().isPresent() || !message.getContent().isPresent()) {
-			return false;
+			return Mono.just(false);
 		}
 
 		final Snowflake authorId = message.getAuthorId().get();
 		String content = message.getContent().get().toLowerCase();
 
 		if(!authorId.equals(guildMusic.getDjId())) {
-			return false;
+			return Mono.just(false);
 		}
 
 		final String prefix = DatabaseManager.getDBGuild(guildMusic.getGuildId()).getPrefix();
 		if(content.equals(prefix + "cancel")) {
-			BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled is choice.", event.getMember().get().getUsername()),
-					guildMusic.getMessageChannel())
-					.subscribe();
 			this.stopWaiting();
-			return true;
+			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled is choice.", event.getMember().get().getUsername()),
+					guildMusic.getMessageChannel())
+					.thenReturn(true);
 		}
 
 		// Remove prefix and command names from message content
@@ -185,7 +185,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			// If the choice is not valid, ignore the message
 			Integer num = NumberUtils.asIntBetween(choiceStr, 1, Math.min(Config.MUSIC_SEARCHES, resultsTracks.size()));
 			if(num == null) {
-				return false;
+				return Mono.just(false);
 			}
 
 			if(!choices.contains(num)) {
@@ -213,7 +213,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		}
 
 		this.stopWaiting();
-		return true;
+		return Mono.just(true);
 	}
 
 	private void stopWaiting() {

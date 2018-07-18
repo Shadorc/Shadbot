@@ -34,25 +34,20 @@ public class RpsCmd extends AbstractCommand {
 
 		final Handsign botHandsign = Utils.randValue(Handsign.values());
 
-		return context.getAuthorName()
-				.map(username -> {
-					StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s.%n**Shadbot**: %s.%n",
-							username, userHandsign.getRepresentation(), botHandsign.getRepresentation()));
+		StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s.%n**Shadbot**: %s.%n",
+				context.getUsername(), userHandsign.getRepresentation(), botHandsign.getRepresentation()));
 
-					if(userHandsign.equals(botHandsign)) {
-						strBuilder.append("It's a draw !");
-					} else if(userHandsign.isSuperior(botHandsign)) {
-						strBuilder.append(String.format("%s wins ! Well done, you won **%d coins**.", username, GAINS));
-						DatabaseManager.getDBMember(context.getGuildId().get(), context.getAuthorId()).addCoins(GAINS);
-						MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
-					} else {
-						strBuilder.append("I win !");
-					}
+		if(userHandsign.equals(botHandsign)) {
+			strBuilder.append("It's a draw !");
+		} else if(userHandsign.isSuperior(botHandsign)) {
+			strBuilder.append(String.format("%s wins ! Well done, you won **%d coins**.", context.getUsername(), GAINS));
+			DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(GAINS);
+			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
+		} else {
+			strBuilder.append("I win !");
+		}
 
-					return strBuilder.toString();
-				})
-				.flatMap(text -> BotUtils.sendMessage(text, context.getChannel()))
-				.then();
+		return BotUtils.sendMessage(strBuilder.toString(), context.getChannel()).then();
 	}
 
 	@Override

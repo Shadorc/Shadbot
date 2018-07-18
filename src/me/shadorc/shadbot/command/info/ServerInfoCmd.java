@@ -39,7 +39,7 @@ public class ServerInfoCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId().get());
+		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
 
 		StringBuilder settingsStr = new StringBuilder();
 
@@ -65,7 +65,7 @@ public class ServerInfoCmd extends AbstractCommand {
 				.then();
 
 		final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getAutoRoles())
-				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId().get(), roleId))
+				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 				.buffer()
 				.singleOrEmpty()
 				.map(roles -> settingsStr.append(
@@ -73,7 +73,7 @@ public class ServerInfoCmd extends AbstractCommand {
 				.then();
 
 		final Mono<Void> permissionsStr = Flux.fromIterable(dbGuild.getAllowedRoles())
-				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId().get(), roleId))
+				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 				.buffer()
 				.singleOrEmpty()
 				.map(roles -> settingsStr.append(

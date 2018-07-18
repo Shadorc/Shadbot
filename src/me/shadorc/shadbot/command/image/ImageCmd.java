@@ -43,13 +43,12 @@ public class ImageCmd extends AbstractCommand {
 		try {
 			Image image = this.getRandomPopularImage(NetUtils.encode(arg));
 			if(image == null) {
-				return context.getAuthorName()
-						.flatMap(username -> loadingMsg.send(
-								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`", username, arg)))
+				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
+						context.getUsername(), arg))
 						.then();
 			}
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("DeviantArt (Search: %s)", arg), image.getUrl(), avatarUrl)
 							.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")

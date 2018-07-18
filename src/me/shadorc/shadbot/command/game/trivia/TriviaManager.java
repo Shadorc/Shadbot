@@ -83,7 +83,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 						.subscribe();
 			}, LIMITED_TIME, TimeUnit.SECONDS);
 
-			return this.getContext().getAuthorAvatarUrl()
+			return this.getContext().getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Trivia", null, avatarUrl)
 							.setDescription(description)
@@ -105,6 +105,19 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
 		TriviaCmd.MANAGERS.remove(this.getContext().getChannelId());
 		return Mono.empty();
+	}
+
+	private Mono<Message> win(Member member) {
+		final float coinsPerSec = (float) MAX_BONUS / LIMITED_TIME;
+		final long remainingSec = LIMITED_TIME - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(startTime));
+		final int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
+
+		DatabaseManager.getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
+		MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+
+		return this.stop()
+				.then(BotUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won **%d coins**.",
+						member.getUsername(), gains), this.getContext().getChannel()));
 	}
 
 	@Override
@@ -162,19 +175,6 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 				});
 
 		return gameCancelled.switchIfEmpty(execution);
-	}
-
-	private Mono<Message> win(Member member) {
-		final float coinsPerSec = (float) MAX_BONUS / LIMITED_TIME;
-		final long remainingSec = LIMITED_TIME - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(startTime));
-		final int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
-
-		DatabaseManager.getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
-		MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
-
-		return this.stop()
-				.then(BotUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won **%d coins**.",
-						member.getUsername(), gains), this.getContext().getChannel()));
 	}
 
 }

@@ -41,8 +41,8 @@ public class SkipCmd extends AbstractCommand {
 			}
 		}
 
-		return context.getAuthorName()
-				.flatMap(username -> BotUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.", username), context.getChannel()))
+		return BotUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.",
+				context.getUsername()), context.getChannel())
 				.then();
 	}
 

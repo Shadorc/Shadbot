@@ -26,7 +26,7 @@ public class PlaylistCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 
-		return context.getAuthorAvatarUrl()
+		return context.getAvatarUrl()
 				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 						.setAuthor("Playlist", null, avatarUrl)
 						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")

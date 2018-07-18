@@ -30,32 +30,25 @@ public class RussianRouletteCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
+		final int bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
 
-		return Utils.checkAndGetBet(context.getChannel(), context.getMember().get(), arg, MAX_BET)
-				.zipWith(context.getAuthorName())
-				.map(betAndUsername -> {
-					final int bet = betAndUsername.getT1();
-					final String username = betAndUsername.getT2();
+		StringBuilder strBuilder = new StringBuilder(
+				String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", context.getUsername()));
 
-					StringBuilder strBuilder = new StringBuilder(
-							String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", username));
+		int gains;
+		if(ThreadLocalRandom.current().nextInt(6) == 0) {
+			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
+			MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
+			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.formatCoins(Math.abs(gains))));
+		} else {
+			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
+			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
+			strBuilder.append(String.format("**click** ... Phew, you are still alive ! You get **%s**.", FormatUtils.formatCoins(gains)));
+		}
 
-					int gains;
-					if(ThreadLocalRandom.current().nextInt(6) == 0) {
-						gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
-						MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
-						strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.formatCoins(Math.abs(gains))));
-					} else {
-						gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
-						MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
-						strBuilder.append(String.format("**click** ... Phew, you are still alive ! You get **%s**.", FormatUtils.formatCoins(gains)));
-					}
+		DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains);
 
-					DatabaseManager.getDBMember(context.getGuildId().get(), context.getAuthorId()).addCoins(gains);
-					return strBuilder;
-				})
-				.flatMap(strBuilder -> BotUtils.sendMessage(strBuilder.toString(), context.getChannel()))
-				.then();
+		return BotUtils.sendMessage(strBuilder.toString(), context.getChannel()).then();
 	}
 
 	@Override

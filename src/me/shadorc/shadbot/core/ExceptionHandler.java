@@ -6,6 +6,7 @@ import java.net.SocketTimeoutException;
 import org.apache.http.HttpStatus;
 import org.jsoup.HttpStatusException;
 
+import discord4j.core.object.entity.Message;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -19,6 +20,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.publisher.Mono;
 
 public class ExceptionHandler {
 
@@ -32,20 +34,26 @@ public class ExceptionHandler {
 		this.context = context;
 	}
 
-	public void handle() {
+	public Mono<Message> handle() {
 		if(this.isCommandException()) {
-			this.onCommandException();
-		} else if(this.isMissingArgumentException()) {
-			this.onMissingArgumentException();
-		} else if(this.isNoMusicException()) {
-			this.onNoMusicException();
-		} else if(this.isUnavailable()) {
-			this.onUnavailable();
-		} else if(this.isUnreacheable()) {
-			this.onUnreacheable();
-		} else if(this.isUnknown()) {
-			this.onUnknown();
+			return this.onCommandException();
 		}
+		if(this.isMissingArgumentException()) {
+			return this.onMissingArgumentException();
+		}
+		if(this.isNoMusicException()) {
+			return this.onNoMusicException();
+		}
+		if(this.isUnavailable()) {
+			return this.onUnavailable();
+		}
+		if(this.isUnreacheable()) {
+			return this.onUnreacheable();
+		}
+		if(this.isForbidden()) {
+			return this.onForbidden();
+		}
+		return this.onUnknown();
 	}
 
 	private boolean isCommandException() {
@@ -69,75 +77,62 @@ public class ExceptionHandler {
 		return err instanceof SocketTimeoutException;
 	}
 
-	public static boolean isForbidden(Throwable err) {
+	public boolean isForbidden() {
 		return err instanceof ClientException
 				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
 	}
 
-	public static boolean isNotForbidden(Throwable err) {
-		return !ExceptionHandler.isForbidden(err);
+	public boolean isNotForbidden() {
+		return !this.isForbidden();
 	}
 
-	private boolean isUnknown() {
-		return !this.isCommandException()
-				&& !this.isNoMusicException()
-				&& !this.isMissingArgumentException()
-				&& !this.isUnavailable()
-				&& !this.isUnreacheable()
-				&& !ExceptionHandler.isForbidden(err);
-	}
-
-	private void onCommandException() {
-		context.getAuthorName()
-				.flatMap(username -> BotUtils.sendMessage(
-						String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s", username, err.getMessage()), context.getChannel()))
-				.subscribe();
+	private Mono<Message> onCommandException() {
 		CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
+		return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
+				context.getUsername(), err.getMessage()), context.getChannel());
 	}
 
-	private void onMissingArgumentException() {
-		command.getHelp(context)
-				.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, context.getChannel()))
-				.subscribe();
+	private Mono<Message> onMissingArgumentException() {
 		CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
+		return command.getHelp(context)
+				.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, context.getChannel()));
 	}
 
-	private void onNoMusicException() {
-		BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel()).subscribe();
+	private Mono<Message> onNoMusicException() {
+		return BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
 	}
 
-	private void onUnavailable() {
-		context.getAuthorName()
-				.flatMap(username -> BotUtils.sendMessage(
-						String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... This is not my fault, I promise ! Try again later.",
-								username, context.getPrefix(), context.getCommandName()), context.getChannel()))
-				.subscribe();
+	private Mono<Message> onUnavailable() {
 		LogUtils.warn(context.getClient(),
 				String.format("[%s] Service unavailable.", command.getClass().getSimpleName()),
 				context.getContent());
+		return BotUtils.sendMessage(
+				String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... This is not my fault, I promise ! Try again later.",
+						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
 	}
 
-	private void onUnreacheable() {
-		context.getAuthorName()
-				.flatMap(username -> BotUtils.sendMessage(
-						String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... This is not my fault, I promise ! Try again later.",
-								username, context.getPrefix(), context.getCommandName()), context.getChannel()))
-				.subscribe();
+	private Mono<Message> onUnreacheable() {
 		LogUtils.warn(context.getClient(),
 				String.format("[%s] Service unreachable.", command.getClass().getSimpleName()),
 				context.getContent());
+		return BotUtils.sendMessage(
+				String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... This is not my fault, I promise ! Try again later.",
+						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
 	}
 
-	private void onUnknown() {
-		context.getAuthorName()
-				.flatMap(username -> BotUtils.sendMessage(
-						String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
-								username, context.getPrefix(), context.getCommandName()), context.getChannel()))
-				.subscribe();
+	private Mono<Message> onForbidden() {
+		// TODO Auto-generated method stub
+		return Mono.empty();
+	}
+
+	private Mono<Message> onUnknown() {
 		LogUtils.error(context.getClient(),
 				err,
 				String.format("[%s] An unknown error occurred.", command.getClass().getSimpleName()),
 				context.getContent());
+		return BotUtils.sendMessage(
+				String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
+						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
 	}
 
 }

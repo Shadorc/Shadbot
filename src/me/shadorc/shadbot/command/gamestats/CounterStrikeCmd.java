@@ -72,9 +72,8 @@ public class CounterStrikeCmd extends AbstractCommand {
 			// Search users matching the steamId
 			List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
 			if(players.isEmpty()) {
-				return context.getAuthorName()
-						.flatMap(username -> loadingMsg.send(
-								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.", username)))
+				return loadingMsg.send(
+						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.", context.getUsername()))
 						.then();
 			}
 
@@ -103,7 +102,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			final Map<String, Integer> statsMap = new HashMap<>();
 			stats.forEach(stat -> statsMap.put(stat.getName(), stat.getValue()));
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Counter-Strike: Global Offensive Stats",
 									"http://steamcommunity.com/profiles/" + steamId,

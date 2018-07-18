@@ -49,9 +49,8 @@ public class Rule34Cmd extends AbstractCommand {
 						R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
 
 						if(r34.getCount() == 0) {
-							return context.getAuthorName()
-									.flatMap(username -> loadingMsg.send(
-											String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`", username, arg)))
+							return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
+									context.getUsername(), arg))
 									.then();
 						}
 
@@ -65,7 +64,7 @@ public class Rule34Cmd extends AbstractCommand {
 						final String formattedtags = org.apache.commons.lang3.StringUtils.abbreviate(
 								FormatUtils.format(tags, tag -> String.format("`%s`", tag), " "), MAX_TAGS_LENGTH);
 
-						return context.getAuthorAvatarUrl()
+						return context.getAvatarUrl()
 								.map(avatarUrl -> {
 									EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 											.setAuthor(String.format("Rule34 (Search: %s)", arg), post.getFileUrl(), avatarUrl)

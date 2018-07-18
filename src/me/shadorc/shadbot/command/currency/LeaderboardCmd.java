@@ -22,7 +22,7 @@ public class LeaderboardCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		return Flux.fromIterable(DatabaseManager.getDBGuild(context.getGuildId().get()).getMembers())
+		return Flux.fromIterable(DatabaseManager.getDBGuild(context.getGuildId()).getMembers())
 				.filter(dbMember -> dbMember.getCoins() > 0)
 				.sort((user1, user2) -> Integer.compare(user1.getCoins(), user2.getCoins()))
 				.take(10)
@@ -38,7 +38,7 @@ public class LeaderboardCmd extends AbstractCommand {
 							return String.format("%d. **%s** - %s", count, username, coins);
 						}))
 				.defaultIfEmpty("\nEveryone is poor here.")
-				.zipWith(context.getAuthorAvatarUrl())
+				.zipWith(context.getAvatarUrl())
 				.map(msgAndAvatar -> EmbedUtils.getDefaultEmbed()
 						.setAuthor("Leaderboard", null, msgAndAvatar.getT2())
 						.setDescription(msgAndAvatar.getT1()))

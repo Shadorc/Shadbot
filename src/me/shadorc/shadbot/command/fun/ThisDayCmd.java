@@ -51,7 +51,7 @@ public class ThisDayCmd extends AbstractCommand {
 					.map(Document::text)
 					.collect(Collectors.joining("\n\n"));
 
-			return context.getAuthorAvatarUrl()
+			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("On This Day (%s)", date), HOME_URL, avatarUrl)
 							.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
