@@ -78,7 +78,9 @@ public class RouletteManager extends AbstractGameManager {
 						embed.addField("Results", results, false);
 					}
 
-					if(!this.isTaskDone()) {
+					if(this.isTaskDone()) {
+						embed.setFooter("Finished", null);
+					} else {
 						embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
 					}
 
