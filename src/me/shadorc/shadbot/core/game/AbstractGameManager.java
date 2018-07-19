@@ -44,8 +44,8 @@ public abstract class AbstractGameManager {
 				.flatMap(content -> message.getAuthorAsMember())
 				.zipWith(DiscordUtils.hasPermissions(message.getAuthorAsMember(), Permission.ADMINISTRATOR))
 				// The author is the author of the game or he is an administrator
-				.map(memberAndIsAdmin -> context.getAuthorId().equals(memberAndIsAdmin.getT1().getId()) || memberAndIsAdmin.getT2())
-				.defaultIfEmpty(false);
+				.filter(memberAndIsAdmin -> context.getAuthorId().equals(memberAndIsAdmin.getT1().getId()) || memberAndIsAdmin.getT2())
+				.hasElement();
 	}
 
 	/**
@@ -53,12 +53,13 @@ public abstract class AbstractGameManager {
 	 * @param execution - the {@link Mono} to execute if the {@link Message} is not a cancel command
 	 * @return A {@link Mono} that returns true if the message is intercepted, false otherwise
 	 */
-	public Mono<Boolean> process(Message message, Mono<Boolean> execution) {
-		return this.isCancelCmd(message)
-				.filter(Boolean.TRUE::equals)
-				.flatMap(ignored -> message.getAuthor())
+	public Mono<Boolean> processIfNotCancelled(Message message, Mono<Boolean> execution) {
+		return Mono.just(message)
+				.filterWhen(msg -> this.isCancelCmd(msg))
+				.flatMap(msg -> msg.getAuthor())
 				.map(User::getUsername)
-				.flatMap(username -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", username), message.getChannel()))
+				.flatMap(username -> BotUtils.sendMessage(
+						String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", username), message.getChannel()))
 				.flatMap(ignored -> this.stop())
 				// The message is intercepted, return true
 				.map(ignored -> Boolean.TRUE)

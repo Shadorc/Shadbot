@@ -176,7 +176,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		return this.process(event.getMessage(), Mono.just(event.getMessage().getAuthorId().get())
+		return this.processIfNotCancelled(event.getMessage(), Mono.just(event.getMessage().getAuthorId().get())
 				.flatMap(authorId -> {
 					final Context context = this.getContext();
 

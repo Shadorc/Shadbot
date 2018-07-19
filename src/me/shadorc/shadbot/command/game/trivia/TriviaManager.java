@@ -76,12 +76,11 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 			MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 
 			startTime = System.currentTimeMillis();
-			this.schedule(() -> {
-				this.stop()
-						.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer),
-								this.getContext().getChannel()))
-						.subscribe();
-			}, LIMITED_TIME, TimeUnit.SECONDS);
+			this.schedule(() -> this.stop()
+					.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer),
+							this.getContext().getChannel()))
+					.subscribe()
+					, LIMITED_TIME, TimeUnit.SECONDS);
 
 			return this.getContext().getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
@@ -123,7 +122,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		final Member member = event.getMember().get();
-		return this.process(event.getMessage(), Mono.just(event.getMessage().getContent().get())
+		return this.processIfNotCancelled(event.getMessage(), Mono.just(event.getMessage().getContent().get())
 				.flatMap(content -> {
 					// It's a number or a text
 					Integer choice = NumberUtils.asIntBetween(content, 1, answers.size());
