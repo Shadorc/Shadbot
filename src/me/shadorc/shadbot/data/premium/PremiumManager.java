@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.databind.JavaType;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.DataManager;
@@ -24,11 +27,12 @@ public class PremiumManager {
 	private static final String FILE_NAME = "premium_data.json";
 	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
 
-	private static Relics relics;
+	private static List<Relic> relics;
 
 	@DataInit
 	public static void init() throws IOException {
-		relics = FILE.exists() ? Utils.MAPPER.readValue(FILE, Relics.class) : new Relics();
+		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(CopyOnWriteArrayList.class, Relic.class);
+		relics = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new CopyOnWriteArrayList<>();
 	}
 
 	@DataSave(filePath = FILE_NAME, initialDelay = 1, period = 1, unit = TimeUnit.HOURS)
@@ -40,12 +44,12 @@ public class PremiumManager {
 
 	public static Relic generateRelic(RelicType type) {
 		Relic relic = new Relic(UUID.randomUUID().toString(), TimeUnit.DAYS.toMillis(180), type);
-		relics.addRelic(relic);
+		relics.add(relic);
 		return relic;
 	}
 
 	public static void activateRelic(@Nullable Snowflake guildId, Snowflake userId, String relicId) throws RelicActivationException {
-		Optional<Relic> relicOpt = relics.getRelics().stream()
+		Optional<Relic> relicOpt = relics.stream()
 				.filter(relicItr -> relicItr.getId().equals(relicId))
 				.findFirst();
 
@@ -67,7 +71,7 @@ public class PremiumManager {
 	}
 
 	public static List<Relic> getRelicsForUser(Snowflake userId) {
-		return relics.getRelics().stream()
+		return relics.stream()
 				.filter(relic -> relic.getUserId().isPresent())
 				.filter(relic -> relic.getUserId().get().equals(userId))
 				.collect(Collectors.toList());
@@ -78,7 +82,7 @@ public class PremiumManager {
 	}
 
 	public static boolean isGuildPremium(Snowflake guildId) {
-		return relics.getRelics().stream()
+		return relics.stream()
 				.filter(relic -> relic.getGuildId().isPresent())
 				.filter(relic -> relic.getGuildId().get().equals(guildId))
 				.anyMatch(relic -> !relic.isExpired());
