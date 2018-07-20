@@ -43,7 +43,7 @@ public class TriviaCmd extends AbstractCommand {
 			}
 		}
 
-		if(context.getArg().isPresent() && context.getArg().get().equals("categories")) {
+		if("categories".equalsIgnoreCase(context.getArg().orElse(null))) {
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Trivia categories", null, avatarUrl)
@@ -55,9 +55,9 @@ public class TriviaCmd extends AbstractCommand {
 
 		Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
 
-		if(context.getArg().isPresent() && (categoryId == null || !categories.getIds().contains(categoryId))) {
-			throw new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list "
-					+ "of categories.", context.getArg().get(), context.getPrefix(), this.getName()));
+		if(context.getArg().isPresent() && !categories.getIds().contains(categoryId)) {
+			throw new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list of categories.",
+					context.getArg().get(), context.getPrefix(), this.getName()));
 		}
 
 		TriviaManager triviaManager = new TriviaManager(context, categoryId);

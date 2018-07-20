@@ -43,7 +43,7 @@ public class HangmanCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final Difficulty difficulty = context.getArg().isPresent() ? Utils.getEnum(Difficulty.class, context.getArg().get()) : Difficulty.EASY;
+		final Difficulty difficulty = Utils.getEnum(Difficulty.class, context.getArg().orElse("easy"));
 
 		if(difficulty == null) {
 			throw new CommandException(String.format("`%s` is not a valid difficulty. %s",

@@ -75,12 +75,11 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 
 			MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 
-			startTime = System.currentTimeMillis();
+			this.startTime = System.currentTimeMillis();
 			this.schedule(() -> this.stop()
 					.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer),
 							this.getContext().getChannel()))
-					.subscribe()
-					, LIMITED_TIME, TimeUnit.SECONDS);
+					.subscribe(), LIMITED_TIME, TimeUnit.SECONDS);
 
 			return this.getContext().getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()

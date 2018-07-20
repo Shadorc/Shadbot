@@ -33,7 +33,10 @@ public class DiceCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		List<String> args = context.requireArgs(1, 2);
 
-		final String numStr = args.get(args.size() == 1 ? 0 : 1);
+		// This value indicates if the user is trying to join or create a game
+		final boolean isJoining = args.size() == 1;
+
+		final String numStr = args.get(isJoining ? 0 : 1);
 		Integer num = NumberUtils.asIntBetween(numStr, 1, 6);
 		if(num == null) {
 			throw new CommandException(String.format("`%s` is not a valid number, must be between 1 and 6.", numStr));
@@ -42,14 +45,14 @@ public class DiceCmd extends AbstractCommand {
 		DiceManager diceManager = MANAGERS.get(context.getChannelId());
 
 		// The user tries to join a game and no game are currently playing
-		if(args.size() == 1 && diceManager == null) {
+		if(isJoining && diceManager == null) {
 			throw new MissingArgumentException();
 		}
 
-		final String betStr = args.size() == 1 ? Integer.toString(diceManager.getBet()) : args.get(0);
+		final String betStr = isJoining ? Integer.toString(diceManager.getBet()) : args.get(0);
 		final Integer bet = Utils.requireBet(context.getMember(), betStr, MAX_BET);
 
-		if(args.size() == 2) {
+		if(!isJoining) {
 			// The user tries to start a game and it has already been started
 			if(diceManager != null) {
 				return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A **Dice Game** has already been started. "
@@ -66,14 +69,14 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		if(diceManager.getPlayersCount() == 6) {
-			return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) Sorry, there are already 6 players.", 
+			return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) Sorry, there are already 6 players.",
 					context.getUsername()), context.getChannel())
 					.then();
 		}
 
 		if(diceManager.isNumBet(num)) {
 			return BotUtils.sendMessage(
-					String.format(Emoji.GREY_EXCLAMATION + " (**%s**) This number has already been bet, please try with another one.", 
+					String.format(Emoji.GREY_EXCLAMATION + " (**%s**) This number has already been bet, please try with another one.",
 							context.getUsername()), context.getChannel())
 					.then();
 		}

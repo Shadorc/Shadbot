@@ -37,8 +37,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 			"https://upload.wikimedia.org/wikipedia/commons/d/d6/Hangman-6.png");
 
 	protected static final int MIN_GAINS = 200;
-	private static final int MAX_BONUS = 200;
-	private static final int IDLE_MIN = 1;
+	protected static final int MAX_BONUS = 200;
+	protected static final int IDLE_MIN = 1;
 
 	private final RateLimiter rateLimiter;
 	private final UpdateableMessage updateableMessage;
@@ -112,8 +112,10 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 			final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
 			final float imagesRemaining = IMG_LIST.size() - failsCount;
 			int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
+
 			DatabaseManager.getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
 			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+
 			text = String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
 					this.getContext().getUsername(), FormatUtils.formatCoins(gains));
 		} else {

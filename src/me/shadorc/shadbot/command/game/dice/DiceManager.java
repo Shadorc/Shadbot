@@ -99,7 +99,7 @@ public class DiceManager extends AbstractGameManager {
 					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
 				})
 				.collectList()
-				.map(list -> this.results = FormatUtils.format(list,Object::toString,"\n"))
+				.map(list -> this.results = FormatUtils.format(list, Object::toString, "\n"))
 				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getContext().getChannel()))
 				.then(this.show())
 				.then();

@@ -53,12 +53,10 @@ public class RouletteManager extends AbstractGameManager {
 	}
 
 	public Mono<Void> show() {
-		Mono<List<User>> usernamesMono = Flux.fromIterable(playersPlace.keySet())
-				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
-				.collectList();
-
 		return this.getContext().getAvatarUrl()
-				.zipWith(usernamesMono)
+				.zipWith(Flux.fromIterable(playersPlace.keySet())
+						.flatMap(userId -> this.getContext().getClient().getUserById(userId))
+						.collectList())
 				.map(avatarUrlAndUsers -> {
 					final String avatarUrl = avatarUrlAndUsers.getT1();
 					final List<User> users = avatarUrlAndUsers.getT2();
@@ -133,8 +131,7 @@ public class RouletteManager extends AbstractGameManager {
 					}
 				})
 				.collectSortedList()
-				.map(list -> FormatUtils.format(list, Object::toString, ", "))
-				.map(results -> this.results = results)
+				.map(list -> this.results = FormatUtils.format(list, Object::toString, ", "))
 				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
 						winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"),
 						this.getContext().getChannel()))
