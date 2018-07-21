@@ -74,8 +74,9 @@ public class LottoCmd extends AbstractCommand {
 
 		LottoManager.getLotto().addGambler(context.getGuildId(), context.getAuthorId(), num);
 
-		return BotUtils.sendMessage(String.format(Emoji.TICKET + " You bought a lottery ticket and bet on number **%d**. Good luck !", num),
-				context.getChannel())
+		return BotUtils.sendMessage(String.format(Emoji.TICKET + " You bought a lottery ticket and bet on number **%d**. Good luck ! "
+				+ "The next draw will take place in **%s**.",
+				num, FormatUtils.formatCustomDate(LottoCmd.getDelay())), context.getChannel())
 				.then();
 	}
 
@@ -99,7 +100,7 @@ public class LottoCmd extends AbstractCommand {
 							.orElse(null);
 
 					if(gambler != null) {
-						embed.setFooter(String.format("%s, you bet on number %d.", context.getUsername(), gambler.getNumber()),
+						embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
 								"https://images.emojiterra.com/twitter/512px/1f39f.png");
 					}
 
