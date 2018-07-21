@@ -1,16 +1,18 @@
-// TODO
+//// TODO
 // package me.shadorc.shadbot.command.admin.setting;
 //
 // import discord4j.core.spec.EmbedCreateSpec;
-// import me.shadorc.shadbot.command.admin.setting.core.AbstractSetting;
-// import me.shadorc.shadbot.command.admin.setting.core.Setting;
-// import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
 // import me.shadorc.shadbot.core.command.Context;
-// import me.shadorc.shadbot.data.db.Database;
-// import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
+// import me.shadorc.shadbot.core.setting.AbstractSetting;
+// import me.shadorc.shadbot.core.setting.Setting;
+// import me.shadorc.shadbot.core.setting.SettingEnum;
+// import me.shadorc.shadbot.data.db.DatabaseManager;
+// import me.shadorc.shadbot.exception.CommandException;
 // import me.shadorc.shadbot.utils.BotUtils;
+// import me.shadorc.shadbot.utils.command.Emoji;
 // import me.shadorc.shadbot.utils.embed.EmbedUtils;
-// import me.shadorc.shadbot.utils.object.Emoji;
+// import me.shadorc.shadbot.utils.embed.HelpBuilder;
+// import reactor.core.publisher.Mono;
 //
 // @Setting(description = "Manage Shadbot's prefix.", setting = SettingEnum.PREFIX)
 // public class PrefixSetting extends AbstractSetting {
@@ -18,23 +20,25 @@
 // private static final int MAX_PREFIX_LENGTH = 5;
 //
 // @Override
-// public void execute(Context context, String arg) {
-// context.requireArg();
+// public Mono<Void> execute(Context context) {
+// final String arg = this.requireArg(context);
 //
 // if(arg.length() > MAX_PREFIX_LENGTH) {
-// throw new IllegalCmdArgumentException(String.format("Prefix cannot contain more than %s characters.", MAX_PREFIX_LENGTH));
+// throw new CommandException(String.format("Prefix cannot contain more than %s characters.", MAX_PREFIX_LENGTH));
 // }
 //
-// Database.getDBGuild(context.getGuildId().get()).setSetting(this.getSetting(), arg);
-// BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", arg), context.getChannel());
+// DatabaseManager.getDBGuild(context.getGuildId()).setSetting(this.getSetting(), arg);
+// return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s` by **%s**",
+// arg, context.getUsername()), context.getChannel())
+// .then();
 // }
 //
 // @Override
-// public EmbedCreateSpec getHelp(String prefix) {
-// return EmbedUtils.getDefaultEmbed()
-// .addField("Usage", String.format("`%s%s <prefix>`", prefix, this.getCmdName()), false)
+// public Mono<EmbedCreateSpec> getHelp(Context context) {
+// return context.get
+// .addField("Usage", String.format("`%s%s <prefix>`", context.getPrefix(), this.getCommandName()), false)
 // .addField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
-// .addField("Example", String.format("`%s%s !`", prefix, this.getCmdName()), false);
+// .addField("Example", String.format("`%s%s !`", context.getPrefix(), this.getCommandName()), false);
 // }
 //
 // }

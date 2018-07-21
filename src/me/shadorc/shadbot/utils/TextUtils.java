@@ -9,7 +9,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
+import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.utils.command.Emoji;
 
 public class TextUtils {

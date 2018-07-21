@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
+import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.utils.Utils;
 
 public class DBGuild {

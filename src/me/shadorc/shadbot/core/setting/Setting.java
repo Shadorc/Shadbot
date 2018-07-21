@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.command.admin.setting.core;
+package me.shadorc.shadbot.core.setting;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

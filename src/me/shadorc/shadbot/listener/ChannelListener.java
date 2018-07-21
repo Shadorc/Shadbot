@@ -4,7 +4,7 @@ import java.util.List;
 
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
+import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import twitter4j.JSONArray;
