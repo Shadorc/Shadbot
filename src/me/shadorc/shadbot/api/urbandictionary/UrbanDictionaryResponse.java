@@ -6,14 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UrbanDictionaryResponse {
 
-	@JsonProperty("result_type")
-	private String resultType;
 	@JsonProperty("list")
 	private List<UrbanDefinition> definitions;
-
-	public String getResultType() {
-		return resultType;
-	}
 
 	public List<UrbanDefinition> getDefinitions() {
 		return definitions;
@@ -21,9 +15,7 @@ public class UrbanDictionaryResponse {
 
 	@Override
 	public String toString() {
-		return "UrbanDictionaryResponse [resultType=" + resultType
-				+ ", definitions=" + definitions
-				+ "]";
+		return "UrbanDictionaryResponse [definitions=" + definitions + "]";
 	}
 
 }

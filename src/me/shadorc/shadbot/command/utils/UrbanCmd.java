@@ -38,7 +38,7 @@ public class UrbanCmd extends AbstractCommand {
 
 			UrbanDictionaryResponse urbanDictionary = Utils.MAPPER.readValue(url, UrbanDictionaryResponse.class);
 
-			if(urbanDictionary.getResultType().equals("no_results")) {
+			if(urbanDictionary.getDefinitions().isEmpty()) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",
 						context.getUsername(), arg))
 						.then();
