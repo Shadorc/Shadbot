@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.utils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,6 +17,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -28,35 +30,39 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.UTILS, names = { "translate", "translation", "trans" })
 public class TranslateCmd extends AbstractCommand {
 
+	private static final String AUTO = "auto";
+
 	private static final BiMap<String, String> LANG_ISO_MAP = HashBiMap.create();
 
 	static {
-		for(String iso : Locale.getISOLanguages()) {
-			LANG_ISO_MAP.put(new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(), iso);
-		}
-		LANG_ISO_MAP.put("auto", "auto");
+		Arrays.stream(Locale.getISOLanguages())
+				.forEach(iso -> LANG_ISO_MAP.put(new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(), iso));
+		LANG_ISO_MAP.put(AUTO, AUTO);
 	}
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(2, 3);
+		final String arg = context.requireArg();
+
+		final List<String> quotedWords = StringUtils.getQuotedElements(arg);
+		if(quotedWords.size() != 1) {
+			throw new CommandException("The text to translate cannot be empty and must be enclosed in quotation marks.");
+		}
+		final String sourceText = quotedWords.get(0);
+
+		final List<String> langs = StringUtils.split(StringUtils.remove(arg, sourceText, "\""));
+		if(langs.size() == 0) {
+			throw new MissingArgumentException();
+		}
+
+		if(langs.size() == 1) {
+			langs.add(0, AUTO);
+		}
+
+		final String langFrom = this.toISO(langs.get(0));
+		final String langTo = this.toISO(langs.get(1));
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		if(args.size() == 2) {
-			args.add(0, "auto");
-		}
-
-		final String langFrom = this.toISO(args.get(0));
-		final String langTo = this.toISO(args.get(1));
-
-		if(langFrom == null || langTo == null) {
-			loadingMsg.stopTyping();
-			throw new CommandException(String.format("One of the specified language doesn't exist. "
-					+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
-		}
-
-		final String sourceText = args.get(2);
 		try {
 			final String url = String.format("https://translate.googleapis.com/translate_a/single?"
 					+ "client=gtx"
@@ -70,7 +76,7 @@ public class TranslateCmd extends AbstractCommand {
 
 			JSONArray result = new JSONArray(NetUtils.getJSON(url));
 
-			if(!(result.get(0) instanceof JSONArray)) {
+			if(langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
 				loadingMsg.stopTyping();
 				throw new CommandException(String.format("One of the specified language isn't supported. "
 						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
@@ -80,6 +86,14 @@ public class TranslateCmd extends AbstractCommand {
 			JSONArray translations = result.getJSONArray(0);
 			for(int i = 0; i < translations.length(); i++) {
 				translatedText.append(translations.getJSONArray(i).getString(0));
+			}
+
+			if(translatedText.toString().equalsIgnoreCase(sourceText)) {
+				loadingMsg.stopTyping();
+				throw new CommandException(String.format("The text could not been translated. "
+						+ "Check that the specified languages are supported, that the text is in the specified language "
+						+ "and that the destination language is different from the source one. "
+						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
 			return context.getAvatarUrl()
@@ -107,8 +121,8 @@ public class TranslateCmd extends AbstractCommand {
 				.setDescription("Translate a text from a language to another.")
 				.addArg("fromLang", "source language, by leaving it blank the language will be automatically detected", true)
 				.addArg("toLang", "destination language", false)
-				.addArg("text", false)
-				.setExample(String.format("`%s%s en fr How are you ?`", context.getPrefix(), this.getName()))
+				.addArg("\"text\"", false)
+				.setExample(String.format("`%s%s en fr \"How are you ?\"`", context.getPrefix(), this.getName()))
 				.addField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false)
 				.build();
 	}
