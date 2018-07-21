@@ -150,7 +150,9 @@ public class Context {
 	}
 
 	public String requireArg() {
-		return this.getArg().orElseThrow(() -> new MissingArgumentException());
+		return this.getArg()
+				.map(StringUtils::normalizeSpace)
+				.orElseThrow(() -> new MissingArgumentException());
 	}
 
 	public List<String> requireArgs(int count) {
