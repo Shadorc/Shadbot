@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -16,6 +17,8 @@ import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -28,7 +31,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-public class RouletteManager extends AbstractGameManager {
+public class RouletteManager extends AbstractGameManager implements MessageInterceptor {
 
 	protected static final List<Integer> RED_NUMS = List.of(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36);
 
@@ -49,52 +52,20 @@ public class RouletteManager extends AbstractGameManager {
 	@Override
 	public Mono<Void> start() {
 		this.schedule(() -> this.stop().subscribe(), GAME_DURATION, TimeUnit.SECONDS);
+		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		return Mono.empty();
-	}
-
-	public Mono<Void> show() {
-		return this.getContext().getAvatarUrl()
-				.zipWith(Flux.fromIterable(playersPlace.keySet())
-						.flatMap(userId -> this.getContext().getClient().getUserById(userId))
-						.collectList())
-				.map(avatarUrlAndUsers -> {
-					final String avatarUrl = avatarUrlAndUsers.getT1();
-					final List<User> users = avatarUrlAndUsers.getT2();
-
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Roulette Game", null, avatarUrl)
-							.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
-							.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
-									+ "%n%n**Place** is a `number between 1 and 36`, %s",
-									this.getContext().getPrefix(), this.getContext().getCommandName(),
-									FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
-							.addField("Player (Bet)", FormatUtils.format(users,
-									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.formatCoins(playersPlace.get(user.getId()).getT1())), "\n"), true)
-							.addField("Place", playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
-
-					if(results != null) {
-						embed.addField("Results", results, false);
-					}
-
-					if(this.isTaskDone()) {
-						embed.setFooter("Finished", null);
-					} else {
-						embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
-					}
-
-					return embed;
-				})
-				.flatMap(embed -> updateableMessage.send(embed))
-				.then();
 	}
 
 	@Override
 	public Mono<Void> stop() {
 		this.cancelScheduledTask();
+		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
 		RouletteCmd.MANAGERS.remove(this.getContext().getChannelId());
+		return Mono.empty();
+	}
 
+	public Mono<Void> spin() {
 		final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
-
 		return Flux.fromIterable(playersPlace.keySet())
 				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
 				.map(user -> {
@@ -135,7 +106,44 @@ public class RouletteManager extends AbstractGameManager {
 				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
 						winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"),
 						this.getContext().getChannel()))
-				.then(this.show());
+				.then(this.show())
+				.then(this.stop());
+	}
+
+	public Mono<Void> show() {
+		return this.getContext().getAvatarUrl()
+				.zipWith(Flux.fromIterable(playersPlace.keySet())
+						.flatMap(userId -> this.getContext().getClient().getUserById(userId))
+						.collectList())
+				.map(avatarUrlAndUsers -> {
+					final String avatarUrl = avatarUrlAndUsers.getT1();
+					final List<User> users = avatarUrlAndUsers.getT2();
+
+					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+							.setAuthor("Roulette Game", null, avatarUrl)
+							.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
+							.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
+									+ "%n%n**Place** is a `number between 1 and 36`, %s",
+									this.getContext().getPrefix(), this.getContext().getCommandName(),
+									FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
+							.addField("Player (Bet)", FormatUtils.format(users,
+									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.formatCoins(playersPlace.get(user.getId()).getT1())), "\n"), true)
+							.addField("Place", playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
+
+					if(results != null) {
+						embed.addField("Results", results, false);
+					}
+
+					if(this.isTaskDone()) {
+						embed.setFooter("Finished", null);
+					} else {
+						embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+					}
+
+					return embed;
+				})
+				.flatMap(embed -> updateableMessage.send(embed))
+				.then();
 	}
 
 	/**
@@ -143,6 +151,11 @@ public class RouletteManager extends AbstractGameManager {
 	 */
 	protected boolean addPlayer(Snowflake userId, Integer bet, String place) {
 		return playersPlace.putIfAbsent(userId, Tuples.of(bet, place)) == null;
+	}
+
+	@Override
+	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
+		return this.processIfNotCancelled(event.getMessage(), Mono.empty());
 	}
 
 }
