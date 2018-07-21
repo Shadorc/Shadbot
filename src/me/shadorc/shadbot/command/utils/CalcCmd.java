@@ -25,8 +25,8 @@ public class CalcCmd extends AbstractCommand {
 		final String arg = context.requireArg();
 
 		try {
-			return BotUtils.sendMessage(
-					String.format(Emoji.TRIANGULAR_RULER + " %s = %s", arg.replace("*", "\\*"), EVALUATOR.evaluate(arg)),
+			return BotUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
+					context.getUsername(), arg.replace("*", "\\*"), EVALUATOR.evaluate(arg)),
 					context.getChannel())
 					.then();
 		} catch (IllegalArgumentException err) {
