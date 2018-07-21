@@ -7,7 +7,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
 
@@ -29,7 +29,12 @@ public class LeetCmd extends AbstractCommand {
 				.replace("S", "5")
 				.replace("T", "7");
 
-		return BotUtils.sendMessage(Emoji.KEYBOARD + " " + text, context.getChannel()).then();
+		return context.getAvatarUrl()
+				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+						.setAuthor("Leetifier", null, avatarUrl)
+						.setDescription(String.format("**Original**%n%s%n%n**Leetified**%n%s", arg, text) ))
+				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.then();
 	}
 
 	@Override
