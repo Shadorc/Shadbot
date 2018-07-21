@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.listener;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Optional;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -40,9 +39,7 @@ public class MessageCreateListener {
 				.switchIfEmpty(Mono.fromRunnable(() -> MessageCreateListener.onPrivateMessage(event)))
 				// The channel is allowed
 				.filter(channel -> BotUtils.isChannelAllowed(guildId.get(), channel.getId()))
-				.flatMapMany(channel -> event.getMember().get().getRoles().buffer())
-				.defaultIfEmpty(Collections.emptyList())
-				.single()
+				.flatMapMany(channel -> event.getMember().get().getRoles().collectList())
 				// The role is allowed
 				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
 				// The message has not been intercepted
@@ -74,7 +71,7 @@ public class MessageCreateListener {
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.take(25)
-				.buffer()
+				.collectList()
 				.map(list -> !list.stream().anyMatch(text::equalsIgnoreCase))
 				.defaultIfEmpty(true)
 				.flatMap(send -> send ? BotUtils.sendMessage(text, event.getMessage().getChannel()) : Mono.empty())

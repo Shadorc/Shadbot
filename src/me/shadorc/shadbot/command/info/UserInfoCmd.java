@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.info;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,7 +38,7 @@ public class UserInfoCmd extends AbstractCommand {
 
 		return Mono.zip(context.getMessage().getUserMentions().switchIfEmpty(context.getAuthor()).single(),
 				member.getPresence(),
-				member.getRoles().buffer().singleOrEmpty().defaultIfEmpty(Collections.emptyList()),
+				member.getRoles().collectList(),
 				context.getAvatarUrl())
 				.map(tuple4 -> {
 					final User user = tuple4.getT1();
@@ -72,7 +71,7 @@ public class UserInfoCmd extends AbstractCommand {
 						embed.addField("Playing text", presence.getActivity().flatMap(Activity::getDetails).get(), true);
 					}
 
-					return new EmbedCreateSpec();
+					return embed;
 				})
 				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
 				.then();

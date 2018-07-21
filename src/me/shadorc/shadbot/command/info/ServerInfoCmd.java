@@ -58,24 +58,21 @@ public class ServerInfoCmd extends AbstractCommand {
 
 		final Mono<Void> allowedChannelsStr = Flux.fromIterable(dbGuild.getAllowedChannels())
 				.flatMap(context.getClient()::getTextChannelById)
-				.buffer()
-				.singleOrEmpty()
+				.collectList()
 				.map(channels -> settingsStr.append(
 						String.format("%n**Allowed channels:**%n\t%s", FormatUtils.format(channels, TextChannel::getName, "\n\t"))))
 				.then();
 
 		final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getAutoRoles())
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-				.buffer()
-				.singleOrEmpty()
+				.collectList()
 				.map(roles -> settingsStr.append(
 						String.format("%n**Auto-roles:**%n\t%s", FormatUtils.format(roles, Role::getMention, "\n\t"))))
 				.then();
 
 		final Mono<Void> permissionsStr = Flux.fromIterable(dbGuild.getAllowedRoles())
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-				.buffer()
-				.singleOrEmpty()
+				.collectList()
 				.map(roles -> settingsStr.append(
 						String.format("%n**Permissions:**%n\t%s", FormatUtils.format(roles, Role::getMention, "\n\t"))))
 				.then();

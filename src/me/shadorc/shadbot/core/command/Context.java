@@ -150,10 +150,7 @@ public class Context {
 	}
 
 	public String requireArg() {
-		if(!this.getArg().isPresent()) {
-			throw new MissingArgumentException();
-		}
-		return this.getArg().get();
+		return this.getArg().orElseThrow(() -> new MissingArgumentException());
 	}
 
 	public List<String> requireArgs(int count) {

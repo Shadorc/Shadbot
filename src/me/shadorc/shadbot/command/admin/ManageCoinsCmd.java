@@ -49,7 +49,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 		final Snowflake guildId = context.getGuildId();
 
 		return BotUtils.getUsersFrom(context.getMessage())
-				.buffer()
+				.collectList()
 				.map(users -> {
 					String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(users, User::getUsername, ", ");
 					switch (action) {

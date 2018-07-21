@@ -59,7 +59,7 @@
 // throw new CommandException("You cannot kick yourself.");
 // }
 //
-// context.getMessage().getUserMentions().buffer().subscribe(mentionedUsers -> {
+// context.getMessage().getUserMentions().collectList().subscribe(mentionedUsers -> {
 //
 // StringBuilder reason = new StringBuilder();
 // reason.append(StringUtils.remove(context.getArg().get(),

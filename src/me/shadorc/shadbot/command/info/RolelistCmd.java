@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.info;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import discord4j.core.object.entity.Guild;
@@ -32,8 +33,9 @@ public class RolelistCmd extends AbstractCommand {
 			throw new MissingArgumentException();
 		}
 
-		final Flux<Role> roles = Flux.fromIterable(roleIds)
-				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId));
+		final Mono<List<Role>> roles = Flux.fromIterable(roleIds)
+				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
+				.collectList();
 
 		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 				.setAuthor("Role List", null, null);
@@ -42,8 +44,8 @@ public class RolelistCmd extends AbstractCommand {
 				.flatMapMany(Guild::getMembers)
 				.filter(member -> !Collections.disjoint(member.getRoleIds(), roleIds))
 				.map(User::getUsername)
-				.buffer()
-				.zipWith(roles.buffer())
+				.collectList()
+				.zipWith(roles)
 				.map(membersAndRoles -> {
 					FormatUtils.createColumns(membersAndRoles.getT1(), 25).stream()
 							.forEach(field -> embed.addField(field.getName(), field.getValue(), false));

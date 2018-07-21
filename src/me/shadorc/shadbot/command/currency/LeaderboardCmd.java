@@ -28,8 +28,7 @@ public class LeaderboardCmd extends AbstractCommand {
 				.take(10)
 				.flatMap(dbMember -> context.getClient().getUserById(dbMember.getId())
 						.zipWith(Mono.just(dbMember.getCoins())))
-				.buffer()
-				.singleOrEmpty()
+				.collectList()
 				.map(list -> FormatUtils.numberedList(10, list.size(),
 						count -> {
 							final Tuple2<User, Integer> userAndCoins = list.get(count - 1);

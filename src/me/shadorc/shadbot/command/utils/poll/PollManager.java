@@ -91,7 +91,7 @@
 // Flux.fromIterable(this.voters)
 // .filter(voter -> voter.getChoice().equals(choice))
 // .flatMap(voter -> this.getContext().getClient().getUserById(voter.getId()))
-// .buffer()
+// .collectList()
 // .subscribe(users -> {
 // // FIXME: Do this inside a subscribe method is probably a very bad idea
 // representation.append(String.format(" *(Vote: %d)*", users.size()));
