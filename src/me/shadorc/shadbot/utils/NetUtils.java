@@ -83,9 +83,12 @@ public class NetUtils {
 	/**
 	 * @param str - the string to encode as UTF-8
 	 * @return The string encoded as UTF-8
-	 * @throws UnsupportedEncodingException
+	 * @throws UnsupportedEncodingException If the named encoding is not supported
 	 */
 	public static String encode(String str) throws UnsupportedEncodingException {
+		if(str == null || str.isEmpty()) {
+			return str;
+		}
 		return URLEncoder.encode(str, "UTF-8");
 	}
 
