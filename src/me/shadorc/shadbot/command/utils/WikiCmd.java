@@ -65,6 +65,7 @@ public class WikiCmd extends AbstractCommand {
 							.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
 									String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
 									avatarUrl)
+							.setThumbnail("https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png")
 							.setDescription(extract))
 					.flatMap(loadingMsg::send)
 					.then();
