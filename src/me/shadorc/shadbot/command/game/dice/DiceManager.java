@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
@@ -14,6 +15,8 @@ import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
@@ -22,7 +25,7 @@ import me.shadorc.shadbot.utils.message.UpdateableMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class DiceManager extends AbstractGameManager {
+public class DiceManager extends AbstractGameManager implements MessageInterceptor {
 
 	private static final int GAME_DURATION = 30;
 
@@ -42,7 +45,44 @@ public class DiceManager extends AbstractGameManager {
 	@Override
 	public Mono<Void> start() {
 		this.schedule(() -> this.stop().subscribe(), GAME_DURATION, TimeUnit.SECONDS);
+		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		return Mono.empty();
+	}
+
+	@Override
+	public Mono<Void> stop() {
+		this.cancelScheduledTask();
+		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
+		DiceCmd.MANAGERS.remove(this.getContext().getChannelId());
+		return Mono.empty();
+	}
+
+	public Mono<Void> rollTheDice() {
+		int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
+		return Flux.fromIterable(numsPlayers.values())
+				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
+				.map(user -> {
+					int num = numsPlayers.keySet().stream()
+							.filter(number -> numsPlayers.get(number).equals(user.getId()))
+							.findFirst()
+							.get();
+					int gains = bet;
+
+					if(num == winningNum) {
+						gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
+						MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+					} else {
+						gains *= -1;
+						MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
+					}
+					DatabaseManager.getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
+					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
+				})
+				.collectList()
+				.map(list -> this.results = FormatUtils.format(list, Object::toString, "\n"))
+				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getContext().getChannel()))
+				.then(this.show())
+				.then(this.stop());
 	}
 
 	protected Mono<Message> show() {
@@ -72,39 +112,6 @@ public class DiceManager extends AbstractGameManager {
 				.flatMap(embed -> updateableMessage.send(embed));
 	}
 
-	@Override
-	public Mono<Void> stop() {
-		this.cancelScheduledTask();
-		DiceCmd.MANAGERS.remove(this.getContext().getChannelId());
-
-		int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
-
-		return Flux.fromIterable(numsPlayers.values())
-				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
-				.map(user -> {
-					int num = numsPlayers.keySet().stream()
-							.filter(number -> numsPlayers.get(number).equals(user.getId()))
-							.findFirst()
-							.get();
-					int gains = bet;
-
-					if(num == winningNum) {
-						gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
-						MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
-					} else {
-						gains *= -1;
-						MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
-					}
-					DatabaseManager.getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
-					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
-				})
-				.collectList()
-				.map(list -> this.results = FormatUtils.format(list, Object::toString, "\n"))
-				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getContext().getChannel()))
-				.then(this.show())
-				.then();
-	}
-
 	public int getBet() {
 		return bet;
 	}
@@ -124,5 +131,10 @@ public class DiceManager extends AbstractGameManager {
 
 	protected boolean isNumBet(int num) {
 		return numsPlayers.containsKey(num);
+	}
+
+	@Override
+	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
+		return this.processIfNotCancelled(event.getMessage(), Mono.empty());
 	}
 }
