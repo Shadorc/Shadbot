@@ -50,10 +50,10 @@ public abstract class AbstractGameManager {
 
 	/**
 	 * @param message - the {@link Message} to check
-	 * @param execution - the {@link Mono} to execute if the {@link Message} is not a cancel command
+	 * @param mono - the {@link Mono} to execute if the {@link Message} is not a cancel command
 	 * @return A {@link Mono} that returns true if the message is intercepted, false otherwise
 	 */
-	public Mono<Boolean> processIfNotCancelled(Message message, Mono<Boolean> execution) {
+	public Mono<Boolean> cancelOrDo(Message message, Mono<Boolean> mono) {
 		return Mono.just(message)
 				.filterWhen(msg -> this.isCancelCmd(msg))
 				.flatMap(msg -> msg.getAuthor())
@@ -63,7 +63,7 @@ public abstract class AbstractGameManager {
 				.flatMap(ignored -> this.stop())
 				// The message is intercepted, return true
 				.map(ignored -> Boolean.TRUE)
-				.switchIfEmpty(execution);
+				.switchIfEmpty(mono);
 	}
 
 	public boolean isTaskDone() {

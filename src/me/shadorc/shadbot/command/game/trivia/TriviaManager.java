@@ -121,7 +121,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		final Member member = event.getMember().get();
-		return this.processIfNotCancelled(event.getMessage(), Mono.just(event.getMessage().getContent().get())
+		return this.cancelOrDo(event.getMessage(), Mono.just(event.getMessage().getContent().get())
 				.flatMap(content -> {
 					// It's a number or a text
 					Integer choice = NumberUtils.asIntBetween(content, 1, answers.size());

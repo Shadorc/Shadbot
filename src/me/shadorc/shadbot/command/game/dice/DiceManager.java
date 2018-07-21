@@ -135,6 +135,6 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		return this.processIfNotCancelled(event.getMessage(), Mono.empty());
+		return this.cancelOrDo(event.getMessage(), Mono.empty());
 	}
 }

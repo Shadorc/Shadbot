@@ -155,7 +155,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		return this.processIfNotCancelled(event.getMessage(), Mono.empty());
+		return this.cancelOrDo(event.getMessage(), Mono.empty());
 	}
 
 }
