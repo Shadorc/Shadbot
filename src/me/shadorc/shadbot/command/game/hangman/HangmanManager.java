@@ -58,8 +58,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	@Override
 	public Mono<Void> start() {
-		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		this.schedule(() -> this.stop().subscribe(), IDLE_MIN, TimeUnit.MINUTES);
+		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		return this.show().then();
 	}
 

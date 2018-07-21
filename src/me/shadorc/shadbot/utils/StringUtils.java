@@ -102,7 +102,7 @@ public class StringUtils {
 
 	/**
 	 * @param text - the string to check
-	 * @return A {@link List} containing the quoted elements from {@code text} 
+	 * @return A {@link List} containing the quoted elements from {@code text}
 	 */
 	public static List<String> getQuotedElements(String text) {
 		List<String> matches = new ArrayList<>();

@@ -17,6 +17,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
 
@@ -51,8 +52,8 @@ public class SlotMachineCmd extends AbstractCommand {
 			MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
 		}
 
-		return BotUtils.sendMessage(String.format("%s%n(**%s**) You %s **%s** !",
-				FormatUtils.format(slots, SlotOptions::getEmoji, " "), context.getUsername(),
+		return BotUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",
+				FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername(),
 				gains > 0 ? "win" : "lose", FormatUtils.formatCoins(Math.abs(gains))), context.getChannel())
 				.then();
 	}

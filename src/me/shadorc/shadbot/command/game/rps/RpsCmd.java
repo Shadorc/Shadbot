@@ -14,6 +14,7 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
 
@@ -40,7 +41,7 @@ public class RpsCmd extends AbstractCommand {
 		if(userHandsign.equals(botHandsign)) {
 			strBuilder.append("It's a draw !");
 		} else if(userHandsign.isSuperior(botHandsign)) {
-			strBuilder.append(String.format("%s wins ! Well done, you won **%d coins**.", context.getUsername(), GAINS));
+			strBuilder.append(String.format(Emoji.BANK + " Well done, you won **%d coins**.", context.getUsername(), GAINS));
 			DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(GAINS);
 			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
 		} else {
