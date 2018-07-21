@@ -1,7 +1,10 @@
 package me.shadorc.shadbot.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -81,6 +84,34 @@ public class StringUtils {
 				.filter(replacement -> !replacement.isEmpty())
 				.map(Pattern::quote)
 				.collect(Collectors.joining("|")), "");
+	}
+
+	/**
+	 * The function returns the argument string with whitespace normalized by using {@link #trim(String)} to remove leading and trailing whitespace and
+	 * then replacing sequences of whitespace characters by a single space.
+	 * 
+	 * @param str - the source String to normalize whitespaces from, may be null
+	 * @return the modified string with whitespace normalized, {@code null} if null String input
+	 */
+	public static String normalizeSpace(String str) {
+		if(str == null || str.isEmpty()) {
+			return str;
+		}
+		return str.trim().replaceAll(" +", " ");
+	}
+
+	/**
+	 * @param text - the string to check
+	 * @return A {@link List} containing the quoted elements from {@code text} 
+	 */
+	public static List<String> getQuotedElements(String text) {
+		List<String> matches = new ArrayList<>();
+		Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(text);
+		while(matcher.find()) {
+			matches.add(matcher.group(1));
+		}
+		matches.removeAll(Collections.singleton(""));
+		return matches;
 	}
 
 }
