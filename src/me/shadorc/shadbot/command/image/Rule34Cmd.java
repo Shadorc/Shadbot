@@ -7,6 +7,7 @@ import org.json.XML;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.image.r34.R34Post;
+import me.shadorc.shadbot.api.image.r34.R34Posts;
 import me.shadorc.shadbot.api.image.r34.R34Response;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -47,21 +48,21 @@ public class Rule34Cmd extends AbstractCommand {
 								NetUtils.encode(arg.replace(" ", "_")));
 
 						R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
+						R34Posts posts = r34.getPosts();
 
-						if(r34.getCount() == 0) {
+						if(posts.getCount() == 0) {
 							return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
-									context.getUsername(), arg))
-									.then();
+									context.getUsername(), arg));
 						}
 
-						R34Post post = Utils.randValue(r34.getPosts());
+						R34Post post = Utils.randValue(posts.getPosts());
 
 						List<String> tags = StringUtils.split(post.getTags(), " ");
 						if(post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
-							return loadingMsg.send(Emoji.WARNING + " Sorry, I don't display images containing children or tagged with `loli` or `shota`.");
+							return loadingMsg.send(Emoji.WARNING + " I don't display images containing children or tagged with `loli` or `shota`.");
 						}
 
-						final String formattedtags = org.apache.commons.lang3.StringUtils.abbreviate(
+						final String formattedtags = org.apache.commons.lang3.StringUtils.truncate(
 								FormatUtils.format(tags, tag -> String.format("`%s`", tag), " "), MAX_TAGS_LENGTH);
 
 						return context.getAvatarUrl()
