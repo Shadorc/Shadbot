@@ -35,7 +35,7 @@ public class LyricsCmd extends AbstractCommand {
 	// Make html() preserve linebreaks and spacing
 	private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
 	private static final String HOME_URL = "https://www.musixmatch.com";
-	private static final int MAX_LYRICS_LENGTH = DiscordUtils.DESCRIPTION_CONTENT_LIMIT / 4;
+	private static final int MAX_LYRICS_LENGTH = DiscordUtils.DESCRIPTION_CONTENT_LIMIT / 2;
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -99,11 +99,10 @@ public class LyricsCmd extends AbstractCommand {
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Lyrics (%s - %s)", artist, title),
-									finalUrl,
-									avatarUrl)
+							.setAuthor(String.format("Lyrics (%s - %s)", artist, title), finalUrl, avatarUrl)
 							.setThumbnail(albumImg)
-							.setDescription(finalUrl + "\n\n" + lyrics))
+							.setDescription(lyrics)
+							.setFooter("Click on the title to see the full version", "https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png"))
 					.flatMap(loadingMsg::send)
 					.then();
 
