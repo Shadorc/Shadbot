@@ -79,7 +79,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
 				})
 				.collectList()
-				.map(list -> this.results = FormatUtils.format(list, Object::toString, "\n"))
+				.map(list -> this.results = String.join("\n", list))
 				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getContext().getChannel()))
 				.then(this.show())
 				.then(this.stop());
@@ -99,7 +99,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 							.setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 							.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
 									this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.formatCoins(bet)))
-							.addField("Player", FormatUtils.format(usernames, Object::toString, "\n"), true)
+							.addField("Player", String.join("\n", usernames), true)
 							.addField("Number", FormatUtils.format(numsPlayers.keySet(), Object::toString, "\n"), true)
 							.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
 

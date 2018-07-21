@@ -98,7 +98,7 @@ public class MoneyStatsManager {
 		Comparator<Entry<String, Tuple2<Float, Long>>> comparator = (v1, v2) -> v1.getValue().getT2().compareTo(v2.getValue().getT2());
 		Map<String, Tuple2<Float, Long>> sortedMap = Utils.sortByValue(averageMap, comparator.reversed());
 
-		return embed.addField("Name", FormatUtils.format(sortedMap.keySet().stream(), Object::toString, "\n"), true)
+		return embed.addField("Name", String.join("\n", sortedMap.keySet()), true)
 				.addField("Average", FormatUtils.format(sortedMap.values().stream().map(Tuple2::getT1), num -> FormatUtils.formatNum(num.intValue()), "\n"), true)
 				.addField("Count", FormatUtils.format(sortedMap.values().stream().map(Tuple2::getT2), num -> FormatUtils.formatNum(num), "\n"), true);
 	}

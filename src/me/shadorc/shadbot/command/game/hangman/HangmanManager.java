@@ -86,7 +86,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 							.addField("Word", this.getRepresentation(word), false);
 
 					if(!missedLetters.isEmpty()) {
-						embed.addField("Misses", FormatUtils.format(missedLetters, Object::toString, ", "), false);
+						embed.addField("Misses", String.join(", ", missedLetters), false);
 					}
 
 					if(this.isTaskDone()) {

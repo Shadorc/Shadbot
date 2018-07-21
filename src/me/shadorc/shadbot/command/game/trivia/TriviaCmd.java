@@ -48,7 +48,7 @@ public class TriviaCmd extends AbstractCommand {
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Trivia categories", null, avatarUrl)
 							.addField("ID", FormatUtils.format(categories.getIds(), id -> Integer.toString(id), "\n"), true)
-							.addField("Name", FormatUtils.format(categories.getNames(), Object::toString, "\n"), true))
+							.addField("Name", String.join("\n", categories.getNames()), true))
 					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
 					.then();
 		}

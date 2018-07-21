@@ -102,7 +102,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 					}
 				})
 				.collectSortedList()
-				.map(list -> this.results = FormatUtils.format(list, Object::toString, ", "))
+				.map(list -> this.results = String.join(", ", list))
 				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
 						winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"),
 						this.getContext().getChannel()))

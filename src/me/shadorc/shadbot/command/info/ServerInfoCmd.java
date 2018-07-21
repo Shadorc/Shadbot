@@ -52,8 +52,7 @@ public class ServerInfoCmd extends AbstractCommand {
 		}
 
 		if(!dbGuild.getBlacklistedCmd().isEmpty()) {
-			settingsStr.append(String.format("%n**Blacklisted commands:**%n\t%s",
-					FormatUtils.format(dbGuild.getBlacklistedCmd(), Object::toString, "\n\t")));
+			settingsStr.append(String.format("%n**Blacklisted commands:**%n\t%s", String.join("\n\t", dbGuild.getBlacklistedCmd())));
 		}
 
 		final Mono<Void> allowedChannelsStr = Flux.fromIterable(dbGuild.getAllowedChannels())
