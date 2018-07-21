@@ -75,7 +75,7 @@ public class MessageCreateListener {
 				.map(list -> !list.stream().anyMatch(text::equalsIgnoreCase))
 				.defaultIfEmpty(true)
 				.flatMap(send -> send ? BotUtils.sendMessage(text, event.getMessage().getChannel()) : Mono.empty())
-				.doOnError(err -> BotUtils.sendMessage(text, event.getMessage().getChannel()).subscribe())
+				.onErrorResume(err -> BotUtils.sendMessage(text, event.getMessage().getChannel()))
 				.then();
 	}
 }

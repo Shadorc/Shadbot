@@ -39,8 +39,13 @@ public class GatewayLifecycleListener {
 		DiscordUtils.registerListener(event.getClient(), MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
 		DiscordUtils.registerListener(event.getClient(), VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 
-		SchedulerUtils.scheduleAtFixedRate(() -> NetUtils.postStats(event.getClient()), 2, 2, TimeUnit.HOURS);
-		SchedulerUtils.scheduleAtFixedRate(() -> BotUtils.updatePresence(event.getClient()), 0, 30, TimeUnit.MINUTES);
+		SchedulerUtils.scheduleAtFixedRate(() -> NetUtils.postStats(event.getClient())
+				.doOnError(err -> LogUtils.error(event.getClient(), err, "An error occurred while posting statistics."))
+				.subscribe(), 2, 2, TimeUnit.HOURS);
+
+		SchedulerUtils.scheduleAtFixedRate(() -> BotUtils.updatePresence(event.getClient())
+				.doOnError(err -> LogUtils.error(event.getClient(), err, "An error occurred while updating presence."))
+				.subscribe(), 0, 30, TimeUnit.MINUTES);
 	}
 
 }

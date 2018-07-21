@@ -74,9 +74,9 @@ public class BotUtils {
 		}
 	}
 
-	public static void updatePresence(DiscordClient client) {
-		String text = String.format("%shelp | %s", Config.DEFAULT_PREFIX, TextUtils.getTip());
-		client.updatePresence(Presence.online(Activity.playing(text))).subscribe();
+	public static Mono<Void> updatePresence(DiscordClient client) {
+		return Mono.just(String.format("%shelp | %s", Config.DEFAULT_PREFIX, TextUtils.getTip()))
+				.flatMap(text -> client.updatePresence(Presence.online(Activity.playing(text))));
 	}
 
 	public static Flux<User> getUsersFrom(Message message) {

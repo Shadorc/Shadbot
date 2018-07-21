@@ -45,17 +45,20 @@ public class RouletteCmd extends AbstractCommand {
 					place, FormatUtils.format(Place.values(), value -> String.format("**%s**", value.toString().toLowerCase()), ", ")));
 		}
 
+		Mono<Void> startMono = Mono.empty();
+
 		RouletteManager rouletteManager = MANAGERS.putIfAbsent(context.getChannelId(), new RouletteManager(context));
 		if(rouletteManager == null) {
 			rouletteManager = MANAGERS.get(context.getChannelId());
-			rouletteManager.start().subscribe();
+			startMono = rouletteManager.start();
 		}
 
 		if(rouletteManager.addPlayer(context.getAuthorId(), bet, place)) {
-			return rouletteManager.show();
+			return startMono.then(rouletteManager.show());
 		} else {
-			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-					context.getUsername()), context.getChannel())
+			return startMono
+					.then(BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+							context.getUsername()), context.getChannel()))
 					.then();
 		}
 	}

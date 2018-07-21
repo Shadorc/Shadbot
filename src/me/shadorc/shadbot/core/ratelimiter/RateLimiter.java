@@ -55,16 +55,15 @@ public class RateLimiter {
 
 	private void sendWarningMessage(DiscordClient client, Snowflake channelId, Snowflake userId) {
 		client.getUserById(userId)
-				.flatMap(author -> {
+				.map(author -> {
 					final String username = author.getUsername();
 					final String message = TextUtils.getSpamMessage();
 					final String maxNum = StringUtils.pluralOf(max, "time");
 					final String durationStr = DurationFormatUtils.formatDurationWords(duration.toMillis(), true, true);
-					final String text = String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
+					return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
 							username, message, maxNum, durationStr);
-
-					return new TemporaryMessage(client, channelId, 10, TimeUnit.SECONDS).send(text);
 				})
+				.flatMap(text -> new TemporaryMessage(client, channelId, 10, TimeUnit.SECONDS).send(text))
 				.subscribe();
 	}
 

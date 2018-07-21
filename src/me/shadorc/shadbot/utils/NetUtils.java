@@ -21,6 +21,8 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
 
 public class NetUtils {
 
@@ -116,11 +118,11 @@ public class NetUtils {
 	/**
 	 * @param client - the client from which to post statistics
 	 */
-	public static void postStats(DiscordClient client) {
-		LogUtils.infof("{Shard %d} Posting statistics...", client.getConfig().getShardIndex());
-		NetUtils.postStatsOn("https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN, client);
-		NetUtils.postStatsOn("https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN, client);
-		LogUtils.infof("{Shard %d} Statistics posted.", client.getConfig().getShardIndex());
+	public static Mono<Void> postStats(DiscordClient client) {
+		return Mono.fromRunnable(() -> LogUtils.infof("{Shard %d} Posting statistics...", client.getConfig().getShardIndex()))
+				.then(NetUtils.postStatsOn(client, "https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN))
+				.then(NetUtils.postStatsOn(client, "https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN))
+				.then(Mono.fromRunnable(() -> LogUtils.infof("{Shard %d} Statistics posted.", client.getConfig().getShardIndex())));
 	}
 
 	/**
@@ -128,27 +130,27 @@ public class NetUtils {
 	 * @param token - the API token corresponding to the website
 	 * @param client - the client from which to post statistics
 	 */
-	private static void postStatsOn(String homeUrl, APIKey token, DiscordClient client) {
-		client.getGuilds().count().subscribe(guildsCount -> {
+	private static Mono<Void> postStatsOn(DiscordClient client, String homeUrl, APIKey token) {
+		return client.getGuilds().count()
+				.doOnSuccess(guildsCount -> {
+					final JSONObject content = new JSONObject()
+							.put("shard_id", client.getConfig().getShardIndex())
+							.put("shard_count", client.getConfig().getShardCount())
+							.put("server_count", guildsCount);
+					final String url = String.format("%s/api/bots/%d/stats", homeUrl, client.getSelfId().get().asLong());
 
-			final JSONObject content = new JSONObject()
-					.put("shard_id", client.getConfig().getShardIndex())
-					.put("shard_count", client.getConfig().getShardCount())
-					.put("server_count", guildsCount);
-			final String url = String.format("%s/api/bots/%d/stats", homeUrl, client.getSelfId().get().asLong());
-
-			try {
-				Jsoup.connect(url)
-						.method(Method.POST)
-						.ignoreContentType(true)
-						.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
-						.requestBody(content.toString())
-						.post();
-			} catch (IOException err) {
-				LogUtils.infof("An error occurred while posting statistics of shard %d. (%s: %s).",
-						client.getConfig().getShardIndex(), err.getClass().getSimpleName(), err.getMessage());
-			}
-		});
+					try {
+						Jsoup.connect(url)
+								.method(Method.POST)
+								.ignoreContentType(true)
+								.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
+								.requestBody(content.toString())
+								.post();
+					} catch (IOException err) {
+						Exceptions.propagate(err);
+					}
+				})
+				.then();
 	}
 
 }

@@ -76,15 +76,15 @@ public class GuildMusic {
 						isInVoiceChannel.set(true);
 						return controller.connect(audioProvider, audioReceiver);
 					})
-					.doOnError(err -> {
-						BotUtils.sendMessage(Emoji.RED_FLAG + "Sorry, something went wrong during the connection to the voice channel... "
-								+ "My developer has been warned.",
-								this.getMessageChannel())
-								.subscribe();
-						LogUtils.error(client, err,
-								String.format("{%d} An unknown error occurred while joining a voice channel.", guildId.asLong()));
+					.onErrorResume(err -> {
 						// FIXME: this does not work
 						this.leaveVoiceChannel();
+						LogUtils.error(client, err,
+								String.format("{%d} An unknown error occurred while joining a voice channel.", guildId.asLong()));
+						return BotUtils.sendMessage(
+								Emoji.RED_FLAG + "Sorry, something went wrong during the connection to the voice channel... My developer has been warned.",
+								this.getMessageChannel())
+								.then();
 					})
 					.subscribe();
 		}
