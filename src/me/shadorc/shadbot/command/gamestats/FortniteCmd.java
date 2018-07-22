@@ -170,7 +170,7 @@
 // public Mono<EmbedCreateSpec> getHelp(Context context) {
 // return new HelpBuilder(this, context)
 // .setDescription("Show player's stats for Fortnite.")
-// .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.values(), region -> region.toString().toLowerCase(), ", ")),
+// .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")),
 // false)
 // .addArg("epic-nickname", false)
 // .setExample(String.format("`%s%s pc Shadbot`", context.getPrefix(), this.getName()))

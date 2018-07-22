@@ -99,8 +99,7 @@ public class HangmanCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Start a Hangman game.")
-				.addArg("difficulty", String.format("%s. The difficulty of the word to find",
-						FormatUtils.format(Difficulty.values(), value -> value.toString().toLowerCase(), "/")), true)
+				.addArg("difficulty", String.format("%s. The difficulty of the word to find", FormatUtils.format(Difficulty.class, "/")), true)
 				.setGains("The winner gets **%d coins** plus a bonus depending on the number of errors.", HangmanManager.MIN_GAINS)
 				.build();
 	}

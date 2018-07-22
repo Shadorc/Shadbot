@@ -79,8 +79,8 @@
 // return EmbedUtils.getDefaultEmbed()
 // .addField("Usage", String.format("`%s%s <action> <#channel(s)>`", prefix, this.getCmdName()), false)
 // .addField("Argument", String.format("**action** - %s%n**channel(s)** - the channel(s) to %s",
-// FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/"),
-// FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/")), false)
+// FormatUtils.format(Action.class, "/"),
+// FormatUtils.format(Action.class, "/")), false)
 // .addField("Example", String.format("`%s%s add #general`", prefix, this.getCmdName()), false);
 // }
 //

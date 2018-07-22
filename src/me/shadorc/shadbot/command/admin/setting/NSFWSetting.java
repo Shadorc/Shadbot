@@ -62,7 +62,7 @@
 // return EmbedUtils.getDefaultEmbed()
 // .addField("Usage", String.format("`%s%s <action>`", prefix, this.getCmdName()), false)
 // .addField("Argument", String.format("**action** - %s",
-// FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/")), false)
+// FormatUtils.format(Action.class, "/")), false)
 // .addField("Example", String.format("`%s%s toggle`", prefix, this.getCmdName()), false);
 // }
 //

@@ -96,8 +96,7 @@ public class OverwatchCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Overwatch.")
-				.addArg("platform", String.format("user's platform (%s)",
-						FormatUtils.format(Platform.values(), platform -> platform.toString().toLowerCase(), ", ")), true)
+				.addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")), true)
 				.addArg("battletag#0000", false)
 				.addField("Info", "**platform** is automatically detected if nothing is specified.", false)
 				.build();

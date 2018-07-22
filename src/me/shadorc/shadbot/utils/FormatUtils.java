@@ -35,6 +35,10 @@ public class FormatUtils {
 		return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
 	}
 
+	public static <T extends Enum<T>> String format(Class<T> enumClass, String delimiter) {
+		return FormatUtils.format(enumClass.getEnumConstants(), value -> value.toString().toLowerCase(), delimiter);
+	}
+
 	public static <T extends Enum<T>> String formatOptions(Class<T> enumClass) {
 		return String.format("Options: %s",
 				FormatUtils.format(enumClass.getEnumConstants(),

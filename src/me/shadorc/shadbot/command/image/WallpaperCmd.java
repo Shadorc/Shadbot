@@ -64,8 +64,8 @@ public class WallpaperCmd extends AbstractCommand {
 		}
 
 		Options options = new Options();
-		options.addOption("p", PURITY, true, FormatUtils.format(Purity.values(), purity -> purity.toString().toLowerCase(), ", "));
-		options.addOption("c", CATEGORY, true, FormatUtils.format(Category.values(), cat -> cat.toString().toLowerCase(), ", "));
+		options.addOption("p", PURITY, true, FormatUtils.format(Purity.class, ", "));
+		options.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
 
 		Option ratioOpt = new Option("rat", RATIO, true, "image ratio");
 		ratioOpt.setValueSeparator('x');
@@ -179,8 +179,8 @@ public class WallpaperCmd extends AbstractCommand {
 		return new HelpBuilder(this, context)
 				.setDescription("Search for a wallpaper.")
 				.setUsage(String.format("[-p %s] [-c %s] [-rat %s] [-res %s] [-k %s]", PURITY, CATEGORY, RATIO, RESOLUTION, KEYWORD))
-				.addArg(PURITY, FormatUtils.format(Purity.values(), purity -> purity.toString().toLowerCase(), ", "), true)
-				.addArg(CATEGORY, FormatUtils.format(Category.values(), cat -> cat.toString().toLowerCase(), ", "), true)
+				.addArg(PURITY, FormatUtils.format(Purity.class, ", "), true)
+				.addArg(CATEGORY, FormatUtils.format(Category.class, ", "), true)
 				.addArg(RATIO, "image ratio (e.g. 16x9)", true)
 				.addArg(RESOLUTION, "image resolution (e.g. 1920x1080)", true)
 				.addArg(KEYWORD, "keywords (e.g. doom,game)", true)

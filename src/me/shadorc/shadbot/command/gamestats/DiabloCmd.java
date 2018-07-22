@@ -107,7 +107,7 @@ public class DiabloCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Diablo 3.")
-				.addArg("region", String.format("user's region (%s)", FormatUtils.format(Region.values(), region -> region.toString().toLowerCase(), ", ")), false)
+				.addArg("region", String.format("user's region (%s)", FormatUtils.format(Region.class, ", ")), false)
 				.addArg("battletag#0000", false)
 				.setExample(String.format("`%s%s eu Shadbot#1758`", context.getPrefix(), this.getName()))
 				.build();

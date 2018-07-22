@@ -121,8 +121,8 @@
 // .addField("Argument", String.format("**action** - %s"
 // + "%n**type** - %s"
 // + "%n**value** - a message for *%s* and *%s* or a @channel for *%s*",
-// FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), "/"),
-// FormatUtils.format(Type.values(), type -> type.toString().toLowerCase(), "/"),
+// FormatUtils.format(Action.class, "/"),
+// FormatUtils.format(Type.class, "/"),
 // Type.JOIN_MESSAGE.toString().toLowerCase(),
 // Type.LEAVE_MESSAGE.toString().toLowerCase(),
 // Type.CHANNEL.toString().toLowerCase()), false)

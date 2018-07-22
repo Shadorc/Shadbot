@@ -68,8 +68,7 @@ public class RouletteCmd extends AbstractCommand {
 		return new HelpBuilder(this, context)
 				.setDescription("Play a roulette game in which everyone can participate.")
 				.addArg("bet", false)
-				.addArg("place", String.format("number between 1 and 36, %s",
-						FormatUtils.format(Place.values(), value -> value.toString().toLowerCase(), ", ")), false)
+				.addArg("place", String.format("number between 1 and 36, %s", FormatUtils.format(Place.class, ", ")), false)
 				.addField("Info", "**low** - numbers between 1 and 18"
 						+ "\n**high** - numbers between 19 and 36", false)
 				.build();

@@ -74,7 +74,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Manage user(s) coins.")
-				.addArg("action", FormatUtils.format(Action.values(), action -> action.toString().toLowerCase(), " / "), false)
+				.addArg("action", FormatUtils.format(Action.class, " / "), false)
 				.addArg("coins", "can be positive or negative", true)
 				.addArg("@user(s)/@role(s)", false)
 				.setExample(String.format("`%s%s add 150 @Shadbot`%n`%s%s reset @Shadbot`",
