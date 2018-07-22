@@ -27,7 +27,7 @@ public class DiscordUtils {
 	public static final int MAX_REASON_LENGTH = 512;
 
 	public static String getChannelMention(Snowflake channelId) {
-		return "<#" + channelId + ">";
+		return "<#" + channelId.asLong() + ">";
 	}
 
 	public static Mono<String> getAuthorAvatarUrl(Mono<User> author) {
