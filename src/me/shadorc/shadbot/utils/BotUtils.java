@@ -52,25 +52,23 @@ public class BotUtils {
 				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT));
 	}
 
-	// TODO: Documentation
 	/**
-	 * @param channel
-	 * @param messages
+	 * @param channel - the channel containing the messages to delete
+	 * @param messages - the {@link List} of messages to delete
 	 * @return The number of deleted messages
 	 */
-	public static Mono<Long> deleteMessages(TextChannel channel, List<Message> messages) {
+	public static Mono<Integer> bulkDelete(Mono<TextChannel> channel, List<Message> messages) {
 		switch (messages.size()) {
 			case 0:
-				return Mono.just(0L);
+				return Mono.just(messages.size());
 			case 1:
-				return messages.get(0).delete().flatMap(message -> {
-					return Mono.just(1L);
-				});
+				return messages.get(0).delete().thenReturn(messages.size());
 			default:
-				return channel.bulkDelete(Flux.fromIterable(messages)
-						.map(Message::getId))
-						.collectList()
-						.flatMap(list -> Mono.just((long) (messages.size() - list.size())));
+				return channel
+						.flatMap(channelItr -> channelItr.bulkDelete(Flux.fromIterable(messages)
+								.map(Message::getId))
+								.collectList()
+								.map(messagesNotDeleted -> messages.size() - messagesNotDeleted.size()));
 		}
 	}
 
