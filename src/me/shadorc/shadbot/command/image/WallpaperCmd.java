@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.image;
 
 import java.awt.Dimension;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -17,7 +16,7 @@ import com.ivkos.wallhaven4j.models.misc.Resolution;
 import com.ivkos.wallhaven4j.models.misc.enums.Category;
 import com.ivkos.wallhaven4j.models.misc.enums.Purity;
 import com.ivkos.wallhaven4j.models.wallpaper.Wallpaper;
-import com.ivkos.wallhaven4j.util.exceptions.ConnectionException;
+import com.ivkos.wallhaven4j.util.exceptions.WallhavenException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -45,8 +44,6 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.IMAGE, names = { "wallpaper" }, alias = "wp")
 public class WallpaperCmd extends AbstractCommand {
 
-	// TODO: I don't like this class at all, this is a fucking mess
-
 	private final static String PURITY = "purity";
 	private final static String CATEGORY = "category";
 	private final static String RATIO = "ratio";
@@ -64,20 +61,21 @@ public class WallpaperCmd extends AbstractCommand {
 		}
 
 		Options options = new Options();
+
 		options.addOption("p", PURITY, true, FormatUtils.format(Purity.class, ", "));
 		options.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
 
-		Option ratioOpt = new Option("rat", RATIO, true, "image ratio");
-		ratioOpt.setValueSeparator('x');
-		options.addOption(ratioOpt);
+		Option ratioOption = new Option("rat", RATIO, true, "image ratio");
+		ratioOption.setValueSeparator('x');
+		options.addOption(ratioOption);
 
-		Option resOpt = new Option("res", RESOLUTION, true, "image resolution");
-		resOpt.setValueSeparator('x');
-		options.addOption(resOpt);
+		Option resOption = new Option("res", RESOLUTION, true, "image resolution");
+		resOption.setValueSeparator('x');
+		options.addOption(resOption);
 
-		Option keyOpt = new Option("k", KEYWORD, true, KEYWORD);
-		keyOpt.setValueSeparator(',');
-		options.addOption(keyOpt);
+		Option keyOption = new Option("k", KEYWORD, true, KEYWORD);
+		keyOption.setValueSeparator(',');
+		options.addOption(keyOption);
 
 		CommandLine cmdLine;
 		try {
@@ -129,8 +127,9 @@ public class WallpaperCmd extends AbstractCommand {
 									.then();
 						}
 
-						Wallpaper wallpaper = wallpapers.get(ThreadLocalRandom.current().nextInt(wallpapers.size()));
-						String tags = FormatUtils.format(wallpaper.getTags(), tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
+						Wallpaper wallpaper = Utils.randValue(wallpapers);
+						String tags = FormatUtils.format(wallpaper.getTags(),
+								tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 
 						return context.getAvatarUrl()
 								.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
@@ -140,9 +139,9 @@ public class WallpaperCmd extends AbstractCommand {
 										.addField("Tags", tags, false))
 								.flatMap(loadingMsg::send)
 								.then();
-					} catch (ConnectionException err) {
+					} catch (WallhavenException err) {
 						loadingMsg.stopTyping();
-						throw Exceptions.propagate(err);
+						throw Exceptions.propagate(err.getCause() == null ? err : err.getCause());
 					}
 				});
 	}
