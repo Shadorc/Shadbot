@@ -16,6 +16,7 @@ import discord4j.core.object.util.Image;
 import discord4j.core.object.util.Image.Format;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
@@ -25,6 +26,26 @@ public class DiscordUtils {
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
+
+	public static Mono<Snowflake> requireSameVoiceChannel(Mono<Member> bot, Mono<Member> member) {
+		return DiscordUtils.getVoiceChannelId(bot)
+				.zipWith(DiscordUtils.getVoiceChannelId(member))
+				.map(tuple -> {
+					final Optional<Snowflake> botVoiceChannelId = tuple.getT1();
+					final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
+
+					if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
+						throw new CommandException("Join a voice channel before using this command.");
+					}
+
+					if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
+						throw new CommandException(String.format("I'm currently playing music in voice channel %s"
+								+ ", join me before using this command.", DiscordUtils.getChannelMention(tuple.getT1().get())));
+					}
+
+					return userVoiceChannelId.get();
+				});
+	}
 
 	public static String getChannelMention(Snowflake channelId) {
 		return "<#" + channelId.asLong() + ">";

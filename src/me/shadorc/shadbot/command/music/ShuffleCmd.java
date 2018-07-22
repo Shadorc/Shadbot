@@ -8,6 +8,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
@@ -19,12 +20,15 @@ public class ShuffleCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
-		guildMusic.getScheduler().shufflePlaylist();
 
-		return BotUtils.sendMessage(
-				String.format(Emoji.CHECK_MARK + " Playlist shuffled by **%s**.", context.getUsername()),
-				context.getChannel())
-				.then();
+		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+				.flatMap(voiceChannelId -> {
+					guildMusic.getScheduler().shufflePlaylist();
+
+					return BotUtils.sendMessage(
+							String.format(Emoji.CHECK_MARK + " Playlist shuffled by **%s**.", context.getUsername()), context.getChannel())
+							.then();
+				});
 	}
 
 	@Override

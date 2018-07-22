@@ -11,6 +11,7 @@ import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.TrackScheduler;
 import me.shadorc.shadbot.music.TrackScheduler.RepeatMode;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -24,29 +25,33 @@ public class RepeatCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 
-		RepeatMode mode;
-		if(context.getArg().isPresent()) {
-			mode = Utils.getEnum(RepeatMode.class, context.getArg().get());
-			if(mode == null) {
-				throw new CommandException(String.format("`%s` is not a valid mode.", context.getArg().get()));
-			}
-		}
-		// By default, modifications are made on song repeat mode
-		else {
-			mode = RepeatMode.SONG;
-		}
+		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+				.flatMap(voiceChannelId -> {
 
-		final TrackScheduler scheduler = guildMusic.getScheduler();
+					RepeatMode mode;
+					if(context.getArg().isPresent()) {
+						mode = Utils.getEnum(RepeatMode.class, context.getArg().get());
+						if(mode == null) {
+							throw new CommandException(String.format("`%s` is not a valid mode.", context.getArg().get()));
+						}
+					}
+					// By default, modifications are made on song repeat mode
+					else {
+						mode = RepeatMode.SONG;
+					}
 
-		scheduler.setRepeatMode(scheduler.getRepeatMode().equals(mode) ? RepeatMode.NONE : mode);
+					final TrackScheduler scheduler = guildMusic.getScheduler();
 
-		final Emoji emoji = scheduler.getRepeatMode().equals(RepeatMode.NONE) ? Emoji.PLAY : Emoji.REPEAT;
-		final String playlistRepetition = RepeatMode.PLAYLIST.equals(mode) ? "Playlist " : "";
-		final String modeStr = scheduler.getRepeatMode().equals(RepeatMode.NONE) ? "disabled" : "enabled";
+					scheduler.setRepeatMode(scheduler.getRepeatMode().equals(mode) ? RepeatMode.NONE : mode);
 
-		return BotUtils.sendMessage(String.format("%s %sRepetition %s by **%s**.",
-				emoji, playlistRepetition, modeStr, context.getUsername()), context.getChannel())
-				.then();
+					final Emoji emoji = scheduler.getRepeatMode().equals(RepeatMode.NONE) ? Emoji.PLAY : Emoji.REPEAT;
+					final String playlistRepetition = RepeatMode.PLAYLIST.equals(mode) ? "Playlist " : "";
+					final String modeStr = scheduler.getRepeatMode().equals(RepeatMode.NONE) ? "disabled" : "enabled";
+
+					return BotUtils.sendMessage(String.format("%s %sRepetition %s by **%s**.",
+							emoji, playlistRepetition, modeStr, context.getUsername()), context.getChannel())
+							.then();
+				});
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package me.shadorc.shadbot.command.music;
 
-import java.util.Optional;
-
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -34,25 +32,8 @@ public class PlayCmd extends AbstractCommand {
 		final String arg = context.requireArg();
 		final Snowflake guildId = context.getGuildId();
 
-		return DiscordUtils.getVoiceChannelId(context.getMember())
-				.zipWith(DiscordUtils.getVoiceChannelId(context.getSelf().flatMap(user -> user.asMember(guildId))))
-				.flatMap(authorAndSelf -> {
-
-					final Optional<Snowflake> authorChannelId = authorAndSelf.getT1();
-					final Optional<Snowflake> botChannelId = authorAndSelf.getT2();
-
-					// If the bot is in a voice channel and the user is not in a channel or not in the same
-					if(botChannelId.isPresent() && !authorChannelId.map(botChannelId.get()::equals).orElse(false)) {
-						return context.getClient().getVoiceChannelById(botChannelId.get()).map(voiceChannel -> {
-							throw new CommandException(String.format("I'm currently playing music in voice channel %s"
-									+ ", join me before using this command.", DiscordUtils.getChannelMention(voiceChannel.getId())));
-						});
-					}
-
-					if(!authorChannelId.isPresent()) {
-						throw new CommandException("Join a voice channel before using this command.");
-					}
-
+		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+				.flatMap(voiceChannelId -> {
 					/*
 					 * TODO: This need to be managed when joining a voice channel if(!botChannelId.isPresent() && !DiscordU.hasPermissions(userVoiceChannel,
 					 * Permissions.VOICE_CONNECT, Permissions.VOICE_SPEAK)) { BotUtils.sendMessage(TextUtils.missingPerm(Permissions.VOICE_CONNECT,
@@ -98,7 +79,7 @@ public class PlayCmd extends AbstractCommand {
 
 					final boolean putFirst = context.getCommandName().endsWith("first");
 					AudioLoadResultListener resultListener = new AudioLoadResultListener(
-							guildMusic, context.getAuthorId(), authorChannelId.get(), identifier, putFirst);
+							guildMusic, context.getAuthorId(), voiceChannelId, identifier, putFirst);
 					GuildMusicManager.AUDIO_PLAYER_MANAGER.loadItemOrdered(guildMusic, identifier, resultListener);
 
 					return Mono.empty();

@@ -10,6 +10,7 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.TrackScheduler;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -23,25 +24,28 @@ public class VolumeCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 
-		final TrackScheduler scheduler = guildMusic.getScheduler();
-		if(!context.getArg().isPresent()) {
-			return BotUtils.sendMessage(String.format(Emoji.SOUND + " Current volume level: **%d%%**",
-					scheduler.getAudioPlayer().getVolume()),
-					context.getChannel())
-					.then();
-		}
+		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+				.flatMap(voiceChannelId -> {
+					final TrackScheduler scheduler = guildMusic.getScheduler();
+					if(!context.getArg().isPresent()) {
+						return BotUtils.sendMessage(String.format(Emoji.SOUND + " Current volume level: **%d%%**",
+								scheduler.getAudioPlayer().getVolume()),
+								context.getChannel())
+								.then();
+					}
 
-		final String arg = context.getArg().get();
-		Integer volume = NumberUtils.asPositiveInt(arg);
-		if(volume == null) {
-			throw new CommandException(String.format("`%s` is not a valid volume.", arg));
-		}
+					final String arg = context.getArg().get();
+					Integer volume = NumberUtils.asPositiveInt(arg);
+					if(volume == null) {
+						throw new CommandException(String.format("`%s` is not a valid volume.", arg));
+					}
 
-		scheduler.setVolume(volume);
-		return BotUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
-				scheduler.getAudioPlayer().getVolume(), context.getUsername()),
-				context.getChannel())
-				.then();
+					scheduler.setVolume(volume);
+					return BotUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
+							scheduler.getAudioPlayer().getVolume(), context.getUsername()),
+							context.getChannel())
+							.then();
+				});
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
@@ -22,16 +23,20 @@ public class PauseCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 		final AudioPlayer audioPlayer = guildMusic.getScheduler().getAudioPlayer();
-		audioPlayer.setPaused(!audioPlayer.isPaused());
 
-		String message;
-		if(audioPlayer.isPaused()) {
-			message = String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getUsername());
-		} else {
-			message = String.format(Emoji.PLAY + " Music resumed by **%s**.", context.getUsername());
-		}
+		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+				.flatMap(voiceChannelId -> {
+					audioPlayer.setPaused(!audioPlayer.isPaused());
 
-		return BotUtils.sendMessage(message, context.getChannel()).then();
+					String message;
+					if(audioPlayer.isPaused()) {
+						message = String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getUsername());
+					} else {
+						message = String.format(Emoji.PLAY + " Music resumed by **%s**.", context.getUsername());
+					}
+
+					return BotUtils.sendMessage(message, context.getChannel()).then();
+				});
 	}
 
 	@Override
