@@ -45,7 +45,7 @@ public class PlayCmd extends AbstractCommand {
 					if(botChannelId.isPresent() && !authorChannelId.map(botChannelId.get()::equals).orElse(false)) {
 						return context.getClient().getVoiceChannelById(botChannelId.get()).map(voiceChannel -> {
 							throw new CommandException(String.format("I'm currently playing music in voice channel %s"
-									+ ", join me before using this command.", voiceChannel.getName())); // TODO: change getName to getMention
+									+ ", join me before using this command.", DiscordUtils.getChannelMention(voiceChannel.getId())));
 						});
 					}
 

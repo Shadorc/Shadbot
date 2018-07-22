@@ -26,6 +26,10 @@ public class DiscordUtils {
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
 
+	public static String getChannelMention(Snowflake channelId) {
+		return "<#" + channelId + ">";
+	}
+
 	public static Mono<String> getAuthorAvatarUrl(Mono<User> author) {
 		return author.map(user -> user.getAvatar(Format.JPEG))
 				.map(image -> image.map(Image::getUrl))
