@@ -12,7 +12,6 @@ import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Image;
 import discord4j.core.object.util.Image.Format;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
@@ -51,11 +50,12 @@ public class DiscordUtils {
 		return "<#" + channelId.asLong() + ">";
 	}
 
-	public static Mono<String> getAuthorAvatarUrl(Mono<User> author) {
-		return author.map(user -> user.getAvatar(Format.JPEG))
-				.map(image -> image.map(Image::getUrl))
-				.map(url -> url.orElse("https://avatars0.githubusercontent.com/u/6373756?s=460&v=4"));
+	public static Mono<String> getAvatarUrl(Mono<User> user) {
+		return user.map(DiscordUtils::getAvatarUrl);
+	}
 
+	public static String getAvatarUrl(User user) {
+		return user.getAvatarUrl(Format.JPEG).orElse(user.getDefaultAvatarUrl());
 	}
 
 	public static Instant getSnowflakeTimeFromID(Snowflake id) {

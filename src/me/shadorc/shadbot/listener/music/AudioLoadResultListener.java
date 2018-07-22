@@ -85,7 +85,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					count -> String.format("\t**%d.** %s",
 							count, FormatUtils.formatTrackName(tracks.get(count - 1).getInfo())));
 
-			DiscordUtils.getAuthorAvatarUrl(guildMusic.getClient().getUserById(guildMusic.getDjId()))
+			DiscordUtils.getAvatarUrl(guildMusic.getClient().getUserById(guildMusic.getDjId()))
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Music results", null, avatarUrl)
 							.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")

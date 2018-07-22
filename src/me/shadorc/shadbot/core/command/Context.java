@@ -122,7 +122,7 @@ public class Context {
 	}
 
 	public Mono<String> getAvatarUrl() {
-		return DiscordUtils.getAuthorAvatarUrl(this.getAuthor());
+		return DiscordUtils.getAvatarUrl(this.getAuthor());
 	}
 
 	public Mono<CommandPermission> getPermission() {

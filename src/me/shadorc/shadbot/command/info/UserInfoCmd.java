@@ -9,7 +9,6 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
-import discord4j.core.object.util.Image.Format;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -56,7 +55,7 @@ public class UserInfoCmd extends AbstractCommand {
 
 					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Info about user \"%s\"%s", user.getUsername(), user.isBot() ? " (Bot)" : ""), null, avatarUrl)
-							.setThumbnail(user.getAvatar(Format.JPEG).get().getUrl())
+							.setThumbnail(DiscordUtils.getAvatarUrl(user))
 							.addField("Display name", member.getDisplayName(), true)
 							.addField("User ID", user.getId().asString(), true)
 							.addField("Creation date", creationDate, true)

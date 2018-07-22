@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" })
 public class PruneCmd extends AbstractCommand {
-	
+
 	private static int MAX = 250;
 
 	@Override

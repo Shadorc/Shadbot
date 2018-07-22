@@ -93,7 +93,7 @@ public class ServerInfoCmd extends AbstractCommand {
 
 					return EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Info about \"%s\"", guild.getName()), null, null)
-							.setThumbnail(guild.getIcon(Format.JPEG).get().getUrl())
+							.setThumbnail(guild.getIconUrl(Format.JPEG).get())
 							.addField("Owner", owner.getUsername(), true)
 							.addField("Server ID", guild.getId().asString(), true)
 							.addField("Creation date", creationDate, true)
