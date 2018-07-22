@@ -23,10 +23,13 @@ import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" })
 public class PruneCmd extends AbstractCommand {
+	
+	private static int MAX = 250;
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -40,6 +43,8 @@ public class PruneCmd extends AbstractCommand {
 
 		final String words = quotedElements.isEmpty() ? null : quotedElements.get(0);
 
+		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+
 		return context.getMessage().getUserMentions()
 				.collectList()
 				.flatMap(mentions -> {
@@ -52,28 +57,29 @@ public class PruneCmd extends AbstractCommand {
 
 					Integer count = NumberUtils.asPositiveInt(argCleaned);
 					if(!argCleaned.isEmpty() && count == null) {
+						loadingMsg.stopTyping();
 						throw new CommandException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
 								+ "please include them in quotation marks. See `%shelp %s` for more information.",
 								argCleaned, context.getPrefix(), this.getName()));
 					}
 
-					count = count == null ? 100 : Math.min(100, count);
+					count = count == null ? MAX : Math.min(MAX, count);
 
 					final List<Snowflake> mentionIds = mentions.stream().map(User::getId).collect(Collectors.toList());
 
 					return context.getChannel()
 							.flatMapMany(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now())))
+							.take(count)
 							.filter(message -> mentions.isEmpty()
 									|| message.getAuthorId().map(mentionIds::contains).orElse(false))
 							.filter(message -> words == null
 									|| message.getContent().map(content -> content.contains(words)).orElse(false)
 									|| this.getEmbedContent(message).contains(words))
-							.take(count)
 							.collectList();
 				})
 				.flatMap(messages -> BotUtils.bulkDelete(context.getChannel().cast(TextChannel.class), messages))
-				.flatMap(deletedMessages -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
-						context.getUsername(), StringUtils.pluralOf(deletedMessages, "message")), context.getChannel()))
+				.flatMap(deletedMessages -> loadingMsg.send(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
+						context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
 				.then();
 	}
 
