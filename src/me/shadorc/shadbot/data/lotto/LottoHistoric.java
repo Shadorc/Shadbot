@@ -29,4 +29,9 @@ public class LottoHistoric {
 		return number;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("LottoHistoric [jackpot=%s, winnersCount=%s, number=%s]", jackpot, winnersCount, number);
+	}
+
 }

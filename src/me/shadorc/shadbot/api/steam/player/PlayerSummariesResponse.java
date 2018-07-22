@@ -13,7 +13,7 @@ public class PlayerSummariesResponse {
 
 	@Override
 	public String toString() {
-		return "PlayerSummariesResponse [response=" + response + "]";
+		return String.format("PlayerSummariesResponse [response=%s]", response);
 	}
 
 }

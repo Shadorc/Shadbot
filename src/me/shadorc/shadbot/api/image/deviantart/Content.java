@@ -13,7 +13,7 @@ public class Content {
 
 	@Override
 	public String toString() {
-		return "Content [source=" + source + "]";
+		return String.format("Content [source=%s]", source);
 	}
 
 }

@@ -42,12 +42,7 @@ public class HeroResponse {
 
 	@Override
 	public String toString() {
-		return "HeroResponse [code=" + code
-				+ ", name=" + name
-				+ ", className=" + className
-				+ ", level=" + level
-				+ ", stats=" + stats
-				+ "]";
+		return String.format("HeroResponse [code=%s, name=%s, className=%s, level=%s, stats=%s]", code, name, className, level, stats);
 	}
 
 }

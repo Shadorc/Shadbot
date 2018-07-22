@@ -17,4 +17,9 @@ public class TriviaCategory {
 		return name;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("TriviaCategory [id=%s, name=%s]", id, name);
+	}
+
 }

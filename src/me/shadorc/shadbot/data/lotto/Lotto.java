@@ -61,4 +61,9 @@ public class Lotto {
 		gamblers.clear();
 	}
 
+	@Override
+	public String toString() {
+		return String.format("Lotto [historic=%s, jackpot=%s, gamblers=%s]", historic, jackpot, gamblers);
+	}
+
 }

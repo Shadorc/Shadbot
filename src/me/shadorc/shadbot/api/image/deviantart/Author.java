@@ -13,7 +13,7 @@ public class Author {
 
 	@Override
 	public String toString() {
-		return "Author [username=" + username + "]";
+		return String.format("Author [username=%s]", username);
 	}
 
 }

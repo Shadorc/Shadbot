@@ -19,9 +19,7 @@ public class QuoteResponse {
 
 	@Override
 	public String toString() {
-		return "QuoteResponse [content=" + content
-				+ ", id=" + id
-				+ "]";
+		return String.format("QuoteResponse [content=%s, id=%s]", content, id);
 	}
 
 }

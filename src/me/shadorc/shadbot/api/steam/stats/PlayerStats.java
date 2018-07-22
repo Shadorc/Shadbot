@@ -18,7 +18,7 @@ public class PlayerStats {
 
 	@Override
 	public String toString() {
-		return "PlayerStats [stats=" + stats + "]";
+		return String.format("PlayerStats [stats=%s]", stats);
 	}
 
 }

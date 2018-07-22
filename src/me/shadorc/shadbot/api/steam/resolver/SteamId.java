@@ -13,7 +13,7 @@ public class SteamId {
 
 	@Override
 	public String toString() {
-		return "SteamId [steamId=" + steamId + "]";
+		return String.format("SteamId [steamId=%s]", steamId);
 	}
 
 }

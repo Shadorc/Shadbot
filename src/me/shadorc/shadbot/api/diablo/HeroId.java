@@ -13,7 +13,7 @@ public class HeroId {
 
 	@Override
 	public String toString() {
-		return "HeroId [id=" + id + "]";
+		return String.format("HeroId [id=%s]", id);
 	}
 
 }

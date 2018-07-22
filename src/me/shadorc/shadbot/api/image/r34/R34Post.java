@@ -43,13 +43,7 @@ public class R34Post {
 
 	@Override
 	public String toString() {
-		return "R34Post [tags=" + tags
-				+ ", fileUrl=" + fileUrl
-				+ ", source=" + source
-				+ ", width=" + width
-				+ ", height=" + height
-				+ ", hasChildren=" + hasChildren
-				+ "]";
+		return String.format("R34Post [tags=%s, fileUrl=%s, source=%s, width=%s, height=%s, hasChildren=%s]", tags, fileUrl, source, width, height, hasChildren);
 	}
 
 }

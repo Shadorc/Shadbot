@@ -18,7 +18,7 @@ public class GiphyResponse {
 
 	@Override
 	public String toString() {
-		return "GiphyResponse [gifs=" + gifs + "]";
+		return String.format("GiphyResponse [gifs=%s]", gifs);
 	}
 
 }

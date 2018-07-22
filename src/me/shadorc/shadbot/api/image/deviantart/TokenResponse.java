@@ -19,9 +19,7 @@ public class TokenResponse {
 
 	@Override
 	public String toString() {
-		return "TokenResponse [accessToken=" + accessToken
-				+ ", expiresIn=" + expiresIn
-				+ "]";
+		return String.format("TokenResponse [accessToken=%s, expiresIn=%s]", accessToken, expiresIn);
 	}
 
 }

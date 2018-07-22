@@ -15,7 +15,7 @@ public class WikipediaQuery {
 
 	@Override
 	public String toString() {
-		return "WikipediaQuery [pages=" + pages + "]";
+		return String.format("WikipediaQuery [pages=%s]", pages);
 	}
 
 }

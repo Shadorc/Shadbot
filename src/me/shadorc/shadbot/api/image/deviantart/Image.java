@@ -37,12 +37,7 @@ public class Image {
 
 	@Override
 	public String toString() {
-		return "Image [content=" + content
-				+ ", author=" + author
-				+ ", url=" + url
-				+ ", title=" + title
-				+ ", categoryPath=" + categoryPath
-				+ "]";
+		return String.format("Image [content=%s, author=%s, url=%s, title=%s, categoryPath=%s]", content, author, url, title, categoryPath);
 	}
 
 }

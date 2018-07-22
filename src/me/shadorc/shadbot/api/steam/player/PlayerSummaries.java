@@ -15,7 +15,7 @@ public class PlayerSummaries {
 
 	@Override
 	public String toString() {
-		return "PlayerSummaries [players=" + players + "]";
+		return String.format("PlayerSummaries [players=%s]", players);
 	}
 
 }

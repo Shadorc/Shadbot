@@ -28,9 +28,6 @@ public class PlayerSummary {
 
 	@Override
 	public String toString() {
-		return "PlayerSummary [communityVisibilityState=" + communityVisibilityState
-				+ ", avatarFull=" + avatarFull
-				+ ", personaName=" + personaName
-				+ "]";
+		return String.format("PlayerSummary [communityVisibilityState=%s, avatarFull=%s, personaName=%s]", communityVisibilityState, avatarFull, personaName);
 	}
 }

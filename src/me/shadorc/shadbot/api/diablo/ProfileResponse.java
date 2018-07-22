@@ -60,15 +60,9 @@ public class ProfileResponse {
 
 	@Override
 	public String toString() {
-		return "ProfileResponse [code=" + code
-				+ ", battleTag=" + battleTag
-				+ ", paragonLevel=" + paragonLevel
-				+ ", paragonLevelHardcore=" + paragonLevelHardcore
-				+ ", paragonLevelSeason=" + paragonLevelSeason
-				+ ", paragonLevelSeasonHardcore=" + paragonLevelSeasonHardcore
-				+ ", guildName=" + guildName
-				+ ", heroeIds=" + heroeIds
-				+ "]";
+		return String.format("ProfileResponse [code=%s, battleTag=%s, paragonLevel=%s, paragonLevelHardcore=%s, paragonLevelSeason=%s, "
+				+ "paragonLevelSeasonHardcore=%s, guildName=%s, heroeIds=%s]", code, battleTag, paragonLevel, paragonLevelHardcore, 
+				paragonLevelSeason, paragonLevelSeasonHardcore, guildName, heroeIds);
 	}
 
 }

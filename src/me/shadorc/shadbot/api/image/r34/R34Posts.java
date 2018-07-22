@@ -21,9 +21,7 @@ public class R34Posts {
 
 	@Override
 	public String toString() {
-		return "R34Posts [posts=" + posts
-				+ ", count=" + count
-				+ "]";
+		return String.format("R34Posts [posts=%s, count=%s]", posts, count);
 	}
 
 }

@@ -39,12 +39,7 @@ public class ChatBotResponse {
 
 	@Override
 	public String toString() {
-		return "ChatBotResponse [input=" + input
-				+ ", response=" + response
-				+ ", custid=" + custid
-				+ ", botid=" + botid
-				+ ", status=" + status
-				+ "]";
+		return String.format("ChatBotResponse [input=%s, response=%s, custid=%s, botid=%s, status=%s]", input, response, custid, botid, status);
 	}
 
 }

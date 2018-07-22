@@ -13,7 +13,7 @@ public class R34Response {
 
 	@Override
 	public String toString() {
-		return "R34Response [posts=" + posts + "]";
+		return String.format("R34Response [posts=%s]", posts);
 	}
 
 }

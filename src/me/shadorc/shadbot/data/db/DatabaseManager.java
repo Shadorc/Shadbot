@@ -46,7 +46,7 @@ public class DatabaseManager {
 		}
 
 		final DBGuild dbGuild = new DBGuild(guildId);
-		DatabaseManager.addGuild(dbGuild);
+		guilds.add(dbGuild);
 		return dbGuild;
 	}
 
@@ -64,10 +64,6 @@ public class DatabaseManager {
 		final DBMember dbMember = new DBMember(guildId, memberId);
 		DatabaseManager.getDBGuild(guildId).addMember(dbMember);
 		return dbMember;
-	}
-
-	private static void addGuild(DBGuild dbGuild) {
-		guilds.add(dbGuild);
 	}
 
 }

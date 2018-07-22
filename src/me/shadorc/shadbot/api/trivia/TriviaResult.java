@@ -50,4 +50,9 @@ public class TriviaResult {
 				.collect(Collectors.toList());
 	}
 
+	@Override
+	public String toString() {
+		return String.format("TriviaResult [category=%s, type=%s, difficulty=%s, question=%s, correctAnswer=%s, incorrectAnswers=%s]", category, type, difficulty, question, correctAnswer, incorrectAnswers);
+	}
+
 }

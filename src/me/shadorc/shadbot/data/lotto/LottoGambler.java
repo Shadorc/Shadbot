@@ -31,4 +31,9 @@ public class LottoGambler {
 		return number;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("LottoGambler [guildId=%s, userId=%s, number=%s]", guildId, userId, number);
+	}
+
 }

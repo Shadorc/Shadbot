@@ -19,9 +19,7 @@ public class Stats {
 
 	@Override
 	public String toString() {
-		return "Stats [name=" + name
-				+ ", value=" + value
-				+ "]";
+		return String.format("Stats [name=%s, value=%s]", name, value);
 	}
 
 }

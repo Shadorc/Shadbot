@@ -13,6 +13,6 @@ public class ResolveVanityUrlResponse {
 
 	@Override
 	public String toString() {
-		return "ResolveVanityUrlResponse [response=" + response + "]";
+		return String.format("ResolveVanityUrlResponse [response=%s]", response);
 	}
 }

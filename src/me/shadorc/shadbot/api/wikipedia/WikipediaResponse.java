@@ -13,7 +13,7 @@ public class WikipediaResponse {
 
 	@Override
 	public String toString() {
-		return "WikipediaResponse [query=" + query + "]";
+		return String.format("WikipediaResponse [query=%s]", query);
 	}
 
 }

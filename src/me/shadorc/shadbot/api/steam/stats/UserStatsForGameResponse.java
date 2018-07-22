@@ -16,7 +16,7 @@ public class UserStatsForGameResponse {
 
 	@Override
 	public String toString() {
-		return "UserStatsForGameResponse [playerStats=" + playerStats + "]";
+		return String.format("UserStatsForGameResponse [playerStats=%s]", playerStats);
 	}
 
 }

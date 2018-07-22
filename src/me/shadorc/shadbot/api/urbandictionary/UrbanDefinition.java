@@ -33,11 +33,7 @@ public class UrbanDefinition {
 
 	@Override
 	public String toString() {
-		return "UrbanDefinition [definition=" + definition
-				+ ", example=" + example
-				+ ", word=" + word
-				+ ", permalink=" + permalink
-				+ "]";
+		return String.format("UrbanDefinition [definition=%s, example=%s, word=%s, permalink=%s]", definition, example, word, permalink);
 	}
 
 }

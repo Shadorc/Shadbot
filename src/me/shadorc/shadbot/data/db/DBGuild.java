@@ -123,4 +123,9 @@ public class DBGuild {
 		settings.remove(setting.toString());
 	}
 
+	@Override
+	public String toString() {
+		return String.format("DBGuild [id=%s, members=%s, settings=%s]", id, members, settings);
+	}
+
 }

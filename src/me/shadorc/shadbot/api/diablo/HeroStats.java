@@ -13,7 +13,7 @@ public class HeroStats {
 
 	@Override
 	public String toString() {
-		return "HeroStats [damage=" + damage + "]";
+		return String.format("HeroStats [damage=%s]", damage);
 	}
 
 }

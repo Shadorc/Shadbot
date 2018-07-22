@@ -15,7 +15,7 @@ public class DeviantArtResponse {
 
 	@Override
 	public String toString() {
-		return "DeviantArtResponse [results=" + results + "]";
+		return String.format("DeviantArtResponse [results=%s]", results);
 	}
 
 }

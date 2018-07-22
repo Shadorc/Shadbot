@@ -13,7 +13,7 @@ public class GiphyGif {
 
 	@Override
 	public String toString() {
-		return "GiphyGif [imageUrl=" + imageUrl + "]";
+		return String.format("GiphyGif [imageUrl=%s]", imageUrl);
 	}
 
 }
