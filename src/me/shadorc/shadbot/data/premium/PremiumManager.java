@@ -72,8 +72,7 @@ public class PremiumManager {
 
 	public static List<Relic> getRelicsForUser(Snowflake userId) {
 		return relics.stream()
-				.filter(relic -> relic.getUserId().isPresent())
-				.filter(relic -> relic.getUserId().get().equals(userId))
+				.filter(relic -> relic.getUserId().map(userId::equals).orElse(false))
 				.collect(Collectors.toList());
 	}
 
@@ -83,8 +82,7 @@ public class PremiumManager {
 
 	public static boolean isGuildPremium(Snowflake guildId) {
 		return relics.stream()
-				.filter(relic -> relic.getGuildId().isPresent())
-				.filter(relic -> relic.getGuildId().get().equals(guildId))
+				.filter(relic -> relic.getGuildId().map(guildId::equals).orElse(false))
 				.anyMatch(relic -> !relic.isExpired());
 	}
 

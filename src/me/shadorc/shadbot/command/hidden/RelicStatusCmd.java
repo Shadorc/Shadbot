@@ -39,9 +39,7 @@ public class RelicStatusCmd extends AbstractCommand {
 				.map(relic -> {
 					StringBuilder contentBld = new StringBuilder(String.format("**ID:** %s", relic.getId()));
 
-					if(relic.getGuildId().isPresent()) {
-						contentBld.append(String.format("%n**Guild ID:** %d", relic.getGuildId().get()));
-					}
+					relic.getGuildId().ifPresent(guildId -> contentBld.append(String.format("%n**Guild ID:** %d", guildId)));
 
 					contentBld.append(String.format("%n**Duration:** %d days", TimeUnit.MILLISECONDS.toDays(relic.getDuration())));
 					if(!relic.isExpired() && relic.getActivationTime().isPresent()) {
