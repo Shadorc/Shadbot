@@ -12,6 +12,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
@@ -169,8 +170,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		final String prefix = DatabaseManager.getDBGuild(guildMusic.getGuildId()).getPrefix();
 		if(content.equals(prefix + "cancel")) {
 			this.stopWaiting();
-			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled is choice.", event.getMember().get().getUsername()),
-					guildMusic.getMessageChannel())
+			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
+					event.getMember().map(User::getUsername).get()), guildMusic.getMessageChannel())
 					.thenReturn(true);
 		}
 
