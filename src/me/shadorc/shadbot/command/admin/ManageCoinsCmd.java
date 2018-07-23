@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.admin;
 
 import java.util.List;
 
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -42,16 +43,18 @@ public class ManageCoinsCmd extends AbstractCommand {
 			throw new CommandException(String.format("`%s` is not a valid amount for coins.", args.get(1)));
 		}
 
-		if(context.getMessage().getUserMentionIds().isEmpty() && context.getMessage().getRoleMentionIds().isEmpty()) {
+		final Message message = context.getMessage();
+
+		if(message.getUserMentionIds().isEmpty() && message.getRoleMentionIds().isEmpty() && !message.mentionsEveryone()) {
 			throw new CommandException("You must specify at least one user / role.");
 		}
 
 		final Snowflake guildId = context.getGuildId();
 
-		return BotUtils.getUsersFrom(context.getMessage())
+		return BotUtils.getMemberFrom(message)
 				.collectList()
 				.map(users -> {
-					String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(users, User::getUsername, ", ");
+					final String mentionsStr = message.mentionsEveryone() ? "Everyone" : FormatUtils.format(users, User::getUsername, ", ");
 					switch (action) {
 						case ADD:
 							users.stream().forEach(user -> DatabaseManager.getDBMember(guildId, user.getId()).addCoins(coins));

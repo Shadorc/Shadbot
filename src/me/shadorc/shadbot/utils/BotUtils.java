@@ -77,19 +77,18 @@ public class BotUtils {
 				.flatMap(text -> client.updatePresence(Presence.online(Activity.playing(text))));
 	}
 
-	public static Flux<User> getUsersFrom(Message message) {
+	public static Flux<User> getMemberFrom(Message message) {
 		return message.getUserMentions()
 				.concatWith(message.getGuild().flatMapMany(Guild::getMembers)
-						.filter(member -> !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()))
-						.map(User.class::cast))
+						.filter(member -> message.mentionsEveryone() || !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds())))
 				.distinct();
 	}
 
 	public static boolean hasAllowedRole(Snowflake guildId, List<Role> roles) {
 		List<Snowflake> allowedRoles = DatabaseManager.getDBGuild(guildId).getAllowedRoles();
 		// If the user is an administrator OR no permissions have been set OR the role is allowed
-		return roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
-				|| allowedRoles.isEmpty()
+		return allowedRoles.isEmpty()
+				|| roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
 				|| roles.stream().anyMatch(role -> allowedRoles.contains(role.getId()));
 	}
 
