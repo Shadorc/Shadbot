@@ -98,15 +98,16 @@ public class GuildMusic {
 		}
 	}
 
-	public void end() {
+	public Mono<Void> end() {
 		StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
 		if(!PremiumManager.isGuildPremium(guildId)) {
 			strBuilder.append(String.format(" If you like me, you can make a donation on **%s**, "
 					+ "it will help my creator keeping me alive :heart:",
 					Config.PATREON_URL));
 		}
-		BotUtils.sendMessage(strBuilder.toString(), client.getMessageChannelById(messageChannelId)).subscribe();
 		this.leaveVoiceChannel();
+		return BotUtils.sendMessage(strBuilder.toString(), client.getMessageChannelById(messageChannelId))
+				.then();
 	}
 
 	public void destroy() {

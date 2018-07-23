@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.music;
 
+import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -22,6 +23,9 @@ public class SkipCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 
+		final Mono<Message> messageMono = BotUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.",
+				context.getUsername()), context.getChannel());
+
 		if(context.getArg().isPresent()) {
 			final int playlistSize = guildMusic.getScheduler().getPlaylist().size();
 			Integer num = NumberUtils.asIntBetween(context.getArg().get(), 1, playlistSize);
@@ -37,13 +41,11 @@ public class SkipCmd extends AbstractCommand {
 				guildMusic.getScheduler().getAudioPlayer().setPaused(false);
 			} else {
 				// There is no more music, this is the end
-				guildMusic.end();
+				return messageMono.then(guildMusic.end());
 			}
 		}
 
-		return BotUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.",
-				context.getUsername()), context.getChannel())
-				.then();
+		return messageMono.then();
 	}
 
 	@Override

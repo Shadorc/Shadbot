@@ -81,7 +81,7 @@ public class AudioEventListener extends AudioEventAdapter {
 
 	private void nextOrEnd() {
 		if(!guildMusic.getScheduler().nextTrack()) {
-			guildMusic.end();
+			guildMusic.end().subscribe();
 		}
 	}
 }
