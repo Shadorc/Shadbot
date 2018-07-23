@@ -106,8 +106,8 @@ public class TrackScheduler {
 
 	public long changePosition(long time) {
 		final AudioTrack track = audioPlayer.getPlayingTrack();
-		final long newPosition = track.getPosition() + time;
-		track.setPosition(NumberUtils.between(newPosition, 0, track.getDuration()));
+		final long newPosition = NumberUtils.between(track.getPosition() + time, 0, track.getDuration());
+		track.setPosition(newPosition);
 		return newPosition;
 	}
 
