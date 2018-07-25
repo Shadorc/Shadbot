@@ -5,11 +5,11 @@ import java.util.List;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.TextChannel;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
@@ -77,11 +77,11 @@ public class BotUtils {
 				.flatMap(text -> client.updatePresence(Presence.online(Activity.playing(text))));
 	}
 
-	public static Flux<User> getMemberFrom(Message message) {
-		return message.getUserMentions()
-				.concatWith(message.getGuild().flatMapMany(Guild::getMembers)
-						.filter(member -> message.mentionsEveryone() || !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds())))
-				.distinct();
+	public static Flux<Member> getMembersFrom(Message message) {
+		return message.getGuild().flatMapMany(Guild::getMembers)
+				.filter(member -> message.mentionsEveryone()
+						|| message.getUserMentionIds().contains(member.getId())
+						|| !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
 	}
 
 	public static boolean hasAllowedRole(Snowflake guildId, List<Role> roles) {
