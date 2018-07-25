@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.info;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.MessageEditSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -18,8 +19,10 @@ public class PingCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		return BotUtils.sendMessage(String.format(Emoji.GEAR + " Ping: %dms",
-				TimeUtils.getMillisUntil(context.getMessage().getTimestamp())), context.getChannel())
+		final long start = System.currentTimeMillis();
+		return BotUtils.sendMessage(Emoji.GEAR + " Testing ping...", context.getChannel())
+				.flatMap(message -> message.edit(new MessageEditSpec().setContent(String.format(Emoji.GEAR + " Ping: %dms",
+						TimeUtils.getMillisUntil(start)))))
 				.then();
 	}
 

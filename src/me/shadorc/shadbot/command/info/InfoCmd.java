@@ -32,7 +32,7 @@ public class InfoCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final long ping = TimeUtils.getMillisUntil(context.getMessage().getTimestamp());
+		final long start = System.currentTimeMillis();
 		final long uptime = TimeUtils.getMillisUntil(Shadbot.getLaunchTime());
 
 		Runtime runtime = Runtime.getRuntime();
@@ -74,7 +74,7 @@ public class InfoCmd extends AbstractCommand {
 					// TODO
 					// + String.format("%nVoice Channels: %d", context.getClient().getConnectedVoiceChannels().size())
 							+ String.format("%nUsers: %s", FormatUtils.formatNum(membersCount))
-							+ String.format("%nPing: %dms", ping)
+							+ String.format("%nPing: %dms", TimeUtils.getMillisUntil(start))
 							+ "```");
 				})
 				.flatMap(info -> BotUtils.sendMessage(info, context.getChannel()))
