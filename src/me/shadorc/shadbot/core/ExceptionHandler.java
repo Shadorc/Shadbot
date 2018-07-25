@@ -8,7 +8,6 @@ import org.jsoup.HttpStatusException;
 
 import discord4j.core.object.entity.Message;
 import discord4j.rest.http.client.ClientException;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.stats.CommandStatsManager;
@@ -50,8 +49,8 @@ public class ExceptionHandler {
 		if(this.isUnreacheable()) {
 			return this.onUnreacheable();
 		}
-		if(this.isForbidden()) {
-			return this.onForbidden();
+		if(this.isPermissionMissing()) {
+			return this.onMissingPermission();
 		}
 		return this.onUnknown();
 	}
@@ -77,13 +76,9 @@ public class ExceptionHandler {
 		return err instanceof SocketTimeoutException;
 	}
 
-	public boolean isForbidden() {
+	public boolean isPermissionMissing() {
 		return err instanceof ClientException
-				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
-	}
-
-	public boolean isNotForbidden() {
-		return !this.isForbidden();
+				&& (int) ClientException.class.cast(err).getErrorResponse().getFields().get("code") == 50013;
 	}
 
 	private Mono<Message> onCommandException() {
@@ -120,8 +115,8 @@ public class ExceptionHandler {
 						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
 	}
 
-	private Mono<Message> onForbidden() {
-		// TODO Auto-generated method stub
+	// TODO
+	private Mono<Message> onMissingPermission() {
 		return Mono.empty();
 	}
 
