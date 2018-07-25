@@ -127,18 +127,18 @@ public class Context {
 
 	public Mono<CommandPermission> getPermission() {
 		// The author is the bot's owner
-		Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
+		final Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
 				.map(ApplicationInfo::getOwnerId)
 				.filter(this.getAuthorId()::equals)
 				.map(bool -> CommandPermission.OWNER);
 
 		// Private message, the author is considered as an administrator
-		Mono<CommandPermission> dmPerm = Mono.just(event.getGuildId())
+		final Mono<CommandPermission> dmPerm = Mono.just(event.getGuildId())
 				.filter(guildId -> !guildId.isPresent())
 				.map(guildId -> CommandPermission.ADMIN);
 
 		// The member is an administrator
-		Mono<CommandPermission> adminPerm = DiscordUtils.hasPermissions(this.getAuthor(), this.getGuildId(), Permission.ADMINISTRATOR)
+		final Mono<CommandPermission> adminPerm = DiscordUtils.hasPermissions(this.getMember(), Permission.ADMINISTRATOR)
 				.map(bool -> CommandPermission.ADMIN);
 
 		return ownerPerm

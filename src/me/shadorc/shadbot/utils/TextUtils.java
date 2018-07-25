@@ -1,13 +1,10 @@
 package me.shadorc.shadbot.utils;
 
-import java.util.EnumSet;
-
 import org.jsoup.Jsoup;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 
 import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.utils.command.Emoji;
@@ -22,29 +19,15 @@ public class TextUtils {
 
 	public static final String NO_PLAYING_MUSIC = Emoji.MUTE + " No currently playing music.";
 
-	private static final String[] SPAM_MESSAGES = { "Take it easy, we are not in a hurry !",
+	public static final String[] SPAM_MESSAGES = { "Take it easy, we are not in a hurry !",
 			"Phew.. give me time to rest, you're too fast for me.",
 			"I'm not going anywhere, no need to be this fast.",
 			"I don't think everyone here want to be spammed by us, just wait a little bit." };
 
-	private static final String[] TIPS_MESSAGES = { String.format("Check %slotto", Config.DEFAULT_PREFIX),
+	public static final String[] TIPS_MESSAGES = { String.format("Check %slotto", Config.DEFAULT_PREFIX),
 			String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
 			String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
 			String.format("Support server: %s", Config.SUPPORT_SERVER_URL) };
-
-	/**
-	 * @return A string representing a random spam message
-	 */
-	public static String getSpamMessage() {
-		return Utils.randValue(SPAM_MESSAGES);
-	}
-
-	/**
-	 * @return A string representing a random tip
-	 */
-	public static String getTip() {
-		return Utils.randValue(TIPS_MESSAGES);
-	}
 
 	public static String notEnoughCoins(User user) {
 		return String.format(Emoji.BANK + " (**%s**) You don't have enough coins. You can get some by playing **RPS**, **Hangman** "
@@ -54,17 +37,6 @@ public class TextUtils {
 	public static String mustBeNsfw(String prefix) {
 		return String.format(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",
 				prefix, SettingEnum.NSFW);
-	}
-
-	public static String missingPerm(EnumSet<Permission> permissions) {
-		return TextUtils.missingPerm(permissions.toArray(new Permission[permissions.size()]));
-	}
-
-	public static String missingPerm(Permission... permissions) {
-		return String.format(Emoji.ACCESS_DENIED + " I can't execute this command due to the lack of permission."
-				+ "%nPlease, check my permissions and channel-specific ones to verify that %s %s checked.",
-				FormatUtils.format(permissions, perm -> String.format("**%s**", StringUtils.capitalizeFully(perm.toString().replace("_", " "))), " and "),
-				permissions.length > 1 ? "are" : "is");
 	}
 
 	/**
