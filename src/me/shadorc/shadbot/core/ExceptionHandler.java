@@ -138,7 +138,7 @@ public class ExceptionHandler {
 				permissionsStr.size() > 1 ? "are" : "is"), context.getChannel())
 				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
 						context.getGuildId().asLong(), String.join(", ", permissionsStr)))
-				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannottSpeak(this.getClass(), context.getGuildId()));
+				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), context.getGuildId()));
 	}
 
 	private Mono<Message> onUnknown() {

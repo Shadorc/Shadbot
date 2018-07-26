@@ -81,7 +81,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 			this.schedule(() -> this.stop()
 					.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer),
 							this.getContext().getChannel()))
-					.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannottSpeak(this.getClass(), this.getContext().getGuildId()))
+					.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), this.getContext().getGuildId()))
 					.subscribe(), LIMITED_TIME, TimeUnit.SECONDS);
 
 			return this.getContext().getAvatarUrl()

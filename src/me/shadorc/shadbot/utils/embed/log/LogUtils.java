@@ -64,7 +64,7 @@ public class LogUtils {
 				clazz.getSimpleName(), FormatUtils.formatPermission(permission));
 	}
 
-	public static void cannottSpeak(Class<?> clazz, Snowflake guildId) {
+	public static void cannotSpeak(Class<?> clazz, Snowflake guildId) {
 		LogUtils.cannot(clazz, guildId, Permission.SEND_MESSAGES);
 	}
 

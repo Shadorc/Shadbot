@@ -29,7 +29,7 @@ public class AudioEventListener extends AudioEventAdapter {
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
 		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
 				FormatUtils.formatTrackName(track.getInfo())), guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 				.subscribe();
 	}
 
@@ -51,14 +51,14 @@ public class AudioEventListener extends AudioEventAdapter {
 			BotUtils.sendMessage(
 					String.format(Emoji.RED_CROSS + " Sorry, %s. I'll try to play the next available song.", errMessage.toLowerCase()),
 					guildMusic.getMessageChannel())
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 					.subscribe();
 		}
 
 		if(errorCount == 3) {
 			BotUtils.sendMessage(Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until I find a music that can be played.",
 					guildMusic.getMessageChannel())
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 					.subscribe();
 			LogUtils.infof("{Guild ID: %d} Too many errors in a row. They will be ignored until a music can be played.",
 					guildMusic.getGuildId().asLong());
@@ -74,7 +74,7 @@ public class AudioEventListener extends AudioEventAdapter {
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
 		BotUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
 				guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 				.subscribe();
 		LogUtils.warn(guildMusic.getClient(), String.format("{Guild ID: %d} Music stuck, skipping it.", guildMusic.getGuildId().asLong()));
 
@@ -84,7 +84,7 @@ public class AudioEventListener extends AudioEventAdapter {
 	private void nextOrEnd() {
 		if(!guildMusic.getScheduler().nextTrack()) {
 			guildMusic.end()
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 					.subscribe();
 		}
 	}

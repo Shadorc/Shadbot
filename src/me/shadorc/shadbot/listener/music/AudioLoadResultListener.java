@@ -64,7 +64,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		if(!guildMusic.getScheduler().startOrQueue(track, putFirst)) {
 			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
 					FormatUtils.formatTrackName(track.getInfo())), guildMusic.getMessageChannel())
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 					.subscribe();
 		}
 	}
@@ -98,7 +98,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 							.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
 									DatabaseManager.getDBGuild(guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
 					.flatMap(embed -> BotUtils.sendMessage(embed, guildMusic.getMessageChannel()))
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 					.subscribe();
 
 			stopWaitingTask = SchedulerUtils.schedule(this::stopWaiting, Config.MUSIC_CHOICE_DURATION, TimeUnit.SECONDS);
@@ -117,7 +117,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			if(guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
 					&& !PremiumManager.isPremium(guildMusic.getGuildId(), djId)) {
 				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getMessageChannel())
-						.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+						.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 						.subscribe();
 				break;
 			}
@@ -125,7 +125,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded),
 				guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 				.subscribe();
 	}
 
@@ -133,7 +133,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	public void loadFailed(FriendlyException err) {
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
 		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 				.subscribe();
 		LogUtils.infof("{Guild ID: %d} Load failed: %s", guildMusic.getGuildId().asLong(), errMessage);
 		this.leaveIfStopped();
@@ -147,7 +147,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	private void onNoMatches() {
 		BotUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
 				StringUtils.remove(identifier, YT_SEARCH, SC_SEARCH)), guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 				.subscribe();
 		LogUtils.infof("{Guild ID: %d} No matches: %s", guildMusic.getGuildId().asLong(), identifier);
 		this.leaveIfStopped();
