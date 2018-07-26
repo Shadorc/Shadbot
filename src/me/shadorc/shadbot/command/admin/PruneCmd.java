@@ -9,6 +9,7 @@ import discord4j.core.object.Embed.Field;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -26,7 +27,7 @@ import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" })
+@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" }, permissions = { Permission.MANAGE_MESSAGES })
 public class PruneCmd extends AbstractCommand {
 
 	private static int MAX = 250;

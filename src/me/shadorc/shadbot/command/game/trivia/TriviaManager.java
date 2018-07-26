@@ -14,6 +14,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.api.trivia.TriviaResponse;
 import me.shadorc.shadbot.api.trivia.TriviaResult;
+import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.DatabaseManager;
@@ -28,6 +29,7 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -79,6 +81,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 			this.schedule(() -> this.stop()
 					.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer),
 							this.getContext().getChannel()))
+					.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannottSpeak(this.getClass(), this.getContext().getGuildId()))
 					.subscribe(), LIMITED_TIME, TimeUnit.SECONDS);
 
 			return this.getContext().getAvatarUrl()

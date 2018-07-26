@@ -73,7 +73,9 @@ public class CommandManager {
 
 		final Predicate<? super CommandPermission> hasPermission = userPerm -> {
 			if(command.getPermission().isSuperior(userPerm)) {
-				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel()).subscribe();
+				BotUtils.sendMessage(Emoji.ACCESS_DENIED + " You do not have the permission to execute this command.", context.getChannel())
+						.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannottSpeak(CommandManager.class, guildId))
+						.subscribe();
 				return false;
 			}
 			return true;

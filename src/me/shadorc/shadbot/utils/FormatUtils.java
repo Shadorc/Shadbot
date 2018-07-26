@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import discord4j.common.json.EmbedFieldEntity;
+import discord4j.core.object.util.Permission;
 
 public class FormatUtils {
 
@@ -94,6 +95,10 @@ public class FormatUtils {
 		}
 
 		return strBuilder.toString();
+	}
+
+	public static String formatPermission(Permission permission) {
+		return StringUtils.capitalizeFully(permission.toString().replace("_", " "));
 	}
 
 	public static String numberedList(int count, int limit, Function<Integer, String> mapper) {

@@ -21,13 +21,12 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "kick" })
+@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "kick" }, permissions = { Permission.KICK_MEMBERS })
 public class KickCmd extends AbstractCommand {
 
 	@Override
@@ -45,21 +44,7 @@ public class KickCmd extends AbstractCommand {
 
 		final Snowflake guildId = context.getGuildId();
 
-		return DiscordUtils.hasPermissions(context.getMember(), Permission.KICK_MEMBERS)
-				.zipWith(DiscordUtils.hasPermissions(context.getSelf(), guildId, Permission.KICK_MEMBERS))
-				.filterWhen(authorAndSelfPerm -> {
-					if(!authorAndSelfPerm.getT1()) {
-						throw new CommandException("You don't have permission to kick.");
-					}
-
-					if(authorAndSelfPerm.getT2()) {
-						return BotUtils.sendMessage(TextUtils.missingPerm(Permission.KICK_MEMBERS), context.getChannel())
-								.thenReturn(false);
-					}
-
-					return Mono.just(true);
-				})
-				.flatMap(ignored -> context.getMessage().getUserMentions().collectList())
+		return context.getMessage().getUserMentions().collectList()
 				.zipWith(context.getGuild())
 				.flatMap(mentionsAndGuild -> {
 

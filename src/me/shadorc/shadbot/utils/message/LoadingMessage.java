@@ -11,7 +11,9 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,7 +38,9 @@ public class LoadingMessage implements Publisher<Void> {
 		this.typingTimeout = typingTimeout;
 		this.subscribers = new ArrayList<>();
 
-		this.startTyping().subscribe();
+		this.startTyping()
+				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass()))
+				.subscribe();
 	}
 
 	/**

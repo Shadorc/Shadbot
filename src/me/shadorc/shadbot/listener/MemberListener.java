@@ -5,10 +5,13 @@ import java.util.Optional;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 
 public class MemberListener {
@@ -21,6 +24,8 @@ public class MemberListener {
 
 		Flux.fromIterable(dbGuild.getAutoRoles())
 				.flatMap(roleId -> event.getMember().addRole(roleId))
+				.doOnError(ExceptionHandler::isForbidden,
+						err -> LogUtils.cannot(MemberListener.class, event.getGuildId(), Permission.MANAGE_ROLES))
 				.subscribe();
 	}
 
@@ -31,7 +36,9 @@ public class MemberListener {
 
 	private static void sendAutoMsg(DiscordClient client, Optional<Snowflake> channelId, Optional<String> msg) {
 		if(channelId.isPresent() && msg.isPresent()) {
-			BotUtils.sendMessage(msg.get(), client.getMessageChannelById(channelId.get())).subscribe();
+			BotUtils.sendMessage(msg.get(), client.getMessageChannelById(channelId.get()))
+					.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(MemberListener.class))
+					.subscribe();
 		}
 	}
 }

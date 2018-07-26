@@ -11,10 +11,12 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
+import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.message.TemporaryMessage;
 
 public class RateLimiter {
@@ -65,6 +67,7 @@ public class RateLimiter {
 							username, message, maxNum, durationStr);
 				})
 				.flatMap(text -> new TemporaryMessage(client, channelId, 10, TimeUnit.SECONDS).send(text))
+				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass()))
 				.subscribe();
 	}
 

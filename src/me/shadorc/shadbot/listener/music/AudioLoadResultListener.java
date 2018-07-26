@@ -15,6 +15,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
@@ -32,6 +33,7 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class AudioLoadResultListener implements AudioLoadResultHandler, MessageInterceptor {
@@ -60,10 +62,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	public void trackLoaded(AudioTrack track) {
 		guildMusic.joinVoiceChannel(voiceChannelId);
 		if(!guildMusic.getScheduler().startOrQueue(track, putFirst)) {
-			BotUtils.sendMessage(
-					String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-							FormatUtils.formatTrackName(track.getInfo())),
-					guildMusic.getMessageChannel())
+			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
+					FormatUtils.formatTrackName(track.getInfo())), guildMusic.getMessageChannel())
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
 					.subscribe();
 		}
 	}
@@ -97,6 +98,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 							.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
 									DatabaseManager.getDBGuild(guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
 					.flatMap(embed -> BotUtils.sendMessage(embed, guildMusic.getMessageChannel()))
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
 					.subscribe();
 
 			stopWaitingTask = SchedulerUtils.schedule(this::stopWaiting, Config.MUSIC_CHOICE_DURATION, TimeUnit.SECONDS);
@@ -114,20 +116,25 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			musicsAdded++;
 			if(guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
 					&& !PremiumManager.isPremium(guildMusic.getGuildId(), djId)) {
-				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getMessageChannel()).subscribe();
+				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getMessageChannel())
+						.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+						.subscribe();
 				break;
 			}
 		}
 
 		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded),
 				guildMusic.getMessageChannel())
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
 				.subscribe();
 	}
 
 	@Override
 	public void loadFailed(FriendlyException err) {
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
-		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), guildMusic.getMessageChannel()).subscribe();
+		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), guildMusic.getMessageChannel())
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
+				.subscribe();
 		LogUtils.infof("{Guild ID: %d} Load failed: %s", guildMusic.getGuildId().asLong(), errMessage);
 		this.leaveIfStopped();
 	}
@@ -140,6 +147,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	private void onNoMatches() {
 		BotUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
 				StringUtils.remove(identifier, YT_SEARCH, SC_SEARCH)), guildMusic.getMessageChannel())
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannottSpeak(this.getClass(), guildMusic.getGuildId()))
 				.subscribe();
 		LogUtils.infof("{Guild ID: %d} No matches: %s", guildMusic.getGuildId().asLong(), identifier);
 		this.leaveIfStopped();
@@ -198,23 +206,23 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(guildMusic.getGuildId(), guildMusic);
 		guildMusic.joinVoiceChannel(voiceChannelId);
 
+		final Flux<Message> messageFlux = Flux.empty();
 		for(int choice : choices) {
 			AudioTrack track = resultsTracks.get(choice - 1);
 			if(!guildMusic.getScheduler().startOrQueue(track, putFirst)) {
-				BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-						FormatUtils.formatTrackName(track.getInfo())), guildMusic.getMessageChannel())
-						.subscribe();
+				messageFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
+						FormatUtils.formatTrackName(track.getInfo())), guildMusic.getMessageChannel()));
 			}
 
 			if(guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
 					&& !PremiumManager.isPremium(guildMusic.getGuildId(), authorId)) {
-				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getMessageChannel()).subscribe();
+				messageFlux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getMessageChannel()));
 				break;
 			}
 		}
 
 		this.stopWaiting();
-		return Mono.just(true);
+		return messageFlux.then(Mono.just(true));
 	}
 
 	private void stopWaiting() {

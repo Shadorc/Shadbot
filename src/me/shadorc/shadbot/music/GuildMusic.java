@@ -87,6 +87,7 @@ public class GuildMusic {
 								.then();
 					})
 					.subscribe();
+			// TODO: Handle missing permissions
 		}
 	}
 

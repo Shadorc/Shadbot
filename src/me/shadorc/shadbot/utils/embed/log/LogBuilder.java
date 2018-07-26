@@ -65,4 +65,9 @@ public class LogBuilder {
 
 		return embed;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("LogBuilder [type=%s, message=%s, err=%s, input=%s]", type, message, err, input);
+	}
 }
