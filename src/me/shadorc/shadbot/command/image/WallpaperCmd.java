@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.image;
 
 import java.awt.Dimension;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -141,7 +142,7 @@ public class WallpaperCmd extends AbstractCommand {
 								.then();
 					} catch (WallhavenException err) {
 						loadingMsg.stopTyping();
-						throw Exceptions.propagate(err.getCause() == null ? err : err.getCause());
+						throw Exceptions.propagate(Objects.requireNonNullElse(err.getCause(), err));
 					}
 				});
 	}

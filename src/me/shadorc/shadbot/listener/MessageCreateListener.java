@@ -30,7 +30,7 @@ public class MessageCreateListener {
 				// The content is not a Webhook
 				.filter(message -> message.getContent().isPresent() && message.getAuthorId().isPresent())
 				.flatMap(Message::getAuthor)
-				// the author is not a bot
+				// The author is not a bot
 				.filter(author -> !author.isBot())
 				.flatMap(author -> event.getMessage().getChannel())
 				// This is not a private message...
@@ -39,7 +39,7 @@ public class MessageCreateListener {
 				.switchIfEmpty(Mono.fromRunnable(() -> MessageCreateListener.onPrivateMessage(event)))
 				// The channel is allowed
 				.filter(channel -> BotUtils.isChannelAllowed(guildId.get(), channel.getId()))
-				.flatMapMany(channel -> event.getMember().get().getRoles().collectList())
+				.flatMap(channel -> event.getMember().get().getRoles().collectList())
 				// The role is allowed
 				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
 				// The message has not been intercepted

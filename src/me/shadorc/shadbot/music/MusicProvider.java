@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.music;
 
+import java.util.Objects;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 
@@ -31,7 +33,7 @@ public class MusicProvider implements AudioProvider {
 		lastFrame = null;
 
 		// FIXME: Is this ok to return an empty array ?
-		return data == null ? new byte[0] : data;
+		return Objects.requireNonNullElse(data, new byte[0]);
 	}
 
 }
