@@ -27,29 +27,18 @@ import reactor.core.publisher.Mono;
 public class BotUtils {
 
 	public static Mono<Message> sendMessage(String content, Mono<MessageChannel> channel) {
-		return channel.flatMap(chnl -> BotUtils.sendMessage(content, chnl));
-	}
-
-	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
-		return BotUtils.sendMessage(new MessageCreateSpec().setContent(content), channel);
+		return BotUtils.sendMessage(content, null, channel);
 	}
 
 	public static Mono<Message> sendMessage(EmbedCreateSpec embed, Mono<MessageChannel> channel) {
-		return channel.flatMap(chnl -> BotUtils.sendMessage(embed, chnl));
-	}
-
-	public static Mono<Message> sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
-		return BotUtils.sendMessage(new MessageCreateSpec().setEmbed(embed), channel)
+		return BotUtils.sendMessage(null, embed, channel)
 				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.EMBEDS_SENT));
 	}
 
-	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, Mono<MessageChannel> channel) {
-		return channel.flatMap(chnl -> BotUtils.sendMessage(new MessageCreateSpec().setContent(content).setEmbed(embed), chnl));
-	}
-
-	private static Mono<Message> sendMessage(MessageCreateSpec message, MessageChannel channel) {
-		return channel.createMessage(message)
-				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT));
+	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, Mono<MessageChannel> channelMono) {
+		final MessageCreateSpec spec = new MessageCreateSpec().setContent(content).setEmbed(embed);
+		return channelMono.flatMap(channel -> channel.createMessage(spec))
+				.doOnSuccess(message -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT));
 	}
 
 	/**
