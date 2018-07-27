@@ -36,7 +36,13 @@ public class BotUtils {
 	}
 
 	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, Mono<MessageChannel> channelMono) {
-		final MessageCreateSpec spec = new MessageCreateSpec().setContent(content).setEmbed(embed);
+		final MessageCreateSpec spec = new MessageCreateSpec();
+		if(content != null) {
+			spec.setContent(content);
+		}
+		if(embed != null) {
+			spec.setEmbed(embed);
+		}
 		return channelMono.flatMap(channel -> channel.createMessage(spec))
 				.doOnSuccess(message -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT));
 	}
