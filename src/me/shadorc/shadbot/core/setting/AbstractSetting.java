@@ -22,7 +22,7 @@ public abstract class AbstractSetting {
 
 	public abstract Mono<Void> execute(Context context);
 
-	public abstract Mono<EmbedCreateSpec> getHelp(Context context);
+	public abstract EmbedCreateSpec getHelp(Context context);
 
 	public String getDescription() {
 		return description;
@@ -46,17 +46,20 @@ public abstract class AbstractSetting {
 			return Optional.empty();
 		}
 
-		List<String> args = StringUtils.split(arg.get());
-
-		if(args.size() == 1) {
-			return Optional.empty();
-		}
-
-		return Optional.of(args.get(1));
+		List<String> args = StringUtils.split(arg.get(), 2);
+		return args.size() == 1 ? Optional.empty() : Optional.of(args.get(1));
 	}
 
 	public String requireArg(Context context) {
-		return this.getSettingArg(context).orElseThrow(() -> new MissingArgumentException());
+		return this.getSettingArg(context).orElseThrow(MissingArgumentException::new);
+	}
+
+	public List<String> requireArg(Context context, int count) {
+		final List<String> args = StringUtils.split(this.requireArg(context), count);
+		if(args.size() < count) {
+			throw new MissingArgumentException();
+		}
+		return args;
 	}
 
 }

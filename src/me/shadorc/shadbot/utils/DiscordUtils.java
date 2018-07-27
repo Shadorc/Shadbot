@@ -3,8 +3,12 @@ package me.shadorc.shadbot.utils;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
@@ -25,6 +29,15 @@ public class DiscordUtils {
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
+
+	public static List<Snowflake> getChannelMentions(String content) {
+		Matcher matcher = Pattern.compile("<#([0-9]{1,19})>").matcher(content);
+		List<Snowflake> channelMentions = new ArrayList<>();
+		while(matcher.find()) {
+			channelMentions.add(Snowflake.of(matcher.group(1)));
+		}
+		return channelMentions.stream().distinct().collect(Collectors.toList());
+	}
 
 	public static Mono<Snowflake> requireSameVoiceChannel(Mono<Member> bot, Mono<Member> member) {
 		return DiscordUtils.getVoiceChannelId(bot)

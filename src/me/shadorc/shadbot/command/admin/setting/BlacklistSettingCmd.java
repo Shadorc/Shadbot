@@ -1,79 +1,77 @@
-// TODO
-// package me.shadorc.shadbot.command.admin.setting;
-//
-// import java.util.List;
-// import java.util.stream.Collectors;
-//
-// import org.json.JSONArray;
-//
-// import me.shadorc.shadbot.command.admin.setting.core.AbstractSetting;
-// import me.shadorc.shadbot.command.admin.setting.core.Setting;
-// import me.shadorc.shadbot.command.admin.setting.core.SettingEnum;
-// import me.shadorc.shadbot.core.command.CommandManager;
-// import me.shadorc.shadbot.core.command.Context;
-// import me.shadorc.shadbot.data.db.DBGuild;
-// import me.shadorc.shadbot.data.db.Database;
-// import me.shadorc.shadbot.exception.IllegalCmdArgumentException;
-// import me.shadorc.shadbot.exception.MissingArgumentException;
-// import me.shadorc.shadbot.utils.BotUtils;
-// import me.shadorc.shadbot.utils.FormatUtils;
-// import me.shadorc.shadbot.utils.StringUtils;
-// import me.shadorc.shadbot.utils.Utils;
-// import me.shadorc.shadbot.utils.embed.EmbedUtils;
-// import me.shadorc.shadbot.utils.object.Emoji;
-//
-// @Setting(description = "Manage blacklisted commands.", setting = SettingEnum.BLACKLIST)
-// public class BlacklistSettingCmd extends AbstractSetting {
-//
-// private enum Action {
-// ADD, REMOVE;
-// }
-//
-// @Override
-// public void execute(Context context, String arg) {
-// context.requireArg();
-//
-// List<String> splitArgs = StringUtils.split(arg, 2);
-// if(splitArgs.size() != 2) {
-// throw new MissingArgumentException();
-// }
-//
-// Action action = Utils.getValueOrNull(Action.class, splitArgs.get(0));
-// if(action == null) {
-// throw new IllegalCmdArgumentException(String.format("`%s` is not a valid action. %s",
-// splitArgs.get(0), FormatUtils.formatOptions(Action.class)));
-// }
-//
-// List<String> commands = StringUtils.split(splitArgs.get(1).toLowerCase());
-//
-// List<String> unknownCmds = commands.stream().filter(cmd -> CommandManager.getCommand(cmd) == null).collect(Collectors.toList());
-// if(!unknownCmds.isEmpty()) {
-// throw new IllegalCmdArgumentException(String.format("Command %s doesn't exist.",
-// FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", ")));
-// }
-//
-// DBGuild dbGuild = Database.getDBGuild(context.getGuild());
-// List<String> blacklist = dbGuild.getBlacklistedCmd();
-// if(Action.ADD.equals(action)) {
-// blacklist.addAll(commands);
-// BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` added to the blacklist.",
-// FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
-// } else if(Action.REMOVE.equals(action)) {
-// blacklist.removeAll(commands);
-// BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` removed from the blacklist.",
-// FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
-// }
-//
-// dbGuild.setSetting(this.getSetting(), new JSONArray(blacklist));
-// }
-//
-// @Override
-// public EmbedBuilder getHelp(String prefix) {
-// return EmbedUtils.getDefaultEmbed()
-// .addField("Usage", String.format("`%s%s <action> <command(s)>`", prefix, this.getCmdName()), false)
-// .addField("Argument", String.format("**action** - %s",
-// FormatUtils.format(Action.class, "/")), false)
-// .addField("Example", String.format("`%s%s add rule34 russian_roulette`", prefix, this.getCmdName()), false);
-// }
-//
-// }
+package me.shadorc.shadbot.command.admin.setting;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.json.JSONArray;
+
+import discord4j.core.object.entity.Message;
+import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.core.command.CommandManager;
+import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.setting.AbstractSetting;
+import me.shadorc.shadbot.core.setting.Setting;
+import me.shadorc.shadbot.core.setting.SettingEnum;
+import me.shadorc.shadbot.data.db.DBGuild;
+import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import reactor.core.publisher.Mono;
+
+@Setting(description = "Manage blacklisted commands.", setting = SettingEnum.BLACKLIST)
+public class BlacklistSettingCmd extends AbstractSetting {
+
+	private enum Action {
+		ADD, REMOVE;
+	}
+
+	@Override
+	public Mono<Void> execute(Context context) {
+		final List<String> args = this.requireArg(context, 2);
+
+		final Action action = Utils.getEnum(Action.class, args.get(0));
+		if(action == null) {
+			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.formatOptions(Action.class)));
+		}
+
+		final List<String> commands = StringUtils.split(args.get(1).toLowerCase());
+
+		final List<String> unknownCmds = commands.stream().filter(cmd -> CommandManager.getCommand(cmd) == null).collect(Collectors.toList());
+		if(!unknownCmds.isEmpty()) {
+			throw new CommandException(String.format("Command %s doesn't exist.",
+					FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", ")));
+		}
+
+		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
+		final List<String> blacklist = dbGuild.getBlacklistedCmd();
+
+		Mono<Message> message;
+		if(Action.ADD.equals(action)) {
+			blacklist.addAll(commands);
+			message = BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` added to the blacklist.",
+					FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
+		} else {
+			blacklist.removeAll(commands);
+			message = BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` removed from the blacklist.",
+					FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
+		}
+
+		dbGuild.setSetting(this.getSetting(), new JSONArray(blacklist));
+		return message.then();
+	}
+
+	@Override
+	public EmbedCreateSpec getHelp(Context context) {
+		return EmbedUtils.getDefaultEmbed()
+				.addField("Usage", String.format("`%s%s <action> <command(s)>`", context.getPrefix(), context.getCommandName()), false)
+				.addField("Argument", String.format("**action** - %s",
+						FormatUtils.format(Action.class, "/")), false)
+				.addField("Example", String.format("`%s%s add rule34 russian_roulette`", context.getPrefix(), context.getCommandName()), false);
+	}
+
+}
