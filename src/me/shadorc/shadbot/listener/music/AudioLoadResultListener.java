@@ -15,6 +15,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.data.db.DatabaseManager;
@@ -27,7 +28,6 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.SchedulerUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
@@ -60,7 +60,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	@Override
 	public void trackLoaded(AudioTrack track) {
-		guildMusic.joinVoiceChannel(voiceChannelId);
+		guildMusic.joinVoiceChannel(voiceChannelId).subscribe();
 		if(!guildMusic.getScheduler().startOrQueue(track, putFirst)) {
 			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
 					FormatUtils.formatTrackName(track.getInfo())), guildMusic.getMessageChannel())
@@ -101,14 +101,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 					.subscribe();
 
-			stopWaitingTask = SchedulerUtils.schedule(this::stopWaiting, Config.MUSIC_CHOICE_DURATION, TimeUnit.SECONDS);
+			stopWaitingTask = Shadbot.getScheduler().schedule(this::stopWaiting, Config.MUSIC_CHOICE_DURATION, TimeUnit.SECONDS);
 
 			resultsTracks = new ArrayList<>(tracks);
 			MessageInterceptorManager.addInterceptor(guildMusic.getMessageChannelId(), this);
 			return;
 		}
 
-		guildMusic.joinVoiceChannel(voiceChannelId);
+		final Flux<Void> flux = Flux.empty();
+		flux.concatWith(guildMusic.joinVoiceChannel(voiceChannelId));
 
 		int musicsAdded = 0;
 		for(AudioTrack track : tracks) {
@@ -116,17 +117,19 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			musicsAdded++;
 			if(guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
 					&& !PremiumManager.isPremium(guildMusic.getGuildId(), djId)) {
-				BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getMessageChannel())
+				flux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getMessageChannel())
 						.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
-						.subscribe();
+						.then());
 				break;
 			}
 		}
 
-		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded),
+		flux.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded),
 				guildMusic.getMessageChannel())
 				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
-				.subscribe();
+				.then());
+
+		flux.subscribe();
 	}
 
 	@Override
@@ -204,7 +207,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel again
 		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(guildMusic.getGuildId(), guildMusic);
-		guildMusic.joinVoiceChannel(voiceChannelId);
+		Mono<Void> joinMono = guildMusic.joinVoiceChannel(voiceChannelId);
 
 		final Flux<Message> messageFlux = Flux.empty();
 		for(int choice : choices) {
@@ -222,7 +225,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		}
 
 		this.stopWaiting();
-		return messageFlux.then(Mono.just(true));
+		return joinMono
+				.thenMany(messageFlux)
+				.then(Mono.just(true));
 	}
 
 	private void stopWaiting() {

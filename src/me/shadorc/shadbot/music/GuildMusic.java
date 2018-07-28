@@ -21,7 +21,6 @@ import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
 public class GuildMusic {
@@ -67,28 +66,15 @@ public class GuildMusic {
 	 * 
 	 * @param voiceChannelId - the voice channel ID to join
 	 */
-	public void joinVoiceChannel(Snowflake voiceChannelId) {
-		if(!isInVoiceChannel.get()) {
-			client.getVoiceChannelById(voiceChannelId)
-					.flatMap(VoiceChannel::join)
-					.map(controller -> this.controller = controller)
-					.flatMap(controller -> {
-						isInVoiceChannel.set(true);
-						return controller.connect(audioProvider, audioReceiver);
-					})
-					.onErrorResume(err -> {
-						// FIXME: this does not work
-						this.leaveVoiceChannel();
-						LogUtils.error(client, err,
-								String.format("{%d} An unknown error occurred while joining a voice channel.", guildId.asLong()));
-						return BotUtils.sendMessage(
-								Emoji.RED_FLAG + "Sorry, something went wrong during the connection to the voice channel... My developer has been warned.",
-								this.getMessageChannel())
-								.then();
-					})
-					.subscribe();
-			// TODO: Handle missing permissions
-		}
+	public Mono<Void> joinVoiceChannel(Snowflake voiceChannelId) {
+		return client.getVoiceChannelById(voiceChannelId)
+				.filter(ignored -> !isInVoiceChannel.get())
+				.flatMap(VoiceChannel::join)
+				.map(controller -> this.controller = controller)
+				.flatMap(controller -> {
+					isInVoiceChannel.set(true);
+					return controller.connect(audioProvider, audioReceiver);
+				});
 	}
 
 	public void leaveVoiceChannel() {

@@ -19,6 +19,7 @@ import me.shadorc.shadbot.data.stats.CommandStatsManager;
 import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -83,8 +84,9 @@ public class ExceptionHandler {
 	}
 
 	public static boolean isForbidden(Throwable err) {
-		return err instanceof ClientException
-				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
+		return err instanceof MissingPermissionException
+				|| err instanceof ClientException
+						&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
 	}
 
 	private Mono<Message> onCommandException() {
@@ -136,7 +138,7 @@ public class ExceptionHandler {
 				+ "%nPlease, check my permissions and channel-specific ones to verify that %s %s checked.",
 				FormatUtils.format(permissionsStr, str -> String.format("**%s**", str), " and "),
 				permissionsStr.size() > 1 ? "are" : "is"), context.getChannel())
-				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
+				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission(s): %s",
 						context.getGuildId().asLong(), String.join(", ", permissionsStr)))
 				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), context.getGuildId()));
 	}

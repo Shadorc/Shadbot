@@ -20,6 +20,7 @@ import discord4j.core.object.util.Image.Format;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
@@ -40,19 +41,25 @@ public class DiscordUtils {
 	}
 
 	public static Mono<Snowflake> requireSameVoiceChannel(Mono<Member> bot, Mono<Member> member) {
-		return DiscordUtils.getVoiceChannelId(bot)
-				.zipWith(DiscordUtils.getVoiceChannelId(member))
-				.map(tuple -> {
-					final Optional<Snowflake> botVoiceChannelId = tuple.getT1();
-					final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
+		return Mono.zip(DiscordUtils.getVoiceChannelId(bot),
+				DiscordUtils.getVoiceChannelId(member),
+				DiscordUtils.hasPermissions(bot, Permission.CONNECT, Permission.SPEAK))
+				.map(tuple3 -> {
+					final Optional<Snowflake> botVoiceChannelId = tuple3.getT1();
+					final Optional<Snowflake> userVoiceChannelId = tuple3.getT2();
+					final boolean hasPerm = tuple3.getT3();
 
 					if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
 						throw new CommandException("Join a voice channel before using this command.");
 					}
 
+					if(!botVoiceChannelId.isPresent() && userVoiceChannelId.isPresent() && !hasPerm) {
+						throw new MissingPermissionException();
+					}
+
 					if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
 						throw new CommandException(String.format("I'm currently playing music in voice channel %s"
-								+ ", join me before using this command.", DiscordUtils.getChannelMention(tuple.getT1().get())));
+								+ ", join me before using this command.", DiscordUtils.getChannelMention(botVoiceChannelId.get())));
 					}
 
 					return userVoiceChannelId.get();

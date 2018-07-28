@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.music;
 
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
@@ -24,7 +25,7 @@ import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 @RateLimited
-@Command(category = CommandCategory.MUSIC, names = { "play", "add", "queue", "playfirst", "addfirst", "queuefirst" })
+@Command(category = CommandCategory.MUSIC, names = { "play", "add", "queue", "playfirst", "addfirst", "queuefirst" }, permissions = { Permission.CONNECT, Permission.SPEAK })
 public class PlayCmd extends AbstractCommand {
 
 	@Override
@@ -34,13 +35,6 @@ public class PlayCmd extends AbstractCommand {
 
 		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
 				.flatMap(voiceChannelId -> {
-					/*
-					 * TODO: This need to be managed when joining a voice channel if(!botChannelId.isPresent() && !DiscordU.hasPermissions(userVoiceChannel,
-					 * Permissions.VOICE_CONNECT, Permissions.VOICE_SPEAK)) { BotUtils.sendMessage(TextUtils.missingPerm(Permissions.VOICE_CONNECT,
-					 * Permissions.VOICE_SPEAK), context.getChannel()); LogUtils.infof("{Guild ID: %d} Shadbot wasn't allowed to connect/speak in a voice channel.",
-					 * context.getGuild().getLongID()); return; }
-					 */
-
 					String identifier;
 					if(arg.startsWith("soundcloud ")) {
 						identifier = AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");
