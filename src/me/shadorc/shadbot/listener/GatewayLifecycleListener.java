@@ -13,10 +13,10 @@ import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.MessageUpdateEvent;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.SchedulerUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class GatewayLifecycleListener {
@@ -39,13 +39,13 @@ public class GatewayLifecycleListener {
 		DiscordUtils.registerListener(event.getClient(), MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
 		DiscordUtils.registerListener(event.getClient(), VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 
-		SchedulerUtils.scheduleAtFixedRate(() -> NetUtils.postStats(event.getClient())
+		Shadbot.getScheduler().scheduleAtFixedRate(NetUtils.postStats(event.getClient()), 2, 2, TimeUnit.HOURS)
 				.doOnError(err -> LogUtils.error(event.getClient(), err, "An error occurred while posting statistics."))
-				.subscribe(), 2, 2, TimeUnit.HOURS);
+				.subscribe();
 
-		SchedulerUtils.scheduleAtFixedRate(() -> BotUtils.updatePresence(event.getClient())
+		Shadbot.getScheduler().scheduleAtFixedRate(BotUtils.updatePresence(event.getClient()), 0, 30, TimeUnit.MINUTES)
 				.doOnError(err -> LogUtils.error(event.getClient(), err, "An error occurred while updating presence."))
-				.subscribe(), 0, 30, TimeUnit.MINUTES);
+				.subscribe();
 	}
 
 }

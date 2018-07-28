@@ -3,10 +3,9 @@ package me.shadorc.shadbot.utils.message;
 import java.util.concurrent.TimeUnit;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.SchedulerUtils;
 import reactor.core.publisher.Mono;
 
 public class TemporaryMessage {
@@ -35,9 +34,10 @@ public class TemporaryMessage {
 	 * @param content - the message's content
 	 * @return A Mono representing the message sent
 	 */
-	public Mono<Message> send(String content) {
+	public Mono<Void> send(String content) {
 		return BotUtils.sendMessage(content, client.getMessageChannelById(channelId))
-				.doOnSuccess(message -> SchedulerUtils.schedule(() -> message.delete().subscribe(), delay, unit));
+				.flatMap(message -> Shadbot.getScheduler().schedule(message.delete(), delay, unit))
+				.then();
 	}
 
 }

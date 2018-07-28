@@ -15,11 +15,11 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.AudioReceiver;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.SchedulerUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
@@ -53,7 +53,7 @@ public class GuildMusic {
 	}
 
 	public void scheduleLeave() {
-		leaveTask = SchedulerUtils.schedule(this::leaveVoiceChannel, 1, TimeUnit.MINUTES);
+		leaveTask = Shadbot.getScheduler().schedule(this::leaveVoiceChannel, 1, TimeUnit.MINUTES);
 	}
 
 	public void cancelLeave() {

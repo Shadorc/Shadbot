@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.publisher.Mono;
 
 public class ScheduledWrappedExecutor extends ScheduledThreadPoolExecutor {
 
@@ -49,6 +50,22 @@ public class ScheduledWrappedExecutor extends ScheduledThreadPoolExecutor {
 	@Override
 	public Future<?> submit(Runnable task) {
 		return super.submit(this.wrapRunnable(task));
+	}
+
+	public <T> Mono<T> scheduleAtFixedRate(Mono<T> mono, long initialDelay, long period, TimeUnit unit) {
+		return Mono.fromRunnable(() -> super.scheduleAtFixedRate(this.wrapRunnable(mono::subscribe), initialDelay, period, unit));
+	}
+
+	public <T> Mono<T> scheduleWithFixedDelay(Mono<T> mono, long initialDelay, long delay, TimeUnit unit) {
+		return Mono.fromRunnable(() -> super.scheduleWithFixedDelay(this.wrapRunnable(mono::subscribe), initialDelay, delay, unit));
+	}
+
+	public <T> Mono<T> schedule(Mono<T> mono, long delay, TimeUnit unit) {
+		return Mono.fromRunnable(() -> super.schedule(this.wrapRunnable(mono::subscribe), delay, unit));
+	}
+
+	public <T> Mono<T> submit(Mono<T> mono) {
+		return Mono.fromRunnable(() -> super.submit(this.wrapRunnable(mono::subscribe)));
 	}
 
 	private Runnable wrapRunnable(Runnable command) {
