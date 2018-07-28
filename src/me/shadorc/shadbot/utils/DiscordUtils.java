@@ -2,7 +2,6 @@ package me.shadorc.shadbot.utils;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,10 +17,12 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Image.Format;
 import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class DiscordUtils {
@@ -29,6 +30,14 @@ public class DiscordUtils {
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
+	
+	public static Mono<Long> getConnectedVoiceChannelCount(DiscordClient client) {
+		return client.getGuilds()
+				.flatMap(guild -> client.getSelf().flatMap(self -> self.asMember(guild.getId())))
+				.flatMap(DiscordUtils::getVoiceChannelId)
+				.flatMap(Mono::justOrEmpty)
+				.count();
+	}
 
 	public static List<Snowflake> getChannelMentions(String content) {
 		Matcher matcher = Pattern.compile("<#([0-9]{1,19})>").matcher(content);
@@ -98,9 +107,9 @@ public class DiscordUtils {
 	public static Mono<Boolean> hasPermissions(Member member, Permission... permissions) {
 		return member.getRoles()
 				.map(Role::getPermissions)
-				.map(ArrayList::new)
-				.map(ArrayList::stream)
-				.all(stream -> stream.allMatch(perm -> Arrays.asList(permissions).contains(perm)));
+				.flatMap(Flux::fromIterable)
+				.collectList()
+				.map(rolePermissions -> rolePermissions.containsAll(PermissionSet.of(permissions)));
 	}
 
 	public static int getRecommendedShardCount() {

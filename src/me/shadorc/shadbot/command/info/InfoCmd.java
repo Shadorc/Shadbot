@@ -20,6 +20,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -44,11 +45,12 @@ public class InfoCmd extends AbstractCommand {
 		final String d4jVersion = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_VERSION);
 
 		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
-				context.getClient().getGuilds().collectList())
-				.map(ownerAndGuilds -> {
-
-					final User owner = ownerAndGuilds.getT1();
-					final List<Guild> guilds = ownerAndGuilds.getT2();
+				context.getClient().getGuilds().collectList(),
+				DiscordUtils.getConnectedVoiceChannelCount(context.getClient()))
+				.map(tuple3 -> {
+					final User owner = tuple3.getT1();
+					final List<Guild> guilds = tuple3.getT2();
+					final Long connectedVoiceChannels = tuple3.getT3();
 
 					final int membersCount = guilds.stream()
 							.map(Guild::getMemberCount)
@@ -71,8 +73,7 @@ public class InfoCmd extends AbstractCommand {
 							+ String.format("%nShadbot Version: %s", Config.VERSION)
 							+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
 							+ String.format("%nServers: %s", FormatUtils.formatNum(guilds.size()))
-					// TODO
-					// + String.format("%nVoice Channels: %d", context.getClient().getConnectedVoiceChannels().size())
+							+ String.format("%nVoice Channels: %d", connectedVoiceChannels)
 							+ String.format("%nUsers: %s", FormatUtils.formatNum(membersCount))
 							+ String.format("%nPing: %dms", TimeUtils.getMillisUntil(start))
 							+ "```");
