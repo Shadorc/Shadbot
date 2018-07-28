@@ -35,7 +35,7 @@ public class UserInfoCmd extends AbstractCommand {
 
 		final Member member = context.getMember();
 
-		return Mono.zip(context.getMessage().getUserMentions().switchIfEmpty(context.getAuthor()).single(),
+		return Mono.zip(context.getMessage().getUserMentions().switchIfEmpty(context.getAuthor()).next(),
 				member.getPresence(),
 				member.getRoles().collectList(),
 				context.getAvatarUrl())

@@ -24,7 +24,6 @@ import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
-//TODO: Use Discord4J's one
 public class DiscordUtils {
 
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
@@ -38,6 +37,32 @@ public class DiscordUtils {
 			channelMentions.add(Snowflake.of(matcher.group(1)));
 		}
 		return channelMentions.stream().distinct().collect(Collectors.toList());
+	}
+
+	public static String getChannelMention(Snowflake channelId) {
+		return "<#" + channelId.asLong() + ">";
+	}
+
+	public static Mono<String> getAvatarUrl(Mono<User> user) {
+		return user.map(DiscordUtils::getAvatarUrl);
+	}
+
+	public static String getAvatarUrl(User user) {
+		return user.getAvatarUrl(Format.JPEG).orElse(user.getDefaultAvatarUrl());
+	}
+
+	public static Mono<Optional<Snowflake>> getVoiceChannelId(Mono<Member> member) {
+		return member.flatMap(DiscordUtils::getVoiceChannelId);
+	}
+
+	public static Mono<Optional<Snowflake>> getVoiceChannelId(Member member) {
+		return member.getVoiceState()
+				.map(VoiceState::getChannelId)
+				.defaultIfEmpty(Optional.empty());
+	}
+
+	public static Instant getSnowflakeTimeFromID(Snowflake id) {
+		return Instant.ofEpochMilli(1420070400000L + (id.asLong() >>> 22));
 	}
 
 	public static Mono<Snowflake> requireSameVoiceChannel(Mono<Member> bot, Mono<Member> member) {
@@ -66,22 +91,6 @@ public class DiscordUtils {
 				});
 	}
 
-	public static String getChannelMention(Snowflake channelId) {
-		return "<#" + channelId.asLong() + ">";
-	}
-
-	public static Mono<String> getAvatarUrl(Mono<User> user) {
-		return user.map(DiscordUtils::getAvatarUrl);
-	}
-
-	public static String getAvatarUrl(User user) {
-		return user.getAvatarUrl(Format.JPEG).orElse(user.getDefaultAvatarUrl());
-	}
-
-	public static Instant getSnowflakeTimeFromID(Snowflake id) {
-		return Instant.ofEpochMilli(1420070400000L + (id.asLong() >>> 22));
-	}
-
 	public static Mono<Boolean> hasPermissions(Mono<Member> member, Permission... permissions) {
 		return member.flatMap(user -> DiscordUtils.hasPermissions(user, permissions));
 	}
@@ -92,16 +101,6 @@ public class DiscordUtils {
 				.map(ArrayList::new)
 				.map(ArrayList::stream)
 				.all(stream -> stream.allMatch(perm -> Arrays.asList(permissions).contains(perm)));
-	}
-
-	public static Mono<Optional<Snowflake>> getVoiceChannelId(Member member) {
-		return member.getVoiceState()
-				.map(VoiceState::getChannelId)
-				.defaultIfEmpty(Optional.empty());
-	}
-
-	public static Mono<Optional<Snowflake>> getVoiceChannelId(Mono<Member> member) {
-		return member.flatMap(DiscordUtils::getVoiceChannelId);
 	}
 
 	public static int getRecommendedShardCount() {
