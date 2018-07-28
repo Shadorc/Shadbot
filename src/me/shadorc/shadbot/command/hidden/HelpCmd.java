@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.hidden;
 
-import java.util.stream.Collectors;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
@@ -36,36 +37,38 @@ public class HelpCmd extends AbstractCommand {
 					.then();
 		}
 
-		return context.getAvatarUrl()
-				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-						.setAuthor("Shadbot Help", null, avatarUrl)
-						.setDescription(String.format("Any issues, questions or suggestions ?"
-								+ " Join the [support server.](%s)"
-								+ "%nGet more information by using `%s%s <command>`.",
-								Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName())))
-				.flatMap(embed -> {
-					return context.getPermission()
-							.flatMap(authorPerm -> {
-								for(CommandCategory category : CommandCategory.values()) {
-									if(category.equals(CommandCategory.HIDDEN)) {
-										continue;
-									}
-
-									Flux.fromIterable(CommandManager.getCommands().values())
-											.distinct()
-											.filter(cmd -> cmd.getCategory().equals(category))
-											.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
-											.filter(cmd -> !context.getEvent().getGuildId().isPresent() || BotUtils.isCommandAllowed(context.getGuildId(), cmd))
-											.map(AbstractCommand::getName)
-											.map(cmdName -> String.format("`%s%s`", context.getPrefix(), cmdName))
-											.collect(Collectors.joining(" "))
-											.filter(commands -> !commands.isEmpty())
-											.subscribe(commands -> embed.addField(String.format("%s Commands", category.toString()), commands, false));
-								}
-
-								return BotUtils.sendMessage(embed, context.getChannel());
-							});
+		return context.getPermission()
+				.flatMap(authorPerm -> {
+					final Multimap<CommandCategory, String> map = LinkedHashMultimap.create();
+					return Flux.fromIterable(CommandManager.getCommands().values())
+							.distinct()
+							.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
+							.filter(cmd -> context.isDm() || BotUtils.isCommandAllowed(context.getGuildId(), cmd))
+							.map(cmd -> map.put(cmd.getCategory(), String.format("`%s%s`", context.getPrefix(), cmd.getName())))
+							.then()
+							.thenReturn(map);
 				})
+				.zipWith(context.getAvatarUrl())
+				.map(mapAndAvatarUrl -> {
+					final Multimap<CommandCategory, String> map = mapAndAvatarUrl.getT1();
+					final String avatarUrl = mapAndAvatarUrl.getT2();
+
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+							.setAuthor("Shadbot Help", null, avatarUrl)
+							.setDescription(String.format("Any issues, questions or suggestions ?"
+									+ " Join the [support server.](%s)"
+									+ "%nGet more information by using `%s%s <command>`.",
+									Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
+
+					for(CommandCategory category : CommandCategory.values()) {
+						if(!map.get(category).isEmpty() && !category.equals(CommandCategory.HIDDEN)) {
+							embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
+						}
+					}
+
+					return embed;
+				})
+				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
 				.then();
 	}
 

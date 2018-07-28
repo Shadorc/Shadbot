@@ -40,10 +40,6 @@ public class Context {
 		this.arg = Optional.ofNullable(splittedMsg.size() > 1 ? splittedMsg.get(1).trim() : null);
 	}
 
-	public MessageCreateEvent getEvent() {
-		return event;
-	}
-
 	public String getPrefix() {
 		return prefix;
 	}
@@ -52,7 +48,6 @@ public class Context {
 		return cmdName;
 	}
 
-	// TODO: Comment this to see everywhere it's used to check that it use correctly optional
 	public Optional<String> getArg() {
 		return arg;
 	}
@@ -145,6 +140,10 @@ public class Context {
 				.switchIfEmpty(dmPerm)
 				.switchIfEmpty(adminPerm)
 				.defaultIfEmpty(CommandPermission.USER);
+	}
+
+	public boolean isDm() {
+		return !event.getGuildId().isPresent();
 	}
 
 	public Mono<Boolean> isChannelNsfw() {
