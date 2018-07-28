@@ -57,7 +57,7 @@ public class GuildMusic {
 	}
 
 	public void cancelLeave() {
-		if(this.isLeavingScheduled()) {
+		if(leaveTask != null) {
 			leaveTask.cancel(false);
 		}
 	}
