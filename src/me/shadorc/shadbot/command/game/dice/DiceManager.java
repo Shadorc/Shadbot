@@ -44,7 +44,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 	@Override
 	public Mono<Void> start() {
-		this.schedule(this.stop(), GAME_DURATION, ChronoUnit.SECONDS);
+		this.schedule(this.rollTheDice(), GAME_DURATION, ChronoUnit.SECONDS);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		return Mono.empty();
 	}
