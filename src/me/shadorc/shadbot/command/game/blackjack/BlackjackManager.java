@@ -58,7 +58,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 			this.dealerCards.add(Card.pick());
 		}
 
-		this.schedule(() -> this.stop().subscribe(), GAME_DURATION, TimeUnit.SECONDS);
+		this.schedule(this.stop(), GAME_DURATION, ChronoUnit.SECONDS);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		this.startTime = System.currentTimeMillis();
 		return Mono.empty();

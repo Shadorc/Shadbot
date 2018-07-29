@@ -5,9 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import org.json.JSONObject;
@@ -63,7 +63,7 @@ public class StatsManager {
 		return EMBED_MAP;
 	}
 
-	@DataSave(filePath = FILE_NAME, initialDelay = 10, period = 10, unit = TimeUnit.MINUTES)
+	@DataSave(filePath = FILE_NAME, initialDelay = 10, period = 10, unit = ChronoUnit.MINUTES)
 	public static void save() throws IOException {
 		JSONObject mainObj = new JSONObject();
 

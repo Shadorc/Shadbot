@@ -3,10 +3,10 @@ package me.shadorc.shadbot.data.db;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.JavaType;
 
@@ -29,7 +29,7 @@ public class DatabaseManager {
 		guilds = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new ArrayList<>();
 	}
 
-	@DataSave(filePath = FILE_NAME, initialDelay = 15, period = 15, unit = TimeUnit.MINUTES)
+	@DataSave(filePath = FILE_NAME, initialDelay = 15, period = 15, unit = ChronoUnit.MINUTES)
 	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(Utils.MAPPER.writeValueAsString(guilds));

@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.game;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -76,7 +77,7 @@ public class LottoCmd extends AbstractCommand {
 
 		return BotUtils.sendMessage(String.format(Emoji.TICKET + " You bought a lottery ticket and bet on number **%d**. Good luck ! "
 				+ "The next draw will take place in **%s**.",
-				num, FormatUtils.formatCustomDate(LottoCmd.getDelay())), context.getChannel())
+				num, FormatUtils.formatCustomDate(LottoCmd.getDelay().toMillis())), context.getChannel())
 				.then();
 	}
 
@@ -89,7 +90,7 @@ public class LottoCmd extends AbstractCommand {
 							.setAuthor("Lotto", null, avatarUrl)
 							.setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 							.setDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
-									FormatUtils.formatCustomDate(LottoCmd.getDelay()),
+									FormatUtils.formatCustomDate(LottoCmd.getDelay().toMillis()),
 									context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
 							.addField("Number of participants", Integer.toString(gamblers.size()), false)
 							.addField("Prize pool", FormatUtils.formatCoins(LottoManager.getLotto().getJackpot()), false);
@@ -130,7 +131,7 @@ public class LottoCmd extends AbstractCommand {
 				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()));
 	}
 
-	public static long getDelay() {
+	public static Duration getDelay() {
 		ZonedDateTime nextDate = ZonedDateTime.now()
 				.with(DayOfWeek.SUNDAY)
 				.withHour(12)
@@ -140,7 +141,7 @@ public class LottoCmd extends AbstractCommand {
 			nextDate = nextDate.plusWeeks(1);
 		}
 
-		return TimeUtils.getMillisUntil(nextDate.toInstant());
+		return Duration.ofMillis(TimeUtils.getMillisUntil(nextDate.toInstant()));
 	}
 
 	public static void draw(DiscordClient client) {

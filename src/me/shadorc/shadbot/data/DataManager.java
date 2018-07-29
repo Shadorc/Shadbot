@@ -2,9 +2,9 @@ package me.shadorc.shadbot.data;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -12,13 +12,13 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class DataManager {
 
 	public static final File SAVE_DIR = new File("./saves");
 
-	private static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR = new ScheduledWrappedExecutor(2, "DataManager-%d");
 	private static final List<Runnable> SAVE_TASKS = new ArrayList<>();
 
 	public static boolean init() {
@@ -50,7 +50,11 @@ public class DataManager {
 						}
 					};
 					SAVE_TASKS.add(saveTask);
-					SCHEDULED_EXECUTOR.scheduleAtFixedRate(saveTask, annotation.initialDelay(), annotation.period(), annotation.unit());
+					Flux.interval(
+							Duration.of(annotation.initialDelay(), annotation.unit()),
+							Duration.of(annotation.period(), annotation.unit()))
+							.doOnNext(ignored -> Mono.fromRunnable(saveTask))
+							.subscribe();
 				}
 			}
 		}
@@ -60,7 +64,6 @@ public class DataManager {
 	}
 
 	public static void stop() {
-		SCHEDULED_EXECUTOR.shutdownNow();
 		SAVE_TASKS.forEach(Runnable::run);
 	}
 }

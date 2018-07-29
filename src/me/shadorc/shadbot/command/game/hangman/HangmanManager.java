@@ -3,7 +3,6 @@ package me.shadorc.shadbot.command.game.hangman;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -58,7 +57,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	@Override
 	public Mono<Void> start() {
-		this.schedule(() -> this.stop().subscribe(), IDLE_MIN, TimeUnit.MINUTES);
+		this.schedule(this.stop(), IDLE_MIN, ChronoUnit.MINUTES);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		return this.show().then();
 	}
@@ -130,7 +129,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	private Mono<Void> checkLetter(String chr) {
 		// Reset IDLE timer
-		this.schedule(() -> this.stop().subscribe(), IDLE_MIN, TimeUnit.MINUTES);
+		this.schedule(this.stop(), IDLE_MIN, ChronoUnit.MINUTES);
 
 		if(lettersTested.contains(chr)) {
 			return Mono.empty();
@@ -155,7 +154,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	private Mono<Void> checkWord(String word) {
 		// Reset IDLE timer
-		this.schedule(() -> this.stop().subscribe(), IDLE_MIN, TimeUnit.MINUTES);
+		this.schedule(this.stop(), IDLE_MIN, ChronoUnit.MINUTES);
 
 		// If the word has been guessed
 		if(this.word.equalsIgnoreCase(word)) {

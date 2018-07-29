@@ -1,10 +1,11 @@
 package me.shadorc.shadbot.utils.message;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.BotUtils;
 import reactor.core.publisher.Mono;
 
@@ -13,7 +14,9 @@ public class TemporaryMessage {
 	private final DiscordClient client;
 	private final Snowflake channelId;
 	private final long delay;
-	private final TimeUnit unit;
+	private final TemporalUnit unit;
+
+	private Snowflake messageId;
 
 	/**
 	 * @param client - the Discord client
@@ -21,7 +24,7 @@ public class TemporaryMessage {
 	 * @param delay - the delay to wait
 	 * @param unit - the delay unit
 	 */
-	public TemporaryMessage(DiscordClient client, Snowflake channelId, long delay, TimeUnit unit) {
+	public TemporaryMessage(DiscordClient client, Snowflake channelId, long delay, TemporalUnit unit) {
 		this.client = client;
 		this.channelId = channelId;
 		this.delay = delay;
@@ -36,8 +39,10 @@ public class TemporaryMessage {
 	 */
 	public Mono<Void> send(String content) {
 		return BotUtils.sendMessage(content, client.getMessageChannelById(channelId))
-				.flatMap(message -> Shadbot.getScheduler().schedule(message.delete(), delay, unit))
-				.then();
+				.map(message -> this.messageId = message.getId())
+				.then(Mono.delay(Duration.of(delay, unit)))
+				.then(client.getMessageById(channelId, messageId))
+				.flatMap(Message::delete);
 	}
 
 }

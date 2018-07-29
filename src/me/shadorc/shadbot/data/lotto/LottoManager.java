@@ -3,7 +3,7 @@ package me.shadorc.shadbot.data.lotto;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.time.temporal.ChronoUnit;
 
 import me.shadorc.shadbot.data.DataManager;
 import me.shadorc.shadbot.data.annotation.DataInit;
@@ -22,7 +22,7 @@ public class LottoManager {
 		lotto = FILE.exists() ? Utils.MAPPER.readValue(FILE, Lotto.class) : new Lotto();
 	}
 
-	@DataSave(filePath = FILE_NAME, initialDelay = 30, period = 30, unit = TimeUnit.MINUTES)
+	@DataSave(filePath = FILE_NAME, initialDelay = 30, period = 30, unit = ChronoUnit.MINUTES)
 	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(Utils.MAPPER.writeValueAsString(lotto));

@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.music;
 
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -15,12 +14,12 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.AudioReceiver;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
 public class GuildMusic {
@@ -33,7 +32,7 @@ public class GuildMusic {
 	private final TrackScheduler trackScheduler;
 
 	private VoiceConnectionController controller;
-	private ScheduledFuture<?> leaveTask;
+	private Disposable leaveTask;
 	private Snowflake messageChannelId;
 	private Snowflake djId;
 	private boolean isWaiting;
@@ -52,12 +51,14 @@ public class GuildMusic {
 	}
 
 	public void scheduleLeave() {
-		leaveTask = Shadbot.getScheduler().schedule(this::leaveVoiceChannel, 1, TimeUnit.MINUTES);
+		leaveTask = Mono.delay(Duration.ofMinutes(1))
+				.then(Mono.fromRunnable(this::leaveVoiceChannel))
+				.subscribe();
 	}
 
 	public void cancelLeave() {
 		if(leaveTask != null) {
-			leaveTask.cancel(false);
+			leaveTask.dispose();
 		}
 	}
 
@@ -86,15 +87,14 @@ public class GuildMusic {
 	}
 
 	public Mono<Void> end() {
-		StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
+		final StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
 		if(!PremiumManager.isGuildPremium(guildId)) {
 			strBuilder.append(String.format(" If you like me, you can make a donation on **%s**, "
 					+ "it will help my creator keeping me alive :heart:",
 					Config.PATREON_URL));
 		}
 		this.leaveVoiceChannel();
-		return BotUtils.sendMessage(strBuilder.toString(), client.getMessageChannelById(messageChannelId))
-				.then();
+		return BotUtils.sendMessage(strBuilder.toString(), client.getMessageChannelById(messageChannelId)).then();
 	}
 
 	public void destroy() {
@@ -132,7 +132,7 @@ public class GuildMusic {
 	}
 
 	public boolean isLeavingScheduled() {
-		return leaveTask != null && !leaveTask.isDone();
+		return leaveTask != null && !leaveTask.isDisposed();
 	}
 
 	public boolean isWaiting() {

@@ -3,6 +3,7 @@ package me.shadorc.shadbot.data.premium;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,7 +36,7 @@ public class PremiumManager {
 		relics = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new CopyOnWriteArrayList<>();
 	}
 
-	@DataSave(filePath = FILE_NAME, initialDelay = 1, period = 1, unit = TimeUnit.HOURS)
+	@DataSave(filePath = FILE_NAME, initialDelay = 1, period = 1, unit = ChronoUnit.HOURS)
 	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(Utils.MAPPER.writeValueAsString(relics));

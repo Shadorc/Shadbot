@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.command.game.roulette;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -51,7 +51,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 
 	@Override
 	public Mono<Void> start() {
-		this.schedule(() -> this.stop().subscribe(), GAME_DURATION, TimeUnit.SECONDS);
+		this.schedule(this.stop(), GAME_DURATION, ChronoUnit.SECONDS);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		return Mono.empty();
 	}

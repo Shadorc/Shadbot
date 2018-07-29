@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.game.trivia;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -78,11 +79,11 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 			MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 
 			this.startTime = System.currentTimeMillis();
-			this.schedule(() -> this.stop()
+			this.schedule(this.stop()
 					.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", correctAnswer),
 							this.getContext().getChannel()))
-					.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), this.getContext().getGuildId()))
-					.subscribe(), LIMITED_TIME, TimeUnit.SECONDS);
+					.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), this.getContext().getGuildId())),
+					LIMITED_TIME, ChronoUnit.SECONDS);
 
 			return this.getContext().getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()

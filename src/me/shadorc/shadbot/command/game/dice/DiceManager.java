@@ -1,9 +1,9 @@
 package me.shadorc.shadbot.command.game.dice;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
@@ -44,7 +44,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 	@Override
 	public Mono<Void> start() {
-		this.schedule(() -> this.stop().subscribe(), GAME_DURATION, TimeUnit.SECONDS);
+		this.schedule(this.stop(), GAME_DURATION, ChronoUnit.SECONDS);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		return Mono.empty();
 	}

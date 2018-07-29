@@ -3,7 +3,6 @@ package me.shadorc.shadbot.core.ratelimiter;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
@@ -66,7 +65,7 @@ public class RateLimiter {
 					return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
 							username, message, maxNum, durationStr);
 				})
-				.flatMap(text -> new TemporaryMessage(client, channelId, 10, TimeUnit.SECONDS).send(text))
+				.flatMap(text -> new TemporaryMessage(client, channelId, 10, ChronoUnit.SECONDS).send(text))
 				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass()))
 				.subscribe();
 	}

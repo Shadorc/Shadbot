@@ -1,9 +1,8 @@
 package me.shadorc.shadbot.listener.music;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -15,7 +14,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.data.db.DatabaseManager;
@@ -33,6 +31,7 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -48,7 +47,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	private final boolean putFirst;
 
 	private List<AudioTrack> resultsTracks;
-	private ScheduledFuture<?> stopWaitingTask;
+	private Disposable stopWaitingTask;
 
 	public AudioLoadResultListener(GuildMusic guildMusic, Snowflake djId, Snowflake voiceChannelId, String identifier, boolean putFirst) {
 		this.guildMusic = guildMusic;
@@ -101,7 +100,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
 					.subscribe();
 
-			stopWaitingTask = Shadbot.getScheduler().schedule(this::stopWaiting, Config.MUSIC_CHOICE_DURATION, TimeUnit.SECONDS);
+			stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
+					.then(Mono.fromRunnable(this::stopWaiting))
+					.subscribe();
 
 			resultsTracks = new ArrayList<>(tracks);
 			MessageInterceptorManager.addInterceptor(guildMusic.getMessageChannelId(), this);
@@ -231,7 +232,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	}
 
 	private void stopWaiting() {
-		stopWaitingTask.cancel(false);
+		stopWaitingTask.dispose();
 		MessageInterceptorManager.removeInterceptor(guildMusic.getMessageChannelId(), this);
 		guildMusic.setWaiting(false);
 		resultsTracks.clear();

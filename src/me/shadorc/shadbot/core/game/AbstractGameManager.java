@@ -1,22 +1,22 @@
 package me.shadorc.shadbot.core.game;
 
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
 
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
 public abstract class AbstractGameManager {
 
 	private final Context context;
-	private ScheduledFuture<?> scheduledTask;
+	private Disposable scheduledTask;
 
 	public AbstractGameManager(Context context) {
 		this.context = context;
@@ -67,17 +67,19 @@ public abstract class AbstractGameManager {
 	}
 
 	public boolean isTaskDone() {
-		return scheduledTask == null || scheduledTask.isDone();
+		return scheduledTask == null || scheduledTask.isDisposed();
 	}
 
-	public void schedule(Runnable command, long delay, TimeUnit unit) {
+	public void schedule(Mono<?> mono, long delay, TemporalUnit unit) {
 		this.cancelScheduledTask();
-		scheduledTask = Shadbot.getScheduler().schedule(command, delay, unit);
+		scheduledTask = Mono.delay(Duration.of(delay, unit))
+				.then(mono)
+				.subscribe();
 	}
 
 	public void cancelScheduledTask() {
 		if(scheduledTask != null) {
-			scheduledTask.cancel(false);
+			scheduledTask.dispose();
 		}
 	}
 

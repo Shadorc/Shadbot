@@ -30,7 +30,7 @@ public class DiscordUtils {
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
-	
+
 	public static Mono<Long> getConnectedVoiceChannelCount(DiscordClient client) {
 		return client.getGuilds()
 				.flatMap(guild -> client.getSelf().flatMap(self -> self.asMember(guild.getId())))

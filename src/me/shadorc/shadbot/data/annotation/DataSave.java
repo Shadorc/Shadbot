@@ -4,7 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
+import java.time.temporal.ChronoUnit;
 
 import me.shadorc.shadbot.data.DataManager;
 
@@ -22,6 +22,6 @@ public @interface DataSave {
 
 	int period();
 
-	TimeUnit unit();
+	ChronoUnit unit();
 
 }

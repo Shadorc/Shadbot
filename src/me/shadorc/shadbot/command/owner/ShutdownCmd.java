@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.command.owner;
 
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -46,8 +46,8 @@ public class ShutdownCmd extends AbstractCommand {
 				.map(User::getMention)
 				.doOnSuccess(botName -> LogUtils.warn(context.getClient(),
 						String.format("%s will restart in %d seconds. (Message: %s)", botName, delay, message)))
-				.doOnTerminate(() -> Shadbot.getScheduler().schedule(Shadbot::logout, delay, TimeUnit.SECONDS))
-				.then();
+				.then(Mono.delay(Duration.ofSeconds(delay)))
+				.then(Mono.fromRunnable(Shadbot::logout));
 	}
 
 	@Override

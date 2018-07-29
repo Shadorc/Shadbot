@@ -1,10 +1,10 @@
 package me.shadorc.shadbot;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -21,14 +21,12 @@ import me.shadorc.shadbot.listener.GatewayLifecycleListener;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.executor.ScheduledWrappedExecutor;
 import reactor.core.publisher.Flux;
 
 public class Shadbot {
 
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
-	private static final ScheduledWrappedExecutor SCHEDULER = new ScheduledWrappedExecutor(3, "ShadbotScheduler-%d");
 
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.US);
@@ -61,7 +59,9 @@ public class Shadbot {
 			DiscordUtils.registerListener(client, ReadyEvent.class, GatewayLifecycleListener::onReady);
 		}
 
-		SCHEDULER.scheduleAtFixedRate(() -> LottoCmd.draw(CLIENTS.get(0)), LottoCmd.getDelay(), TimeUnit.DAYS.toMillis(7), TimeUnit.MILLISECONDS);
+		Flux.interval(LottoCmd.getDelay(), Duration.ofDays(7))
+				.doOnNext(ignored -> LottoCmd.draw(CLIENTS.get(0)))
+				.subscribe();
 
 		// Initiate login and block
 		Flux.merge(Flux.fromIterable(CLIENTS)).flatMap(DiscordClient::login).blockLast();
@@ -77,10 +77,6 @@ public class Shadbot {
 	 */
 	public static Instant getLaunchTime() {
 		return LAUNCH_TIME;
-	}
-
-	public static ScheduledWrappedExecutor getScheduler() {
-		return SCHEDULER;
 	}
 
 }
