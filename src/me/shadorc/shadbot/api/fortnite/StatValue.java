@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class StatValue {
 
 	@JsonProperty("valueInt")
-	private int valueInt;
+	private final int valueInt;
 	@JsonProperty("valueDec")
-	private double valueDec;
+	private final double valueDec;
 
 	public StatValue() {
 		this.valueInt = 0;

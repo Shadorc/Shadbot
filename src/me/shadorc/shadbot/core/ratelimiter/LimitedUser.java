@@ -7,7 +7,7 @@ import io.github.bucket4j.Bucket;
 public class LimitedUser {
 
 	private final Bucket bucket;
-	private AtomicBoolean isWarned;
+	private final AtomicBoolean isWarned;
 
 	public LimitedUser(Bucket bucket) {
 		this.bucket = bucket;

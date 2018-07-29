@@ -11,7 +11,6 @@ public enum Emoji {
 	RED_EXCLAMATION("exclamation"),
 	RED_FLAG("triangular_flag_on_post"),
 	WHITE_FLAG("flag_white"),
-	QUESTION("question"),
 
 	INFO("information_source"),
 	MAGNIFYING_GLASS("mag"),
@@ -36,7 +35,6 @@ public enum Emoji {
 	WIND("wind_blowing_face"),
 	RAIN("cloud_rain"),
 	DROPLET("droplet"),
-	MAP("map"),
 
 	MUSICAL_NOTE("musical_note"),
 	TRACK_NEXT("track_next"),
@@ -49,7 +47,6 @@ public enum Emoji {
 	SLEEPING("sleeping_accommodation"),
 	THUMBSDOWN("thumbsdown"),
 	SPEECH("speech_balloon"),
-	KEYBOARD("keyboard"),
 	CLAP("clap"),
 	TRIANGULAR_RULER("triangular_ruler"),
 

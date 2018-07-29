@@ -25,10 +25,6 @@ public class LogBuilder {
 		this.input = input;
 	}
 
-	public LogBuilder(LogType type, String message, String input) {
-		this(type, message, null, input);
-	}
-
 	public LogBuilder(LogType type, String message, Throwable err) {
 		this(type, message, err, null);
 	}

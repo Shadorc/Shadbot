@@ -3,13 +3,11 @@ package me.shadorc.shadbot.utils;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -27,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import discord4j.core.object.entity.Member;
 import me.shadorc.shadbot.data.db.DatabaseManager;
@@ -123,14 +120,6 @@ public class Utils {
 	}
 
 	/**
-	 * @param map - the map to sort
-	 * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by ascending value
-	 */
-	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
-		return Utils.sortByValue(map, Map.Entry.comparingByValue(Collections.reverseOrder()));
-	}
-
-	/**
 	 * @param member - the member who bet
 	 * @param betStr - the string representing the bet
 	 * @param maxValue - the maximum bet value
@@ -154,14 +143,6 @@ public class Utils {
 		}
 
 		return bet;
-	}
-
-	/**
-	 * @param threadName - the naming format to use
-	 * @return A daemon {@link ThreadFactory} with the name format sets as {@code threadName}
-	 */
-	public static ThreadFactory createDaemonThreadFactory(String threadName) {
-		return new ThreadFactoryBuilder().setNameFormat(threadName).setDaemon(true).build();
 	}
 
 	/**

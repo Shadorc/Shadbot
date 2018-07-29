@@ -7,9 +7,9 @@ public class SubStats {
 	public static final SubStats DEFAULT = new SubStats();
 
 	@JsonProperty("top1")
-	private StatValue top1;
+	private final StatValue top1;
 	@JsonProperty("kd")
-	private StatValue ratio;
+	private final StatValue ratio;
 
 	public SubStats() {
 		this.top1 = new StatValue();
