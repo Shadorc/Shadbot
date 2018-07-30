@@ -73,7 +73,10 @@ public class FortniteCmd extends AbstractCommand {
 			FortniteResponse fortnite = Utils.MAPPER.readValue(response.parse().body().html(), FortniteResponse.class);
 
 			if(fortnite.getError().map("Player Not Found"::equals).orElse(false)) {
-				return loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Fortnite on this platform or doesn't exist.").then();
+				return loadingMsg.send(
+						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Fortnite on this platform or doesn't exist.",
+								context.getUsername()))
+						.then();
 			}
 
 			final int length = 8;
