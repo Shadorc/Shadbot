@@ -5,6 +5,7 @@ import java.util.List;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -24,7 +25,7 @@ public class SendMessageCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		List<String> args = context.requireArgs(2);
 
-		Long userId = NumberUtils.asPositiveLong(args.get(0));
+		final Long userId = NumberUtils.asPositiveLong(args.get(0));
 		if(userId == null) {
 			throw new CommandException(String.format("`%s` is not a valid user ID.", args.get(0)));
 		}
@@ -43,7 +44,7 @@ public class SendMessageCmd extends AbstractCommand {
 
 				})
 				.then(BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel()))
-				.switchIfEmpty(BotUtils.sendMessage(Emoji.GREY_EXCLAMATION + " User not found.", context.getChannel()))
+				.onErrorMap(ExceptionHandler::isNotFound, err -> new CommandException("User not found."))
 				.then();
 	}
 
