@@ -4,6 +4,7 @@ import java.util.List;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -21,7 +22,7 @@ public class DatabaseCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(2);
+		List<String> args = context.requireArgs(1, 2);
 
 		final Long guildId = NumberUtils.asPositiveLong(args.get(0));
 		if(guildId == null) {
@@ -29,15 +30,13 @@ public class DatabaseCmd extends AbstractCommand {
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.switchIfEmpty(Mono.fromRunnable(() -> {
-					throw new CommandException("Guild not found.");
-				}))
+				.onErrorMap(ExceptionHandler::isForbidden, err -> new CommandException("Guild not found."))
 				.map(guild -> {
 					if(args.size() == 1) {
 						return DatabaseManager.getDBGuild(guild.getId()).toString();
 					}
 
-					Long memberId = NumberUtils.asPositiveLong(args.get(1));
+					final Long memberId = NumberUtils.asPositiveLong(args.get(1));
 					if(memberId == null) {
 						throw new CommandException(String.format("`%s` is not a valid member ID.", args.get(1)));
 					}
