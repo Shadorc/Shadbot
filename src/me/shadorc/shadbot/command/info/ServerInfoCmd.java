@@ -38,10 +38,8 @@ public class ServerInfoCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-
 		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
-
-		StringBuilder settingsStr = new StringBuilder();
+		final StringBuilder settingsStr = new StringBuilder();
 
 		if(!dbGuild.getPrefix().equals(Config.DEFAULT_PREFIX)) {
 			settingsStr.append(String.format("**Prefix:** %s", context.getPrefix()));
@@ -57,51 +55,63 @@ public class ServerInfoCmd extends AbstractCommand {
 
 		final Mono<Void> allowedChannelsStr = Flux.fromIterable(dbGuild.getAllowedChannels())
 				.flatMap(context.getClient()::getTextChannelById)
+				.map(TextChannel::getName)
 				.collectList()
-				.map(channels -> settingsStr.append(
-						String.format("%n**Allowed channels:**%n\t%s", FormatUtils.format(channels, TextChannel::getName, "\n\t"))))
+				.filter(channels -> !channels.isEmpty())
+				.map(channels -> settingsStr.append(String.format("%n**Allowed channels:**%n\t%s", String.join("\n\t", channels))))
 				.then();
 
 		final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getAutoRoles())
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
+				.map(Role::getMention)
 				.collectList()
-				.map(roles -> settingsStr.append(
-						String.format("%n**Auto-roles:**%n\t%s", FormatUtils.format(roles, Role::getMention, "\n\t"))))
+				.filter(roles -> !roles.isEmpty())
+				.map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n\t%s", String.join("\n\t", roles))))
 				.then();
 
 		final Mono<Void> permissionsStr = Flux.fromIterable(dbGuild.getAllowedRoles())
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
+				.map(Role::getMention)
 				.collectList()
-				.map(roles -> settingsStr.append(
-						String.format("%n**Permissions:**%n\t%s", FormatUtils.format(roles, Role::getMention, "\n\t"))))
+				.filter(roles -> !roles.isEmpty())
+				.map(roles -> settingsStr.append(String.format("%n**Permissions:**%n\t%s", String.join("\n\t", roles))))
 				.then();
 
 		return allowedChannelsStr
 				.then(autoRolesStr)
 				.then(permissionsStr)
 				.then(context.getGuild())
-				.flatMap(guild -> Mono.zip(context.getGuild(), guild.getOwner(), guild.getChannels().collectList(), guild.getRegion()))
-				.map(tuple4 -> {
-					final Guild guild = tuple4.getT1();
-					final Member owner = tuple4.getT2();
-					final List<GuildChannel> channels = tuple4.getT3();
-					final Region region = tuple4.getT4();
+				.flatMap(guild -> Mono.zip(context.getGuild(), guild.getOwner(), guild.getChannels().collectList(),
+						guild.getRegion(), context.getAvatarUrl()))
+				.map(tuple5 -> {
+					final Guild guild = tuple5.getT1();
+					final Member owner = tuple5.getT2();
+					final List<GuildChannel> channels = tuple5.getT3();
+					final Region region = tuple5.getT4();
+					final String avatarUrl = tuple5.getT5();
 
 					final String creationDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(guild.getId())).format(dateFormatter),
 							FormatUtils.formatLongDuration(DiscordUtils.getSnowflakeTimeFromID(guild.getId())));
+					final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
+					final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
-					return EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Info about \"%s\"", guild.getName()), null, null)
+					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+							.setAuthor(String.format("Info about \"%s\"", guild.getName()), null, avatarUrl)
 							.setThumbnail(guild.getIconUrl(Format.JPEG).get())
 							.addField("Owner", owner.getUsername(), true)
 							.addField("Server ID", guild.getId().asString(), true)
 							.addField("Creation date", creationDate, true)
 							.addField("Region", region.getName(), true)
-							.addField("Channels", String.format("**Voice:** %d", channels.stream().filter(channel -> channel instanceof VoiceChannel).count())
-									+ String.format("%n**Text:** %d", channels.size()), true)
-							.addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true)
-							.addField("Settings", settingsStr.toString(), true);
+							.addField("Channels", String.format("**Voice:** %d", voiceChannels)
+									+ String.format("%n**Text:** %d", textChannels), true)
+							.addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true);
+
+					if(!settingsStr.toString().isEmpty()) {
+						embed.addField("Settings", settingsStr.toString(), true);
+					}
+
+					return embed;
 				})
 				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
 				.then();
