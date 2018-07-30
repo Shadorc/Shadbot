@@ -80,7 +80,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
 			guildMusic.setDj(djId);
-			guildMusic.setWaiting(true);
+			guildMusic.setWaitingForChoice(true);
 
 			final String choices = FormatUtils.numberedList(5, tracks.size(),
 					count -> String.format("\t**%d.** %s",
@@ -234,7 +234,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	private void stopWaiting() {
 		stopWaitingTask.dispose();
 		MessageInterceptorManager.removeInterceptor(guildMusic.getMessageChannelId(), this);
-		guildMusic.setWaiting(false);
+		guildMusic.setWaitingForChoice(false);
 		resultsTracks.clear();
 		this.leaveIfStopped();
 	}

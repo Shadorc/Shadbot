@@ -20,7 +20,7 @@ public class MusicProvider implements AudioProvider {
 
 	@Override
 	public boolean isDone() {
-		return guildMusic.isDone();
+		return !guildMusic.isInVoiceChannel();
 	}
 
 	@Override

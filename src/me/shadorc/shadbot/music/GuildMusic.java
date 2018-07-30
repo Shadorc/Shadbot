@@ -35,8 +35,7 @@ public class GuildMusic {
 	private Disposable leaveTask;
 	private Snowflake messageChannelId;
 	private Snowflake djId;
-	private boolean isWaiting;
-	private boolean isDone;
+	private boolean isWaitingForChoice;
 
 	public GuildMusic(DiscordClient client, Snowflake guildId, AudioPlayerManager audioPlayerManager) {
 		this.client = client;
@@ -80,9 +79,8 @@ public class GuildMusic {
 
 	public void leaveVoiceChannel() {
 		if(isInVoiceChannel.get()) {
-			isDone = true;
-			controller.disconnect();
 			isInVoiceChannel.set(false);
+			controller.disconnect();
 		}
 	}
 
@@ -135,12 +133,12 @@ public class GuildMusic {
 		return leaveTask != null && !leaveTask.isDisposed();
 	}
 
-	public boolean isWaiting() {
-		return isWaiting;
+	public boolean isWaitingForChoice() {
+		return isWaitingForChoice;
 	}
 
-	public boolean isDone() {
-		return isDone;
+	public boolean isInVoiceChannel() {
+		return isInVoiceChannel.get();
 	}
 
 	public void setMessageChannel(Snowflake messageChannelId) {
@@ -151,8 +149,8 @@ public class GuildMusic {
 		this.djId = djId;
 	}
 
-	public void setWaiting(boolean isWaiting) {
-		this.isWaiting = isWaiting;
+	public void setWaitingForChoice(boolean isWaitingForChoice) {
+		this.isWaitingForChoice = isWaitingForChoice;
 	}
 
 }
