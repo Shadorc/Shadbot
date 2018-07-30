@@ -32,6 +32,12 @@ public class Relic {
 	@JsonProperty("activationTime")
 	private long activationTime;
 
+	public Relic() {
+		this.id = null;
+		this.duration = 0;
+		this.type = null;
+	}
+
 	public Relic(String id, long duration, RelicType type) {
 		this.id = id;
 		this.duration = duration;
