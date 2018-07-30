@@ -89,6 +89,11 @@ public class ExceptionHandler {
 						&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
 	}
 
+	public static boolean isNotFound(Throwable err) {
+		return err instanceof ClientException
+				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.NOT_FOUND);
+	}
+
 	private Mono<Message> onCommandException() {
 		CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
 		return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
