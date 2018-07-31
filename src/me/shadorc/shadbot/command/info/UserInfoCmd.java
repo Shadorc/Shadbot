@@ -6,7 +6,6 @@ import java.util.Locale;
 
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -33,40 +32,46 @@ public class UserInfoCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 
-		final Member member = context.getMember();
+		final Mono<Member> memberMono = context.getMessage()
+				.getUserMentions()
+				.switchIfEmpty(context.getAuthor())
+				.next()
+				.flatMap(user -> user.asMember(context.getGuildId()));
 
-		return Mono.zip(context.getMessage().getUserMentions().switchIfEmpty(context.getAuthor()).next(),
-				member.getPresence(),
-				member.getRoles().collectList(),
+		return Mono.zip(memberMono,
+				memberMono.flatMap(Member::getPresence),
+				memberMono.flatMapMany(Member::getRoles).collectList(),
 				context.getAvatarUrl())
 				.map(tuple4 -> {
-					final User user = tuple4.getT1();
+					final Member member = tuple4.getT1();
 					final Presence presence = tuple4.getT2();
 					final List<Role> roles = tuple4.getT3();
 					final String avatarUrl = tuple4.getT4();
 
 					final String creationDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(user.getId())).format(dateFormatter),
-							FormatUtils.formatLongDuration(DiscordUtils.getSnowflakeTimeFromID(user.getId())));
+							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(member.getId())).format(dateFormatter),
+							FormatUtils.formatLongDuration(DiscordUtils.getSnowflakeTimeFromID(member.getId())));
 
 					final String joinDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(member.getJoinTime()).format(dateFormatter),
 							FormatUtils.formatLongDuration(member.getJoinTime()));
 
 					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Info about user \"%s\"%s", user.getUsername(), user.isBot() ? " (Bot)" : ""), null, avatarUrl)
-							.setThumbnail(DiscordUtils.getAvatarUrl(user))
+							.setAuthor(String.format("Info about user \"%s\"%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)
+							.setThumbnail(DiscordUtils.getAvatarUrl(member))
 							.addField("Display name", member.getDisplayName(), true)
-							.addField("User ID", user.getId().asString(), true)
+							.addField("User ID", member.getId().asString(), true)
 							.addField("Creation date", creationDate, true)
 							.addField("Join date", joinDate, true);
 
 					if(!roles.isEmpty()) {
-						embed.addField("Roles", FormatUtils.format(roles, Role::getName, "\n"), true);
+						embed.addField("Roles", FormatUtils.format(roles, Role::getMention, "\n"), true);
 					}
 
 					embed.addField("Status", StringUtils.capitalizeFully(presence.getStatus().getValue()), true);
-					presence.getActivity().flatMap(Activity::getDetails).ifPresent(details -> embed.addField("Playing text", details, true));
+					presence.getActivity()
+							.map(Activity::getName)
+							.ifPresent(details -> embed.addField("Playing text", details, true));
 
 					return embed;
 				})
