@@ -42,14 +42,14 @@ public class RolelistCmd extends AbstractCommand {
 				.map(usernamesAndRoles -> {
 					final List<String> usernames = usernamesAndRoles.getT1().stream().distinct().collect(Collectors.toList());
 					final List<Role> roles = usernamesAndRoles.getT2();
-					
+
 					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed();
-					
+
 					if(usernames.isEmpty()) {
 						return embed.setDescription(
 								String.format("There is nobody with %s.", roleIds.size() == 1 ? "this role" : "these roles"));
 					}
-					
+
 					FormatUtils.createColumns(usernames, 25).stream()
 							.forEach(field -> embed.addField(field.getName(), field.getValue(), false));
 

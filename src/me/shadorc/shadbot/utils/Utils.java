@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.utils;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -85,22 +84,14 @@ public class Utils {
 
 	/**
 	 * @param array - the array to convert
-	 * @param listClass - the class of the elements contained by {@code array}
+	 * @param clazz - the class of the elements contained by {@code array}
 	 * @return A list containing the elements of {@code array} converted to {@code listClass} objects
 	 */
-	public static <T> List<T> toList(JSONArray array, Class<T> listClass) {
+	public static <T> List<T> toList(JSONArray array, Class<T> clazz) {
 		if(array == null) {
 			return null;
 		}
-
-		List<T> list = new ArrayList<>();
-		for(int i = 0; i < array.length(); i++) {
-			if(!listClass.isInstance(array.get(i))) {
-				throw new IllegalArgumentException(String.format("Array's elements cannot be casted to %s.", listClass.getSimpleName()));
-			}
-			list.add(listClass.cast(array.get(i)));
-		}
-		return list;
+		return array.toList().stream().map(clazz::cast).collect(Collectors.toList());
 	}
 
 	/**
