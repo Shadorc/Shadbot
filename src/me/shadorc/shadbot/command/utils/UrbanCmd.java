@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.utils;
 
 import java.io.IOException;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,13 +35,15 @@ public class UrbanCmd extends AbstractCommand {
 		try {
 			String url = String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(context.getArg()));
 			JSONObject mainObj = new JSONObject(NetUtils.getJSON(url));
+			
+			JSONArray list = mainObj.getJSONArray("list");
 
-			if(mainObj.getString("result_type").equals("no_results")) {
+			if(list.toList().isEmpty()) {
 				BotUtils.sendMessage(TextUtils.noResult(context.getArg()), context.getChannel());
 				return;
 			}
 
-			JSONObject resultObj = mainObj.getJSONArray("list").getJSONObject(0);
+			JSONObject resultObj = list.getJSONObject(0);
 			String definition = StringUtils.truncate(resultObj.getString("definition"), EmbedBuilder.DESCRIPTION_CONTENT_LIMIT);
 			String example = StringUtils.truncate(resultObj.getString("example"), EmbedBuilder.FIELD_CONTENT_LIMIT);
 
