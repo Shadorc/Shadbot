@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.BooleanUtils;
 
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
-import discord4j.core.object.entity.Guild;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
@@ -51,7 +50,7 @@ public class VoiceStateUpdateListener {
 		DiscordUtils.getVoiceChannelId(event.getClient().getSelf().flatMap(user -> user.asMember(guildId)))
 				.flatMap(Mono::justOrEmpty)
 				.flatMap(botVoiceChannel -> event.getCurrent().getGuild()
-						.flatMapMany(Guild::getMembers)
+						.flatMapMany(DiscordUtils::getMembers)
 						.filter(member -> !member.getId().equals(event.getClient().getSelfId().get()))
 						.flatMap(DiscordUtils::getVoiceChannelId)
 						.flatMap(Mono::justOrEmpty)

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.object.VoiceState;
+import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
@@ -30,6 +31,25 @@ public class DiscordUtils {
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
+
+	public static Flux<Member> getMembers(Guild guild) {
+		return DiscordUtils.getMembers(Mono.just(guild));
+	}
+
+	public static Flux<Member> getMembers(Mono<Guild> guild) {
+		return guild.flatMapMany(Guild::getMembers)
+				.collectList()
+				.map(list -> {
+					final List<Member> members = new ArrayList<>();
+					for(Member member : list) {
+						if(!members.stream().map(Member::getId).anyMatch(member.getId()::equals)) {
+							members.add(member);
+						}
+					}
+					return members;
+				})
+				.flatMapMany(Flux::fromIterable);
+	}
 
 	public static Mono<Long> getConnectedVoiceChannelCount(DiscordClient client) {
 		return client.getGuilds()

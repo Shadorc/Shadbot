@@ -81,7 +81,7 @@ public class ExceptionHandler {
 	}
 
 	public static boolean isUnreacheable(Throwable err) {
-		return err instanceof NoRouteToHostException ||err instanceof SocketTimeoutException;
+		return err instanceof NoRouteToHostException || err instanceof SocketTimeoutException;
 	}
 
 	public static boolean isForbidden(Throwable err) {

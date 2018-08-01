@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
@@ -73,7 +72,7 @@ public class BotUtils {
 	}
 
 	public static Flux<Member> getMembersFrom(Message message) {
-		return message.getGuild().flatMapMany(Guild::getMembers)
+		return DiscordUtils.getMembers(message.getGuild())
 				.filter(member -> message.mentionsEveryone()
 						|| message.getUserMentionIds().contains(member.getId())
 						|| !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
