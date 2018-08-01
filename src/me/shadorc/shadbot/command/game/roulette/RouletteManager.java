@@ -51,23 +51,25 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 
 	@Override
 	public Mono<Void> start() {
-		this.schedule(this.spin(), GAME_DURATION, ChronoUnit.SECONDS);
-		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-		return Mono.empty();
+		return Mono.fromRunnable(() -> {
+			this.schedule(this.spin(), GAME_DURATION, ChronoUnit.SECONDS);
+			MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
+		});
 	}
 
 	@Override
 	public Mono<Void> stop() {
-		this.cancelScheduledTask();
-		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-		RouletteCmd.MANAGERS.remove(this.getContext().getChannelId());
-		return Mono.empty();
+		return Mono.fromRunnable(() -> {
+			this.cancelScheduledTask();
+			MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
+			RouletteCmd.MANAGERS.remove(this.getContext().getChannelId());
+		});
 	}
 
 	public Mono<Void> spin() {
 		final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
 		return Flux.fromIterable(playersPlace.keySet())
-				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
+				.flatMap(this.getContext().getClient()::getUserById)
 				.map(user -> {
 					final int bet = playersPlace.get(user.getId()).getT1();
 					final String place = playersPlace.get(user.getId()).getT2();

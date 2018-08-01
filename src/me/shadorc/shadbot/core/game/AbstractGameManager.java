@@ -2,6 +2,7 @@ package me.shadorc.shadbot.core.game;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
@@ -16,10 +17,16 @@ import reactor.core.publisher.Mono;
 public abstract class AbstractGameManager {
 
 	private final Context context;
+	/**
+	 * Used to ensure the veracity of {@code isTaskDone}, certain conditions may lead to the task being completed without the Mono being disposed or null
+	 * leading to {@code isTaskDone} returning false
+	 */
+	private final AtomicBoolean isDone;
 	private Disposable scheduledTask;
 
 	public AbstractGameManager(Context context) {
 		this.context = context;
+		this.isDone = new AtomicBoolean(false);
 	}
 
 	public abstract Mono<Void> start();
@@ -67,12 +74,13 @@ public abstract class AbstractGameManager {
 	}
 
 	public boolean isTaskDone() {
-		return scheduledTask == null || scheduledTask.isDisposed();
+		return isDone.get() || scheduledTask == null || scheduledTask.isDisposed();
 	}
 
 	public void schedule(Mono<?> mono, long delay, TemporalUnit unit) {
 		this.cancelScheduledTask();
 		scheduledTask = Mono.delay(Duration.of(delay, unit))
+				.then(Mono.fromRunnable(() -> this.isDone.set(true)))
 				.then(mono)
 				.subscribe();
 	}
