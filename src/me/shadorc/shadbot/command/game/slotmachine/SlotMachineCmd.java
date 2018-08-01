@@ -13,6 +13,7 @@ import me.shadorc.shadbot.data.db.DBMember;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager;
 import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -37,9 +38,7 @@ public class SlotMachineCmd extends AbstractCommand {
 		DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId());
 
 		if(dbMember.getCoins() < PAID_COST) {
-			return context.getAuthor()
-					.flatMap(author -> BotUtils.sendMessage(TextUtils.notEnoughCoins(author), context.getChannel()))
-					.then();
+			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
 		}
 
 		final List<SlotOptions> slots = List.of(Utils.randValue(SLOTS_ARRAY), Utils.randValue(SLOTS_ARRAY), Utils.randValue(SLOTS_ARRAY));

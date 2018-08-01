@@ -50,9 +50,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 
 		DBMember dbSender = DatabaseManager.getDBMember(context.getGuildId(), senderUserId);
 		if(dbSender.getCoins() < coins) {
-			return context.getAuthor()
-					.flatMap(author -> BotUtils.sendMessage(TextUtils.notEnoughCoins(author), context.getChannel()))
-					.then();
+			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
 		}
 
 		DBMember dbReceiver = DatabaseManager.getDBMember(context.getGuildId(), receiverUserId);

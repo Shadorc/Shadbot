@@ -51,9 +51,7 @@ public class LottoCmd extends AbstractCommand {
 
 		final DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId());
 		if(dbMember.getCoins() < PAID_COST) {
-			return context.getAuthor()
-					.flatMap(author -> BotUtils.sendMessage(TextUtils.notEnoughCoins(author), context.getChannel()))
-					.then();
+			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
 		}
 
 		final LottoGambler gambler = LottoManager.getLotto().getGamblers().stream()

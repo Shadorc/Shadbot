@@ -4,7 +4,6 @@ import org.jsoup.Jsoup;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 
-import discord4j.core.object.entity.User;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.utils.command.Emoji;
@@ -19,6 +18,8 @@ public class TextUtils {
 
 	public static final String NO_PLAYING_MUSIC = Emoji.MUTE + " No currently playing music.";
 
+	public static final String NOT_ENOUGH_COINS = "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
+
 	public static final String[] SPAM_MESSAGES = { "Take it easy, we are not in a hurry !",
 			"Phew.. give me time to rest, you're too fast for me.",
 			"I'm not going anywhere, no need to be this fast.",
@@ -28,11 +29,6 @@ public class TextUtils {
 			String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
 			String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
 			String.format("Support server: %s", Config.SUPPORT_SERVER_URL) };
-
-	public static String notEnoughCoins(User user) {
-		return String.format(Emoji.BANK + " (**%s**) You don't have enough coins. You can get some by playing **RPS**, **Hangman** "
-				+ "or **Trivia**.", user.getUsername());
-	}
 
 	public static String mustBeNsfw(String prefix) {
 		return String.format(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",

@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import discord4j.core.object.entity.Member;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.command.Emoji;
 
 public class Utils {
 
@@ -125,11 +124,11 @@ public class Utils {
 		}
 
 		if(DatabaseManager.getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
-			throw new CommandException(TextUtils.notEnoughCoins(member));
+			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
 		}
 
 		if(bet > maxValue) {
-			throw new CommandException(String.format(Emoji.BANK + " Sorry, you can't bet more than **%s**.",
+			throw new CommandException(String.format("Sorry, you can't bet more than **%s**.",
 					FormatUtils.formatCoins(maxValue)));
 		}
 
