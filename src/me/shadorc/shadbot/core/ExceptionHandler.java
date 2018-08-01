@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.core;
 
 import java.net.ConnectException;
+import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class ExceptionHandler {
 	}
 
 	public static boolean isUnreacheable(Throwable err) {
-		return err instanceof SocketTimeoutException;
+		return err instanceof NoRouteToHostException ||err instanceof SocketTimeoutException;
 	}
 
 	public static boolean isForbidden(Throwable err) {
