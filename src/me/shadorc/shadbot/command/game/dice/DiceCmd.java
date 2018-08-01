@@ -64,10 +64,6 @@ public class DiceCmd extends AbstractCommand {
 			diceManager = new DiceManager(context, bet);
 		}
 
-		if(MANAGERS.putIfAbsent(context.getChannelId(), diceManager) == null) {
-			diceManager.start();
-		}
-
 		if(diceManager.getPlayersCount() == 6) {
 			return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) Sorry, there are already 6 players.",
 					context.getUsername()), context.getChannel())
@@ -81,8 +77,16 @@ public class DiceCmd extends AbstractCommand {
 					.then();
 		}
 
+		Mono<Void> startMono = Mono.empty();
+
+		if(MANAGERS.putIfAbsent(context.getChannelId(), diceManager) == null) {
+			startMono = diceManager.start();
+		}
+
 		if(diceManager.addPlayer(context.getAuthorId(), num)) {
-			return diceManager.show().then();
+			return startMono
+					.then(diceManager.show())
+					.then();
 		} else {
 			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
 					context.getUsername()), context.getChannel())

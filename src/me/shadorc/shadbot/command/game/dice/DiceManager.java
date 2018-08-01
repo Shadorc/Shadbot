@@ -44,23 +44,25 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 	@Override
 	public Mono<Void> start() {
-		this.schedule(this.rollTheDice(), GAME_DURATION, ChronoUnit.SECONDS);
-		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-		return Mono.empty();
+		return Mono.fromRunnable(() -> {
+			this.schedule(this.rollTheDice(), GAME_DURATION, ChronoUnit.SECONDS);
+			MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
+		});
 	}
 
 	@Override
 	public Mono<Void> stop() {
-		this.cancelScheduledTask();
-		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-		DiceCmd.MANAGERS.remove(this.getContext().getChannelId());
-		return Mono.empty();
+		return Mono.fromRunnable(() -> {
+			this.cancelScheduledTask();
+			MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
+			DiceCmd.MANAGERS.remove(this.getContext().getChannelId());
+		});
 	}
 
 	public Mono<Void> rollTheDice() {
 		int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
 		return Flux.fromIterable(numsPlayers.values())
-				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
+				.flatMap(this.getContext().getClient()::getUserById)
 				.map(user -> {
 					int num = numsPlayers.keySet().stream()
 							.filter(number -> numsPlayers.get(number).equals(user.getId()))
@@ -88,7 +90,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 	protected Mono<Message> show() {
 		return this.getContext().getAvatarUrl()
 				.zipWith(Flux.fromIterable(numsPlayers.values())
-						.flatMap(userId -> this.getContext().getClient().getUserById(userId))
+						.flatMap(this.getContext().getClient()::getUserById)
 						.map(User::getUsername)
 						.collectList())
 				.map(avatarUrlAndUsers -> {
@@ -100,8 +102,13 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 							.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
 									this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.formatCoins(bet)))
 							.addField("Player", String.join("\n", usernames), true)
-							.addField("Number", FormatUtils.format(numsPlayers.keySet(), Object::toString, "\n"), true)
-							.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+							.addField("Number", FormatUtils.format(numsPlayers.keySet(), Object::toString, "\n"), true);
+
+					if(this.isTaskDone()) {
+						embed.setFooter("Finished.", null);
+					} else {
+						embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+					}
 
 					if(results != null) {
 						embed.addField("Results", results, false);
@@ -109,7 +116,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 					return embed;
 				})
-				.flatMap(embed -> updateableMessage.send(embed));
+				.flatMap(updateableMessage::send);
 	}
 
 	public int getBet() {
@@ -120,6 +127,11 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 		return numsPlayers.size();
 	}
 
+	/**
+	 * @param userId - the used ID to add
+	 * @param num - the number bet by the user
+	 * @return true if the user could be added, false otherwise
+	 */
 	public boolean addPlayer(Snowflake userId, int num) {
 		if(numsPlayers.containsValue(userId)) {
 			return false;
