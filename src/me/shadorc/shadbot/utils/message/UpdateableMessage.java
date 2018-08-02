@@ -17,7 +17,7 @@ public class UpdateableMessage {
 
 	/**
 	 * Sends a message that will be deleted each time the {@code send} method is called
-	 * 
+	 *
 	 * @param client - the Discord client
 	 * @param channelId - the Channel ID in which send the message
 	 */
@@ -29,7 +29,7 @@ public class UpdateableMessage {
 
 	/**
 	 * Send a message and delete the previous one
-	 * 
+	 *
 	 * @param embed - the embed to send
 	 */
 	public Mono<Message> send(EmbedCreateSpec embed) {

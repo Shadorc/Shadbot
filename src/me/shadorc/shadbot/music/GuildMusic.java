@@ -63,7 +63,7 @@ public class GuildMusic {
 
 	/**
 	 * Join a voice channel only if the bot is not already in a voice channel
-	 * 
+	 *
 	 * @param voiceChannelId - the voice channel ID to join
 	 */
 	public Mono<Void> joinVoiceChannel(Snowflake voiceChannelId) {

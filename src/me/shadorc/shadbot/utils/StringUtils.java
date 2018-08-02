@@ -89,7 +89,7 @@ public class StringUtils {
 	/**
 	 * The function returns the argument string with whitespace normalized by using {@link #trim(String)} to remove leading and trailing whitespace and
 	 * then replacing sequences of whitespace characters by a single space.
-	 * 
+	 *
 	 * @param str - the source String to normalize whitespaces from, may be null
 	 * @return the modified string with whitespace normalized, {@code null} if null String input
 	 */

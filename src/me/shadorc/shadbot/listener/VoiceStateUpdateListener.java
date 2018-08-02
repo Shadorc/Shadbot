@@ -20,9 +20,9 @@ public class VoiceStateUpdateListener {
 		event.getClient().getSelfId().ifPresent(selfId -> {
 			final Snowflake userId = event.getCurrent().getUserId();
 			if(userId.equals(selfId)) {
-				onBotEvent(event);
+				VoiceStateUpdateListener.onBotEvent(event);
 			} else {
-				onUserEvent(event);
+				VoiceStateUpdateListener.onUserEvent(event);
 			}
 		});
 	}

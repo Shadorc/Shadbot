@@ -40,7 +40,7 @@ public class TimeUtils {
 	/**
 	 * Convert a string, case insensitive, representing time (example: 1m03s) into seconds. <br>
 	 * Supported units: s, m, h
-	 * 
+	 *
 	 * @param str - the text to parse
 	 * @return The amount of seconds corresponding to the {@code str} format
 	 */

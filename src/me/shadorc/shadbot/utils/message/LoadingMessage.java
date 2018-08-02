@@ -27,7 +27,7 @@ public class LoadingMessage implements Publisher<Void> {
 
 	/**
 	 * Start typing until a message is send or the typing timeout have passed
-	 * 
+	 *
 	 * @param client - the Discord client
 	 * @param channelId - the Channel ID in which send the message
 	 * @param typingTimeout - the duration before a message is send
@@ -45,7 +45,7 @@ public class LoadingMessage implements Publisher<Void> {
 
 	/**
 	 * Start typing until a message is send Start typing until a message is send or 30 seconds have passed
-	 * 
+	 *
 	 * @param client - the Discord client
 	 * @param channelId - the Channel ID in which send the message
 	 */

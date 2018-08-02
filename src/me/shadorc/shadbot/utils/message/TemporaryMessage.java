@@ -33,7 +33,7 @@ public class TemporaryMessage {
 
 	/**
 	 * Send a message and then wait {@code delay} {@code unit} to delete it
-	 * 
+	 *
 	 * @param content - the message's content
 	 * @return A Mono representing the message sent
 	 */
