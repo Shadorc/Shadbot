@@ -127,12 +127,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 		return numsPlayers.size();
 	}
 
-	/**
-	 * @param userId - the used ID to add
-	 * @param num - the number bet by the user
-	 * @return true if the user could be added, false otherwise
-	 */
-	public boolean addPlayer(Snowflake userId, int num) {
+	public boolean addPlayerIfAbsent(Snowflake userId, int num) {
 		if(numsPlayers.containsValue(userId)) {
 			return false;
 		}

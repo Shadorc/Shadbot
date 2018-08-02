@@ -83,7 +83,7 @@ public class DiceCmd extends AbstractCommand {
 			startMono = diceManager.start();
 		}
 
-		if(diceManager.addPlayer(context.getAuthorId(), num)) {
+		if(diceManager.addPlayerIfAbsent(context.getAuthorId(), num)) {
 			return startMono
 					.then(diceManager.show())
 					.then();
