@@ -51,11 +51,15 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 		this.dealerCards = new ArrayList<>();
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 	}
+	
+	//TODO: Bug avec la main du dealer sur la fin
+	//TODO: IsIntercepeted considère tous les messages
 
 	@Override
 	public Mono<Void> start() {
 		return Mono.fromRunnable(() -> {
-			while(this.dealerCards.size() < 2 || BlackjackUtils.getValue(this.dealerCards) < 17) {
+			this.dealerCards.addAll(Card.pick(2));
+			while(BlackjackUtils.getValue(this.dealerCards) < 17) {
 				this.dealerCards.add(Card.pick());
 			}
 
