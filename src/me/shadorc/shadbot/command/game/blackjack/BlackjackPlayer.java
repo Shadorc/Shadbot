@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import discord4j.core.object.util.Snowflake;
@@ -17,9 +18,11 @@ public class BlackjackPlayer {
 	public BlackjackPlayer(Snowflake userId, int bet) {
 		this.userId = userId;
 		this.bet = bet;
-		this.cards = Card.pick(2);
+		this.cards = new ArrayList<>();
 		this.isDoubleDown = false;
 		this.isStanding = false;
+
+		this.addCards(Card.pick(2));
 	}
 
 	public void hit() {

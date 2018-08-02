@@ -27,7 +27,7 @@ public class BlackjackCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		Integer bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
+		final Integer bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
 
 		Mono<Void> startMono = Mono.empty();
 
@@ -38,11 +38,11 @@ public class BlackjackCmd extends AbstractCommand {
 		}
 
 		if(blackjackManager.addPlayerIfAbsent(context.getAuthorId(), bet)) {
-			return startMono.then(blackjackManager.stopOrShow());
-		} else {
 			return startMono
-					.then(BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-							context.getUsername()), context.getChannel()))
+					.then(blackjackManager.computeResultsOrShow());
+		} else {
+			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+					context.getUsername()), context.getChannel())
 					.then();
 		}
 	}

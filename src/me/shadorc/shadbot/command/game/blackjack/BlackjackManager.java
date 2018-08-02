@@ -11,6 +11,7 @@ import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
@@ -53,45 +54,36 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 
 	@Override
 	public Mono<Void> start() {
-		this.dealerCards.addAll(Card.pick(2));
-		while(BlackjackUtils.getValue(this.dealerCards) < 17) {
-			this.dealerCards.add(Card.pick());
-		}
+		return Mono.fromRunnable(() -> {
+			while(this.dealerCards.size() < 2 || BlackjackUtils.getValue(this.dealerCards) < 17) {
+				this.dealerCards.add(Card.pick());
+			}
 
-		this.schedule(this.stop(), GAME_DURATION, ChronoUnit.SECONDS);
-		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-		this.startTime = System.currentTimeMillis();
-		return Mono.empty();
+			this.schedule(this.computeResults(), GAME_DURATION, ChronoUnit.SECONDS);
+			MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
+			this.startTime = System.currentTimeMillis();
+		});
 	}
 
 	@Override
 	public Mono<Void> stop() {
-		this.cancelScheduledTask();
-		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-		// BlackjackCmd.MANAGERS.remove(this.getContext().getChannelId());
-
-		return this.show()
-				.then(this.computeResults());
+		return Mono.fromRunnable(() -> {
+			this.cancelScheduledTask();
+			MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
+			BlackjackCmd.MANAGERS.remove(this.getContext().getChannelId());
+		});
 	}
 
-	public boolean addPlayerIfAbsent(Snowflake userId, int bet) {
-		if(players.stream().map(BlackjackPlayer::getUserId).anyMatch(userId::equals)) {
-			return false;
-		}
-		return players.add(new BlackjackPlayer(userId, bet));
-	}
-
-	public Mono<Void> stopOrShow() {
-		return players.stream().allMatch(BlackjackPlayer::isStanding) ? this.stop() : this.show().then();
-	}
-
-	private Mono<Message> show() {
+	public Mono<Message> show() {
 		return Flux.fromIterable(players)
-				.flatMap(player -> this.getContext().getClient().getUserById(player.getUserId()))
-				.map(user -> {
-					BlackjackPlayer player = players.stream().filter(playerItr -> playerItr.getUserId().equals(user.getId())).findFirst().get();
-					return new EmbedFieldEntity(String.format("%s's hand%s%s",
-							user.getUsername(), player.isStanding() ? " (Stand)" : "", player.isDoubleDown() ? " (Double down)" : ""),
+				.flatMap(player -> Mono.zip(Mono.just(player), this.getContext().getClient().getUserById(player.getUserId())))
+				.map(playerAndUser -> {
+					final BlackjackPlayer player = playerAndUser.getT1();
+					final User user = playerAndUser.getT2();
+					final String stand = player.isStanding() ? " (Stand)" : "";
+					final String doubleDown = player.isDoubleDown() ? " (Double down)" : "";
+
+					return new EmbedFieldEntity(String.format("%s's hand%s%s", user.getUsername(), stand, doubleDown),
 							BlackjackUtils.formatCards(player.getCards()), true);
 				})
 				.collectList()
@@ -100,7 +92,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 					final List<EmbedFieldEntity> fields = fieldsAndAvatarUrl.getT1();
 					final String avatarUrl = fieldsAndAvatarUrl.getT2();
 
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Blackjack", null, avatarUrl)
 							.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
 							.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
@@ -108,10 +100,10 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 									this.getContext().getPrefix(), this.getContext().getCommandName()))
 							.addField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? dealerCards : dealerCards.subList(0, 1)), true);
 
-					if(this.isTaskDone()) {
+					if(this.isFinished() || this.isTaskDone()) {
 						embed.setFooter("Finished", null);
 					} else {
-						long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(startTime));
+						final long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(startTime));
 						embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingTime), null);
 					}
 
@@ -123,17 +115,24 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 				.flatMap(updateableMessage::send);
 	}
 
-	private Mono<Void> computeResults() {
-		int dealerValue = BlackjackUtils.getValue(dealerCards);
+	public Mono<Void> computeResultsOrShow() {
+		if(this.isFinished()) {
+			return this.computeResults();
+		}
+		return this.show().then();
+	}
 
+	private Mono<Void> computeResults() {
+		final int dealerValue = BlackjackUtils.getValue(dealerCards);
 		return Flux.fromIterable(players)
-				.map(BlackjackPlayer::getUserId)
-				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
-				.map(user -> {
-					final BlackjackPlayer player = players.stream().filter(playerItr -> playerItr.getUserId().equals(user.getId())).findFirst().get();
+				.flatMap(player -> Mono.zip(Mono.just(player), this.getContext().getClient().getUserById(player.getUserId())))
+				.map(playerAndUser -> {
+					final BlackjackPlayer player = playerAndUser.getT1();
+					final User user = playerAndUser.getT2();
 					final int playerValue = BlackjackUtils.getValue(player.getCards());
 
-					int result; // -1 = Lose | 0 = Draw | 1 = Win
+					// -1 = Lose | 0 = Draw | 1 = Win
+					int result;
 					if(playerValue > 21) {
 						result = -1;
 					} else if(dealerValue <= 21) {
@@ -146,16 +145,15 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 					String text = new String();
 					switch (result) {
 						case 1:
-							gains = (int) Math.ceil(player.getBet() * WIN_MULTIPLIER);
+							gains += (int) Math.ceil(player.getBet() * WIN_MULTIPLIER);
 							MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
 							text = String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
 							break;
 						case 0:
-							gains = 0;
 							text = String.format("**%s** (Draw)", user.getUsername());
 							break;
 						case -1:
-							gains = -player.getBet();
+							gains -= player.getBet();
 							MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
 							text = String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.formatCoins(Math.abs(gains)));
 							break;
@@ -167,20 +165,37 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 				.collectList()
 				.flatMap(results -> BotUtils.sendMessage(
 						String.format(Emoji.DICE + " __Results:__ %s", String.join(", ", results)), this.getContext().getChannel()))
-				.then();
+				.then(this.show())
+				.then(this.stop());
+	}
+
+	public boolean addPlayerIfAbsent(Snowflake userId, int bet) {
+		if(players.stream().map(BlackjackPlayer::getUserId).anyMatch(userId::equals)) {
+			return false;
+		}
+		return players.add(new BlackjackPlayer(userId, bet));
+	}
+
+	public boolean isFinished() {
+		return players.stream().allMatch(BlackjackPlayer::isStanding);
 	}
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		final Member member = event.getMember().get();
-
 		return this.cancelOrDo(event.getMessage(),
-				Flux.fromIterable(players)
-						.map(BlackjackPlayer::getUserId)
-						.collectList()
-						.filter(playerIds -> playerIds.contains(member.getId()))
-						.filter(playerIds -> !rateLimiter.isLimitedAndWarn(event.getClient(), member.getGuildId(), event.getMessage().getChannelId(), member.getId()))
-						.map(playerIds -> players.stream().filter(player -> player.getUserId().equals(member.getId())).findAny().get())
+				Mono.just(players)
+						// Check if the member is a current player
+						.filter(blackjackPlayers -> blackjackPlayers.stream()
+								.map(BlackjackPlayer::getUserId)
+								.anyMatch(member.getId()::equals))
+						.filter(blackjackPlayers -> !rateLimiter.isLimitedAndWarn(
+								event.getClient(), member.getGuildId(), event.getMessage().getChannelId(), member.getId()))
+						// Find the player associated with the user
+						.map(blackjackPlayers -> blackjackPlayers.stream()
+								.filter(player -> player.getUserId().equals(member.getId()))
+								.findFirst()
+								.get())
 						.flatMap(player -> {
 							if(player.isStanding()) {
 								return BotUtils.sendMessage(
@@ -189,7 +204,8 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 										.thenReturn(false);
 							}
 
-							final String content = event.getMessage().getContent().get().toLowerCase().trim();
+							final String prefix = DatabaseManager.getDBGuild(event.getGuildId().get()).getPrefix();
+							final String content = event.getMessage().getContent().orElse("").replace(prefix, "").toLowerCase().trim();
 							if("double down".equals(content) && player.getCards().size() != 2) {
 								return BotUtils.sendMessage(
 										String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a maximum of 2 cards to use `double down`.",
@@ -199,13 +215,13 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 
 							Map<String, Runnable> actionsMap = Map.of("hit", player::hit, "stand", player::stand, "double down", player::doubleDown);
 
-							Runnable action = actionsMap.get(content);
+							final Runnable action = actionsMap.get(content);
 							if(action == null) {
 								return Mono.just(false);
 							}
 
 							action.run();
-							return this.stopOrShow()
+							return this.computeResultsOrShow()
 									.thenReturn(true);
 						}));
 	}
