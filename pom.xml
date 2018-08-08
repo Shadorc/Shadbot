@@ -22,14 +22,15 @@
 	</properties>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-		<!--Allow to read POM information directly from the source code -->
 		<resources>
+			<!-- Allow to read POM information directly from the source code -->
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
 		<plugins>
+			<!-- Check dependency and plugin updates. Usage: versions:display-dependency-updates -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>
@@ -76,6 +77,10 @@
 		<repository>
 			<id>jcenter</id>
 			<url>http://jcenter.bintray.com</url>
+		</repository>
+		<repository>
+			<id>Pivotal Milestones</id>
+			<url>https://repo.spring.io/milestone</url>
 		</repository>
 		<repository>
 			<id>jitpack.io</id>
