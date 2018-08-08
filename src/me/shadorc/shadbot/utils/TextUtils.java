@@ -16,8 +16,6 @@ public class TextUtils {
 			String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "
 					+ "You can remove this limit by contributing to Shadbot. More info on **%s**", Config.DEFAULT_PLAYLIST_SIZE, Config.PATREON_URL);
 
-	public static final String NO_PLAYING_MUSIC = Emoji.MUTE + " No currently playing music.";
-
 	public static final String NOT_ENOUGH_COINS = "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
 
 	public static final String[] SPAM_MESSAGES = { "Take it easy, we are not in a hurry !",
@@ -25,7 +23,7 @@ public class TextUtils {
 			"I'm not going anywhere, no need to be this fast.",
 			"I don't think everyone here want to be spammed by us, just wait a little bit." };
 
-	public static final String[] TIPS_MESSAGES = { String.format("Check %slotto", Config.DEFAULT_PREFIX),
+	public static final String[] TIP_MESSAGES = { String.format("Check %slotto", Config.DEFAULT_PREFIX),
 			String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
 			String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
 			String.format("Support server: %s", Config.SUPPORT_SERVER_URL) };

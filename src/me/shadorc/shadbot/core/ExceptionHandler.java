@@ -108,7 +108,7 @@ public class ExceptionHandler {
 	}
 
 	private Mono<Message> onNoMusicException() {
-		return BotUtils.sendMessage(TextUtils.NO_PLAYING_MUSIC, context.getChannel());
+		return BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
 	}
 
 	private Mono<Message> onUnavailable() {

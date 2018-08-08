@@ -72,7 +72,7 @@ public class NetUtils {
 	 * @throws HttpStatusException if the URL returns an invalid JSON
 	 */
 	public static String getJSON(String url) throws IOException {
-		String json = NetUtils.getBody(url);
+		final String json = NetUtils.getBody(url);
 		if(json.isEmpty() || json.charAt(0) != '{' && json.charAt(0) != '[') {
 			throw new HttpStatusException(
 					String.format("%s did not return valid JSON: %s", url, json.isEmpty() ? "Empty" : json),

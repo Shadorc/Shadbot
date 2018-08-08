@@ -67,7 +67,7 @@ public class BotUtils {
 	}
 
 	public static Mono<Void> updatePresence(DiscordClient client) {
-		return Mono.just(String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIPS_MESSAGES)))
+		return Mono.just(String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES)))
 				.flatMap(text -> client.updatePresence(Presence.online(Activity.playing(text))));
 	}
 
