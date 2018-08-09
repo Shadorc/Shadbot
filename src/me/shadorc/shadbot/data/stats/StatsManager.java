@@ -3,84 +3,67 @@ package me.shadorc.shadbot.data.stats;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
-
-import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.annotation.DataInit;
 import me.shadorc.shadbot.data.annotation.DataSave;
-import me.shadorc.shadbot.data.stats.annotation.StatsInit;
-import me.shadorc.shadbot.data.stats.annotation.StatsJSON;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.data.stats.core.SimpleStat;
+import me.shadorc.shadbot.data.stats.core.TableStat;
+import me.shadorc.shadbot.data.stats.enums.CommandEnum;
+import me.shadorc.shadbot.data.stats.enums.DatabaseEnum;
+import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
+import me.shadorc.shadbot.data.stats.enums.VariousEnum;
+import me.shadorc.shadbot.utils.Utils;
 
 public class StatsManager {
 
-	private static final Map<String, Supplier<EmbedCreateSpec>> EMBED_MAP = new HashMap<>();
+	public enum SimpleStatEnum {
+		DATABASE,
+		VARIOUS
+	}
+
+	public enum TableStatEnum {
+		COMMANDS,
+		MONEY
+	}
 
 	private static final String FILE_NAME = "stats.json";
 	private static final File FILE = new File(FILE_NAME);
 
+	private static Map<SimpleStatEnum, SimpleStat<?>> simpleStatsMap = new ConcurrentHashMap<>();
+	private static Map<TableStatEnum, TableStat<?>> tableStatsMap = new ConcurrentHashMap<>();
+
 	@DataInit
 	public static void init() throws IOException {
-		if(!FILE.exists()) {
-			try (FileWriter writer = new FileWriter(FILE)) {
-				writer.write(new JSONObject().toString(Config.JSON_INDENT_FACTOR));
-			}
-		}
+		simpleStatsMap = Utils.MAPPER.readValue(FILE, 
+				Utils.MAPPER.getTypeFactory().constructMapType(
+						ConcurrentHashMap.class, SimpleStatEnum.class, SimpleStat.class));
+		simpleStatsMap.putIfAbsent(SimpleStatEnum.DATABASE, new SimpleStat<DatabaseEnum>());
+		simpleStatsMap.putIfAbsent(SimpleStatEnum.VARIOUS, new SimpleStat<VariousEnum>());
 
-		JSONObject statsObj;
-		try (InputStream stream = FILE.toURI().toURL().openStream()) {
-			statsObj = new JSONObject(new JSONTokener(stream));
-		}
-
-		Reflections reflections = new Reflections(StatsManager.class.getPackage().getName(), new MethodAnnotationsScanner());
-		for(Method initMethod : reflections.getMethodsAnnotatedWith(StatsInit.class)) {
-			StatsInit annotation = initMethod.getAnnotation(StatsInit.class);
-			try {
-				initMethod.invoke(null, statsObj.has(annotation.name()) ? statsObj.getJSONObject(annotation.name()) : new JSONObject());
-			} catch (Exception err) {
-				LogUtils.error(err, String.format("An error occurred while initializing statistics %s.",
-						initMethod.getDeclaringClass().getSimpleName()));
-			}
-		}
-	}
-
-	public static void register(String name, Supplier<EmbedCreateSpec> supplier) {
-		EMBED_MAP.put(name, supplier);
-	}
-
-	public static Map<String, Supplier<EmbedCreateSpec>> getStats() {
-		return EMBED_MAP;
+		tableStatsMap = Utils.MAPPER.readValue(FILE,
+				Utils.MAPPER.getTypeFactory().constructMapType(
+						ConcurrentHashMap.class, TableStatEnum.class, TableStat.class));
+		tableStatsMap.putIfAbsent(TableStatEnum.COMMANDS, new TableStat<CommandEnum>());
+		tableStatsMap.putIfAbsent(TableStatEnum.MONEY, new TableStat<MoneyEnum>());
 	}
 
 	@DataSave(filePath = FILE_NAME, initialDelay = 10, period = 10, unit = ChronoUnit.MINUTES)
 	public static void save() throws IOException {
-		JSONObject mainObj = new JSONObject();
-
-		Reflections reflections = new Reflections(StatsManager.class.getPackage().getName(), new MethodAnnotationsScanner());
-		for(Method jsonMethod : reflections.getMethodsAnnotatedWith(StatsJSON.class)) {
-			StatsJSON annotation = jsonMethod.getAnnotation(StatsJSON.class);
-			try {
-				mainObj.put(annotation.name(), jsonMethod.invoke(null));
-			} catch (Exception err) {
-				LogUtils.error(err, String.format("An error occurred while saving statistics %s.",
-						jsonMethod.getDeclaringClass().getSimpleName()));
-			}
-		}
-
 		try (FileWriter writer = new FileWriter(FILE)) {
-			writer.write(mainObj.toString(Config.JSON_INDENT_FACTOR));
+			writer.write(Utils.MAPPER.writeValueAsString(simpleStatsMap));
+			writer.write(Utils.MAPPER.writeValueAsString(tableStatsMap));
 		}
+	}
+
+	public static SimpleStat<?> get(SimpleStatEnum stat) {
+		return simpleStatsMap.get(stat);
+	}
+
+	public static TableStat<?> get(TableStatEnum stat) {
+		return tableStatsMap.get(stat);
 	}
 
 }

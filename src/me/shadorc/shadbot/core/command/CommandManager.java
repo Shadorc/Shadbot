@@ -16,9 +16,11 @@ import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.CommandStatsManager;
-import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.StatsManager.TableStatEnum;
 import me.shadorc.shadbot.data.stats.VariousStatsManager;
-import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
+import me.shadorc.shadbot.data.stats.enums.CommandEnum;
+import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
@@ -88,7 +90,7 @@ public class CommandManager {
 			}
 
 			if(rateLimiter.get().isLimitedAndWarn(context.getClient(), guildId, context.getChannelId(), context.getAuthorId())) {
-				CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, cmd);
+				StatsManager.get(TableStatEnum.COMMANDS).log(CommandEnum.COMMAND_LIMITED, cmd.getName());
 				return true;
 			}
 			return false;
