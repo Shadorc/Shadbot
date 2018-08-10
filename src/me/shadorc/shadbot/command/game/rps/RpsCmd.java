@@ -8,8 +8,8 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.db.DatabaseManager;
-import me.shadorc.shadbot.data.stats.MoneyStatsManager;
-import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -43,7 +43,7 @@ public class RpsCmd extends AbstractCommand {
 		} else if(userHandsign.isSuperior(botHandsign)) {
 			strBuilder.append(String.format(Emoji.BANK + " Well done, you won **%d coins**.", context.getUsername(), GAINS));
 			DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(GAINS);
-			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
+			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
 		} else {
 			strBuilder.append("I win !");
 		}

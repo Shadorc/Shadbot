@@ -12,8 +12,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.db.DatabaseManager;
-import me.shadorc.shadbot.data.stats.MoneyStatsManager;
-import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -113,7 +113,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 			int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
 
 			DatabaseManager.getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
-			MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
 
 			text = String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
 					this.getContext().getUsername(), FormatUtils.formatCoins(gains));

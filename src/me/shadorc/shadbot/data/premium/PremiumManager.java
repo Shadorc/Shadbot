@@ -25,8 +25,7 @@ import me.shadorc.shadbot.utils.Utils;
 
 public class PremiumManager {
 
-	private static final String FILE_NAME = "premium_data.json";
-	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
+	private static final File FILE = new File(DataManager.SAVE_DIR, "premium_data.json");
 
 	private static List<Relic> relics;
 
@@ -36,7 +35,7 @@ public class PremiumManager {
 		relics = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new CopyOnWriteArrayList<>();
 	}
 
-	@DataSave(filePath = FILE_NAME, initialDelay = 1, period = 1, unit = ChronoUnit.HOURS)
+	@DataSave(initialDelay = 1, period = 1, unit = ChronoUnit.HOURS)
 	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(Utils.MAPPER.writeValueAsString(relics));

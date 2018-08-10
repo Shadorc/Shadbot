@@ -10,8 +10,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import me.shadorc.shadbot.data.stats.VariousStatsManager;
-import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.utils.NumberUtils;
 
 public class TrackScheduler {
@@ -65,7 +65,7 @@ public class TrackScheduler {
 	 * @return {@code true} if the track was started, {@code false} if it was added to the queue
 	 */
 	public boolean startOrQueue(AudioTrack track, boolean first) {
-		VariousStatsManager.log(VariousEnum.MUSICS_LOADED);
+		StatsManager.VARIOUS_STATS.log(VariousEnum.MUSICS_LOADED);
 
 		if(audioPlayer.startTrack(track.makeClone(), true)) {
 			this.currentTrack = track;

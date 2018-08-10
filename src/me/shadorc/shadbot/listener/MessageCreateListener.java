@@ -13,8 +13,8 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.DatabaseManager;
-import me.shadorc.shadbot.data.stats.VariousStatsManager;
-import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import reactor.core.publisher.Mono;
@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 public class MessageCreateListener {
 
 	public static void onMessageCreate(MessageCreateEvent event) {
-		VariousStatsManager.log(VariousEnum.MESSAGES_RECEIVED);
+		StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_RECEIVED);
 
 		final Optional<Snowflake> guildId = event.getGuildId();
 
@@ -52,30 +52,27 @@ public class MessageCreateListener {
 	}
 
 	private static Mono<Void> onPrivateMessage(MessageCreateEvent event) {
-		VariousStatsManager.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
-
-		String msgContent = event.getMessage().getContent().get();
-		if(msgContent.startsWith(Config.DEFAULT_PREFIX + "help")) {
-			return CommandManager.getCommand("help").execute(new Context(event, Config.DEFAULT_PREFIX));
-		}
-
 		final String text = String.format("Hello !"
 				+ "%nCommands only work in a server but you can see help using `%shelp`."
 				+ "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
 				+ "join my support server : %s",
 				Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-		return event.getMessage().getChannel()
+		return Mono.justOrEmpty(event.getMessage().getContent())
+				.filter(content -> content.startsWith(Config.DEFAULT_PREFIX + "help"))
+				.flatMap(content -> CommandManager.getCommand("help").execute(new Context(event, Config.DEFAULT_PREFIX)))
+				.then(event.getMessage().getChannel())
 				.flatMapMany(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now())))
 				.map(Message::getContent)
-				.filter(Optional::isPresent)
-				.map(Optional::get)
+				.flatMap(Mono::justOrEmpty)
 				.take(25)
 				.collectList()
 				.map(list -> !list.stream().anyMatch(text::equalsIgnoreCase))
 				.defaultIfEmpty(true)
-				.flatMap(send -> send ? BotUtils.sendMessage(text, event.getMessage().getChannel()) : Mono.empty())
+				.filter(Boolean.TRUE::equals)
+				.flatMap(send -> BotUtils.sendMessage(text, event.getMessage().getChannel()))
 				.onErrorResume(err -> BotUtils.sendMessage(text, event.getMessage().getChannel()))
+				.doOnTerminate(() -> StatsManager.VARIOUS_STATS.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED))
 				.then();
 	}
 }

@@ -13,8 +13,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.DatabaseManager;
-import me.shadorc.shadbot.data.stats.MoneyStatsManager;
-import me.shadorc.shadbot.data.stats.MoneyStatsManager.MoneyEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -72,10 +72,10 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 					if(num == winningNum) {
 						gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
-						MoneyStatsManager.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
 					} else {
 						gains *= -1;
-						MoneyStatsManager.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
+						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
 					}
 					DatabaseManager.getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
 					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.formatCoins(gains));

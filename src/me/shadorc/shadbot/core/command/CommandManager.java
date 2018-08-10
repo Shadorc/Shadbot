@@ -15,10 +15,9 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import me.shadorc.shadbot.data.stats.CommandStatsManager;
-import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
-import me.shadorc.shadbot.data.stats.VariousStatsManager;
-import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.CommandEnum;
+import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
@@ -88,7 +87,7 @@ public class CommandManager {
 			}
 
 			if(rateLimiter.get().isLimitedAndWarn(context.getClient(), guildId, context.getChannelId(), context.getAuthorId())) {
-				CommandStatsManager.log(CommandEnum.COMMAND_LIMITED, cmd);
+				StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_LIMITED, cmd);
 				return true;
 			}
 			return false;
@@ -105,8 +104,8 @@ public class CommandManager {
 				.flatMap(cmd -> cmd.execute(context))
 				.onErrorResume(err -> new ExceptionHandler(err, command, context).handle().then())
 				.doOnSuccess(perm -> {
-					CommandStatsManager.log(CommandEnum.COMMAND_USED, command);
-					VariousStatsManager.log(VariousEnum.COMMANDS_EXECUTED);
+					StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_USED, command);
+					StatsManager.VARIOUS_STATS.log(VariousEnum.COMMANDS_EXECUTED);
 				});
 	}
 

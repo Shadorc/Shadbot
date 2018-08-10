@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.collect.HashBasedTable;
 
 import discord4j.core.object.entity.Member;
 import me.shadorc.shadbot.data.db.DatabaseManager;
@@ -82,15 +83,31 @@ public class Utils {
 	}
 
 	/**
-	 * @param array - the array to convert
+	 * @param array - the {@link JSONArray} to convert
 	 * @param clazz - the class of the elements contained by {@code array}
-	 * @return A list containing the elements of {@code array} converted to {@code listClass} objects
+	 * @return A {@link List} containing the elements of {@code array} converted to {@code clazz} objects
 	 */
 	public static <T> List<T> toList(JSONArray array, Class<T> clazz) {
 		if(array == null) {
 			return null;
 		}
 		return array.toList().stream().map(clazz::cast).collect(Collectors.toList());
+	}
+
+	/**
+	 * @param map - the {@link Map} to convert
+	 * @return A {@link HashBasedTable} based on {@code map}
+	 */
+	public static <R, C, V> HashBasedTable<R, C, V> toTable(Map<R, Map<C, V>> map) {
+		HashBasedTable<R, C, V> table = HashBasedTable.create();
+		for(R rowKey : map.keySet()) {
+			Map<C, V> rowMap = map.get(rowKey);
+			for(C columnKey : rowMap.keySet()) {
+				V value = rowMap.get(columnKey);
+				table.put(rowKey, columnKey, value);
+			}
+		}
+		return table;
 	}
 
 	/**

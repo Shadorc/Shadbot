@@ -18,8 +18,8 @@ import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.DatabaseManager;
-import me.shadorc.shadbot.data.stats.VariousStatsManager;
-import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,7 +31,7 @@ public class BotUtils {
 
 	public static Mono<Message> sendMessage(EmbedCreateSpec embed, Mono<MessageChannel> channel) {
 		return BotUtils.sendMessage(null, embed, channel)
-				.doOnSuccess(msg -> VariousStatsManager.log(VariousEnum.EMBEDS_SENT));
+				.doOnSuccess(msg -> StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT));
 	}
 
 	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, Mono<MessageChannel> channelMono) {
@@ -43,7 +43,7 @@ public class BotUtils {
 			spec.setEmbed(embed);
 		}
 		return channelMono.flatMap(channel -> channel.createMessage(spec))
-				.doOnSuccess(message -> VariousStatsManager.log(VariousEnum.MESSAGES_SENT));
+				.doOnSuccess(message -> StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT));
 	}
 
 	/**

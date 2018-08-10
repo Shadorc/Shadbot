@@ -16,8 +16,6 @@ import me.shadorc.shadbot.data.DataManager;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DataSave {
 
-	String filePath();
-
 	int initialDelay();
 
 	int period();
