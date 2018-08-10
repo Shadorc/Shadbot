@@ -18,8 +18,8 @@ public abstract class AbstractGameManager {
 
 	private final Context context;
 	/**
-	 * Used to ensure the veracity of {@code isTaskDone}, certain conditions may lead to the task being completed without the Mono being disposed or null
-	 * leading to {@code isTaskDone} returning false
+	 * Used to ensure the veracity of {@code isTaskDone}, certain conditions may lead to the task being completed without the
+	 * Mono being disposed or null leading to {@code isTaskDone} returning false
 	 */
 	private final AtomicBoolean isDone;
 	private Disposable scheduledTask;

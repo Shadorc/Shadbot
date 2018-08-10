@@ -14,8 +14,8 @@ public class StringUtils {
 	 * @param str - the string to split
 	 * @param limit - the result threshold
 	 * @param delimiter - the delimiting regular expression
-	 * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted using {@code delimiter} excluding
-	 *         empty results
+	 * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted using
+	 *         {@code delimiter} excluding empty results
 	 */
 	public static List<String> split(String str, int limit, String delimiter) {
 		return Arrays.stream(str.split(delimiter, limit))
@@ -45,7 +45,8 @@ public class StringUtils {
 
 	/**
 	 * @param str - the string to split
-	 * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding empty results
+	 * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding empty
+	 *         results
 	 */
 	public static List<String> split(String str) {
 		return StringUtils.split(str, -1);
@@ -87,8 +88,8 @@ public class StringUtils {
 	}
 
 	/**
-	 * The function returns the argument string with whitespace normalized by using {@link #trim(String)} to remove leading and trailing whitespace and
-	 * then replacing sequences of whitespace characters by a single space.
+	 * The function returns the argument string with whitespace normalized by using {@link #trim(String)} to remove leading and
+	 * trailing whitespace and then replacing sequences of whitespace characters by a single space.
 	 *
 	 * @param str - the source String to normalize whitespaces from, may be null
 	 * @return the modified string with whitespace normalized, {@code null} if null String input
