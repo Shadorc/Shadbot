@@ -16,8 +16,8 @@ import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.data.stats.CommandStatsManager;
-import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
@@ -96,13 +96,13 @@ public class ExceptionHandler {
 	}
 
 	private Mono<Message> onCommandException() {
-		CommandStatsManager.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
+		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
 		return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
 				context.getUsername(), err.getMessage()), context.getChannel());
 	}
 
 	private Mono<Message> onMissingArgumentException() {
-		CommandStatsManager.log(CommandEnum.COMMAND_MISSING_ARG, command);
+		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, command);
 		return command.getHelp(context)
 				.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, context.getChannel()));
 	}

@@ -5,7 +5,7 @@ public enum MoneyEnum {
 	MONEY_LOST
 }
 
-//TODO
+// TODO
 /*
 	public static EmbedCreateSpec getAverageEmbed() {
 		Map<String, AtomicLong> moneyGained = MONEY_STATS_MAP.getOrDefault(MoneyEnum.MONEY_GAINED, Collections.emptyMap());

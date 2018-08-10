@@ -13,8 +13,8 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.db.DatabaseManager;
-import me.shadorc.shadbot.data.stats.VariousStatsManager;
-import me.shadorc.shadbot.data.stats.VariousStatsManager.VariousEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import reactor.core.publisher.Mono;
@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 public class MessageCreateListener {
 
 	public static void onMessageCreate(MessageCreateEvent event) {
-		VariousStatsManager.log(VariousEnum.MESSAGES_RECEIVED);
+		StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_RECEIVED);
 
 		final Optional<Snowflake> guildId = event.getGuildId();
 

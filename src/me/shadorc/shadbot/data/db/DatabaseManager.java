@@ -18,8 +18,7 @@ import me.shadorc.shadbot.utils.Utils;
 
 public class DatabaseManager {
 
-	private static final String FILE_NAME = "database.json";
-	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
+	private static final File FILE = new File(DataManager.SAVE_DIR, "database.json");
 
 	private static List<DBGuild> guilds;
 
@@ -29,7 +28,7 @@ public class DatabaseManager {
 		guilds = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new ArrayList<>();
 	}
 
-	@DataSave(filePath = FILE_NAME, initialDelay = 15, period = 15, unit = ChronoUnit.MINUTES)
+	@DataSave(initialDelay = 15, period = 15, unit = ChronoUnit.MINUTES)
 	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(Utils.MAPPER.writeValueAsString(guilds));

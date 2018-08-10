@@ -11,8 +11,8 @@ import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.data.stats.CommandStatsManager;
-import me.shadorc.shadbot.data.stats.CommandStatsManager.CommandEnum;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -31,7 +31,7 @@ public class HelpCmd extends AbstractCommand {
 				return Mono.empty();
 			}
 
-			CommandStatsManager.log(CommandEnum.COMMAND_HELPED, cmd);
+			StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_HELPED, cmd);
 			return cmd.getHelp(context)
 					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
 					.then();

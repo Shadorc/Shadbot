@@ -8,4 +8,3 @@ public enum VariousEnum {
 	MESSAGES_SENT,
 	EMBEDS_SENT
 }
-

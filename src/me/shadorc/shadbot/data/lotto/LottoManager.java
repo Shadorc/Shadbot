@@ -12,8 +12,7 @@ import me.shadorc.shadbot.utils.Utils;
 
 public class LottoManager {
 
-	private static final String FILE_NAME = "lotto_data.json";
-	private static final File FILE = new File(DataManager.SAVE_DIR, FILE_NAME);
+	private static final File FILE = new File(DataManager.SAVE_DIR, "lotto_data.json");
 
 	private static Lotto lotto;
 
@@ -22,7 +21,7 @@ public class LottoManager {
 		lotto = FILE.exists() ? Utils.MAPPER.readValue(FILE, Lotto.class) : new Lotto();
 	}
 
-	@DataSave(filePath = FILE_NAME, initialDelay = 30, period = 30, unit = ChronoUnit.MINUTES)
+	@DataSave(initialDelay = 30, period = 30, unit = ChronoUnit.MINUTES)
 	public static void save() throws IOException {
 		try (FileWriter writer = new FileWriter(FILE)) {
 			writer.write(Utils.MAPPER.writeValueAsString(lotto));
