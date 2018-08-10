@@ -52,30 +52,27 @@ public class MessageCreateListener {
 	}
 
 	private static Mono<Void> onPrivateMessage(MessageCreateEvent event) {
-		VariousStatsManager.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
-
-		String msgContent = event.getMessage().getContent().get();
-		if(msgContent.startsWith(Config.DEFAULT_PREFIX + "help")) {
-			return CommandManager.getCommand("help").execute(new Context(event, Config.DEFAULT_PREFIX));
-		}
-
 		final String text = String.format("Hello !"
 				+ "%nCommands only work in a server but you can see help using `%shelp`."
 				+ "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
 				+ "join my support server : %s",
 				Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-		return event.getMessage().getChannel()
+		return Mono.justOrEmpty(event.getMessage().getContent())
+				.filter(content -> content.startsWith(Config.DEFAULT_PREFIX + "help"))
+				.flatMap(content -> CommandManager.getCommand("help").execute(new Context(event, Config.DEFAULT_PREFIX)))
+				.then(event.getMessage().getChannel())
 				.flatMapMany(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now())))
 				.map(Message::getContent)
-				.filter(Optional::isPresent)
-				.map(Optional::get)
+				.flatMap(Mono::justOrEmpty)
 				.take(25)
 				.collectList()
 				.map(list -> !list.stream().anyMatch(text::equalsIgnoreCase))
 				.defaultIfEmpty(true)
-				.flatMap(send -> send ? BotUtils.sendMessage(text, event.getMessage().getChannel()) : Mono.empty())
+				.filter(Boolean.TRUE::equals)
+				.flatMap(send -> BotUtils.sendMessage(text, event.getMessage().getChannel()))
 				.onErrorResume(err -> BotUtils.sendMessage(text, event.getMessage().getChannel()))
+				.doOnTerminate(() -> StatsManager.VARIOUS_STATS.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED))
 				.then();
 	}
 }
