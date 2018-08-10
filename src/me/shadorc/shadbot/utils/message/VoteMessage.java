@@ -1,8 +1,6 @@
 package me.shadorc.shadbot.utils.message;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
@@ -20,37 +18,25 @@ public class VoteMessage {
 	private final Snowflake channelId;
 	private final int seconds;
 
-	private Snowflake messageId;
-
 	public VoteMessage(DiscordClient client, Snowflake channelId, int seconds) {
 		this.client = client;
 		this.channelId = channelId;
 		this.seconds = seconds;
 	}
 
-	public Mono<Map<Reaction, Integer>> sendMessage(EmbedCreateSpec embed) {
+	/**
+	 * @param embed - the embed to send
+	 * @return A {@link Flux} that continually emits the message's {@link Reaction}. If an error is received, it is emitted
+	 *         through the {@code Flux}.
+	 */
+	public Flux<Reaction> sendMessage(EmbedCreateSpec embed) {
 		return BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
-				.flatMap(message -> message.addReaction(ReactionEmoji.unicode("✅"))
+				.flatMapMany(message -> message.addReaction(ReactionEmoji.unicode("✅"))
 						.then(message.addReaction(ReactionEmoji.unicode("❌")))
-						.thenReturn(message.getId()))
-				.map(messageId -> this.messageId = messageId)
-				.then(Mono.delay(Duration.ofSeconds(seconds)))
-				.then(client.getMessageById(channelId, messageId))
-				.then(this.count());
-	}
-
-	private Mono<Map<Reaction, Integer>> count() {
-		return client.getMessageById(channelId, messageId)
-				.map(Message::getReactions)
-				.flatMapMany(Flux::fromIterable)
-				.collectList()
-				.map(reactions -> {
-					final Map<Reaction, Integer> reactionsMap = new HashMap<>();
-					for(Reaction reaction : reactions) {
-						reactionsMap.put(reaction, reactionsMap.getOrDefault(reactionsMap, 0) + 1);
-					}
-					return reactionsMap;
-				});
+						.then(Mono.delay(Duration.ofSeconds(seconds)))
+						.then(client.getMessageById(channelId, message.getId()))
+						.map(Message::getReactions)
+						.flatMapMany(Flux::fromIterable));
 	}
 
 }
