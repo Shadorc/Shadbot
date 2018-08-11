@@ -40,10 +40,9 @@ public class FormatUtils {
 		return FormatUtils.format(enumClass.getEnumConstants(), value -> value.toString().toLowerCase(), delimiter);
 	}
 
-	public static <T extends Enum<T>> String formatOptions(Class<T> enumClass) {
+	public static <E extends Enum<E>> String formatOptions(Class<E> enumClass) {
 		return String.format("Options: %s",
-				FormatUtils.format(enumClass.getEnumConstants(),
-						value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
+				FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
 	}
 
 	public static String formatNum(double num) {

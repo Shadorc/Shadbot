@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.data.stats.core;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,12 +13,12 @@ import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
-public class TableStat<R extends Enum<R>> extends Stat {
+public class TableStatistic<E extends Enum<E>> extends Statistic<E> {
 
 	private HashBasedTable<String, String, AtomicLong> table;
 
-	public TableStat(File file) {
-		super(file);
+	public TableStatistic(String fileName, Class<E> enumClass) {
+		super(fileName, enumClass);
 		this.table = HashBasedTable.create();
 
 		try {
@@ -35,7 +34,7 @@ public class TableStat<R extends Enum<R>> extends Stat {
 		}
 	}
 
-	public void log(R rowKey, String columnKey, long value) {
+	public void log(E rowKey, String columnKey, long value) {
 		synchronized (table) {
 			if(!table.contains(rowKey.toString(), columnKey)) {
 				table.put(rowKey.toString(), columnKey, new AtomicLong(0));
@@ -44,13 +43,13 @@ public class TableStat<R extends Enum<R>> extends Stat {
 		}
 	}
 
-	public void log(R rowKey, AbstractCommand cmd) {
+	public void log(E rowKey, AbstractCommand cmd) {
 		this.log(rowKey, cmd.getName(), 1);
 	}
 
-	public Map<String, AtomicLong> get(R rowKey) {
+	public Map<String, AtomicLong> getMap(String rowKey) {
 		synchronized (table) {
-			return table.row(rowKey.toString());
+			return table.row(rowKey);
 		}
 	}
 
