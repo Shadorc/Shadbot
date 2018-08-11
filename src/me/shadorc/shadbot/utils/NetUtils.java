@@ -47,8 +47,7 @@ public class NetUtils {
 
 	/**
 	 * @param url - URL to connect to. The protocol must be http or https
-	 * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type
-	 *         and HTTP errors
+	 * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type and HTTP errors
 	 * @throws IOException
 	 */
 	public static Response getResponse(String url) throws IOException {

@@ -131,8 +131,8 @@ public class Utils {
 	 * @param betStr - the string representing the bet
 	 * @param maxValue - the maximum bet value
 	 * @return An Integer representing {@code betStr} converted as an integer
-	 * @throws CommandException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough
-	 *             coins or if the bet value is superior to {code maxValue}
+	 * @throws CommandException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough coins or if the bet value
+	 *             is superior to {code maxValue}
 	 */
 	public static int requireBet(Member member, String betStr, int maxValue) {
 		Integer bet = NumberUtils.asPositiveInt(betStr);
