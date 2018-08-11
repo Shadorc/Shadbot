@@ -3,7 +3,6 @@ package me.shadorc.shadbot.command.game.trivia;
 import java.io.IOException;
 import java.net.URL;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -39,22 +38,13 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 	protected static final int MAX_BONUS = 100;
 	protected static final int LIMITED_TIME = 30;
 
-	private final Integer categoryId;
+	private final TriviaResult trivia;
 	private final ConcurrentHashMap<Snowflake, Boolean> alreadyAnswered;
 
-	private TriviaResult trivia;
 	private long startTime;
-	private List<String> answers;
 
 	public TriviaManager(Context context, Integer categoryId) {
 		super(context);
-		this.categoryId = categoryId;
-		this.alreadyAnswered = new ConcurrentHashMap<>();
-	}
-
-	// Trivia API doc : https://opentdb.com/api_config.php
-	@Override
-	public void start() {
 		try {
 			final URL url = new URL(String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, "")));
 			TriviaResponse response = Utils.MAPPER.readValue(url, TriviaResponse.class);
@@ -62,7 +52,12 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		} catch (IOException err) {
 			throw Exceptions.propagate(err);
 		}
+		this.alreadyAnswered = new ConcurrentHashMap<>();
+	}
 
+	// Trivia API doc : https://opentdb.com/api_config.php
+	@Override
+	public void start() {
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		this.schedule(Mono.fromRunnable(this::stop)
 				.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", trivia.getCorrectAnswer()),
@@ -83,8 +78,8 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 	public Mono<Void> show() {
 		final String description = String.format("**%s**%n%s",
 				trivia.getQuestion(),
-				FormatUtils.numberedList(answers.size(), answers.size(),
-						count -> String.format("\t**%d**. %s", count, answers.get(count - 1))));
+				FormatUtils.numberedList(trivia.getAnswers().size(), trivia.getAnswers().size(),
+						count -> String.format("\t**%d**. %s", count, trivia.getAnswers().get(count - 1))));
 
 		return this.getContext().getAvatarUrl()
 				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
@@ -117,10 +112,10 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		return this.cancelOrDo(event.getMessage(), Mono.just(event.getMessage().getContent().get())
 				.flatMap(content -> {
 					// It's a number or a text
-					Integer choice = NumberUtils.asIntBetween(content, 1, answers.size());
+					Integer choice = NumberUtils.asIntBetween(content, 1, trivia.getAnswers().size());
 
 					// Message is a text and doesn't match any answers, ignore it
-					if(choice == null && !answers.stream().anyMatch(content::equalsIgnoreCase)) {
+					if(choice == null && !trivia.getAnswers().stream().anyMatch(content::equalsIgnoreCase)) {
 						return Mono.just(false);
 					}
 
@@ -129,7 +124,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 						return Mono.just(false);
 					}
 
-					final String answer = choice == null ? content : answers.get(choice - 1);
+					final String answer = choice == null ? content : trivia.getAnswers().get(choice - 1);
 
 					Mono<Message> monoMessage;
 					if(alreadyAnswered.containsKey(member.getId())) {

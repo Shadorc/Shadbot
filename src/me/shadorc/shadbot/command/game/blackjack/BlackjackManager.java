@@ -107,8 +107,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 						embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingTime), null);
 					}
 
-					fields.stream()
-							.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
+					fields.stream().forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
 
 					return embed;
 				})
@@ -143,7 +142,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 					}
 
 					int gains = 0;
-					String text = new String();
+					String text = "";
 					switch (result) {
 						case 1:
 							gains += (int) Math.ceil(player.getBet() * WIN_MULTIPLIER);

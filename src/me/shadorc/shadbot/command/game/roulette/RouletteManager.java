@@ -62,6 +62,43 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 		RouletteCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
+	@Override
+	public Mono<Void> show() {
+		return this.getContext().getAvatarUrl()
+				.zipWith(Flux.fromIterable(playersPlace.keySet())
+						.flatMap(userId -> this.getContext().getClient().getUserById(userId))
+						.collectList())
+				.map(avatarUrlAndUsers -> {
+					final String avatarUrl = avatarUrlAndUsers.getT1();
+					final List<User> users = avatarUrlAndUsers.getT2();
+
+					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+							.setAuthor("Roulette Game", null, avatarUrl)
+							.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
+							.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
+									+ "%n%n**Place** is a `number between 1 and 36`, %s",
+									this.getContext().getPrefix(), this.getContext().getCommandName(),
+									FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
+							.addField("Player (Bet)", FormatUtils.format(users,
+									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.formatCoins(playersPlace.get(user.getId()).getT1())), "\n"), true)
+							.addField("Place", playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
+
+					if(results != null) {
+						embed.addField("Results", results, false);
+					}
+
+					if(this.isTaskDone()) {
+						embed.setFooter("Finished", null);
+					} else {
+						embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+					}
+
+					return embed;
+				})
+				.flatMap(embed -> updateableMessage.send(embed))
+				.then();
+	}
+
 	public Mono<Void> spin() {
 		final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
 		return Flux.fromIterable(playersPlace.keySet())
@@ -106,43 +143,6 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 						this.getContext().getChannel()))
 				.then(this.show())
 				.then(Mono.fromRunnable(this::stop));
-	}
-
-	@Override
-	public Mono<Void> show() {
-		return this.getContext().getAvatarUrl()
-				.zipWith(Flux.fromIterable(playersPlace.keySet())
-						.flatMap(userId -> this.getContext().getClient().getUserById(userId))
-						.collectList())
-				.map(avatarUrlAndUsers -> {
-					final String avatarUrl = avatarUrlAndUsers.getT1();
-					final List<User> users = avatarUrlAndUsers.getT2();
-
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Roulette Game", null, avatarUrl)
-							.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
-							.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
-									+ "%n%n**Place** is a `number between 1 and 36`, %s",
-									this.getContext().getPrefix(), this.getContext().getCommandName(),
-									FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
-							.addField("Player (Bet)", FormatUtils.format(users,
-									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.formatCoins(playersPlace.get(user.getId()).getT1())), "\n"), true)
-							.addField("Place", playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
-
-					if(results != null) {
-						embed.addField("Results", results, false);
-					}
-
-					if(this.isTaskDone()) {
-						embed.setFooter("Finished", null);
-					} else {
-						embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
-					}
-
-					return embed;
-				})
-				.flatMap(embed -> updateableMessage.send(embed))
-				.then();
 	}
 
 	/**

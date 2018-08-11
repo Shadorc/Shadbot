@@ -54,34 +54,6 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 		DiceCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
-	public Mono<Void> rollTheDice() {
-		int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
-		return Flux.fromIterable(numsPlayers.values())
-				.flatMap(this.getContext().getClient()::getUserById)
-				.map(user -> {
-					int num = numsPlayers.keySet().stream()
-							.filter(number -> numsPlayers.get(number).equals(user.getId()))
-							.findFirst()
-							.get();
-					int gains = bet;
-
-					if(num == winningNum) {
-						gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
-						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
-					} else {
-						gains *= -1;
-						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
-					}
-					DatabaseManager.getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
-					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
-				})
-				.collectList()
-				.map(list -> this.results = String.join("\n", list))
-				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getContext().getChannel()))
-				.then(this.show())
-				.then(Mono.fromRunnable(this::stop));
-	}
-
 	@Override
 	public Mono<Void> show() {
 		return this.getContext().getAvatarUrl()
@@ -114,6 +86,34 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 				})
 				.flatMap(updateableMessage::send)
 				.then();
+	}
+
+	public Mono<Void> rollTheDice() {
+		int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
+		return Flux.fromIterable(numsPlayers.values())
+				.flatMap(this.getContext().getClient()::getUserById)
+				.map(user -> {
+					int num = numsPlayers.keySet().stream()
+							.filter(number -> numsPlayers.get(number).equals(user.getId()))
+							.findFirst()
+							.get();
+					int gains = bet;
+
+					if(num == winningNum) {
+						gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
+						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+					} else {
+						gains *= -1;
+						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
+					}
+					DatabaseManager.getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
+					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
+				})
+				.collectList()
+				.map(list -> this.results = String.join("\n", list))
+				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getContext().getChannel()))
+				.then(this.show())
+				.then(Mono.fromRunnable(this::stop));
 	}
 
 	public int getBet() {

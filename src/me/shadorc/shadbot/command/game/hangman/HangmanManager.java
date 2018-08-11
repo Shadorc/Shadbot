@@ -70,7 +70,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	@Override
 	public Mono<Void> show() {
-		List<String> missedLetters = lettersTested.stream()
+		final List<String> missedLetters = lettersTested.stream()
 				.filter(letter -> !word.contains(letter))
 				.map(String::toUpperCase)
 				.collect(Collectors.toList());
@@ -100,7 +100,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 					return embed;
 				})
-				.flatMap(embed -> updateableMessage.send(embed))
+				.flatMap(updateableMessage::send)
 				.then();
 	}
 
