@@ -56,21 +56,19 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 	}
 
 	@Override
-	public Mono<Void> start() {
-		this.schedule(this.stop(), IDLE_MIN, ChronoUnit.MINUTES);
+	public void start() {
+		this.schedule(Mono.fromRunnable(this::stop), IDLE_MIN, ChronoUnit.MINUTES);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-		return this.show().then();
 	}
 
 	@Override
-	public Mono<Void> stop() {
+	public void stop() {
 		this.cancelScheduledTask();
 		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
 		HangmanCmd.MANAGERS.remove(this.getContext().getChannelId());
-		return Mono.empty();
 	}
 
-	private Mono<Void> show() {
+	public Mono<Void> show() {
 		List<String> missedLetters = lettersTested.stream()
 				.filter(letter -> !word.contains(letter))
 				.map(String::toUpperCase)
@@ -124,12 +122,12 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 		return this.show()
 				.then(BotUtils.sendMessage(text, this.getContext().getChannel()))
-				.then(this.stop());
+				.then(Mono.fromRunnable(this::stop));
 	}
 
 	private Mono<Void> checkLetter(String chr) {
 		// Reset IDLE timer
-		this.schedule(this.stop(), IDLE_MIN, ChronoUnit.MINUTES);
+		this.schedule(Mono.fromRunnable(this::stop), IDLE_MIN, ChronoUnit.MINUTES);
 
 		if(lettersTested.contains(chr)) {
 			return Mono.empty();
@@ -154,7 +152,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	private Mono<Void> checkWord(String word) {
 		// Reset IDLE timer
-		this.schedule(this.stop(), IDLE_MIN, ChronoUnit.MINUTES);
+		this.schedule(Mono.fromRunnable(this::stop), IDLE_MIN, ChronoUnit.MINUTES);
 
 		// If the word has been guessed
 		if(this.word.equalsIgnoreCase(word)) {

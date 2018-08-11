@@ -32,7 +32,6 @@ public class MusicProvider implements AudioProvider {
 		byte[] data = lastFrame == null ? null : lastFrame.getData();
 		lastFrame = null;
 
-		// FIXME: Is this ok to return an empty array ?
 		return Objects.requireNonNullElse(data, new byte[0]);
 	}
 

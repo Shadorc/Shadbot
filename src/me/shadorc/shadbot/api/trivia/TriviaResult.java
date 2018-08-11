@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.api.trivia;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,18 @@ public class TriviaResult {
 				.map(Jsoup::parse)
 				.map(Document::text)
 				.collect(Collectors.toList());
+	}
+
+	public List<String> getAnswers() {
+		final List<String> answers = new ArrayList<>();
+		if(this.getType().equals("multiple")) {
+			answers.addAll(this.getIncorrectAnswers());
+			answers.add(this.getCorrectAnswer());
+			Collections.shuffle(answers);
+		} else {
+			answers.addAll(List.of("True", "False"));
+		}
+		return answers;
 	}
 
 	@Override

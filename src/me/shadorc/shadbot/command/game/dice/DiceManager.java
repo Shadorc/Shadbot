@@ -43,20 +43,16 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 	}
 
 	@Override
-	public Mono<Void> start() {
-		return Mono.fromRunnable(() -> {
-			this.schedule(this.rollTheDice(), GAME_DURATION, ChronoUnit.SECONDS);
-			MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-		});
+	public void start() {
+		this.schedule(this.rollTheDice(), GAME_DURATION, ChronoUnit.SECONDS);
+		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 	}
 
 	@Override
-	public Mono<Void> stop() {
-		return Mono.fromRunnable(() -> {
-			this.cancelScheduledTask();
-			MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-			DiceCmd.MANAGERS.remove(this.getContext().getChannelId());
-		});
+	public void stop() {
+		this.cancelScheduledTask();
+		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
+		DiceCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
 	public Mono<Void> rollTheDice() {
@@ -84,7 +80,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 				.map(list -> this.results = String.join("\n", list))
 				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getContext().getChannel()))
 				.then(this.show())
-				.then(this.stop());
+				.then(Mono.fromRunnable(this::stop));
 	}
 
 	protected Mono<Message> show() {

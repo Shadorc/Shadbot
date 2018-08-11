@@ -29,9 +29,9 @@ public abstract class AbstractGameManager {
 		this.isDone = new AtomicBoolean(false);
 	}
 
-	public abstract Mono<Void> start();
+	public abstract void start();
 
-	public abstract Mono<Void> stop();
+	public abstract void stop();
 
 	public Context getContext() {
 		return context;
@@ -41,13 +41,10 @@ public abstract class AbstractGameManager {
 	 * @param message - the {@link Message} to check
 	 * @return A {@link Mono} that returns true if the {@link Message} is a valid cancel command, false otherwise
 	 */
-	private Mono<Boolean> isCancelCmd(Message message) {
-		return Mono.just(message)
-				// This is not a webhook nor an embed
-				.filter(msg -> msg.getAuthorId().isPresent() && msg.getContent().isPresent())
-				.map(msg -> msg.getContent().get())
+	private Mono<Boolean> isCancelMessage(Message message) {
+		return Mono.justOrEmpty(message.getContent())
 				// This is a cancel command
-				.filter(content -> content.equals(context.getPrefix() + "cancel"))
+				.filter(String.format("%scancel", context.getPrefix())::equals)
 				.flatMap(content -> message.getAuthorAsMember())
 				.zipWith(DiscordUtils.hasPermissions(message.getAuthorAsMember(), Permission.ADMINISTRATOR))
 				// The author is the author of the game or he is an administrator
@@ -62,12 +59,12 @@ public abstract class AbstractGameManager {
 	 */
 	public Mono<Boolean> cancelOrDo(Message message, Mono<Boolean> mono) {
 		return Mono.just(message)
-				.filterWhen(msg -> this.isCancelCmd(msg))
-				.flatMap(msg -> msg.getAuthor())
+				.filterWhen(this::isCancelMessage)
+				.flatMap(Message::getAuthor)
 				.map(User::getUsername)
 				.flatMap(username -> BotUtils.sendMessage(
 						String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", username), message.getChannel()))
-				.flatMap(ignored -> this.stop())
+				.flatMap(ignored -> Mono.fromRunnable(this::stop))
 				// The message is intercepted, return true
 				.map(ignored -> Boolean.TRUE)
 				.switchIfEmpty(mono);
@@ -80,7 +77,7 @@ public abstract class AbstractGameManager {
 	public void schedule(Mono<?> mono, long delay, TemporalUnit unit) {
 		this.cancelScheduledTask();
 		scheduledTask = Mono.delay(Duration.of(delay, unit))
-				.then(Mono.fromRunnable(() -> this.isDone.set(true)))
+				.then(Mono.fromRunnable(() -> isDone.set(true)))
 				.then(mono)
 				.subscribe();
 	}

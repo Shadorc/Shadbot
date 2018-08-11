@@ -63,7 +63,8 @@ public class HangmanCmd extends AbstractCommand {
 		HangmanManager hangmanManager = MANAGERS.putIfAbsent(context.getChannelId(), new HangmanManager(context, difficulty));
 		if(hangmanManager == null) {
 			hangmanManager = MANAGERS.get(context.getChannelId());
-			return hangmanManager.start();
+			hangmanManager.start();
+			return hangmanManager.show();
 		} else {
 			return BotUtils.sendMessage(
 					String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**. Please, wait for him to finish.",

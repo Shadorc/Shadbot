@@ -29,17 +29,14 @@ public class BlackjackCmd extends AbstractCommand {
 
 		final Integer bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
 
-		Mono<Void> startMono = Mono.empty();
-
 		BlackjackManager blackjackManager = MANAGERS.putIfAbsent(context.getChannelId(), new BlackjackManager(context));
 		if(blackjackManager == null) {
 			blackjackManager = MANAGERS.get(context.getChannelId());
-			startMono = blackjackManager.start();
+			blackjackManager.start();
 		}
 
 		if(blackjackManager.addPlayerIfAbsent(context.getAuthorId(), bet)) {
-			return startMono
-					.then(blackjackManager.computeResultsOrShow());
+			return blackjackManager.computeResultsOrShow();
 		} else {
 			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
 					context.getUsername()), context.getChannel())

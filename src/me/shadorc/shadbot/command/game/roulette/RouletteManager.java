@@ -50,20 +50,16 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 	}
 
 	@Override
-	public Mono<Void> start() {
-		return Mono.fromRunnable(() -> {
-			this.schedule(this.spin(), GAME_DURATION, ChronoUnit.SECONDS);
-			MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-		});
+	public void start() {
+		this.schedule(this.spin(), GAME_DURATION, ChronoUnit.SECONDS);
+		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 	}
 
 	@Override
-	public Mono<Void> stop() {
-		return Mono.fromRunnable(() -> {
-			this.cancelScheduledTask();
-			MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-			RouletteCmd.MANAGERS.remove(this.getContext().getChannelId());
-		});
+	public void stop() {
+		this.cancelScheduledTask();
+		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
+		RouletteCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
 	public Mono<Void> spin() {
@@ -109,7 +105,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 						winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"),
 						this.getContext().getChannel()))
 				.then(this.show())
-				.then(this.stop());
+				.then(Mono.fromRunnable(this::stop));
 	}
 
 	public Mono<Void> show() {

@@ -62,7 +62,8 @@ public class TriviaCmd extends AbstractCommand {
 
 		TriviaManager triviaManager = new TriviaManager(context, categoryId);
 		if(MANAGERS.putIfAbsent(context.getChannelId(), triviaManager) == null) {
-			return triviaManager.start();
+			triviaManager.start();
+			return triviaManager.show();
 		} else {
 			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Trivia game has already been started.",
 					context.getUsername()), context.getChannel())

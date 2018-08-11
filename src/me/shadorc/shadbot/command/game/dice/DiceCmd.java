@@ -77,16 +77,12 @@ public class DiceCmd extends AbstractCommand {
 					.then();
 		}
 
-		Mono<Void> startMono = Mono.empty();
-
 		if(MANAGERS.putIfAbsent(context.getChannelId(), diceManager) == null) {
-			startMono = diceManager.start();
+			diceManager.start();
 		}
 
 		if(diceManager.addPlayerIfAbsent(context.getAuthorId(), num)) {
-			return startMono
-					.then(diceManager.show())
-					.then();
+			return diceManager.show().then();
 		} else {
 			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
 					context.getUsername()), context.getChannel())

@@ -56,26 +56,22 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 	// TODO: IsIntercepeted considère tous les messages
 
 	@Override
-	public Mono<Void> start() {
-		return Mono.fromRunnable(() -> {
-			this.dealerCards.addAll(Card.pick(2));
-			while(BlackjackUtils.getValue(this.dealerCards) < 17) {
-				this.dealerCards.add(Card.pick());
-			}
+	public void start() {
+		this.dealerCards.addAll(Card.pick(2));
+		while(BlackjackUtils.getValue(this.dealerCards) < 17) {
+			this.dealerCards.add(Card.pick());
+		}
 
-			this.schedule(this.computeResults(), GAME_DURATION, ChronoUnit.SECONDS);
-			MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-			this.startTime = System.currentTimeMillis();
-		});
+		this.schedule(this.computeResults(), GAME_DURATION, ChronoUnit.SECONDS);
+		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
+		this.startTime = System.currentTimeMillis();
 	}
 
 	@Override
-	public Mono<Void> stop() {
-		return Mono.fromRunnable(() -> {
-			this.cancelScheduledTask();
-			MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-			BlackjackCmd.MANAGERS.remove(this.getContext().getChannelId());
-		});
+	public void stop() {
+		this.cancelScheduledTask();
+		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
+		BlackjackCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
 	public Mono<Message> show() {
@@ -170,7 +166,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 				.flatMap(results -> BotUtils.sendMessage(
 						String.format(Emoji.DICE + " __Results:__ %s", String.join(", ", results)), this.getContext().getChannel()))
 				.then(this.show())
-				.then(this.stop());
+				.then(Mono.fromRunnable(this::stop));
 	}
 
 	public boolean addPlayerIfAbsent(Snowflake userId, int bet) {
