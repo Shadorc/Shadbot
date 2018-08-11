@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -74,7 +73,8 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 		BlackjackCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
-	public Mono<Message> show() {
+	@Override
+	public Mono<Void> show() {
 		return Flux.fromIterable(players)
 				.flatMap(player -> Mono.zip(Mono.just(player), this.getContext().getClient().getUserById(player.getUserId())))
 				.map(playerAndUser -> {
@@ -112,7 +112,8 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 
 					return embed;
 				})
-				.flatMap(updateableMessage::send);
+				.flatMap(updateableMessage::send)
+				.then();
 	}
 
 	public Mono<Void> computeResultsOrShow() {

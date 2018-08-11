@@ -33,6 +33,8 @@ public abstract class AbstractGameManager {
 
 	public abstract void stop();
 
+	public abstract Mono<Void> show();
+
 	public Context getContext() {
 		return context;
 	}

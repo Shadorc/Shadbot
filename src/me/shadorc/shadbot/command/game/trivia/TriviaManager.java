@@ -79,6 +79,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		TriviaCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
+	@Override
 	public Mono<Void> show() {
 		final String description = String.format("**%s**%n%s",
 				trivia.getQuestion(),

@@ -68,6 +68,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 		HangmanCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
+	@Override
 	public Mono<Void> show() {
 		List<String> missedLetters = lettersTested.stream()
 				.filter(letter -> !word.contains(letter))

@@ -108,6 +108,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 				.then(Mono.fromRunnable(this::stop));
 	}
 
+	@Override
 	public Mono<Void> show() {
 		return this.getContext().getAvatarUrl()
 				.zipWith(Flux.fromIterable(playersPlace.keySet())

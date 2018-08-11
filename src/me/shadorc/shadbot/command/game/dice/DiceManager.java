@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -83,7 +82,8 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 				.then(Mono.fromRunnable(this::stop));
 	}
 
-	protected Mono<Message> show() {
+	@Override
+	public Mono<Void> show() {
 		return this.getContext().getAvatarUrl()
 				.zipWith(Flux.fromIterable(numsPlayers.values())
 						.flatMap(this.getContext().getClient()::getUserById)
@@ -112,7 +112,8 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 					return embed;
 				})
-				.flatMap(updateableMessage::send);
+				.flatMap(updateableMessage::send)
+				.then();
 	}
 
 	public int getBet() {
