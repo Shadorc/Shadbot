@@ -31,6 +31,7 @@ import reactor.core.publisher.Mono;
 public class TranslateCmd extends AbstractCommand {
 
 	private static final String AUTO = "auto";
+	private static final int CHARACTERS_LIMIT = 150;
 
 	private static final BiMap<String, String> LANG_ISO_MAP = HashBiMap.create();
 
@@ -49,6 +50,9 @@ public class TranslateCmd extends AbstractCommand {
 			throw new CommandException("The text to translate cannot be empty and must be enclosed in quotation marks.");
 		}
 		final String sourceText = quotedWords.get(0);
+		if(sourceText.length() > CHARACTERS_LIMIT) {
+			throw new CommandException(String.format("The text to translate cannot exceed %d characters.", CHARACTERS_LIMIT));
+		}
 
 		final List<String> langs = StringUtils.split(StringUtils.remove(arg, sourceText, "\""));
 		if(langs.size() == 0) {
