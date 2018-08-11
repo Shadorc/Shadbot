@@ -29,6 +29,13 @@ public class StatsCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(1, 2);
 
+		if(args.get(0).equalsIgnoreCase("average")) {
+			return context.getAvatarUrl()
+					.map(avatarUrl -> EmbedUtils.getAverageEmbed().setAuthor("Stats: average", null, avatarUrl))
+					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+					.then();
+		}
+
 		final StatisticEnum statEnum = Utils.getEnum(StatisticEnum.class, args.get(0));
 		if(statEnum == null) {
 			throw new CommandException(String.format("`%s` is not a valid category. %s",
@@ -82,6 +89,7 @@ public class StatsCmd extends AbstractCommand {
 				.setDescription("Show statistics for the specified category.")
 				.addArg("category", FormatUtils.formatOptions(StatisticEnum.class), false)
 				.addArg("sub-category", "Needed when checking table statistics or to see a specific statistic", true)
+				.addField("Info", "You can also use `average` as a *category* to get average winnings per game", false)
 				.build();
 	}
 }

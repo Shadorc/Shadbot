@@ -53,6 +53,10 @@ public class TableStatistic<E extends Enum<E>> extends Statistic<E> {
 		}
 	}
 
+	public Map<String, AtomicLong> getMap(E rowKey) {
+		return this.getMap(rowKey.toString());
+	}
+
 	@Override
 	public void save() throws IOException {
 		synchronized (table) {
