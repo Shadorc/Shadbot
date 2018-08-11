@@ -27,7 +27,8 @@ public class VoteMessage {
 	/**
 	 * @param embed - the embed to send
 	 * @return A {@link Flux} that continually emits the message's {@link Reaction}. If an error is received, it is emitted
-	 *         through the {@code Flux}.
+	 *         through the {@code Flux}. For example, if the message is deleted during the delay, a {@code 404 Forbidden} 
+	 *         will be thrown.
 	 */
 	public Flux<Reaction> sendMessage(EmbedCreateSpec embed) {
 		return BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
