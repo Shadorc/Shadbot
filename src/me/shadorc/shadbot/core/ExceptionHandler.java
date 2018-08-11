@@ -126,7 +126,8 @@ public class ExceptionHandler {
 				String.format("[%s] Service unreachable.", command.getClass().getSimpleName()),
 				context.getContent());
 		return BotUtils.sendMessage(
-				String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... This is not my fault, I promise ! Try again later.",
+				String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... "
+						+ "This is not my fault, I promise ! Try again later.",
 						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
 	}
 

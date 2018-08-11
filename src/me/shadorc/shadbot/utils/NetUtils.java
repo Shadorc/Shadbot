@@ -75,8 +75,9 @@ public class NetUtils {
 	public static String getJSON(String url) throws IOException {
 		final String json = NetUtils.getBody(url);
 		if(json.isEmpty() || json.charAt(0) != '{' && json.charAt(0) != '[') {
+			final String errorMessage = Jsoup.parse(json).text();
 			throw new HttpStatusException(
-					String.format("%s did not return valid JSON: %s", url, json.isEmpty() ? "Empty" : json),
+					String.format("%s did not return valid JSON: %s", url, errorMessage.isEmpty() ? "Empty" : errorMessage),
 					HttpStatus.SC_SERVICE_UNAVAILABLE,
 					url);
 		}
