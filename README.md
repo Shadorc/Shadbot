@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <img align="right" src="https://i.imgur.com/ab9PUtE.png" height="220" width="220">
+    <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=271674390">
+        <img align="right" src="https://i.imgur.com/ab9PUtE.png" height="220" width="220">
+    </a>
     <h1>Shadbot</h1>
     <p><b>Shadbot is a configurable Discord Bot which plays musics, executes useful, admin and fun commands, play games and more !</b></p>
     <hr>
     <h2>Usage</h2>
+    <a href="https://discordbots.org/bot/331146243596091403">
+        <img src="https://discordbots.org/api/widget/331146243596091403.svg">
+    </a>
     <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=271674390">link</a> !</b></p>
     <hr>
     <h2>Support</h2>
@@ -18,12 +23,11 @@
         <li>Server ID is used to store settings.
         <li>When an error occurred, I may log the message that triggers the command for debugging purpose.
     </ul>
-    If you have any questions, do not hesitate to <a href="https://discord.gg/CKnV4ff">join</a> the support server and ask them.
+    If you have any questions, do not hesitate to <a href="https://discord.gg/CKnV4ff">join</a> the support server.
     <hr>
     <h2>Libraries used</h2>
     <ul>
         <li><a href="https://github.com/Discord4J/Discord4J">Discord4J</a>
-        <li><a href="https://github.com/Discord4J/Stores">Discord4J-Stores</a>
         <li><a href="https://github.com/yusuke/twitter4j">Twitter4J</a>
         <li><a href="https://github.com/sedmelluq/lavaplayer">lavaplayer</a>
         <li><a href="https://github.com/akapribot/OWM-JAPIs">OpenWeatherMap-JAPIs</a>
