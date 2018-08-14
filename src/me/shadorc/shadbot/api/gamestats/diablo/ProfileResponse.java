@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.api.diablo;
+package me.shadorc.shadbot.api.gamestats.diablo;
 
 import java.util.List;
 

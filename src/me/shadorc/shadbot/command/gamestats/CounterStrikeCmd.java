@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.api.steam.player.PlayerSummariesResponse;
-import me.shadorc.shadbot.api.steam.player.PlayerSummary;
-import me.shadorc.shadbot.api.steam.resolver.ResolveVanityUrlResponse;
-import me.shadorc.shadbot.api.steam.stats.Stats;
-import me.shadorc.shadbot.api.steam.stats.UserStatsForGameResponse;
+import me.shadorc.shadbot.api.gamestats.steam.player.PlayerSummariesResponse;
+import me.shadorc.shadbot.api.gamestats.steam.player.PlayerSummary;
+import me.shadorc.shadbot.api.gamestats.steam.resolver.ResolveVanityUrlResponse;
+import me.shadorc.shadbot.api.gamestats.steam.stats.Stats;
+import me.shadorc.shadbot.api.gamestats.steam.stats.UserStatsForGameResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;

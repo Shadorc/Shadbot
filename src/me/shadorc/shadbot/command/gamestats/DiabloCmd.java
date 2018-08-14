@@ -8,9 +8,9 @@ import java.util.Collections;
 import java.util.List;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.api.diablo.HeroId;
-import me.shadorc.shadbot.api.diablo.HeroResponse;
-import me.shadorc.shadbot.api.diablo.ProfileResponse;
+import me.shadorc.shadbot.api.gamestats.diablo.HeroId;
+import me.shadorc.shadbot.api.gamestats.diablo.HeroResponse;
+import me.shadorc.shadbot.api.gamestats.diablo.ProfileResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;

@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.api.fortnite;
+package me.shadorc.shadbot.api.gamestats.fortnite;
 
 import java.util.Optional;
 

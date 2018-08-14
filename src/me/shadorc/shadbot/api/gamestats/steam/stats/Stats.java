@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.api.steam.stats;
+package me.shadorc.shadbot.api.gamestats.steam.stats;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

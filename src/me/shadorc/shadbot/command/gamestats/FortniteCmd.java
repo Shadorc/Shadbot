@@ -11,8 +11,8 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.api.fortnite.FortniteResponse;
-import me.shadorc.shadbot.api.fortnite.Stats;
+import me.shadorc.shadbot.api.gamestats.fortnite.FortniteResponse;
+import me.shadorc.shadbot.api.gamestats.fortnite.Stats;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
