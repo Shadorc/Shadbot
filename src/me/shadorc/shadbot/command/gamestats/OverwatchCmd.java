@@ -36,7 +36,7 @@ public class OverwatchCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final List<String> args = context.requireArgs(1, 3);
+		final List<String> args = context.requireArgs(1, 2);
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
