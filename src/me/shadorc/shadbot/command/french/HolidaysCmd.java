@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.french;
 
+import java.io.IOException;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -16,7 +18,6 @@ import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
-import twitter4j.TwitterException;
 
 @RateLimited
 @Command(category = CommandCategory.FRENCH, names = { "vacs", "vacances" })
@@ -40,7 +41,7 @@ public class HolidaysCmd extends AbstractCommand {
 		try {
 			final String holidays = StringUtils.remove(TwitterUtils.getLastTweet("Vacances_Zone" + zone), "#");
 			return loadingMsg.send(String.format(Emoji.BEACH + " (**%s**) %s", context.getUsername(), holidays)).then();
-		} catch (TwitterException err) {
+		} catch (IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}
