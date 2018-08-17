@@ -66,25 +66,20 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	private Image getRandomPopularImage(String encodedSearch) throws IOException {
-		try {
-			if(token == null || TimeUtils.getMillisUntil(lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(token.getExpiresIn())) {
-				this.generateAccessToken();
-			}
-
-			final URL url = new URL(String.format("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
-					+ "q=%s"
-					+ "&timerange=alltime"
-					+ "&limit=25" // The pagination limit (min: 1 max: 50)
-					+ "&offset=%d" // The pagination offset (min: 0 max: 50000)
-					+ "&access_token=%s",
-					encodedSearch, ThreadLocalRandom.current().nextInt(150), token.getAccessToken()));
-
-			DeviantArtResponse deviantArt = Utils.MAPPER.readValue(url, DeviantArtResponse.class);
-			return deviantArt.getResults().isEmpty() ? null : Utils.randValue(deviantArt.getResults());
-
-		} catch (IOException err) {
-			return null;
+		if(token == null || TimeUtils.getMillisUntil(lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(token.getExpiresIn())) {
+			this.generateAccessToken();
 		}
+
+		final URL url = new URL(String.format("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
+				+ "q=%s"
+				+ "&timerange=alltime"
+				+ "&limit=25" // The pagination limit (min: 1 max: 50)
+				+ "&offset=%d" // The pagination offset (min: 0 max: 50000)
+				+ "&access_token=%s",
+				encodedSearch, ThreadLocalRandom.current().nextInt(150), token.getAccessToken()));
+
+		DeviantArtResponse deviantArt = Utils.MAPPER.readValue(url, DeviantArtResponse.class);
+		return deviantArt.getResults().isEmpty() ? null : Utils.randValue(deviantArt.getResults());
 	}
 
 	private synchronized void generateAccessToken() throws IOException {
