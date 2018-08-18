@@ -39,7 +39,7 @@ public class WeatherCmd extends AbstractCommand {
 		/**
 		 * https://bitbucket.org/aksinghnet/owm-japis
 		 */
-		
+
 		try {
 			OpenWeatherMap owm = new OpenWeatherMap(Units.METRIC, APIKeys.get(APIKey.OPENWEATHERMAP_API_KEY));
 			CurrentWeather weather = owm.currentWeatherByCityName(arg);

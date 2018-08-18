@@ -53,9 +53,9 @@ public class Twitter {
 		final String endPointUrl = "https://api.twitter.com/oauth2/token";
 		Document doc = Jsoup.connect(endPointUrl)
 				.ignoreContentType(true)
-				.headers(Map.of("Host", "api.twitter.com", 
-						"User-Agent", Config.USER_AGENT, 
-						"Authorization", "Basic " + this.encodeKeys(consumerKey, consumerSecret), 
+				.headers(Map.of("Host", "api.twitter.com",
+						"User-Agent", Config.USER_AGENT,
+						"Authorization", "Basic " + this.encodeKeys(consumerKey, consumerSecret),
 						"Content-Type", "application/x-www-form-urlencoded;charset=UTF-8",
 						"Content-Length", "29"))
 				.requestBody("grant_type=client_credentials")
@@ -77,13 +77,13 @@ public class Twitter {
 			throw new IOException("Twitter bearer token is null.");
 		}
 
-		final String endPointUrl = "https://api.twitter.com/1.1/statuses/user_timeline.json?" 
-				+ "screen_name=" + screenName 
+		final String endPointUrl = "https://api.twitter.com/1.1/statuses/user_timeline.json?"
+				+ "screen_name=" + screenName
 				+ "&count=1";
 		Document doc = Jsoup.connect(endPointUrl)
 				.ignoreContentType(true)
 				.headers(Map.of("Host", "api.twitter.com",
-						"User-Agent", Config.USER_AGENT, 
+						"User-Agent", Config.USER_AGENT,
 						"Authorization", String.format("Bearer %s", bearerToken)))
 				.get();
 

@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.FRENCH, names = { "vacs", "vacances" })
 public class HolidaysCmd extends AbstractCommand {
 
-	private static final Twitter TWITTER = new Twitter(APIKeys.get(APIKey.TWITTER_API_KEY), 
+	private static final Twitter TWITTER = new Twitter(APIKeys.get(APIKey.TWITTER_API_KEY),
 			APIKeys.get(APIKey.TWITTER_API_SECRET));
 
 	private enum Zone {
