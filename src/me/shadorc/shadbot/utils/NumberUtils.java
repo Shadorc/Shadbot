@@ -83,12 +83,12 @@ public class NumberUtils {
 	}
 
 	/**
-	 * @param num - the float to check
+	 * @param num - the double to check
 	 * @param min - the minimum value, inclusive
 	 * @param max - the maximum value, inclusive
 	 * @return true if {@code num} is between {@code min}, inclusive, and {@code max}, inclusive, false otherwise
 	 */
-	public static boolean isInRange(float num, float min, float max) {
+	public static boolean isInRange(double num, double min, double max) {
 		return num >= min && num <= max;
 	}
 

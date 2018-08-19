@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.utils;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -18,9 +17,10 @@ import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
-import net.aksingh.owmjapis.CurrentWeather;
-import net.aksingh.owmjapis.OpenWeatherMap;
-import net.aksingh.owmjapis.OpenWeatherMap.Units;
+import net.aksingh.owmjapis.api.APIException;
+import net.aksingh.owmjapis.core.OWM;
+import net.aksingh.owmjapis.core.OWM.Unit;
+import net.aksingh.owmjapis.model.CurrentWeather;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -36,31 +36,29 @@ public class WeatherCmd extends AbstractCommand {
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		/**
-		 * https://bitbucket.org/aksinghnet/owm-japis
-		 */
-
 		try {
-			OpenWeatherMap owm = new OpenWeatherMap(Units.METRIC, APIKeys.get(APIKey.OPENWEATHERMAP_API_KEY));
-			CurrentWeather weather = owm.currentWeatherByCityName(arg);
+	        OWM owm = new OWM(APIKeys.get(APIKey.OPENWEATHERMAP_API_KEY));
+	        owm.setUnit(Unit.METRIC);
 
-			if(!weather.isValid()) {
+	        CurrentWeather weather = owm.currentWeatherByCityName(arg);
+
+			if(!weather.hasCityName()) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
 						context.getUsername(), arg))
 						.then();
 			}
 
-			final String clouds = StringUtils.capitalizeFully(weather.getWeatherInstance(0).getWeatherDescription());
-			final float windSpeed = weather.getWindInstance().getWindSpeed() * 3.6f;
+			final String clouds = StringUtils.capitalizeFully(weather.getWeatherList().get(0).getDescription());
+			final double windSpeed = weather.getWindData().getSpeed() * 3.6;
 			final String windDesc = this.getWindDesc(windSpeed);
-			final String rain = weather.hasRainInstance() ? String.format("%.1f mm/h", weather.getRainInstance().getRain3h()) : "None";
-			final float humidity = weather.getMainInstance().getHumidity();
-			final float temperature = weather.getMainInstance().getTemperature();
+			final String rain = weather.hasRainData() ? String.format("%.1f mm/h", weather.getRainData().getPrecipVol3h()) : "None";
+			final double humidity = weather.getMainData().getHumidity();
+			final double temperature = weather.getMainData().getTemp();
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Weather for: %s", weather.getCityName()),
-									String.format("http://openweathermap.org/city/%d", weather.getCityCode()),
+									String.format("http://openweathermap.org/city/%d", weather.getCityId()),
 									avatarUrl)
 							.setThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
 							.setDescription("Last updated " + dateFormatter.format(weather.getDateTime()))
@@ -72,13 +70,13 @@ public class WeatherCmd extends AbstractCommand {
 					.flatMap(loadingMsg::send)
 					.then();
 
-		} catch (IOException err) {
+		} catch (APIException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}
 	}
 
-	private String getWindDesc(float windSpeed) {
+	private String getWindDesc(double windSpeed) {
 		if(windSpeed < 1) {
 			return "Calm";
 		} else if(NumberUtils.isInRange(windSpeed, 1, 6)) {
