@@ -29,7 +29,7 @@ public class Twitter {
 
 	/**
 	 * Encodes the consumer key and secret to create the basic authorization key
-	 * 
+	 *
 	 * @return Twitter Consumer API keys encoded to Base 64
 	 * @throws UnsupportedEncodingException If the named encoding is not supported
 	 */
@@ -42,7 +42,7 @@ public class Twitter {
 
 	/**
 	 * Constructs the request for requesting a bearer token and returns that token as a string
-	 * 
+	 *
 	 * @return The bearer token as a string
 	 * @throws IOException on error
 	 */
@@ -67,7 +67,7 @@ public class Twitter {
 
 	/**
 	 * Fetches the first tweet from a given user's timeline
-	 * 
+	 *
 	 * @param screenName - user's screen name
 	 * @return The first tweet from a given user's timeline
 	 * @throws IOException on error

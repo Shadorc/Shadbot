@@ -37,10 +37,10 @@ public class WeatherCmd extends AbstractCommand {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-	        OWM owm = new OWM(APIKeys.get(APIKey.OPENWEATHERMAP_API_KEY));
-	        owm.setUnit(Unit.METRIC);
+			OWM owm = new OWM(APIKeys.get(APIKey.OPENWEATHERMAP_API_KEY));
+			owm.setUnit(Unit.METRIC);
 
-	        CurrentWeather weather = owm.currentWeatherByCityName(arg);
+			CurrentWeather weather = owm.currentWeatherByCityName(arg);
 
 			if(!weather.hasCityName()) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
