@@ -1,12 +1,11 @@
 package me.shadorc.shadbot.command.french;
 
 import java.io.IOException;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.net.URL;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.api.dtc.QuoteResponse;
+import me.shadorc.shadbot.api.dtc.DtcResponse;
+import me.shadorc.shadbot.api.dtc.Quote;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -15,11 +14,9 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
@@ -32,46 +29,39 @@ public class DtcCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		return context.getAvatarUrl()
-				.flatMap(avatarUrl -> {
-					try {
-						final String url = String.format("http://api.danstonchat.com/0.3/view/random?key=%s&format=json",
-								APIKeys.get(APIKey.DTC_API_KEY));
-						final JSONArray quoteObjs = new JSONArray(NetUtils.getJSON(url));
+		try {
+			final URL url = new URL(String.format("https://api.danstonchat.com/item/rest_item/random?comments=0&key=%s",
+					APIKeys.get(APIKey.DTC_API_KEY)));
 
-						for(JSONObject quoteObj : Utils.toList(quoteObjs, JSONObject.class)) {
-							QuoteResponse quote = Utils.MAPPER.readValue(quoteObj.toString(), QuoteResponse.class);
-							if(quote.getContent().length() < 1000) {
-								final String content = quote.getContent().replace("*", "\\*");
+			Quote quote;
+			do {
+				quote = Utils.MAPPER.readValue(url, DtcResponse.class).getRoot().getQuote();
+			} while(quote.getContent().length() > 1000);
 
-								return loadingMsg.send(EmbedUtils.getDefaultEmbed()
-										.setAuthor("Quote DansTonChat",
-												String.format("https://danstonchat.com/%s.html", quote.getId()),
-												avatarUrl)
-										.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-										.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n")));
-							}
-						}
+			final String content = quote.getContent().replace("*", "\\*");
+			;
+			final String id = quote.getId();
 
-						LogUtils.warn(context.getClient(), String.format("{%s} No quotes were found.", this.getClass().getSimpleName()));
-						return loadingMsg.send(EmbedUtils.getDefaultEmbed()
-								.setAuthor("Quote DansTonChat", null, avatarUrl)
-								.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-								.setDescription("Sorry, no quotes were found."));
+			return context.getAvatarUrl()
+					.flatMap(avatarUrl -> loadingMsg.send(EmbedUtils.getDefaultEmbed()
+							.setAuthor("Quote DansTonChat",
+									String.format("https://danstonchat.com/%s.html", id),
+									avatarUrl)
+							.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+							.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"))))
+					.then();
 
-					} catch (IOException err) {
-						loadingMsg.stopTyping();
-						throw Exceptions.propagate(err);
-					}
-				})
-				.then();
+		} catch (IOException err) {
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
+		}
 	}
 
 	private String format(String line) {
 		// Set the user name as bold
 		if(line.contains(" ")) {
 			int index = line.indexOf(' ');
-			return "**" + line.substring(0, index) + "** " + line.substring(index + 1);
+			return String.format("**%s** %s", line.substring(0, index), line.substring(index + 1));
 		}
 		return line;
 	}

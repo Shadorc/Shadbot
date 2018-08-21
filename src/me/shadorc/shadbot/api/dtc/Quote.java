@@ -2,24 +2,24 @@ package me.shadorc.shadbot.api.dtc;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class QuoteResponse {
+public class Quote {
 
-	@JsonProperty("content")
-	private String content;
 	@JsonProperty("id")
 	private String id;
-
-	public String getContent() {
-		return content;
-	}
+	@JsonProperty("content")
+	private String content;
 
 	public String getId() {
 		return id;
 	}
 
+	public String getContent() {
+		return content;
+	}
+
 	@Override
 	public String toString() {
-		return String.format("QuoteResponse [content=%s, id=%s]", content, id);
+		return String.format("Quote [id=%s, content=%s]", id, content);
 	}
 
 }
