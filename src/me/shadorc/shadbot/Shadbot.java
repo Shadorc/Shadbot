@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -22,6 +23,7 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class Shadbot {
 
@@ -36,23 +38,15 @@ public class Shadbot {
 			System.exit(1);
 		}
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				DataManager.stop();
-			}
-		});
+		Runtime.getRuntime().addShutdownHook(new Thread(DataManager::stop));
 
-		final int shardCount = DiscordUtils.getRecommendedShardCount();
+		DiscordClientBuilder builder = new DiscordClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
+				.setShardCount(DiscordUtils.getRecommendedShardCount())
+				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
-		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(shardCount, "shard"));
-
-		for(int i = 0; i < shardCount; i++) {
-			DiscordClient client = new DiscordClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
-					.setInitialPresence(Presence.idle(Activity.playing("Connecting...")))
-					.setShardIndex(i)
-					.setShardCount(shardCount)
-					.build();
+		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
+		for(int i = 0; i < builder.getShardCount(); i++) {
+			DiscordClient client = builder.setShardIndex(i).build();
 			CLIENTS.add(client);
 
 			DiscordUtils.registerListener(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
@@ -64,7 +58,7 @@ public class Shadbot {
 				.subscribe();
 
 		// Initiate login and block
-		Flux.merge(Flux.fromIterable(CLIENTS)).flatMap(DiscordClient::login).blockLast();
+		Mono.when(CLIENTS.stream().map(DiscordClient::login).collect(Collectors.toList())).block();
 	}
 
 	public static void logout() {
