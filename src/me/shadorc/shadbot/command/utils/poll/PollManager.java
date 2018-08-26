@@ -1,15 +1,21 @@
 package me.shadorc.shadbot.command.utils.poll;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
+import discord4j.core.object.reaction.ReactionEmoji.Unicode;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
+import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.TimeUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.message.VoteMessage;
 import reactor.core.publisher.Mono;
@@ -18,8 +24,6 @@ public class PollManager extends AbstractGameManager {
 
 	private final PollCreateSpec spec;
 	private final VoteMessage voteMessage;
-
-	private long startTime;
 
 	public PollManager(Context context, PollCreateSpec spec) {
 		super(context);
@@ -30,7 +34,6 @@ public class PollManager extends AbstractGameManager {
 	@Override
 	public void start() {
 		this.schedule(Mono.fromRunnable(this::stop), spec.getDuration(), ChronoUnit.SECONDS);
-		startTime = System.currentTimeMillis();
 		this.show().subscribe();
 	}
 
@@ -48,14 +51,14 @@ public class PollManager extends AbstractGameManager {
 					for(int i = 0; i < spec.getChoices().size(); i++) {
 						representation.append(String.format("%n\t**%d.** %s", i + 1, spec.getChoices().get(i)));
 					}
-					final long elapsedTime = TimeUnit.SECONDS.toMillis(spec.getDuration()) - TimeUtils.getMillisUntil(startTime);
 
 					return EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Poll (Created by: %s)", this.getContext().getUsername()), null, avatarUrl)
+							.setAuthor(String.format("Poll (Author: %s)", this.getContext().getUsername()), null, avatarUrl)
 							.setDescription(String.format("Vote using: `%s%s <choice>`%n%n__**%s**__%s",
 									this.getContext().getPrefix(), this.getContext().getCommandName(),
 									spec.getQuestion(), representation.toString()))
-							.setFooter(String.format("You have %s to vote.", FormatUtils.formatShortDuration(elapsedTime)),
+							.setFooter(String.format("You have %s to vote.",
+									FormatUtils.formatShortDuration(TimeUnit.SECONDS.toMillis(spec.getDuration()))),
 									"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png");
 				})
 				.flatMap(voteMessage::sendMessage)
@@ -63,9 +66,34 @@ public class PollManager extends AbstractGameManager {
 				.then();
 	}
 
-	// TODO
 	private Mono<Message> sendResults(Set<Reaction> reactions) {
-		return Mono.empty();
+		return this.getContext().getAvatarUrl()
+				.map(avatarUrl -> {
+					// Reactions are not in the same order as they were when added to the message, they need to be ordered
+					Map<String, Integer> votes = new HashMap<>();
+					for(Reaction reaction : reactions) {
+						for(int i = 0; i < spec.getReactions().size(); i++) {
+							final Unicode unicode = reaction.getEmoji().asUnicodeEmoji().get();
+							if(unicode.equals(spec.getReactions().get(i))) {
+								votes.put(spec.getChoices().get(i), reaction.getCount() - 1);
+							}
+						}
+					}
+
+					// Sort votes map by value in the ascending order
+					StringBuilder representation = new StringBuilder();
+					int count = 1;
+					for(String key : Utils.sortByValue(votes, Collections.reverseOrder(Entry.comparingByValue())).keySet()) {
+						representation.append(String.format("%n\t**%d.** %s (Votes: %d)", count, key, votes.get(key)));
+						count++;
+					}
+
+					return EmbedUtils.getDefaultEmbed()
+							.setAuthor(String.format("Poll results (Author: %s)", this.getContext().getUsername()), null, avatarUrl)
+							.setDescription(String.format("__**%s**__%s", spec.getQuestion(), representation.toString()));
+
+				})
+				.flatMap(embed -> BotUtils.sendMessage(embed, this.getContext().getChannel()));
 	}
 
 }

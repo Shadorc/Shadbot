@@ -102,7 +102,7 @@ public class PollCmd extends AbstractCommand {
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}
 
-		return new PollManager(context, new PollCreateSpec(duration, substrings.get(0), choices, NUMBER_EMOJI.subList(0, 1)));
+		return new PollManager(context, new PollCreateSpec(duration, substrings.get(0), choices, NUMBER_EMOJI.subList(1, choices.size() + 1)));
 	}
 
 	@Override
