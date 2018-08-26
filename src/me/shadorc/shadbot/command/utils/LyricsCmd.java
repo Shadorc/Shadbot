@@ -17,7 +17,6 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
@@ -39,10 +38,7 @@ public class LyricsCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = me.shadorc.shadbot.utils.StringUtils.split(context.getArg().orElse(""), 2, "-");
-		if(args.size() != 2) {
-			throw new MissingArgumentException();
-		}
+		List<String> args = context.requireArgs(2, "-");
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
@@ -116,7 +112,7 @@ public class LyricsCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show lyrics for a song.")
-				.setUsage("<artist> - <title>")
+				.setDelimiter(" - ")
 				.setSource(HOME_URL)
 				.build();
 	}
