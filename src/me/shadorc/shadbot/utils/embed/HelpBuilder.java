@@ -2,10 +2,12 @@ package me.shadorc.shadbot.utils.embed;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -24,12 +26,14 @@ public class HelpBuilder {
 	private String example;
 	private String gains;
 	private String source;
+	private String delimiter;
 
 	public HelpBuilder(AbstractCommand cmd, Context context) {
 		this.context = context;
 		this.cmd = cmd;
 		this.args = new ArrayList<>();
 		this.fields = new ArrayList<>();
+		this.delimiter = Config.DEFAULT_COMMAND_DELIMITER;
 	}
 
 	public HelpBuilder setThumbnail(String thumbnail) {
@@ -63,6 +67,11 @@ public class HelpBuilder {
 
 	public HelpBuilder setSource(String source) {
 		this.source = source;
+		return this;
+	}
+
+	public HelpBuilder setDelimiter(String delimiter) {
+		this.delimiter = delimiter;
 		return this;
 	}
 
@@ -138,12 +147,12 @@ public class HelpBuilder {
 
 		return String.format("`%s%s %s`",
 				context.getPrefix(), cmd.getName(),
-				FormatUtils.format(args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), " "));
+				FormatUtils.format(args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), delimiter));
 	}
 
 	private String getArguments() {
 		return args.stream()
-				.filter(arg -> arg.getDesc() != null)
+				.filter(arg -> Objects.nonNull(arg.getDesc()))
 				.map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isFacultative() ? "[optional] " : "", arg.getDesc()))
 				.collect(Collectors.joining());
 	}
