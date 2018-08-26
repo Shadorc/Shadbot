@@ -39,7 +39,6 @@ public class DtcCmd extends AbstractCommand {
 			} while(quote.getContent().length() > 1000);
 
 			final String content = quote.getContent().replace("*", "\\*");
-			;
 			final String id = quote.getId();
 
 			return context.getAvatarUrl()

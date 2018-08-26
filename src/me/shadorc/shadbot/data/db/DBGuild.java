@@ -21,15 +21,11 @@ import me.shadorc.shadbot.utils.Utils;
 public class DBGuild {
 
 	@JsonProperty("id")
-	private final Long id;
+	private Long id;
 	@JsonProperty("members")
-	private final List<DBMember> members;
+	private List<DBMember> members;
 	@JsonProperty("settings")
-	private final Map<String, Object> settings;
-
-	public DBGuild() {
-		this(Snowflake.of(0));
-	}
+	private Map<String, Object> settings;
 
 	public DBGuild(Snowflake id) {
 		this.id = id.asLong();
