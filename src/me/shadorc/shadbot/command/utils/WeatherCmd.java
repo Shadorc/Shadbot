@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.utils;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -13,14 +14,18 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.message.LoadingMessage;
 import net.aksingh.owmjapis.api.APIException;
 import net.aksingh.owmjapis.core.OWM;
+import net.aksingh.owmjapis.core.OWM.Country;
 import net.aksingh.owmjapis.core.OWM.Unit;
 import net.aksingh.owmjapis.model.CurrentWeather;
+import net.aksingh.owmjapis.model.param.Main;
+import net.aksingh.owmjapis.model.param.Weather;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +37,7 @@ public class WeatherCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final String arg = context.requireArg();
+		final List<String> args = context.requireArgs(1, 2, ",");
 
 		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
@@ -40,37 +45,46 @@ public class WeatherCmd extends AbstractCommand {
 			OWM owm = new OWM(APIKeys.get(APIKey.OPENWEATHERMAP_API_KEY));
 			owm.setUnit(Unit.METRIC);
 
-			CurrentWeather weather = owm.currentWeatherByCityName(arg);
-
-			if(!weather.hasCityName()) {
-				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
-						context.getUsername(), arg))
-						.then();
+			CurrentWeather currentWeather;
+			if(args.size() == 2) {
+				final Country country = Utils.getEnum(Country.class, args.get(1).replace(" ", "_"));
+				if(country == null) {
+					return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
+							context.getUsername(), args.get(1))).then();
+				}
+				currentWeather = owm.currentWeatherByCityName(args.get(0), country);
+			} else {
+				currentWeather = owm.currentWeatherByCityName(args.get(0));
 			}
 
-			final String clouds = StringUtils.capitalizeFully(weather.getWeatherList().get(0).getDescription());
-			final double windSpeed = weather.getWindData().getSpeed() * 3.6;
+			final Weather weather = currentWeather.getWeatherList().get(0);
+			final Main main = currentWeather.getMainData();
+
+			final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
 			final String windDesc = this.getWindDesc(windSpeed);
-			final String rain = weather.hasRainData() ? String.format("%.1f mm/h", weather.getRainData().getPrecipVol3h()) : "None";
-			final double humidity = weather.getMainData().getHumidity();
-			final double temperature = weather.getMainData().getTemp();
+			final String rain = currentWeather.hasRainData() ? String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
+			final String countryCode = currentWeather.getSystemData().getCountryCode();
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Weather for: %s", weather.getCityName()),
-									String.format("http://openweathermap.org/city/%d", weather.getCityId()),
+							.setAuthor(String.format("Weather for %s (%s)", currentWeather.getCityName(), countryCode),
+									String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
 									avatarUrl)
-							.setThumbnail("https://image.flaticon.com/icons/svg/494/494472.svg")
-							.setDescription("Last updated " + dateFormatter.format(weather.getDateTime()))
-							.addField(Emoji.CLOUD + " Clouds", clouds, true)
+							.setThumbnail(weather.getIconLink())
+							.setDescription(String.format("Last updated %s", dateFormatter.format(currentWeather.getDateTime())))
+							.addField(Emoji.CLOUD + " Clouds", StringUtils.capitalizeFully(weather.getDescription()), true)
 							.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
 							.addField(Emoji.RAIN + " Rain", rain, true)
-							.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", humidity), true)
-							.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", temperature), true))
+							.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
+							.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true))
 					.flatMap(loadingMsg::send)
 					.then();
 
 		} catch (APIException err) {
+			if(err.getCode() == 404) {
+				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
+						context.getUsername(), args.get(0))).then();
+			}
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}
@@ -110,7 +124,9 @@ public class WeatherCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show weather report for a city.")
+				.setDelimiter(", ")
 				.addArg("city", false)
+				.addArg("country", true)
 				.setSource("http://openweathermap.org/")
 				.build();
 	}
