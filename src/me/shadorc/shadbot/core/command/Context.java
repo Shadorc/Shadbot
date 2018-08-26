@@ -14,6 +14,7 @@ import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.music.GuildMusic;
@@ -155,15 +156,23 @@ public class Context {
 	public String requireArg() {
 		return this.getArg()
 				.map(StringUtils::normalizeSpace)
-				.orElseThrow(() -> new MissingArgumentException());
+				.orElseThrow(MissingArgumentException::new);
 	}
 
 	public List<String> requireArgs(int count) {
 		return this.requireArgs(count, count);
 	}
 
+	public List<String> requireArgs(int count, String delimiter) {
+		return this.requireArgs(count, count);
+	}
+
 	public List<String> requireArgs(int min, int max) {
-		List<String> args = StringUtils.split(this.requireArg(), max);
+		return this.requireArgs(min, max, Config.DEFAULT_COMMAND_DELIMITER);
+	}
+
+	public List<String> requireArgs(int min, int max, String delimiter) {
+		List<String> args = StringUtils.split(this.requireArg(), max, delimiter);
 		if(!NumberUtils.isInRange(args.size(), min, max)) {
 			throw new MissingArgumentException();
 		}
