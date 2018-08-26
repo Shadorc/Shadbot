@@ -1,6 +1,8 @@
 package me.shadorc.shadbot.utils.message;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Set;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
@@ -17,26 +19,27 @@ public class VoteMessage {
 	private final DiscordClient client;
 	private final Snowflake channelId;
 	private final int seconds;
+	private final List<ReactionEmoji> reactions;
 
-	public VoteMessage(DiscordClient client, Snowflake channelId, int seconds) {
+	public VoteMessage(DiscordClient client, Snowflake channelId, int seconds, List<ReactionEmoji> reactions) {
 		this.client = client;
 		this.channelId = channelId;
 		this.seconds = seconds;
+		this.reactions = reactions;
 	}
 
 	/**
 	 * @param embed - the embed to send
-	 * @return A {@link Flux} that continually emits the message's {@link Reaction}. If an error is received, it is emitted through the {@code Flux}. For
-	 *         example, if the message is deleted during the delay, a {@code 404 Forbidden} will be thrown.
+	 * @return A {@link Mono} containing a {@link Set} of the message's {@link Reaction}. If an error is received, it is emitted through the {@code Mono}.
+	 *         For example, if the message is deleted during the delay, a {@code 404 Forbidden} will be thrown.
 	 */
-	public Flux<Reaction> sendMessage(EmbedCreateSpec embed) {
+	public Mono<Set<Reaction>> sendMessage(EmbedCreateSpec embed) {
 		return BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
-				.flatMapMany(message -> message.addReaction(ReactionEmoji.unicode("✅"))
-						.then(message.addReaction(ReactionEmoji.unicode("❌")))
+				.flatMap(message -> Flux.fromIterable(reactions)
+						.flatMap(message::addReaction)
 						.then(Mono.delay(Duration.ofSeconds(seconds)))
 						.then(client.getMessageById(channelId, message.getId()))
-						.map(Message::getReactions)
-						.flatMapMany(Flux::fromIterable));
+						.map(Message::getReactions));
 	}
 
 }
