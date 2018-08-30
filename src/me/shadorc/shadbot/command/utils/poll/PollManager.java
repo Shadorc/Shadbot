@@ -8,9 +8,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
-import discord4j.core.object.reaction.ReactionEmoji.Unicode;
+import discord4j.core.object.reaction.ReactionEmoji;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -28,7 +31,7 @@ public class PollManager extends AbstractGameManager {
 	public PollManager(Context context, PollCreateSpec spec) {
 		super(context);
 		this.spec = spec;
-		this.voteMessage = new VoteMessage(context.getClient(), context.getChannelId(), spec.getDuration(), spec.getReactions());
+		this.voteMessage = new VoteMessage(context.getClient(), context.getChannelId(), spec.getDuration(), spec.getChoices().values());
 	}
 
 	@Override
@@ -49,7 +52,7 @@ public class PollManager extends AbstractGameManager {
 				.map(avatarUrl -> {
 					StringBuilder representation = new StringBuilder();
 					for(int i = 0; i < spec.getChoices().size(); i++) {
-						representation.append(String.format("%n\t**%d.** %s", i + 1, spec.getChoices().get(i)));
+						representation.append(String.format("%n\t**%d.** %s", i + 1, spec.getChoices().keySet().toArray()[i]));
 					}
 
 					return EmbedUtils.getDefaultEmbed()
@@ -70,21 +73,17 @@ public class PollManager extends AbstractGameManager {
 		return this.getContext().getAvatarUrl()
 				.map(avatarUrl -> {
 					// Reactions are not in the same order as they were when added to the message, they need to be ordered
-					Map<String, Integer> votes = new HashMap<>();
+					BiMap<ReactionEmoji, String> reactionsChoices = HashBiMap.create(spec.getChoices()).inverse();
+					Map<String, Integer> choicesVotes = new HashMap<>();
 					for(Reaction reaction : reactions) {
-						for(int i = 0; i < spec.getReactions().size(); i++) {
-							final Unicode unicode = reaction.getEmoji().asUnicodeEmoji().get();
-							if(unicode.equals(spec.getReactions().get(i))) {
-								votes.put(spec.getChoices().get(i), reaction.getCount() - 1);
-							}
-						}
+						choicesVotes.put(reactionsChoices.get(reaction.getEmoji()), reaction.getCount());
 					}
 
 					// Sort votes map by value in the ascending order
 					StringBuilder representation = new StringBuilder();
 					int count = 1;
-					for(String key : Utils.sortByValue(votes, Collections.reverseOrder(Entry.comparingByValue())).keySet()) {
-						representation.append(String.format("%n\t**%d.** %s (Votes: %d)", count, key, votes.get(key)));
+					for(String key : Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue())).keySet()) {
+						representation.append(String.format("%n\t**%d.** %s (Votes: %d)", count, key, choicesVotes.get(key)));
 						count++;
 					}
 

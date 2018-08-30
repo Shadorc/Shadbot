@@ -1,10 +1,11 @@
 package me.shadorc.shadbot.command.utils.poll;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -96,13 +97,18 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		// Remove duplicate choices
-		Set<String> choices = new HashSet<>(substrings.subList(1, substrings.size()));
+		List<String> choices = substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList());
 		if(!NumberUtils.isInRange(choices.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
 			throw new CommandException(String.format("You must specify between %d and %d different non-empty choices.",
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}
 
-		return new PollManager(context, new PollCreateSpec(duration, substrings.get(0), choices, NUMBER_EMOJI.subList(1, choices.size() + 1)));
+		Map<String, ReactionEmoji> choicesReactions = new HashMap<>();
+		for(int i = 0; i < choices.size(); i++) {
+			choicesReactions.put(choices.get(i), NUMBER_EMOJI.get(i + 1));
+		}
+
+		return new PollManager(context, new PollCreateSpec(duration, substrings.get(0), choicesReactions));
 	}
 
 	@Override

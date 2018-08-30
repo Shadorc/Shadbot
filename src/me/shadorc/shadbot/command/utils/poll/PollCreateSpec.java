@@ -1,8 +1,6 @@
 package me.shadorc.shadbot.command.utils.poll;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import discord4j.core.object.reaction.ReactionEmoji;
 
@@ -10,14 +8,12 @@ public class PollCreateSpec {
 
 	private final int duration;
 	private final String question;
-	private final List<String> choices;
-	private final List<ReactionEmoji> reactions;
+	private final Map<String, ReactionEmoji> choices;
 
-	public PollCreateSpec(int duration, String question, Set<String> choices, List<ReactionEmoji> reactions) {
+	public PollCreateSpec(int duration, String question, Map<String, ReactionEmoji> choices) {
 		this.duration = duration;
 		this.question = question;
-		this.choices = new ArrayList<>(choices);
-		this.reactions = reactions;
+		this.choices = choices;
 	}
 
 	public int getDuration() {
@@ -28,12 +24,8 @@ public class PollCreateSpec {
 		return question;
 	}
 
-	public List<String> getChoices() {
+	public Map<String, ReactionEmoji> getChoices() {
 		return choices;
-	}
-
-	public List<ReactionEmoji> getReactions() {
-		return reactions;
 	}
 
 }

@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.utils.message;
 
 import java.time.Duration;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 import discord4j.core.DiscordClient;
@@ -19,13 +19,13 @@ public class VoteMessage {
 	private final DiscordClient client;
 	private final Snowflake channelId;
 	private final int seconds;
-	private final List<ReactionEmoji> reactions;
+	private final Collection<ReactionEmoji> reactions;
 
-	public VoteMessage(DiscordClient client, Snowflake channelId, int seconds, List<ReactionEmoji> reactions) {
+	public VoteMessage(DiscordClient client, Snowflake channelId, int seconds, Collection<ReactionEmoji> collection) {
 		this.client = client;
 		this.channelId = channelId;
 		this.seconds = seconds;
-		this.reactions = reactions;
+		this.reactions = collection;
 	}
 
 	/**
