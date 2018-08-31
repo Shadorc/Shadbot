@@ -51,7 +51,6 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 	}
 
-	// TODO: Bug avec la main du dealer sur la fin
 	// TODO: IsIntercepeted considère tous les messages
 
 	@Override
@@ -100,7 +99,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 									this.getContext().getPrefix(), this.getContext().getCommandName()))
 							.addField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? this.dealerCards : this.dealerCards.subList(0, 1)), true);
 
-					if(this.isFinished() || this.isTaskDone()) {
+					if(this.isTaskDone()) {
 						embed.setFooter("Finished", null);
 					} else {
 						final long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(this.startTime));
@@ -165,8 +164,8 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 				.collectList()
 				.flatMap(results -> BotUtils.sendMessage(
 						String.format(Emoji.DICE + " __Results:__ %s", String.join(", ", results)), this.getContext().getChannel()))
-				.then(this.show())
-				.then(Mono.fromRunnable(this::stop));
+				.then(Mono.fromRunnable(this::stop))
+				.then(this.show());
 	}
 
 	public boolean addPlayerIfAbsent(Snowflake userId, int bet) {
