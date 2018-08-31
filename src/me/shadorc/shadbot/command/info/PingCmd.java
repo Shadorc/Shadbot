@@ -20,7 +20,7 @@ public class PingCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final long start = System.currentTimeMillis();
-		return BotUtils.sendMessage(Emoji.GEAR + " Testing ping...", context.getChannel())
+		return BotUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Testing ping...", context.getUsername()), context.getChannel())
 				.flatMap(message -> message.edit(new MessageEditSpec().setContent(String.format(Emoji.GEAR + " Ping: %dms",
 						TimeUtils.getMillisUntil(start)))))
 				.then();

@@ -28,9 +28,8 @@ public class VolumeCmd extends AbstractCommand {
 				.flatMap(voiceChannelId -> {
 					final TrackScheduler scheduler = guildMusic.getScheduler();
 					if(!context.getArg().isPresent()) {
-						return BotUtils.sendMessage(String.format(Emoji.SOUND + " Current volume level: **%d%%**",
-								scheduler.getAudioPlayer().getVolume()),
-								context.getChannel())
+						return BotUtils.sendMessage(String.format(Emoji.SOUND + " (**%s**) Current volume level: **%d%%**",
+								context.getUsername(), scheduler.getAudioPlayer().getVolume()), context.getChannel())
 								.then();
 					}
 

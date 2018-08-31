@@ -28,10 +28,10 @@ public class RelicStatusCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final List<Relic> relics = PremiumManager.getRelicsForUser(context.getAuthorId());
 		if(relics.isEmpty()) {
-			return BotUtils.sendMessage(String.format(Emoji.INFO + " You are not a donator. If you like Shadbot, you can help me keep it alive"
-					+ " by making a donation on **%s**."
+			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
+					+ "you can help me keep it alive by making a donation on **%s**."
 					+ "%nAll donations are important and really help me %s",
-					Config.PATREON_URL, Emoji.HEARTS), context.getChannel())
+					context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), context.getChannel())
 					.then();
 		}
 

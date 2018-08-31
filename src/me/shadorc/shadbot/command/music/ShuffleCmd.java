@@ -25,8 +25,8 @@ public class ShuffleCmd extends AbstractCommand {
 				.flatMap(voiceChannelId -> {
 					guildMusic.getScheduler().shufflePlaylist();
 
-					return BotUtils.sendMessage(
-							String.format(Emoji.CHECK_MARK + " Playlist shuffled by **%s**.", context.getUsername()), context.getChannel())
+					return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Playlist shuffled by **%s**.",
+							context.getUsername()), context.getChannel())
 							.then();
 				});
 	}

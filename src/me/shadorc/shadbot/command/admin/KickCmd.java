@@ -76,8 +76,8 @@ public class KickCmd extends AbstractCommand {
 					}
 
 					return banFlux
-							.then(BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) **%s** got kicked. Reason: `%s`",
-									context.getUsername(), FormatUtils.format(mentions, User::getUsername, ", "), reason),
+							.then(BotUtils.sendMessage(String.format(Emoji.INFO + " **%s** got kicked by **%s**. Reason: `%s`",
+									FormatUtils.format(mentions, User::getUsername, ", "), context.getUsername(), reason),
 									context.getChannel()))
 							.then();
 				});

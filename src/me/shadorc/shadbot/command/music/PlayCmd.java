@@ -57,9 +57,9 @@ public class PlayCmd extends AbstractCommand {
 						if(identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH)) {
 							return context.getClient().getUserById(guildMusic.getDjId())
 									.map(User::getUsername)
-									.flatMap(djName -> BotUtils.sendMessage(
-											String.format(Emoji.HOURGLASS + " (**%s**) **%s** is already selecting a music, please wait for him to finish.",
-													context.getUsername(), djName), context.getChannel()))
+									.flatMap(djName -> BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " (**%s**) **%s** is "
+											+ "already selecting a music, please wait for him to finish.",
+											context.getUsername(), djName), context.getChannel()))
 									.then();
 						}
 					}

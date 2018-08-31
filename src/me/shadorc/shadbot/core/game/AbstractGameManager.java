@@ -64,8 +64,8 @@ public abstract class AbstractGameManager {
 				.filterWhen(this::isCancelMessage)
 				.flatMap(Message::getAuthor)
 				.map(User::getUsername)
-				.flatMap(username -> BotUtils.sendMessage(
-						String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", username), message.getChannel()))
+				.flatMap(username -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.",
+						username), message.getChannel()))
 				.flatMap(ignored -> Mono.fromRunnable(this::stop))
 				// The message is intercepted, return true
 				.map(ignored -> Boolean.TRUE)

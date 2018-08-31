@@ -73,9 +73,9 @@ public class LottoCmd extends AbstractCommand {
 
 		LottoManager.getLotto().addGambler(context.getGuildId(), context.getAuthorId(), num);
 
-		return BotUtils.sendMessage(String.format(Emoji.TICKET + " You bought a lottery ticket and bet on number **%d**. Good luck ! "
+		return BotUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
 				+ "The next draw will take place in **%s**.",
-				num, FormatUtils.formatCustomDate(LottoCmd.getDelay().toMillis())), context.getChannel())
+				context.getUsername(), num, FormatUtils.formatCustomDate(LottoCmd.getDelay().toMillis())), context.getChannel())
 				.then();
 	}
 
@@ -155,9 +155,8 @@ public class LottoCmd extends AbstractCommand {
 					.flatMap(user -> {
 						final int coins = (int) Math.ceil((double) LottoManager.getLotto().getJackpot() / winners.size());
 						DatabaseManager.getDBMember(winner.getGuildId(), winner.getUserId()).addCoins(coins);
-						return BotUtils.sendMessage(
-								String.format("Congratulations, you have the winning Lotto number! You earn %s.", FormatUtils.formatCoins(coins)),
-								user.getPrivateChannel().cast(MessageChannel.class));
+						return BotUtils.sendMessage(String.format("Congratulations, you have the winning Lotto number! You earn %s.",
+								FormatUtils.formatCoins(coins)), user.getPrivateChannel().cast(MessageChannel.class));
 					})
 					.subscribe();
 

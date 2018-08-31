@@ -48,9 +48,8 @@ public class AudioEventListener extends AudioEventAdapter {
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
 
 		if(this.errorCount <= 3) {
-			BotUtils.sendMessage(
-					String.format(Emoji.RED_CROSS + " Sorry, %s. I'll try to play the next available song.", errMessage.toLowerCase()),
-					this.guildMusic.getMessageChannel())
+			BotUtils.sendMessage(String.format(Emoji.RED_CROSS + " Sorry, %s. I'll try to play the next available song.",
+					errMessage.toLowerCase()), this.guildMusic.getMessageChannel())
 					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 					.subscribe();
 		}

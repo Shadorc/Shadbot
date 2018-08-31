@@ -56,8 +56,8 @@ public class ChatCmd extends AbstractCommand {
 							this.getClass().getSimpleName(), ERROR_COUNT.get()));
 		}
 
-		return BotUtils.sendMessage(Emoji.SLEEPING + " Sorry, A.L.I.C.E. seems to be AFK, she'll probably come back later.",
-				context.getChannel()).then();
+		return BotUtils.sendMessage(String.format(Emoji.SLEEPING + " (**%s**) Sorry, A.L.I.C.E. seems to be AFK, she'll probably come back later.",
+				context.getUsername()), context.getChannel()).then();
 	}
 
 	private String talk(Snowflake channelId, String botId, String input) throws UnsupportedEncodingException, IOException {

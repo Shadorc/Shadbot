@@ -108,27 +108,26 @@ public class ExceptionHandler {
 	}
 
 	private Mono<Message> onNoMusicException() {
-		return BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", this.context.getChannel());
+		return BotUtils.sendMessage(String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
+				this.context.getUsername()), this.context.getChannel());
 	}
 
 	private Mono<Message> onUnavailable() {
 		LogUtils.warn(this.context.getClient(),
 				String.format("[%s] Service unavailable.", this.command.getClass().getSimpleName()),
 				this.context.getContent());
-		return BotUtils.sendMessage(
-				String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... "
-						+ "This is not my fault, I promise ! Try again later.",
-						this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
+		return BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... "
+				+ "This is not my fault, I promise ! Try again later.",
+				this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
 	}
 
 	private Mono<Message> onUnreacheable() {
 		LogUtils.warn(this.context.getClient(),
 				String.format("[%s] Service unreachable.", this.command.getClass().getSimpleName()),
 				this.context.getContent());
-		return BotUtils.sendMessage(
-				String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... "
-						+ "This is not my fault, I promise ! Try again later.",
-						this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
+		return BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... "
+				+ "This is not my fault, I promise ! Try again later.",
+				this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
 	}
 
 	private Mono<Message> onForbidden() {
@@ -141,8 +140,9 @@ public class ExceptionHandler {
 				.map(FormatUtils::formatPermission)
 				.collect(Collectors.toList());
 
-		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I can't execute this command due to the lack of permission."
+		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of permission."
 				+ "%nPlease, check my permissions and channel-specific ones to verify that %s %s checked.",
+				this.context.getUsername(),
 				FormatUtils.format(permissionsStr, str -> String.format("**%s**", str), " and "),
 				permissionsStr.size() > 1 ? "are" : "is"), this.context.getChannel())
 				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission(s): %s",

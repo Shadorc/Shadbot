@@ -20,7 +20,8 @@ public class NameCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
-		return BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
+		return BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " (**%s**) Currently playing: **%s**",
+				context.getUsername(),
 				FormatUtils.formatTrackName(guildMusic.getScheduler().getAudioPlayer().getPlayingTrack().getInfo())), context.getChannel())
 				.then();
 	}

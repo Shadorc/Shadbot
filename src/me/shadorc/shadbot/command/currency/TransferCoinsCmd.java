@@ -57,8 +57,8 @@ public class TransferCoinsCmd extends AbstractCommand {
 		if(dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
 			return context.getClient().getUserById(receiverUserId)
 					.flatMap(user -> BotUtils.sendMessage(String.format(
-							Emoji.BANK + " This transfer cannot be done because %s would exceed the maximum coins cap.",
-							user.getUsername()), context.getChannel()))
+							Emoji.BANK + " (**%s**) This transfer cannot be done because %s would exceed the maximum coins cap.",
+							context.getUsername(), user.getUsername()), context.getChannel()))
 					.then();
 		}
 

@@ -66,9 +66,9 @@ public class HangmanCmd extends AbstractCommand {
 			hangmanManager.start();
 			return hangmanManager.show();
 		} else {
-			return BotUtils.sendMessage(
-					String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**. Please, wait for him to finish.",
-							context.getUsername(), hangmanManager.getContext().getUsername()), context.getChannel())
+			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
+					+ " Please, wait for him to finish.",
+					context.getUsername(), hangmanManager.getContext().getUsername()), context.getChannel())
 					.then();
 		}
 	}

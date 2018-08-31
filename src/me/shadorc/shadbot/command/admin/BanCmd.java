@@ -78,8 +78,8 @@ public class BanCmd extends AbstractCommand {
 					}
 
 					return banFlux
-							.then(BotUtils.sendMessage(String.format(Emoji.INFO + " (Requested by **%s**) **%s** got banned. Reason: `%s`",
-									context.getUsername(), FormatUtils.format(mentions, User::getUsername, ", "), reason),
+							.then(BotUtils.sendMessage(String.format(Emoji.INFO + " **%s** got banned by **%s**. Reason: `%s`",
+									FormatUtils.format(mentions, User::getUsername, ", "), context.getUsername(), reason),
 									context.getChannel()))
 							.then();
 				});
