@@ -99,7 +99,7 @@ public class AutoMessageSetting extends AbstractSetting {
 	@Override
 	public EmbedCreateSpec getHelp(Context context) {
 		return EmbedUtils.getDefaultEmbed()
-				.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", context.getPrefix(), context.getCommandName()), false)
+				.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", context.getPrefix(), this.getCommandName()), false)
 				.addField("Argument", String.format("**action** - %s"
 						+ "%n**type** - %s"
 						+ "%n**value** - a message for *%s* and *%s* or a @channel for *%s*",
@@ -111,6 +111,6 @@ public class AutoMessageSetting extends AbstractSetting {
 				.addField("Info", "You don't need to specify *value* to disable a type.", false)
 				.addField("Example", String.format("`%s%s enable join_message Hello you (:`"
 						+ "%n`%s%s disable leave_message`",
-						context.getPrefix(), context.getCommandName(), context.getPrefix(), context.getCommandName()), false);
+						context.getPrefix(), this.getCommandName(), context.getPrefix(), context.getCommandName()), false);
 	}
 }

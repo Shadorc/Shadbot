@@ -75,10 +75,10 @@ public class AutoRoleSetting extends AbstractSetting {
 	@Override
 	public EmbedCreateSpec getHelp(Context context) {
 		return EmbedUtils.getDefaultEmbed()
-				.addField("Usage", String.format("`%s%s <action> <@role(s)>`", context.getPrefix(), context.getCommandName()), false)
+				.addField("Usage", String.format("`%s%s <action> <@role(s)>`", context.getPrefix(), this.getCommandName()), false)
 				.addField("Argument", String.format("**action** - %s",
 						FormatUtils.format(Action.class, "/")), false)
-				.addField("Example", String.format("`%s%s add @newbie`", context.getPrefix(), context.getCommandName()), false);
+				.addField("Example", String.format("`%s%s add @newbie`", context.getPrefix(), this.getCommandName()), false);
 	}
 
 }

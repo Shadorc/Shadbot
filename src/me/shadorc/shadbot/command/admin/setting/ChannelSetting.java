@@ -104,11 +104,11 @@ public class ChannelSetting extends AbstractSetting {
 	@Override
 	public EmbedCreateSpec getHelp(Context context) {
 		return EmbedUtils.getDefaultEmbed()
-				.addField("Usage", String.format("`%s%s <action> <#channel(s)>`", context.getPrefix(), context.getCommandName()), false)
+				.addField("Usage", String.format("`%s%s <action> <#channel(s)>`", context.getPrefix(), this.getCommandName()), false)
 				.addField("Argument", String.format("**action** - %s%n**channel(s)** - the (voice) channel(s) to %s",
 						FormatUtils.format(Action.class, "/"),
 						FormatUtils.format(Action.class, "/")), false)
-				.addField("Example", String.format("`%s%s add #general`", context.getPrefix(), context.getCommandName()), false);
+				.addField("Example", String.format("`%s%s add #general`", context.getPrefix(), this.getCommandName()), false);
 	}
 
 }

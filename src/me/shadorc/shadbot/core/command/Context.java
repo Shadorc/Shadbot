@@ -159,6 +159,10 @@ public class Context {
 				.orElseThrow(MissingArgumentException::new);
 	}
 
+	public List<String> requireAtLeastArgs(int min) {
+		return this.requireArgs(min, Integer.MAX_VALUE);
+	}
+
 	public List<String> requireArgs(int count) {
 		return this.requireArgs(count, count);
 	}
