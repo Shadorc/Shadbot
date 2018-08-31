@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
-
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
@@ -94,8 +92,8 @@ public class ChannelSetting extends AbstractSetting {
 								FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")), context.getChannel()));
 					}
 
-					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, new JSONArray(allowedTextChannels));
-					dbGuild.setSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, new JSONArray(allowedVoiceChannels));
+					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
+					dbGuild.setSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, allowedVoiceChannels);
 					return messages;
 				})
 				.then();

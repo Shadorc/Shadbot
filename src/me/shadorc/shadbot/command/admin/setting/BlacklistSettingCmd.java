@@ -3,7 +3,6 @@ package me.shadorc.shadbot.command.admin.setting;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
 
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -61,8 +60,8 @@ public class BlacklistSettingCmd extends AbstractSetting {
 					FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
 		}
 
-		dbGuild.setSetting(this.getSetting(), new JSONArray(blacklist));
 		return message.then();
+		dbGuild.setSetting(this.getSetting(), blacklist);
 	}
 
 	@Override

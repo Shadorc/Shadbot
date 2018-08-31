@@ -17,6 +17,10 @@ public class DBMember {
 	@JsonProperty("coins")
 	private AtomicInteger coins;
 
+	public DBMember() {
+		// Default constructor
+	}
+
 	public DBMember(Snowflake guildId, Snowflake id) {
 		this.guildId = guildId.asLong();
 		this.id = id.asLong();

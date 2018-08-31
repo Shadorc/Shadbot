@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.data.db;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,15 +9,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.setting.SettingEnum;
-import me.shadorc.shadbot.utils.Utils;
 
 public class DBGuild {
 
@@ -26,6 +24,10 @@ public class DBGuild {
 	private List<DBMember> members;
 	@JsonProperty("settings")
 	private Map<String, Object> settings;
+
+	public DBGuild() {
+		// Default constructor
+	}
 
 	public DBGuild(Snowflake id) {
 		this.id = id.asLong();
@@ -111,8 +113,11 @@ public class DBGuild {
 	}
 
 	private <T> List<T> getSetting(SettingEnum setting, Class<T> listClass) {
-		final JSONArray array = (JSONArray) Optional.ofNullable(this.settings.get(setting.toString())).orElse(new JSONArray());
-		return Utils.toList(array, listClass);
+		return Optional.ofNullable((List<?>) this.settings.get(setting.toString()))
+				.orElse(Collections.emptyList())
+				.stream()
+				.map(listClass::cast)
+				.collect(Collectors.toList());
 	}
 
 	public void setSetting(SettingEnum setting, Object value) {

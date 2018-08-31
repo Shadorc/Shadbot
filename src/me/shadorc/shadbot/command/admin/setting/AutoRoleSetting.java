@@ -3,8 +3,6 @@ package me.shadorc.shadbot.command.admin.setting;
 import java.util.List;
 import java.util.Set;
 
-import org.json.JSONArray;
-
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
@@ -68,7 +66,7 @@ public class AutoRoleSetting extends AbstractSetting {
 							String.join(", ", roles)), context.getChannel()));
 		}
 
-		dbGuild.setSetting(this.getSetting(), new JSONArray(autoRoles));
+		dbGuild.setSetting(this.getSetting(), autoRoles);
 		return message.then();
 	}
 
