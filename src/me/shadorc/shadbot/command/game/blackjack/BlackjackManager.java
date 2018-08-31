@@ -51,8 +51,6 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 	}
 
-	// TODO: IsIntercepeted considère tous les messages
-
 	@Override
 	public void start() {
 		this.dealerCards.addAll(Card.pick(2));
