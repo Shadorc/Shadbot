@@ -22,7 +22,7 @@ Thumbs.db
 
 # Project Files
 saves/
-stats.json
+stats/
 Shadbot.log
 clean.bat
 api_keys.properties
