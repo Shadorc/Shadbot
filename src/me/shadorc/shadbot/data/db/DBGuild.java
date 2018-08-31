@@ -44,8 +44,16 @@ public class DBGuild {
 	}
 
 	@JsonIgnore
-	public List<Snowflake> getAllowedChannels() {
-		return this.getSetting(SettingEnum.ALLOWED_CHANNELS, Long.class)
+	public List<Snowflake> getAllowedTextChannels() {
+		return this.getSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, Long.class)
+				.stream()
+				.map(Snowflake::of)
+				.collect(Collectors.toList());
+	}
+
+	@JsonIgnore
+	public List<Snowflake> getAllowedVoiceChannels() {
+		return this.getSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, Long.class)
 				.stream()
 				.map(Snowflake::of)
 				.collect(Collectors.toList());

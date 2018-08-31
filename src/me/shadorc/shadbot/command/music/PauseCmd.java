@@ -24,7 +24,7 @@ public class PauseCmd extends AbstractCommand {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 		final AudioPlayer audioPlayer = guildMusic.getScheduler().getAudioPlayer();
 
-		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+		return DiscordUtils.requireSameVoiceChannel(context)
 				.flatMap(voiceChannelId -> {
 					audioPlayer.setPaused(!audioPlayer.isPaused());
 

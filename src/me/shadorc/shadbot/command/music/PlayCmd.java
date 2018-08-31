@@ -33,7 +33,7 @@ public class PlayCmd extends AbstractCommand {
 		final String arg = context.requireArg();
 		final Snowflake guildId = context.getGuildId();
 
-		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+		return DiscordUtils.requireSameVoiceChannel(context)
 				.flatMap(voiceChannelId -> {
 					String identifier;
 					if(arg.startsWith("soundcloud ")) {

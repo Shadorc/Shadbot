@@ -86,10 +86,16 @@ public class BotUtils {
 				|| roles.stream().anyMatch(role -> allowedRoles.contains(role.getId()));
 	}
 
-	public static boolean isChannelAllowed(Snowflake guildId, Snowflake channelId) {
-		List<Snowflake> allowedChannels = DatabaseManager.getDBGuild(guildId).getAllowedChannels();
-		// If no permission has been set OR the channel is allowed
-		return allowedChannels.isEmpty() || allowedChannels.contains(channelId);
+	public static boolean isTextChannelAllowed(Snowflake guildId, Snowflake channelId) {
+		List<Snowflake> allowedTextChannels = DatabaseManager.getDBGuild(guildId).getAllowedTextChannels();
+		// If no permission has been set OR the text channel is allowed
+		return allowedTextChannels.isEmpty() || allowedTextChannels.contains(channelId);
+	}
+
+	public static boolean isVoiceChannelAllowed(Snowflake guildId, Snowflake channelId) {
+		List<Snowflake> allowedVoiceChannels = DatabaseManager.getDBGuild(guildId).getAllowedVoiceChannels();
+		// If no permission has been set OR the voice channel is allowed
+		return allowedVoiceChannels.isEmpty() || allowedVoiceChannels.contains(channelId);
 	}
 
 	public static boolean isCommandAllowed(Snowflake guildId, AbstractCommand cmd) {

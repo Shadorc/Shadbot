@@ -24,7 +24,7 @@ public class VolumeCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 
-		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+		return DiscordUtils.requireSameVoiceChannel(context)
 				.flatMap(voiceChannelId -> {
 					final TrackScheduler scheduler = guildMusic.getScheduler();
 					if(!context.getArg().isPresent()) {

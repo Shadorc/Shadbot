@@ -38,7 +38,7 @@ public class MessageCreateListener {
 				// ... else switch to #onPrivateMessage
 				.switchIfEmpty(Mono.fromRunnable(() -> MessageCreateListener.onPrivateMessage(event)))
 				// The channel is allowed
-				.filter(channel -> BotUtils.isChannelAllowed(guildId.get(), channel.getId()))
+				.filter(channel -> BotUtils.isTextChannelAllowed(guildId.get(), channel.getId()))
 				.flatMap(channel -> event.getMember().get().getRoles().collectList())
 				// The role is allowed
 				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))

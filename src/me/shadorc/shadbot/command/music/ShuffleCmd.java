@@ -21,7 +21,7 @@ public class ShuffleCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 
-		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+		return DiscordUtils.requireSameVoiceChannel(context)
 				.flatMap(voiceChannelId -> {
 					guildMusic.getScheduler().shufflePlaylist();
 

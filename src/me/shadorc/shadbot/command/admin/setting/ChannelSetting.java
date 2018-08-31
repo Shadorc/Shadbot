@@ -1,10 +1,15 @@
 package me.shadorc.shadbot.command.admin.setting;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 
+import discord4j.core.object.entity.Channel.Type;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -36,48 +41,71 @@ public class ChannelSetting extends AbstractSetting {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = this.requireArg(context, 2);
 
-		final List<Snowflake> mentionedChannels = DiscordUtils.getChannelMentions(context.getContent());
-		if(mentionedChannels.isEmpty()) {
-			throw new MissingArgumentException();
-		}
+		return context.getGuild()
+				.flatMapMany(Guild::getChannels)
+				.collectList()
+				.flatMapMany(channels -> {
+					final List<Snowflake> mentionedChannels = DiscordUtils.getChannelMentions(context.getContent());
+					if(mentionedChannels.isEmpty()) {
+						throw new MissingArgumentException();
+					}
 
-		final Action action = Utils.getEnum(Action.class, args.get(0));
-		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.formatOptions(Action.class)));
-		}
+					final Action action = Utils.getEnum(Action.class, args.get(0));
+					if(action == null) {
+						throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.formatOptions(Action.class)));
+					}
 
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
-		final List<Snowflake> allowedChannels = dbGuild.getAllowedChannels();
+					final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
+					final Set<Snowflake> allowedTextChannels = new HashSet<>(dbGuild.getAllowedTextChannels());
+					final Set<Snowflake> allowedVoiceChannels = new HashSet<>(dbGuild.getAllowedVoiceChannels());
 
-		Flux<Message> messages = Flux.empty();
-		if(Action.ADD.equals(action)) {
-			if(allowedChannels.isEmpty()
-					&& mentionedChannels.stream().noneMatch(context.getChannelId()::equals)) {
-				messages = messages.concatWith(BotUtils.sendMessage(Emoji.WARNING + " You did not mentioned this channel. "
-						+ "I will not reply here until this channel is added to the list of allowed channels.", context.getChannel()));
-			}
+					Flux<Message> messages = Flux.empty();
+					if(Action.ADD.equals(action)) {
+						if(allowedTextChannels.isEmpty()
+								&& mentionedChannels.stream().noneMatch(context.getChannelId()::equals)) {
+							messages = messages.concatWith(BotUtils.sendMessage(Emoji.WARNING + " You did not mentioned this channel. "
+									+ "I will not reply here until this channel is added to the list of allowed channels.", context.getChannel()));
+						}
 
-			allowedChannels.addAll(mentionedChannels);
-			allowedChannels.stream().distinct().collect(Collectors.toList());
+						final List<Snowflake> textChannels = channels.stream()
+								.filter(channel -> channel.getType().equals(Type.GUILD_TEXT))
+								.map(GuildChannel::getId)
+								.collect(Collectors.toList());
+						final List<Snowflake> voiceChannels = channels.stream()
+								.filter(channel -> channel.getType().equals(Type.GUILD_VOICE))
+								.map(GuildChannel::getId)
+								.collect(Collectors.toList());
 
-			messages = messages.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
-					FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")), context.getChannel()));
+						for(Snowflake channelId : mentionedChannels) {
+							if(textChannels.contains(channelId)) {
+								allowedTextChannels.add(channelId);
+							} else if(voiceChannels.contains(channelId)) {
+								allowedVoiceChannels.add(channelId);
+							}
+						}
 
-		} else {
-			allowedChannels.removeAll(mentionedChannels);
-			messages = messages.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
-					FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")), context.getChannel()));
-		}
+						messages = messages.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
+								FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")), context.getChannel()));
 
-		dbGuild.setSetting(this.getSetting(), new JSONArray(allowedChannels));
-		return messages.then();
+					} else {
+						allowedTextChannels.removeAll(mentionedChannels);
+						allowedVoiceChannels.removeAll(mentionedChannels);
+						messages = messages.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
+								FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")), context.getChannel()));
+					}
+
+					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, new JSONArray(allowedTextChannels));
+					dbGuild.setSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, new JSONArray(allowedVoiceChannels));
+					return messages;
+				})
+				.then();
 	}
 
 	@Override
 	public EmbedCreateSpec getHelp(Context context) {
 		return EmbedUtils.getDefaultEmbed()
 				.addField("Usage", String.format("`%s%s <action> <#channel(s)>`", context.getPrefix(), context.getCommandName()), false)
-				.addField("Argument", String.format("**action** - %s%n**channel(s)** - the channel(s) to %s",
+				.addField("Argument", String.format("**action** - %s%n**channel(s)** - the (voice) channel(s) to %s",
 						FormatUtils.format(Action.class, "/"),
 						FormatUtils.format(Action.class, "/")), false)
 				.addField("Example", String.format("`%s%s add #general`", context.getPrefix(), context.getCommandName()), false);

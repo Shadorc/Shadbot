@@ -28,7 +28,7 @@ public class BackwardCmd extends AbstractCommand {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 		final String arg = context.requireArg();
 
-		return DiscordUtils.requireSameVoiceChannel(context.getSelfAsMember(), context.getMessage().getAuthorAsMember())
+		return DiscordUtils.requireSameVoiceChannel(context)
 				.flatMap(voiceChannelId -> {
 					// If the argument is a number of seconds...
 					Long num = NumberUtils.asPositiveLong(arg);
