@@ -30,11 +30,11 @@ public class BlackjackPlayer {
 	}
 
 	public void stand() {
-		isStanding = true;
+		this.isStanding = true;
 	}
 
 	public void doubleDown() {
-		isDoubleDown = true;
+		this.isDoubleDown = true;
 		this.hit();
 		this.stand();
 	}
@@ -52,23 +52,23 @@ public class BlackjackPlayer {
 	}
 
 	public Snowflake getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	public int getBet() {
-		return bet * (this.isDoubleDown() ? 2 : 1);
+		return this.bet * (this.isDoubleDown() ? 2 : 1);
 	}
 
 	public List<Card> getCards() {
-		return cards;
+		return this.cards;
 	}
 
 	public boolean isDoubleDown() {
-		return isDoubleDown;
+		return this.isDoubleDown;
 	}
 
 	public boolean isStanding() {
-		return isStanding;
+		return this.isStanding;
 	}
 
 }

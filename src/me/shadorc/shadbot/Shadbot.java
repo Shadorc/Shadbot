@@ -40,13 +40,13 @@ public class Shadbot {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(DataManager::stop));
 
-		DiscordClientBuilder builder = new DiscordClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
+		final DiscordClientBuilder builder = new DiscordClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
 				.setShardCount(DiscordUtils.getRecommendedShardCount())
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
 		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
 		for(int i = 0; i < builder.getShardCount(); i++) {
-			DiscordClient client = builder.setShardIndex(i).build();
+			final DiscordClient client = builder.setShardIndex(i).build();
 			CLIENTS.add(client);
 
 			DiscordUtils.registerListener(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);

@@ -70,18 +70,18 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	@Override
 	public Mono<Void> show() {
-		final List<String> missedLetters = lettersTested.stream()
-				.filter(letter -> !word.contains(letter))
+		final List<String> missedLetters = this.lettersTested.stream()
+				.filter(letter -> !this.word.contains(letter))
 				.map(String::toUpperCase)
 				.collect(Collectors.toList());
 
 		return this.getContext().getAvatarUrl()
 				.map(avatarUrl -> {
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Hangman Game", null, avatarUrl)
 							.setThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")
 							.setDescription("Type letters or enter a word if you think you've guessed it.")
-							.addField("Word", this.getRepresentation(word), false);
+							.addField("Word", this.getRepresentation(this.word), false);
 
 					if(!missedLetters.isEmpty()) {
 						embed.addField("Misses", String.join(", ", missedLetters), false);
@@ -94,13 +94,13 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 								this.getContext().getPrefix(), IDLE_MIN), null);
 					}
 
-					if(failsCount > 0) {
-						embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), failsCount) - 1));
+					if(this.failsCount > 0) {
+						embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failsCount) - 1));
 					}
 
 					return embed;
 				})
-				.flatMap(updateableMessage::send)
+				.flatMap(this.updateableMessage::send)
 				.then();
 	}
 
@@ -108,8 +108,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 		String text;
 		if(win) {
 			final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
-			final float imagesRemaining = IMG_LIST.size() - failsCount;
-			int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
+			final float imagesRemaining = IMG_LIST.size() - this.failsCount;
+			final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
 
 			DatabaseManager.getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
@@ -118,7 +118,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 					this.getContext().getUsername(), FormatUtils.formatCoins(gains));
 		} else {
 			text = String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
-					this.getContext().getUsername(), word);
+					this.getContext().getUsername(), this.word);
 		}
 
 		return this.show()
@@ -130,21 +130,21 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 		// Reset IDLE timer
 		this.schedule(Mono.fromRunnable(this::stop), IDLE_MIN, ChronoUnit.MINUTES);
 
-		if(lettersTested.contains(chr)) {
+		if(this.lettersTested.contains(chr)) {
 			return Mono.empty();
 		}
 
-		if(!word.contains(chr)) {
-			failsCount++;
-			if(failsCount == IMG_LIST.size()) {
+		if(!this.word.contains(chr)) {
+			this.failsCount++;
+			if(this.failsCount == IMG_LIST.size()) {
 				return this.showResultAndStop(false);
 			}
 		}
 
-		lettersTested.add(chr);
+		this.lettersTested.add(chr);
 
 		// The word has been entirely guessed
-		if(StringUtils.remove(this.getRepresentation(word), "\\", " ", "*").equalsIgnoreCase(word)) {
+		if(StringUtils.remove(this.getRepresentation(this.word), "\\", " ", "*").equalsIgnoreCase(this.word)) {
 			return this.showResultAndStop(true);
 		}
 
@@ -157,12 +157,12 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 		// If the word has been guessed
 		if(this.word.equalsIgnoreCase(word)) {
-			lettersTested.addAll(StringUtils.split(word, ""));
+			this.lettersTested.addAll(StringUtils.split(word, ""));
 			return this.showResultAndStop(true);
 		}
 
-		failsCount++;
-		if(failsCount == IMG_LIST.size()) {
+		this.failsCount++;
+		if(this.failsCount == IMG_LIST.size()) {
 			return this.showResultAndStop(false);
 		}
 		return this.show();
@@ -171,7 +171,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 	private String getRepresentation(String word) {
 		return String.format("**%s**",
 				FormatUtils.format(StringUtils.split(word, ""),
-						letter -> lettersTested.contains(letter) ? letter.toUpperCase() : "\\_", " "));
+						letter -> this.lettersTested.contains(letter) ? letter.toUpperCase() : "\\_", " "));
 	}
 
 	@Override
@@ -192,10 +192,10 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 					}
 
 					Mono<Void> checkMono = Mono.empty();
-					if(content.length() == 1 && !rateLimiter.isLimitedAndWarn(
+					if(content.length() == 1 && !this.rateLimiter.isLimitedAndWarn(
 							context.getClient(), context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
 						checkMono = this.checkLetter(content);
-					} else if(content.length() == word.length() && !rateLimiter.isLimitedAndWarn(
+					} else if(content.length() == this.word.length() && !this.rateLimiter.isLimitedAndWarn(
 							context.getClient(), context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
 						checkMono = this.checkWord(content);
 					}

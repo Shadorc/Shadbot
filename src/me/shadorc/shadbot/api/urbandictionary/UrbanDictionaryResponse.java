@@ -10,12 +10,12 @@ public class UrbanDictionaryResponse {
 	private List<UrbanDefinition> definitions;
 
 	public List<UrbanDefinition> getDefinitions() {
-		return definitions;
+		return this.definitions;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("UrbanDictionaryResponse [definitions=%s]", definitions);
+		return String.format("UrbanDictionaryResponse [definitions=%s]", this.definitions);
 	}
 
 }

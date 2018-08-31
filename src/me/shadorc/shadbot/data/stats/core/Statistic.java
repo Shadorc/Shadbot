@@ -18,15 +18,15 @@ public abstract class Statistic<E extends Enum<E>> {
 	public abstract void save() throws IOException;
 
 	public Class<E> getEnumClass() {
-		return enumClass;
+		return this.enumClass;
 	}
 
 	public E[] getEnumConstants() {
-		return enumClass.getEnumConstants();
+		return this.enumClass.getEnumConstants();
 	}
 
 	public File getFile() {
-		return new File(StatsManager.STATS_DIR.getPath(), fileName);
+		return new File(StatsManager.STATS_DIR.getPath(), this.fileName);
 	}
 
 }

@@ -57,20 +57,20 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 	@Override
 	public Mono<Void> show() {
 		return this.getContext().getAvatarUrl()
-				.zipWith(Flux.fromIterable(numsPlayers.values())
+				.zipWith(Flux.fromIterable(this.numsPlayers.values())
 						.flatMap(this.getContext().getClient()::getUserById)
 						.map(User::getUsername)
 						.collectList())
 				.map(avatarUrlAndUsers -> {
 					final String avatarUrl = avatarUrlAndUsers.getT1();
 					final List<String> usernames = avatarUrlAndUsers.getT2();
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Dice Game", null, avatarUrl)
 							.setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 							.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
-									this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.formatCoins(bet)))
+									this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.formatCoins(this.bet)))
 							.addField("Player", String.join("\n", usernames), true)
-							.addField("Number", FormatUtils.format(numsPlayers.keySet(), Object::toString, "\n"), true);
+							.addField("Number", FormatUtils.format(this.numsPlayers.keySet(), Object::toString, "\n"), true);
 
 					if(this.isTaskDone()) {
 						embed.setFooter("Finished.", null);
@@ -78,29 +78,29 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 						embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
 					}
 
-					if(results != null) {
-						embed.addField("Results", results, false);
+					if(this.results != null) {
+						embed.addField("Results", this.results, false);
 					}
 
 					return embed;
 				})
-				.flatMap(updateableMessage::send)
+				.flatMap(this.updateableMessage::send)
 				.then();
 	}
 
 	public Mono<Void> rollTheDice() {
-		int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
-		return Flux.fromIterable(numsPlayers.values())
+		final int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
+		return Flux.fromIterable(this.numsPlayers.values())
 				.flatMap(this.getContext().getClient()::getUserById)
 				.map(user -> {
-					int num = numsPlayers.keySet().stream()
-							.filter(number -> numsPlayers.get(number).equals(user.getId()))
+					final int num = this.numsPlayers.keySet().stream()
+							.filter(number -> this.numsPlayers.get(number).equals(user.getId()))
 							.findFirst()
 							.get();
-					int gains = bet;
+					int gains = this.bet;
 
 					if(num == winningNum) {
-						gains *= numsPlayers.size() + DiceCmd.MULTIPLIER;
+						gains *= this.numsPlayers.size() + DiceCmd.MULTIPLIER;
 						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
 					} else {
 						gains *= -1;
@@ -117,24 +117,24 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 	}
 
 	public int getBet() {
-		return bet;
+		return this.bet;
 	}
 
 	public int getPlayersCount() {
-		return numsPlayers.size();
+		return this.numsPlayers.size();
 	}
 
 	public boolean addPlayerIfAbsent(Snowflake userId, int num) {
-		if(numsPlayers.containsValue(userId)) {
+		if(this.numsPlayers.containsValue(userId)) {
 			return false;
 		}
 
-		numsPlayers.putIfAbsent(num, userId);
+		this.numsPlayers.putIfAbsent(num, userId);
 		return true;
 	}
 
 	protected boolean isNumBet(int num) {
-		return numsPlayers.containsKey(num);
+		return this.numsPlayers.containsKey(num);
 	}
 
 	@Override

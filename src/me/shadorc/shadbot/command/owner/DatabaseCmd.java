@@ -22,7 +22,7 @@ public class DatabaseCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(1, 2);
+		final List<String> args = context.requireArgs(1, 2);
 
 		final Long guildId = NumberUtils.asPositiveLong(args.get(0));
 		if(guildId == null) {

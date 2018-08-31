@@ -55,32 +55,32 @@ public class WallpaperCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		if(wallhaven == null) {
-			wallhaven = new Wallhaven(APIKeys.get(APIKey.WALLHAVEN_LOGIN), APIKeys.get(APIKey.WALLHAVEN_PASSWORD));
+		if(this.wallhaven == null) {
+			this.wallhaven = new Wallhaven(APIKeys.get(APIKey.WALLHAVEN_LOGIN), APIKeys.get(APIKey.WALLHAVEN_PASSWORD));
 		}
 
-		Options options = new Options();
+		final Options options = new Options();
 
 		options.addOption("p", PURITY, true, FormatUtils.format(Purity.class, ", "));
 		options.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
 
-		Option ratioOption = new Option("rat", RATIO, true, "image ratio");
+		final Option ratioOption = new Option("rat", RATIO, true, "image ratio");
 		ratioOption.setValueSeparator('x');
 		options.addOption(ratioOption);
 
-		Option resOption = new Option("res", RESOLUTION, true, "image resolution");
+		final Option resOption = new Option("res", RESOLUTION, true, "image resolution");
 		resOption.setValueSeparator('x');
 		options.addOption(resOption);
 
-		Option keyOption = new Option("k", KEYWORD, true, KEYWORD);
+		final Option keyOption = new Option("k", KEYWORD, true, KEYWORD);
 		keyOption.setValueSeparator(',');
 		options.addOption(keyOption);
 
 		CommandLine cmdLine;
 		try {
-			List<String> args = StringUtils.split(context.getArg().orElse(""));
+			final List<String> args = StringUtils.split(context.getArg().orElse(""));
 			cmdLine = new DefaultParser().parse(options, args.toArray(new String[args.size()]));
 		} catch (UnrecognizedOptionException | org.apache.commons.cli.MissingArgumentException err) {
 			loadingMsg.stopTyping();
@@ -93,12 +93,12 @@ public class WallpaperCmd extends AbstractCommand {
 
 		return context.isChannelNsfw()
 				.flatMap(isNsfw -> {
-					Purity purity = this.parseEnum(loadingMsg, context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
+					final Purity purity = this.parseEnum(loadingMsg, context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
 					if((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !isNsfw) {
 						return loadingMsg.send(TextUtils.mustBeNsfw(context.getPrefix())).then();
 					}
 
-					SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
+					final SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
 					queryBuilder.purity(purity);
 
 					if(cmdLine.hasOption(CATEGORY)) {
@@ -106,12 +106,12 @@ public class WallpaperCmd extends AbstractCommand {
 					}
 
 					if(cmdLine.hasOption(RATIO)) {
-						Dimension dim = this.parseDim(loadingMsg, context, RATIO, cmdLine.getOptionValues(RATIO));
+						final Dimension dim = this.parseDim(loadingMsg, context, RATIO, cmdLine.getOptionValues(RATIO));
 						queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
 					}
 
 					if(cmdLine.hasOption(RESOLUTION)) {
-						Dimension dim = this.parseDim(loadingMsg, context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
+						final Dimension dim = this.parseDim(loadingMsg, context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
 						queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
 					}
 
@@ -120,7 +120,7 @@ public class WallpaperCmd extends AbstractCommand {
 					}
 
 					try {
-						List<Wallpaper> wallpapers = wallhaven.search(queryBuilder.pages(1).build());
+						final List<Wallpaper> wallpapers = this.wallhaven.search(queryBuilder.pages(1).build());
 						if(wallpapers.isEmpty()) {
 							return loadingMsg.send(
 									String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
@@ -128,8 +128,8 @@ public class WallpaperCmd extends AbstractCommand {
 									.then();
 						}
 
-						Wallpaper wallpaper = Utils.randValue(wallpapers);
-						String tags = FormatUtils.format(wallpaper.getTags(),
+						final Wallpaper wallpaper = Utils.randValue(wallpapers);
+						final String tags = FormatUtils.format(wallpaper.getTags(),
 								tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 
 						return context.getAvatarUrl()
@@ -148,12 +148,12 @@ public class WallpaperCmd extends AbstractCommand {
 	}
 
 	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) {
-		List<String> sizeList = List.of(values);
+		final List<String> sizeList = List.of(values);
 		if(sizeList.size() != 2) {
 			this.throwInvalidArg(msg, context, name);
 		}
-		Integer width = NumberUtils.asPositiveInt(sizeList.get(0));
-		Integer height = NumberUtils.asPositiveInt(sizeList.get(1));
+		final Integer width = NumberUtils.asPositiveInt(sizeList.get(0));
+		final Integer height = NumberUtils.asPositiveInt(sizeList.get(1));
 		if(width == null || height == null) {
 			this.throwInvalidArg(msg, context, name);
 		}
@@ -161,7 +161,7 @@ public class WallpaperCmd extends AbstractCommand {
 	}
 
 	private <T extends Enum<T>> T parseEnum(LoadingMessage msg, Context context, Class<T> enumClass, String name, String value) {
-		T enumObj = Utils.getEnum(enumClass, value);
+		final T enumObj = Utils.getEnum(enumClass, value);
 		if(enumObj == null) {
 			this.throwInvalidArg(msg, context, name);
 		}

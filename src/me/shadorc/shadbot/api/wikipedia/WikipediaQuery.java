@@ -10,12 +10,12 @@ public class WikipediaQuery {
 	private Map<String, WikipediaPage> pages;
 
 	public Map<String, WikipediaPage> getPages() {
-		return pages;
+		return this.pages;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("WikipediaQuery [pages=%s]", pages);
+		return String.format("WikipediaQuery [pages=%s]", this.pages);
 	}
 
 }

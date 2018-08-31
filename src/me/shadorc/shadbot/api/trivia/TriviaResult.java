@@ -26,27 +26,27 @@ public class TriviaResult {
 	private List<String> incorrectAnswers;
 
 	public String getCategory() {
-		return category;
+		return this.category;
 	}
 
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	public String getDifficulty() {
-		return difficulty;
+		return this.difficulty;
 	}
 
 	public String getQuestion() {
-		return Jsoup.parse(question).text();
+		return Jsoup.parse(this.question).text();
 	}
 
 	public String getCorrectAnswer() {
-		return Jsoup.parse(correctAnswer).text();
+		return Jsoup.parse(this.correctAnswer).text();
 	}
 
 	public List<String> getIncorrectAnswers() {
-		return incorrectAnswers.stream()
+		return this.incorrectAnswers.stream()
 				.map(Jsoup::parse)
 				.map(Document::text)
 				.collect(Collectors.toList());
@@ -66,7 +66,7 @@ public class TriviaResult {
 
 	@Override
 	public String toString() {
-		return String.format("TriviaResult [category=%s, type=%s, difficulty=%s, question=%s, correctAnswer=%s, incorrectAnswers=%s]", category, type, difficulty, question, correctAnswer, incorrectAnswers);
+		return String.format("TriviaResult [category=%s, type=%s, difficulty=%s, question=%s, correctAnswer=%s, incorrectAnswers=%s]", this.category, this.type, this.difficulty, this.question, this.correctAnswer, this.incorrectAnswers);
 	}
 
 }

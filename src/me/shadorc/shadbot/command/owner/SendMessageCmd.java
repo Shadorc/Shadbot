@@ -23,7 +23,7 @@ public class SendMessageCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(2);
+		final List<String> args = context.requireArgs(2);
 
 		final Long userId = NumberUtils.asPositiveLong(args.get(0));
 		if(userId == null) {

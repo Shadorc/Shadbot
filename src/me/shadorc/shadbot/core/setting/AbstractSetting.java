@@ -15,7 +15,7 @@ public abstract class AbstractSetting {
 	private final SettingEnum setting;
 
 	public AbstractSetting() {
-		Setting settingAnnotation = this.getClass().getAnnotation(Setting.class);
+		final Setting settingAnnotation = this.getClass().getAnnotation(Setting.class);
 		this.description = settingAnnotation.description();
 		this.setting = settingAnnotation.setting();
 	}
@@ -25,15 +25,15 @@ public abstract class AbstractSetting {
 	public abstract EmbedCreateSpec getHelp(Context context);
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public SettingEnum getSetting() {
-		return setting;
+		return this.setting;
 	}
 
 	public String getName() {
-		return setting.toString();
+		return this.setting.toString();
 	}
 
 	public String getCommandName() {
@@ -41,12 +41,12 @@ public abstract class AbstractSetting {
 	}
 
 	public Optional<String> getSettingArg(Context context) {
-		Optional<String> arg = context.getArg();
+		final Optional<String> arg = context.getArg();
 		if(!arg.isPresent()) {
 			return Optional.empty();
 		}
 
-		List<String> args = StringUtils.split(arg.get(), 2);
+		final List<String> args = StringUtils.split(arg.get(), 2);
 		return args.size() == 1 ? Optional.empty() : Optional.of(args.get(1));
 	}
 

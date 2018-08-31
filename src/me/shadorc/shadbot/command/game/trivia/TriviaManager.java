@@ -47,7 +47,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		super(context);
 		try {
 			final URL url = new URL(String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, "")));
-			TriviaResponse response = Utils.MAPPER.readValue(url, TriviaResponse.class);
+			final TriviaResponse response = Utils.MAPPER.readValue(url, TriviaResponse.class);
 			this.trivia = response.getResults().get(0);
 		} catch (IOException err) {
 			throw Exceptions.propagate(err);
@@ -60,7 +60,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 	public void start() {
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		this.schedule(Mono.fromRunnable(this::stop)
-				.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", trivia.getCorrectAnswer()),
+				.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", this.trivia.getCorrectAnswer()),
 						this.getContext().getChannel()))
 				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), this.getContext().getGuildId())),
 				LIMITED_TIME, ChronoUnit.SECONDS);
@@ -77,17 +77,17 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 	@Override
 	public Mono<Void> show() {
 		final String description = String.format("**%s**%n%s",
-				trivia.getQuestion(),
-				FormatUtils.numberedList(trivia.getAnswers().size(), trivia.getAnswers().size(),
-						count -> String.format("\t**%d**. %s", count, trivia.getAnswers().get(count - 1))));
+				this.trivia.getQuestion(),
+				FormatUtils.numberedList(this.trivia.getAnswers().size(), this.trivia.getAnswers().size(),
+						count -> String.format("\t**%d**. %s", count, this.trivia.getAnswers().get(count - 1))));
 
 		return this.getContext().getAvatarUrl()
 				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 						.setAuthor("Trivia", null, avatarUrl)
 						.setDescription(description)
-						.addField("Category", String.format("`%s`", trivia.getCategory()), true)
-						.addField("Type", String.format("`%s`", trivia.getType()), true)
-						.addField("Difficulty", String.format("`%s`", trivia.getDifficulty()), true)
+						.addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
+						.addField("Type", String.format("`%s`", this.trivia.getType()), true)
+						.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
 						.setFooter(String.format("You have %d seconds to answer.", LIMITED_TIME), null))
 				.flatMap(embed -> BotUtils.sendMessage(embed, this.getContext().getChannel()))
 				.then();
@@ -95,7 +95,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 
 	private Mono<Message> win(Member member) {
 		final float coinsPerSec = (float) MAX_BONUS / LIMITED_TIME;
-		final long remainingSec = LIMITED_TIME - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(startTime));
+		final long remainingSec = LIMITED_TIME - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(this.startTime));
 		final int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
 
 		DatabaseManager.getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
@@ -112,32 +112,32 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		return this.cancelOrDo(event.getMessage(), Mono.just(event.getMessage().getContent().get())
 				.flatMap(content -> {
 					// It's a number or a text
-					Integer choice = NumberUtils.asIntBetween(content, 1, trivia.getAnswers().size());
+					final Integer choice = NumberUtils.asIntBetween(content, 1, this.trivia.getAnswers().size());
 
 					// Message is a text and doesn't match any answers, ignore it
-					if(choice == null && !trivia.getAnswers().stream().anyMatch(content::equalsIgnoreCase)) {
+					if(choice == null && !this.trivia.getAnswers().stream().anyMatch(content::equalsIgnoreCase)) {
 						return Mono.just(false);
 					}
 
 					// If the user has already answered and has been warned, ignore him
-					if(alreadyAnswered.containsKey(member.getId()) && alreadyAnswered.get(member.getId())) {
+					if(this.alreadyAnswered.containsKey(member.getId()) && this.alreadyAnswered.get(member.getId())) {
 						return Mono.just(false);
 					}
 
-					final String answer = choice == null ? content : trivia.getAnswers().get(choice - 1);
+					final String answer = choice == null ? content : this.trivia.getAnswers().get(choice - 1);
 
 					Mono<Message> monoMessage;
-					if(alreadyAnswered.containsKey(member.getId())) {
+					if(this.alreadyAnswered.containsKey(member.getId())) {
 						monoMessage = BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
 								member.getUsername()), event.getMessage().getChannel());
-						alreadyAnswered.put(member.getId(), true);
-					} else if(answer.equalsIgnoreCase(trivia.getCorrectAnswer())) {
+						this.alreadyAnswered.put(member.getId(), true);
+					} else if(answer.equalsIgnoreCase(this.trivia.getCorrectAnswer())) {
 						monoMessage = this.win(member);
 
 					} else {
 						monoMessage = BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
 								member.getUsername()), event.getMessage().getChannel());
-						alreadyAnswered.put(member.getId(), false);
+						this.alreadyAnswered.put(member.getId(), false);
 					}
 
 					return monoMessage.thenReturn(true);

@@ -8,12 +8,12 @@ public class GiphyGif {
 	private String imageUrl;
 
 	public String getImageUrl() {
-		return imageUrl;
+		return this.imageUrl;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("GiphyGif [imageUrl=%s]", imageUrl);
+		return String.format("GiphyGif [imageUrl=%s]", this.imageUrl);
 	}
 
 }

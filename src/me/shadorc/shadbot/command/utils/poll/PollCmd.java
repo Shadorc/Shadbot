@@ -74,7 +74,7 @@ public class PollCmd extends AbstractCommand {
 	}
 
 	private PollManager createPoll(Context context) {
-		List<String> args = context.requireArgs(2);
+		final List<String> args = context.requireArgs(2);
 
 		Integer duration;
 		if(NumberUtils.isPositiveLong(args.get(0))) {
@@ -91,19 +91,19 @@ public class PollCmd extends AbstractCommand {
 			}
 		}
 
-		List<String> substrings = Arrays.asList(StringUtils.substringsBetween(args.get(1), "\"", "\""));
+		final List<String> substrings = Arrays.asList(StringUtils.substringsBetween(args.get(1), "\"", "\""));
 		if(substrings.isEmpty() || StringUtils.countMatches(args.get(1), "\"") % 2 != 0) {
 			throw new CommandException("Question and choices cannot be empty and must be enclosed in quotation marks.");
 		}
 
 		// Remove duplicate choices
-		List<String> choices = substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList());
+		final List<String> choices = substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList());
 		if(!NumberUtils.isInRange(choices.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
 			throw new CommandException(String.format("You must specify between %d and %d different non-empty choices.",
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}
 
-		Map<String, ReactionEmoji> choicesReactions = new HashMap<>();
+		final Map<String, ReactionEmoji> choicesReactions = new HashMap<>();
 		for(int i = 0; i < choices.size(); i++) {
 			choicesReactions.put(choices.get(i), NUMBER_EMOJI.get(i + 1));
 		}

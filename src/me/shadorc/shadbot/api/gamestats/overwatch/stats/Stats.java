@@ -8,12 +8,12 @@ public class Stats {
 	private TopHeroes topHeroes;
 
 	public TopHeroes getTopHeroes() {
-		return topHeroes;
+		return this.topHeroes;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Stats [topHeroes=%s]", topHeroes);
+		return String.format("Stats [topHeroes=%s]", this.topHeroes);
 	}
 
 }

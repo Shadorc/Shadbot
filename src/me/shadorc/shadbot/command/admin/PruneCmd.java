@@ -36,7 +36,7 @@ public class PruneCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.getArg().orElse("");
 
-		List<String> quotedElements = StringUtils.getQuotedElements(arg);
+		final List<String> quotedElements = StringUtils.getQuotedElements(arg);
 
 		if(arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
 			throw new CommandException("You have forgotten a quote or have specified several quotes in quotation marks.");
@@ -44,14 +44,14 @@ public class PruneCmd extends AbstractCommand {
 
 		final String words = quotedElements.isEmpty() ? null : quotedElements.get(0);
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.getMessage().getUserMentions()
 				.collectList()
 				.flatMap(mentions -> {
 
 					// Remove everything from argument (users mentioned and quoted words) to keep only count if specified
-					String argCleaned = StringUtils.remove(arg,
+					final String argCleaned = StringUtils.remove(arg,
 							FormatUtils.format(mentions, User::getMention, " "),
 							String.format("\"%s\"", words))
 							.trim();
@@ -85,7 +85,7 @@ public class PruneCmd extends AbstractCommand {
 	}
 
 	private String getEmbedContent(Message message) {
-		StringBuilder strBuilder = new StringBuilder();
+		final StringBuilder strBuilder = new StringBuilder();
 		for(Embed embed : message.getEmbeds()) {
 			for(Field field : embed.getFields()) {
 				strBuilder.append(field.getName() + "\n" + field.getValue() + "\n");

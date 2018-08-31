@@ -8,12 +8,12 @@ public class SteamId {
 	private String steamId;
 
 	public String getSteamId() {
-		return steamId;
+		return this.steamId;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("SteamId [steamId=%s]", steamId);
+		return String.format("SteamId [steamId=%s]", this.steamId);
 	}
 
 }

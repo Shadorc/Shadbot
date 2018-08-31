@@ -22,14 +22,14 @@ public abstract class AbstractCommand {
 	private final Optional<RateLimiter> rateLimiter;
 
 	public AbstractCommand() {
-		Command cmdAnnotation = this.getClass().getAnnotation(Command.class);
+		final Command cmdAnnotation = this.getClass().getAnnotation(Command.class);
 		this.names = new ArrayList<>(Arrays.asList(cmdAnnotation.names()));
 		this.alias = cmdAnnotation.alias();
 		this.category = cmdAnnotation.category();
 		this.permission = cmdAnnotation.permission();
 		this.permissions = Arrays.asList(cmdAnnotation.permissions());
 
-		RateLimited limiterAnnotation = this.getClass().getAnnotation(RateLimited.class);
+		final RateLimited limiterAnnotation = this.getClass().getAnnotation(RateLimited.class);
 		if(limiterAnnotation == null) {
 			this.rateLimiter = Optional.empty();
 		} else {
@@ -42,7 +42,7 @@ public abstract class AbstractCommand {
 	public abstract Mono<EmbedCreateSpec> getHelp(Context context);
 
 	public List<String> getNames() {
-		return names;
+		return this.names;
 	}
 
 	public String getName() {
@@ -50,23 +50,23 @@ public abstract class AbstractCommand {
 	}
 
 	public String getAlias() {
-		return alias;
+		return this.alias;
 	}
 
 	public CommandCategory getCategory() {
-		return category;
+		return this.category;
 	}
 
 	public CommandPermission getPermission() {
-		return permission;
+		return this.permission;
 	}
 
 	public List<Permission> getPermissions() {
-		return permissions;
+		return this.permissions;
 	}
 
 	public Optional<RateLimiter> getRateLimiter() {
-		return rateLimiter;
+		return this.rateLimiter;
 	}
 
 }

@@ -8,12 +8,12 @@ public class DtcResponse {
 	private Root root;
 
 	public Root getRoot() {
-		return root;
+		return this.root;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("DtcResponse [root=%s]", root);
+		return String.format("DtcResponse [root=%s]", this.root);
 	}
 
 }

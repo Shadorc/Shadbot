@@ -41,7 +41,7 @@ public class PermissionsSetting extends AbstractSetting {
 			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
-		Set<Snowflake> mentionedRoles = context.getMessage().getRoleMentionIds();
+		final Set<Snowflake> mentionedRoles = context.getMessage().getRoleMentionIds();
 		if(mentionedRoles.isEmpty()) {
 			throw new MissingArgumentException();
 		}
@@ -65,7 +65,7 @@ public class PermissionsSetting extends AbstractSetting {
 					.map(Role::getName)
 					.collectList()
 					.map(roleNames -> {
-						StringBuilder text = new StringBuilder(String.format(Emoji.CHECK_MARK + " %s will not be able to interact with me anymore.",
+						final StringBuilder text = new StringBuilder(String.format(Emoji.CHECK_MARK + " %s will not be able to interact with me anymore.",
 								String.join(", ", roleNames)));
 						if(roleNames.isEmpty()) {
 							text.append("\n" + Emoji.INFO + " There are no more roles set, everyone can now interact with me.");

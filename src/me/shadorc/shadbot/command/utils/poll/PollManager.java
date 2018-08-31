@@ -36,7 +36,7 @@ public class PollManager extends AbstractGameManager {
 
 	@Override
 	public void start() {
-		this.schedule(Mono.fromRunnable(this::stop), spec.getDuration(), ChronoUnit.SECONDS);
+		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration(), ChronoUnit.SECONDS);
 		this.show().subscribe();
 	}
 
@@ -50,21 +50,21 @@ public class PollManager extends AbstractGameManager {
 	public Mono<Void> show() {
 		return this.getContext().getAvatarUrl()
 				.map(avatarUrl -> {
-					StringBuilder representation = new StringBuilder();
-					for(int i = 0; i < spec.getChoices().size(); i++) {
-						representation.append(String.format("%n\t**%d.** %s", i + 1, spec.getChoices().keySet().toArray()[i]));
+					final StringBuilder representation = new StringBuilder();
+					for(int i = 0; i < this.spec.getChoices().size(); i++) {
+						representation.append(String.format("%n\t**%d.** %s", i + 1, this.spec.getChoices().keySet().toArray()[i]));
 					}
 
 					return EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Poll (Author: %s)", this.getContext().getUsername()), null, avatarUrl)
 							.setDescription(String.format("Vote using: `%s%s <choice>`%n%n__**%s**__%s",
 									this.getContext().getPrefix(), this.getContext().getCommandName(),
-									spec.getQuestion(), representation.toString()))
+									this.spec.getQuestion(), representation.toString()))
 							.setFooter(String.format("You have %s to vote.",
-									FormatUtils.formatShortDuration(TimeUnit.SECONDS.toMillis(spec.getDuration()))),
+									FormatUtils.formatShortDuration(TimeUnit.SECONDS.toMillis(this.spec.getDuration()))),
 									"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png");
 				})
-				.flatMap(voteMessage::sendMessage)
+				.flatMap(this.voteMessage::sendMessage)
 				.flatMap(this::sendResults)
 				.then();
 	}
@@ -73,14 +73,14 @@ public class PollManager extends AbstractGameManager {
 		return this.getContext().getAvatarUrl()
 				.map(avatarUrl -> {
 					// Reactions are not in the same order as they were when added to the message, they need to be ordered
-					BiMap<ReactionEmoji, String> reactionsChoices = HashBiMap.create(spec.getChoices()).inverse();
-					Map<String, Integer> choicesVotes = new HashMap<>();
+					final BiMap<ReactionEmoji, String> reactionsChoices = HashBiMap.create(this.spec.getChoices()).inverse();
+					final Map<String, Integer> choicesVotes = new HashMap<>();
 					for(Reaction reaction : reactions) {
 						choicesVotes.put(reactionsChoices.get(reaction.getEmoji()), reaction.getCount());
 					}
 
 					// Sort votes map by value in the ascending order
-					StringBuilder representation = new StringBuilder();
+					final StringBuilder representation = new StringBuilder();
 					int count = 1;
 					for(String key : Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue())).keySet()) {
 						representation.append(String.format("%n\t**%d.** %s (Votes: %d)", count, key, choicesVotes.get(key)));
@@ -89,7 +89,7 @@ public class PollManager extends AbstractGameManager {
 
 					return EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Poll results (Author: %s)", this.getContext().getUsername()), null, avatarUrl)
-							.setDescription(String.format("__**%s**__%s", spec.getQuestion(), representation.toString()));
+							.setDescription(String.format("__**%s**__%s", this.spec.getQuestion(), representation.toString()));
 
 				})
 				.flatMap(embed -> BotUtils.sendMessage(embed, this.getContext().getChannel()));

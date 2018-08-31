@@ -12,16 +12,16 @@ public class TriviaResponse {
 	private List<TriviaResult> results;
 
 	public int getResponseCode() {
-		return responseCode;
+		return this.responseCode;
 	}
 
 	public List<TriviaResult> getResults() {
-		return results;
+		return this.results;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("TriviaResponse [responseCode=%s, results=%s]", responseCode, results);
+		return String.format("TriviaResponse [responseCode=%s, results=%s]", this.responseCode, this.results);
 	}
 
 }

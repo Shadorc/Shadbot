@@ -36,7 +36,7 @@ public class DatabaseManager {
 	}
 
 	public static DBGuild getDBGuild(Snowflake guildId) {
-		Optional<DBGuild> dbGuildOpt = guilds.stream()
+		final Optional<DBGuild> dbGuildOpt = guilds.stream()
 				.filter(guild -> guild.getId().equals(guildId))
 				.findFirst();
 
@@ -50,7 +50,7 @@ public class DatabaseManager {
 	}
 
 	public static DBMember getDBMember(Snowflake guildId, Snowflake memberId) {
-		Optional<DBMember> dbMemberOpt = DatabaseManager.getDBGuild(guildId)
+		final Optional<DBMember> dbMemberOpt = DatabaseManager.getDBGuild(guildId)
 				.getMembers()
 				.stream()
 				.filter(member -> member.getId().equals(memberId))

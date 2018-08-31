@@ -8,12 +8,12 @@ public class Author {
 	private String username;
 
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Author [username=%s]", username);
+		return String.format("Author [username=%s]", this.username);
 	}
 
 }

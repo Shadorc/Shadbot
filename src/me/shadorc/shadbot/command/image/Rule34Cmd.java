@@ -41,23 +41,23 @@ public class Rule34Cmd extends AbstractCommand {
 				.filter(Boolean.TRUE::equals)
 				.flatMap(isNsfw -> {
 
-					LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+					final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 					try {
 						final String url = String.format("https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=%s",
 								NetUtils.encode(arg.replace(" ", "_")));
 
-						R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
-						R34Posts posts = r34.getPosts();
+						final R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
+						final R34Posts posts = r34.getPosts();
 
 						if(posts.getCount() == 0) {
 							return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
 									context.getUsername(), arg));
 						}
 
-						R34Post post = Utils.randValue(posts.getPosts());
+						final R34Post post = Utils.randValue(posts.getPosts());
 
-						List<String> tags = StringUtils.split(post.getTags(), " ");
+						final List<String> tags = StringUtils.split(post.getTags(), " ");
 						if(post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
 							return loadingMsg.send(Emoji.WARNING + " I don't display images containing children or tagged with `loli` or `shota`.");
 						}
@@ -67,7 +67,7 @@ public class Rule34Cmd extends AbstractCommand {
 
 						return context.getAvatarUrl()
 								.map(avatarUrl -> {
-									EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+									final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 											.setAuthor(String.format("Rule34 (Search: %s)", arg), post.getFileUrl(), avatarUrl)
 											.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
 											.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)

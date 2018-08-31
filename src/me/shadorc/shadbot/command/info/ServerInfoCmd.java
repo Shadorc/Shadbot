@@ -91,12 +91,12 @@ public class ServerInfoCmd extends AbstractCommand {
 					final String avatarUrl = tuple5.getT5();
 
 					final String creationDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(guild.getId())).format(dateFormatter),
+							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(guild.getId())).format(this.dateFormatter),
 							FormatUtils.formatLongDuration(DiscordUtils.getSnowflakeTimeFromID(guild.getId())));
 					final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
 					final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Info about \"%s\"", guild.getName()), null, avatarUrl)
 							.setThumbnail(guild.getIconUrl(Format.JPEG).get())
 							.addField("Owner", owner.getUsername(), true)

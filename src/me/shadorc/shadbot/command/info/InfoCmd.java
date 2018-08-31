@@ -36,7 +36,7 @@ public class InfoCmd extends AbstractCommand {
 		final long start = System.currentTimeMillis();
 		final long uptime = TimeUtils.getMillisUntil(Shadbot.getLaunchTime());
 
-		Runtime runtime = Runtime.getRuntime();
+		final Runtime runtime = Runtime.getRuntime();
 		final int mbUnit = 1024 * 1024;
 		final long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / mbUnit;
 		final long maxMemory = runtime.maxMemory() / mbUnit;

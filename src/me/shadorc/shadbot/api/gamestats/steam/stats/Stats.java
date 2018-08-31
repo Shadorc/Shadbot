@@ -10,16 +10,16 @@ public class Stats {
 	private int value;
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public int getValue() {
-		return value;
+		return this.value;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Stats [name=%s, value=%s]", name, value);
+		return String.format("Stats [name=%s, value=%s]", this.name, this.value);
 	}
 
 }

@@ -11,12 +11,12 @@ public class UserStatsForGameResponse {
 	private PlayerStats playerStats;
 
 	public PlayerStats getPlayerStats() {
-		return playerStats;
+		return this.playerStats;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("UserStatsForGameResponse [playerStats=%s]", playerStats);
+		return String.format("UserStatsForGameResponse [playerStats=%s]", this.playerStats);
 	}
 
 }

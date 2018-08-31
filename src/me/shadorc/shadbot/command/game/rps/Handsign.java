@@ -16,11 +16,11 @@ public enum Handsign {
 	}
 
 	public String getHandsign() {
-		return handsign;
+		return this.handsign;
 	}
 
 	public String getRepresentation() {
-		return emoji + " " + handsign;
+		return this.emoji + " " + this.handsign;
 	}
 
 	public boolean isSuperior(Handsign other) {

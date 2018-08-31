@@ -12,16 +12,16 @@ public class R34Posts {
 	private int count;
 
 	public List<R34Post> getPosts() {
-		return posts;
+		return this.posts;
 	}
 
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("R34Posts [posts=%s, count=%s]", posts, count);
+		return String.format("R34Posts [posts=%s, count=%s]", this.posts, this.count);
 	}
 
 }

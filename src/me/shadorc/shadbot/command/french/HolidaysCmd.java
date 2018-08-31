@@ -41,7 +41,7 @@ public class HolidaysCmd extends AbstractCommand {
 			throw new CommandException(String.format("`%s` is not a valid zone. %s", arg, FormatUtils.formatOptions(Zone.class)));
 		}
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			final String holidays = StringUtils.remove(TWITTER.getLastTweet("Vacances_Zone" + zone), "#");

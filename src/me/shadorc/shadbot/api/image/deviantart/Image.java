@@ -16,28 +16,28 @@ public class Image {
 	private String categoryPath;
 
 	public Content getContent() {
-		return content;
+		return this.content;
 	}
 
 	public Author getAuthor() {
-		return author;
+		return this.author;
 	}
 
 	public String getUrl() {
-		return url;
+		return this.url;
 	}
 
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 
 	public String getCategoryPath() {
-		return categoryPath;
+		return this.categoryPath;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Image [content=%s, author=%s, url=%s, title=%s, categoryPath=%s]", content, author, url, title, categoryPath);
+		return String.format("Image [content=%s, author=%s, url=%s, title=%s, categoryPath=%s]", this.content, this.author, this.url, this.title, this.categoryPath);
 	}
 
 }

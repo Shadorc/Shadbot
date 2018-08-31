@@ -42,7 +42,7 @@ public class GuildMusic {
 		this.guildId = guildId;
 		this.isInVoiceChannel = new AtomicBoolean(false);
 
-		AudioPlayer audioPlayer = audioPlayerManager.createPlayer();
+		final AudioPlayer audioPlayer = audioPlayerManager.createPlayer();
 		audioPlayer.addListener(new AudioEventListener(this));
 		this.audioProvider = new MusicProvider(audioPlayer, this);
 		this.audioReceiver = new MusicReceiver();
@@ -50,14 +50,14 @@ public class GuildMusic {
 	}
 
 	public void scheduleLeave() {
-		leaveTask = Mono.delay(Duration.ofMinutes(1))
+		this.leaveTask = Mono.delay(Duration.ofMinutes(1))
 				.then(Mono.fromRunnable(this::leaveVoiceChannel))
 				.subscribe();
 	}
 
 	public void cancelLeave() {
-		if(leaveTask != null) {
-			leaveTask.dispose();
+		if(this.leaveTask != null) {
+			this.leaveTask.dispose();
 		}
 	}
 
@@ -67,78 +67,78 @@ public class GuildMusic {
 	 * @param voiceChannelId - the voice channel ID to join
 	 */
 	public Mono<Void> joinVoiceChannel(Snowflake voiceChannelId) {
-		return client.getVoiceChannelById(voiceChannelId)
-				.filter(ignored -> !isInVoiceChannel.get())
+		return this.client.getVoiceChannelById(voiceChannelId)
+				.filter(ignored -> !this.isInVoiceChannel.get())
 				.flatMap(VoiceChannel::join)
 				.map(controller -> this.controller = controller)
 				.flatMap(controller -> {
-					isInVoiceChannel.set(true);
-					return controller.connect(audioProvider, audioReceiver);
+					this.isInVoiceChannel.set(true);
+					return controller.connect(this.audioProvider, this.audioReceiver);
 				});
 	}
 
 	public void leaveVoiceChannel() {
-		if(isInVoiceChannel.get()) {
-			isInVoiceChannel.set(false);
-			controller.disconnect();
+		if(this.isInVoiceChannel.get()) {
+			this.isInVoiceChannel.set(false);
+			this.controller.disconnect();
 		}
 	}
 
 	public Mono<Void> end() {
 		final StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
-		if(!PremiumManager.isGuildPremium(guildId)) {
+		if(!PremiumManager.isGuildPremium(this.guildId)) {
 			strBuilder.append(String.format(" If you like me, you can make a donation on **%s**, "
 					+ "it will help my creator keeping me alive :heart:",
 					Config.PATREON_URL));
 		}
 		this.leaveVoiceChannel();
-		return BotUtils.sendMessage(strBuilder.toString(), client.getMessageChannelById(messageChannelId)).then();
+		return BotUtils.sendMessage(strBuilder.toString(), this.client.getMessageChannelById(this.messageChannelId)).then();
 	}
 
 	public void destroy() {
 		this.cancelLeave();
-		GuildMusicManager.GUILD_MUSIC_MAP.remove(guildId);
-		trackScheduler.destroy();
+		GuildMusicManager.GUILD_MUSIC_MAP.remove(this.guildId);
+		this.trackScheduler.destroy();
 	}
 
 	public DiscordClient getClient() {
-		return client;
+		return this.client;
 	}
 
 	public Snowflake getGuildId() {
-		return guildId;
+		return this.guildId;
 	}
 
 	public Snowflake getMessageChannelId() {
-		return messageChannelId;
+		return this.messageChannelId;
 	}
 
 	public Mono<MessageChannel> getMessageChannel() {
-		return client.getMessageChannelById(messageChannelId);
+		return this.client.getMessageChannelById(this.messageChannelId);
 	}
 
 	public Snowflake getDjId() {
-		return djId;
+		return this.djId;
 	}
 
 	public AudioProvider getAudioProvider() {
-		return audioProvider;
+		return this.audioProvider;
 	}
 
 	public TrackScheduler getScheduler() {
-		return trackScheduler;
+		return this.trackScheduler;
 	}
 
 	public boolean isLeavingScheduled() {
-		return leaveTask != null && !leaveTask.isDisposed();
+		return this.leaveTask != null && !this.leaveTask.isDisposed();
 	}
 
 	public boolean isWaitingForChoice() {
-		return isWaitingForChoice;
+		return this.isWaitingForChoice;
 	}
 
 	public boolean isInVoiceChannel() {
-		return isInVoiceChannel.get();
+		return this.isInVoiceChannel.get();
 	}
 
 	public void setMessageChannel(Snowflake messageChannelId) {

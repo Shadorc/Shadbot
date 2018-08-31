@@ -29,9 +29,9 @@ public class CommandManager {
 	private static final Map<String, AbstractCommand> COMMANDS_MAP = new HashMap<>();
 
 	public static boolean init() {
-		Reflections reflections = new Reflections(Shadbot.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
+		final Reflections reflections = new Reflections(Shadbot.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
 		for(Class<?> cmdClass : reflections.getTypesAnnotatedWith(Command.class)) {
-			String cmdName = cmdClass.getSimpleName();
+			final String cmdName = cmdClass.getSimpleName();
 			if(!AbstractCommand.class.isAssignableFrom(cmdClass)) {
 				LogUtils.error(String.format("An error occurred while generating command: %s cannot be casted to %s.",
 						cmdName, AbstractCommand.class.getSimpleName()));
@@ -39,9 +39,9 @@ public class CommandManager {
 			}
 
 			try {
-				AbstractCommand cmd = (AbstractCommand) cmdClass.getConstructor().newInstance();
+				final AbstractCommand cmd = (AbstractCommand) cmdClass.getConstructor().newInstance();
 
-				List<String> names = cmd.getNames();
+				final List<String> names = cmd.getNames();
 				if(!cmd.getAlias().isEmpty()) {
 					names.add(cmd.getAlias());
 				}
@@ -63,7 +63,7 @@ public class CommandManager {
 	}
 
 	public static Mono<Void> execute(Context context) {
-		AbstractCommand command = COMMANDS_MAP.get(context.getCommandName());
+		final AbstractCommand command = COMMANDS_MAP.get(context.getCommandName());
 		if(command == null) {
 			return Mono.empty();
 		}
@@ -81,7 +81,7 @@ public class CommandManager {
 		};
 
 		final Predicate<? super AbstractCommand> isRateLimited = cmd -> {
-			Optional<RateLimiter> rateLimiter = cmd.getRateLimiter();
+			final Optional<RateLimiter> rateLimiter = cmd.getRateLimiter();
 			if(!rateLimiter.isPresent()) {
 				return false;
 			}

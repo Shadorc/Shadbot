@@ -10,16 +10,16 @@ public class TriviaCategory {
 	private String name;
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("TriviaCategory [id=%s, name=%s]", id, name);
+		return String.format("TriviaCategory [id=%s, name=%s]", this.id, this.name);
 	}
 
 }

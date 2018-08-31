@@ -36,41 +36,41 @@ public class Context {
 		this.event = event;
 		this.prefix = prefix;
 
-		List<String> splittedMsg = StringUtils.split(this.getContent(), 2);
+		final List<String> splittedMsg = StringUtils.split(this.getContent(), 2);
 		this.cmdName = splittedMsg.get(0).substring(prefix.length()).toLowerCase();
 		this.arg = Optional.ofNullable(splittedMsg.size() > 1 ? splittedMsg.get(1).trim() : null);
 	}
 
 	public String getPrefix() {
-		return prefix;
+		return this.prefix;
 	}
 
 	public String getCommandName() {
-		return cmdName;
+		return this.cmdName;
 	}
 
 	public Optional<String> getArg() {
-		return arg;
+		return this.arg;
 	}
 
 	public DiscordClient getClient() {
-		return event.getClient();
+		return this.event.getClient();
 	}
 
 	public Mono<Guild> getGuild() {
-		return event.getGuild();
+		return this.event.getGuild();
 	}
 
 	public Snowflake getGuildId() {
-		return event.getGuildId().get();
+		return this.event.getGuildId().get();
 	}
 
 	public Member getMember() {
-		return event.getMember().get();
+		return this.event.getMember().get();
 	}
 
 	public Message getMessage() {
-		return event.getMessage();
+		return this.event.getMessage();
 	}
 
 	public int getShardIndex() {
@@ -129,7 +129,7 @@ public class Context {
 				.map(bool -> CommandPermission.OWNER);
 
 		// Private message, the author is considered as an administrator
-		final Mono<CommandPermission> dmPerm = Mono.just(event.getGuildId())
+		final Mono<CommandPermission> dmPerm = Mono.just(this.event.getGuildId())
 				.filter(guildId -> !guildId.isPresent())
 				.map(guildId -> CommandPermission.ADMIN);
 
@@ -144,7 +144,7 @@ public class Context {
 	}
 
 	public boolean isDm() {
-		return !event.getGuildId().isPresent();
+		return !this.event.getGuildId().isPresent();
 	}
 
 	public Mono<Boolean> isChannelNsfw() {
@@ -172,7 +172,7 @@ public class Context {
 	}
 
 	public List<String> requireArgs(int min, int max, String delimiter) {
-		List<String> args = StringUtils.split(this.requireArg(), max, delimiter);
+		final List<String> args = StringUtils.split(this.requireArg(), max, delimiter);
 		if(!NumberUtils.isInRange(args.size(), min, max)) {
 			throw new MissingArgumentException();
 		}

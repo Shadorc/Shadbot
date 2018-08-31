@@ -10,12 +10,12 @@ public class DeviantArtResponse {
 	private List<Image> results;
 
 	public List<Image> getResults() {
-		return results;
+		return this.results;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("DeviantArtResponse [results=%s]", results);
+		return String.format("DeviantArtResponse [results=%s]", this.results);
 	}
 
 }

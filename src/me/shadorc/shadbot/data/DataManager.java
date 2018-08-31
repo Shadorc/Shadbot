@@ -27,9 +27,9 @@ public class DataManager {
 			return false;
 		}
 
-		Reflections reflections = new Reflections(DataManager.class.getPackage().getName(), new MethodAnnotationsScanner());
+		final Reflections reflections = new Reflections(DataManager.class.getPackage().getName(), new MethodAnnotationsScanner());
 		for(Method initMethod : reflections.getMethodsAnnotatedWith(DataInit.class)) {
-			String className = initMethod.getDeclaringClass().getSimpleName();
+			final String className = initMethod.getDeclaringClass().getSimpleName();
 			try {
 				initMethod.invoke(null);
 			} catch (Exception err) {
@@ -40,8 +40,8 @@ public class DataManager {
 			// Search for save() method and if found, schedule it
 			for(Method method : initMethod.getDeclaringClass().getMethods()) {
 				if(method.isAnnotationPresent(DataSave.class)) {
-					DataSave annotation = method.getAnnotation(DataSave.class);
-					Runnable saveTask = () -> {
+					final DataSave annotation = method.getAnnotation(DataSave.class);
+					final Runnable saveTask = () -> {
 						try {
 							method.invoke(null);
 							LogUtils.infof("%s saved.", className);

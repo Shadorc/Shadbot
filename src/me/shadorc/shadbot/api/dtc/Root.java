@@ -8,12 +8,12 @@ public class Root {
 	private Quote quote;
 
 	public Quote getQuote() {
-		return quote;
+		return this.quote;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Root [quote=%s]", quote);
+		return String.format("Root [quote=%s]", this.quote);
 	}
 
 }

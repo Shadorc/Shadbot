@@ -28,7 +28,7 @@ public class SkipCmd extends AbstractCommand {
 
 		if(context.getArg().isPresent()) {
 			final int playlistSize = guildMusic.getScheduler().getPlaylist().size();
-			Integer num = NumberUtils.asIntBetween(context.getArg().get(), 1, playlistSize);
+			final Integer num = NumberUtils.asIntBetween(context.getArg().get(), 1, playlistSize);
 			if(num == null) {
 				throw new CommandException(String.format("Number must be between 1 and %d.", playlistSize));
 			}

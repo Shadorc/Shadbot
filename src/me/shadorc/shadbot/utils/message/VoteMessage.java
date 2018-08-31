@@ -34,11 +34,11 @@ public class VoteMessage {
 	 *         For example, if the message is deleted during the delay, a {@code 404 Forbidden} will be thrown.
 	 */
 	public Mono<Set<Reaction>> sendMessage(EmbedCreateSpec embed) {
-		return BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
-				.flatMap(message -> Flux.fromIterable(reactions)
+		return BotUtils.sendMessage(embed, this.client.getMessageChannelById(this.channelId))
+				.flatMap(message -> Flux.fromIterable(this.reactions)
 						.flatMap(message::addReaction)
-						.then(Mono.delay(Duration.ofSeconds(seconds)))
-						.then(client.getMessageById(channelId, message.getId()))
+						.then(Mono.delay(Duration.ofSeconds(this.seconds)))
+						.then(this.client.getMessageById(this.channelId, message.getId()))
 						.map(Message::getReactions));
 	}
 

@@ -20,17 +20,17 @@ public class MusicProvider implements AudioProvider {
 
 	@Override
 	public boolean isDone() {
-		return !guildMusic.isInVoiceChannel();
+		return !this.guildMusic.isInVoiceChannel();
 	}
 
 	@Override
 	public byte[] provide() {
-		if(lastFrame == null) {
-			lastFrame = audioPlayer.provide();
+		if(this.lastFrame == null) {
+			this.lastFrame = this.audioPlayer.provide();
 		}
 
-		byte[] data = lastFrame == null ? null : lastFrame.getData();
-		lastFrame = null;
+		final byte[] data = this.lastFrame == null ? null : this.lastFrame.getData();
+		this.lastFrame = null;
 
 		return Objects.requireNonNullElse(data, new byte[0]);
 	}

@@ -38,10 +38,10 @@ public class ImageCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			Image image = this.getRandomPopularImage(NetUtils.encode(arg));
+			final Image image = this.getRandomPopularImage(NetUtils.encode(arg));
 			if(image == null) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
 						context.getUsername(), arg))
@@ -66,7 +66,7 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	private Image getRandomPopularImage(String encodedSearch) throws IOException {
-		if(token == null || TimeUtils.getMillisUntil(lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(token.getExpiresIn())) {
+		if(this.token == null || TimeUtils.getMillisUntil(this.lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn())) {
 			this.generateAccessToken();
 		}
 
@@ -76,9 +76,9 @@ public class ImageCmd extends AbstractCommand {
 				+ "&limit=25" // The pagination limit (min: 1 max: 50)
 				+ "&offset=%d" // The pagination offset (min: 0 max: 50000)
 				+ "&access_token=%s",
-				encodedSearch, ThreadLocalRandom.current().nextInt(150), token.getAccessToken()));
+				encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken()));
 
-		DeviantArtResponse deviantArt = Utils.MAPPER.readValue(url, DeviantArtResponse.class);
+		final DeviantArtResponse deviantArt = Utils.MAPPER.readValue(url, DeviantArtResponse.class);
 		return deviantArt.getResults().isEmpty() ? null : Utils.randValue(deviantArt.getResults());
 	}
 
@@ -87,7 +87,7 @@ public class ImageCmd extends AbstractCommand {
 				APIKeys.get(APIKey.DEVIANTART_CLIENT_ID), APIKeys.get(APIKey.DEVIANTART_API_SECRET)));
 		this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
 		this.lastTokenGeneration = System.currentTimeMillis();
-		LogUtils.infof("DeviantArt token generated: %s", token.getAccessToken());
+		LogUtils.infof("DeviantArt token generated: %s", this.token.getAccessToken());
 	}
 
 	@Override

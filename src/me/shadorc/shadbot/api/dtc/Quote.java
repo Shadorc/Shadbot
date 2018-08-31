@@ -10,16 +10,16 @@ public class Quote {
 	private String content;
 
 	public String getId() {
-		return id;
+		return this.id;
 	}
 
 	public String getContent() {
-		return content;
+		return this.content;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Quote [id=%s, content=%s]", id, content);
+		return String.format("Quote [id=%s, content=%s]", this.id, this.content);
 	}
 
 }

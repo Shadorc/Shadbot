@@ -26,7 +26,7 @@ public class RelicStatusCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<Relic> relics = PremiumManager.getRelicsForUser(context.getAuthorId());
+		final List<Relic> relics = PremiumManager.getRelicsForUser(context.getAuthorId());
 		if(relics.isEmpty()) {
 			return BotUtils.sendMessage(String.format(Emoji.INFO + " You are not a donator. If you like Shadbot, you can help me keep it alive"
 					+ " by making a donation on **%s**."
@@ -37,17 +37,17 @@ public class RelicStatusCmd extends AbstractCommand {
 
 		return Flux.fromIterable(relics)
 				.map(relic -> {
-					StringBuilder contentBld = new StringBuilder(String.format("**ID:** %s", relic.getId()));
+					final StringBuilder contentBld = new StringBuilder(String.format("**ID:** %s", relic.getId()));
 
 					relic.getGuildId().ifPresent(guildId -> contentBld.append(String.format("%n**Guild ID:** %d", guildId.asLong())));
 
 					contentBld.append(String.format("%n**Duration:** %d days", TimeUnit.MILLISECONDS.toDays(relic.getDuration())));
 					if(!relic.isExpired() && relic.getActivationTime().isPresent()) {
-						long millisLeft = relic.getDuration() - TimeUtils.getMillisUntil(relic.getActivationTime().getAsLong());
+						final long millisLeft = relic.getDuration() - TimeUtils.getMillisUntil(relic.getActivationTime().getAsLong());
 						contentBld.append(String.format("%n**Expires in:** %d days", TimeUnit.MILLISECONDS.toDays(millisLeft)));
 					}
 
-					StringBuilder titleBld = new StringBuilder();
+					final StringBuilder titleBld = new StringBuilder();
 					if(relic.getType().equals(RelicType.GUILD.toString())) {
 						titleBld.append("Legendary ");
 					}
@@ -61,7 +61,7 @@ public class RelicStatusCmd extends AbstractCommand {
 					final List<EmbedFieldEntity> fields = fieldsAndAvatarUrl.getT1();
 					final String avatarUrl = fieldsAndAvatarUrl.getT2();
 
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Contributor status", null, avatarUrl)
 							.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
 

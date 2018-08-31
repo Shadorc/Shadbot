@@ -57,23 +57,23 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Start typing in the channel until a message is send or the typing timeout seconds have passed
 	 */
 	private Flux<Long> startTyping() {
-		return client.getMessageChannelById(channelId)
+		return this.client.getMessageChannelById(this.channelId)
 				.flatMapMany(channel -> channel.typeUntil(this))
-				.take(typingTimeout);
+				.take(this.typingTimeout);
 	}
 
 	/**
 	 * Stop typing
 	 */
 	public void stopTyping() {
-		subscribers.forEach(Subscriber::onComplete);
+		this.subscribers.forEach(Subscriber::onComplete);
 	}
 
 	/**
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
 	public Mono<Message> send(String content) {
-		return BotUtils.sendMessage(content, client.getMessageChannelById(channelId))
+		return BotUtils.sendMessage(content, this.client.getMessageChannelById(this.channelId))
 				.doAfterTerminate(this::stopTyping);
 	}
 
@@ -81,13 +81,13 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
 	public Mono<Message> send(EmbedCreateSpec embed) {
-		return BotUtils.sendMessage(embed, client.getMessageChannelById(channelId))
+		return BotUtils.sendMessage(embed, this.client.getMessageChannelById(this.channelId))
 				.doAfterTerminate(this::stopTyping);
 	}
 
 	@Override
 	public void subscribe(Subscriber<? super Void> subscriber) {
-		subscribers.add(subscriber);
+		this.subscribers.add(subscriber);
 	}
 
 }

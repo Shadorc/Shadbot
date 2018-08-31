@@ -21,28 +21,28 @@ public class HeroResponse {
 	private HeroStats stats;
 
 	public String getCode() {
-		return code;
+		return this.code;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public String getClassName() {
-		return StringUtils.capitalizeFully(className.replace("-", " "));
+		return StringUtils.capitalizeFully(this.className.replace("-", " "));
 	}
 
 	public int getLevel() {
-		return level;
+		return this.level;
 	}
 
 	public HeroStats getStats() {
-		return stats;
+		return this.stats;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("HeroResponse [code=%s, name=%s, className=%s, level=%s, stats=%s]", code, name, className, level, stats);
+		return String.format("HeroResponse [code=%s, name=%s, className=%s, level=%s, stats=%s]", this.code, this.name, this.className, this.level, this.stats);
 	}
 
 }

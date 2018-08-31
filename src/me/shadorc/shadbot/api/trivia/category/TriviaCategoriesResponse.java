@@ -12,7 +12,7 @@ public class TriviaCategoriesResponse {
 	private List<TriviaCategory> categories;
 
 	public List<TriviaCategory> getCategories() {
-		return categories;
+		return this.categories;
 	}
 
 	public List<Integer> getIds() {
@@ -25,7 +25,7 @@ public class TriviaCategoriesResponse {
 
 	@Override
 	public String toString() {
-		return String.format("TriviaCategoriesResponse [categories=%s]", categories);
+		return String.format("TriviaCategoriesResponse [categories=%s]", this.categories);
 	}
 
 }

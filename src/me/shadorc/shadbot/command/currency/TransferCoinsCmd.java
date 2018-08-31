@@ -30,30 +30,30 @@ public class TransferCoinsCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(2);
+		final List<String> args = context.requireArgs(2);
 
 		if(context.getMessage().getUserMentionIds().isEmpty()) {
 			throw new MissingArgumentException();
 		}
 
-		Snowflake senderUserId = context.getAuthorId();
-		Snowflake receiverUserId = new ArrayList<>(context.getMessage().getUserMentionIds()).get(0);
+		final Snowflake senderUserId = context.getAuthorId();
+		final Snowflake receiverUserId = new ArrayList<>(context.getMessage().getUserMentionIds()).get(0);
 		if(receiverUserId.equals(senderUserId)) {
 			throw new CommandException("You cannot transfer coins to yourself.");
 		}
 
-		Integer coins = NumberUtils.asPositiveInt(args.get(0));
+		final Integer coins = NumberUtils.asPositiveInt(args.get(0));
 		if(coins == null) {
 			throw new CommandException(
 					String.format("`%s` is not a valid amount for coins.", args.get(0)));
 		}
 
-		DBMember dbSender = DatabaseManager.getDBMember(context.getGuildId(), senderUserId);
+		final DBMember dbSender = DatabaseManager.getDBMember(context.getGuildId(), senderUserId);
 		if(dbSender.getCoins() < coins) {
 			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
 		}
 
-		DBMember dbReceiver = DatabaseManager.getDBMember(context.getGuildId(), receiverUserId);
+		final DBMember dbReceiver = DatabaseManager.getDBMember(context.getGuildId(), receiverUserId);
 		if(dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
 			return context.getClient().getUserById(receiverUserId)
 					.flatMap(user -> BotUtils.sendMessage(String.format(

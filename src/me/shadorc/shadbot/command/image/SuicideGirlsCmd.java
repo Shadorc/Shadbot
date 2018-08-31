@@ -28,7 +28,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.isChannelNsfw()
 				.filter(Boolean.TRUE::equals)

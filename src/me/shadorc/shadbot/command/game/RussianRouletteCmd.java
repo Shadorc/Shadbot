@@ -32,7 +32,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		final String arg = context.requireArg();
 		final int bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
 
-		StringBuilder strBuilder = new StringBuilder(
+		final StringBuilder strBuilder = new StringBuilder(
 				String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", context.getUsername()));
 
 		int gains;

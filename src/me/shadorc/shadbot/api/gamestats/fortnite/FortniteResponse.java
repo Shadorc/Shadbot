@@ -15,16 +15,16 @@ public class FortniteResponse {
 	private Stats stats;
 
 	public Optional<String> getError() {
-		return Optional.ofNullable(error);
+		return Optional.ofNullable(this.error);
 	}
 
 	public Stats getStats() {
-		return stats;
+		return this.stats;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("FortniteResponse [error=%s, stats=%s]", error, stats);
+		return String.format("FortniteResponse [error=%s, stats=%s]", this.error, this.stats);
 	}
 
 }

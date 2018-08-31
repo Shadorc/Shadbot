@@ -35,12 +35,12 @@ public class DBGuild {
 
 	@JsonIgnore
 	public Snowflake getId() {
-		return Snowflake.of(id);
+		return Snowflake.of(this.id);
 	}
 
 	@JsonIgnore
 	public List<DBMember> getMembers() {
-		return members;
+		return this.members;
 	}
 
 	@JsonIgnore
@@ -83,53 +83,53 @@ public class DBGuild {
 	@JsonIgnore
 	public String getPrefix() {
 		return Objects.toString(
-				settings.get(SettingEnum.PREFIX.toString()),
+				this.settings.get(SettingEnum.PREFIX.toString()),
 				Config.DEFAULT_PREFIX);
 	}
 
 	@JsonIgnore
 	public Integer getDefaultVol() {
 		return Integer.parseInt(Objects.toString(
-				settings.get(SettingEnum.DEFAULT_VOLUME.toString()),
+				this.settings.get(SettingEnum.DEFAULT_VOLUME.toString()),
 				Integer.toString(Config.DEFAULT_VOLUME)));
 	}
 
 	@JsonIgnore
 	public Optional<Snowflake> getMessageChannelId() {
-		return Optional.ofNullable((Long) settings.get(SettingEnum.MESSAGE_CHANNEL_ID.toString()))
+		return Optional.ofNullable((Long) this.settings.get(SettingEnum.MESSAGE_CHANNEL_ID.toString()))
 				.map(Snowflake::of);
 	}
 
 	@JsonIgnore
 	public Optional<String> getJoinMessage() {
-		return Optional.ofNullable((String) settings.get(SettingEnum.JOIN_MESSAGE.toString()));
+		return Optional.ofNullable((String) this.settings.get(SettingEnum.JOIN_MESSAGE.toString()));
 	}
 
 	@JsonIgnore
 	public Optional<String> getLeaveMessage() {
-		return Optional.ofNullable((String) settings.get(SettingEnum.LEAVE_MESSAGE.toString()));
+		return Optional.ofNullable((String) this.settings.get(SettingEnum.LEAVE_MESSAGE.toString()));
 	}
 
 	private <T> List<T> getSetting(SettingEnum setting, Class<T> listClass) {
-		final JSONArray array = (JSONArray) Optional.ofNullable(settings.get(setting.toString())).orElse(new JSONArray());
+		final JSONArray array = (JSONArray) Optional.ofNullable(this.settings.get(setting.toString())).orElse(new JSONArray());
 		return Utils.toList(array, listClass);
 	}
 
 	public void setSetting(SettingEnum setting, Object value) {
-		settings.put(setting.toString(), value);
+		this.settings.put(setting.toString(), value);
 	}
 
 	public void addMember(DBMember dbMember) {
-		members.add(dbMember);
+		this.members.add(dbMember);
 	}
 
 	public void removeSetting(SettingEnum setting) {
-		settings.remove(setting.toString());
+		this.settings.remove(setting.toString());
 	}
 
 	@Override
 	public String toString() {
-		return String.format("DBGuild [id=%s, members=%s, settings=%s]", id, members, settings);
+		return String.format("DBGuild [id=%s, members=%s, settings=%s]", this.id, this.members, this.settings);
 	}
 
 }

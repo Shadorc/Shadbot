@@ -30,15 +30,15 @@ public class ManageCoinsCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(2, 3);
+		final List<String> args = context.requireArgs(2, 3);
 
-		Action action = Utils.getEnum(Action.class, args.get(0));
+		final Action action = Utils.getEnum(Action.class, args.get(0));
 		if(action == null) {
 			throw new CommandException(String.format("`%s` is not a valid action. %s",
 					args.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
-		Integer coins = NumberUtils.asInt(args.get(1));
+		final Integer coins = NumberUtils.asInt(args.get(1));
 		if(coins == null && !Action.RESET.equals(action)) {
 			throw new CommandException(String.format("`%s` is not a valid amount for coins.", args.get(1)));
 		}

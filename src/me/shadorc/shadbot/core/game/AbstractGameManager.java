@@ -36,7 +36,7 @@ public abstract class AbstractGameManager {
 	public abstract Mono<Void> show();
 
 	public Context getContext() {
-		return context;
+		return this.context;
 	}
 
 	/**
@@ -46,11 +46,11 @@ public abstract class AbstractGameManager {
 	private Mono<Boolean> isCancelMessage(Message message) {
 		return Mono.justOrEmpty(message.getContent())
 				// This is a cancel command
-				.filter(String.format("%scancel", context.getPrefix())::equals)
+				.filter(String.format("%scancel", this.context.getPrefix())::equals)
 				.flatMap(content -> message.getAuthorAsMember())
 				.zipWith(DiscordUtils.hasPermissions(message.getAuthorAsMember(), Permission.ADMINISTRATOR))
 				// The author is the author of the game or he is an administrator
-				.filter(memberAndIsAdmin -> context.getAuthorId().equals(memberAndIsAdmin.getT1().getId()) || memberAndIsAdmin.getT2())
+				.filter(memberAndIsAdmin -> this.context.getAuthorId().equals(memberAndIsAdmin.getT1().getId()) || memberAndIsAdmin.getT2())
 				.hasElement();
 	}
 
@@ -73,20 +73,20 @@ public abstract class AbstractGameManager {
 	}
 
 	public boolean isTaskDone() {
-		return isDone.get() || scheduledTask == null || scheduledTask.isDisposed();
+		return this.isDone.get() || this.scheduledTask == null || this.scheduledTask.isDisposed();
 	}
 
 	public void schedule(Mono<?> mono, long delay, TemporalUnit unit) {
 		this.cancelScheduledTask();
-		scheduledTask = Mono.delay(Duration.of(delay, unit))
-				.then(Mono.fromRunnable(() -> isDone.set(true)))
+		this.scheduledTask = Mono.delay(Duration.of(delay, unit))
+				.then(Mono.fromRunnable(() -> this.isDone.set(true)))
 				.then(mono)
 				.subscribe();
 	}
 
 	public void cancelScheduledTask() {
-		if(scheduledTask != null) {
-			scheduledTask.dispose();
+		if(this.scheduledTask != null) {
+			this.scheduledTask.dispose();
 		}
 	}
 

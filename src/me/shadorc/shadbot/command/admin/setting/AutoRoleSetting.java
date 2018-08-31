@@ -41,7 +41,7 @@ public class AutoRoleSetting extends AbstractSetting {
 			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.formatOptions(Action.class)));
 		}
 
-		Set<Snowflake> mentionedRoles = context.getMessage().getRoleMentionIds();
+		final Set<Snowflake> mentionedRoles = context.getMessage().getRoleMentionIds();
 		if(mentionedRoles.isEmpty()) {
 			throw new MissingArgumentException();
 		}

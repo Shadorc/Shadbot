@@ -35,11 +35,11 @@ public class TableStatistic<E extends Enum<E>> extends Statistic<E> {
 	}
 
 	public void log(E rowKey, String columnKey, long value) {
-		synchronized (table) {
-			if(!table.contains(rowKey.toString(), columnKey)) {
-				table.put(rowKey.toString(), columnKey, new AtomicLong(0));
+		synchronized (this.table) {
+			if(!this.table.contains(rowKey.toString(), columnKey)) {
+				this.table.put(rowKey.toString(), columnKey, new AtomicLong(0));
 			}
-			table.get(rowKey.toString(), columnKey).addAndGet(value);
+			this.table.get(rowKey.toString(), columnKey).addAndGet(value);
 		}
 	}
 
@@ -48,8 +48,8 @@ public class TableStatistic<E extends Enum<E>> extends Statistic<E> {
 	}
 
 	public Map<String, AtomicLong> getMap(String rowKey) {
-		synchronized (table) {
-			return table.row(rowKey);
+		synchronized (this.table) {
+			return this.table.row(rowKey);
 		}
 	}
 
@@ -59,9 +59,9 @@ public class TableStatistic<E extends Enum<E>> extends Statistic<E> {
 
 	@Override
 	public void save() throws IOException {
-		synchronized (table) {
+		synchronized (this.table) {
 			try (FileWriter writer = new FileWriter(this.getFile())) {
-				writer.write(Utils.MAPPER.writeValueAsString(table.rowMap()));
+				writer.write(Utils.MAPPER.writeValueAsString(this.table.rowMap()));
 			}
 		}
 	}

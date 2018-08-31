@@ -28,7 +28,7 @@ public class RolelistCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		Set<Snowflake> roleIds = context.getMessage().getRoleMentionIds();
+		final Set<Snowflake> roleIds = context.getMessage().getRoleMentionIds();
 		if(roleIds.isEmpty()) {
 			throw new MissingArgumentException();
 		}
@@ -43,7 +43,7 @@ public class RolelistCmd extends AbstractCommand {
 					final List<String> usernames = usernamesAndRoles.getT1().stream().distinct().collect(Collectors.toList());
 					final List<Role> roles = usernamesAndRoles.getT2();
 
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed();
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed();
 
 					if(usernames.isEmpty()) {
 						return embed.setDescription(

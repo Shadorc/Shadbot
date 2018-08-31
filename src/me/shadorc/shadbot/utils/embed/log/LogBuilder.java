@@ -34,11 +34,11 @@ public class LogBuilder {
 	}
 
 	public EmbedCreateSpec build() {
-		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-				.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeFully(type.toString()), Config.VERSION), null, null)
-				.setDescription(message);
+		final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+				.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeFully(this.type.toString()), Config.VERSION), null, null)
+				.setDescription(this.message);
 
-		switch (type) {
+		switch (this.type) {
 			case ERROR:
 				embed.setColor(Color.RED);
 				break;
@@ -50,13 +50,13 @@ public class LogBuilder {
 				break;
 		}
 
-		if(err != null) {
-			embed.addField("Error type", err.getClass().getSimpleName(), false);
-			embed.addField("Error message", err.getMessage(), false);
+		if(this.err != null) {
+			embed.addField("Error type", this.err.getClass().getSimpleName(), false);
+			embed.addField("Error message", this.err.getMessage(), false);
 		}
 
-		if(input != null) {
-			embed.addField("Input", input, false);
+		if(this.input != null) {
+			embed.addField("Input", this.input, false);
 		}
 
 		return embed;
@@ -64,6 +64,6 @@ public class LogBuilder {
 
 	@Override
 	public String toString() {
-		return String.format("LogBuilder [type=%s, message=%s, err=%s, input=%s]", type, message, err, input);
+		return String.format("LogBuilder [type=%s, message=%s, err=%s, input=%s]", this.type, this.message, this.err, this.input);
 	}
 }

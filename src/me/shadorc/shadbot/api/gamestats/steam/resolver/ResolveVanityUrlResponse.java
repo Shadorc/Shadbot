@@ -8,11 +8,11 @@ public class ResolveVanityUrlResponse {
 	private SteamId response;
 
 	public SteamId getResponse() {
-		return response;
+		return this.response;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("ResolveVanityUrlResponse [response=%s]", response);
+		return String.format("ResolveVanityUrlResponse [response=%s]", this.response);
 	}
 }

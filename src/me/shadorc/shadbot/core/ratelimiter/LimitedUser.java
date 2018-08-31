@@ -15,19 +15,19 @@ public class LimitedUser {
 	}
 
 	public Bucket getBucket() {
-		return bucket;
+		return this.bucket;
 	}
 
 	public boolean isWarned() {
-		return isWarned.get();
+		return this.isWarned.get();
 	}
 
 	public void warn() {
-		isWarned.set(true);
+		this.isWarned.set(true);
 	}
 
 	public void unwarn() {
-		isWarned.set(false);
+		this.isWarned.set(false);
 	}
 
 }

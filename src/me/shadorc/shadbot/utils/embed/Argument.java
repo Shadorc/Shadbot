@@ -13,15 +13,15 @@ public class Argument {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public String getDesc() {
-		return desc;
+		return this.desc;
 	}
 
 	public boolean isFacultative() {
-		return isFacultative;
+		return this.isFacultative;
 	}
 
 }

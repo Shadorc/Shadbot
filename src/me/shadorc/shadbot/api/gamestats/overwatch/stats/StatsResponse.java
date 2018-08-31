@@ -8,12 +8,12 @@ public class StatsResponse {
 	private Stats stats;
 
 	public Stats getStats() {
-		return stats;
+		return this.stats;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("StatsResponse [stats=%s]", stats);
+		return String.format("StatsResponse [stats=%s]", this.stats);
 	}
 
 }

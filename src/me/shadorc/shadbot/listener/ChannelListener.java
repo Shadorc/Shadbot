@@ -13,8 +13,8 @@ import me.shadorc.shadbot.data.db.DatabaseManager;
 public class ChannelListener {
 
 	public static void onTextChannelDelete(TextChannelDeleteEvent event) {
-		DBGuild dbGuild = DatabaseManager.getDBGuild(event.getChannel().getGuildId());
-		List<Snowflake> allowedChannelIds = dbGuild.getAllowedTextChannels();
+		final DBGuild dbGuild = DatabaseManager.getDBGuild(event.getChannel().getGuildId());
+		final List<Snowflake> allowedChannelIds = dbGuild.getAllowedTextChannels();
 		// If the channel was an allowed channel...
 		if(allowedChannelIds.remove(event.getChannel().getId())) {
 			// ...update settings to remove the deleted one

@@ -35,7 +35,7 @@ public class VolumeCmd extends AbstractCommand {
 					}
 
 					final String arg = context.getArg().get();
-					Integer volume = NumberUtils.asPositiveInt(arg);
+					final Integer volume = NumberUtils.asPositiveInt(arg);
 					if(volume == null) {
 						throw new CommandException(String.format("`%s` is not a valid volume.", arg));
 					}

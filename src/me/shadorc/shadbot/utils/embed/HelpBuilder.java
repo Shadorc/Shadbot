@@ -52,7 +52,7 @@ public class HelpBuilder {
 	}
 
 	public HelpBuilder setUsage(String usage) {
-		return this.setFullUsage(String.format("%s%s %s", context.getPrefix(), cmd.getName(), usage));
+		return this.setFullUsage(String.format("%s%s %s", this.context.getPrefix(), this.cmd.getName(), usage));
 	}
 
 	public HelpBuilder setExample(String example) {
@@ -76,7 +76,7 @@ public class HelpBuilder {
 	}
 
 	public HelpBuilder addArg(String name, String desc, boolean isFacultative) {
-		args.add(new Argument(name, desc, isFacultative));
+		this.args.add(new Argument(name, desc, isFacultative));
 		return this;
 	}
 
@@ -93,47 +93,47 @@ public class HelpBuilder {
 	}
 
 	public HelpBuilder addField(String name, String value, boolean inline) {
-		fields.add(new EmbedFieldEntity(name, value, inline));
+		this.fields.add(new EmbedFieldEntity(name, value, inline));
 		return this;
 	}
 
 	public Mono<EmbedCreateSpec> build() {
-		return context.getAvatarUrl()
+		return this.context.getAvatarUrl()
 				.map(avatarUrl -> {
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Help for %s command", cmd.getName()), null, avatarUrl)
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+							.setAuthor(String.format("Help for %s command", this.cmd.getName()), null, avatarUrl)
 							.addField("Usage", this.getUsage(), false);
 
-					if(description != null) {
-						embed.setDescription(description);
+					if(this.description != null) {
+						embed.setDescription(this.description);
 					}
 
-					if(thumbnail != null) {
-						embed.setThumbnail(thumbnail);
+					if(this.thumbnail != null) {
+						embed.setThumbnail(this.thumbnail);
 					}
 
 					if(!this.getArguments().isEmpty()) {
 						embed.addField("Arguments", this.getArguments(), false);
 					}
 
-					if(example != null) {
-						embed.addField("Example", example, false);
+					if(this.example != null) {
+						embed.addField("Example", this.example, false);
 					}
 
-					if(gains != null) {
-						embed.addField("Gains", gains, false);
+					if(this.gains != null) {
+						embed.addField("Gains", this.gains, false);
 					}
 
-					if(source != null) {
-						embed.addField("Source", source, false);
+					if(this.source != null) {
+						embed.addField("Source", this.source, false);
 					}
 
-					for(EmbedFieldEntity field : fields) {
+					for(EmbedFieldEntity field : this.fields) {
 						embed.addField(field.getName(), field.getValue(), field.isInline());
 					}
 
-					if(!cmd.getAlias().isEmpty()) {
-						embed.setFooter(String.format("Alias: %s", cmd.getAlias()), null);
+					if(!this.cmd.getAlias().isEmpty()) {
+						embed.setFooter(String.format("Alias: %s", this.cmd.getAlias()), null);
 					}
 
 					return embed;
@@ -141,17 +141,17 @@ public class HelpBuilder {
 	}
 
 	private String getUsage() {
-		if(usage != null) {
-			return String.format("`%s`", usage);
+		if(this.usage != null) {
+			return String.format("`%s`", this.usage);
 		}
 
 		return String.format("`%s%s %s`",
-				context.getPrefix(), cmd.getName(),
-				FormatUtils.format(args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), delimiter));
+				this.context.getPrefix(), this.cmd.getName(),
+				FormatUtils.format(this.args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
 	}
 
 	private String getArguments() {
-		return args.stream()
+		return this.args.stream()
 				.filter(arg -> Objects.nonNull(arg.getDesc()))
 				.map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isFacultative() ? "[optional] " : "", arg.getDesc()))
 				.collect(Collectors.joining());

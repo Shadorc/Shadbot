@@ -23,36 +23,36 @@ public class ProfileResponse {
 	private Map<String, String> competitive;
 
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	public String getLevel() {
-		return Integer.toString(level);
+		return Integer.toString(this.level);
 	}
 
 	public String getPortrait() {
-		return portrait;
+		return this.portrait;
 	}
 
 	public boolean isPrivate() {
-		return isPrivate;
+		return this.isPrivate;
 	}
 
 	public Games getGames() {
-		return games;
+		return this.games;
 	}
 
 	public String getRank() {
-		return Objects.requireNonNullElse(competitive.get("rank"), "0");
+		return Objects.requireNonNullElse(this.competitive.get("rank"), "0");
 	}
 
 	public String getQuickplayPlaytime() {
-		return playtime.get("quickplay");
+		return this.playtime.get("quickplay");
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Data [username=%s, level=%s, portrait=%s, isPrivate=%s, games=%s, playtime=%s, competitive=%s]", username, level, portrait, isPrivate, games, playtime, competitive);
+		return String.format("Data [username=%s, level=%s, portrait=%s, isPrivate=%s, games=%s, playtime=%s, competitive=%s]", this.username, this.level, this.portrait, this.isPrivate, this.games, this.playtime, this.competitive);
 	}
 
 }

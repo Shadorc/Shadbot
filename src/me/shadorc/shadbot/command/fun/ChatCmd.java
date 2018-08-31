@@ -42,7 +42,7 @@ public class ChatCmd extends AbstractCommand {
 
 		for(String botName : BOTS.keySet()) {
 			try {
-				String response = this.talk(context.getChannelId(), BOTS.get(botName), arg);
+				final String response = this.talk(context.getChannelId(), BOTS.get(botName), arg);
 				ERROR_COUNT.set(0);
 				return BotUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", botName, response), context.getChannel()).then();
 			} catch (IOException err) {
@@ -63,8 +63,8 @@ public class ChatCmd extends AbstractCommand {
 	private String talk(Snowflake channelId, String botId, String input) throws UnsupportedEncodingException, IOException {
 		final String url = String.format("https://www.pandorabots.com/pandora/talk-xml?botid=%s&input=%s&custid=%s",
 				botId, NetUtils.encode(input), CHANNELS_CUSTID.getOrDefault(channelId, ""));
-		JSONObject resultObj = XML.toJSONObject(NetUtils.getDoc(url).html()).getJSONObject("result");
-		ChatBotResponse chat = Utils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class);
+		final JSONObject resultObj = XML.toJSONObject(NetUtils.getDoc(url).html()).getJSONObject("result");
+		final ChatBotResponse chat = Utils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class);
 		CHANNELS_CUSTID.put(channelId, chat.getCustId());
 		return chat.getResponse();
 	}

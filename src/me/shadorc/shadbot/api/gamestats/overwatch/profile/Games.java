@@ -10,12 +10,12 @@ public class Games {
 	private Map<String, Integer> quickplay;
 
 	public String getQuickplayWon() {
-		return quickplay.get("won").toString();
+		return this.quickplay.get("won").toString();
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Games [quickplay=%s]", quickplay);
+		return String.format("Games [quickplay=%s]", this.quickplay);
 	}
 
 }

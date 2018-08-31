@@ -39,7 +39,7 @@ public class DiabloCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(2);
+		final List<String> args = context.requireArgs(2);
 
 		final Region region = Utils.getEnum(Region.class, args.get(0));
 		if(region == null) {
@@ -49,24 +49,24 @@ public class DiabloCmd extends AbstractCommand {
 
 		final String battletag = args.get(1).replaceAll("#", "-");
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			final URL url = new URL(String.format("https://%s.api.battle.net/d3/profile/%s/?locale=en_GB&apikey=%s",
 					region, NetUtils.encode(battletag), APIKeys.get(APIKey.BLIZZARD_API_KEY)));
 
-			ProfileResponse profile = Utils.MAPPER.readValue(url, ProfileResponse.class);
+			final ProfileResponse profile = Utils.MAPPER.readValue(url, ProfileResponse.class);
 
 			if("NOTFOUND".equals(profile.getCode())) {
 				throw new FileNotFoundException();
 			}
 
-			List<HeroResponse> heroResponses = new ArrayList<>();
+			final List<HeroResponse> heroResponses = new ArrayList<>();
 			for(HeroId heroId : profile.getHeroeIds()) {
 				final URL heroUrl = new URL(String.format("https://%s.api.battle.net/d3/profile/%s/hero/%d?locale=en_GB&apikey=%s",
 						region, NetUtils.encode(battletag), heroId.getId(), APIKeys.get(APIKey.BLIZZARD_API_KEY)));
 
-				HeroResponse hero = Utils.MAPPER.readValue(heroUrl, HeroResponse.class);
+				final HeroResponse hero = Utils.MAPPER.readValue(heroUrl, HeroResponse.class);
 				if(hero.getCode() == null) {
 					heroResponses.add(hero);
 				}

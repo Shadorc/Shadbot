@@ -51,7 +51,7 @@ public class StatsCmd extends AbstractCommand {
 
 			map = ((MapStatistic<?>) statEnum.getStat()).getMap();
 		} else {
-			Enum<?> subStatEnum = Utils.getEnum(statEnum.getStat().getEnumClass(), args.get(1));
+			final Enum<?> subStatEnum = Utils.getEnum(statEnum.getStat().getEnumClass(), args.get(1));
 			if(subStatEnum == null) {
 				throw new CommandException(String.format("`%s` is not a valid sub-category. %s",
 						args.get(1), FormatUtils.formatOptions(statEnum.getStat().getEnumClass())));
@@ -64,7 +64,7 @@ public class StatsCmd extends AbstractCommand {
 			}
 		}
 
-		EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed();
+		final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed();
 
 		if(map == null || map.isEmpty()) {
 			embed.setDescription("No statistics yet.");

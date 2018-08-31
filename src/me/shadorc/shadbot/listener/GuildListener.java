@@ -17,7 +17,7 @@ public class GuildListener {
 	}
 
 	public static void onGuildDelete(GuildDeleteEvent event) {
-		Optional<Guild> guild = event.getGuild();
+		final Optional<Guild> guild = event.getGuild();
 		LogUtils.infof("Shadbot disconnected from a guild. (ID: %d | Users: %d)",
 				event.getGuildId().asLong(),
 				guild.map(Guild::getMemberCount).orElse(OptionalInt.of(-1)).getAsInt());

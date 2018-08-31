@@ -16,10 +16,10 @@ public class StatValue {
 
 	@Override
 	public String toString() {
-		if(valueDec != 0) {
-			return Double.toString(valueDec);
+		if(this.valueDec != 0) {
+			return Double.toString(this.valueDec);
 		}
-		return Integer.toString(valueInt);
+		return Integer.toString(this.valueInt);
 	}
 
 }

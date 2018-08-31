@@ -34,7 +34,7 @@ public class StatsManager {
 		}
 
 		public Statistic<?> getStat() {
-			return stat;
+			return this.stat;
 		}
 
 	}

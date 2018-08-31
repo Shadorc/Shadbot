@@ -43,13 +43,13 @@ public class PremiumManager {
 	}
 
 	public static Relic generateRelic(RelicType type) {
-		Relic relic = new Relic(UUID.randomUUID().toString(), TimeUnit.DAYS.toMillis(180), type);
+		final Relic relic = new Relic(UUID.randomUUID().toString(), TimeUnit.DAYS.toMillis(180), type);
 		relics.add(relic);
 		return relic;
 	}
 
 	public static void activateRelic(@Nullable Snowflake guildId, Snowflake userId, String relicId) throws RelicActivationException {
-		Optional<Relic> relicOpt = relics.stream()
+		final Optional<Relic> relicOpt = relics.stream()
 				.filter(relicItr -> relicItr.getId().equals(relicId))
 				.findFirst();
 

@@ -18,32 +18,32 @@ public class R34Post {
 	private boolean hasChildren;
 
 	public String getTags() {
-		return tags;
+		return this.tags;
 	}
 
 	public String getFileUrl() {
-		return fileUrl;
+		return this.fileUrl;
 	}
 
 	public String getSource() {
-		return source;
+		return this.source;
 	}
 
 	public int getWidth() {
-		return width;
+		return this.width;
 	}
 
 	public int getHeight() {
-		return height;
+		return this.height;
 	}
 
 	public boolean hasChildren() {
-		return hasChildren;
+		return this.hasChildren;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("R34Post [tags=%s, fileUrl=%s, source=%s, width=%s, height=%s, hasChildren=%s]", tags, fileUrl, source, width, height, hasChildren);
+		return String.format("R34Post [tags=%s, fileUrl=%s, source=%s, width=%s, height=%s, hasChildren=%s]", this.tags, this.fileUrl, this.source, this.width, this.height, this.hasChildren);
 	}
 
 }

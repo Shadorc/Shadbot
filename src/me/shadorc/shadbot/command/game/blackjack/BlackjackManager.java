@@ -75,7 +75,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 
 	@Override
 	public Mono<Void> show() {
-		return Flux.fromIterable(players)
+		return Flux.fromIterable(this.players)
 				.flatMap(player -> Mono.zip(Mono.just(player), this.getContext().getClient().getUserById(player.getUserId())))
 				.map(playerAndUser -> {
 					final BlackjackPlayer player = playerAndUser.getT1();
@@ -98,12 +98,12 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 							.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
 									+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
 									this.getContext().getPrefix(), this.getContext().getCommandName()))
-							.addField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? dealerCards : dealerCards.subList(0, 1)), true);
+							.addField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? this.dealerCards : this.dealerCards.subList(0, 1)), true);
 
 					if(this.isFinished() || this.isTaskDone()) {
 						embed.setFooter("Finished", null);
 					} else {
-						final long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(startTime));
+						final long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(this.startTime));
 						embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingTime), null);
 					}
 
@@ -111,7 +111,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 
 					return embed;
 				})
-				.flatMap(updateableMessage::send)
+				.flatMap(this.updateableMessage::send)
 				.then();
 	}
 
@@ -123,8 +123,8 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 	}
 
 	private Mono<Void> computeResults() {
-		final int dealerValue = BlackjackUtils.getValue(dealerCards);
-		return Flux.fromIterable(players)
+		final int dealerValue = BlackjackUtils.getValue(this.dealerCards);
+		return Flux.fromIterable(this.players)
 				.flatMap(player -> Mono.zip(Mono.just(player), this.getContext().getClient().getUserById(player.getUserId())))
 				.map(playerAndUser -> {
 					final BlackjackPlayer player = playerAndUser.getT1();
@@ -170,26 +170,26 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 	}
 
 	public boolean addPlayerIfAbsent(Snowflake userId, int bet) {
-		if(players.stream().map(BlackjackPlayer::getUserId).anyMatch(userId::equals)) {
+		if(this.players.stream().map(BlackjackPlayer::getUserId).anyMatch(userId::equals)) {
 			return false;
 		}
-		return players.add(new BlackjackPlayer(userId, bet));
+		return this.players.add(new BlackjackPlayer(userId, bet));
 	}
 
 	public boolean isFinished() {
-		return players.stream().allMatch(BlackjackPlayer::isStanding);
+		return this.players.stream().allMatch(BlackjackPlayer::isStanding);
 	}
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		final Member member = event.getMember().get();
 		return this.cancelOrDo(event.getMessage(),
-				Mono.just(players)
+				Mono.just(this.players)
 						// Check if the member is a current player
 						.filter(blackjackPlayers -> blackjackPlayers.stream()
 								.map(BlackjackPlayer::getUserId)
 								.anyMatch(member.getId()::equals))
-						.filter(blackjackPlayers -> !rateLimiter.isLimitedAndWarn(
+						.filter(blackjackPlayers -> !this.rateLimiter.isLimitedAndWarn(
 								event.getClient(), member.getGuildId(), event.getMessage().getChannelId(), member.getId()))
 						// Find the player associated with the user
 						.map(blackjackPlayers -> blackjackPlayers.stream()
@@ -213,7 +213,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 										.thenReturn(true);
 							}
 
-							Map<String, Runnable> actionsMap = Map.of("hit", player::hit, "stand", player::stand, "double down", player::doubleDown);
+							final Map<String, Runnable> actionsMap = Map.of("hit", player::hit, "stand", player::stand, "double down", player::doubleDown);
 
 							final Runnable action = actionsMap.get(content);
 							if(action == null) {

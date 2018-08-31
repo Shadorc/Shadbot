@@ -26,7 +26,7 @@ public class HelpCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		if(context.getArg().isPresent()) {
-			AbstractCommand cmd = CommandManager.getCommand(context.getArg().get());
+			final AbstractCommand cmd = CommandManager.getCommand(context.getArg().get());
 			if(cmd == null) {
 				return Mono.empty();
 			}

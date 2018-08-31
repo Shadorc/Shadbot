@@ -17,16 +17,16 @@ public class SubStats {
 	}
 
 	public StatValue getTop1() {
-		return top1;
+		return this.top1;
 	}
 
 	public StatValue getRatio() {
-		return ratio;
+		return this.ratio;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("SubStats [top1=%s, ratio=%s]", top1, ratio);
+		return String.format("SubStats [top1=%s, ratio=%s]", this.top1, this.ratio);
 	}
 
 }

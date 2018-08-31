@@ -61,8 +61,8 @@ public class DiscordUtils {
 	}
 
 	public static List<Snowflake> getChannelMentions(String content) {
-		Matcher matcher = Pattern.compile("<#([0-9]{1,19})>").matcher(content);
-		List<Snowflake> channelMentions = new ArrayList<>();
+		final Matcher matcher = Pattern.compile("<#([0-9]{1,19})>").matcher(content);
+		final List<Snowflake> channelMentions = new ArrayList<>();
 		while(matcher.find()) {
 			channelMentions.add(Snowflake.of(matcher.group(1)));
 		}

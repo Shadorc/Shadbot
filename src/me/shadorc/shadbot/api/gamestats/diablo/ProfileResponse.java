@@ -27,42 +27,42 @@ public class ProfileResponse {
 	private List<HeroId> heroeIds;
 
 	public String getCode() {
-		return code;
+		return this.code;
 	}
 
 	public String getBattleTag() {
-		return battleTag;
+		return this.battleTag;
 	}
 
 	public int getParagonLevel() {
-		return paragonLevel;
+		return this.paragonLevel;
 	}
 
 	public int getParagonLevelHardcore() {
-		return paragonLevelHardcore;
+		return this.paragonLevelHardcore;
 	}
 
 	public int getParagonLevelSeason() {
-		return paragonLevelSeason;
+		return this.paragonLevelSeason;
 	}
 
 	public int getParagonLevelSeasonHardcore() {
-		return paragonLevelSeasonHardcore;
+		return this.paragonLevelSeasonHardcore;
 	}
 
 	public String getGuildName() {
-		return guildName;
+		return this.guildName;
 	}
 
 	public List<HeroId> getHeroeIds() {
-		return heroeIds;
+		return this.heroeIds;
 	}
 
 	@Override
 	public String toString() {
 		return String.format("ProfileResponse [code=%s, battleTag=%s, paragonLevel=%s, paragonLevelHardcore=%s, paragonLevelSeason=%s, "
-				+ "paragonLevelSeasonHardcore=%s, guildName=%s, heroeIds=%s]", code, battleTag, paragonLevel, paragonLevelHardcore,
-				paragonLevelSeason, paragonLevelSeasonHardcore, guildName, heroeIds);
+				+ "paragonLevelSeasonHardcore=%s, guildName=%s, heroeIds=%s]", this.code, this.battleTag, this.paragonLevel, this.paragonLevelHardcore,
+				this.paragonLevelSeason, this.paragonLevelSeasonHardcore, this.guildName, this.heroeIds);
 	}
 
 }

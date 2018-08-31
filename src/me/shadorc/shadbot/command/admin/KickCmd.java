@@ -33,7 +33,7 @@ public class KickCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		Set<Snowflake> mentionedUserIds = context.getMessage().getUserMentionIds();
+		final Set<Snowflake> mentionedUserIds = context.getMessage().getUserMentionIds();
 		if(mentionedUserIds.isEmpty()) {
 			throw new MissingArgumentException();
 		}
@@ -51,7 +51,7 @@ public class KickCmd extends AbstractCommand {
 					final List<User> mentions = mentionsAndGuild.getT1();
 					final Guild guild = mentionsAndGuild.getT2();
 
-					StringBuilder reason = new StringBuilder();
+					final StringBuilder reason = new StringBuilder();
 					reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
 					if(reason.length() > DiscordUtils.MAX_REASON_LENGTH) {
 						throw new CommandException(String.format("Reason cannot exceed **%d characters**.", DiscordUtils.MAX_REASON_LENGTH));
@@ -61,7 +61,7 @@ public class KickCmd extends AbstractCommand {
 						reason.append("Reason not specified.");
 					}
 
-					Flux<Void> banFlux = Flux.empty();
+					final Flux<Void> banFlux = Flux.empty();
 					for(User user : mentions) {
 						if(!user.isBot()) {
 							banFlux.concatWith(BotUtils.sendMessage(

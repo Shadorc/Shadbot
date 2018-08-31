@@ -29,7 +29,7 @@ public class JokeCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.getAvatarUrl()
 				.flatMap(avatarUrl -> {
@@ -37,7 +37,7 @@ public class JokeCmd extends AbstractCommand {
 						final String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d",
 								ThreadLocalRandom.current().nextInt(1, 6));
 
-						List<String> jokes = NetUtils.getDoc(url).getElementsByClass("texte ").stream()
+						final List<String> jokes = NetUtils.getDoc(url).getElementsByClass("texte ").stream()
 								.map(Element::html)
 								.filter(elmt -> elmt.length() < 1000)
 								.collect(Collectors.toList());

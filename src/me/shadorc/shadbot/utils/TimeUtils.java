@@ -45,12 +45,12 @@ public class TimeUtils {
 	 * @return The amount of seconds corresponding to the {@code str} format
 	 */
 	public static long parseTime(String str) {
-		String normalizedText = str.replaceAll(" ", "").toLowerCase();
+		final String normalizedText = str.replaceAll(" ", "").toLowerCase();
 
-		Pattern pattern = Pattern.compile("[0-9]+[a-z]{1}");
-		Matcher matcher = pattern.matcher(normalizedText);
+		final Pattern pattern = Pattern.compile("[0-9]+[a-z]{1}");
+		final Matcher matcher = pattern.matcher(normalizedText);
 
-		List<String> matches = new ArrayList<>();
+		final List<String> matches = new ArrayList<>();
 		while(matcher.find()) {
 			matches.add(matcher.group());
 		}
@@ -62,8 +62,8 @@ public class TimeUtils {
 		long seconds = 0;
 
 		for(String match : matches) {
-			long time = Long.parseLong(match.replaceAll("[a-z]", ""));
-			String unit = match.replaceAll("[0-9]", "");
+			final long time = Long.parseLong(match.replaceAll("[a-z]", ""));
+			final String unit = match.replaceAll("[0-9]", "");
 			switch (unit) {
 				case "s":
 					seconds += TimeUnit.SECONDS.toSeconds(time);

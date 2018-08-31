@@ -10,16 +10,16 @@ public class HeroPlayed {
 	private String played;
 
 	public String getHero() {
-		return hero;
+		return this.hero;
 	}
 
 	public String getPlayed() {
-		return played;
+		return this.played;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("HeroPlayed [hero=%s, played=%s]", hero, played);
+		return String.format("HeroPlayed [hero=%s, played=%s]", this.hero, this.played);
 	}
 
 }

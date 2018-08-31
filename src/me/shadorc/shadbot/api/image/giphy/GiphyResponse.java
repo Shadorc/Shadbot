@@ -13,12 +13,12 @@ public class GiphyResponse {
 	private List<GiphyGif> gifs;
 
 	public List<GiphyGif> getGifs() {
-		return gifs;
+		return this.gifs;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("GiphyResponse [gifs=%s]", gifs);
+		return String.format("GiphyResponse [gifs=%s]", this.gifs);
 	}
 
 }

@@ -32,7 +32,7 @@ public class WikiCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
@@ -47,8 +47,8 @@ public class WikiCmd extends AbstractCommand {
 					+ "&exsentences=5",
 					NetUtils.encode(arg)));
 
-			WikipediaResponse wikipedia = Utils.MAPPER.readValue(url, WikipediaResponse.class);
-			Map<String, WikipediaPage> pages = wikipedia.getQuery().getPages();
+			final WikipediaResponse wikipedia = Utils.MAPPER.readValue(url, WikipediaResponse.class);
+			final Map<String, WikipediaPage> pages = wikipedia.getQuery().getPages();
 			final String pageId = pages.keySet().toArray()[0].toString();
 			final WikipediaPage page = pages.get(pageId);
 

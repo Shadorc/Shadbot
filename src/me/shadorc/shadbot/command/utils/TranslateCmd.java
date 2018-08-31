@@ -66,7 +66,7 @@ public class TranslateCmd extends AbstractCommand {
 		final String langFrom = this.toISO(langs.get(0));
 		final String langTo = this.toISO(langs.get(1));
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 		try {
 			final String url = String.format("https://translate.googleapis.com/translate_a/single?"
 					+ "client=gtx"
@@ -78,7 +78,7 @@ public class TranslateCmd extends AbstractCommand {
 					+ "&q=%s",
 					NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
 
-			JSONArray result = new JSONArray(NetUtils.getJSON(url));
+			final JSONArray result = new JSONArray(NetUtils.getJSON(url));
 
 			if(langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
 				loadingMsg.stopTyping();
@@ -86,8 +86,8 @@ public class TranslateCmd extends AbstractCommand {
 						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
-			StringBuilder translatedText = new StringBuilder();
-			JSONArray translations = result.getJSONArray(0);
+			final StringBuilder translatedText = new StringBuilder();
+			final JSONArray translations = result.getJSONArray(0);
 			for(int i = 0; i < translations.length(); i++) {
 				translatedText.append(translations.getJSONArray(i).getString(0));
 			}

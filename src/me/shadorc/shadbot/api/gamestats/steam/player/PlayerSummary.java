@@ -15,19 +15,19 @@ public class PlayerSummary {
 	 * @return 1: Private 2: FriendsOnly 3: Public
 	 */
 	public int getCommunityVisibilityState() {
-		return communityVisibilityState;
+		return this.communityVisibilityState;
 	}
 
 	public String getAvatarFull() {
-		return avatarFull;
+		return this.avatarFull;
 	}
 
 	public String getPersonaName() {
-		return personaName;
+		return this.personaName;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("PlayerSummary [communityVisibilityState=%s, avatarFull=%s, personaName=%s]", communityVisibilityState, avatarFull, personaName);
+		return String.format("PlayerSummary [communityVisibilityState=%s, avatarFull=%s, personaName=%s]", this.communityVisibilityState, this.avatarFull, this.personaName);
 	}
 }

@@ -31,13 +31,13 @@ public class DiceCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(1, 2);
+		final List<String> args = context.requireArgs(1, 2);
 
 		// This value indicates if the user is trying to join or create a game
 		final boolean isJoining = args.size() == 1;
 
 		final String numStr = args.get(isJoining ? 0 : 1);
-		Integer num = NumberUtils.asIntBetween(numStr, 1, 6);
+		final Integer num = NumberUtils.asIntBetween(numStr, 1, 6);
 		if(num == null) {
 			throw new CommandException(String.format("`%s` is not a valid number, must be between 1 and 6.", numStr));
 		}

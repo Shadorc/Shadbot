@@ -33,7 +33,7 @@ public class RouletteCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(2);
+		final List<String> args = context.requireArgs(2);
 
 		final int bet = Utils.requireBet(context.getMember(), args.get(0), MAX_BET);
 

@@ -37,7 +37,7 @@ public class Config {
 	public static final Color BOT_COLOR = Color.decode(PROPERTIES.getProperty("color"));
 
 	public static Properties getProperties() {
-		Properties properties = new Properties();
+		final Properties properties = new Properties();
 		try (InputStream inputStream = Config.class.getClassLoader().getResourceAsStream("project.properties")) {
 			if(inputStream != null) {
 				properties.load(inputStream);

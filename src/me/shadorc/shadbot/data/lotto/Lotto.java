@@ -17,9 +17,9 @@ public class Lotto {
 	@JsonProperty("historic")
 	private LottoHistoric historic;
 	@JsonProperty("jackpot")
-	private AtomicInteger jackpot;
+	private final AtomicInteger jackpot;
 	@JsonProperty("gamblers")
-	private List<LottoGambler> gamblers;
+	private final List<LottoGambler> gamblers;
 
 	public Lotto() {
 		this.historic = null;
@@ -29,15 +29,15 @@ public class Lotto {
 
 	@Nullable
 	public LottoHistoric getHistoric() {
-		return historic;
+		return this.historic;
 	}
 
 	public int getJackpot() {
-		return jackpot.get();
+		return this.jackpot.get();
 	}
 
 	public List<LottoGambler> getGamblers() {
-		return gamblers;
+		return this.gamblers;
 	}
 
 	public void setHistoric(LottoHistoric historic) {
@@ -46,25 +46,25 @@ public class Lotto {
 
 	// TODO from UCDetector: Method "Lotto.addToJackpot(int)" has 0 references
 	public void addToJackpot(int coins) { // NO_UCD (unused code)
-		int newPool = jackpot.get() + (int) Math.ceil(coins / 100f);
-		jackpot.set(NumberUtils.between(newPool, 0, Config.MAX_COINS));
+		final int newPool = this.jackpot.get() + (int) Math.ceil(coins / 100f);
+		this.jackpot.set(NumberUtils.between(newPool, 0, Config.MAX_COINS));
 	}
 
 	public void addGambler(Snowflake guildId, Snowflake userId, int number) {
-		gamblers.add(new LottoGambler(guildId, userId, number));
+		this.gamblers.add(new LottoGambler(guildId, userId, number));
 	}
 
 	public void resetJackpot() {
-		jackpot.set(0);
+		this.jackpot.set(0);
 	}
 
 	public void resetGamblers() {
-		gamblers.clear();
+		this.gamblers.clear();
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Lotto [historic=%s, jackpot=%s, gamblers=%s]", historic, jackpot, gamblers);
+		return String.format("Lotto [historic=%s, jackpot=%s, gamblers=%s]", this.historic, this.jackpot, this.gamblers);
 	}
 
 }

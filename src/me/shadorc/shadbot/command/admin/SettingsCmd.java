@@ -33,7 +33,7 @@ public class SettingsCmd extends AbstractCommand {
 	private static final Map<SettingEnum, AbstractSetting> SETTINGS_MAP = new HashMap<>();
 
 	static {
-		Reflections reflections = new Reflections(SettingsCmd.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
+		final Reflections reflections = new Reflections(SettingsCmd.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
 		for(Class<?> settingClass : reflections.getTypesAnnotatedWith(Setting.class)) {
 			final String settingName = settingClass.getSimpleName();
 			if(!AbstractSetting.class.isAssignableFrom(settingClass)) {
@@ -43,7 +43,7 @@ public class SettingsCmd extends AbstractCommand {
 			}
 
 			try {
-				AbstractSetting settingCmd = (AbstractSetting) settingClass.getConstructor().newInstance();
+				final AbstractSetting settingCmd = (AbstractSetting) settingClass.getConstructor().newInstance();
 				if(SETTINGS_MAP.putIfAbsent(settingCmd.getSetting(), settingCmd) != null) {
 					LogUtils.error(String.format("Command name collision between %s and %s",
 							settingName, SETTINGS_MAP.get(settingCmd.getSetting()).getClass().getSimpleName()));
@@ -92,7 +92,7 @@ public class SettingsCmd extends AbstractCommand {
 
 	@Override
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
-		HelpBuilder embed = new HelpBuilder(this, context)
+		final HelpBuilder embed = new HelpBuilder(this, context)
 				.setThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
 				.setDescription("Change Shadbot's settings for this server.")
 				.addArg("name", false)

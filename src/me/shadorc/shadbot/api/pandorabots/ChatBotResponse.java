@@ -18,28 +18,28 @@ public class ChatBotResponse {
 	private int status;
 
 	public String getInput() {
-		return input;
+		return this.input;
 	}
 
 	public String getResponse() {
-		return StringUtils.normalizeSpace(response.replace("<br>", "\n"));
+		return StringUtils.normalizeSpace(this.response.replace("<br>", "\n"));
 	}
 
 	public String getCustId() {
-		return custid;
+		return this.custid;
 	}
 
 	public String getBotId() {
-		return botid;
+		return this.botid;
 	}
 
 	public int getStatus() {
-		return status;
+		return this.status;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("ChatBotResponse [input=%s, response=%s, custid=%s, botid=%s, status=%s]", input, response, custid, botid, status);
+		return String.format("ChatBotResponse [input=%s, response=%s, custid=%s, botid=%s, status=%s]", this.input, this.response, this.custid, this.botid, this.status);
 	}
 
 }

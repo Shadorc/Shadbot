@@ -28,44 +28,44 @@ public class AudioEventListener extends AudioEventAdapter {
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
 		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
-				FormatUtils.formatTrackName(track.getInfo())), guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+				FormatUtils.formatTrackName(track.getInfo())), this.guildMusic.getMessageChannel())
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 				.subscribe();
 	}
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 		if(endReason.mayStartNext) {
-			errorCount = 0; // Everything seems to be fine, reset error counter.
+			this.errorCount = 0; // Everything seems to be fine, reset error counter.
 			this.nextOrEnd();
 		}
 	}
 
 	@Override
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
-		errorCount++;
+		this.errorCount++;
 
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
 
-		if(errorCount <= 3) {
+		if(this.errorCount <= 3) {
 			BotUtils.sendMessage(
 					String.format(Emoji.RED_CROSS + " Sorry, %s. I'll try to play the next available song.", errMessage.toLowerCase()),
-					guildMusic.getMessageChannel())
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+					this.guildMusic.getMessageChannel())
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 					.subscribe();
 		}
 
-		if(errorCount == 3) {
+		if(this.errorCount == 3) {
 			BotUtils.sendMessage(Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until I find a music that can be played.",
-					guildMusic.getMessageChannel())
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+					this.guildMusic.getMessageChannel())
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 					.subscribe();
 			LogUtils.infof("{Guild ID: %d} Too many errors in a row. They will be ignored until a music can be played.",
-					guildMusic.getGuildId().asLong());
+					this.guildMusic.getGuildId().asLong());
 		}
 
 		LogUtils.infof("{Guild ID: %d} %sTrack exception: %s",
-				guildMusic.getGuildId().asLong(), errorCount > 3 ? "(Ignored) " : "", errMessage);
+				this.guildMusic.getGuildId().asLong(), this.errorCount > 3 ? "(Ignored) " : "", errMessage);
 
 		this.nextOrEnd();
 	}
@@ -73,18 +73,18 @@ public class AudioEventListener extends AudioEventAdapter {
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
 		BotUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
-				guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+				this.guildMusic.getMessageChannel())
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 				.subscribe();
-		LogUtils.warn(guildMusic.getClient(), String.format("{Guild ID: %d} Music stuck, skipping it.", guildMusic.getGuildId().asLong()));
+		LogUtils.warn(this.guildMusic.getClient(), String.format("{Guild ID: %d} Music stuck, skipping it.", this.guildMusic.getGuildId().asLong()));
 
 		this.nextOrEnd();
 	}
 
 	private void nextOrEnd() {
-		if(!guildMusic.getScheduler().nextTrack()) {
-			guildMusic.end()
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+		if(!this.guildMusic.getScheduler().nextTrack()) {
+			this.guildMusic.end()
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 					.subscribe();
 		}
 	}

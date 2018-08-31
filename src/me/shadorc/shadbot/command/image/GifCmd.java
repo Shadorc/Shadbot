@@ -30,13 +30,13 @@ public class GifCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			final URL url = new URL(String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
 					APIKeys.get(APIKey.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse(""))));
 
-			GiphyResponse giphy = Utils.MAPPER.readValue(url, GiphyResponse.class);
+			final GiphyResponse giphy = Utils.MAPPER.readValue(url, GiphyResponse.class);
 
 			if(giphy.getGifs() == null) {
 				throw new HttpStatusException("Giphy did not return valid JSON.", HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
@@ -48,7 +48,7 @@ public class GifCmd extends AbstractCommand {
 						.then();
 			}
 
-			EmbedCreateSpec embed = new EmbedCreateSpec()
+			final EmbedCreateSpec embed = new EmbedCreateSpec()
 					.setColor(Config.BOT_COLOR)
 					.setImage(giphy.getGifs().get(0).getImageUrl());
 			return loadingMsg.send(embed).then();

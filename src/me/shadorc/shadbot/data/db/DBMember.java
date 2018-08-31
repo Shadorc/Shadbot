@@ -25,30 +25,30 @@ public class DBMember {
 
 	@JsonIgnore
 	public Snowflake getGuildId() {
-		return Snowflake.of(guildId);
+		return Snowflake.of(this.guildId);
 	}
 
 	@JsonIgnore
 	public Snowflake getId() {
-		return Snowflake.of(id);
+		return Snowflake.of(this.id);
 	}
 
 	@JsonIgnore
 	public int getCoins() {
-		return coins.get();
+		return this.coins.get();
 	}
 
 	public void addCoins(int gains) {
-		coins.set(NumberUtils.between(this.getCoins() + gains, 0, Config.MAX_COINS));
+		this.coins.set(NumberUtils.between(this.getCoins() + gains, 0, Config.MAX_COINS));
 	}
 
 	public void resetCoins() {
-		coins.set(0);
+		this.coins.set(0);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("DBMember [guildId=%s, id=%s, coins=%s]", guildId, id, coins);
+		return String.format("DBMember [guildId=%s, id=%s, coins=%s]", this.guildId, this.id, this.coins);
 	}
 
 }

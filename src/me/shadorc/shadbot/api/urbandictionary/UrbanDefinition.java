@@ -16,24 +16,24 @@ public class UrbanDefinition {
 	private String permalink;
 
 	public String getDefinition() {
-		return StringUtils.remove(definition, "[", "]");
+		return StringUtils.remove(this.definition, "[", "]");
 	}
 
 	public String getExample() {
-		return StringUtils.remove(example, "[", "]");
+		return StringUtils.remove(this.example, "[", "]");
 	}
 
 	public String getWord() {
-		return word;
+		return this.word;
 	}
 
 	public String getPermalink() {
-		return permalink;
+		return this.permalink;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("UrbanDefinition [definition=%s, example=%s, word=%s, permalink=%s]", definition, example, word, permalink);
+		return String.format("UrbanDefinition [definition=%s, example=%s, word=%s, permalink=%s]", this.definition, this.example, this.word, this.permalink);
 	}
 
 }

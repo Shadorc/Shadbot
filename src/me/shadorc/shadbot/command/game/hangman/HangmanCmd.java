@@ -51,7 +51,7 @@ public class HangmanCmd extends AbstractCommand {
 		}
 
 		if(HARD_WORDS.isEmpty() || EASY_WORDS.isEmpty()) {
-			LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+			final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 			try {
 				this.load();
 			} catch (IOException err) {

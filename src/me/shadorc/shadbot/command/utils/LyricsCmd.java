@@ -38,9 +38,9 @@ public class LyricsCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		List<String> args = context.requireArgs(2, "-");
+		final List<String> args = context.requireArgs(2, "-");
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			final String artistSrch = NetUtils.encode(args.get(0).replaceAll("[^A-Za-z0-9]", "-"));
@@ -74,8 +74,8 @@ public class LyricsCmd extends AbstractCommand {
 				final String searchUrl = String.format("%s/search/%s-%s?", HOME_URL, artistSrch, titleSrch);
 
 				// Make a search request on the site
-				Document searchDoc = NetUtils.getDoc(searchUrl);
-				Element trackListElement = searchDoc.getElementsByClass("tracks list").first();
+				final Document searchDoc = NetUtils.getDoc(searchUrl);
+				final Element trackListElement = searchDoc.getElementsByClass("tracks list").first();
 				if(trackListElement == null) {
 					return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
 							context.getUsername(), context.getArg().get()))

@@ -49,14 +49,14 @@ public class UserInfoCmd extends AbstractCommand {
 					final String avatarUrl = tuple4.getT4();
 
 					final String creationDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(member.getId())).format(dateFormatter),
+							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(member.getId())).format(this.dateFormatter),
 							FormatUtils.formatLongDuration(DiscordUtils.getSnowflakeTimeFromID(member.getId())));
 
 					final String joinDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(member.getJoinTime()).format(dateFormatter),
+							TimeUtils.toLocalDate(member.getJoinTime()).format(this.dateFormatter),
 							FormatUtils.formatLongDuration(member.getJoinTime()));
 
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Info about user \"%s\"%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)
 							.setThumbnail(DiscordUtils.getAvatarUrl(member))
 							.addField("Display name", member.getDisplayName(), true)

@@ -105,8 +105,8 @@ public class StringUtils {
 	 * @return A {@link List} containing the quoted elements from {@code text}
 	 */
 	public static List<String> getQuotedElements(String text) {
-		List<String> matches = new ArrayList<>();
-		Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(text);
+		final List<String> matches = new ArrayList<>();
+		final Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(text);
 		while(matcher.find()) {
 			matches.add(matcher.group(1));
 		}

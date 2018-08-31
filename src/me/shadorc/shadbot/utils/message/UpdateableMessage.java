@@ -33,10 +33,10 @@ public class UpdateableMessage {
 	 * @param embed - the embed to send
 	 */
 	public Mono<Message> send(EmbedCreateSpec embed) {
-		return Mono.justOrEmpty(Optional.ofNullable(messageId))
-				.flatMap(messageId -> client.getMessageById(channelId, messageId))
+		return Mono.justOrEmpty(Optional.ofNullable(this.messageId))
+				.flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
 				.flatMap(Message::delete)
-				.then(BotUtils.sendMessage(embed, client.getMessageChannelById(channelId)))
+				.then(BotUtils.sendMessage(embed, this.client.getMessageChannelById(this.channelId)))
 				.doOnSuccess(message -> this.messageId = message.getId());
 	}
 

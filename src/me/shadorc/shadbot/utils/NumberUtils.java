@@ -28,7 +28,7 @@ public class NumberUtils {
 		}
 
 		try {
-			Integer nbr = Integer.parseInt(str);
+			final Integer nbr = Integer.parseInt(str);
 			return nbr > 0 ? nbr : null;
 		} catch (NumberFormatException err) {
 			return null;
@@ -47,7 +47,7 @@ public class NumberUtils {
 		}
 
 		try {
-			Integer nbr = Integer.parseInt(str);
+			final Integer nbr = Integer.parseInt(str);
 			if(!NumberUtils.isInRange(nbr, min, max)) {
 				return null;
 			}
@@ -67,7 +67,7 @@ public class NumberUtils {
 		}
 
 		try {
-			Long nbr = Long.parseLong(str);
+			final Long nbr = Long.parseLong(str);
 			return nbr > 0 ? nbr : null;
 		} catch (NumberFormatException err) {
 			return null;

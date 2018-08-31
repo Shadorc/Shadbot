@@ -10,16 +10,16 @@ public class WikipediaPage {
 	private String extract;
 
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 
 	public String getExtract() {
-		return extract;
+		return this.extract;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("WikipediaPage [title=%s, extract=%s]", title, extract);
+		return String.format("WikipediaPage [title=%s, extract=%s]", this.title, this.extract);
 	}
 
 }

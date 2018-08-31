@@ -10,16 +10,16 @@ public class HeroEliminations {
 	private String eliminationsPerLife;
 
 	public String getHero() {
-		return hero;
+		return this.hero;
 	}
 
 	public String getEliminationsPerLife() {
-		return eliminationsPerLife;
+		return this.eliminationsPerLife;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("HeroEliminations [hero=%s, eliminationsPerLife=%s]", hero, eliminationsPerLife);
+		return String.format("HeroEliminations [hero=%s, eliminationsPerLife=%s]", this.hero, this.eliminationsPerLife);
 	}
 
 }

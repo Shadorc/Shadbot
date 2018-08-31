@@ -8,12 +8,12 @@ public class HeroId {
 	private long id;
 
 	public long getId() {
-		return id;
+		return this.id;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("HeroId [id=%s]", id);
+		return String.format("HeroId [id=%s]", this.id);
 	}
 
 }

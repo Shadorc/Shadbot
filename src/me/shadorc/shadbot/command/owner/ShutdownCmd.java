@@ -31,7 +31,7 @@ public class ShutdownCmd extends AbstractCommand {
 			return Mono.empty();
 		}
 
-		List<String> args = context.requireArgs(2);
+		final List<String> args = context.requireArgs(2);
 
 		final Integer delay = NumberUtils.asPositiveInt(args.get(0));
 		if(delay == null) {

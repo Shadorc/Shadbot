@@ -8,12 +8,12 @@ public class R34Response {
 	private R34Posts posts;
 
 	public R34Posts getPosts() {
-		return posts;
+		return this.posts;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("R34Response [posts=%s]", posts);
+		return String.format("R34Response [posts=%s]", this.posts);
 	}
 
 }

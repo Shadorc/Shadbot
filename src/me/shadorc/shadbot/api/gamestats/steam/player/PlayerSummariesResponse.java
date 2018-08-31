@@ -8,12 +8,12 @@ public class PlayerSummariesResponse {
 	private PlayerSummaries response;
 
 	public PlayerSummaries getResponse() {
-		return response;
+		return this.response;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("PlayerSummariesResponse [response=%s]", response);
+		return String.format("PlayerSummariesResponse [response=%s]", this.response);
 	}
 
 }

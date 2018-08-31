@@ -34,7 +34,7 @@ public class TriviaCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		if(categories == null) {
+		if(this.categories == null) {
 			try {
 				final URL url = new URL("https://opentdb.com/api_category.php");
 				this.categories = Utils.MAPPER.readValue(url, TriviaCategoriesResponse.class);
@@ -47,20 +47,20 @@ public class TriviaCmd extends AbstractCommand {
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Trivia categories", null, avatarUrl)
-							.addField("ID", FormatUtils.format(categories.getIds(), id -> Integer.toString(id), "\n"), true)
-							.addField("Name", String.join("\n", categories.getNames()), true))
+							.addField("ID", FormatUtils.format(this.categories.getIds(), id -> Integer.toString(id), "\n"), true)
+							.addField("Name", String.join("\n", this.categories.getNames()), true))
 					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
 					.then();
 		}
 
-		Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
+		final Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
 
-		if(context.getArg().isPresent() && !categories.getIds().contains(categoryId)) {
+		if(context.getArg().isPresent() && !this.categories.getIds().contains(categoryId)) {
 			throw new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list of categories.",
 					context.getArg().get(), context.getPrefix(), this.getName()));
 		}
 
-		TriviaManager triviaManager = new TriviaManager(context, categoryId);
+		final TriviaManager triviaManager = new TriviaManager(context, categoryId);
 		if(MANAGERS.putIfAbsent(context.getChannelId(), triviaManager) == null) {
 			triviaManager.start();
 			return triviaManager.show();

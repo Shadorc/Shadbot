@@ -38,10 +38,10 @@ public class TemporaryMessage {
 	 * @return A Mono representing the message sent
 	 */
 	public Mono<Void> send(String content) {
-		return BotUtils.sendMessage(content, client.getMessageChannelById(channelId))
+		return BotUtils.sendMessage(content, this.client.getMessageChannelById(this.channelId))
 				.map(message -> this.messageId = message.getId())
-				.then(Mono.delay(Duration.of(delay, unit)))
-				.then(client.getMessageById(channelId, messageId))
+				.then(Mono.delay(Duration.of(this.delay, this.unit)))
+				.then(this.client.getMessageById(this.channelId, this.messageId))
 				.flatMap(Message::delete);
 	}
 

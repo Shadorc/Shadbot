@@ -17,15 +17,15 @@ public class PollCreateSpec {
 	}
 
 	public int getDuration() {
-		return duration;
+		return this.duration;
 	}
 
 	public String getQuestion() {
-		return question;
+		return this.question;
 	}
 
 	public Map<String, ReactionEmoji> getChoices() {
-		return choices;
+		return this.choices;
 	}
 
 }

@@ -27,7 +27,7 @@ public class DtcCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			final URL url = new URL(String.format("https://api.danstonchat.com/item/rest_item/random?comments=0&key=%s",
@@ -59,7 +59,7 @@ public class DtcCmd extends AbstractCommand {
 	private String format(String line) {
 		// Set the user name as bold
 		if(line.contains(" ")) {
-			int index = line.indexOf(' ');
+			final int index = line.indexOf(' ');
 			return String.format("**%s** %s", line.substring(0, index), line.substring(index + 1));
 		}
 		return line;

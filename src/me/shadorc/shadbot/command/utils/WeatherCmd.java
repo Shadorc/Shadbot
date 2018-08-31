@@ -39,10 +39,10 @@ public class WeatherCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(1, 2, ",");
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			OWM owm = new OWM(APIKeys.get(APIKey.OPENWEATHERMAP_API_KEY));
+			final OWM owm = new OWM(APIKeys.get(APIKey.OPENWEATHERMAP_API_KEY));
 			owm.setUnit(Unit.METRIC);
 
 			CurrentWeather currentWeather;
@@ -71,7 +71,7 @@ public class WeatherCmd extends AbstractCommand {
 									String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
 									avatarUrl)
 							.setThumbnail(weather.getIconLink())
-							.setDescription(String.format("Last updated %s", dateFormatter.format(currentWeather.getDateTime())))
+							.setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
 							.addField(Emoji.CLOUD + " Clouds", StringUtils.capitalizeFully(weather.getDescription()), true)
 							.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
 							.addField(Emoji.RAIN + " Rain", rain, true)

@@ -8,12 +8,12 @@ public class WikipediaResponse {
 	private WikipediaQuery query;
 
 	public WikipediaQuery getQuery() {
-		return query;
+		return this.query;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("WikipediaResponse [query=%s]", query);
+		return String.format("WikipediaResponse [query=%s]", this.query);
 	}
 
 }

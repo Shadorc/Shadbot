@@ -63,7 +63,7 @@ public class LottoCmd extends AbstractCommand {
 			throw new CommandException("You're already participating.");
 		}
 
-		Integer num = NumberUtils.asIntBetween(arg, MIN_NUM, MAX_NUM);
+		final Integer num = NumberUtils.asIntBetween(arg, MIN_NUM, MAX_NUM);
 		if(num == null) {
 			throw new CommandException(String.format("`%s` is not a valid number, it must be between %d and %d.",
 					arg, MIN_NUM, MAX_NUM));
@@ -80,11 +80,11 @@ public class LottoCmd extends AbstractCommand {
 	}
 
 	private Mono<Message> show(Context context) {
-		List<LottoGambler> gamblers = LottoManager.getLotto().getGamblers();
+		final List<LottoGambler> gamblers = LottoManager.getLotto().getGamblers();
 
 		return context.getAvatarUrl()
 				.map(avatarUrl -> {
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Lotto", null, avatarUrl)
 							.setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 							.setDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
@@ -146,14 +146,14 @@ public class LottoCmd extends AbstractCommand {
 		LogUtils.infof("Lottery draw started...");
 		final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
-		List<LottoGambler> winners = LottoManager.getLotto().getGamblers().stream()
+		final List<LottoGambler> winners = LottoManager.getLotto().getGamblers().stream()
 				.filter(gambler -> gambler.getNumber() == winningNum)
 				.collect(Collectors.toList());
 
 		for(LottoGambler winner : winners) {
 			client.getUserById(winner.getUserId())
 					.flatMap(user -> {
-						int coins = (int) Math.ceil((double) LottoManager.getLotto().getJackpot() / winners.size());
+						final int coins = (int) Math.ceil((double) LottoManager.getLotto().getJackpot() / winners.size());
 						DatabaseManager.getDBMember(winner.getGuildId(), winner.getUserId()).addCoins(coins);
 						return BotUtils.sendMessage(
 								String.format("Congratulations, you have the winning Lotto number! You earn %s.", FormatUtils.formatCoins(coins)),

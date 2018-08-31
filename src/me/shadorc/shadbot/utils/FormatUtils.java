@@ -54,9 +54,9 @@ public class FormatUtils {
 	}
 
 	public static String formatCustomDate(long millis) {
-		long minutes = millis / 1000 / 60;
-		long hours = minutes / 60;
-		long days = hours / 24;
+		final long minutes = millis / 1000 / 60;
+		final long hours = minutes / 60;
+		final long days = hours / 24;
 		return String.format("%s%s%s",
 				days > 0 ? StringUtils.pluralOf(days, "day") + " " : "",
 				hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "",
@@ -64,8 +64,8 @@ public class FormatUtils {
 	}
 
 	public static String formatLongDuration(Instant instant) {
-		Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
-		String str = period.getUnits().stream()
+		final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
+		final String str = period.getUnits().stream()
 				.filter(unit -> period.get(unit) != 0)
 				.map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
 				.collect(Collectors.joining(", "));
@@ -80,7 +80,7 @@ public class FormatUtils {
 	}
 
 	public static String formatTrackName(AudioTrackInfo info) {
-		StringBuilder strBuilder = new StringBuilder();
+		final StringBuilder strBuilder = new StringBuilder();
 		if("Unknown artist".equals(info.author)) {
 			strBuilder.append(info.title);
 		} else {

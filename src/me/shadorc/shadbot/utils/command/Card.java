@@ -28,11 +28,11 @@ public class Card {
 		}
 
 		public Color getColor() {
-			return color;
+			return this.color;
 		}
 
 		public Emoji getEmoji() {
-			return emoji;
+			return this.emoji;
 		}
 	}
 
@@ -56,15 +56,15 @@ public class Card {
 	}
 
 	public int getNum() {
-		return num;
+		return this.num;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public Sign getSign() {
-		return sign;
+		return this.sign;
 	}
 
 	public static Card pick() {
@@ -72,7 +72,7 @@ public class Card {
 	}
 
 	public static List<Card> pick(int count) {
-		List<Card> cards = new ArrayList<>();
+		final List<Card> cards = new ArrayList<>();
 		for(int i = 0; i < count; i++) {
 			cards.add(Card.pick());
 		}

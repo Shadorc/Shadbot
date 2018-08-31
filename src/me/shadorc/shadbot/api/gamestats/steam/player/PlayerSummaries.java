@@ -10,12 +10,12 @@ public class PlayerSummaries {
 	private List<PlayerSummary> players;
 
 	public List<PlayerSummary> getPlayers() {
-		return players;
+		return this.players;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("PlayerSummaries [players=%s]", players);
+		return String.format("PlayerSummaries [players=%s]", this.players);
 	}
 
 }

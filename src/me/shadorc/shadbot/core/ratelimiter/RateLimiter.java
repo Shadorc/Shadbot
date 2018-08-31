@@ -32,13 +32,13 @@ public class RateLimiter {
 		this.guildsLimitedMap = new ConcurrentHashMap<>();
 		this.max = max;
 		this.duration = Duration.of(cooldown, unit);
-		this.bandwidth = Bandwidth.classic(max, Refill.intervally(max, duration));
+		this.bandwidth = Bandwidth.classic(max, Refill.intervally(max, this.duration));
 	}
 
 	public boolean isLimitedAndWarn(DiscordClient client, Snowflake guildId, Snowflake channelId, Snowflake userId) {
-		guildsLimitedMap.putIfAbsent(guildId, new LimitedGuild(bandwidth));
+		this.guildsLimitedMap.putIfAbsent(guildId, new LimitedGuild(this.bandwidth));
 
-		final LimitedUser limitedUser = guildsLimitedMap.get(guildId)
+		final LimitedUser limitedUser = this.guildsLimitedMap.get(guildId)
 				.getUser(userId);
 
 		// The token could not been consumed, the user is limited
@@ -60,8 +60,8 @@ public class RateLimiter {
 				.map(author -> {
 					final String username = author.getUsername();
 					final String message = Utils.randValue(TextUtils.SPAM_MESSAGES);
-					final String maxNum = StringUtils.pluralOf(max, "time");
-					final String durationStr = DurationFormatUtils.formatDurationWords(duration.toMillis(), true, true);
+					final String maxNum = StringUtils.pluralOf(this.max, "time");
+					final String durationStr = DurationFormatUtils.formatDurationWords(this.duration.toMillis(), true, true);
 					return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
 							username, message, maxNum, durationStr);
 				})

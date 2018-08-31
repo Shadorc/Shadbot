@@ -40,11 +40,11 @@ public class PlaylistCmd extends AbstractCommand {
 			return "**The playlist is empty.**";
 		}
 
-		StringBuilder playlist = new StringBuilder(String.format("**%s in the playlist:**\n", StringUtils.pluralOf(queue.size(), "music")));
+		final StringBuilder playlist = new StringBuilder(String.format("**%s in the playlist:**\n", StringUtils.pluralOf(queue.size(), "music")));
 
 		int count = 1;
 		for(AudioTrack track : queue) {
-			String name = String.format("%n\t**%d.** %s", count, FormatUtils.formatTrackName(track.getInfo()));
+			final String name = String.format("%n\t**%d.** %s", count, FormatUtils.formatTrackName(track.getInfo()));
 			if(playlist.length() + name.length() < 1800) {
 				playlist.append(name);
 			} else {

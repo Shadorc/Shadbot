@@ -45,16 +45,16 @@ public class Utils {
 	public static double getProcessCpuLoad() {
 		double cpuLoad;
 		try {
-			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-			ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
-			AttributeList list = mbs.getAttributes(name, new String[] { "ProcessCpuLoad" });
+			final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+			final ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+			final AttributeList list = mbs.getAttributes(name, new String[] { "ProcessCpuLoad" });
 
 			if(list.isEmpty()) {
 				return Double.NaN;
 			}
 
-			Attribute att = (Attribute) list.get(0);
-			Double value = (Double) att.getValue();
+			final Attribute att = (Attribute) list.get(0);
+			final Double value = (Double) att.getValue();
 
 			if(value == -1.0) {
 				return Double.NaN;
@@ -99,11 +99,11 @@ public class Utils {
 	 * @return A {@link HashBasedTable} based on {@code map}
 	 */
 	public static <R, C, V> HashBasedTable<R, C, V> toTable(Map<R, Map<C, V>> map) {
-		HashBasedTable<R, C, V> table = HashBasedTable.create();
+		final HashBasedTable<R, C, V> table = HashBasedTable.create();
 		for(R rowKey : map.keySet()) {
-			Map<C, V> rowMap = map.get(rowKey);
+			final Map<C, V> rowMap = map.get(rowKey);
 			for(C columnKey : rowMap.keySet()) {
-				V value = rowMap.get(columnKey);
+				final V value = rowMap.get(columnKey);
 				table.put(rowKey, columnKey, value);
 			}
 		}
@@ -135,7 +135,7 @@ public class Utils {
 	 *             is superior to {code maxValue}
 	 */
 	public static int requireBet(Member member, String betStr, int maxValue) {
-		Integer bet = NumberUtils.asPositiveInt(betStr);
+		final Integer bet = NumberUtils.asPositiveInt(betStr);
 		if(bet == null) {
 			throw new CommandException(String.format("`%s` is not a valid amount for coins.", betStr));
 		}

@@ -22,7 +22,7 @@ public class MessageInterceptorManager {
 
 	public static void removeInterceptor(Snowflake channelId, MessageInterceptor interceptor) {
 		synchronized (CHANNELS_INTERCEPTORS) {
-			Collection<MessageInterceptor> listeners = CHANNELS_INTERCEPTORS.get(channelId);
+			final Collection<MessageInterceptor> listeners = CHANNELS_INTERCEPTORS.get(channelId);
 			listeners.remove(interceptor);
 			if(listeners.isEmpty()) {
 				CHANNELS_INTERCEPTORS.removeAll(channelId);

@@ -17,7 +17,7 @@ public class BaguetteCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		EmbedCreateSpec embed = new EmbedCreateSpec()
+		final EmbedCreateSpec embed = new EmbedCreateSpec()
 				.setColor(Config.BOT_COLOR)
 				.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg");
 		return BotUtils.sendMessage(embed, context.getChannel()).then();

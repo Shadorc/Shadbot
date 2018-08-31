@@ -51,7 +51,7 @@ public class FortniteCmd extends AbstractCommand {
 
 		final String epicNickname = args.get(1);
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			final String encodedNickname = NetUtils.encode(epicNickname);
@@ -70,7 +70,7 @@ public class FortniteCmd extends AbstractCommand {
 						HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
 			}
 
-			FortniteResponse fortnite = Utils.MAPPER.readValue(response.parse().body().html(), FortniteResponse.class);
+			final FortniteResponse fortnite = Utils.MAPPER.readValue(response.parse().body().html(), FortniteResponse.class);
 
 			if(fortnite.getError().map("Player Not Found"::equals).orElse(false)) {
 				return loadingMsg.send(

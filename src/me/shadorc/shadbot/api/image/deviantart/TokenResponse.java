@@ -10,16 +10,16 @@ public class TokenResponse {
 	private int expiresIn;
 
 	public String getAccessToken() {
-		return accessToken;
+		return this.accessToken;
 	}
 
 	public int getExpiresIn() {
-		return expiresIn;
+		return this.expiresIn;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("TokenResponse [accessToken=%s, expiresIn=%s]", accessToken, expiresIn);
+		return String.format("TokenResponse [accessToken=%s, expiresIn=%s]", this.accessToken, this.expiresIn);
 	}
 
 }

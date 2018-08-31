@@ -59,11 +59,11 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	@Override
 	public void trackLoaded(AudioTrack track) {
-		guildMusic.joinVoiceChannel(voiceChannelId).subscribe();
-		if(!guildMusic.getScheduler().startOrQueue(track, putFirst)) {
+		this.guildMusic.joinVoiceChannel(this.voiceChannelId).subscribe();
+		if(!this.guildMusic.getScheduler().startOrQueue(track, this.putFirst)) {
 			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-					FormatUtils.formatTrackName(track.getInfo())), guildMusic.getMessageChannel())
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+					FormatUtils.formatTrackName(track.getInfo())), this.guildMusic.getMessageChannel())
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 					.subscribe();
 		}
 	}
@@ -78,15 +78,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			return;
 		}
 
-		if(identifier.startsWith(YT_SEARCH) || identifier.startsWith(SC_SEARCH)) {
-			guildMusic.setDj(djId);
-			guildMusic.setWaitingForChoice(true);
+		if(this.identifier.startsWith(YT_SEARCH) || this.identifier.startsWith(SC_SEARCH)) {
+			this.guildMusic.setDj(this.djId);
+			this.guildMusic.setWaitingForChoice(true);
 
 			final String choices = FormatUtils.numberedList(5, tracks.size(),
 					count -> String.format("\t**%d.** %s",
 							count, FormatUtils.formatTrackName(tracks.get(count - 1).getInfo())));
 
-			DiscordUtils.getAvatarUrl(guildMusic.getClient().getUserById(guildMusic.getDjId()))
+			DiscordUtils.getAvatarUrl(this.guildMusic.getClient().getUserById(this.guildMusic.getDjId()))
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Music results", null, avatarUrl)
 							.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
@@ -95,39 +95,39 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 									+ "\nExample: 1,3,4"
 									+ "\n\n" + choices)
 							.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-									DatabaseManager.getDBGuild(guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
-					.flatMap(embed -> BotUtils.sendMessage(embed, guildMusic.getMessageChannel()))
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+									DatabaseManager.getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
+					.flatMap(embed -> BotUtils.sendMessage(embed, this.guildMusic.getMessageChannel()))
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 					.subscribe();
 
-			stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
+			this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
 					.then(Mono.fromRunnable(this::stopWaiting))
 					.subscribe();
 
-			resultsTracks = new ArrayList<>(tracks);
-			MessageInterceptorManager.addInterceptor(guildMusic.getMessageChannelId(), this);
+			this.resultsTracks = new ArrayList<>(tracks);
+			MessageInterceptorManager.addInterceptor(this.guildMusic.getMessageChannelId(), this);
 			return;
 		}
 
 		final Flux<Void> flux = Flux.empty();
-		flux.concatWith(guildMusic.joinVoiceChannel(voiceChannelId));
+		flux.concatWith(this.guildMusic.joinVoiceChannel(this.voiceChannelId));
 
 		int musicsAdded = 0;
 		for(AudioTrack track : tracks) {
-			guildMusic.getScheduler().startOrQueue(track, putFirst);
+			this.guildMusic.getScheduler().startOrQueue(track, this.putFirst);
 			musicsAdded++;
-			if(guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-					&& !PremiumManager.isPremium(guildMusic.getGuildId(), djId)) {
-				flux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getMessageChannel())
-						.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+			if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
+					&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), this.djId)) {
+				flux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, this.guildMusic.getMessageChannel())
+						.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 						.then());
 				break;
 			}
 		}
 
 		flux.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded),
-				guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+				this.guildMusic.getMessageChannel())
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 				.then());
 
 		flux.subscribe();
@@ -136,10 +136,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	@Override
 	public void loadFailed(FriendlyException err) {
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
-		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), this.guildMusic.getMessageChannel())
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 				.subscribe();
-		LogUtils.infof("{Guild ID: %d} Load failed: %s", guildMusic.getGuildId().asLong(), errMessage);
+		LogUtils.infof("{Guild ID: %d} Load failed: %s", this.guildMusic.getGuildId().asLong(), errMessage);
 		this.leaveIfStopped();
 	}
 
@@ -150,16 +150,16 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	private void onNoMatches() {
 		BotUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
-				StringUtils.remove(identifier, YT_SEARCH, SC_SEARCH)), guildMusic.getMessageChannel())
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), guildMusic.getGuildId()))
+				StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), this.guildMusic.getMessageChannel())
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 				.subscribe();
-		LogUtils.infof("{Guild ID: %d} No matches: %s", guildMusic.getGuildId().asLong(), identifier);
+		LogUtils.infof("{Guild ID: %d} No matches: %s", this.guildMusic.getGuildId().asLong(), this.identifier);
 		this.leaveIfStopped();
 	}
 
 	private void leaveIfStopped() {
-		if(guildMusic.getScheduler().isStopped()) {
-			guildMusic.leaveVoiceChannel();
+		if(this.guildMusic.getScheduler().isStopped()) {
+			this.guildMusic.leaveVoiceChannel();
 		}
 	}
 
@@ -175,15 +175,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		final Snowflake authorId = message.getAuthorId().get();
 		String content = message.getContent().get().toLowerCase();
 
-		if(!authorId.equals(guildMusic.getDjId())) {
+		if(!authorId.equals(this.guildMusic.getDjId())) {
 			return Mono.just(false);
 		}
 
-		final String prefix = DatabaseManager.getDBGuild(guildMusic.getGuildId()).getPrefix();
+		final String prefix = DatabaseManager.getDBGuild(this.guildMusic.getGuildId()).getPrefix();
 		if(content.equals(prefix + "cancel")) {
 			this.stopWaiting();
 			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
-					event.getMember().map(User::getUsername).get()), guildMusic.getMessageChannel())
+					event.getMember().map(User::getUsername).get()), this.guildMusic.getMessageChannel())
 					.thenReturn(true);
 		}
 
@@ -193,10 +193,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			content = StringUtils.remove(content, name);
 		}
 
-		List<Integer> choices = new ArrayList<>();
+		final List<Integer> choices = new ArrayList<>();
 		for(String choiceStr : content.split(",")) {
 			// If the choice is not valid, ignore the message
-			Integer num = NumberUtils.asIntBetween(choiceStr, 1, Math.min(Config.MUSIC_SEARCHES, resultsTracks.size()));
+			final Integer num = NumberUtils.asIntBetween(choiceStr, 1, Math.min(Config.MUSIC_SEARCHES, this.resultsTracks.size()));
 			if(num == null) {
 				return Mono.just(false);
 			}
@@ -207,20 +207,20 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		}
 
 		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel again
-		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(guildMusic.getGuildId(), guildMusic);
-		Mono<Void> joinMono = guildMusic.joinVoiceChannel(voiceChannelId);
+		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(this.guildMusic.getGuildId(), this.guildMusic);
+		final Mono<Void> joinMono = this.guildMusic.joinVoiceChannel(this.voiceChannelId);
 
 		final Flux<Message> messageFlux = Flux.empty();
 		for(int choice : choices) {
-			AudioTrack track = resultsTracks.get(choice - 1);
-			if(!guildMusic.getScheduler().startOrQueue(track, putFirst)) {
+			final AudioTrack track = this.resultsTracks.get(choice - 1);
+			if(!this.guildMusic.getScheduler().startOrQueue(track, this.putFirst)) {
 				messageFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-						FormatUtils.formatTrackName(track.getInfo())), guildMusic.getMessageChannel()));
+						FormatUtils.formatTrackName(track.getInfo())), this.guildMusic.getMessageChannel()));
 			}
 
-			if(guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-					&& !PremiumManager.isPremium(guildMusic.getGuildId(), authorId)) {
-				messageFlux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, guildMusic.getMessageChannel()));
+			if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
+					&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), authorId)) {
+				messageFlux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, this.guildMusic.getMessageChannel()));
 				break;
 			}
 		}
@@ -232,10 +232,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	}
 
 	private void stopWaiting() {
-		stopWaitingTask.dispose();
-		MessageInterceptorManager.removeInterceptor(guildMusic.getMessageChannelId(), this);
-		guildMusic.setWaitingForChoice(false);
-		resultsTracks.clear();
+		this.stopWaitingTask.dispose();
+		MessageInterceptorManager.removeInterceptor(this.guildMusic.getMessageChannelId(), this);
+		this.guildMusic.setWaitingForChoice(false);
+		this.resultsTracks.clear();
 		this.leaveIfStopped();
 	}
 

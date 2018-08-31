@@ -31,10 +31,10 @@ public class ThisDayCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			Document doc = NetUtils.getDoc(HOME_URL);
+			final Document doc = NetUtils.getDoc(HOME_URL);
 
 			final String date = doc.getElementsByClass("date-large")
 					.first()

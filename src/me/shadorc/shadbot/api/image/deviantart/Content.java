@@ -8,12 +8,12 @@ public class Content {
 	private String source;
 
 	public String getSource() {
-		return source;
+		return this.source;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Content [source=%s]", source);
+		return String.format("Content [source=%s]", this.source);
 	}
 
 }

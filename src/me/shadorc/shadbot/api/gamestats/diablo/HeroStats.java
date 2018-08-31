@@ -8,12 +8,12 @@ public class HeroStats {
 	private double damage;
 
 	public double getDamage() {
-		return damage;
+		return this.damage;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("HeroStats [damage=%s]", damage);
+		return String.format("HeroStats [damage=%s]", this.damage);
 	}
 
 }

@@ -31,12 +31,12 @@ public class UrbanCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			final URL url = new URL(String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(arg)));
 
-			UrbanDictionaryResponse urbanDictionary = Utils.MAPPER.readValue(url, UrbanDictionaryResponse.class);
+			final UrbanDictionaryResponse urbanDictionary = Utils.MAPPER.readValue(url, UrbanDictionaryResponse.class);
 
 			if(urbanDictionary.getDefinitions().isEmpty()) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",
@@ -44,7 +44,7 @@ public class UrbanCmd extends AbstractCommand {
 						.then();
 			}
 
-			UrbanDefinition urbanDefinition = urbanDictionary.getDefinitions().get(0);
+			final UrbanDefinition urbanDefinition = urbanDictionary.getDefinitions().get(0);
 
 			final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(), DiscordUtils.DESCRIPTION_CONTENT_LIMIT);
 			final String example = StringUtils.abbreviate(urbanDefinition.getExample(), DiscordUtils.FIELD_CONTENT_LIMIT);

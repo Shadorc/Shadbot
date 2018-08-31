@@ -30,21 +30,21 @@ public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
 	}
 
 	public void log(E key) {
-		map.computeIfAbsent(key.toString(), ignored -> new AtomicLong(0)).incrementAndGet();
+		this.map.computeIfAbsent(key.toString(), ignored -> new AtomicLong(0)).incrementAndGet();
 	}
 
 	public Map<String, AtomicLong> getMap() {
-		return map;
+		return this.map;
 	}
 
 	public AtomicLong getValue(String key) {
-		return map.getOrDefault(key, new AtomicLong(0));
+		return this.map.getOrDefault(key, new AtomicLong(0));
 	}
 
 	@Override
 	public void save() throws IOException {
 		try (FileWriter writer = new FileWriter(this.getFile())) {
-			writer.write(Utils.MAPPER.writeValueAsString(map));
+			writer.write(Utils.MAPPER.writeValueAsString(this.map));
 		}
 	}
 

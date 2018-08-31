@@ -72,7 +72,7 @@ public class PlayCmd extends AbstractCommand {
 					guildMusic.setMessageChannel(context.getChannelId());
 
 					final boolean putFirst = context.getCommandName().endsWith("first");
-					AudioLoadResultListener resultListener = new AudioLoadResultListener(
+					final AudioLoadResultListener resultListener = new AudioLoadResultListener(
 							guildMusic, context.getAuthorId(), voiceChannelId, identifier, putFirst);
 					GuildMusicManager.AUDIO_PLAYER_MANAGER.loadItemOrdered(guildMusic, identifier, resultListener);
 

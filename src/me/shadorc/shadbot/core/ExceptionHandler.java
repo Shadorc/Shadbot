@@ -42,22 +42,22 @@ public class ExceptionHandler {
 	}
 
 	public Mono<Message> handle() {
-		if(ExceptionHandler.isCommandException(err)) {
+		if(ExceptionHandler.isCommandException(this.err)) {
 			return this.onCommandException();
 		}
-		if(ExceptionHandler.isMissingArgumentException(err)) {
+		if(ExceptionHandler.isMissingArgumentException(this.err)) {
 			return this.onMissingArgumentException();
 		}
-		if(ExceptionHandler.isNoMusicException(err)) {
+		if(ExceptionHandler.isNoMusicException(this.err)) {
 			return this.onNoMusicException();
 		}
-		if(ExceptionHandler.isUnavailable(err)) {
+		if(ExceptionHandler.isUnavailable(this.err)) {
 			return this.onUnavailable();
 		}
-		if(ExceptionHandler.isUnreacheable(err)) {
+		if(ExceptionHandler.isUnreacheable(this.err)) {
 			return this.onUnreacheable();
 		}
-		if(ExceptionHandler.isForbidden(err)) {
+		if(ExceptionHandler.isForbidden(this.err)) {
 			return this.onForbidden();
 		}
 		return this.onUnknown();
@@ -96,43 +96,43 @@ public class ExceptionHandler {
 	}
 
 	private Mono<Message> onCommandException() {
-		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_ILLEGAL_ARG, command);
+		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_ILLEGAL_ARG, this.command);
 		return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
-				context.getUsername(), err.getMessage()), context.getChannel());
+				this.context.getUsername(), this.err.getMessage()), this.context.getChannel());
 	}
 
 	private Mono<Message> onMissingArgumentException() {
-		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, command);
-		return command.getHelp(context)
-				.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, context.getChannel()));
+		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, this.command);
+		return this.command.getHelp(this.context)
+				.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, this.context.getChannel()));
 	}
 
 	private Mono<Message> onNoMusicException() {
-		return BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", context.getChannel());
+		return BotUtils.sendMessage(Emoji.MUTE + " No currently playing music.", this.context.getChannel());
 	}
 
 	private Mono<Message> onUnavailable() {
-		LogUtils.warn(context.getClient(),
-				String.format("[%s] Service unavailable.", command.getClass().getSimpleName()),
-				context.getContent());
+		LogUtils.warn(this.context.getClient(),
+				String.format("[%s] Service unavailable.", this.command.getClass().getSimpleName()),
+				this.context.getContent());
 		return BotUtils.sendMessage(
 				String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... "
 						+ "This is not my fault, I promise ! Try again later.",
-						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
+						this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
 	}
 
 	private Mono<Message> onUnreacheable() {
-		LogUtils.warn(context.getClient(),
-				String.format("[%s] Service unreachable.", command.getClass().getSimpleName()),
-				context.getContent());
+		LogUtils.warn(this.context.getClient(),
+				String.format("[%s] Service unreachable.", this.command.getClass().getSimpleName()),
+				this.context.getContent());
 		return BotUtils.sendMessage(
 				String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... "
 						+ "This is not my fault, I promise ! Try again later.",
-						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
+						this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
 	}
 
 	private Mono<Message> onForbidden() {
-		final List<Permission> permissions = new ArrayList<>(command.getPermissions());
+		final List<Permission> permissions = new ArrayList<>(this.command.getPermissions());
 		if(permissions.isEmpty()) {
 			permissions.add(Permission.EMBED_LINKS);
 		}
@@ -144,20 +144,20 @@ public class ExceptionHandler {
 		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I can't execute this command due to the lack of permission."
 				+ "%nPlease, check my permissions and channel-specific ones to verify that %s %s checked.",
 				FormatUtils.format(permissionsStr, str -> String.format("**%s**", str), " and "),
-				permissionsStr.size() > 1 ? "are" : "is"), context.getChannel())
+				permissionsStr.size() > 1 ? "are" : "is"), this.context.getChannel())
 				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission(s): %s",
-						context.getGuildId().asLong(), String.join(", ", permissionsStr)))
-				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), context.getGuildId()));
+						this.context.getGuildId().asLong(), String.join(", ", permissionsStr)))
+				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), this.context.getGuildId()));
 	}
 
 	private Mono<Message> onUnknown() {
-		LogUtils.error(context.getClient(),
-				err,
-				String.format("[%s] An unknown error occurred.", command.getClass().getSimpleName()),
-				context.getContent());
+		LogUtils.error(this.context.getClient(),
+				this.err,
+				String.format("[%s] An unknown error occurred.", this.command.getClass().getSimpleName()),
+				this.context.getContent());
 		return BotUtils.sendMessage(
 				String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
-						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
+						this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
 	}
 
 }

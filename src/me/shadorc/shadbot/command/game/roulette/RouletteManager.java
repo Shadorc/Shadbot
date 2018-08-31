@@ -65,14 +65,14 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 	@Override
 	public Mono<Void> show() {
 		return this.getContext().getAvatarUrl()
-				.zipWith(Flux.fromIterable(playersPlace.keySet())
+				.zipWith(Flux.fromIterable(this.playersPlace.keySet())
 						.flatMap(userId -> this.getContext().getClient().getUserById(userId))
 						.collectList())
 				.map(avatarUrlAndUsers -> {
 					final String avatarUrl = avatarUrlAndUsers.getT1();
 					final List<User> users = avatarUrlAndUsers.getT2();
 
-					EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Roulette Game", null, avatarUrl)
 							.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
 							.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
@@ -80,11 +80,11 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 									this.getContext().getPrefix(), this.getContext().getCommandName(),
 									FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
 							.addField("Player (Bet)", FormatUtils.format(users,
-									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.formatCoins(playersPlace.get(user.getId()).getT1())), "\n"), true)
-							.addField("Place", playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
+									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.formatCoins(this.playersPlace.get(user.getId()).getT1())), "\n"), true)
+							.addField("Place", this.playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
 
-					if(results != null) {
-						embed.addField("Results", results, false);
+					if(this.results != null) {
+						embed.addField("Results", this.results, false);
 					}
 
 					if(this.isTaskDone()) {
@@ -95,20 +95,20 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 
 					return embed;
 				})
-				.flatMap(embed -> updateableMessage.send(embed))
+				.flatMap(embed -> this.updateableMessage.send(embed))
 				.then();
 	}
 
 	public Mono<Void> spin() {
 		final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
-		return Flux.fromIterable(playersPlace.keySet())
+		return Flux.fromIterable(this.playersPlace.keySet())
 				.flatMap(this.getContext().getClient()::getUserById)
 				.map(user -> {
-					final int bet = playersPlace.get(user.getId()).getT1();
-					final String place = playersPlace.get(user.getId()).getT2();
+					final int bet = this.playersPlace.get(user.getId()).getT1();
+					final String place = this.playersPlace.get(user.getId()).getT2();
 					final Place placeEnum = Utils.getEnum(Place.class, place);
 
-					Map<Place, Boolean> testsMap = Map.of(
+					final Map<Place, Boolean> testsMap = Map.of(
 							Place.RED, RED_NUMS.contains(winningPlace),
 							Place.BLACK, !RED_NUMS.contains(winningPlace),
 							Place.LOW, NumberUtils.isInRange(winningPlace, 1, 19),
@@ -149,7 +149,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 	 * @return true if the user was not participating, false otherwise
 	 */
 	protected boolean addPlayer(Snowflake userId, Integer bet, String place) {
-		return playersPlace.putIfAbsent(userId, Tuples.of(bet, place)) == null;
+		return this.playersPlace.putIfAbsent(userId, Tuples.of(bet, place)) == null;
 	}
 
 	@Override

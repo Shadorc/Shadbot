@@ -40,14 +40,14 @@ public class CounterStrikeCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
 			String identificator = arg;
 
 			// The user provided an URL that can contains a pseudo or an ID
 			if(arg.contains("/")) {
-				List<String> splittedURl = StringUtils.split(arg, "/");
+				final List<String> splittedURl = StringUtils.split(arg, "/");
 				identificator = splittedURl.get(splittedURl.size() - 1);
 			}
 
@@ -60,17 +60,17 @@ public class CounterStrikeCmd extends AbstractCommand {
 			else {
 				final URL resolveVanityUrl = new URL(String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
 						APIKeys.get(APIKey.STEAM_API_KEY), NetUtils.encode(identificator)));
-				ResolveVanityUrlResponse response = Utils.MAPPER.readValue(resolveVanityUrl, ResolveVanityUrlResponse.class);
+				final ResolveVanityUrlResponse response = Utils.MAPPER.readValue(resolveVanityUrl, ResolveVanityUrlResponse.class);
 				steamId = response.getResponse().getSteamId();
 			}
 
 			final URL playerSummariesUrl = new URL(String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
 					APIKeys.get(APIKey.STEAM_API_KEY), steamId));
 
-			PlayerSummariesResponse playerSummary = Utils.MAPPER.readValue(playerSummariesUrl, PlayerSummariesResponse.class);
+			final PlayerSummariesResponse playerSummary = Utils.MAPPER.readValue(playerSummariesUrl, PlayerSummariesResponse.class);
 
 			// Search users matching the steamId
-			List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
+			final List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
 			if(players.isEmpty()) {
 				return loadingMsg.send(
 						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.", context.getUsername()))
@@ -91,7 +91,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 						.then();
 			}
 
-			UserStatsForGameResponse userStats = Utils.MAPPER.readValue(userStatsUrl, UserStatsForGameResponse.class);
+			final UserStatsForGameResponse userStats = Utils.MAPPER.readValue(userStatsUrl, UserStatsForGameResponse.class);
 
 			if(userStats.getPlayerStats() == null || userStats.getPlayerStats().getStats() == null) {
 				return loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.").then();

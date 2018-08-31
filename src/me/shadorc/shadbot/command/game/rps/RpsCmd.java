@@ -35,7 +35,7 @@ public class RpsCmd extends AbstractCommand {
 
 		final Handsign botHandsign = Utils.randValue(Handsign.values());
 
-		StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s.%n**Shadbot**: %s.%n",
+		final StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s.%n**Shadbot**: %s.%n",
 				context.getUsername(), userHandsign.getRepresentation(), botHandsign.getRepresentation()));
 
 		if(userHandsign.equals(botHandsign)) {

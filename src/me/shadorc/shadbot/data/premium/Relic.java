@@ -17,7 +17,7 @@ public class Relic {
 	}
 
 	@JsonProperty("id")
-	private String id;
+	private final String id;
 	@Nullable
 	@JsonProperty("guildId")
 	private Snowflake guildId;
@@ -25,9 +25,9 @@ public class Relic {
 	@JsonProperty("userId")
 	private Snowflake userId;
 	@JsonProperty("type")
-	private String type;
+	private final String type;
 	@JsonProperty("duration")
-	private long duration;
+	private final long duration;
 	@Nullable
 	@JsonProperty("activationTime")
 	private long activationTime;
@@ -50,39 +50,39 @@ public class Relic {
 	}
 
 	public String getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
 	 * @return The guild ID of this {@link Relic}, if present
 	 */
 	public Optional<Snowflake> getGuildId() {
-		return Optional.ofNullable(guildId);
+		return Optional.ofNullable(this.guildId);
 	}
 
 	/**
 	 * @return The user ID of this {@link Relic}, if present
 	 */
 	public Optional<Snowflake> getUserId() {
-		return Optional.ofNullable(userId);
+		return Optional.ofNullable(this.userId);
 	}
 
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	/**
 	 * @return The duration of this {@link Relic} in milliseconds
 	 */
 	public long getDuration() {
-		return duration;
+		return this.duration;
 	}
 
 	/**
 	 * @return The activation time of this {@link Relic} in milliseconds if activated
 	 */
 	public OptionalLong getActivationTime() {
-		return OptionalLong.of(activationTime);
+		return OptionalLong.of(this.activationTime);
 	}
 
 	public boolean isExpired() {
@@ -103,7 +103,7 @@ public class Relic {
 	@Override
 	public String toString() {
 		return String.format("Relic [id=%s, guildId=%s, userId=%s, type=%s, duration=%s, activationTime=%s]",
-				id, guildId, userId, type, duration, activationTime);
+				this.id, this.guildId, this.userId, this.type, this.duration, this.activationTime);
 	}
 
 }

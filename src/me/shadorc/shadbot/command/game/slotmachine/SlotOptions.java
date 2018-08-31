@@ -13,7 +13,7 @@ public enum SlotOptions {
 	}
 
 	public int getGain() {
-		return gain;
+		return this.gain;
 	}
 
 	public String getEmoji() {

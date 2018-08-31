@@ -17,18 +17,18 @@ public class Quickplay {
 	private List<HeroEliminations> eliminationsPerLife;
 
 	public String getPlayed() {
-		return FormatUtils.numberedList(RANKING_SIZE, played.size(), count -> String.format(FORMAT,
-				count, played.get(count - 1).getHero(), played.get(count - 1).getPlayed()));
+		return FormatUtils.numberedList(RANKING_SIZE, this.played.size(), count -> String.format(FORMAT,
+				count, this.played.get(count - 1).getHero(), this.played.get(count - 1).getPlayed()));
 	}
 
 	public String getEliminationsPerLife() {
-		return FormatUtils.numberedList(RANKING_SIZE, eliminationsPerLife.size(), count -> String.format(FORMAT,
-				count, eliminationsPerLife.get(count - 1).getHero(), eliminationsPerLife.get(count - 1).getEliminationsPerLife()));
+		return FormatUtils.numberedList(RANKING_SIZE, this.eliminationsPerLife.size(), count -> String.format(FORMAT,
+				count, this.eliminationsPerLife.get(count - 1).getHero(), this.eliminationsPerLife.get(count - 1).getEliminationsPerLife()));
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Quickplay [played=%s, eliminationsPerLife=%s]", played, eliminationsPerLife);
+		return String.format("Quickplay [played=%s, eliminationsPerLife=%s]", this.played, this.eliminationsPerLife);
 	}
 
 }

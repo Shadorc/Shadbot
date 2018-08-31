@@ -13,12 +13,12 @@ public class PlayerStats {
 	private List<Stats> stats;
 
 	public List<Stats> getStats() {
-		return stats;
+		return this.stats;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("PlayerStats [stats=%s]", stats);
+		return String.format("PlayerStats [stats=%s]", this.stats);
 	}
 
 }

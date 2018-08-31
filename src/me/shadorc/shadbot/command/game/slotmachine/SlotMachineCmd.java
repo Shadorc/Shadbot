@@ -35,7 +35,7 @@ public class SlotMachineCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId());
+		final DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId());
 
 		if(dbMember.getCoins() < PAID_COST) {
 			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);

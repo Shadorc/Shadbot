@@ -34,27 +34,27 @@ public class TrackScheduler {
 	}
 
 	public BlockingQueue<AudioTrack> getPlaylist() {
-		return queue;
+		return this.queue;
 	}
 
 	public AudioPlayer getAudioPlayer() {
-		return audioPlayer;
+		return this.audioPlayer;
 	}
 
 	public RepeatMode getRepeatMode() {
-		return repeatMode;
+		return this.repeatMode;
 	}
 
 	public boolean isPlaying() {
-		return audioPlayer.getPlayingTrack() != null;
+		return this.audioPlayer.getPlayingTrack() != null;
 	}
 
 	public boolean isStopped() {
-		return queue.isEmpty() && !this.isPlaying();
+		return this.queue.isEmpty() && !this.isPlaying();
 	}
 
 	public void setVolume(int volume) {
-		audioPlayer.setVolume(NumberUtils.between(volume, 0, 100));
+		this.audioPlayer.setVolume(NumberUtils.between(volume, 0, 100));
 	}
 
 	public void setRepeatMode(RepeatMode repeatMode) {
@@ -67,13 +67,13 @@ public class TrackScheduler {
 	public boolean startOrQueue(AudioTrack track, boolean first) {
 		StatsManager.VARIOUS_STATS.log(VariousEnum.MUSICS_LOADED);
 
-		if(audioPlayer.startTrack(track.makeClone(), true)) {
+		if(this.audioPlayer.startTrack(track.makeClone(), true)) {
 			this.currentTrack = track;
 			return true;
 		} else if(first) {
-			queue.offerFirst(track);
+			this.queue.offerFirst(track);
 		} else {
-			queue.offerLast(track);
+			this.queue.offerLast(track);
 		}
 		return false;
 	}
@@ -82,14 +82,14 @@ public class TrackScheduler {
 	 * @return {@code true} if the track was started, {@code false} otherwise
 	 */
 	public boolean nextTrack() {
-		switch (repeatMode) {
+		switch (this.repeatMode) {
 			case PLAYLIST:
-				queue.offer(currentTrack.makeClone());
+				this.queue.offer(this.currentTrack.makeClone());
 			case NONE:
-				this.currentTrack = queue.poll();
-				return audioPlayer.startTrack(currentTrack, false);
+				this.currentTrack = this.queue.poll();
+				return this.audioPlayer.startTrack(this.currentTrack, false);
 			case SONG:
-				audioPlayer.playTrack(currentTrack.makeClone());
+				this.audioPlayer.playTrack(this.currentTrack.makeClone());
 				break;
 		}
 		return true;
@@ -98,32 +98,32 @@ public class TrackScheduler {
 	public void skipTo(int num) {
 		AudioTrack track = null;
 		for(int i = 0; i < num; i++) {
-			track = queue.poll();
+			track = this.queue.poll();
 		}
-		audioPlayer.playTrack(track.makeClone());
+		this.audioPlayer.playTrack(track.makeClone());
 		this.currentTrack = track;
 	}
 
 	public long changePosition(long time) {
-		final AudioTrack track = audioPlayer.getPlayingTrack();
+		final AudioTrack track = this.audioPlayer.getPlayingTrack();
 		final long newPosition = NumberUtils.between(track.getPosition() + time, 0, track.getDuration());
 		track.setPosition(newPosition);
 		return newPosition;
 	}
 
 	public void shufflePlaylist() {
-		List<AudioTrack> tempList = new ArrayList<>(queue);
+		final List<AudioTrack> tempList = new ArrayList<>(this.queue);
 		Collections.shuffle(tempList);
-		queue.clear();
-		queue.addAll(tempList);
+		this.queue.clear();
+		this.queue.addAll(tempList);
 	}
 
 	public void clearPlaylist() {
-		queue.clear();
+		this.queue.clear();
 	}
 
 	public void destroy() {
-		audioPlayer.destroy();
+		this.audioPlayer.destroy();
 		this.clearPlaylist();
 	}
 }
