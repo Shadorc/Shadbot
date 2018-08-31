@@ -3,8 +3,6 @@ package me.shadorc.shadbot.command.admin.setting;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
@@ -49,19 +47,19 @@ public class BlacklistSettingCmd extends AbstractSetting {
 		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
 		final List<String> blacklist = dbGuild.getBlacklistedCmd();
 
-		Mono<Message> message;
+		String actionVerbose;
 		if(Action.ADD.equals(action)) {
 			blacklist.addAll(commands);
-			message = BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` added to the blacklist.",
-					FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
+			actionVerbose = "added";
 		} else {
 			blacklist.removeAll(commands);
-			message = BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` removed from the blacklist.",
-					FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", ")), context.getChannel());
+			actionVerbose = "removed";
 		}
 
-		return message.then();
 		dbGuild.setSetting(this.getSetting(), blacklist);
+		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) Command(s) `%s` %s to the blacklist.",
+				context.getUsername(), FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "), actionVerbose),
+				context.getChannel()).then();
 	}
 
 	@Override

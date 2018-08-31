@@ -26,12 +26,13 @@ public class VolumeSetting extends AbstractSetting {
 
 		final Integer volume = NumberUtils.asIntBetween(arg, MIN_VOLUME, MAX_VOLUME);
 		if(volume == null) {
-			throw new CommandException(String.format("`%s` is not a valid number, it must be between %d and %d.",
+			throw new CommandException(String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
 					arg, MIN_VOLUME, MAX_VOLUME));
 		}
 
 		DatabaseManager.getDBGuild(context.getGuildId()).setSetting(this.getSetting(), volume);
-		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), context.getChannel()).then();
+		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**)  Default volume set to **%d%%**",
+				context.getUsername(), volume), context.getChannel()).then();
 	}
 
 	@Override

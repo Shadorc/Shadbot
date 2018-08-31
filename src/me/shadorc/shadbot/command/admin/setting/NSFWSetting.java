@@ -48,8 +48,8 @@ public class NSFWSetting extends AbstractSetting {
 					}
 
 					return channel.edit(new TextChannelEditSpec().setNsfw(isNSFW))
-							.then(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " This channel is now %sSFW.", isNSFW ? "N" : ""),
-									context.getChannel()));
+							.then(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) This channel is now **%sSFW**.",
+									context.getUsername(), isNSFW ? "N" : ""), context.getChannel()));
 				})
 				.then();
 	}

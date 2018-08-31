@@ -26,8 +26,8 @@ public class PrefixSetting extends AbstractSetting {
 		}
 
 		DatabaseManager.getDBGuild(context.getGuildId()).setSetting(this.getSetting(), arg);
-		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s` by **%s**",
-				arg, context.getUsername()), context.getChannel())
+		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) Prefix set to `%s`",
+				context.getUsername(), arg), context.getChannel())
 				.then();
 	}
 
