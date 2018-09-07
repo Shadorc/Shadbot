@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.admin.setting;
 
+import java.util.List;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.AbstractSetting;
@@ -19,7 +21,8 @@ public class PrefixSetting extends AbstractSetting {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final String arg = this.requireArg(context);
+		final List<String> args = context.requireArgs(2);
+		final String arg = args.get(1);
 
 		if(arg.length() > MAX_PREFIX_LENGTH) {
 			throw new CommandException(String.format("Prefix cannot contain more than %s characters.", MAX_PREFIX_LENGTH));

@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.admin.setting;
 
+import java.util.List;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.Context;
@@ -22,7 +24,8 @@ public class VolumeSetting extends AbstractSetting {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final String arg = this.requireArg(context);
+		final List<String> args = context.requireArgs(2);
+		final String arg = args.get(1);
 
 		final Integer volume = NumberUtils.asIntBetween(arg, MIN_VOLUME, MAX_VOLUME);
 		if(volume == null) {

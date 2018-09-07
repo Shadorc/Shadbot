@@ -37,7 +37,8 @@ public class ChannelSetting extends AbstractSetting {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final List<String> args = this.requireArg(context, 2);
+		final List<String> args = context.requireArgs(3);
+		args.remove(0);
 
 		return context.getGuild()
 				.flatMapMany(Guild::getChannels)

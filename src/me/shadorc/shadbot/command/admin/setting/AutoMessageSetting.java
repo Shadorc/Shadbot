@@ -35,7 +35,8 @@ public class AutoMessageSetting extends AbstractSetting {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final List<String> args = this.requireArg(context, 2);
+		final List<String> args = context.requireArgs(3, 4);
+		args.remove(0);
 
 		final Action action = Utils.getEnum(Action.class, args.get(0));
 		if(action == null) {

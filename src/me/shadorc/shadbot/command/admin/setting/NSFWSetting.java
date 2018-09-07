@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.admin.setting;
 
+import java.util.List;
+
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.TextChannelEditSpec;
@@ -24,7 +26,8 @@ public class NSFWSetting extends AbstractSetting {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final String arg = this.requireArg(context);
+		final List<String> args = context.requireArgs(2);
+		final String arg = args.get(1);
 
 		final Action action = Utils.getEnum(Action.class, arg);
 		if(action == null) {

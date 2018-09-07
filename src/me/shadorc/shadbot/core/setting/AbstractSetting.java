@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.core.publisher.Mono;
 
@@ -48,18 +47,6 @@ public abstract class AbstractSetting {
 
 		final List<String> args = StringUtils.split(arg.get(), 2);
 		return args.size() == 1 ? Optional.empty() : Optional.of(args.get(1));
-	}
-
-	public String requireArg(Context context) {
-		return this.getSettingArg(context).orElseThrow(MissingArgumentException::new);
-	}
-
-	public List<String> requireArg(Context context, int count) {
-		final List<String> args = StringUtils.split(this.requireArg(context), count);
-		if(args.size() < count) {
-			throw new MissingArgumentException();
-		}
-		return args;
 	}
 
 }

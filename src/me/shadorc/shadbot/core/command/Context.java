@@ -31,7 +31,7 @@ public class Context {
 	private final String cmdName;
 	private final Optional<String> arg;
 
-	// Note: The message is considered to be from a member, so all optional values should be accessible
+	// Note: The message is considered to be from a member, so all optional values should be present
 	public Context(MessageCreateEvent event, String prefix) {
 		this.event = event;
 		this.prefix = prefix;
