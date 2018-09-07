@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
@@ -62,10 +61,10 @@ public class SoftBanCmd extends AbstractCommand {
 						reason.append("Reason not specified.");
 					}
 
-					final Flux<Void> banFlux = Flux.empty();
+					Flux<Void> softbanFlux = Flux.empty();
 					for(User user : mentions) {
 						if(!user.isBot()) {
-							banFlux.concatWith(BotUtils.sendMessage(
+							softbanFlux = softbanFlux.concatWith(BotUtils.sendMessage(
 									String.format(Emoji.INFO + " You were softbanned from the server **%s** by **%s**. Reason: `%s`",
 											guild.getName(), context.getUsername(), reason), user.getPrivateChannel().cast(MessageChannel.class))
 									.then());
@@ -74,13 +73,11 @@ public class SoftBanCmd extends AbstractCommand {
 						final BanQuerySpec banQuery = new BanQuerySpec()
 								.setReason(reason.toString())
 								.setDeleteMessageDays(7);
-						banFlux.concatWith(user.asMember(guildId)
-								.flatMap(member -> member.ban(banQuery)));
-						banFlux.concatWith(user.asMember(guildId)
-								.flatMap(Member::unban));
+						softbanFlux = softbanFlux.concatWith(user.asMember(guildId)
+								.flatMap(member -> member.ban(banQuery).then(member.unban())));
 					}
 
-					return banFlux
+					return softbanFlux
 							.then(BotUtils.sendMessage(String.format(Emoji.INFO + " **%s** got softbanned by **%s**. Reason: `%s`",
 									FormatUtils.format(mentions, User::getUsername, ", "), context.getUsername(), reason),
 									context.getChannel()))

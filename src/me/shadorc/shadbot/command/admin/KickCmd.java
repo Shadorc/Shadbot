@@ -61,21 +61,21 @@ public class KickCmd extends AbstractCommand {
 						reason.append("Reason not specified.");
 					}
 
-					final Flux<Void> banFlux = Flux.empty();
+					Flux<Void> kickFlux = Flux.empty();
 					for(User user : mentions) {
 						if(!user.isBot()) {
-							banFlux.concatWith(BotUtils.sendMessage(
+							kickFlux = kickFlux.concatWith(BotUtils.sendMessage(
 									String.format(Emoji.INFO + " You were kicked from the server **%s** by **%s**. Reason: `%s`",
 											guild.getName(), context.getUsername(), reason), user.getPrivateChannel().cast(MessageChannel.class))
 									.then());
 						}
 
 						// TODO: Add reason
-						banFlux.concatWith(user.asMember(guildId)
+						kickFlux = kickFlux.concatWith(user.asMember(guildId)
 								.flatMap(Member::kick));
 					}
 
-					return banFlux
+					return kickFlux
 							.then(BotUtils.sendMessage(String.format(Emoji.INFO + " **%s** got kicked by **%s**. Reason: `%s`",
 									FormatUtils.format(mentions, User::getUsername, ", "), context.getUsername(), reason),
 									context.getChannel()))

@@ -61,10 +61,10 @@ public class BanCmd extends AbstractCommand {
 						reason.append("Reason not specified.");
 					}
 
-					final Flux<Void> banFlux = Flux.empty();
+					Flux<Void> banFlux = Flux.empty();
 					for(User user : mentions) {
 						if(!user.isBot()) {
-							banFlux.concatWith(BotUtils.sendMessage(
+							banFlux = banFlux.concatWith(BotUtils.sendMessage(
 									String.format(Emoji.INFO + " You were banned from the server **%s** by **%s**. Reason: `%s`",
 											guild.getName(), context.getUsername(), reason), user.getPrivateChannel().cast(MessageChannel.class))
 									.then());
@@ -73,7 +73,7 @@ public class BanCmd extends AbstractCommand {
 						final BanQuerySpec banQuery = new BanQuerySpec()
 								.setReason(reason.toString())
 								.setDeleteMessageDays(7);
-						banFlux.concatWith(user.asMember(guildId)
+						banFlux = banFlux.concatWith(user.asMember(guildId)
 								.flatMap(member -> member.ban(banQuery)));
 					}
 

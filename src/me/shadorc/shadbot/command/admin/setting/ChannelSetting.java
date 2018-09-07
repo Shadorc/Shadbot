@@ -57,11 +57,11 @@ public class ChannelSetting extends AbstractSetting {
 					final Set<Snowflake> allowedTextChannels = new HashSet<>(dbGuild.getAllowedTextChannels());
 					final Set<Snowflake> allowedVoiceChannels = new HashSet<>(dbGuild.getAllowedVoiceChannels());
 
-					Flux<Message> messages = Flux.empty();
+					Flux<Message> messagesFlux = Flux.empty();
 					if(Action.ADD.equals(action)) {
 						if(allowedTextChannels.isEmpty()
 								&& mentionedChannels.stream().noneMatch(context.getChannelId()::equals)) {
-							messages = messages.concatWith(BotUtils.sendMessage(Emoji.WARNING + " You did not mentioned this channel. "
+							messagesFlux = messagesFlux.concatWith(BotUtils.sendMessage(Emoji.WARNING + " You did not mentioned this channel. "
 									+ "I will not reply here until this channel is added to the list of allowed channels.", context.getChannel()));
 						}
 
@@ -82,19 +82,19 @@ public class ChannelSetting extends AbstractSetting {
 							}
 						}
 
-						messages = messages.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
+						messagesFlux = messagesFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
 								FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")), context.getChannel()));
 
 					} else {
 						allowedTextChannels.removeAll(mentionedChannels);
 						allowedVoiceChannels.removeAll(mentionedChannels);
-						messages = messages.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
+						messagesFlux = messagesFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
 								FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")), context.getChannel()));
 					}
 
 					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
 					dbGuild.setSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, allowedVoiceChannels);
-					return messages;
+					return messagesFlux;
 				})
 				.then();
 	}

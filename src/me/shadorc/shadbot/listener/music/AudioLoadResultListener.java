@@ -109,8 +109,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			return;
 		}
 
-		final Flux<Void> flux = Flux.empty();
-		flux.concatWith(this.guildMusic.joinVoiceChannel(this.voiceChannelId));
+		Flux<Void> flux = Flux.empty();
+		flux = flux.concatWith(this.guildMusic.joinVoiceChannel(this.voiceChannelId));
 
 		int musicsAdded = 0;
 		for(AudioTrack track : tracks) {
@@ -118,7 +118,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			musicsAdded++;
 			if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
 					&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), this.djId)) {
-				flux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, this.guildMusic.getMessageChannel())
+				flux = flux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, this.guildMusic.getMessageChannel())
 						.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 						.then());
 				break;
@@ -128,9 +128,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		flux.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded),
 				this.guildMusic.getMessageChannel())
 				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
-				.then());
-
-		flux.subscribe();
+				.then())
+				.subscribe();
 	}
 
 	@Override
@@ -210,24 +209,24 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(this.guildMusic.getGuildId(), this.guildMusic);
 		final Mono<Void> joinMono = this.guildMusic.joinVoiceChannel(this.voiceChannelId);
 
-		final Flux<Message> messageFlux = Flux.empty();
+		Flux<Message> messages = Flux.empty();
 		for(int choice : choices) {
 			final AudioTrack track = this.resultsTracks.get(choice - 1);
 			if(!this.guildMusic.getScheduler().startOrQueue(track, this.putFirst)) {
-				messageFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
+				messages = messages.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
 						FormatUtils.formatTrackName(track.getInfo())), this.guildMusic.getMessageChannel()));
 			}
 
 			if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
 					&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), authorId)) {
-				messageFlux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, this.guildMusic.getMessageChannel()));
+				messages = messages.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, this.guildMusic.getMessageChannel()));
 				break;
 			}
 		}
 
 		this.stopWaiting();
 		return joinMono
-				.thenMany(messageFlux)
+				.thenMany(messages)
 				.then(Mono.just(true));
 	}
 
