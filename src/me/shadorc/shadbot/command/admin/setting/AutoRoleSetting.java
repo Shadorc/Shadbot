@@ -53,18 +53,18 @@ public class AutoRoleSetting extends AbstractSetting {
 			autoRoles.addAll(mentionedRoles);
 			message = Flux.fromIterable(autoRoles)
 					.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-					.map(Role::getName)
+					.map(Role::getMention)
 					.collectList()
 					.flatMap(roles -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New comers will now have role(s): %s",
-							String.join(", ", roles)), context.getChannel()));
+							FormatUtils.format(roles, role -> String.format("`%s`", role), ", ")), context.getChannel()));
 		} else {
 			autoRoles.removeAll(mentionedRoles);
 			message = Flux.fromIterable(mentionedRoles)
 					.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-					.map(Role::getName)
+					.map(Role::getMention)
 					.collectList()
 					.flatMap(roles -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
-							String.join(", ", roles)), context.getChannel()));
+							FormatUtils.format(roles, role -> String.format("`%s`", role), ", ")), context.getChannel()));
 		}
 
 		dbGuild.setSetting(this.getSetting(), autoRoles);

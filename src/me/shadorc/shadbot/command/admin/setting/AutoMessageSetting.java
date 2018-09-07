@@ -20,6 +20,7 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Setting(description = "Manage auto messages on user join/leave.", setting = SettingEnum.AUTO_MESSAGE)
@@ -74,7 +75,7 @@ public class AutoMessageSetting extends AbstractSetting {
 					DiscordUtils.getChannelMention(channelId)), context.getChannel());
 		} else {
 			dbGuild.removeSetting(SettingEnum.MESSAGE_CHANNEL_ID);
-			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send automatic messages "
+			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
 					+ "until a new channel is defined.", DiscordUtils.getChannelMention(channelId)), context.getChannel());
 		}
 	}
@@ -87,8 +88,16 @@ public class AutoMessageSetting extends AbstractSetting {
 			}
 			final String message = args.get(2);
 			dbGuild.setSetting(setting, message);
-			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s set to `%s`",
-					StringUtils.capitalizeFully(setting.toString().replace("_", " ")), message), context.getChannel());
+
+			Flux<Message> warningFlux = Flux.empty();
+			if(!dbGuild.getMessageChannelId().isPresent()) {
+				warningFlux = warningFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.WARNING + " You need to specify a channel "
+						+ "in which send the auto-messages. Use `%s%s add channel <@channel>`",
+						context.getPrefix(), this.getCommandName()), context.getChannel()));
+			}
+
+			return warningFlux.then(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s set to `%s`",
+					StringUtils.capitalizeFully(setting.toString().replace("_", " ")), message), context.getChannel()));
 
 		} else {
 			dbGuild.removeSetting(setting);
@@ -96,6 +105,8 @@ public class AutoMessageSetting extends AbstractSetting {
 					StringUtils.capitalizeFully(setting.toString().replace("_", " "))), context.getChannel());
 		}
 	}
+
+	// TODO create a function FormatUtils#enum to format enum and use enum everywhere here
 
 	@Override
 	public EmbedCreateSpec getHelp(Context context) {
@@ -112,6 +123,6 @@ public class AutoMessageSetting extends AbstractSetting {
 				.addField("Info", "You don't need to specify *value* to disable a type.", false)
 				.addField("Example", String.format("`%s%s enable join_message Hello you (:`"
 						+ "%n`%s%s disable leave_message`",
-						context.getPrefix(), this.getCommandName(), context.getPrefix(), context.getCommandName()), false);
+						context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()), false);
 	}
 }
