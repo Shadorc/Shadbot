@@ -60,9 +60,9 @@ public class InfoCmd extends AbstractCommand {
 
 					return new String("```prolog"
 							+ String.format("%n-= Performance Info =-")
-							+ String.format("%nMemory: %s/%s MB", FormatUtils.formatNum(usedMemory), FormatUtils.formatNum(maxMemory))
+							+ String.format("%nMemory: %s/%s MB", FormatUtils.number(usedMemory), FormatUtils.number(maxMemory))
 							+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
-							+ String.format("%nThreads Count: %s", FormatUtils.formatNum(Thread.activeCount()))
+							+ String.format("%nThreads Count: %s", FormatUtils.number(Thread.activeCount()))
 							+ String.format("%n%n-= APIs Info =-")
 							+ String.format("%nJava Version: %s", System.getProperty("java.version"))
 							+ String.format("%n%s Version: %s", d4jName, d4jVersion)
@@ -72,9 +72,9 @@ public class InfoCmd extends AbstractCommand {
 							+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
 							+ String.format("%nShadbot Version: %s", Config.VERSION)
 							+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
-							+ String.format("%nServers: %s", FormatUtils.formatNum(guilds.size()))
+							+ String.format("%nServers: %s", FormatUtils.number(guilds.size()))
 							+ String.format("%nVoice Channels: %d", connectedVoiceChannels)
-							+ String.format("%nUsers: %s", FormatUtils.formatNum(membersCount))
+							+ String.format("%nUsers: %s", FormatUtils.number(membersCount))
 							+ String.format("%nPing: %dms", TimeUtils.getMillisUntil(start))
 							+ "```");
 				})

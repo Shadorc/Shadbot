@@ -31,7 +31,7 @@ public class NSFWSetting extends AbstractSetting {
 
 		final Action action = Utils.getEnum(Action.class, arg);
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", arg, FormatUtils.formatOptions(Action.class)));
+			throw new CommandException(String.format("`%s` is not a valid action. %s", arg, FormatUtils.options(Action.class)));
 		}
 
 		return context.getChannel()

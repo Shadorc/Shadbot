@@ -75,7 +75,7 @@ public class LottoCmd extends AbstractCommand {
 
 		return BotUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
 				+ "The next draw will take place in **%s**.",
-				context.getUsername(), num, FormatUtils.formatCustomDate(LottoCmd.getDelay().toMillis())), context.getChannel())
+				context.getUsername(), num, FormatUtils.customDate(LottoCmd.getDelay().toMillis())), context.getChannel())
 				.then();
 	}
 
@@ -88,10 +88,10 @@ public class LottoCmd extends AbstractCommand {
 							.setAuthor("Lotto", null, avatarUrl)
 							.setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 							.setDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
-									FormatUtils.formatCustomDate(LottoCmd.getDelay().toMillis()),
+									FormatUtils.customDate(LottoCmd.getDelay().toMillis()),
 									context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
 							.addField("Number of participants", Integer.toString(gamblers.size()), false)
-							.addField("Prize pool", FormatUtils.formatCoins(LottoManager.getLotto().getJackpot()), false);
+							.addField("Prize pool", FormatUtils.coins(LottoManager.getLotto().getJackpot()), false);
 
 					final LottoGambler gambler = gamblers.stream()
 							.filter(lottoGambler -> lottoGambler.getUserId().equals(context.getAuthorId()))
@@ -120,7 +120,7 @@ public class LottoCmd extends AbstractCommand {
 
 						embed.addField("Historic",
 								String.format("Last week, the prize pool contained **%s**, the winning number was **%d** and **%s won**.",
-										FormatUtils.formatCoins(historic.getJackpot()), historic.getNumber(), people),
+										FormatUtils.coins(historic.getJackpot()), historic.getNumber(), people),
 								false);
 					}
 
@@ -156,7 +156,7 @@ public class LottoCmd extends AbstractCommand {
 						final int coins = (int) Math.ceil((double) LottoManager.getLotto().getJackpot() / winners.size());
 						DatabaseManager.getDBMember(winner.getGuildId(), winner.getUserId()).addCoins(coins);
 						return BotUtils.sendMessage(String.format("Congratulations, you have the winning Lotto number! You earn %s.",
-								FormatUtils.formatCoins(coins)), user.getPrivateChannel().cast(MessageChannel.class));
+								FormatUtils.coins(coins)), user.getPrivateChannel().cast(MessageChannel.class));
 					})
 					.subscribe();
 

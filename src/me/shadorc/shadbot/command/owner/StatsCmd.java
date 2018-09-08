@@ -39,14 +39,14 @@ public class StatsCmd extends AbstractCommand {
 		final StatisticEnum statEnum = Utils.getEnum(StatisticEnum.class, args.get(0));
 		if(statEnum == null) {
 			throw new CommandException(String.format("`%s` is not a valid category. %s",
-					args.get(0), FormatUtils.formatOptions(StatisticEnum.class)));
+					args.get(0), FormatUtils.options(StatisticEnum.class)));
 		}
 
 		Map<String, AtomicLong> map;
 		if(args.size() == 1) {
 			if(statEnum.getStat() instanceof TableStatistic) {
 				throw new CommandException(String.format("You need to specify a valid sub-category.%n%s",
-						FormatUtils.formatOptions(statEnum.getStat().getEnumClass())));
+						FormatUtils.options(statEnum.getStat().getEnumClass())));
 			}
 
 			map = ((MapStatistic<?>) statEnum.getStat()).getMap();
@@ -54,7 +54,7 @@ public class StatsCmd extends AbstractCommand {
 			final Enum<?> subStatEnum = Utils.getEnum(statEnum.getStat().getEnumClass(), args.get(1));
 			if(subStatEnum == null) {
 				throw new CommandException(String.format("`%s` is not a valid sub-category. %s",
-						args.get(1), FormatUtils.formatOptions(statEnum.getStat().getEnumClass())));
+						args.get(1), FormatUtils.options(statEnum.getStat().getEnumClass())));
 			}
 
 			if(statEnum.getStat() instanceof MapStatistic) {
@@ -74,7 +74,7 @@ public class StatsCmd extends AbstractCommand {
 			final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
 
 			embed.addField("Name", FormatUtils.format(sortedMap.keySet(), key -> key.toString().toLowerCase(), "\n"), true)
-					.addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.formatNum(Long.parseLong(value.toString())), "\n"), true);
+					.addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.number(Long.parseLong(value.toString())), "\n"), true);
 		}
 
 		return context.getAvatarUrl()
@@ -87,7 +87,7 @@ public class StatsCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show statistics for the specified category.")
-				.addArg("category", FormatUtils.formatOptions(StatisticEnum.class), false)
+				.addArg("category", FormatUtils.options(StatisticEnum.class), false)
 				.addArg("sub-category", "Needed when checking table statistics or to see a specific statistic", true)
 				.addField("Info", "You can also use `average` as a *category* to get average winnings per game", false)
 				.build();

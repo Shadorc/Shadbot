@@ -39,11 +39,11 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(ThreadLocalRandom.current().nextInt(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
-			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.formatCoins(Math.abs(gains))));
+			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.coins(Math.abs(gains))));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
-			strBuilder.append(String.format("**click** ... Phew, you are still alive ! You get **%s**.", FormatUtils.formatCoins(gains)));
+			strBuilder.append(String.format("**click** ... Phew, you are still alive ! You get **%s**.", FormatUtils.coins(gains)));
 		}
 
 		DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains);
@@ -55,7 +55,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Play Russian roulette.")
-				.addArg("bet", String.format("You can't bet more than **%s**.", FormatUtils.formatCoins(MAX_BET)), false)
+				.addArg("bet", String.format("You can't bet more than **%s**.", FormatUtils.coins(MAX_BET)), false)
 				.setGains("You have a **5-in-6** chance to win **%.1f times** your bet and a **1-in-6** chance to lose **%.1f times** your bet.",
 						WIN_MULTIPLIER, LOSE_MULTIPLIER)
 				.build();

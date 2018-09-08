@@ -50,11 +50,11 @@ public class UserInfoCmd extends AbstractCommand {
 
 					final String creationDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(member.getId())).format(this.dateFormatter),
-							FormatUtils.formatLongDuration(DiscordUtils.getSnowflakeTimeFromID(member.getId())));
+							FormatUtils.longDuration(DiscordUtils.getSnowflakeTimeFromID(member.getId())));
 
 					final String joinDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(member.getJoinTime()).format(this.dateFormatter),
-							FormatUtils.formatLongDuration(member.getJoinTime()));
+							FormatUtils.longDuration(member.getJoinTime()));
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Info about user \"%s\"%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)

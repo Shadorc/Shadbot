@@ -35,7 +35,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 		final Action action = Utils.getEnum(Action.class, args.get(0));
 		if(action == null) {
 			throw new CommandException(String.format("`%s` is not a valid action. %s",
-					args.get(0), FormatUtils.formatOptions(Action.class)));
+					args.get(0), FormatUtils.options(Action.class)));
 		}
 
 		final Integer coins = NumberUtils.asInt(args.get(1));
@@ -58,10 +58,10 @@ public class ManageCoinsCmd extends AbstractCommand {
 					switch (action) {
 						case ADD:
 							users.stream().forEach(user -> DatabaseManager.getDBMember(guildId, user.getId()).addCoins(coins));
-							return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.formatCoins(coins));
+							return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.coins(coins));
 						case REMOVE:
 							users.stream().forEach(user -> DatabaseManager.getDBMember(guildId, user.getId()).addCoins(-coins));
-							return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.formatCoins(coins));
+							return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.coins(coins));
 						case RESET:
 							users.stream().forEach(user -> DatabaseManager.getDBMember(guildId, user.getId()).resetCoins());
 							return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, users.size() == 1 ? "his" : "their");

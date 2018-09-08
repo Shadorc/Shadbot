@@ -115,7 +115,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
 
 			text = String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
-					this.getContext().getUsername(), FormatUtils.formatCoins(gains));
+					this.getContext().getUsername(), FormatUtils.coins(gains));
 		} else {
 			text = String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
 					this.getContext().getUsername(), this.word);

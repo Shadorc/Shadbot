@@ -34,7 +34,7 @@ public class BlacklistSettingCmd extends AbstractSetting {
 
 		final Action action = Utils.getEnum(Action.class, args.get(0));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.formatOptions(Action.class)));
+			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.options(Action.class)));
 		}
 
 		final List<String> commands = StringUtils.split(args.get(1).toLowerCase());

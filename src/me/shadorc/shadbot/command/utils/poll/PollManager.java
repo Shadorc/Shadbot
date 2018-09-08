@@ -61,7 +61,7 @@ public class PollManager extends AbstractGameManager {
 									this.getContext().getPrefix(), this.getContext().getCommandName(),
 									this.spec.getQuestion(), representation.toString()))
 							.setFooter(String.format("You have %s to vote.",
-									FormatUtils.formatShortDuration(TimeUnit.SECONDS.toMillis(this.spec.getDuration()))),
+									FormatUtils.shortDuration(TimeUnit.SECONDS.toMillis(this.spec.getDuration()))),
 									"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png");
 				})
 				.flatMap(this.voteMessage::sendMessage)

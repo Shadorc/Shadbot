@@ -28,7 +28,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 		final RelicType type = Utils.getEnum(RelicType.class, context.getArg().get());
 		if(type == null) {
 			throw new CommandException(String.format("`%s`in not a valid type. %s",
-					arg, FormatUtils.formatOptions(RelicType.class)));
+					arg, FormatUtils.options(RelicType.class)));
 		}
 
 		final Relic relic = PremiumManager.generateRelic(type);

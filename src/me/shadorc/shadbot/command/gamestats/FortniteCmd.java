@@ -46,7 +46,7 @@ public class FortniteCmd extends AbstractCommand {
 		final Platform platform = Utils.getEnum(Platform.class, args.get(0));
 		if(platform == null) {
 			throw new CommandException(String.format("`%s` is not a valid Platform. %s",
-					args.get(0), FormatUtils.formatOptions(Platform.class)));
+					args.get(0), FormatUtils.options(Platform.class)));
 		}
 
 		final String epicNickname = args.get(1);

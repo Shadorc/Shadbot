@@ -28,7 +28,7 @@ public class AudioEventListener extends AudioEventAdapter {
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
 		BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
-				FormatUtils.formatTrackName(track.getInfo())), this.guildMusic.getMessageChannel())
+				FormatUtils.trackName(track.getInfo())), this.guildMusic.getMessageChannel())
 				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 				.subscribe();
 	}

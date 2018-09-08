@@ -137,7 +137,7 @@ public class ExceptionHandler {
 		}
 
 		final List<String> permissionsStr = permissions.stream()
-				.map(FormatUtils::formatPermission)
+				.map(FormatUtils::capitalizeFully)
 				.collect(Collectors.toList());
 
 		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of permission."

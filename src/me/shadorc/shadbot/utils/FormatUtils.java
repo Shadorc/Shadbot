@@ -20,66 +20,39 @@ import com.google.common.collect.Lists;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import discord4j.common.json.EmbedFieldEntity;
-import discord4j.core.object.util.Permission;
 
 public class FormatUtils {
 
-	public static <T> String format(Stream<T> stream, Function<T, String> mapper, String delimiter) {
+	public static <T> String format(Stream<T> stream, Function<T, String> mapper, CharSequence delimiter) {
 		return stream.map(mapper).collect(Collectors.joining(delimiter));
 	}
 
-	public static <T> String format(Collection<T> collection, Function<T, String> mapper, String delimiter) {
+	public static <T> String format(Collection<T> collection, Function<T, String> mapper, CharSequence delimiter) {
 		return FormatUtils.format(collection.stream(), mapper, delimiter);
 	}
 
-	public static <T> String format(T[] array, Function<T, String> mapper, String delimiter) {
+	public static <T> String format(T[] array, Function<T, String> mapper, CharSequence delimiter) {
 		return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
 	}
 
-	public static <T extends Enum<T>> String format(Class<T> enumClass, String delimiter) {
-		return FormatUtils.format(enumClass.getEnumConstants(), value -> value.toString().toLowerCase(), delimiter);
+	public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
+		return FormatUtils.format(enumClass.getEnumConstants(), FormatUtils::toLowerCase, delimiter);
 	}
 
-	public static <E extends Enum<E>> String formatOptions(Class<E> enumClass) {
+	public static <E extends Enum<E>> String options(Class<E> enumClass) {
 		return String.format("Options: %s",
-				FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
+				FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", FormatUtils.toLowerCase(value)), ", "));
 	}
 
-	public static String formatNum(double num) {
+	public static String number(double num) {
 		return NumberFormat.getNumberInstance(Locale.ENGLISH).format(num);
 	}
 
-	public static String formatCoins(int coins) {
-		return String.format("%s coin%s", FormatUtils.formatNum(coins), Math.abs(coins) > 1 ? "s" : "");
+	public static String coins(int coins) {
+		return String.format("%s coin%s", FormatUtils.number(coins), Math.abs(coins) > 1 ? "s" : "");
 	}
 
-	public static String formatCustomDate(long millis) {
-		final long minutes = millis / 1000 / 60;
-		final long hours = minutes / 60;
-		final long days = hours / 24;
-		return String.format("%s%s%s",
-				days > 0 ? StringUtils.pluralOf(days, "day") + " " : "",
-				hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "",
-				StringUtils.pluralOf(minutes % 60, "minute"));
-	}
-
-	public static String formatLongDuration(Instant instant) {
-		final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
-		final String str = period.getUnits().stream()
-				.filter(unit -> period.get(unit) != 0)
-				.map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
-				.collect(Collectors.joining(", "));
-		return str.isEmpty() ? FormatUtils.formatShortDuration(instant.toEpochMilli()) : str;
-	}
-
-	public static String formatShortDuration(long duration) {
-		if(TimeUnit.MILLISECONDS.toHours(duration) > 0) {
-			return DurationFormatUtils.formatDuration(duration, "H:mm:ss", true);
-		}
-		return DurationFormatUtils.formatDuration(duration, "m:ss", true);
-	}
-
-	public static String formatTrackName(AudioTrackInfo info) {
+	public static String trackName(AudioTrackInfo info) {
 		final StringBuilder strBuilder = new StringBuilder();
 		if("Unknown artist".equals(info.author)) {
 			strBuilder.append(info.title);
@@ -90,14 +63,60 @@ public class FormatUtils {
 		if(info.isStream) {
 			strBuilder.append(" (Stream)");
 		} else {
-			strBuilder.append(String.format(" (%s)", FormatUtils.formatShortDuration(info.length)));
+			strBuilder.append(String.format(" (%s)", FormatUtils.shortDuration(info.length)));
 		}
 
 		return strBuilder.toString();
 	}
 
-	public static String formatPermission(Permission permission) {
-		return StringUtils.capitalizeFully(permission.toString().replace("_", " "));
+	/**
+	 * @param durationMillis - the duration to format in milliseconds
+	 * @return The formatted duration, not null, as H:mm:ss
+	 */
+	public static String shortDuration(long durationMillis) {
+		if(TimeUnit.MILLISECONDS.toHours(durationMillis) > 0) {
+			return DurationFormatUtils.formatDuration(durationMillis, "H:mm:ss", true);
+		}
+		return DurationFormatUtils.formatDuration(durationMillis, "m:ss", true);
+	}
+
+	public static String longDuration(Instant instant) {
+		final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
+		final String str = period.getUnits().stream()
+				.filter(unit -> period.get(unit) != 0)
+				.map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
+				.collect(Collectors.joining(", "));
+		return str.isEmpty() ? FormatUtils.shortDuration(instant.toEpochMilli()) : str;
+	}
+
+	/**
+	 * @param durationMillis - the duration to format in milliseconds
+	 * @return The formatted duration, not null, as X days and Y hours and Z minutes
+	 */
+	public static String customDate(long durationMillis) {
+		final long minutes = durationMillis / 1000 / 60;
+		final long hours = minutes / 60;
+		final long days = hours / 24;
+		return String.format("%s%s%s",
+				days > 0 ? StringUtils.pluralOf(days, "day") + " " : "",
+				hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "",
+				StringUtils.pluralOf(minutes % 60, "minute"));
+	}
+
+	/**
+	 * @param object - the object to format
+	 * @return The object converted to a lower case string with underscores replaced with spaces
+	 */
+	public static String toLowerCase(Object object) {
+		return object.toString().toLowerCase().replace("_", " ");
+	}
+
+	/**
+	 * @param object - the object to format
+	 * @return The object converted to a fully capitalized string with underscores replaced with spaces
+	 */
+	public static String capitalizeFully(Object object) {
+		return StringUtils.capitalizeFully(FormatUtils.toLowerCase(object));
 	}
 
 	public static String numberedList(int count, int limit, Function<Integer, String> mapper) {

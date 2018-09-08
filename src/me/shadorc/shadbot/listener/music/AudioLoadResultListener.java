@@ -62,7 +62,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		this.guildMusic.joinVoiceChannel(this.voiceChannelId).subscribe();
 		if(!this.guildMusic.getScheduler().startOrQueue(track, this.putFirst)) {
 			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-					FormatUtils.formatTrackName(track.getInfo())), this.guildMusic.getMessageChannel())
+					FormatUtils.trackName(track.getInfo())), this.guildMusic.getMessageChannel())
 					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 					.subscribe();
 		}
@@ -84,7 +84,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 			final String choices = FormatUtils.numberedList(5, tracks.size(),
 					count -> String.format("\t**%d.** %s",
-							count, FormatUtils.formatTrackName(tracks.get(count - 1).getInfo())));
+							count, FormatUtils.trackName(tracks.get(count - 1).getInfo())));
 
 			DiscordUtils.getAvatarUrl(this.guildMusic.getClient().getUserById(this.guildMusic.getDjId()))
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
@@ -214,7 +214,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			final AudioTrack track = this.resultsTracks.get(choice - 1);
 			if(!this.guildMusic.getScheduler().startOrQueue(track, this.putFirst)) {
 				messages = messages.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-						FormatUtils.formatTrackName(track.getInfo())), this.guildMusic.getMessageChannel()));
+						FormatUtils.trackName(track.getInfo())), this.guildMusic.getMessageChannel()));
 			}
 
 			if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1

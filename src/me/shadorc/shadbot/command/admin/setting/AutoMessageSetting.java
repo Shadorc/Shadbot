@@ -41,12 +41,12 @@ public class AutoMessageSetting extends AbstractSetting {
 
 		final Action action = Utils.getEnum(Action.class, args.get(0));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.formatOptions(Action.class)));
+			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.options(Action.class)));
 		}
 
 		final Type type = Utils.getEnum(Type.class, args.get(1));
 		if(type == null) {
-			throw new CommandException(String.format("`%s` is not a valid type. %s", args.get(1), FormatUtils.formatOptions(Type.class)));
+			throw new CommandException(String.format("`%s` is not a valid type. %s", args.get(1), FormatUtils.options(Type.class)));
 		}
 
 		switch (type) {

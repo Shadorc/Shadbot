@@ -44,7 +44,7 @@ public class DiabloCmd extends AbstractCommand {
 		final Region region = Utils.getEnum(Region.class, args.get(0));
 		if(region == null) {
 			throw new CommandException(String.format("`%s` is not a valid Region. %s",
-					args.get(0), FormatUtils.formatOptions(Region.class)));
+					args.get(0), FormatUtils.options(Region.class)));
 		}
 
 		final String battletag = args.get(1).replaceAll("#", "-");
@@ -89,7 +89,7 @@ public class DiabloCmd extends AbstractCommand {
 							.addField("Heroes", FormatUtils.format(heroResponses,
 									hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
 							.addField("Damage", FormatUtils.format(heroResponses,
-									hero -> String.format("%s DPS", FormatUtils.formatNum(hero.getStats().getDamage())), "\n"), true))
+									hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true))
 					.flatMap(loadingMsg::send)
 					.then();
 

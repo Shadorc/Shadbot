@@ -26,7 +26,7 @@ public class CoinsCmd extends AbstractCommand {
 				.next()
 				.flatMap(user -> {
 					final DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId(), user.getId());
-					final String coins = FormatUtils.formatCoins(dbMember.getCoins());
+					final String coins = FormatUtils.coins(dbMember.getCoins());
 
 					String text;
 					if(user.getId().equals(context.getAuthorId())) {

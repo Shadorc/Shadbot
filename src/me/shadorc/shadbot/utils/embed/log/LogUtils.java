@@ -56,12 +56,12 @@ public class LogUtils {
 
 	public static void cannot(Class<?> clazz, Snowflake guildId, Permission permission) {
 		LogUtils.infof("{Guild ID: %d} {%s} Missing permission: %s",
-				clazz.getSimpleName(), guildId.asLong(), FormatUtils.formatPermission(permission));
+				clazz.getSimpleName(), guildId.asLong(), FormatUtils.capitalizeFully(permission));
 	}
 
 	public static void cannot(Class<?> clazz, Permission permission) {
 		LogUtils.infof("{%s} Missing permission: %s",
-				clazz.getSimpleName(), FormatUtils.formatPermission(permission));
+				clazz.getSimpleName(), FormatUtils.capitalizeFully(permission));
 	}
 
 	public static void cannotSpeak(Class<?> clazz, Snowflake guildId) {

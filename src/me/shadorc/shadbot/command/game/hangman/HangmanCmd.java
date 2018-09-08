@@ -47,7 +47,7 @@ public class HangmanCmd extends AbstractCommand {
 
 		if(difficulty == null) {
 			throw new CommandException(String.format("`%s` is not a valid difficulty. %s",
-					context.getArg().get(), FormatUtils.formatOptions(Difficulty.class)));
+					context.getArg().get(), FormatUtils.options(Difficulty.class)));
 		}
 
 		if(HARD_WORDS.isEmpty() || EASY_WORDS.isEmpty()) {

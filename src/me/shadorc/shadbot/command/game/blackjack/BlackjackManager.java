@@ -144,7 +144,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 						case 1:
 							gains += (int) Math.ceil(player.getBet() * WIN_MULTIPLIER);
 							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
-							text = String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
+							text = String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.coins(gains));
 							break;
 						case 0:
 							text = String.format("**%s** (Draw)", user.getUsername());
@@ -152,7 +152,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 						case -1:
 							gains -= player.getBet();
 							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
-							text = String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.formatCoins(Math.abs(gains)));
+							text = String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
 							break;
 					}
 

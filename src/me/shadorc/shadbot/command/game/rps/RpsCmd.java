@@ -30,7 +30,7 @@ public class RpsCmd extends AbstractCommand {
 
 		final Handsign userHandsign = Utils.getEnum(Handsign.class, arg);
 		if(userHandsign == null) {
-			throw new CommandException(String.format("`%s` is not a valid handsign. %s.", arg, FormatUtils.formatOptions(Handsign.class)));
+			throw new CommandException(String.format("`%s` is not a valid handsign. %s.", arg, FormatUtils.options(Handsign.class)));
 		}
 
 		final Handsign botHandsign = Utils.randValue(Handsign.values());

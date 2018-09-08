@@ -146,7 +146,7 @@ public class Utils {
 
 		if(bet > maxValue) {
 			throw new CommandException(String.format("Sorry, you can't bet more than **%s**.",
-					FormatUtils.formatCoins(maxValue)));
+					FormatUtils.coins(maxValue)));
 		}
 
 		return bet;

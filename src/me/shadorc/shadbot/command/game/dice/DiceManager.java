@@ -68,7 +68,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 							.setAuthor("Dice Game", null, avatarUrl)
 							.setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 							.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
-									this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.formatCoins(this.bet)))
+									this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
 							.addField("Player", String.join("\n", usernames), true)
 							.addField("Number", FormatUtils.format(this.numsPlayers.keySet(), Object::toString, "\n"), true);
 
@@ -107,7 +107,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
 					}
 					DatabaseManager.getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
-					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
+					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.coins(gains));
 				})
 				.collectList()
 				.map(list -> this.results = String.join("\n", list))

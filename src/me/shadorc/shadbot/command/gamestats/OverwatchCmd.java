@@ -76,7 +76,7 @@ public class OverwatchCmd extends AbstractCommand {
 		}
 
 		throw new CommandException(String.format("Platform not found. Try again specifying it. %s",
-				FormatUtils.formatOptions(Platform.class)));
+				FormatUtils.options(Platform.class)));
 	}
 
 	private Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String platformStr, String battletag) throws IOException {
@@ -84,7 +84,7 @@ public class OverwatchCmd extends AbstractCommand {
 		final Platform platform = Utils.getEnum(Platform.class, platformStr);
 		if(platform == null) {
 			throw new CommandException(String.format("`%s` is not a valid Platform. %s",
-					platformStr, FormatUtils.formatOptions(Platform.class)));
+					platformStr, FormatUtils.options(Platform.class)));
 		}
 
 		final ProfileResponse profile = Utils.MAPPER.readValue(this.getUrl("profile", platform, username), ProfileResponse.class);

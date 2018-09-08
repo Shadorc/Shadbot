@@ -43,7 +43,7 @@ public class BackwardCmd extends AbstractCommand {
 
 					final long newPosition = guildMusic.getScheduler().changePosition(-TimeUnit.SECONDS.toMillis(num));
 					return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New position set to **%s** by **%s**.",
-							FormatUtils.formatShortDuration(newPosition), context.getUsername()),
+							FormatUtils.shortDuration(newPosition), context.getUsername()),
 							context.getChannel())
 							.then();
 				});

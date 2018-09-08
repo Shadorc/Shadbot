@@ -80,7 +80,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 									this.getContext().getPrefix(), this.getContext().getCommandName(),
 									FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
 							.addField("Player (Bet)", FormatUtils.format(users,
-									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.formatCoins(this.playersPlace.get(user.getId()).getT1())), "\n"), true)
+									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.coins(this.playersPlace.get(user.getId()).getT1())), "\n"), true)
 							.addField("Place", this.playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
 
 					if(this.results != null) {
@@ -130,10 +130,10 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 
 					if(gains > 0) {
 						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
-						return String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.formatCoins(gains));
+						return String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.coins(gains));
 					} else {
 						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
-						return String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.formatCoins(Math.abs(gains)));
+						return String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
 					}
 				})
 				.collectSortedList()

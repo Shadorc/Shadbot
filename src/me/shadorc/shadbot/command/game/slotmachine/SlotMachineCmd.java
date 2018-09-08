@@ -53,7 +53,7 @@ public class SlotMachineCmd extends AbstractCommand {
 
 		return BotUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",
 				FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername(),
-				gains > 0 ? "win" : "lose", FormatUtils.formatCoins(Math.abs(gains))), context.getChannel())
+				gains > 0 ? "win" : "lose", FormatUtils.coins(Math.abs(gains))), context.getChannel())
 				.then();
 	}
 

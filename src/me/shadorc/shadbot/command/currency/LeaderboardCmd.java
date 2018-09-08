@@ -33,7 +33,7 @@ public class LeaderboardCmd extends AbstractCommand {
 						count -> {
 							final Tuple2<User, Integer> userAndCoins = list.get(count - 1);
 							final String username = userAndCoins.getT1().getUsername();
-							final String coins = FormatUtils.formatCoins(userAndCoins.getT2());
+							final String coins = FormatUtils.coins(userAndCoins.getT2());
 							return String.format("%d. **%s** - %s", count, username, coins);
 						}))
 				.defaultIfEmpty("\nEveryone is poor here.")
