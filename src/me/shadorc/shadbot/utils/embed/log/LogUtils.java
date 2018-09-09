@@ -10,7 +10,7 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogBuilder.LogType;
 
 public class LogUtils {
@@ -56,12 +56,12 @@ public class LogUtils {
 
 	public static void cannot(Class<?> clazz, Snowflake guildId, Permission permission) {
 		LogUtils.infof("{Guild ID: %d} {%s} Missing permission: %s",
-				clazz.getSimpleName(), guildId.asLong(), FormatUtils.capitalizeFully(permission));
+				clazz.getSimpleName(), guildId.asLong(), StringUtils.capitalizeEnum(permission));
 	}
 
 	public static void cannot(Class<?> clazz, Permission permission) {
 		LogUtils.infof("{%s} Missing permission: %s",
-				clazz.getSimpleName(), FormatUtils.capitalizeFully(permission));
+				clazz.getSimpleName(), StringUtils.capitalizeEnum(permission));
 	}
 
 	public static void cannotSpeak(Class<?> clazz, Snowflake guildId) {

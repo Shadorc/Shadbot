@@ -97,16 +97,14 @@ public class AutoMessageSetting extends AbstractSetting {
 			}
 
 			return warningFlux.then(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s set to `%s`",
-					StringUtils.capitalizeFully(setting.toString().replace("_", " ")), message), context.getChannel()));
+					StringUtils.capitalizeEnum(setting), message), context.getChannel()));
 
 		} else {
 			dbGuild.removeSetting(setting);
 			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s disabled.",
-					StringUtils.capitalizeFully(setting.toString().replace("_", " "))), context.getChannel());
+					StringUtils.capitalizeEnum(setting)), context.getChannel());
 		}
 	}
-
-	// TODO create a function FormatUtils#enum to format enum and use enum everywhere here
 
 	@Override
 	public EmbedCreateSpec getHelp(Context context) {
@@ -117,9 +115,9 @@ public class AutoMessageSetting extends AbstractSetting {
 						+ "%n**value** - a message for *%s* and *%s* or a @channel for *%s*",
 						FormatUtils.format(Action.class, "/"),
 						FormatUtils.format(Type.class, "/"),
-						Type.JOIN_MESSAGE.toString().toLowerCase(),
-						Type.LEAVE_MESSAGE.toString().toLowerCase(),
-						Type.CHANNEL.toString().toLowerCase()), false)
+						StringUtils.toLowerCase(Type.JOIN_MESSAGE),
+						StringUtils.toLowerCase(Type.LEAVE_MESSAGE),
+						StringUtils.toLowerCase(Type.CHANNEL)), false)
 				.addField("Info", "You don't need to specify *value* to disable a type.", false)
 				.addField("Example", String.format("`%s%s enable join_message Hello you (:`"
 						+ "%n`%s%s disable leave_message`",

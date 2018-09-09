@@ -17,6 +17,7 @@ import me.shadorc.shadbot.data.stats.core.TableStatistic;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -73,12 +74,12 @@ public class StatsCmd extends AbstractCommand {
 					(v1, v2) -> Long.compare(v1.getValue().get(), v1.getValue().get());
 			final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
 
-			embed.addField("Name", FormatUtils.format(sortedMap.keySet(), key -> key.toString().toLowerCase(), "\n"), true)
+			embed.addField("Name", FormatUtils.format(sortedMap.keySet(), StringUtils::toLowerCase, "\n"), true)
 					.addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.number(Long.parseLong(value.toString())), "\n"), true);
 		}
 
 		return context.getAvatarUrl()
-				.map(avatarUrl -> embed.setAuthor(String.format("Stats: %s", statEnum.toString().toLowerCase()), null, avatarUrl))
+				.map(avatarUrl -> embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, avatarUrl))
 				.flatMap(embedItr -> BotUtils.sendMessage(embedItr, context.getChannel()))
 				.then();
 	}

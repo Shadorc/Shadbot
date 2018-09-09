@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.game.slotmachine;
 
+import me.shadorc.shadbot.utils.StringUtils;
+
 public enum SlotOptions {
 
 	CHERRIES(70),
@@ -17,6 +19,6 @@ public enum SlotOptions {
 	}
 
 	public String getEmoji() {
-		return String.format(":%s:", this.toString().toLowerCase());
+		return String.format(":%s:", StringUtils.toLowerCase(this));
 	}
 }

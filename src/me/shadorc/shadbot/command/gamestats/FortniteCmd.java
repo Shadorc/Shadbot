@@ -23,6 +23,7 @@ import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -56,7 +57,7 @@ public class FortniteCmd extends AbstractCommand {
 		try {
 			final String encodedNickname = NetUtils.encode(epicNickname);
 			final URL url = new URL(String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
-					platform.toString().toLowerCase(), encodedNickname));
+					StringUtils.toLowerCase(platform), encodedNickname));
 
 			final Response response = Jsoup.connect(url.toString())
 					.method(Method.GET)
@@ -96,7 +97,7 @@ public class FortniteCmd extends AbstractCommand {
 						return EmbedUtils.getDefaultEmbed()
 								.setAuthor("Fortnite Stats",
 										String.format("https://fortnitetracker.com/profile/%s/%s",
-												platform.toString().toLowerCase(), encodedNickname),
+												StringUtils.toLowerCase(platform), encodedNickname),
 										avatarUrl)
 								.setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
 								.setDescription(description);

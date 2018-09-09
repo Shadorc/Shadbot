@@ -68,7 +68,7 @@ public class UserInfoCmd extends AbstractCommand {
 						embed.addField("Roles", FormatUtils.format(roles, Role::getMention, "\n"), true);
 					}
 
-					embed.addField("Status", StringUtils.capitalizeFully(presence.getStatus().getValue()), true);
+					embed.addField("Status", StringUtils.capitalize(presence.getStatus().getValue()), true);
 					presence.getActivity()
 							.map(Activity::getName)
 							.ifPresent(details -> embed.addField("Playing text", details, true));

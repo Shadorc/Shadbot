@@ -55,11 +55,27 @@ public class StringUtils {
 	 * @param str - the String to capitalize, may be null
 	 * @return The capitalized String, null if null String input
 	 */
-	public static String capitalizeFully(String str) {
+	public static String capitalize(String str) {
 		if(str == null || str.isEmpty()) {
 			return str;
 		}
 		return str.substring(0, 1).toUpperCase() + str.toLowerCase().substring(1);
+	}
+
+	/**
+	 * @param enumeration - the enumeration to format
+	 * @return The enumeration converted to a capitalized string with underscores replaced with spaces
+	 */
+	public static <E extends Enum<E>> String capitalizeEnum(E enumeration) {
+		return StringUtils.capitalize(StringUtils.toLowerCase(enumeration).replace("_", " "));
+	}
+
+	/**
+	 * @param object - the object to format
+	 * @return The object converted to a lower case string
+	 */
+	public static String toLowerCase(Object object) {
+		return object.toString().toLowerCase();
 	}
 
 	/**

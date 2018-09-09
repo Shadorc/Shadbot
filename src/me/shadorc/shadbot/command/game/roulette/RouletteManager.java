@@ -22,6 +22,7 @@ import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -78,7 +79,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 							.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
 									+ "%n%n**Place** is a `number between 1 and 36`, %s",
 									this.getContext().getPrefix(), this.getContext().getCommandName(),
-									FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
+									FormatUtils.format(Place.values(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", ")))
 							.addField("Player (Bet)", FormatUtils.format(users,
 									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.coins(this.playersPlace.get(user.getId()).getT1())), "\n"), true)
 							.addField("Place", this.playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);

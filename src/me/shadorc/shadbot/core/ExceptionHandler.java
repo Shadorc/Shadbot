@@ -24,6 +24,7 @@ import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -137,7 +138,7 @@ public class ExceptionHandler {
 		}
 
 		final List<String> permissionsStr = permissions.stream()
-				.map(FormatUtils::capitalizeFully)
+				.map(StringUtils::capitalizeEnum)
 				.collect(Collectors.toList());
 
 		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of permission."

@@ -104,8 +104,8 @@ public class TranslateCmd extends AbstractCommand {
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Translation", null, avatarUrl)
 							.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
-									StringUtils.capitalizeFully(LANG_ISO_MAP.inverse().get(langFrom)), sourceText,
-									StringUtils.capitalizeFully(LANG_ISO_MAP.inverse().get(langTo)), translatedText.toString())))
+									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)), sourceText,
+									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)), translatedText.toString())))
 					.flatMap(embed -> loadingMsg.send(embed))
 					.then();
 

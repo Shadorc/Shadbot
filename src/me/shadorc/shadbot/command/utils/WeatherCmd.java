@@ -72,7 +72,7 @@ public class WeatherCmd extends AbstractCommand {
 									avatarUrl)
 							.setThumbnail(weather.getIconLink())
 							.setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
-							.addField(Emoji.CLOUD + " Clouds", StringUtils.capitalizeFully(weather.getDescription()), true)
+							.addField(Emoji.CLOUD + " Clouds", StringUtils.capitalize(weather.getDescription()), true)
 							.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
 							.addField(Emoji.RAIN + " Rain", rain, true)
 							.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)

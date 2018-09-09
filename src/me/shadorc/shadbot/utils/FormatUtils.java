@@ -36,12 +36,12 @@ public class FormatUtils {
 	}
 
 	public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
-		return FormatUtils.format(enumClass.getEnumConstants(), FormatUtils::toLowerCase, delimiter);
+		return FormatUtils.format(enumClass.getEnumConstants(), StringUtils::toLowerCase, delimiter);
 	}
 
 	public static <E extends Enum<E>> String options(Class<E> enumClass) {
 		return String.format("Options: %s",
-				FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", FormatUtils.toLowerCase(value)), ", "));
+				FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", "));
 	}
 
 	public static String number(double num) {
@@ -84,7 +84,7 @@ public class FormatUtils {
 		final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
 		final String str = period.getUnits().stream()
 				.filter(unit -> period.get(unit) != 0)
-				.map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
+				.map(unit -> String.format("%d %s", period.get(unit), StringUtils.toLowerCase(unit)))
 				.collect(Collectors.joining(", "));
 		return str.isEmpty() ? FormatUtils.shortDuration(instant.toEpochMilli()) : str;
 	}
@@ -101,22 +101,6 @@ public class FormatUtils {
 				days > 0 ? StringUtils.pluralOf(days, "day") + " " : "",
 				hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "",
 				StringUtils.pluralOf(minutes % 60, "minute"));
-	}
-
-	/**
-	 * @param object - the object to format
-	 * @return The object converted to a lower case string with underscores replaced with spaces
-	 */
-	public static String toLowerCase(Object object) {
-		return object.toString().toLowerCase().replace("_", " ");
-	}
-
-	/**
-	 * @param object - the object to format
-	 * @return The object converted to a fully capitalized string with underscores replaced with spaces
-	 */
-	public static String capitalizeFully(Object object) {
-		return StringUtils.capitalizeFully(FormatUtils.toLowerCase(object));
 	}
 
 	public static String numberedList(int count, int limit, Function<Integer, String> mapper) {

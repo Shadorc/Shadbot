@@ -33,7 +33,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 
 		final Relic relic = PremiumManager.generateRelic(type);
 		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-				StringUtils.capitalizeFully(type.toString()), relic.getId()), context.getChannel())
+				StringUtils.capitalize(type.toString()), relic.getId()), context.getChannel())
 				.then();
 	}
 

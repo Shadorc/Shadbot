@@ -14,6 +14,7 @@ import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -42,7 +43,7 @@ public class RouletteCmd extends AbstractCommand {
 		// Match [1-36], red, black, odd, even, high or low
 		if(!place.matches("^([1-9]|1[0-9]|2[0-9]|3[0-6])$") && Utils.getEnum(Place.class, place) == null) {
 			throw new CommandException(String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
-					place, FormatUtils.format(Place.values(), value -> String.format("**%s**", value.toString().toLowerCase()), ", ")));
+					place, FormatUtils.format(Place.values(), value -> String.format("**%s**", StringUtils.toLowerCase(value)), ", ")));
 		}
 
 		RouletteManager rouletteManager = MANAGERS.putIfAbsent(context.getChannelId(), new RouletteManager(context));

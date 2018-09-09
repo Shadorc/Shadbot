@@ -16,6 +16,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -49,7 +50,7 @@ public class OverwatchCmd extends AbstractCommand {
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
-									platform.toString().toLowerCase(), profile.getUsername()), avatarUrl)
+									StringUtils.toLowerCase(platform), profile.getUsername()), avatarUrl)
 							.setThumbnail(profile.getPortrait())
 							.setDescription(String.format("Stats for user **%s**", profile.getUsername()))
 							.addField("Level", profile.getLevel(), true)
@@ -101,7 +102,7 @@ public class OverwatchCmd extends AbstractCommand {
 
 	private URL getUrl(String endpoint, Platform platform, String username) throws MalformedURLException {
 		return new URL(String.format("http://ow-api.herokuapp.com/%s/%s/global/%s",
-				endpoint, platform.toString().toLowerCase(), username));
+				endpoint, StringUtils.toLowerCase(platform), username));
 	}
 
 	@Override
