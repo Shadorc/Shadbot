@@ -17,6 +17,7 @@ public class Config {
 	public static final Properties PROPERTIES = Config.getProperties();
 
 	public static final String VERSION = PROPERTIES.getProperty("version");
+	public static final boolean IS_SNAPSHOT = VERSION.endsWith("SNAPSHOT");
 	public static final String GITHUB_URL = PROPERTIES.getProperty("url.github");
 	public static final String PATREON_URL = PROPERTIES.getProperty("url.patreon");
 	public static final String SUPPORT_SERVER_URL = PROPERTIES.getProperty("url.support.server");

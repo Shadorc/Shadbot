@@ -120,6 +120,9 @@ public class NetUtils {
 	 * @param client - the client from which to post statistics
 	 */
 	public static Mono<Void> postStats(DiscordClient client) {
+		if(Config.IS_SNAPSHOT) {
+			return Mono.empty();
+		}
 		return Mono.fromRunnable(() -> LogUtils.infof("{Shard %d} Posting statistics...", client.getConfig().getShardIndex()))
 				.then(NetUtils.postStatsOn(client, "https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN))
 				.then(NetUtils.postStatsOn(client, "https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN))
