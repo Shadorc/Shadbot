@@ -14,6 +14,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -51,7 +52,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 
 		final Snowflake guildId = context.getGuildId();
 
-		return BotUtils.getMembersFrom(message)
+		return DiscordUtils.getMembersFrom(message)
 				.collectList()
 				.map(users -> {
 					final String mentionsStr = message.mentionsEveryone() ? "Everyone" : FormatUtils.format(users, User::getUsername, ", ");

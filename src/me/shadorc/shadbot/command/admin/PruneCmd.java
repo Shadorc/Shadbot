@@ -18,7 +18,7 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -78,7 +78,7 @@ public class PruneCmd extends AbstractCommand {
 									|| this.getEmbedContent(message).contains(words))
 							.collectList();
 				})
-				.flatMap(messages -> BotUtils.bulkDelete(context.getChannel().cast(TextChannel.class), messages))
+				.flatMap(messages -> DiscordUtils.bulkDelete(context.getChannel().cast(TextChannel.class), messages))
 				.flatMap(deletedMessages -> loadingMsg.send(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
 						context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
 				.then();

@@ -1,14 +1,11 @@
 package me.shadorc.shadbot.utils;
 
-import java.util.Collections;
 import java.util.List;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
@@ -20,7 +17,6 @@ import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class BotUtils {
@@ -46,36 +42,9 @@ public class BotUtils {
 				.doOnSuccess(message -> StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT));
 	}
 
-	/**
-	 * @param channel - the channel containing the messages to delete
-	 * @param messages - the {@link List} of messages to delete
-	 * @return The number of deleted messages
-	 */
-	public static Mono<Integer> bulkDelete(Mono<TextChannel> channel, List<Message> messages) {
-		switch (messages.size()) {
-			case 0:
-				return Mono.just(messages.size());
-			case 1:
-				return messages.get(0).delete().thenReturn(messages.size());
-			default:
-				return channel
-						.flatMap(channelItr -> channelItr.bulkDelete(Flux.fromIterable(messages)
-								.map(Message::getId))
-								.collectList()
-								.map(messagesNotDeleted -> messages.size() - messagesNotDeleted.size()));
-		}
-	}
-
 	public static Mono<Void> updatePresence(DiscordClient client) {
 		return Mono.just(String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES)))
 				.flatMap(text -> client.updatePresence(Presence.online(Activity.playing(text))));
-	}
-
-	public static Flux<Member> getMembersFrom(Message message) {
-		return DiscordUtils.getMembers(message.getGuild())
-				.filter(member -> message.mentionsEveryone()
-						|| message.getUserMentionIds().contains(member.getId())
-						|| !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
 	}
 
 	public static boolean hasAllowedRole(Snowflake guildId, List<Role> roles) {

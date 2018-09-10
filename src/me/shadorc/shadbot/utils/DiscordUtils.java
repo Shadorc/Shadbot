@@ -2,6 +2,7 @@ package me.shadorc.shadbot.utils;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -14,7 +15,9 @@ import discord4j.core.event.domain.Event;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Image.Format;
 import discord4j.core.object.util.Permission;
@@ -32,6 +35,37 @@ public class DiscordUtils {
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
+
+	/**
+	 * @param channel - the channel containing the messages to delete
+	 * @param messages - the {@link List} of messages to delete
+	 * @return The number of deleted messages
+	 */
+	public static Mono<Integer> bulkDelete(Mono<TextChannel> channel, List<Message> messages) {
+		switch (messages.size()) {
+			case 0:
+				return Mono.just(messages.size());
+			case 1:
+				return messages.get(0).delete().thenReturn(messages.size());
+			default:
+				return channel
+						.flatMap(channelItr -> channelItr.bulkDelete(Flux.fromIterable(messages)
+								.map(Message::getId))
+								.collectList()
+								.map(messagesNotDeleted -> messages.size() - messagesNotDeleted.size()));
+		}
+	}
+
+	/**
+	 * @param message - the message
+	 * @return The members mentioned in a {@link Message}
+	 */
+	public static Flux<Member> getMembersFrom(Message message) {
+		return DiscordUtils.getMembers(message.getGuild())
+				.filter(member -> message.mentionsEveryone()
+						|| message.getUserMentionIds().contains(member.getId())
+						|| !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
+	}
 
 	public static Flux<Member> getMembers(Guild guild) {
 		return DiscordUtils.getMembers(Mono.just(guild));
@@ -144,8 +178,7 @@ public class DiscordUtils {
 
 	public static <T extends Event> void registerListener(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
 		client.getEventDispatcher().on(eventClass)
-				.doOnError(err -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
-				.retry()
+				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
 				.subscribe(consumer);
 	}
 
