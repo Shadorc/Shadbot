@@ -25,12 +25,11 @@ public class VolumeSetting extends AbstractSetting {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(2);
-		final String arg = args.get(1);
 
-		final Integer volume = NumberUtils.asIntBetween(arg, MIN_VOLUME, MAX_VOLUME);
+		final Integer volume = NumberUtils.asIntBetween(args.get(1), MIN_VOLUME, MAX_VOLUME);
 		if(volume == null) {
 			throw new CommandException(String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
-					arg, MIN_VOLUME, MAX_VOLUME));
+					args.get(1), MIN_VOLUME, MAX_VOLUME));
 		}
 
 		DatabaseManager.getDBGuild(context.getGuildId()).setSetting(this.getSetting(), volume);

@@ -57,7 +57,7 @@ public class SettingsCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final List<String> args = context.requireAtLeastArgs(1);
+		final List<String> args = context.requireArgs(1, Integer.MAX_VALUE);
 
 		final SettingEnum settingEnum = Utils.getEnum(SettingEnum.class, args.get(0));
 		final AbstractSetting setting = SETTINGS_MAP.get(settingEnum);

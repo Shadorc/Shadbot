@@ -37,16 +37,15 @@ public class AutoMessageSetting extends AbstractSetting {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(3, 4);
-		args.remove(0);
 
-		final Action action = Utils.getEnum(Action.class, args.get(0));
+		final Action action = Utils.getEnum(Action.class, args.get(1));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.options(Action.class)));
+			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
 		}
 
-		final Type type = Utils.getEnum(Type.class, args.get(1));
+		final Type type = Utils.getEnum(Type.class, args.get(2));
 		if(type == null) {
-			throw new CommandException(String.format("`%s` is not a valid type. %s", args.get(1), FormatUtils.options(Type.class)));
+			throw new CommandException(String.format("`%s` is not a valid type. %s", args.get(2), FormatUtils.options(Type.class)));
 		}
 
 		switch (type) {
@@ -83,17 +82,18 @@ public class AutoMessageSetting extends AbstractSetting {
 	private Mono<Message> updateMessage(Context context, SettingEnum setting, Action action, List<String> args) {
 		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
 		if(Action.ENABLE.equals(action)) {
-			if(args.size() < 3) {
+			if(args.size() < 4) {
 				throw new MissingArgumentException();
 			}
-			final String message = args.get(2);
+			final String message = args.get(3);
 			dbGuild.setSetting(setting, message);
 
 			Flux<Message> warningFlux = Flux.empty();
 			if(!dbGuild.getMessageChannelId().isPresent()) {
 				warningFlux = warningFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.WARNING + " You need to specify a channel "
-						+ "in which send the auto-messages. Use `%s%s add channel <@channel>`",
-						context.getPrefix(), this.getCommandName()), context.getChannel()));
+						+ "in which send the auto-messages. Use `%s%s %s %s <#channel>`",
+						context.getPrefix(), this.getCommandName(),
+						StringUtils.toLowerCase(Action.ENABLE), StringUtils.toLowerCase(Type.CHANNEL)), context.getChannel()));
 			}
 
 			return warningFlux.then(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s set to `%s`",

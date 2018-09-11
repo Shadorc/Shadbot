@@ -30,14 +30,13 @@ public class BlacklistSettingCmd extends AbstractSetting {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(3);
-		args.remove(0);
 
-		final Action action = Utils.getEnum(Action.class, args.get(0));
+		final Action action = Utils.getEnum(Action.class, args.get(1));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.options(Action.class)));
+			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
 		}
 
-		final List<String> commands = StringUtils.split(args.get(1).toLowerCase());
+		final List<String> commands = StringUtils.split(args.get(2).toLowerCase());
 
 		final List<String> unknownCmds = commands.stream().filter(cmd -> CommandManager.getCommand(cmd) == null).collect(Collectors.toList());
 		if(!unknownCmds.isEmpty()) {

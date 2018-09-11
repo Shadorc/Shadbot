@@ -22,14 +22,13 @@ public class PrefixSetting extends AbstractSetting {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(2);
-		final String arg = args.get(1);
 
-		if(arg.length() > MAX_PREFIX_LENGTH) {
+		if(args.get(1).length() > MAX_PREFIX_LENGTH) {
 			throw new CommandException(String.format("Prefix cannot contain more than %s characters.", MAX_PREFIX_LENGTH));
 		}
 
-		DatabaseManager.getDBGuild(context.getGuildId()).setSetting(this.getSetting(), arg);
-		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", arg), context.getChannel()).then();
+		DatabaseManager.getDBGuild(context.getGuildId()).setSetting(this.getSetting(), args.get(1));
+		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", args.get(1)), context.getChannel()).then();
 	}
 
 	@Override

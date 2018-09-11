@@ -32,12 +32,11 @@ public class PermissionsSetting extends AbstractSetting {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final List<String> args = context.requireArgs(2);
-		args.remove(0);
+		final List<String> args = context.requireArgs(3);
 
-		final Action action = Utils.getEnum(Action.class, args.get(0));
+		final Action action = Utils.getEnum(Action.class, args.get(1));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.options(Action.class)));
+			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
 		}
 
 		final Set<Snowflake> mentionedRoles = context.getMessage().getRoleMentionIds();

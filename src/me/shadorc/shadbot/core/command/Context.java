@@ -159,20 +159,16 @@ public class Context {
 				.orElseThrow(MissingArgumentException::new);
 	}
 
-	public List<String> requireAtLeastArgs(int min) {
-		return this.requireArgs(min, Integer.MAX_VALUE);
-	}
-
 	public List<String> requireArgs(int count) {
-		return this.requireArgs(count, count);
-	}
-
-	public List<String> requireArgs(int count, String delimiter) {
 		return this.requireArgs(count, count);
 	}
 
 	public List<String> requireArgs(int min, int max) {
 		return this.requireArgs(min, max, Config.DEFAULT_COMMAND_DELIMITER);
+	}
+
+	public List<String> requireArgs(int count, String delimiter) {
+		return this.requireArgs(count, count, delimiter);
 	}
 
 	public List<String> requireArgs(int min, int max, String delimiter) {

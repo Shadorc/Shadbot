@@ -33,11 +33,10 @@ public class AutoRoleSetting extends AbstractSetting {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(3);
-		args.remove(0);
 
-		final Action action = Utils.getEnum(Action.class, args.get(0));
+		final Action action = Utils.getEnum(Action.class, args.get(1));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(0), FormatUtils.options(Action.class)));
+			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
 		}
 
 		final Set<Snowflake> mentionedRoles = context.getMessage().getRoleMentionIds();
@@ -53,18 +52,18 @@ public class AutoRoleSetting extends AbstractSetting {
 			autoRoles.addAll(mentionedRoles);
 			message = Flux.fromIterable(autoRoles)
 					.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-					.map(Role::getMention)
+					.map(Role::getName)
 					.collectList()
 					.flatMap(roles -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New comers will now have role(s): %s",
-							FormatUtils.format(roles, role -> String.format("`%s`", role), ", ")), context.getChannel()));
+							FormatUtils.format(roles, role -> String.format("`@%s`", role), ", ")), context.getChannel()));
 		} else {
 			autoRoles.removeAll(mentionedRoles);
 			message = Flux.fromIterable(mentionedRoles)
 					.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-					.map(Role::getMention)
+					.map(Role::getName)
 					.collectList()
 					.flatMap(roles -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
-							FormatUtils.format(roles, role -> String.format("`%s`", role), ", ")), context.getChannel()));
+							FormatUtils.format(roles, role -> String.format("`@%s`", role), ", ")), context.getChannel()));
 		}
 
 		dbGuild.setSetting(this.getSetting(), autoRoles);

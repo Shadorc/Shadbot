@@ -27,11 +27,10 @@ public class NSFWSetting extends AbstractSetting {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(2);
-		final String arg = args.get(1);
 
-		final Action action = Utils.getEnum(Action.class, arg);
+		final Action action = Utils.getEnum(Action.class, args.get(1));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", arg, FormatUtils.options(Action.class)));
+			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
 		}
 
 		return context.getChannel()
