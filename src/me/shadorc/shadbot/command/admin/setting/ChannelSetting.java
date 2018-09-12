@@ -83,13 +83,13 @@ public class ChannelSetting extends AbstractSetting {
 						}
 
 						messagesFlux = messagesFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
-								FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")), context.getChannel()));
+								FormatUtils.format(mentionedChannels, DiscordUtils::mentionChannel, ", ")), context.getChannel()));
 
 					} else {
 						allowedTextChannels.removeAll(mentionedChannels);
 						allowedVoiceChannels.removeAll(mentionedChannels);
 						messagesFlux = messagesFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
-								FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")), context.getChannel()));
+								FormatUtils.format(mentionedChannels, DiscordUtils::mentionChannel, ", ")), context.getChannel()));
 					}
 
 					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);

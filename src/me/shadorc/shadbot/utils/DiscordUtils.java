@@ -103,7 +103,7 @@ public class DiscordUtils {
 		return channelMentions.stream().distinct().collect(Collectors.toList());
 	}
 
-	public static String getChannelMention(Snowflake channelId) {
+	public static String mentionChannel(Snowflake channelId) {
 		return "<#" + channelId.asLong() + ">";
 	}
 
@@ -153,7 +153,7 @@ public class DiscordUtils {
 
 					if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
 						throw new CommandException(String.format("I'm currently playing music in voice channel %s"
-								+ ", join me before using this command.", DiscordUtils.getChannelMention(botVoiceChannelId.get())));
+								+ ", join me before using this command.", DiscordUtils.mentionChannel(botVoiceChannelId.get())));
 					}
 
 					return userVoiceChannelId.get();
