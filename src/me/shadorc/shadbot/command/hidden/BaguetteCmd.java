@@ -30,4 +30,19 @@ public class BaguetteCmd extends AbstractCommand {
 				.build();
 	}
 
+	// Essential part of Shadbot (Thanks to @Bluerin)
+	private String cake;
+
+	public void howToDoAChocolateCake() {
+		String meal = "50g farine";
+		String chocolate = "200g chocolat";
+		String eggs = "3 oeufs";
+		String sugar = "100g sucre";
+		String butter = "100g beurre";
+		this.cake = "Mélanger " + meal + " " + sugar + " " + eggs + " dans un saladier." +
+				"\nFaire fondre au bain-marie " + chocolate + butter +
+				"\nRajouter le chocolat et le beurre dans le saladier.\nVerser le mélange dans un moule et enfourner pendant 25min à 180°C.";
+		System.out.println(this.cake);
+	}
+
 }
