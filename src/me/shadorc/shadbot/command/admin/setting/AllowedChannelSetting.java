@@ -26,7 +26,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Setting(description = "Manage channels allowed to Shadbot.", setting = SettingEnum.ALLOWED_CHANNELS)
-public class ChannelSetting extends AbstractSetting {
+public class AllowedChannelSetting extends AbstractSetting {
 
 	private enum Action {
 		ADD, REMOVE;
