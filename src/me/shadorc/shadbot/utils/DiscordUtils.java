@@ -45,6 +45,15 @@ public class DiscordUtils {
 				.collectList();
 	}
 
+	private static List<Snowflake> getChannelMentions(String content) {
+		final Matcher matcher = Pattern.compile("<#([0-9]{1,19})>").matcher(content);
+		final List<Snowflake> channelMentions = new ArrayList<>();
+		while(matcher.find()) {
+			channelMentions.add(Snowflake.of(matcher.group(1)));
+		}
+		return channelMentions.stream().distinct().collect(Collectors.toList());
+	}
+
 	/**
 	 * @param channel - the channel containing the messages to delete
 	 * @param messages - the {@link List} of messages to delete
@@ -101,15 +110,6 @@ public class DiscordUtils {
 				.flatMap(DiscordUtils::getVoiceChannelId)
 				.flatMap(Mono::justOrEmpty)
 				.count();
-	}
-
-	public static List<Snowflake> getChannelMentions(String content) {
-		final Matcher matcher = Pattern.compile("<#([0-9]{1,19})>").matcher(content);
-		final List<Snowflake> channelMentions = new ArrayList<>();
-		while(matcher.find()) {
-			channelMentions.add(Snowflake.of(matcher.group(1)));
-		}
-		return channelMentions.stream().distinct().collect(Collectors.toList());
 	}
 
 	public static String mentionChannel(Snowflake channelId) {

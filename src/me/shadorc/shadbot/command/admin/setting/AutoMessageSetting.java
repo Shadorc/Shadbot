@@ -61,22 +61,24 @@ public class AutoMessageSetting extends AbstractSetting {
 	}
 
 	private Mono<Message> channel(Context context, Action action) {
-		final List<Snowflake> channelsMentionned = DiscordUtils.getChannelMentions(context.getContent());
-		if(channelsMentionned.size() != 1) {
-			throw new MissingArgumentException();
-		}
+		return DiscordUtils.getChannels(context.getGuild(), context.getContent())
+				.flatMap(channelsMentionned -> {
+					if(channelsMentionned.size() != 1) {
+						throw new MissingArgumentException();
+					}
 
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
-		final Snowflake channelId = channelsMentionned.get(0);
-		if(Action.ENABLE.equals(action)) {
-			dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channelId);
-			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
-					DiscordUtils.mentionChannel(channelId)), context.getChannel());
-		} else {
-			dbGuild.removeSetting(SettingEnum.MESSAGE_CHANNEL_ID);
-			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
-					+ "until a new channel is defined.", DiscordUtils.mentionChannel(channelId)), context.getChannel());
-		}
+					final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
+					final Snowflake channelId = channelsMentionned.get(0);
+					if(Action.ENABLE.equals(action)) {
+						dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channelId);
+						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
+								DiscordUtils.mentionChannel(channelId)), context.getChannel());
+					} else {
+						dbGuild.removeSetting(SettingEnum.MESSAGE_CHANNEL_ID);
+						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
+								+ "until a new channel is defined.", DiscordUtils.mentionChannel(channelId)), context.getChannel());
+					}
+				});
 	}
 
 	private Mono<Message> updateMessage(Context context, SettingEnum setting, Action action, List<String> args) {

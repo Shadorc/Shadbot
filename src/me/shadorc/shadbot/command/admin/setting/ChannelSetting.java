@@ -42,8 +42,10 @@ public class ChannelSetting extends AbstractSetting {
 		return context.getGuild()
 				.flatMapMany(Guild::getChannels)
 				.collectList()
-				.flatMapMany(channels -> {
-					final List<Snowflake> mentionedChannels = DiscordUtils.getChannelMentions(context.getContent());
+				.zipWith(DiscordUtils.getChannels(context.getGuild(), context.getContent()))
+				.flatMapMany(channelsAndMentioned -> {
+					final List<GuildChannel> channels = channelsAndMentioned.getT1();
+					final List<Snowflake> mentionedChannels = channelsAndMentioned.getT2();
 					if(mentionedChannels.isEmpty()) {
 						throw new MissingArgumentException();
 					}
