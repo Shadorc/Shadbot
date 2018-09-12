@@ -14,6 +14,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
@@ -35,6 +36,14 @@ public class DiscordUtils {
 	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
+
+	public static <T extends GuildChannel> Mono<List<Snowflake>> getChannels(Mono<Guild> guild, String content) {
+		return guild.flatMapMany(Guild::getChannels)
+				.filter(channel -> content.toLowerCase().contains(channel.getName()))
+				.map(GuildChannel::getId)
+				.concatWith(Flux.fromIterable(DiscordUtils.getChannelMentions(content)))
+				.collectList();
+	}
 
 	/**
 	 * @param channel - the channel containing the messages to delete
