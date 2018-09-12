@@ -38,8 +38,13 @@ public class DiscordUtils {
 	public static final int MAX_REASON_LENGTH = 512;
 
 	public static <T extends GuildChannel> Mono<List<Snowflake>> getChannels(Mono<Guild> guild, String content) {
+		final List<String> words = StringUtils.split(content).stream()
+				.map(String::toLowerCase)
+				.map(word -> word.replace("#", ""))
+				.collect(Collectors.toList());
+
 		return guild.flatMapMany(Guild::getChannels)
-				.filter(channel -> content.toLowerCase().contains(channel.getName()))
+				.filter(channel -> words.contains(channel.getName()))
 				.map(GuildChannel::getId)
 				.concatWith(Flux.fromIterable(DiscordUtils.getChannelMentions(content)))
 				.collectList();
