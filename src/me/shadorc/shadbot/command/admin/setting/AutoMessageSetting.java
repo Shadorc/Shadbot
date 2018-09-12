@@ -114,7 +114,7 @@ public class AutoMessageSetting extends AbstractSetting {
 				.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", context.getPrefix(), this.getCommandName()), false)
 				.addField("Argument", String.format("**action** - %s"
 						+ "%n**type** - %s"
-						+ "%n**value** - a message for *%s* and *%s* or a @channel for *%s*",
+						+ "%n**value** - a message for *%s* and *%s* or a #channel for *%s*",
 						FormatUtils.format(Action.class, "/"),
 						FormatUtils.format(Type.class, "/"),
 						StringUtils.toLowerCase(Type.JOIN_MESSAGE),

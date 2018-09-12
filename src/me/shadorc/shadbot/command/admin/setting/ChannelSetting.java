@@ -1,8 +1,6 @@
 package me.shadorc.shadbot.command.admin.setting;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import discord4j.core.object.entity.Channel.Type;
@@ -18,7 +16,6 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.db.DBGuild;
 import me.shadorc.shadbot.data.db.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -47,7 +44,7 @@ public class ChannelSetting extends AbstractSetting {
 					final List<GuildChannel> channels = channelsAndMentioned.getT1();
 					final List<Snowflake> mentionedChannels = channelsAndMentioned.getT2();
 					if(mentionedChannels.isEmpty()) {
-						throw new MissingArgumentException();
+						throw new CommandException(String.format("`%s` is/are not valid channel(s).", args.get(2)));
 					}
 
 					final Action action = Utils.getEnum(Action.class, args.get(1));
@@ -56,8 +53,8 @@ public class ChannelSetting extends AbstractSetting {
 					}
 
 					final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
-					final Set<Snowflake> allowedTextChannels = new HashSet<>(dbGuild.getAllowedTextChannels());
-					final Set<Snowflake> allowedVoiceChannels = new HashSet<>(dbGuild.getAllowedVoiceChannels());
+					final List<Snowflake> allowedTextChannels = dbGuild.getAllowedTextChannels();
+					final List<Snowflake> allowedVoiceChannels = dbGuild.getAllowedVoiceChannels();
 
 					Flux<Message> messagesFlux = Flux.empty();
 					if(Action.ADD.equals(action)) {
@@ -77,9 +74,9 @@ public class ChannelSetting extends AbstractSetting {
 								.collect(Collectors.toList());
 
 						for(Snowflake channelId : mentionedChannels) {
-							if(textChannels.contains(channelId)) {
+							if(textChannels.contains(channelId) && !allowedTextChannels.contains(channelId)) {
 								allowedTextChannels.add(channelId);
-							} else if(voiceChannels.contains(channelId)) {
+							} else if(voiceChannels.contains(channelId) && !allowedVoiceChannels.contains(channelId)) {
 								allowedVoiceChannels.add(channelId);
 							}
 						}
