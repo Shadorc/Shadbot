@@ -10,6 +10,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.data.lotto.LottoManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -39,6 +40,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(ThreadLocalRandom.current().nextInt(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
+			LottoManager.getLotto().addToJackpot(Math.abs(gains));
 			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.coins(Math.abs(gains))));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);

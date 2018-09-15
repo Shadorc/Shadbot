@@ -44,7 +44,6 @@ public class Lotto {
 		this.historic = historic;
 	}
 
-	// TODO from UCDetector: Method "Lotto.addToJackpot(int)" has 0 references
 	public void addToJackpot(int coins) { // NO_UCD (unused code)
 		final int newPool = this.jackpot.get() + (int) Math.ceil(coins / 100f);
 		this.jackpot.set(NumberUtils.between(newPool, 0, Config.MAX_COINS));

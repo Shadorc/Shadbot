@@ -11,6 +11,7 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.db.DBMember;
 import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.data.lotto.LottoManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.exception.CommandException;
@@ -49,6 +50,7 @@ public class SlotMachineCmd extends AbstractCommand {
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
 		} else {
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
+			LottoManager.getLotto().addToJackpot(Math.abs(gains));
 		}
 
 		return BotUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",

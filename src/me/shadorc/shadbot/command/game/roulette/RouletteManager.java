@@ -15,6 +15,7 @@ import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.data.lotto.LottoManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
@@ -134,6 +135,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 						return String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.coins(gains));
 					} else {
 						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
+						LottoManager.getLotto().addToJackpot(Math.abs(gains));
 						return String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
 					}
 				})
