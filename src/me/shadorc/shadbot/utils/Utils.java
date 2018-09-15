@@ -18,8 +18,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
-import org.json.JSONArray;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,18 +78,6 @@ public class Utils {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * @param array - the {@link JSONArray} to convert
-	 * @param clazz - the class of the elements contained by {@code array}
-	 * @return A {@link List} containing the elements of {@code array} converted to {@code clazz} objects
-	 */
-	public static <T> List<T> toList(JSONArray array, Class<T> clazz) {
-		if(array == null) {
-			return null;
-		}
-		return array.toList().stream().map(clazz::cast).collect(Collectors.toList());
 	}
 
 	/**
