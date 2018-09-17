@@ -20,18 +20,18 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.message.VoteMessage;
+import me.shadorc.shadbot.utils.message.ReactionMessage;
 import reactor.core.publisher.Mono;
 
 public class PollManager extends AbstractGameManager {
 
 	private final PollCreateSpec spec;
-	private final VoteMessage voteMessage;
+	private final ReactionMessage voteMessage;
 
 	public PollManager(Context context, PollCreateSpec spec) {
 		super(context);
 		this.spec = spec;
-		this.voteMessage = new VoteMessage(context.getClient(), context.getChannelId(), spec.getDuration(), spec.getChoices().values());
+		this.voteMessage = new ReactionMessage(context.getClient(), context.getChannelId(), spec.getDuration(), spec.getChoices().values());
 	}
 
 	@Override

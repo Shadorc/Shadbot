@@ -14,7 +14,8 @@ public enum SettingEnum {
 	JOIN_MESSAGE,
 	LEAVE_MESSAGE,
 	AUTO_ROLE,
-	PERMISSIONS;
+	PERMISSIONS,
+	IAM_MESSAGES;
 
 	@Override
 	public String toString() {

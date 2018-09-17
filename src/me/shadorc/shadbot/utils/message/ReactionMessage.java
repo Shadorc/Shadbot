@@ -14,17 +14,24 @@ import me.shadorc.shadbot.utils.BotUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class VoteMessage {
+public class ReactionMessage {
 
 	private final DiscordClient client;
 	private final Snowflake channelId;
-	private final int seconds;
+	private final Mono<Long> delay;
 	private final Collection<ReactionEmoji> reactions;
 
-	public VoteMessage(DiscordClient client, Snowflake channelId, int seconds, Collection<ReactionEmoji> collection) {
+	public ReactionMessage(DiscordClient client, Snowflake channelId, Collection<ReactionEmoji> collection) {
 		this.client = client;
 		this.channelId = channelId;
-		this.seconds = seconds;
+		this.delay = Mono.empty();
+		this.reactions = collection;
+	}
+
+	public ReactionMessage(DiscordClient client, Snowflake channelId, int seconds, Collection<ReactionEmoji> collection) {
+		this.client = client;
+		this.channelId = channelId;
+		this.delay = Mono.delay(Duration.ofSeconds(seconds));
 		this.reactions = collection;
 	}
 
@@ -37,7 +44,7 @@ public class VoteMessage {
 		return BotUtils.sendMessage(embed, this.client.getMessageChannelById(this.channelId))
 				.flatMap(message -> Flux.fromIterable(this.reactions)
 						.flatMap(message::addReaction)
-						.then(Mono.delay(Duration.ofSeconds(this.seconds)))
+						.then(delay)
 						.then(this.client.getMessageById(this.channelId, message.getId()))
 						.map(Message::getReactions));
 	}

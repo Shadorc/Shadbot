@@ -18,6 +18,8 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 
 public class DBGuild {
 
+	// TODO: Check concurrency everywhere
+
 	@JsonProperty("id")
 	private Long id;
 	@JsonProperty("members")
@@ -97,6 +99,16 @@ public class DBGuild {
 	@JsonIgnore
 	public Optional<String> getLeaveMessage() {
 		return Optional.ofNullable((String) this.settings.get(SettingEnum.LEAVE_MESSAGE.toString()));
+	}
+
+	/**
+	 * @return A map containing message's ID as key and role's ID as value
+	 */
+	@SuppressWarnings("unchecked")
+	@JsonIgnore
+	public Map<Snowflake, Snowflake> getIamMessages() {
+		return Optional.ofNullable((Map<Snowflake, Snowflake>) this.settings.get(SettingEnum.IAM_MESSAGES.toString()))
+				.orElse(Collections.emptyMap());
 	}
 
 	private <T> List<T> getSetting(SettingEnum setting, Class<T> listClass) {
