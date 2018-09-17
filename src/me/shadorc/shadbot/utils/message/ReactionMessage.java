@@ -18,20 +18,20 @@ public class ReactionMessage {
 
 	private final DiscordClient client;
 	private final Snowflake channelId;
-	private final Mono<Long> delay;
+	private final Duration delay;
 	private final Collection<ReactionEmoji> reactions;
 
 	public ReactionMessage(DiscordClient client, Snowflake channelId, Collection<ReactionEmoji> collection) {
 		this.client = client;
 		this.channelId = channelId;
-		this.delay = Mono.empty();
+		this.delay = Duration.ZERO;
 		this.reactions = collection;
 	}
 
 	public ReactionMessage(DiscordClient client, Snowflake channelId, int seconds, Collection<ReactionEmoji> collection) {
 		this.client = client;
 		this.channelId = channelId;
-		this.delay = Mono.delay(Duration.ofSeconds(seconds));
+		this.delay = Duration.ofSeconds(seconds);
 		this.reactions = collection;
 	}
 
@@ -42,10 +42,13 @@ public class ReactionMessage {
 	 */
 	public Mono<Set<Reaction>> sendMessage(EmbedCreateSpec embed) {
 		return BotUtils.sendMessage(embed, this.client.getMessageChannelById(this.channelId))
+				// Add the reactions to the message then wait
 				.flatMap(message -> Flux.fromIterable(this.reactions)
 						.flatMap(message::addReaction)
-						.then(delay)
-						.then(this.client.getMessageById(this.channelId, message.getId()))
+						.then(Mono.delay(delay))
+						.thenReturn(message.getId()))
+				// Request to retrieve the message then return its reactions
+				.flatMap(id -> this.client.getMessageById(this.channelId, id)
 						.map(Message::getReactions));
 	}
 
