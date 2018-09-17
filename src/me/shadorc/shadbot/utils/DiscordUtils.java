@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.event.domain.Event;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
@@ -27,7 +25,6 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -184,16 +181,6 @@ public class DiscordUtils {
 				.flatMap(Flux::fromIterable)
 				.collectList()
 				.map(rolePermissions -> rolePermissions.containsAll(PermissionSet.of(permissions)));
-	}
-
-	public static int getRecommendedShardCount() {
-		return 1;
-	}
-
-	public static <T extends Event> void registerListener(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
-		client.getEventDispatcher().on(eventClass)
-				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
-				.subscribe(consumer);
 	}
 
 }
