@@ -7,8 +7,8 @@ import org.json.JSONArray;
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.setting.SettingEnum;
-import me.shadorc.shadbot.data.db.DBGuild;
-import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 
 public class ChannelListener {
 

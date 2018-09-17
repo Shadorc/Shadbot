@@ -16,7 +16,7 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.CommandManager;
-import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;

@@ -7,7 +7,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
-import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.command.Emoji;

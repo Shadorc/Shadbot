@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.data.db;
+package me.shadorc.shadbot.data.database;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

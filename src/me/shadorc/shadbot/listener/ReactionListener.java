@@ -4,7 +4,7 @@ import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.command.admin.IamCommand;
-import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 
 public class ReactionListener {
 

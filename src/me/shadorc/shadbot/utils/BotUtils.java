@@ -14,7 +14,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import reactor.core.publisher.Mono;

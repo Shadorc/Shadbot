@@ -16,7 +16,7 @@ import me.shadorc.shadbot.api.trivia.TriviaResult;
 import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
-import me.shadorc.shadbot.data.db.DatabaseManager;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;

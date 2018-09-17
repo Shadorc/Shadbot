@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.data.db;
+package me.shadorc.shadbot.data.database;
 
 import java.util.Collections;
 import java.util.List;
