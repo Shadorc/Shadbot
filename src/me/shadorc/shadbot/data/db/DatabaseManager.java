@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.databind.JavaType;
 
@@ -20,12 +19,12 @@ public class DatabaseManager {
 
 	private static final File FILE = new File(DataManager.SAVE_DIR, "database.json");
 
-	private static List<DBGuild> guilds;
+	private static CopyOnWriteArrayList<DBGuild> guilds;
 
 	@DataInit
 	public static void init() throws IOException {
-		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, DBGuild.class);
-		guilds = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new ArrayList<>();
+		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(CopyOnWriteArrayList.class, DBGuild.class);
+		guilds = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new CopyOnWriteArrayList<>();
 	}
 
 	@DataSave(initialDelay = 15, period = 15, unit = ChronoUnit.MINUTES)

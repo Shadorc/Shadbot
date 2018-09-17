@@ -1,12 +1,12 @@
 package me.shadorc.shadbot.data.db;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,14 +18,12 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 
 public class DBGuild {
 
-	// TODO: Check concurrency everywhere
-
 	@JsonProperty("id")
 	private Long id;
 	@JsonProperty("members")
-	private List<DBMember> members;
+	private CopyOnWriteArrayList<DBMember> members;
 	@JsonProperty("settings")
-	private Map<String, Object> settings;
+	private ConcurrentHashMap<String, Object> settings;
 
 	public DBGuild() {
 		// Default constructor
@@ -33,8 +31,8 @@ public class DBGuild {
 
 	public DBGuild(Snowflake id) {
 		this.id = id.asLong();
-		this.members = new ArrayList<>();
-		this.settings = new HashMap<>();
+		this.members = new CopyOnWriteArrayList<>();
+		this.settings = new ConcurrentHashMap<>();
 	}
 
 	@JsonIgnore
@@ -49,34 +47,27 @@ public class DBGuild {
 
 	@JsonIgnore
 	public List<Snowflake> getAllowedTextChannels() {
-		return this.getSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, Snowflake.class);
+		return this.getListSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, Snowflake.class);
 	}
 
 	@JsonIgnore
 	public List<Snowflake> getAllowedVoiceChannels() {
-		return this.getSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, Snowflake.class);
-	}
-
-	@JsonIgnore
-	public List<String> getBlacklistedCmd() {
-		return this.getSetting(SettingEnum.BLACKLIST, String.class);
-	}
-
-	@JsonIgnore
-	public List<Snowflake> getAutoRoles() {
-		return this.getSetting(SettingEnum.AUTO_ROLE, Snowflake.class);
+		return this.getListSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, Snowflake.class);
 	}
 
 	@JsonIgnore
 	public List<Snowflake> getAllowedRoles() {
-		return this.getSetting(SettingEnum.PERMISSIONS, Snowflake.class);
+		return this.getListSetting(SettingEnum.PERMISSIONS, Snowflake.class);
 	}
 
 	@JsonIgnore
-	public String getPrefix() {
-		return Objects.toString(
-				this.settings.get(SettingEnum.PREFIX.toString()),
-				Config.DEFAULT_PREFIX);
+	public List<Snowflake> getAutoRoles() {
+		return this.getListSetting(SettingEnum.AUTO_ROLE, Snowflake.class);
+	}
+
+	@JsonIgnore
+	public List<String> getBlacklistedCmd() {
+		return this.getListSetting(SettingEnum.BLACKLIST, String.class);
 	}
 
 	@JsonIgnore
@@ -84,21 +75,6 @@ public class DBGuild {
 		return Integer.parseInt(Objects.toString(
 				this.settings.get(SettingEnum.DEFAULT_VOLUME.toString()),
 				Integer.toString(Config.DEFAULT_VOLUME)));
-	}
-
-	@JsonIgnore
-	public Optional<Snowflake> getMessageChannelId() {
-		return Optional.ofNullable((Snowflake) this.settings.get(SettingEnum.MESSAGE_CHANNEL_ID.toString()));
-	}
-
-	@JsonIgnore
-	public Optional<String> getJoinMessage() {
-		return Optional.ofNullable((String) this.settings.get(SettingEnum.JOIN_MESSAGE.toString()));
-	}
-
-	@JsonIgnore
-	public Optional<String> getLeaveMessage() {
-		return Optional.ofNullable((String) this.settings.get(SettingEnum.LEAVE_MESSAGE.toString()));
 	}
 
 	/**
@@ -111,7 +87,29 @@ public class DBGuild {
 				.orElse(Collections.emptyMap());
 	}
 
-	private <T> List<T> getSetting(SettingEnum setting, Class<T> listClass) {
+	@JsonIgnore
+	public Optional<String> getJoinMessage() {
+		return Optional.ofNullable((String) this.settings.get(SettingEnum.JOIN_MESSAGE.toString()));
+	}
+
+	@JsonIgnore
+	public Optional<String> getLeaveMessage() {
+		return Optional.ofNullable((String) this.settings.get(SettingEnum.LEAVE_MESSAGE.toString()));
+	}
+
+	@JsonIgnore
+	public Optional<Snowflake> getMessageChannelId() {
+		return Optional.ofNullable((Snowflake) this.settings.get(SettingEnum.MESSAGE_CHANNEL_ID.toString()));
+	}
+
+	@JsonIgnore
+	public String getPrefix() {
+		return Objects.toString(
+				this.settings.get(SettingEnum.PREFIX.toString()),
+				Config.DEFAULT_PREFIX);
+	}
+
+	private <T> List<T> getListSetting(SettingEnum setting, Class<T> listClass) {
 		return Optional.ofNullable((List<?>) this.settings.get(setting.toString()))
 				.orElse(Collections.emptyList())
 				.stream()
@@ -123,12 +121,12 @@ public class DBGuild {
 		this.settings.put(setting.toString(), value);
 	}
 
-	public void addMember(DBMember dbMember) {
-		this.members.add(dbMember);
-	}
-
 	public void removeSetting(SettingEnum setting) {
 		this.settings.remove(setting.toString());
+	}
+
+	public void addMember(DBMember dbMember) {
+		this.members.add(dbMember);
 	}
 
 	@Override
