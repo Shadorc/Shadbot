@@ -11,7 +11,9 @@ public class ReactionListener {
 	// TODO: Manage errors
 	public static void onReactionAddEvent(ReactionAddEvent event) {
 		event.getGuildId().ifPresent(guildId -> {
-			final Snowflake roleId = DatabaseManager.getDBGuild(guildId).getIamMessages().get(event.getMessageId());
+			final Snowflake roleId = DatabaseManager.getDBGuild(guildId)
+					.getIamMessages()
+					.get(event.getMessageId());
 			if(roleId != null && event.getEmoji().equals(IamCommand.ADD_REACTION)) {
 				event.getUser()
 						.flatMap(user -> user.asMember(guildId))
@@ -24,7 +26,9 @@ public class ReactionListener {
 	// TODO: Manage errors
 	public static void onReactionRemoveEvent(ReactionRemoveEvent event) {
 		event.getGuildId().ifPresent(guildId -> {
-			final Snowflake roleId = DatabaseManager.getDBGuild(guildId).getIamMessages().get(event.getMessageId());
+			final Snowflake roleId = DatabaseManager.getDBGuild(guildId)
+					.getIamMessages()
+					.get(event.getMessageId());
 			if(roleId != null && event.getEmoji().equals(IamCommand.REMOVE_REACTION)) {
 				event.getUser()
 						.flatMap(user -> user.asMember(guildId))

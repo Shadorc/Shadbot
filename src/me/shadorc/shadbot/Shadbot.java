@@ -17,6 +17,7 @@ import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.MessageUpdateEvent;
 import discord4j.core.event.domain.message.ReactionAddEvent;
@@ -36,8 +37,6 @@ import me.shadorc.shadbot.listener.MessageCreateListener;
 import me.shadorc.shadbot.listener.MessageUpdateListener;
 import me.shadorc.shadbot.listener.ReactionListener;
 import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
-import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
@@ -69,6 +68,7 @@ public class Shadbot {
 			CLIENTS.add(client);
 
 			final EventDispatcher dispatcher = client.getEventDispatcher();
+			dispatcher.on(ReadyEvent.class).subscribe(GatewayLifecycleListener::onReadyEvent);
 			dispatcher.on(GatewayLifecycleEvent.class).subscribe(GatewayLifecycleListener::onGatewayLifecycleEvent);
 			dispatcher.on(TextChannelDeleteEvent.class).subscribe(ChannelListener::onTextChannelDelete);
 			dispatcher.on(GuildCreateEvent.class).subscribe(GuildListener::onGuildCreate);
@@ -80,16 +80,6 @@ public class Shadbot {
 			dispatcher.on(VoiceStateUpdateEvent.class).subscribe(VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 			dispatcher.on(ReactionAddEvent.class).subscribe(ReactionListener::onReactionAddEvent);
 			dispatcher.on(ReactionRemoveEvent.class).subscribe(ReactionListener::onReactionRemoveEvent);
-
-			Flux.interval(Duration.ofHours(2), Duration.ofHours(2))
-					.flatMap(ignored -> NetUtils.postStats(client))
-					.doOnError(err -> LogUtils.error(client, err, "An error occurred while posting statistics."))
-					.subscribe();
-
-			Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
-					.flatMap(ignored -> BotUtils.updatePresence(client))
-					.doOnError(err -> LogUtils.error(client, err, "An error occurred while updating presence."))
-					.subscribe();
 		}
 
 		Flux.interval(LottoCmd.getDelay(), Duration.ofDays(7))
