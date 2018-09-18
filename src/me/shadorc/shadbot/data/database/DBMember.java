@@ -18,7 +18,9 @@ public class DBMember {
 	private AtomicInteger coins;
 
 	public DBMember() {
-		// Default constructor
+		this.guildId = null;
+		this.id = null;
+		this.coins = new AtomicInteger(0);
 	}
 
 	public DBMember(Snowflake guildId, Snowflake id) {

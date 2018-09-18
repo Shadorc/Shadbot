@@ -26,7 +26,9 @@ public class DBGuild {
 	private ConcurrentHashMap<String, Object> settings;
 
 	public DBGuild() {
-		// Default constructor
+		this.id = null;
+		this.members = new CopyOnWriteArrayList<>();
+		this.settings = new ConcurrentHashMap<>();
 	}
 
 	public DBGuild(Snowflake id) {
