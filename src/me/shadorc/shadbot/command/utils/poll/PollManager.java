@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -31,12 +30,12 @@ public class PollManager extends AbstractGameManager {
 	public PollManager(Context context, PollCreateSpec spec) {
 		super(context);
 		this.spec = spec;
-		this.voteMessage = new ReactionMessage(context.getClient(), context.getChannelId(), spec.getDuration(), spec.getChoices().values());
+		this.voteMessage = new ReactionMessage(context.getClient(), context.getChannelId(), spec.getChoices().values());
 	}
 
 	@Override
 	public void start() {
-		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration(), ChronoUnit.SECONDS);
+		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration().toMillis(), ChronoUnit.SECONDS);
 		this.show().subscribe();
 	}
 
@@ -61,10 +60,14 @@ public class PollManager extends AbstractGameManager {
 									this.getContext().getPrefix(), this.getContext().getCommandName(),
 									this.spec.getQuestion(), representation.toString()))
 							.setFooter(String.format("You have %s to vote.",
-									FormatUtils.shortDuration(TimeUnit.SECONDS.toMillis(this.spec.getDuration()))),
+									FormatUtils.shortDuration(this.spec.getDuration().toMillis())),
 									"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png");
 				})
 				.flatMap(this.voteMessage::sendMessage)
+				.flatMap(message -> Mono.delay(spec.getDuration())
+						.thenReturn(message.getId()))
+				.flatMap(messageId -> this.getContext().getClient().getMessageById(this.getContext().getChannelId(), messageId))
+				.map(Message::getReactions)
 				.flatMap(this::sendResults)
 				.then();
 	}

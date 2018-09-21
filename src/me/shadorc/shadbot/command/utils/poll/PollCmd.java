@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.utils.poll;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -76,16 +77,16 @@ public class PollCmd extends AbstractCommand {
 	private PollManager createPoll(Context context) {
 		final List<String> args = context.requireArgs(2);
 
-		Integer duration;
+		Integer seconds;
 		if(NumberUtils.isPositiveLong(args.get(0))) {
-			duration = NumberUtils.asIntBetween(args.get(0), MIN_DURATION, MAX_DURATION);
-			if(duration == null) {
+			seconds = NumberUtils.asIntBetween(args.get(0), MIN_DURATION, MAX_DURATION);
+			if(seconds == null) {
 				throw new CommandException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
 						args.get(0), MIN_DURATION, MAX_DURATION));
 			}
 		} else {
-			duration = Integer.valueOf((int) TimeUtils.parseTime(args.get(0)));
-			if(!NumberUtils.isInRange(duration, MIN_DURATION, MAX_DURATION)) {
+			seconds = Integer.valueOf((int) TimeUtils.parseTime(args.get(0)));
+			if(!NumberUtils.isInRange(seconds, MIN_DURATION, MAX_DURATION)) {
 				throw new CommandException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
 						args.get(0), MIN_DURATION, MAX_DURATION));
 			}
@@ -108,7 +109,7 @@ public class PollCmd extends AbstractCommand {
 			choicesReactions.put(choices.get(i), NUMBER_EMOJI.get(i + 1));
 		}
 
-		return new PollManager(context, new PollCreateSpec(duration, substrings.get(0), choicesReactions));
+		return new PollManager(context, new PollCreateSpec(Duration.ofSeconds(seconds), substrings.get(0), choicesReactions));
 	}
 
 	@Override
