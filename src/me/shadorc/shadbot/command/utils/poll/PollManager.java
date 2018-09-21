@@ -35,7 +35,7 @@ public class PollManager extends AbstractGameManager {
 
 	@Override
 	public void start() {
-		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration().toMillis(), ChronoUnit.SECONDS);
+		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration().toMillis(), ChronoUnit.MILLIS);
 		this.show().subscribe();
 	}
 
