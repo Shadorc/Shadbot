@@ -5,11 +5,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
-import discord4j.core.event.EventDispatcher;
+import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
@@ -67,19 +68,18 @@ public class Shadbot {
 			final DiscordClient client = builder.setShardIndex(i).build();
 			CLIENTS.add(client);
 
-			final EventDispatcher dispatcher = client.getEventDispatcher();
-			dispatcher.on(ReadyEvent.class).subscribe(GatewayLifecycleListener::onReadyEvent);
-			dispatcher.on(GatewayLifecycleEvent.class).subscribe(GatewayLifecycleListener::onGatewayLifecycleEvent);
-			dispatcher.on(TextChannelDeleteEvent.class).subscribe(ChannelListener::onTextChannelDelete);
-			dispatcher.on(GuildCreateEvent.class).subscribe(GuildListener::onGuildCreate);
-			dispatcher.on(GuildDeleteEvent.class).subscribe(GuildListener::onGuildDelete);
-			dispatcher.on(MemberJoinEvent.class).subscribe(MemberListener::onMemberJoin);
-			dispatcher.on(MemberLeaveEvent.class).subscribe(MemberListener::onMemberLeave);
-			dispatcher.on(MessageCreateEvent.class).subscribe(MessageCreateListener::onMessageCreate);
-			dispatcher.on(MessageUpdateEvent.class).subscribe(MessageUpdateListener::onMessageUpdateEvent);
-			dispatcher.on(VoiceStateUpdateEvent.class).subscribe(VoiceStateUpdateListener::onVoiceStateUpdateEvent);
-			dispatcher.on(ReactionAddEvent.class).subscribe(ReactionListener::onReactionAddEvent);
-			dispatcher.on(ReactionRemoveEvent.class).subscribe(ReactionListener::onReactionRemoveEvent);
+			register(client, ReadyEvent.class, GatewayLifecycleListener::onReadyEvent);
+			register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
+			register(client, TextChannelDeleteEvent.class, ChannelListener::onTextChannelDelete);
+			register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
+			register(client, GuildDeleteEvent.class, GuildListener::onGuildDelete);
+			register(client, MemberJoinEvent.class, MemberListener::onMemberJoin);
+			register(client, MemberLeaveEvent.class, MemberListener::onMemberLeave);
+			register(client, MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
+			register(client, MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
+			register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
+			register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
+			register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
 		}
 
 		Flux.interval(LottoCmd.getDelay(), Duration.ofDays(7))
@@ -100,6 +100,12 @@ public class Shadbot {
 	 */
 	public static Instant getLaunchTime() {
 		return LAUNCH_TIME;
+	}
+	
+	private static <T extends Event> void register(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
+		client.getEventDispatcher().on(eventClass)
+				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
+				.subscribe(consumer);
 	}
 
 }
