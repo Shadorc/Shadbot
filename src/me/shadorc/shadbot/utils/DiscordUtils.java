@@ -47,6 +47,18 @@ public class DiscordUtils {
 				.map(GuildChannel::getId)
 				.concatWith(Flux.fromIterable(DiscordUtils.getChannelMentions(content)));
 	}
+
+	public static Flux<Snowflake> getRoles(Message message) {
+		final List<String> words = StringUtils.split(message.getContent().orElse("")).stream()
+				.map(String::toLowerCase)
+				.map(word -> word.replace("@", ""))
+				.collect(Collectors.toList());
+
+		return message.getGuild()
+				.flatMapMany(Guild::getRoles)
+				.filter(role -> words.contains(role.getName()))
+				.map(Role::getId)
+				.concatWith(Flux.fromIterable(message.getRoleMentionIds()));
 	}
 
 	private static List<Snowflake> getChannelMentions(String content) {
