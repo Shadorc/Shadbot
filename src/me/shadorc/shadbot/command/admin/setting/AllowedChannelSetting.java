@@ -39,7 +39,7 @@ public class AllowedChannelSetting extends AbstractSetting {
 		return context.getGuild()
 				.flatMapMany(Guild::getChannels)
 				.collectList()
-				.zipWith(DiscordUtils.getChannels(context.getGuild(), context.getContent()))
+				.zipWith(DiscordUtils.getChannels(context.getMessage()).collectList())
 				.flatMapMany(channelsAndMentioned -> {
 					final List<GuildChannel> channels = channelsAndMentioned.getT1();
 					final List<Snowflake> mentionedChannels = channelsAndMentioned.getT2();

@@ -34,17 +34,19 @@ public class DiscordUtils {
 	public static final int FIELD_CONTENT_LIMIT = 1024;
 	public static final int MAX_REASON_LENGTH = 512;
 
-	public static <T extends GuildChannel> Mono<List<Snowflake>> getChannels(Mono<Guild> guild, String content) {
+	public static Flux<Snowflake> getChannels(Message message) {
+		final String content = message.getContent().orElse("");
 		final List<String> words = StringUtils.split(content).stream()
 				.map(String::toLowerCase)
 				.map(word -> word.replace("#", ""))
 				.collect(Collectors.toList());
 
-		return guild.flatMapMany(Guild::getChannels)
+		return message.getGuild()
+				.flatMapMany(Guild::getChannels)
 				.filter(channel -> words.contains(channel.getName()))
 				.map(GuildChannel::getId)
-				.concatWith(Flux.fromIterable(DiscordUtils.getChannelMentions(content)))
-				.collectList();
+				.concatWith(Flux.fromIterable(DiscordUtils.getChannelMentions(content)));
+	}
 	}
 
 	private static List<Snowflake> getChannelMentions(String content) {

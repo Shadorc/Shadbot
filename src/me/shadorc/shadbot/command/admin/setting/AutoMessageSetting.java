@@ -61,7 +61,8 @@ public class AutoMessageSetting extends AbstractSetting {
 	}
 
 	private Mono<Message> channel(Context context, Action action) {
-		return DiscordUtils.getChannels(context.getGuild(), context.getContent())
+		return DiscordUtils.getChannels(context.getMessage())
+				.collectList()
 				.flatMap(channelsMentionned -> {
 					if(channelsMentionned.size() != 1) {
 						throw new MissingArgumentException();
