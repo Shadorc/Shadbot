@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.data.database;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,7 +87,7 @@ public class DBGuild {
 	@JsonIgnore
 	public Map<Snowflake, Snowflake> getIamMessages() {
 		return Optional.ofNullable((Map<Snowflake, Snowflake>) this.settings.get(SettingEnum.IAM_MESSAGES.toString()))
-				.orElse(Collections.emptyMap());
+				.orElse(new HashMap<Snowflake, Snowflake>());
 	}
 
 	@JsonIgnore
@@ -113,7 +114,7 @@ public class DBGuild {
 
 	private <T> List<T> getListSetting(SettingEnum setting, Class<T> listClass) {
 		return Optional.ofNullable((List<?>) this.settings.get(setting.toString()))
-				.orElse(Collections.emptyList())
+				.orElse(new ArrayList<>())
 				.stream()
 				.map(listClass::cast)
 				.collect(Collectors.toList());
