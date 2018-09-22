@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils.command;
+package me.shadorc.shadbot.utils.object;
 
 public enum Emoji {
 

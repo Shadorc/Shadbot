@@ -19,7 +19,7 @@ import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.message.ReactionMessage;
+import me.shadorc.shadbot.utils.object.message.ReactionMessage;
 import reactor.core.publisher.Mono;
 
 public class PollManager extends AbstractGameManager {

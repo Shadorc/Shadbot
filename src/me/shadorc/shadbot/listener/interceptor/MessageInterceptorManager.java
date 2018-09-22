@@ -37,8 +37,7 @@ public class MessageInterceptorManager {
 	public static Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		synchronized (CHANNELS_INTERCEPTORS) {
 			return Flux.fromIterable(CHANNELS_INTERCEPTORS.get(event.getMessage().getChannelId()))
-					.flatMap(interceptor -> interceptor.isIntercepted(event))
-					.filter(Boolean.TRUE::equals)
+					.filterWhen(interceptor -> interceptor.isIntercepted(event))
 					.hasElements();
 		}
 	}

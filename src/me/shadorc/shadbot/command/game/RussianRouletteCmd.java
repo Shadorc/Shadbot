@@ -14,10 +14,10 @@ import me.shadorc.shadbot.data.lotto.LottoManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
@@ -31,7 +31,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
-		final int bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
+		final int bet = DiscordUtils.requireBet(context.getMember(), arg, MAX_BET);
 
 		final StringBuilder strBuilder = new StringBuilder(
 				String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", context.getUsername()));

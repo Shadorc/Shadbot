@@ -14,9 +14,9 @@ import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.message.TemporaryMessage;
+import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.object.message.TemporaryMessage;
 
 public class RateLimiter {
 

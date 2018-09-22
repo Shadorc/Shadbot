@@ -17,8 +17,7 @@ import reactor.core.publisher.Flux;
 public class MemberListener {
 
 	public static void onMemberJoin(MemberJoinEvent event) {
-		final Snowflake guildId = event.getGuildId();
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(guildId);
+		final DBGuild dbGuild = DatabaseManager.getDBGuild(event.getGuildId());
 
 		MemberListener.sendAutoMsg(event.getClient(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage());
 
@@ -34,9 +33,9 @@ public class MemberListener {
 		MemberListener.sendAutoMsg(event.getClient(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage());
 	}
 
-	private static void sendAutoMsg(DiscordClient client, Optional<Snowflake> channelId, Optional<String> msg) {
-		if(channelId.isPresent() && msg.isPresent()) {
-			BotUtils.sendMessage(msg.get(), client.getMessageChannelById(channelId.get()))
+	private static void sendAutoMsg(DiscordClient client, Optional<Snowflake> channelId, Optional<String> message) {
+		if(channelId.isPresent() && message.isPresent()) {
+			BotUtils.sendMessage(message.get(), client.getMessageChannelById(channelId.get()))
 					.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(MemberListener.class))
 					.subscribe();
 		}

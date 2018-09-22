@@ -44,7 +44,7 @@ public class Lotto {
 		this.historic = historic;
 	}
 
-	public void addToJackpot(int coins) { // NO_UCD (unused code)
+	public void addToJackpot(int coins) {
 		final int newPool = this.jackpot.get() + (int) Math.ceil(coins / 100f);
 		this.jackpot.set(NumberUtils.between(newPool, 0, Config.MAX_COINS));
 	}

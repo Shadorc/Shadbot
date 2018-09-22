@@ -20,6 +20,7 @@ import reactor.util.function.Tuples;
 
 public class EmbedUtils {
 
+	// TODO: Add message timestamp ?
 	public static EmbedCreateSpec getDefaultEmbed() {
 		return new EmbedCreateSpec()
 				.setColor(Config.BOT_COLOR);

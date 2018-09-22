@@ -2,17 +2,13 @@ package me.shadorc.shadbot.utils;
 
 import java.util.List;
 
-import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
-import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -40,11 +36,6 @@ public class BotUtils {
 		}
 		return channelMono.flatMap(channel -> channel.createMessage(spec))
 				.doOnSuccess(message -> StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT));
-	}
-
-	public static Mono<Void> updatePresence(DiscordClient client) {
-		return Mono.just(String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES)))
-				.flatMap(text -> client.updatePresence(Presence.online(Activity.playing(text))));
 	}
 
 	public static boolean hasAllowedRole(Snowflake guildId, List<Role> roles) {

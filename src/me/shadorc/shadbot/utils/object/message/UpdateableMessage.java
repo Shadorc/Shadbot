@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils.message;
+package me.shadorc.shadbot.utils.object.message;
 
 import java.util.Optional;
 

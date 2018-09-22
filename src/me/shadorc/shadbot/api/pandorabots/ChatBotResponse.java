@@ -39,7 +39,8 @@ public class ChatBotResponse {
 
 	@Override
 	public String toString() {
-		return String.format("ChatBotResponse [input=%s, response=%s, custid=%s, botid=%s, status=%s]", this.input, this.response, this.custid, this.botid, this.status);
+		return String.format("ChatBotResponse [input=%s, response=%s, custid=%s, botid=%s, status=%s]",
+				this.input, this.response, this.custid, this.botid, this.status);
 	}
 
 }

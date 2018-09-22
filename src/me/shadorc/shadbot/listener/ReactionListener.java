@@ -12,7 +12,7 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.command.admin.IamCommand;
 import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.data.database.DatabaseManager;
-import me.shadorc.shadbot.utils.message.TemporaryMessage;
+import me.shadorc.shadbot.utils.object.message.TemporaryMessage;
 
 public class ReactionListener {
 

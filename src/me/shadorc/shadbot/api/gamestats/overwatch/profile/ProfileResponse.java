@@ -52,7 +52,8 @@ public class ProfileResponse {
 
 	@Override
 	public String toString() {
-		return String.format("Data [username=%s, level=%s, portrait=%s, isPrivate=%s, games=%s, playtime=%s, competitive=%s]", this.username, this.level, this.portrait, this.isPrivate, this.games, this.playtime, this.competitive);
+		return String.format("Data [username=%s, level=%s, portrait=%s, isPrivate=%s, games=%s, playtime=%s, competitive=%s]",
+				this.username, this.level, this.portrait, this.isPrivate, this.games, this.playtime, this.competitive);
 	}
 
 }

@@ -33,7 +33,8 @@ public class UrbanDefinition {
 
 	@Override
 	public String toString() {
-		return String.format("UrbanDefinition [definition=%s, example=%s, word=%s, permalink=%s]", this.definition, this.example, this.word, this.permalink);
+		return String.format("UrbanDefinition [definition=%s, example=%s, word=%s, permalink=%s]",
+				this.definition, this.example, this.word, this.permalink);
 	}
 
 }

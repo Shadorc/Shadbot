@@ -101,7 +101,7 @@ public class Shadbot {
 	public static Instant getLaunchTime() {
 		return LAUNCH_TIME;
 	}
-	
+
 	private static <T extends Event> void register(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
 		client.getEventDispatcher().on(eventClass)
 				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))

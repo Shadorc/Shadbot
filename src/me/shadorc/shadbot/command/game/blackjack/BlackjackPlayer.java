@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.utils.command.Card;
+import me.shadorc.shadbot.utils.object.Card;
 
 public class BlackjackPlayer {
 

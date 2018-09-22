@@ -5,8 +5,7 @@ import java.time.Duration;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
-import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 
@@ -22,12 +21,12 @@ public class GatewayLifecycleListener {
 		final DiscordClient client = event.getClient();
 
 		Flux.interval(Duration.ofHours(2), Duration.ofHours(2))
-				.flatMap(ignored -> NetUtils.postStats(client))
+				.flatMap(ignored -> DiscordUtils.postStats(client))
 				.doOnError(err -> LogUtils.error(client, err, "An error occurred while posting statistics."))
 				.subscribe();
 
 		Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
-				.flatMap(ignored -> BotUtils.updatePresence(client))
+				.flatMap(ignored -> DiscordUtils.updatePresence(client))
 				.doOnError(err -> LogUtils.error(client, err, "An error occurred while updating presence."))
 				.subscribe();
 	}

@@ -6,7 +6,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.setting.SettingEnum;
-import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.object.Emoji;
 
 public class TextUtils {
 

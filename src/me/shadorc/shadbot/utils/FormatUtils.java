@@ -44,8 +44,12 @@ public class FormatUtils {
 				FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", "));
 	}
 
-	public static String number(double num) {
-		return NumberFormat.getNumberInstance(Locale.ENGLISH).format(num);
+	/**
+	 * @param number the double number to format
+	 * @return the formatted String using English locale
+	 */
+	public static String number(double number) {
+		return NumberFormat.getNumberInstance(Locale.ENGLISH).format(number);
 	}
 
 	public static String coins(int coins) {

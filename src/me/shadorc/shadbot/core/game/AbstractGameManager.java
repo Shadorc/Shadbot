@@ -10,7 +10,7 @@ import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 

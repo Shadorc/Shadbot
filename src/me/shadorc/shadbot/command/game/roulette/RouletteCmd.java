@@ -13,11 +13,12 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.command.Emoji;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 @RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
@@ -36,7 +37,7 @@ public class RouletteCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(2);
 
-		final int bet = Utils.requireBet(context.getMember(), args.get(0), MAX_BET);
+		final int bet = DiscordUtils.requireBet(context.getMember(), args.get(0), MAX_BET);
 
 		final String place = args.get(1).toLowerCase();
 

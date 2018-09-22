@@ -24,10 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.HashBasedTable;
 
-import discord4j.core.object.entity.Member;
-import me.shadorc.shadbot.data.database.DatabaseManager;
-import me.shadorc.shadbot.exception.CommandException;
-
 public class Utils {
 
 	public static final ObjectMapper MAPPER = new ObjectMapper()
@@ -110,32 +106,6 @@ public class Utils {
 						Map.Entry::getValue,
 						(value1, value2) -> value1,
 						LinkedHashMap::new));
-	}
-
-	/**
-	 * @param member - the member who bet
-	 * @param betStr - the string representing the bet
-	 * @param maxValue - the maximum bet value
-	 * @return An Integer representing {@code betStr} converted as an integer
-	 * @throws CommandException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough coins or if the bet value
-	 *             is superior to {code maxValue}
-	 */
-	public static int requireBet(Member member, String betStr, int maxValue) {
-		final Integer bet = NumberUtils.asPositiveInt(betStr);
-		if(bet == null) {
-			throw new CommandException(String.format("`%s` is not a valid amount for coins.", betStr));
-		}
-
-		if(DatabaseManager.getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
-			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
-		}
-
-		if(bet > maxValue) {
-			throw new CommandException(String.format("Sorry, you can't bet more than **%s**.",
-					FormatUtils.coins(maxValue)));
-		}
-
-		return bet;
 	}
 
 	/**

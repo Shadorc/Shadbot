@@ -28,6 +28,7 @@ public class PlayerSummary {
 
 	@Override
 	public String toString() {
-		return String.format("PlayerSummary [communityVisibilityState=%s, avatarFull=%s, personaName=%s]", this.communityVisibilityState, this.avatarFull, this.personaName);
+		return String.format("PlayerSummary [communityVisibilityState=%s, avatarFull=%s, personaName=%s]",
+				this.communityVisibilityState, this.avatarFull, this.personaName);
 	}
 }

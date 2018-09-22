@@ -5,24 +5,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Map;
 
 import org.apache.http.HttpStatus;
-import org.json.JSONObject;
 import org.jsoup.Connection;
-import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import discord4j.core.DiscordClient;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.APIKeys;
-import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import reactor.core.Exceptions;
-import reactor.core.publisher.Mono;
 
 public class NetUtils {
 
@@ -114,47 +105,6 @@ public class NetUtils {
 				conn.disconnect();
 			}
 		}
-	}
-
-	/**
-	 * @param client - the client from which to post statistics
-	 */
-	public static Mono<Void> postStats(DiscordClient client) {
-		if(Config.IS_SNAPSHOT) {
-			return Mono.empty();
-		}
-		return Mono.fromRunnable(() -> LogUtils.infof("{Shard %d} Posting statistics...", client.getConfig().getShardIndex()))
-				.then(NetUtils.postStatsOn(client, "https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN))
-				.then(NetUtils.postStatsOn(client, "https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN))
-				.then(Mono.fromRunnable(() -> LogUtils.infof("{Shard %d} Statistics posted.", client.getConfig().getShardIndex())));
-	}
-
-	/**
-	 * @param homeUrl - the statistics site URL
-	 * @param token - the API token corresponding to the website
-	 * @param client - the client from which to post statistics
-	 */
-	private static Mono<Void> postStatsOn(DiscordClient client, String homeUrl, APIKey token) {
-		return client.getGuilds().count()
-				.doOnSuccess(guildsCount -> {
-					final JSONObject content = new JSONObject()
-							.put("shard_id", client.getConfig().getShardIndex())
-							.put("shard_count", client.getConfig().getShardCount())
-							.put("server_count", guildsCount);
-					final String url = String.format("%s/api/bots/%d/stats", homeUrl, client.getSelfId().get().asLong());
-
-					try {
-						Jsoup.connect(url)
-								.method(Method.POST)
-								.ignoreContentType(true)
-								.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
-								.requestBody(content.toString())
-								.post();
-					} catch (IOException err) {
-						Exceptions.propagate(err);
-					}
-				})
-				.then();
 	}
 
 }

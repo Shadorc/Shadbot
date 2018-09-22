@@ -29,7 +29,7 @@ public class TrackScheduler {
 	public TrackScheduler(AudioPlayer audioPlayer, int defaultVolume) {
 		this.audioPlayer = audioPlayer;
 		this.queue = new LinkedBlockingDeque<>();
-		this.repeatMode = RepeatMode.NONE;
+		this.setRepeatMode(RepeatMode.NONE);
 		this.setVolume(defaultVolume);
 	}
 

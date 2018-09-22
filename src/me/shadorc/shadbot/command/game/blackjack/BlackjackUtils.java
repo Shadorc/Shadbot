@@ -3,7 +3,7 @@ package me.shadorc.shadbot.command.game.blackjack;
 import java.util.List;
 
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.command.Card;
+import me.shadorc.shadbot.utils.object.Card;
 
 public class BlackjackUtils {
 

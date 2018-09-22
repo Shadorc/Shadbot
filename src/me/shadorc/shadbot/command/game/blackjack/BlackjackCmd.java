@@ -10,9 +10,9 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.command.Emoji;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -27,7 +27,7 @@ public class BlackjackCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		final Integer bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
+		final Integer bet = DiscordUtils.requireBet(context.getMember(), arg, MAX_BET);
 
 		BlackjackManager blackjackManager = MANAGERS.putIfAbsent(context.getChannelId(), new BlackjackManager(context));
 		if(blackjackManager == null) {
