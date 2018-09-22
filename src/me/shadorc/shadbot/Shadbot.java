@@ -26,7 +26,7 @@ import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import me.shadorc.shadbot.command.game.LottoCmd;
-import me.shadorc.shadbot.core.command.CommandManager;
+import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.data.DataManager;
@@ -52,7 +52,7 @@ public class Shadbot {
 		Locale.setDefault(Locale.US);
 
 		// If file loading or command generation has failed, abort attempt to connect the bot
-		if(!DataManager.init() || !CommandManager.init()) {
+		if(!DataManager.init() || !CommandInitializer.init()) {
 			System.exit(1);
 		}
 

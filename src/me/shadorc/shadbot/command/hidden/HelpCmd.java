@@ -7,7 +7,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
-import me.shadorc.shadbot.core.command.CommandManager;
+import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
@@ -26,7 +26,7 @@ public class HelpCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		if(context.getArg().isPresent()) {
-			final AbstractCommand cmd = CommandManager.getCommand(context.getArg().get());
+			final AbstractCommand cmd = CommandInitializer.getCommand(context.getArg().get());
 			if(cmd == null) {
 				return Mono.empty();
 			}
@@ -40,7 +40,7 @@ public class HelpCmd extends AbstractCommand {
 		return context.getPermission()
 				.flatMap(authorPerm -> {
 					final Multimap<CommandCategory, String> map = LinkedHashMultimap.create();
-					return Flux.fromIterable(CommandManager.getCommands().values())
+					return Flux.fromIterable(CommandInitializer.getCommands().values())
 							.distinct()
 							.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
 							.filter(cmd -> context.isDm() || BotUtils.isCommandAllowed(context.getGuildId(), cmd))

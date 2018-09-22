@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.CommandManager;
+import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
@@ -38,7 +38,7 @@ public class BlacklistSettingCmd extends AbstractSetting {
 
 		final List<String> commands = StringUtils.split(args.get(2).toLowerCase());
 
-		final List<String> unknownCmds = commands.stream().filter(cmd -> CommandManager.getCommand(cmd) == null).collect(Collectors.toList());
+		final List<String> unknownCmds = commands.stream().filter(cmd -> CommandInitializer.getCommand(cmd) == null).collect(Collectors.toList());
 		if(!unknownCmds.isEmpty()) {
 			throw new CommandException(String.format("Command %s doesn't exist.",
 					FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", ")));

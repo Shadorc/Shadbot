@@ -15,7 +15,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.ExceptionHandler;
-import me.shadorc.shadbot.core.command.CommandManager;
+import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
@@ -188,7 +188,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 		// Remove prefix and command names from message content
 		content = StringUtils.remove(content, prefix);
-		for(String name : CommandManager.getCommand("play").getNames()) {
+		for(String name : CommandInitializer.getCommand("play").getNames()) {
 			content = StringUtils.remove(content, name);
 		}
 
