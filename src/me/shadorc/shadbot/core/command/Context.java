@@ -3,6 +3,8 @@ package me.shadorc.shadbot.core.command;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.ApplicationInfo;
@@ -60,12 +62,14 @@ public class Context {
 		return this.event.getGuild();
 	}
 
+	@Nullable
 	public Snowflake getGuildId() {
-		return this.event.getGuildId().get();
+		return this.event.getGuildId().orElse(null);
 	}
 
+	@Nullable
 	public Member getMember() {
-		return this.event.getMember().get();
+		return this.event.getMember().orElse(null);
 	}
 
 	public Message getMessage() {
@@ -88,12 +92,14 @@ public class Context {
 		return this.getSelf().flatMap(self -> self.asMember(this.getGuildId()));
 	}
 
+	@Nullable
 	public Snowflake getSelfId() {
-		return this.getClient().getSelfId().get();
+		return this.getClient().getSelfId().orElse(null);
 	}
 
+	@Nullable
 	public String getContent() {
-		return this.getMessage().getContent().get();
+		return this.getMessage().getContent().orElse(null);
 	}
 
 	public Mono<MessageChannel> getChannel() {
@@ -108,8 +114,9 @@ public class Context {
 		return this.getMessage().getAuthor();
 	}
 
+	@Nullable
 	public Snowflake getAuthorId() {
-		return this.getMessage().getAuthorId().get();
+		return this.getMessage().getAuthorId().orElse(null);
 	}
 
 	public String getUsername() {

@@ -276,7 +276,8 @@ public class DiscordUtils {
 	}
 
 	public static Mono<Boolean> hasPermissions(Member member, Permission... permissions) {
-		return member.getRoles()
+		return Mono.justOrEmpty(member)
+				.flatMapMany(Member::getRoles)
 				.map(Role::getPermissions)
 				.flatMap(Flux::fromIterable)
 				.collectList()

@@ -2,6 +2,7 @@ package me.shadorc.shadbot.core.command;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -28,6 +29,13 @@ public class CommandProcessor {
 	public static void processMessageEvent(MessageCreateEvent event) {
 		final Optional<Snowflake> guildId = event.getGuildId();
 
+		final Function<MessageChannel, Mono<Boolean>> isNotDm = channel -> {
+			if(channel.getType().equals(Type.GUILD_TEXT)) {
+				return Mono.just(true);
+			}
+			return CommandProcessor.onPrivateMessage(event).thenReturn(false);
+		};
+
 		Mono.just(event.getMessage())
 				// The content is not a Webhook
 				.filter(message -> message.getContent().isPresent())
@@ -37,10 +45,7 @@ public class CommandProcessor {
 				.filter(author -> !author.isBot())
 				.flatMap(author -> event.getMessage().getChannel())
 				// This is not a private message...
-				.filter(channel -> !channel.getType().equals(Type.DM))
-				// ... else switch to #onPrivateMessage
-				// TODO
-				// .switchIfEmpty(CommandProcessor.onPrivateMessage(event))
+				.filterWhen(isNotDm)
 				// The channel is allowed
 				.filter(channel -> BotUtils.isTextChannelAllowed(guildId.get(), channel.getId()))
 				.flatMap(channel -> event.getMember().get().getRoles().collectList())
@@ -96,30 +101,35 @@ public class CommandProcessor {
 				});
 	}
 
-	// TODO: Rework
-	private static Mono<MessageChannel> onPrivateMessage(MessageCreateEvent event) {
+	private static Mono<Void> onPrivateMessage(MessageCreateEvent event) {
+		StatsManager.VARIOUS_STATS.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
+
 		final String text = String.format("Hello !"
 				+ "%nCommands only work in a server but you can see help using `%shelp`."
 				+ "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
 				+ "join my support server : %s",
 				Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-		return Mono.justOrEmpty(event.getMessage().getContent())
-				.filter(content -> content.startsWith(Config.DEFAULT_PREFIX + "help"))
-				.flatMap(content -> CommandInitializer.getCommand("help").execute(new Context(event, Config.DEFAULT_PREFIX)))
-				.then(event.getMessage().getChannel())
-				.flatMapMany(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now())))
-				.map(Message::getContent)
-				.flatMap(Mono::justOrEmpty)
-				.take(25)
-				.collectList()
-				.map(list -> !list.stream().anyMatch(text::equalsIgnoreCase))
-				.defaultIfEmpty(true)
-				.filter(Boolean.TRUE::equals)
-				.flatMap(send -> BotUtils.sendMessage(text, event.getMessage().getChannel()))
-				.onErrorResume(err -> BotUtils.sendMessage(text, event.getMessage().getChannel()))
-				.doOnTerminate(() -> StatsManager.VARIOUS_STATS.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED))
-				.then(Mono.empty());
+		final String content = event.getMessage().getContent().orElse("");
+		if(content.startsWith(Config.DEFAULT_PREFIX + "help")) {
+			return CommandInitializer.getCommand("help")
+					.execute(new Context(event, Config.DEFAULT_PREFIX));
+		} else {
+			return event.getMessage()
+					.getChannel()
+					.flatMapMany(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now())))
+					.map(Message::getContent)
+					.flatMap(Mono::justOrEmpty)
+					.take(50)
+					.collectList()
+					.flatMap(list -> {
+						if(list.stream().anyMatch(text::equalsIgnoreCase)) {
+							return Mono.empty();
+						}
+						return BotUtils.sendMessage(text, event.getMessage().getChannel());
+					})
+					.then();
+		}
 	}
 
 }
