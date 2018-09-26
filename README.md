@@ -30,8 +30,7 @@
         <li><a href="https://github.com/Discord4J/Discord4J">Discord4J</a>
         <li><a href="https://github.com/yusuke/twitter4j">Twitter4J</a>
         <li><a href="https://github.com/sedmelluq/lavaplayer">lavaplayer</a>
-        <li><a href="https://github.com/akapribot/OWM-JAPIs">OpenWeatherMap-JAPIs</a>
-        <li><a href="https://github.com/Shadorc/Overwatch4J">Overwatch4J</a>
+        <li><a href="https://bitbucket.org/aksinghnet/owm-japis">OWM-JAPIs</a>
         <li><a href="https://github.com/ivkos/wallhaven4j">Wallhaven4J</a>
         <li><a href="https://github.com/vladimir-bukhtoyarov/bucket4j">Bucket4J</a>
         <li><a href="http://javaluator.sourceforge.net/en/home/">javaluator</a>
