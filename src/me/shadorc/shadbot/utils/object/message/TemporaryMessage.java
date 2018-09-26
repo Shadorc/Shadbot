@@ -16,8 +16,6 @@ public class TemporaryMessage {
 	private final long delay;
 	private final TemporalUnit unit;
 
-	private Snowflake messageId;
-
 	/**
 	 * @param client - the Discord client
 	 * @param channelId - the Channel ID in which send the message
@@ -39,10 +37,8 @@ public class TemporaryMessage {
 	 */
 	public Mono<Void> send(String content) {
 		return BotUtils.sendMessage(content, this.client.getMessageChannelById(this.channelId))
-				.map(message -> this.messageId = message.getId())
-				.then(Mono.delay(Duration.of(this.delay, this.unit)))
-				.then(this.client.getMessageById(this.channelId, this.messageId))
-				.flatMap(Message::delete);
+				.flatMap(message -> Mono.delay(Duration.of(this.delay, this.unit))
+						.then(message.delete()));
 	}
 
 }
