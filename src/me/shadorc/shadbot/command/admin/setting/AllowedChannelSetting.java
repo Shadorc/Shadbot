@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
-import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
@@ -22,7 +21,6 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Setting(description = "Manage channels allowed to Shadbot.", setting = SettingEnum.ALLOWED_CHANNELS)
@@ -56,12 +54,12 @@ public class AllowedChannelSetting extends AbstractSetting {
 					final List<Snowflake> allowedTextChannels = dbGuild.getAllowedTextChannels();
 					final List<Snowflake> allowedVoiceChannels = dbGuild.getAllowedVoiceChannels();
 
-					Flux<Message> messagesFlux = Flux.empty();
+					final StringBuilder strBuilder = new StringBuilder();
 					if(Action.ADD.equals(action)) {
 						if(allowedTextChannels.isEmpty()
 								&& mentionedChannels.stream().noneMatch(context.getChannelId()::equals)) {
-							messagesFlux = messagesFlux.concatWith(BotUtils.sendMessage(Emoji.WARNING + " You did not mentioned this channel. "
-									+ "I will not reply here until this channel is added to the list of allowed channels.", context.getChannel()));
+							strBuilder.append(Emoji.WARNING + " You did not mentioned this channel. "
+									+ "I will not reply here until this channel is added to the list of allowed channels.\n");
 						}
 
 						final List<Snowflake> textChannels = channels.stream()
@@ -81,19 +79,19 @@ public class AllowedChannelSetting extends AbstractSetting {
 							}
 						}
 
-						messagesFlux = messagesFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
-								FormatUtils.format(mentionedChannels, DiscordUtils::mentionChannel, ", ")), context.getChannel()));
+						strBuilder.append(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
+								FormatUtils.format(mentionedChannels, DiscordUtils::mentionChannel, ", ")));
 
 					} else {
 						allowedTextChannels.removeAll(mentionedChannels);
 						allowedVoiceChannels.removeAll(mentionedChannels);
-						messagesFlux = messagesFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
-								FormatUtils.format(mentionedChannels, DiscordUtils::mentionChannel, ", ")), context.getChannel()));
+						strBuilder.append(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
+								FormatUtils.format(mentionedChannels, DiscordUtils::mentionChannel, ", ")));
 					}
 
 					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
 					dbGuild.setSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, allowedVoiceChannels);
-					return messagesFlux;
+					return BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
 				})
 				.then();
 	}
