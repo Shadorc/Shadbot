@@ -77,37 +77,37 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		// SoundCloud returns an empty playlist when no results where found
 		if(tracks.isEmpty()) {
 			this.onNoMatches();
-		} 
+		}
 		// The user is searching something
 		else if(playlist.isSearchResult()) {
 			this.onSearchResult(playlist);
-		} 
+		}
 		// The user loads a full playlist
 		else {
 			this.guildMusic.joinVoiceChannel(this.voiceChannelId)
-				.then(Mono.fromCallable(() -> {
-					final StringBuilder strBuilder = new StringBuilder();
-					int musicsAdded = 0;
-					
-					for(AudioTrack track : tracks) {
-						this.guildMusic.getScheduler().startOrQueue(track, this.putFirst);
-						musicsAdded++;
-						if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-								&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), this.djId)) {
-							strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
-							break;
+					.then(Mono.fromCallable(() -> {
+						final StringBuilder strBuilder = new StringBuilder();
+						int musicsAdded = 0;
+
+						for(AudioTrack track : tracks) {
+							this.guildMusic.getScheduler().startOrQueue(track, this.putFirst);
+							musicsAdded++;
+							if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
+									&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), this.djId)) {
+								strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
+								break;
+							}
 						}
-					}
-					
-					strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
-					return strBuilder.toString();
-				}))
-				.flatMap(text -> BotUtils.sendMessage(text, this.guildMusic.getMessageChannel()))
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
-				.subscribe();
+
+						strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
+						return strBuilder.toString();
+					}))
+					.flatMap(text -> BotUtils.sendMessage(text, this.guildMusic.getMessageChannel()))
+					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
+					.subscribe();
 		}
 	}
-	
+
 	@Override
 	public void loadFailed(FriendlyException err) {
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
@@ -126,11 +126,11 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	private void onSearchResult(AudioPlaylist playlist) {
 		this.guildMusic.setDj(this.djId);
 		this.guildMusic.setWaitingForChoice(true);
-	
+
 		final String choices = FormatUtils.numberedList(5, playlist.getTracks().size(),
 				count -> String.format("\t**%d.** %s",
 						count, FormatUtils.trackName(playlist.getTracks().get(count - 1).getInfo())));
-	
+
 		DiscordUtils.getAvatarUrl(this.guildMusic.getClient().getUserById(this.guildMusic.getDjId()))
 				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 						.setAuthor(String.format("Music results: %s", playlist.getName()), null, avatarUrl)
@@ -147,7 +147,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
 							.then(Mono.fromRunnable(this::stopWaiting))
 							.subscribe();
-	
+
 					this.resultsTracks = new ArrayList<>(playlist.getTracks());
 					MessageInterceptorManager.addInterceptor(this.guildMusic.getMessageChannelId(), this);
 				}))

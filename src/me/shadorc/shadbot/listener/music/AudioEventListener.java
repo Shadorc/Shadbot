@@ -67,7 +67,7 @@ public class AudioEventListener extends AudioEventAdapter {
 					this.guildMusic.getGuildId().asLong());
 			strBuilder.append("\n" + Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until I find a music that can be played.");
 		}
-		
+
 		BotUtils.sendMessage(strBuilder.toString(), this.guildMusic.getMessageChannel())
 				.then(this.nextOrEnd())
 				.doOnError(ExceptionHandler::isForbidden,
