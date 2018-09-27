@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -59,13 +61,13 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	@Override
 	public void trackLoaded(AudioTrack track) {
-		this.guildMusic.joinVoiceChannel(this.voiceChannelId).subscribe();
-		if(!this.guildMusic.getScheduler().startOrQueue(track, this.putFirst)) {
-			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-					FormatUtils.trackName(track.getInfo())), this.guildMusic.getMessageChannel())
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
-					.subscribe();
-		}
+		this.guildMusic.joinVoiceChannel(this.voiceChannelId)
+				.then(Mono.just(this.guildMusic.getScheduler().startOrQueue(track, this.putFirst)))
+				.filter(BooleanUtils::negate)
+				.flatMap(queued -> BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
+						FormatUtils.trackName(track.getInfo())), this.guildMusic.getMessageChannel()))
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
+				.subscribe();
 	}
 
 	@Override
@@ -75,70 +77,44 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		// SoundCloud returns an empty playlist when no results where found
 		if(tracks.isEmpty()) {
 			this.onNoMatches();
-			return;
-		}
-
-		if(this.identifier.startsWith(YT_SEARCH) || this.identifier.startsWith(SC_SEARCH)) {
-			this.guildMusic.setDj(this.djId);
-			this.guildMusic.setWaitingForChoice(true);
-
-			final String choices = FormatUtils.numberedList(5, tracks.size(),
-					count -> String.format("\t**%d.** %s",
-							count, FormatUtils.trackName(tracks.get(count - 1).getInfo())));
-
-			DiscordUtils.getAvatarUrl(this.guildMusic.getClient().getUserById(this.guildMusic.getDjId()))
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor("Music results", null, avatarUrl)
-							.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-							.setDescription("**Select a music by typing the corresponding number.**"
-									+ "\nYou can choose several musics by separating them with a comma."
-									+ "\nExample: 1,3,4"
-									+ "\n\n" + choices)
-							.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-									DatabaseManager.getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
-					.flatMap(embed -> BotUtils.sendMessage(embed, this.guildMusic.getMessageChannel()))
-					.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
-					.subscribe();
-
-			this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
-					.then(Mono.fromRunnable(this::stopWaiting))
-					.subscribe();
-
-			this.resultsTracks = new ArrayList<>(tracks);
-			MessageInterceptorManager.addInterceptor(this.guildMusic.getMessageChannelId(), this);
-			return;
-		}
-
-		Flux<Void> flux = Flux.empty();
-		flux = flux.concatWith(this.guildMusic.joinVoiceChannel(this.voiceChannelId));
-
-		int musicsAdded = 0;
-		for(AudioTrack track : tracks) {
-			this.guildMusic.getScheduler().startOrQueue(track, this.putFirst);
-			musicsAdded++;
-			if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-					&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), this.djId)) {
-				flux = flux.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, this.guildMusic.getMessageChannel())
-						.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
-						.then());
-				break;
-			}
-		}
-
-		flux.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded),
-				this.guildMusic.getMessageChannel())
+		} 
+		// The user is searching something
+		else if(playlist.isSearchResult()) {
+			this.onSearchResult(playlist);
+		} 
+		// The user loads a full playlist
+		else {
+			this.guildMusic.joinVoiceChannel(this.voiceChannelId)
+				.then(Mono.fromCallable(() -> {
+					final StringBuilder strBuilder = new StringBuilder();
+					int musicsAdded = 0;
+					
+					for(AudioTrack track : tracks) {
+						this.guildMusic.getScheduler().startOrQueue(track, this.putFirst);
+						musicsAdded++;
+						if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
+								&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), this.djId)) {
+							strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
+							break;
+						}
+					}
+					
+					strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
+					return strBuilder.toString();
+				}))
+				.flatMap(text -> BotUtils.sendMessage(text, this.guildMusic.getMessageChannel()))
 				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
-				.then())
 				.subscribe();
+		}
 	}
-
+	
 	@Override
 	public void loadFailed(FriendlyException err) {
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
+		LogUtils.infof("{Guild ID: %d} Load failed: %s", this.guildMusic.getGuildId().asLong(), errMessage);
 		BotUtils.sendMessage(Emoji.RED_CROSS + " Sorry, " + errMessage.toLowerCase(), this.guildMusic.getMessageChannel())
 				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 				.subscribe();
-		LogUtils.infof("{Guild ID: %d} Load failed: %s", this.guildMusic.getGuildId().asLong(), errMessage);
 		this.leaveIfStopped();
 	}
 
@@ -147,12 +123,43 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		this.onNoMatches();
 	}
 
+	private void onSearchResult(AudioPlaylist playlist) {
+		this.guildMusic.setDj(this.djId);
+		this.guildMusic.setWaitingForChoice(true);
+	
+		final String choices = FormatUtils.numberedList(5, playlist.getTracks().size(),
+				count -> String.format("\t**%d.** %s",
+						count, FormatUtils.trackName(playlist.getTracks().get(count - 1).getInfo())));
+	
+		DiscordUtils.getAvatarUrl(this.guildMusic.getClient().getUserById(this.guildMusic.getDjId()))
+				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
+						.setAuthor(String.format("Music results: %s", playlist.getName()), null, avatarUrl)
+						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
+						.setDescription("**Select a music by typing the corresponding number.**"
+								+ "\nYou can choose several musics by separating them with a comma."
+								+ "\nExample: 1,3,4"
+								+ "\n\n" + choices)
+						.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
+								DatabaseManager.getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
+				.flatMap(embed -> BotUtils.sendMessage(embed, this.guildMusic.getMessageChannel()))
+				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
+				.then(Mono.fromRunnable(() -> {
+					this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
+							.then(Mono.fromRunnable(this::stopWaiting))
+							.subscribe();
+	
+					this.resultsTracks = new ArrayList<>(playlist.getTracks());
+					MessageInterceptorManager.addInterceptor(this.guildMusic.getMessageChannelId(), this);
+				}))
+				.subscribe();
+	}
+
 	private void onNoMatches() {
+		LogUtils.infof("{Guild ID: %d} No matches: %s", this.guildMusic.getGuildId().asLong(), this.identifier);
 		BotUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
 				StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), this.guildMusic.getMessageChannel())
 				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 				.subscribe();
-		LogUtils.infof("{Guild ID: %d} No matches: %s", this.guildMusic.getGuildId().asLong(), this.identifier);
 		this.leaveIfStopped();
 	}
 
