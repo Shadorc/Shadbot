@@ -78,6 +78,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		if(tracks.isEmpty()) {
 			this.onNoMatches();
 		}
+		// If a track is specifically selected
+		else if(playlist.getSelectedTrack() != null) {
+			this.trackLoaded(playlist.getSelectedTrack());
+		}
 		// The user is searching something
 		else if(playlist.isSearchResult()) {
 			this.onSearchResult(playlist);
