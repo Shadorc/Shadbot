@@ -137,7 +137,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 		DiscordUtils.getAvatarUrl(this.guildMusic.getClient().getUserById(this.guildMusic.getDjId()))
 				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-						.setAuthor(String.format("Music results: %s", playlist.getName()), null, avatarUrl)
+						.setAuthor(playlist.getName(), null, avatarUrl)
 						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 						.setDescription("**Select a music by typing the corresponding number.**"
 								+ "\nYou can choose several musics by separating them with a comma."
