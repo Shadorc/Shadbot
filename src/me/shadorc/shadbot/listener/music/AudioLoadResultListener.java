@@ -2,7 +2,9 @@ package me.shadorc.shadbot.listener.music;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.BooleanUtils;
 
@@ -12,8 +14,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.ExceptionHandler;
@@ -34,7 +34,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class AudioLoadResultListener implements AudioLoadResultHandler, MessageInterceptor {
@@ -175,70 +174,60 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		final Message message = event.getMessage();
+		return Mono.justOrEmpty(event.getMember())
+			.filter(member -> member.getId().equals(this.guildMusic.getDjId()))
+			.filter(member -> event.getMessage().getContent().isPresent())
+			.flatMap(member -> {
+				final String content = event.getMessage().getContent().get();
+				final Snowflake authorId = member.getId();
+				
+				final String prefix = DatabaseManager.getDBGuild(this.guildMusic.getGuildId()).getPrefix();
+				if(content.equals(String.format("%scancel", prefix))) {
+					this.stopWaiting();
+					return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
+							member.getUsername()), this.guildMusic.getMessageChannel())
+							.thenReturn(true);
+				}
+				
+				// Remove prefix and command names from message content
+				String contentCleaned = StringUtils.remove(content, prefix);
+				contentCleaned = StringUtils.remove(contentCleaned, CommandInitializer.getCommand("play").getNames().toArray(new String[0]));
 
-		// Ignore webhooks and embeds
-		if(!message.getAuthorId().isPresent() || !message.getContent().isPresent()) {
-			return Mono.just(false);
-		}
+				final Set<Integer> choices = new HashSet<>();
+				for(String choiceStr : contentCleaned.split(",")) {
+					// If the choice is not valid, ignore the message
+					final Integer num = NumberUtils.asIntBetween(choiceStr, 1, Math.min(Config.MUSIC_SEARCHES, this.resultsTracks.size()));
+					if(num == null) {
+						return Mono.just(false);
+					}
 
-		final Snowflake authorId = message.getAuthorId().get();
-		String content = message.getContent().get().toLowerCase();
+					choices.add(num);
+				}
 
-		if(!authorId.equals(this.guildMusic.getDjId())) {
-			return Mono.just(false);
-		}
+				// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel again
+				GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(this.guildMusic.getGuildId(), this.guildMusic);
 
-		final String prefix = DatabaseManager.getDBGuild(this.guildMusic.getGuildId()).getPrefix();
-		if(content.equals(prefix + "cancel")) {
-			this.stopWaiting();
-			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
-					event.getMember().map(User::getUsername).get()), this.guildMusic.getMessageChannel())
-					.thenReturn(true);
-		}
+				final StringBuilder strBuilder = new StringBuilder();
+				for(int choice : choices) {
+					final AudioTrack track = this.resultsTracks.get(choice - 1);
+					if(!this.guildMusic.getScheduler().startOrQueue(track, this.putFirst)) {
+						strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.%n",
+								FormatUtils.trackName(track.getInfo())));
+					}
 
-		// Remove prefix and command names from message content
-		content = StringUtils.remove(content, prefix);
-		for(String name : CommandInitializer.getCommand("play").getNames()) {
-			content = StringUtils.remove(content, name);
-		}
-
-		final List<Integer> choices = new ArrayList<>();
-		for(String choiceStr : content.split(",")) {
-			// If the choice is not valid, ignore the message
-			final Integer num = NumberUtils.asIntBetween(choiceStr, 1, Math.min(Config.MUSIC_SEARCHES, this.resultsTracks.size()));
-			if(num == null) {
-				return Mono.just(false);
-			}
-
-			if(!choices.contains(num)) {
-				choices.add(num);
-			}
-		}
-
-		// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel again
-		GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(this.guildMusic.getGuildId(), this.guildMusic);
-		final Mono<Void> joinMono = this.guildMusic.joinVoiceChannel(this.voiceChannelId);
-
-		Flux<Message> messages = Flux.empty();
-		for(int choice : choices) {
-			final AudioTrack track = this.resultsTracks.get(choice - 1);
-			if(!this.guildMusic.getScheduler().startOrQueue(track, this.putFirst)) {
-				messages = messages.concatWith(BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-						FormatUtils.trackName(track.getInfo())), this.guildMusic.getMessageChannel()));
-			}
-
-			if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-					&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), authorId)) {
-				messages = messages.concatWith(BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, this.guildMusic.getMessageChannel()));
-				break;
-			}
-		}
-
-		this.stopWaiting();
-		return joinMono
-				.thenMany(messages)
-				.then(Mono.just(true));
+					if(this.guildMusic.getScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
+							&& !PremiumManager.isPremium(this.guildMusic.getGuildId(), authorId)) {
+						strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED);
+						break;
+					}
+				}
+				
+				this.stopWaiting();
+				//TODO: Chain (stop only on disconnect)
+				this.guildMusic.joinVoiceChannel(this.voiceChannelId).subscribe();
+				return BotUtils.sendMessage(strBuilder.toString(), this.guildMusic.getMessageChannel())
+						.thenReturn(true);
+			});
 	}
 
 	private void stopWaiting() {
