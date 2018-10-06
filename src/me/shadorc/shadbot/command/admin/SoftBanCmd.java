@@ -46,8 +46,8 @@ public class SoftBanCmd extends AbstractCommand {
 
 		final Snowflake guildId = context.getGuildId();
 
-		return Mono.zip(context.getMessage().getUserMentions().collectList(), 
-				context.getGuild(), 
+		return Mono.zip(context.getMessage().getUserMentions().collectList(),
+				context.getGuild(),
 				DiscordUtils.hasPermission(context.getChannel(), context.getAuthorId(), Permission.BAN_MEMBERS),
 				DiscordUtils.hasPermission(context.getChannel(), context.getSelfId(), Permission.BAN_MEMBERS))
 				.flatMap(tuple -> {
@@ -55,7 +55,7 @@ public class SoftBanCmd extends AbstractCommand {
 					final Guild guild = tuple.getT2();
 					final boolean hasUserPerm = tuple.getT3();
 					final boolean hasBotPerm = tuple.getT4();
-					
+
 					if(!hasUserPerm) {
 						throw new MissingPermissionException(Type.USER, Permission.BAN_MEMBERS);
 					}

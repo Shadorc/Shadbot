@@ -182,13 +182,13 @@ public class Context {
 		return args;
 	}
 
-	//	TODO: Implement
-	//	public GuildMusic requireGuildMusic() {
-	//		final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(this.getGuildId());
-	//		if(guildMusic == null || guildMusic.getScheduler().isStopped()) {
-	//			throw new NoMusicException();
-	//		}
-	//		return guildMusic;
-	//	}
+	// TODO: Implement
+	// public GuildMusic requireGuildMusic() {
+	// final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(this.getGuildId());
+	// if(guildMusic == null || guildMusic.getScheduler().isStopped()) {
+	// throw new NoMusicException();
+	// }
+	// return guildMusic;
+	// }
 
 }

@@ -22,7 +22,7 @@ public class GatewayLifecycleListener {
 
 	public static void onReadyEvent(ReadyEvent event) {
 		LogUtils.infof("%s (Version: %s) is ready",
-				event.getSelf().getUsername(), 
+				event.getSelf().getUsername(),
 				Config.VERSION);
 
 		final DiscordClient client = event.getClient();

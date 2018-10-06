@@ -83,14 +83,14 @@ public class ExceptionHandler {
 	public static boolean isUnreacheable(Throwable err) {
 		return err instanceof NoRouteToHostException || err instanceof SocketTimeoutException;
 	}
-	
+
 	public static boolean isMissingPermission(Throwable err) {
 		return err instanceof MissingPermissionException;
 	}
 
 	public static boolean isForbidden(Throwable err) {
 		return err instanceof ClientException
-						&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
+				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
 	}
 
 	public static boolean isNotFound(Throwable err) {
@@ -135,13 +135,13 @@ public class ExceptionHandler {
 
 	private Mono<Message> onMissingPermissionException() {
 		final Permission missingPerm = ((MissingPermissionException) this.err).getPermission();
-		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of permission." 
+		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of permission."
 				+ "%nPlease, check my permissions and channel-specific ones to verify that %s is checked.",
 				context.getUsername(), String.format("**%s**", StringUtils.capitalizeEnum(missingPerm))), context.getChannel())
 				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
 						this.context.getGuildId().asLong(), StringUtils.capitalizeEnum(missingPerm)));
 	}
-	
+
 	private Mono<Message> onForbidden() {
 		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to an unknown lack of permission.",
 				context.getUsername()), context.getChannel())

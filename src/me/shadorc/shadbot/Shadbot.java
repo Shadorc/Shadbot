@@ -75,8 +75,8 @@ public class Shadbot {
 			register(client, MemberLeaveEvent.class, MemberListener::onMemberLeave);
 			register(client, MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
 			register(client, MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
-			//TODO: Implement
-			//register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
+			// TODO: Implement
+			// register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 			register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
 			register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
 		}

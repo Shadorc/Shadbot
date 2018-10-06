@@ -43,15 +43,15 @@ public class ShutdownCmd extends AbstractCommand {
 				.then(Mono.delay(Duration.ofSeconds(delay)))
 				.then(Mono.fromRunnable(Shadbot::logout));
 
-		//		TODO: Implement
-		//		return Flux.fromIterable(GuildMusicManager.GUILD_MUSIC_MAP.values())
-		//				.flatMap(guildMusic -> BotUtils.sendMessage(Emoji.INFO + " " + message, guildMusic.getMessageChannel()))
-		//				.then(context.getSelf())
-		//				.map(User::getMention)
-		//				.doOnSuccess(botName -> LogUtils.warn(context.getClient(),
-		//						String.format("%s will restart in %d seconds. (Message: %s)", botName, delay, message)))
-		//				.then(Mono.delay(Duration.ofSeconds(delay)))
-		//				.then(Mono.fromRunnable(Shadbot::logout));
+		// TODO: Implement
+		// return Flux.fromIterable(GuildMusicManager.GUILD_MUSIC_MAP.values())
+		// .flatMap(guildMusic -> BotUtils.sendMessage(Emoji.INFO + " " + message, guildMusic.getMessageChannel()))
+		// .then(context.getSelf())
+		// .map(User::getMention)
+		// .doOnSuccess(botName -> LogUtils.warn(context.getClient(),
+		// String.format("%s will restart in %d seconds. (Message: %s)", botName, delay, message)))
+		// .then(Mono.delay(Duration.ofSeconds(delay)))
+		// .then(Mono.fromRunnable(Shadbot::logout));
 	}
 
 	@Override

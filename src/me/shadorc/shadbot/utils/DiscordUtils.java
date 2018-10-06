@@ -115,7 +115,7 @@ public class DiscordUtils {
 				.then();
 	}
 
-	public static Flux<Snowflake> getChannels(Message message) {
+	public static Flux<Snowflake> extractChannels(Message message) {
 		final String content = message.getContent().orElse("");
 		final List<String> words = StringUtils.split(content).stream()
 				.map(String::toLowerCase)
@@ -126,10 +126,10 @@ public class DiscordUtils {
 				.flatMapMany(Guild::getChannels)
 				.filter(channel -> words.contains(channel.getName()))
 				.map(GuildChannel::getId)
-				.concatWith(Flux.fromIterable(DiscordUtils.getChannelMentions(content)));
+				.concatWith(Flux.fromIterable(DiscordUtils.extractChannelMentions(content)));
 	}
 
-	public static Flux<Snowflake> getRoles(Message message) {
+	public static Flux<Snowflake> extractRoles(Message message) {
 		final List<String> words = StringUtils.split(message.getContent().orElse("")).stream()
 				.map(String::toLowerCase)
 				.map(word -> word.replace("@", ""))
@@ -142,7 +142,7 @@ public class DiscordUtils {
 				.concatWith(Flux.fromIterable(message.getRoleMentionIds()));
 	}
 
-	private static List<Snowflake> getChannelMentions(String content) {
+	private static List<Snowflake> extractChannelMentions(String content) {
 		final Matcher matcher = Pattern.compile("<#([0-9]{1,19})>").matcher(content);
 		final List<Snowflake> channelMentions = new ArrayList<>();
 		while(matcher.find()) {
@@ -161,7 +161,9 @@ public class DiscordUtils {
 			case 0:
 				return Mono.just(messages.size());
 			case 1:
-				return messages.get(0).delete().thenReturn(messages.size());
+				return messages.get(0)
+						.delete()
+						.thenReturn(messages.size());
 			default:
 				return channel
 						.flatMap(channelItr -> channelItr.bulkDelete(Flux.fromIterable(messages)
@@ -182,10 +184,12 @@ public class DiscordUtils {
 						|| !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
 	}
 
+	// Fix: https://github.com/Discord4J/Discord4J/issues/429
 	public static Flux<Member> getMembers(Guild guild) {
 		return DiscordUtils.getMembers(Mono.just(guild));
 	}
 
+	// Fix: https://github.com/Discord4J/Discord4J/issues/429
 	public static Flux<Member> getMembers(Mono<Guild> guild) {
 		return guild.flatMapMany(Guild::getMembers)
 				.collectList()
@@ -223,38 +227,38 @@ public class DiscordUtils {
 				.defaultIfEmpty(Optional.empty());
 	}
 
-	//TODO: Implement
-	//	public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
-	//		return Mono.zip(DiscordUtils.getVoiceChannelId(context.getSelfAsMember()),
-	//				DiscordUtils.getVoiceChannelId(context.getMessage().getAuthorAsMember()))
-	//				.map(tuple2 -> {
-	//					final Optional<Snowflake> botVoiceChannelId = tuple2.getT1();
-	//					final Optional<Snowflake> userVoiceChannelId = tuple2.getT2();
+	// TODO: Implement
+	// public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
+	// return Mono.zip(DiscordUtils.getVoiceChannelId(context.getSelfAsMember()),
+	// DiscordUtils.getVoiceChannelId(context.getMessage().getAuthorAsMember()))
+	// .map(tuple2 -> {
+	// final Optional<Snowflake> botVoiceChannelId = tuple2.getT1();
+	// final Optional<Snowflake> userVoiceChannelId = tuple2.getT2();
 	//
-	//					if(userVoiceChannelId.isPresent() && !BotUtils.isVoiceChannelAllowed(context.getGuildId(), userVoiceChannelId.get())) {
-	//						throw new CommandException("I'm not allowed to join this voice channel.");
-	//					}
+	// if(userVoiceChannelId.isPresent() && !BotUtils.isVoiceChannelAllowed(context.getGuildId(), userVoiceChannelId.get())) {
+	// throw new CommandException("I'm not allowed to join this voice channel.");
+	// }
 	//
-	//					if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
-	//						throw new CommandException("Join a voice channel before using this command.");
-	//					}
+	// if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
+	// throw new CommandException("Join a voice channel before using this command.");
+	// }
 	//
-	//					if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
-	//						throw new CommandException(String.format("I'm currently playing music in voice channel %s"
-	//								+ ", join me before using this command.", DiscordUtils.mentionChannel(botVoiceChannelId.get())));
-	//					}
+	// if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
+	// throw new CommandException(String.format("I'm currently playing music in voice channel %s"
+	// + ", join me before using this command.", DiscordUtils.mentionChannel(botVoiceChannelId.get())));
+	// }
 	//
-	//					return userVoiceChannelId.get();
-	//				});
-	//	}
-	
+	// return userVoiceChannelId.get();
+	// });
+	// }
+
 	public static Mono<Boolean> hasPermission(Mono<MessageChannel> channel, Snowflake memberId, Permission permission) {
 		return channel
 				.filter(chnl -> chnl instanceof TextChannel)
 				.cast(TextChannel.class)
 				.flatMap(chnl -> chnl.getEffectivePermissions(memberId))
 				.map(perms -> perms.contains(permission));
-				
+
 	}
 
 }

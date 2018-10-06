@@ -39,15 +39,15 @@ public class BanCmd extends AbstractCommand {
 		if(mentionedUserIds.isEmpty()) {
 			throw new MissingArgumentException();
 		}
-		
+
 		if(mentionedUserIds.contains(context.getAuthorId())) {
 			throw new CommandException("You cannot ban yourself.");
 		}
 
 		final Snowflake guildId = context.getGuildId();
 
-		return Mono.zip(context.getMessage().getUserMentions().collectList(), 
-				context.getGuild(), 
+		return Mono.zip(context.getMessage().getUserMentions().collectList(),
+				context.getGuild(),
 				DiscordUtils.hasPermission(context.getChannel(), context.getAuthorId(), Permission.BAN_MEMBERS),
 				DiscordUtils.hasPermission(context.getChannel(), context.getSelfId(), Permission.BAN_MEMBERS))
 				.flatMap(tuple -> {
@@ -55,7 +55,7 @@ public class BanCmd extends AbstractCommand {
 					final Guild guild = tuple.getT2();
 					final boolean hasUserPerm = tuple.getT3();
 					final boolean hasBotPerm = tuple.getT4();
-					
+
 					if(!hasUserPerm) {
 						throw new MissingPermissionException(Type.USER, Permission.BAN_MEMBERS);
 					}
@@ -63,7 +63,7 @@ public class BanCmd extends AbstractCommand {
 					if(!hasBotPerm) {
 						throw new MissingPermissionException(Type.BOT, Permission.BAN_MEMBERS);
 					}
-					
+
 					final StringBuilder reason = new StringBuilder();
 					reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
 					if(reason.length() > DiscordUtils.MAX_REASON_LENGTH) {
