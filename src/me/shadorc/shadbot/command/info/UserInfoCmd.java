@@ -58,7 +58,7 @@ public class UserInfoCmd extends AbstractCommand {
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Info about user \"%s\"%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)
-							.setThumbnail(DiscordUtils.getAvatarUrl(member))
+							.setThumbnail(member.getAvatarUrl())
 							.addField("Display name", member.getDisplayName(), true)
 							.addField("User ID", member.getId().asString(), true)
 							.addField("Creation date", creationDate, true)

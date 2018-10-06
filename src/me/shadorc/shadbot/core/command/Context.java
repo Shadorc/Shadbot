@@ -121,7 +121,7 @@ public class Context {
 	}
 
 	public Mono<String> getAvatarUrl() {
-		return DiscordUtils.getAvatarUrl(this.getAuthor());
+		return this.getAuthor().map(User::getAvatarUrl);
 	}
 
 	public Mono<CommandPermission> getPermission() {

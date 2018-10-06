@@ -23,10 +23,8 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.TextChannel;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
-import discord4j.core.object.util.Image.Format;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
@@ -216,14 +214,6 @@ public class DiscordUtils {
 
 	public static String mentionChannel(Snowflake channelId) {
 		return "<#" + channelId.asLong() + ">";
-	}
-
-	public static Mono<String> getAvatarUrl(Mono<User> user) {
-		return user.map(DiscordUtils::getAvatarUrl);
-	}
-
-	public static String getAvatarUrl(User user) {
-		return user.getAvatarUrl(Format.JPEG).orElse(user.getDefaultAvatarUrl());
 	}
 
 	public static Mono<Optional<Snowflake>> getVoiceChannelId(Mono<Member> member) {
