@@ -12,13 +12,9 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.music.GuildMusicManager;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "shutdown" })
@@ -40,14 +36,22 @@ public class ShutdownCmd extends AbstractCommand {
 
 		final String message = args.get(1);
 
-		return Flux.fromIterable(GuildMusicManager.GUILD_MUSIC_MAP.values())
-				.flatMap(guildMusic -> BotUtils.sendMessage(Emoji.INFO + " " + message, guildMusic.getMessageChannel()))
-				.then(context.getSelf())
+		return context.getSelf()
 				.map(User::getMention)
 				.doOnSuccess(botName -> LogUtils.warn(context.getClient(),
 						String.format("%s will restart in %d seconds. (Message: %s)", botName, delay, message)))
 				.then(Mono.delay(Duration.ofSeconds(delay)))
 				.then(Mono.fromRunnable(Shadbot::logout));
+
+		//		TODO: Implement
+		//		return Flux.fromIterable(GuildMusicManager.GUILD_MUSIC_MAP.values())
+		//				.flatMap(guildMusic -> BotUtils.sendMessage(Emoji.INFO + " " + message, guildMusic.getMessageChannel()))
+		//				.then(context.getSelf())
+		//				.map(User::getMention)
+		//				.doOnSuccess(botName -> LogUtils.warn(context.getClient(),
+		//						String.format("%s will restart in %d seconds. (Message: %s)", botName, delay, message)))
+		//				.then(Mono.delay(Duration.ofSeconds(delay)))
+		//				.then(Mono.fromRunnable(Shadbot::logout));
 	}
 
 	@Override

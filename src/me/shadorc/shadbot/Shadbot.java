@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.event.domain.Event;
-import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
@@ -37,7 +36,6 @@ import me.shadorc.shadbot.listener.MemberListener;
 import me.shadorc.shadbot.listener.MessageCreateListener;
 import me.shadorc.shadbot.listener.MessageUpdateListener;
 import me.shadorc.shadbot.listener.ReactionListener;
-import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
@@ -77,7 +75,8 @@ public class Shadbot {
 			register(client, MemberLeaveEvent.class, MemberListener::onMemberLeave);
 			register(client, MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
 			register(client, MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
-			register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
+			//TODO: Implement
+			//register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 			register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
 			register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
 		}

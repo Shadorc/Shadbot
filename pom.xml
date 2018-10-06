@@ -86,7 +86,7 @@
 		<dependency>
 			<groupId>com.github.Discord4J</groupId>
 			<artifactId>Discord4J</artifactId>
-			<version>feature~voice-SNAPSHOT</version>
+			<version>v3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.Discord4J.Stores</groupId>
