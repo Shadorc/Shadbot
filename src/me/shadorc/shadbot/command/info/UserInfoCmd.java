@@ -15,7 +15,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
@@ -49,8 +48,8 @@ public class UserInfoCmd extends AbstractCommand {
 					final String avatarUrl = tuple4.getT4();
 
 					final String creationDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(member.getId())).format(this.dateFormatter),
-							FormatUtils.longDuration(DiscordUtils.getSnowflakeTimeFromID(member.getId())));
+							TimeUtils.toLocalDate(member.getId().getTimestamp()).format(this.dateFormatter),
+							FormatUtils.longDuration(member.getId().getTimestamp()));
 
 					final String joinDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(member.getJoinTime()).format(this.dateFormatter),

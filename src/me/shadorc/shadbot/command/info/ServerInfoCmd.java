@@ -22,7 +22,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -91,8 +90,8 @@ public class ServerInfoCmd extends AbstractCommand {
 					final String avatarUrl = tuple5.getT5();
 
 					final String creationDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(DiscordUtils.getSnowflakeTimeFromID(guild.getId())).format(this.dateFormatter),
-							FormatUtils.longDuration(DiscordUtils.getSnowflakeTimeFromID(guild.getId())));
+							TimeUtils.toLocalDate(guild.getId().getTimestamp()).format(this.dateFormatter),
+							FormatUtils.longDuration(guild.getId().getTimestamp()));
 					final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
 					final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
