@@ -48,7 +48,7 @@ public abstract class AbstractGameManager {
 				// This is a cancel command
 				.filter(String.format("%scancel", this.context.getPrefix())::equals)
 				.flatMap(content -> message.getAuthorAsMember())
-				.zipWith(DiscordUtils.hasPermissions(message.getAuthorAsMember(), Permission.ADMINISTRATOR))
+				.zipWith(DiscordUtils.hasPermission(message.getChannel(), message.getAuthorId().get(), Permission.ADMINISTRATOR))
 				// The author is the author of the game or he is an administrator
 				.filter(memberAndIsAdmin -> this.context.getAuthorId().equals(memberAndIsAdmin.getT1().getId()) || memberAndIsAdmin.getT2())
 				.hasElement();

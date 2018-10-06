@@ -26,6 +26,7 @@ public class BotUtils {
 				.doOnSuccess(msg -> StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT));
 	}
 
+	//TODO: Check Permission.SEND_MESSAGE and Permission.EMBED_LINK
 	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, Mono<MessageChannel> channelMono) {
 		final MessageCreateSpec spec = new MessageCreateSpec();
 		if(content != null) {

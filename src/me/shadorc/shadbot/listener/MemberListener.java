@@ -35,9 +35,7 @@ public class MemberListener {
 
 	private static void sendAutoMsg(DiscordClient client, Optional<Snowflake> channelId, Optional<String> message) {
 		if(channelId.isPresent() && message.isPresent()) {
-			BotUtils.sendMessage(message.get(), client.getMessageChannelById(channelId.get()))
-					.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(MemberListener.class))
-					.subscribe();
+			BotUtils.sendMessage(message.get(), client.getMessageChannelById(channelId.get())).subscribe();
 		}
 	}
 }

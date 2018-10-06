@@ -13,7 +13,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.api.trivia.TriviaResponse;
 import me.shadorc.shadbot.api.trivia.TriviaResult;
-import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.database.DatabaseManager;
@@ -27,7 +26,6 @@ import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
@@ -61,8 +59,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		this.schedule(Mono.fromRunnable(this::stop)
 				.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", this.trivia.getCorrectAnswer()),
-						this.getContext().getChannel()))
-				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), this.getContext().getGuildId())),
+						this.getContext().getChannel())),
 				LIMITED_TIME, ChronoUnit.SECONDS);
 		this.startTime = System.currentTimeMillis();
 	}

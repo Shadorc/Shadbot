@@ -39,7 +39,6 @@ public class CommandProcessor {
 		Mono.just(event.getMessage())
 				// The content is not a Webhook
 				.filter(message -> message.getContent().isPresent())
-				.filter(message -> message.getAuthorId().isPresent())
 				.flatMap(Message::getAuthor)
 				// The author is not a bot
 				.filter(author -> !author.isBot())

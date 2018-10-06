@@ -3,9 +3,6 @@ package me.shadorc.shadbot.core;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
 import org.jsoup.HttpStatusException;
@@ -23,7 +20,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -58,6 +54,9 @@ public class ExceptionHandler {
 		if(ExceptionHandler.isUnreacheable(this.err)) {
 			return this.onUnreacheable();
 		}
+		if(ExceptionHandler.isMissingPermission(this.err)) {
+			return this.onMissingPermissionException();
+		}
 		if(ExceptionHandler.isForbidden(this.err)) {
 			return this.onForbidden();
 		}
@@ -84,10 +83,13 @@ public class ExceptionHandler {
 	public static boolean isUnreacheable(Throwable err) {
 		return err instanceof NoRouteToHostException || err instanceof SocketTimeoutException;
 	}
+	
+	public static boolean isMissingPermission(Throwable err) {
+		return err instanceof MissingPermissionException;
+	}
 
 	public static boolean isForbidden(Throwable err) {
-		return err instanceof MissingPermissionException
-				|| err instanceof ClientException
+		return err instanceof ClientException
 						&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
 	}
 
@@ -131,24 +133,20 @@ public class ExceptionHandler {
 				this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
 	}
 
+	private Mono<Message> onMissingPermissionException() {
+		final Permission missingPerm = ((MissingPermissionException) this.err).getPermission();
+		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of permission." 
+				+ "%nPlease, check my permissions and channel-specific ones to verify that %s is checked.",
+				context.getUsername(), String.format("**%s**", StringUtils.capitalizeEnum(missingPerm))), context.getChannel())
+				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
+						this.context.getGuildId().asLong(), StringUtils.capitalizeEnum(missingPerm)));
+	}
+	
 	private Mono<Message> onForbidden() {
-		final List<Permission> permissions = new ArrayList<>(this.command.getPermissions());
-		if(permissions.isEmpty()) {
-			permissions.add(Permission.EMBED_LINKS);
-		}
-
-		final List<String> permissionsStr = permissions.stream()
-				.map(StringUtils::capitalizeEnum)
-				.collect(Collectors.toList());
-
-		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of permission."
-				+ "%nPlease, check my permissions and channel-specific ones to verify that %s %s checked.",
-				this.context.getUsername(),
-				FormatUtils.format(permissionsStr, str -> String.format("**%s**", str), " and "),
-				permissionsStr.size() > 1 ? "are" : "is"), this.context.getChannel())
-				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission(s): %s",
-						this.context.getGuildId().asLong(), String.join(", ", permissionsStr)))
-				.doOnError(ExceptionHandler::isForbidden, err -> LogUtils.cannotSpeak(this.getClass(), this.context.getGuildId()));
+		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to an unknown lack of permission.",
+				context.getUsername()), context.getChannel())
+				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: Unknown",
+						this.context.getGuildId().asLong()));
 	}
 
 	private Mono<Message> onUnknown() {

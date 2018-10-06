@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
@@ -18,7 +17,6 @@ public abstract class AbstractCommand {
 	private final String alias;
 	private final CommandCategory category;
 	private final CommandPermission permission;
-	private final List<Permission> permissions;
 	private final Optional<RateLimiter> rateLimiter;
 
 	public AbstractCommand() {
@@ -27,7 +25,6 @@ public abstract class AbstractCommand {
 		this.alias = cmdAnnotation.alias();
 		this.category = cmdAnnotation.category();
 		this.permission = cmdAnnotation.permission();
-		this.permissions = Arrays.asList(cmdAnnotation.permissions());
 
 		final RateLimited limiterAnnotation = this.getClass().getAnnotation(RateLimited.class);
 		if(limiterAnnotation == null) {
@@ -59,10 +56,6 @@ public abstract class AbstractCommand {
 
 	public CommandPermission getPermission() {
 		return this.permission;
-	}
-
-	public List<Permission> getPermissions() {
-		return this.permissions;
 	}
 
 	public Optional<RateLimiter> getRateLimiter() {

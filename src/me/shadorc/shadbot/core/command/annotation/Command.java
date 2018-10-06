@@ -5,7 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 
@@ -20,7 +19,5 @@ public @interface Command {
 	CommandCategory category();
 
 	CommandPermission permission() default CommandPermission.USER;
-
-	Permission[] permissions() default {};
 
 }

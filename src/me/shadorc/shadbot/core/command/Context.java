@@ -137,7 +137,7 @@ public class Context {
 				.map(guildId -> CommandPermission.ADMIN);
 
 		// The member is an administrator
-		final Mono<CommandPermission> adminPerm = DiscordUtils.hasPermissions(this.getMember(), Permission.ADMINISTRATOR)
+		final Mono<CommandPermission> adminPerm = DiscordUtils.hasPermission(this.getChannel(), this.getAuthorId(), Permission.ADMINISTRATOR)
 				.map(bool -> CommandPermission.ADMIN);
 
 		return ownerPerm

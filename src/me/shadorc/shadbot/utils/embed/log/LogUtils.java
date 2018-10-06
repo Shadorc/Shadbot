@@ -8,7 +8,6 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogBuilder.LogType;
@@ -64,18 +63,8 @@ public class LogUtils {
 				clazz.getSimpleName(), StringUtils.capitalizeEnum(permission));
 	}
 
-	public static void cannotSpeak(Class<?> clazz, Snowflake guildId) {
-		LogUtils.cannot(clazz, guildId, Permission.SEND_MESSAGES);
-	}
-
-	public static void cannotSpeak(Class<?> clazz) {
-		LogUtils.cannot(clazz, Permission.SEND_MESSAGES);
-	}
-
 	private static void sendLog(DiscordClient client, LogBuilder embed) {
-		BotUtils.sendMessage(embed.build(), client.getMessageChannelById(Config.LOGS_CHANNEL_ID))
-				.doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(LogUtils.class))
-				.subscribe();
+		BotUtils.sendMessage(embed.build(), client.getMessageChannelById(Config.LOGS_CHANNEL_ID)).subscribe();
 	}
 
 }

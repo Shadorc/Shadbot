@@ -17,6 +17,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.exception.MissingPermissionException;
+import me.shadorc.shadbot.exception.MissingPermissionException.Type;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -26,7 +28,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "softban" }, permissions = { Permission.BAN_MEMBERS })
+@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "softban" })
 public class SoftBanCmd extends AbstractCommand {
 
 	@Override
@@ -44,12 +46,23 @@ public class SoftBanCmd extends AbstractCommand {
 
 		final Snowflake guildId = context.getGuildId();
 
-		return context.getMessage().getUserMentions().collectList()
-				.zipWith(context.getGuild())
-				.flatMap(mentionsAndGuild -> {
+		return Mono.zip(context.getMessage().getUserMentions().collectList(), 
+				context.getGuild(), 
+				DiscordUtils.hasPermission(context.getChannel(), context.getAuthorId(), Permission.BAN_MEMBERS),
+				DiscordUtils.hasPermission(context.getChannel(), context.getSelfId(), Permission.BAN_MEMBERS))
+				.flatMap(tuple -> {
+					final List<User> mentions = tuple.getT1();
+					final Guild guild = tuple.getT2();
+					final boolean hasUserPerm = tuple.getT3();
+					final boolean hasBotPerm = tuple.getT4();
+					
+					if(!hasUserPerm) {
+						throw new MissingPermissionException(Type.USER, Permission.BAN_MEMBERS);
+					}
 
-					final List<User> mentions = mentionsAndGuild.getT1();
-					final Guild guild = mentionsAndGuild.getT2();
+					if(!hasBotPerm) {
+						throw new MissingPermissionException(Type.BOT, Permission.BAN_MEMBERS);
+					}
 
 					final StringBuilder reason = new StringBuilder();
 					reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());

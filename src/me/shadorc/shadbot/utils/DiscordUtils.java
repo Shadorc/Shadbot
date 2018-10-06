@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.utils;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,20 +20,18 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
-import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -226,52 +223,38 @@ public class DiscordUtils {
 				.defaultIfEmpty(Optional.empty());
 	}
 
-	public static Instant getSnowflakeTimeFromID(Snowflake id) {
-		return Instant.ofEpochMilli(1420070400000L + (id.asLong() >>> 22));
-	}
-
-	public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
-		return Mono.zip(DiscordUtils.getVoiceChannelId(context.getSelfAsMember()),
-				DiscordUtils.getVoiceChannelId(context.getMessage().getAuthorAsMember()),
-				DiscordUtils.hasPermissions(context.getSelfAsMember(), Permission.CONNECT, Permission.SPEAK))
-				.map(tuple3 -> {
-					final Optional<Snowflake> botVoiceChannelId = tuple3.getT1();
-					final Optional<Snowflake> userVoiceChannelId = tuple3.getT2();
-					final boolean hasPerm = tuple3.getT3();
-
-					if(userVoiceChannelId.isPresent() && !BotUtils.isVoiceChannelAllowed(context.getGuildId(), userVoiceChannelId.get())) {
-						throw new CommandException("I'm not allowed to join this voice channel.");
-					}
-
-					if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
-						throw new CommandException("Join a voice channel before using this command.");
-					}
-
-					if(!botVoiceChannelId.isPresent() && userVoiceChannelId.isPresent() && !hasPerm) {
-						// TODO: Manage with timeout or forbidden error
-						throw new MissingPermissionException();
-					}
-
-					if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
-						throw new CommandException(String.format("I'm currently playing music in voice channel %s"
-								+ ", join me before using this command.", DiscordUtils.mentionChannel(botVoiceChannelId.get())));
-					}
-
-					return userVoiceChannelId.get();
-				});
-	}
-
-	public static Mono<Boolean> hasPermissions(Mono<Member> member, Permission... permissions) {
-		return member.flatMap(user -> DiscordUtils.hasPermissions(user, permissions));
-	}
-
-	public static Mono<Boolean> hasPermissions(Member member, Permission... permissions) {
-		return Mono.justOrEmpty(member)
-				.flatMapMany(Member::getRoles)
-				.map(Role::getPermissions)
-				.flatMap(Flux::fromIterable)
-				.collectList()
-				.map(rolePermissions -> rolePermissions.containsAll(PermissionSet.of(permissions)));
+	//TODO: Implement
+	//	public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
+	//		return Mono.zip(DiscordUtils.getVoiceChannelId(context.getSelfAsMember()),
+	//				DiscordUtils.getVoiceChannelId(context.getMessage().getAuthorAsMember()))
+	//				.map(tuple2 -> {
+	//					final Optional<Snowflake> botVoiceChannelId = tuple2.getT1();
+	//					final Optional<Snowflake> userVoiceChannelId = tuple2.getT2();
+	//
+	//					if(userVoiceChannelId.isPresent() && !BotUtils.isVoiceChannelAllowed(context.getGuildId(), userVoiceChannelId.get())) {
+	//						throw new CommandException("I'm not allowed to join this voice channel.");
+	//					}
+	//
+	//					if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
+	//						throw new CommandException("Join a voice channel before using this command.");
+	//					}
+	//
+	//					if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
+	//						throw new CommandException(String.format("I'm currently playing music in voice channel %s"
+	//								+ ", join me before using this command.", DiscordUtils.mentionChannel(botVoiceChannelId.get())));
+	//					}
+	//
+	//					return userVoiceChannelId.get();
+	//				});
+	//	}
+	
+	public static Mono<Boolean> hasPermission(Mono<MessageChannel> channel, Snowflake memberId, Permission permission) {
+		return channel
+				.filter(chnl -> chnl instanceof TextChannel)
+				.cast(TextChannel.class)
+				.flatMap(chnl -> chnl.getEffectivePermissions(memberId))
+				.map(perms -> perms.contains(permission));
+				
 	}
 
 }
