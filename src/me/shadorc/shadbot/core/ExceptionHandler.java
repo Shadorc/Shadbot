@@ -8,7 +8,6 @@ import org.apache.http.HttpStatus;
 import org.jsoup.HttpStatusException;
 
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.util.Permission;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -18,6 +17,7 @@ import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
+import me.shadorc.shadbot.exception.MissingPermissionException.Type;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -134,16 +134,25 @@ public class ExceptionHandler {
 	}
 
 	private Mono<Message> onMissingPermissionException() {
-		final Permission missingPerm = ((MissingPermissionException) this.err).getPermission();
-		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of permission."
-				+ "%nPlease, check my permissions and channel-specific ones to verify that %s is checked.",
-				context.getUsername(), String.format("**%s**", StringUtils.capitalizeEnum(missingPerm))), context.getChannel())
-				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
-						this.context.getGuildId().asLong(), StringUtils.capitalizeEnum(missingPerm)));
+		final MissingPermissionException exception = (MissingPermissionException) this.err;
+		final String missingPerm = StringUtils.capitalizeEnum(exception.getPermission());
+		if(exception.getType().equals(Type.BOT)) {
+			return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
+					+ " (**%s**) I can't execute this command due to the lack of permission."
+					+ "%nPlease, check my permissions and channel-specific ones to verify that %s is checked.",
+					context.getUsername(), String.format("**%s**", missingPerm)), context.getChannel())
+					.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
+							this.context.getGuildId().asLong(), missingPerm));
+		} else {
+			return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
+					+ " (**%s**) You can't execute this command because you don't have the permission to %s.",
+					context.getUsername(), String.format("**%s**", missingPerm)), context.getChannel());
+		}
 	}
 
 	private Mono<Message> onForbidden() {
-		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to an unknown lack of permission.",
+		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
+				+ " (**%s**) I can't execute this command due to an unknown lack of permission.",
 				context.getUsername()), context.getChannel())
 				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: Unknown",
 						this.context.getGuildId().asLong()));
