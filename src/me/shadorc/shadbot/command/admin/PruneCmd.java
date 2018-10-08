@@ -18,6 +18,7 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.exception.MissingPermissionException.Type;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -27,28 +28,28 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" }, permissions = { Permission.MANAGE_MESSAGES })
+@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" })
 public class PruneCmd extends AbstractCommand {
 
 	private static int MAX = 250;
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final String arg = context.getArg().orElse("");
-
-		final List<String> quotedElements = StringUtils.getQuotedElements(arg);
-
-		if(arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
-			throw new CommandException("You have forgotten a quote or have specified several quotes in quotation marks.");
-		}
-
-		final String words = quotedElements.isEmpty() ? null : quotedElements.get(0);
-
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		return context.getMessage().getUserMentions()
-				.collectList()
+		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), Type.BOT, Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
+				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), Type.USER, Permission.MANAGE_MESSAGES))
+				.then(context.getMessage().getUserMentions().collectList())
 				.flatMap(mentions -> {
+					final String arg = context.getArg().orElse("");
+
+					final List<String> quotedElements = StringUtils.getQuotedElements(arg);
+
+					if(arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
+						throw new CommandException("You have forgotten a quote or have specified several quotes in quotation marks.");
+					}
+
+					final String words = quotedElements.isEmpty() ? null : quotedElements.get(0);
 
 					// Remove everything from argument (users mentioned and quoted words) to keep only count if specified
 					final String argCleaned = StringUtils.remove(arg,

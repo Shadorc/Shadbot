@@ -18,7 +18,6 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.Type;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -34,28 +33,17 @@ public class IamCommand extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		return Mono.zip(DiscordUtils.extractRoles(context.getMessage())
-				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-				.collectList(),
-				context.getAvatarUrl(),
-				DiscordUtils.hasPermission(context.getChannel(), context.getSelfId(), Permission.MANAGE_ROLES),
-				DiscordUtils.hasPermission(context.getChannel(), context.getSelfId(), Permission.ADD_REACTIONS))
+		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), Type.BOT, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
+				.then(Mono.zip(DiscordUtils.extractRoles(context.getMessage())
+						.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
+						.collectList(),
+						context.getAvatarUrl()))
 				.flatMap(tuple -> {
 					final List<Role> roles = tuple.getT1();
 					final String avatarUrl = tuple.getT2();
-					final boolean canManageRoles = tuple.getT3();
-					final boolean canAddReactions = tuple.getT4();
 
 					if(roles.isEmpty()) {
 						throw new MissingArgumentException();
-					}
-
-					if(!canManageRoles) {
-						throw new MissingPermissionException(Type.BOT, Permission.MANAGE_ROLES);
-					}
-
-					if(!canAddReactions) {
-						throw new MissingPermissionException(Type.BOT, Permission.ADD_REACTIONS);
 					}
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()

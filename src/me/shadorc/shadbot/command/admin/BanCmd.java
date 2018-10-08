@@ -17,7 +17,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.Type;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -44,25 +43,12 @@ public class BanCmd extends AbstractCommand {
 			throw new CommandException("You cannot ban yourself.");
 		}
 
-		final Snowflake guildId = context.getGuildId();
-
-		return Mono.zip(context.getMessage().getUserMentions().collectList(),
-				context.getGuild(),
-				DiscordUtils.hasPermission(context.getChannel(), context.getAuthorId(), Permission.BAN_MEMBERS),
-				DiscordUtils.hasPermission(context.getChannel(), context.getSelfId(), Permission.BAN_MEMBERS))
+		return DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), Type.USER, Permission.BAN_MEMBERS)
+				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), Type.BOT, Permission.BAN_MEMBERS))
+				.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
 				.flatMap(tuple -> {
 					final List<User> mentions = tuple.getT1();
 					final Guild guild = tuple.getT2();
-					final boolean hasUserPerm = tuple.getT3();
-					final boolean hasBotPerm = tuple.getT4();
-
-					if(!hasUserPerm) {
-						throw new MissingPermissionException(Type.USER, Permission.BAN_MEMBERS);
-					}
-
-					if(!hasBotPerm) {
-						throw new MissingPermissionException(Type.BOT, Permission.BAN_MEMBERS);
-					}
 
 					final StringBuilder reason = new StringBuilder();
 					reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
@@ -86,7 +72,7 @@ public class BanCmd extends AbstractCommand {
 						final BanQuerySpec banQuery = new BanQuerySpec()
 								.setReason(reason.toString())
 								.setDeleteMessageDays(7);
-						banFlux = banFlux.concatWith(user.asMember(guildId)
+						banFlux = banFlux.concatWith(user.asMember(context.getGuildId())
 								.flatMap(member -> member.ban(banQuery)));
 					}
 

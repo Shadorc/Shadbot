@@ -17,7 +17,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.Type;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -44,25 +43,12 @@ public class KickCmd extends AbstractCommand {
 			throw new CommandException("You cannot kick yourself.");
 		}
 
-		final Snowflake guildId = context.getGuildId();
-
-		return Mono.zip(context.getMessage().getUserMentions().collectList(),
-				context.getGuild(),
-				DiscordUtils.hasPermission(context.getChannel(), context.getAuthorId(), Permission.KICK_MEMBERS),
-				DiscordUtils.hasPermission(context.getChannel(), context.getSelfId(), Permission.KICK_MEMBERS))
+		return DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), Type.USER, Permission.KICK_MEMBERS)
+				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), Type.BOT, Permission.KICK_MEMBERS))
+				.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
 				.flatMap(tuple -> {
 					final List<User> mentions = tuple.getT1();
 					final Guild guild = tuple.getT2();
-					final boolean hasUserPerm = tuple.getT3();
-					final boolean hasBotPerm = tuple.getT4();
-
-					if(!hasUserPerm) {
-						throw new MissingPermissionException(Type.USER, Permission.KICK_MEMBERS);
-					}
-
-					if(!hasBotPerm) {
-						throw new MissingPermissionException(Type.BOT, Permission.KICK_MEMBERS);
-					}
 
 					final StringBuilder reason = new StringBuilder();
 					reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
@@ -84,7 +70,7 @@ public class KickCmd extends AbstractCommand {
 						}
 
 						// TODO: Add reason
-						kickFlux = kickFlux.concatWith(user.asMember(guildId)
+						kickFlux = kickFlux.concatWith(user.asMember(context.getGuildId())
 								.flatMap(Member::kick));
 					}
 
