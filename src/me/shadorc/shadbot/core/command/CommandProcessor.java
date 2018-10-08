@@ -11,6 +11,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.ExceptionHandler;
@@ -21,6 +22,8 @@ import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
@@ -36,6 +39,16 @@ public class CommandProcessor {
 			return CommandProcessor.onPrivateMessage(event).thenReturn(false);
 		};
 
+		final Function<MessageChannel, Mono<Boolean>> canSendMessages = channel -> {
+			return DiscordUtils.hasPermission(event.getMessage().getChannel(), event.getClient().getSelfId().get(), Permission.SEND_MESSAGES)
+					.map(canSend -> {
+						if(!canSend) {
+							LogUtils.infof("{Guild ID: %d} Shadbot cannot send messages.", guildId.get().asLong());
+						}
+						return canSend;
+					});
+		};
+
 		Mono.just(event.getMessage())
 				// The content is not a Webhook
 				.filter(message -> message.getContent().isPresent())
@@ -45,6 +58,7 @@ public class CommandProcessor {
 				.flatMap(author -> event.getMessage().getChannel())
 				// This is not a private message...
 				.filterWhen(isNotDm)
+				.filterWhen(canSendMessages)
 				// The channel is allowed
 				.filter(channel -> BotUtils.isTextChannelAllowed(guildId.get(), channel.getId()))
 				.flatMap(channel -> event.getMember().get().getRoles().collectList())
