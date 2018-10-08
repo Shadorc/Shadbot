@@ -5,11 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class LottoHistoric {
 
 	@JsonProperty("jackpot")
-	private final int jackpot;
+	private int jackpot;
 	@JsonProperty("winners_count")
-	private final int winnersCount;
+	private int winnersCount;
 	@JsonProperty("number")
-	private final int number;
+	private int number;
+
+	public LottoHistoric() {
+		this.jackpot = 0;
+		this.winnersCount = 0;
+		this.number = 0;
+	}
 
 	public LottoHistoric(int jackpot, int winnersCount, int number) {
 		this.jackpot = jackpot;
