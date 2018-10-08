@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.api.image.deviantart;
+package me.shadorc.shadbot.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

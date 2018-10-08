@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.api.gamestats.diablo;
+package me.shadorc.shadbot.api.gamestats.diablo.hero;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

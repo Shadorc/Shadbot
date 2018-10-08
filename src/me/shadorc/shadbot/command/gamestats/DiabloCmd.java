@@ -6,11 +6,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.api.gamestats.diablo.HeroId;
-import me.shadorc.shadbot.api.gamestats.diablo.HeroResponse;
-import me.shadorc.shadbot.api.gamestats.diablo.ProfileResponse;
+import me.shadorc.shadbot.api.TokenResponse;
+import me.shadorc.shadbot.api.gamestats.diablo.hero.HeroResponse;
+import me.shadorc.shadbot.api.gamestats.diablo.profile.HeroId;
+import me.shadorc.shadbot.api.gamestats.diablo.profile.ProfileResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -21,9 +23,11 @@ import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
@@ -36,6 +40,9 @@ public class DiabloCmd extends AbstractCommand {
 	private enum Region {
 		EU, US, TW, KR;
 	}
+
+	private TokenResponse token;
+	private long lastTokenGeneration;
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -52,8 +59,13 @@ public class DiabloCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			final URL url = new URL(String.format("https://%s.api.battle.net/d3/profile/%s/?locale=en_GB&apikey=%s",
-					region, NetUtils.encode(battletag), APIKeys.get(APIKey.BLIZZARD_API_KEY)));
+
+			if(this.token == null || TimeUtils.getMillisUntil(this.lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn())) {
+				this.generateAccessToken();
+			}
+
+			final URL url = new URL(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
+					region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken()));
 
 			final ProfileResponse profile = Utils.MAPPER.readValue(url, ProfileResponse.class);
 
@@ -63,8 +75,8 @@ public class DiabloCmd extends AbstractCommand {
 
 			final List<HeroResponse> heroResponses = new ArrayList<>();
 			for(HeroId heroId : profile.getHeroeIds()) {
-				final URL heroUrl = new URL(String.format("https://%s.api.battle.net/d3/profile/%s/hero/%d?locale=en_GB&apikey=%s",
-						region, NetUtils.encode(battletag), heroId.getId(), APIKeys.get(APIKey.BLIZZARD_API_KEY)));
+				final URL heroUrl = new URL(String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
+						region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken()));
 
 				final HeroResponse hero = Utils.MAPPER.readValue(heroUrl, HeroResponse.class);
 				if(hero.getCode() == null) {
@@ -101,6 +113,14 @@ public class DiabloCmd extends AbstractCommand {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}
+	}
+
+	private synchronized void generateAccessToken() throws IOException {
+		final URL url = new URL(String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
+				APIKeys.get(APIKey.BLIZZARD_CLIENT_ID), APIKeys.get(APIKey.BLIZZARD_CLIENT_SECRET)));
+		this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
+		this.lastTokenGeneration = System.currentTimeMillis();
+		LogUtils.infof("Blizzard token generated: %s", this.token.getAccessToken());
 	}
 
 	@Override

@@ -6,9 +6,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.api.TokenResponse;
 import me.shadorc.shadbot.api.image.deviantart.DeviantArtResponse;
 import me.shadorc.shadbot.api.image.deviantart.Image;
-import me.shadorc.shadbot.api.image.deviantart.TokenResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
