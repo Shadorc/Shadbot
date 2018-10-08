@@ -22,7 +22,6 @@ import me.shadorc.shadbot.data.APIKeys;
 import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -55,7 +54,7 @@ public class FortniteCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			final String encodedNickname = NetUtils.encode(epicNickname);
+			final String encodedNickname = epicNickname.replace(" ", "%20");
 			final URL url = new URL(String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
 					StringUtils.toLowerCase(platform), encodedNickname));
 
