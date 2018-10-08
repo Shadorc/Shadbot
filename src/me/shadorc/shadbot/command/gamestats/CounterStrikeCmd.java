@@ -111,9 +111,9 @@ public class CounterStrikeCmd extends AbstractCommand {
 							.setDescription(String.format("Stats for **%s**", player.getPersonaName()))
 							.addField("Kills", statsMap.get("total_kills").toString(), true)
 							.addField("Deaths", statsMap.get("total_deaths").toString(), true)
-							.addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), true)
 							.addField("Total wins", statsMap.get("total_wins").toString(), true)
-							.addField("Total MVP", statsMap.get("total_mvps").toString(), true))
+							.addField("Total MVP", statsMap.get("total_mvps").toString(), true)
+							.addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), false))
 					.flatMap(loadingMsg::send)
 					.then();
 
