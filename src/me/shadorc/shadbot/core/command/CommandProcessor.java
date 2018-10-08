@@ -40,7 +40,7 @@ public class CommandProcessor {
 		};
 
 		final Function<MessageChannel, Mono<Boolean>> canSendMessages = channel -> {
-			return DiscordUtils.hasPermission(event.getMessage().getChannel(), event.getClient().getSelfId().get(), Permission.SEND_MESSAGES)
+			return DiscordUtils.hasPermission(Mono.just(channel), channel.getClient().getSelfId().get(), Permission.SEND_MESSAGES)
 					.map(canSend -> {
 						if(!canSend) {
 							LogUtils.infof("{Guild ID: %d} Shadbot cannot send messages.", guildId.get().asLong());

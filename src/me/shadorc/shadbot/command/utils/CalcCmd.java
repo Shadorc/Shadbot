@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 public class CalcCmd extends AbstractCommand {
 
 	private static final DoubleEvaluator EVALUATOR = new DoubleEvaluator();
-	private static final DecimalFormat FORMATTER = new DecimalFormat("#.##"); 
+	private static final DecimalFormat FORMATTER = new DecimalFormat("#.##");
 
 	@Override
 	public Mono<Void> execute(Context context) {
