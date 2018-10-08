@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.utils;
 
+import java.text.DecimalFormat;
+
 import com.fathzer.soft.javaluator.DoubleEvaluator;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -19,6 +21,7 @@ import reactor.core.publisher.Mono;
 public class CalcCmd extends AbstractCommand {
 
 	private static final DoubleEvaluator EVALUATOR = new DoubleEvaluator();
+	private static final DecimalFormat FORMATTER = new DecimalFormat("#.##"); 
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -26,7 +29,7 @@ public class CalcCmd extends AbstractCommand {
 
 		try {
 			return BotUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
-					context.getUsername(), arg.replace("*", "\\*"), EVALUATOR.evaluate(arg)),
+					context.getUsername(), arg.replace("*", "\\*"), FORMATTER.format(EVALUATOR.evaluate(arg))),
 					context.getChannel())
 					.then();
 		} catch (IllegalArgumentException err) {
