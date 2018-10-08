@@ -79,7 +79,8 @@ public class PollManager extends AbstractGameManager {
 					final BiMap<ReactionEmoji, String> reactionsChoices = HashBiMap.create(this.spec.getChoices()).inverse();
 					final Map<String, Integer> choicesVotes = new HashMap<>();
 					for(Reaction reaction : reactions) {
-						choicesVotes.put(reactionsChoices.get(reaction.getEmoji()), reaction.getCount());
+						// -1 is here to ignore the reaction of the bot itself
+						choicesVotes.put(reactionsChoices.get(reaction.getEmoji()), reaction.getCount() - 1);
 					}
 
 					// Sort votes map by value in the ascending order
