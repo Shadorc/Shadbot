@@ -50,7 +50,7 @@ public class IamCommand extends AbstractCommand {
 							.setAuthor("Iam", null, avatarUrl)
 							.setDescription(String.format("Click on %s to get role(s): %s",
 									REACTION.getRaw(),
-									FormatUtils.format(roles, role -> String.format("`%s`", role.getMention()), "\n")));
+									FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
 
 					return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
 							.sendMessage(embed)
