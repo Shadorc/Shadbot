@@ -20,6 +20,7 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
@@ -43,6 +44,13 @@ public class OverwatchCmd extends AbstractCommand {
 		try {
 			final Tuple3<Platform, ProfileResponse, StatsResponse> response =
 					args.size() == 1 ? this.getResponse(args.get(0)) : this.getResponse(args.get(0), args.get(1));
+
+			if(response == null) {
+				return loadingMsg.send(
+						Emoji.MAGNIFYING_GLASS + " User not found. Check if the Platform and the Username are correct.")
+						.then();
+			}
+
 			final Platform platform = response.getT1();
 			final ProfileResponse profile = response.getT2();
 			final Quickplay topHeroes = response.getT3().getStats().getTopHeroes().getQuickplay();
@@ -96,7 +104,6 @@ public class OverwatchCmd extends AbstractCommand {
 		if(stats.getStats() == null) {
 			return null;
 		}
-
 		return Tuples.of(platform, profile, stats);
 	}
 
