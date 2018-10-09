@@ -43,7 +43,7 @@ public class CommandProcessor {
 			return DiscordUtils.hasPermission(Mono.just(channel), channel.getClient().getSelfId().get(), Permission.SEND_MESSAGES)
 					.map(canSend -> {
 						if(!canSend) {
-							LogUtils.infof("{Guild ID: %d} Shadbot cannot send messages.", guildId.get().asLong());
+							LogUtils.infof("{Guild ID: %d} Shadbot could not send a message.", guildId.get().asLong());
 						}
 						return canSend;
 					});

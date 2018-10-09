@@ -5,14 +5,14 @@ import java.util.Optional;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class MemberListener {
 
@@ -21,10 +21,12 @@ public class MemberListener {
 
 		MemberListener.sendAutoMsg(event.getClient(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage());
 
-		Flux.fromIterable(dbGuild.getAutoRoles())
+		Mono.zip(event.getGuild(), Mono.justOrEmpty(event.getClient().getSelfId()))
+				.flatMap(tuple -> tuple.getT1().getMemberById(tuple.getT2()))
+				.flatMap(Member::getBasePermissions)
+				.filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
+				.flatMapMany(ignored -> Flux.fromIterable(dbGuild.getAutoRoles()))
 				.flatMap(roleId -> event.getMember().addRole(roleId))
-				.doOnError(ExceptionHandler::isForbidden,
-						err -> LogUtils.cannot(MemberListener.class, event.getGuildId(), Permission.MANAGE_ROLES))
 				.subscribe();
 	}
 
