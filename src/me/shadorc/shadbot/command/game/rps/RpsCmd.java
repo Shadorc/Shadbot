@@ -41,7 +41,7 @@ public class RpsCmd extends AbstractCommand {
 		if(userHandsign.equals(botHandsign)) {
 			strBuilder.append("It's a draw !");
 		} else if(userHandsign.isSuperior(botHandsign)) {
-			strBuilder.append(String.format(Emoji.BANK + " Well done, you won **%d coins**.", context.getUsername(), GAINS));
+			strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you won **%d coins**.", context.getUsername(), GAINS));
 			DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(GAINS);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
 		} else {
