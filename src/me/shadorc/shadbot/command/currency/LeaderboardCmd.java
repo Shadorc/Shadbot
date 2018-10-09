@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.currency;
 
+import java.util.Comparator;
+
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -7,6 +9,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -20,11 +23,14 @@ import reactor.util.function.Tuple2;
 @Command(category = CommandCategory.CURRENCY, names = { "leaderboard" })
 public class LeaderboardCmd extends AbstractCommand {
 
+	private static final Comparator<DBMember> COMPARATOR =
+			(user1, user2) -> Integer.compare(user1.getCoins(), user2.getCoins());
+
 	@Override
 	public Mono<Void> execute(Context context) {
 		return Flux.fromIterable(DatabaseManager.getDBGuild(context.getGuildId()).getMembers())
 				.filter(dbMember -> dbMember.getCoins() > 0)
-				.sort((user1, user2) -> Integer.compare(user1.getCoins(), user2.getCoins()))
+				.sort(COMPARATOR.reversed())
 				.take(10)
 				.flatMap(dbMember -> context.getClient().getUserById(dbMember.getId())
 						.zipWith(Mono.just(dbMember.getCoins())))
