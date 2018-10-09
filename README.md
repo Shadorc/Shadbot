@@ -28,7 +28,6 @@
     <h2>Libraries used</h2>
     <ul>
         <li><a href="https://github.com/Discord4J/Discord4J">Discord4J</a>
-        <li><a href="https://github.com/yusuke/twitter4j">Twitter4J</a>
         <li><a href="https://github.com/sedmelluq/lavaplayer">lavaplayer</a>
         <li><a href="https://bitbucket.org/aksinghnet/owm-japis">OWM-JAPIs</a>
         <li><a href="https://github.com/ivkos/wallhaven4j">Wallhaven4J</a>
