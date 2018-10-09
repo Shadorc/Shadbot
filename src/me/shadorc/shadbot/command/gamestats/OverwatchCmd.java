@@ -47,7 +47,7 @@ public class OverwatchCmd extends AbstractCommand {
 
 			if(response == null) {
 				return loadingMsg.send(
-						Emoji.MAGNIFYING_GLASS + " User not found. Check if the Platform and the Username are correct.")
+						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Overwatch player not found.", context.getUsername()))
 						.then();
 			}
 
