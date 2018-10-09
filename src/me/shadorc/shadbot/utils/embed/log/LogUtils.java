@@ -39,7 +39,7 @@ public class LogUtils {
 		LOGGER.error(msg);
 	}
 
-	public static void warn(DiscordClient client, String input, String msg) {
+	public static void warn(DiscordClient client, String msg, String input) {
 		LOGGER.warn(String.format("%s (Input: %s)", msg, input));
 		LogUtils.sendLog(client, new LogBuilder(LogType.WARN, msg, null, input));
 	}
