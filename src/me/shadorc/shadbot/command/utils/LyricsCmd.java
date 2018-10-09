@@ -113,6 +113,8 @@ public class LyricsCmd extends AbstractCommand {
 		return new HelpBuilder(this, context)
 				.setDescription("Show lyrics for a song.")
 				.setDelimiter(" - ")
+				.addArg("artist", false)
+				.addArg("title", false)
 				.setSource(HOME_URL)
 				.build();
 	}
