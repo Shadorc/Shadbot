@@ -51,9 +51,9 @@ public class RolelistCmd extends AbstractCommand {
 					}
 
 					FormatUtils.createColumns(usernames, 25).stream()
-							.forEach(field -> embed.addField(field.getName(), field.getValue(), false));
+							.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
 
-					return embed.setDescription(String.format("Members with role(s) **%s**",
+					return embed.setDescription(String.format("Members with role(s): **%s**",
 							FormatUtils.format(roles, Role::getName, ", ")));
 				})
 				.zipWith(context.getAvatarUrl())
