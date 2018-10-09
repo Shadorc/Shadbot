@@ -87,10 +87,10 @@ public class LyricsCmd extends AbstractCommand {
 				doc = NetUtils.getDoc(url).outputSettings(PRESERVE_FORMAT);
 			}
 
-			final String artist = doc.getElementsByClass("mxm-track-title__artist").html();
+			final String artist = doc.getElementsByClass("mxm-track-title__artist").text();
 			final String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
 			final String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
-			final String lyrics = StringUtils.abbreviate(doc.getElementsByClass("mxm-lyrics__content ").html(), MAX_LYRICS_LENGTH);
+			final String lyrics = StringUtils.abbreviate(doc.getElementsByClass("mxm-lyrics__content ").text(), MAX_LYRICS_LENGTH);
 			final String finalUrl = url;
 
 			return context.getAvatarUrl()
