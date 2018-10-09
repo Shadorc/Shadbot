@@ -29,14 +29,18 @@ public class LeaderboardCmd extends AbstractCommand {
 				.flatMap(dbMember -> context.getClient().getUserById(dbMember.getId())
 						.zipWith(Mono.just(dbMember.getCoins())))
 				.collectList()
-				.map(list -> FormatUtils.numberedList(10, list.size(),
-						count -> {
-							final Tuple2<User, Integer> userAndCoins = list.get(count - 1);
-							final String username = userAndCoins.getT1().getUsername();
-							final String coins = FormatUtils.coins(userAndCoins.getT2());
-							return String.format("%d. **%s** - %s", count, username, coins);
-						}))
-				.defaultIfEmpty("\nEveryone is poor here.")
+				.map(list -> {
+					if(list.isEmpty()) {
+						return "\nEveryone is poor here.";
+					}
+					return FormatUtils.numberedList(10, list.size(),
+							count -> {
+								final Tuple2<User, Integer> userAndCoins = list.get(count - 1);
+								final String username = userAndCoins.getT1().getUsername();
+								final String coins = FormatUtils.coins(userAndCoins.getT2());
+								return String.format("%d. **%s** - %s", count, username, coins);
+							});
+				})
 				.zipWith(context.getAvatarUrl())
 				.map(msgAndAvatar -> EmbedUtils.getDefaultEmbed()
 						.setAuthor("Leaderboard", null, msgAndAvatar.getT2())
