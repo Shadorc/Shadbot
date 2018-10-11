@@ -62,7 +62,8 @@ public class WeatherCmd extends AbstractCommand {
 
 			final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
 			final String windDesc = this.getWindDesc(windSpeed);
-			final String rain = currentWeather.hasRainData() ? String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
+			final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ? 
+					String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
 			final String countryCode = currentWeather.getSystemData().getCountryCode();
 
 			return context.getAvatarUrl()
