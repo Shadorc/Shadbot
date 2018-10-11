@@ -53,7 +53,7 @@ public class WikiCmd extends AbstractCommand {
 			final WikipediaPage page = pages.get(pageId);
 
 			if("-1".equals(pageId) || page.getExtract() == null) {
-				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia resultats found for `%s`",
+				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
 						context.getUsername(), arg))
 						.then();
 			}
