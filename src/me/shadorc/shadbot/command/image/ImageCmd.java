@@ -50,7 +50,7 @@ public class ImageCmd extends AbstractCommand {
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("DeviantArt (Search: %s)", arg), image.getUrl(), avatarUrl)
+							.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), avatarUrl)
 							.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
 							.addField("Title", image.getTitle(), false)
 							.addField("Author", image.getAuthor().getUsername(), false)

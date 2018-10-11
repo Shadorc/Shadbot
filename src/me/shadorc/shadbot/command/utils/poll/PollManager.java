@@ -55,7 +55,7 @@ public class PollManager extends AbstractGameManager {
 					}
 
 					return EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Poll (Author: %s)", this.getContext().getUsername()), null, avatarUrl)
+							.setAuthor(String.format("Poll by %s)", this.getContext().getUsername()), null, avatarUrl)
 							.setDescription(String.format("Vote using: `%s%s <choice>`%n%n__**%s**__%s",
 									this.getContext().getPrefix(), this.getContext().getCommandName(),
 									this.spec.getQuestion(), representation.toString()))

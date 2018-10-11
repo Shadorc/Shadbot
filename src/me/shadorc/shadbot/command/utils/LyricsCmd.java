@@ -95,7 +95,7 @@ public class LyricsCmd extends AbstractCommand {
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Lyrics (%s - %s)", artist, title), finalUrl, avatarUrl)
+							.setAuthor(String.format("Lyrics: %s - %s", artist, title), finalUrl, avatarUrl)
 							.setThumbnail(albumImg)
 							.setDescription(lyrics)
 							.setFooter("Click on the title to see the full version", "https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png"))

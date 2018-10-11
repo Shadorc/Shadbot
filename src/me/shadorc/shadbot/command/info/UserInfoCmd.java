@@ -56,7 +56,7 @@ public class UserInfoCmd extends AbstractCommand {
 							FormatUtils.longDuration(member.getJoinTime()));
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Info about user \"%s\"%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)
+							.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)
 							.setThumbnail(member.getAvatarUrl())
 							.addField("Display name", member.getDisplayName(), true)
 							.addField("User ID", member.getId().asString(), true)

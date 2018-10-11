@@ -51,7 +51,7 @@ public class UrbanCmd extends AbstractCommand {
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Urban Dictionary (%s)", urbanDefinition.getWord()), urbanDefinition.getPermalink(), avatarUrl)
+							.setAuthor(String.format("Urban Dictionary: %s", urbanDefinition.getWord()), urbanDefinition.getPermalink(), avatarUrl)
 							.setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
 							.setDescription(definition)
 							.addField("Example", example, false))

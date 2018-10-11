@@ -62,7 +62,7 @@ public class WikiCmd extends AbstractCommand {
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Wikipedia (%s)", page.getTitle()),
+							.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
 									String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
 									avatarUrl)
 							.setThumbnail("https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png")

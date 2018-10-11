@@ -68,7 +68,7 @@ public class Rule34Cmd extends AbstractCommand {
 						return context.getAvatarUrl()
 								.map(avatarUrl -> {
 									final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-											.setAuthor(String.format("Rule34 (Search: %s)", arg), post.getFileUrl(), avatarUrl)
+											.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), avatarUrl)
 											.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
 											.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
 											.addField("Tags", formattedtags, false)

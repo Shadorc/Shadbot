@@ -67,7 +67,7 @@ public class WeatherCmd extends AbstractCommand {
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Weather for %s (%s)", currentWeather.getCityName(), countryCode),
+							.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
 									String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
 									avatarUrl)
 							.setThumbnail(weather.getIconLink())

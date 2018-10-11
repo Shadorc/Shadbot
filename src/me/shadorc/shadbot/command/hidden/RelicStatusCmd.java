@@ -62,7 +62,7 @@ public class RelicStatusCmd extends AbstractCommand {
 					final String avatarUrl = fieldsAndAvatarUrl.getT2();
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Contributor status", null, avatarUrl)
+							.setAuthor("Contributor Status", null, avatarUrl)
 							.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
 
 					fields.stream()

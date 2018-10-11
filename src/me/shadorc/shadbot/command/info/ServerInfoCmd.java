@@ -96,7 +96,7 @@ public class ServerInfoCmd extends AbstractCommand {
 					final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Info about \"%s\"", guild.getName()), null, avatarUrl)
+							.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
 							.setThumbnail(guild.getIconUrl(Format.JPEG).get())
 							.addField("Owner", owner.getUsername(), true)
 							.addField("Server ID", guild.getId().asString(), true)

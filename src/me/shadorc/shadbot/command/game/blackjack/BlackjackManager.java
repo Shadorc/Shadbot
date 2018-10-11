@@ -91,7 +91,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 					final String avatarUrl = fieldsAndAvatarUrl.getT2();
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Blackjack", null, avatarUrl)
+							.setAuthor("Blackjack Game", null, avatarUrl)
 							.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
 							.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
 									+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",

@@ -57,7 +57,7 @@ public class RolelistCmd extends AbstractCommand {
 							FormatUtils.format(roles, Role::getName, ", ")));
 				})
 				.zipWith(context.getAvatarUrl())
-				.map(embedAndAvatarUrl -> embedAndAvatarUrl.getT1().setAuthor("Role List", null, embedAndAvatarUrl.getT2()))
+				.map(embedAndAvatarUrl -> embedAndAvatarUrl.getT1().setAuthor("Rolelist", null, embedAndAvatarUrl.getT2()))
 				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
 				.then();
 	}
