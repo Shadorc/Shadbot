@@ -7,8 +7,10 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
+import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.util.VersionUtil;
@@ -20,7 +22,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -44,9 +45,16 @@ public class InfoCmd extends AbstractCommand {
 		final String d4jName = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_NAME);
 		final String d4jVersion = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_VERSION);
 
+		final Mono<Long> voiceChannelsCount = context.getClient()
+				.getGuilds()
+				.flatMap(guild -> guild.getMemberById(context.getSelfId()))
+				.flatMap(Member::getVoiceState)
+				.flatMap(VoiceState::getChannel)
+				.count();
+
 		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
 				context.getClient().getGuilds().collectList(),
-				DiscordUtils.getConnectedVoiceChannelCount(context.getClient()))
+				voiceChannelsCount)
 				.map(tuple3 -> {
 					final User owner = tuple3.getT1();
 					final List<Guild> guilds = tuple3.getT2();

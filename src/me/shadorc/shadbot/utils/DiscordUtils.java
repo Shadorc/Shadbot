@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -15,7 +14,6 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Jsoup;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Member;
@@ -117,6 +115,19 @@ public class DiscordUtils {
 				.then();
 	}
 
+	public static Flux<Snowflake> extractRoles(Message message) {
+		final List<String> words = StringUtils.split(message.getContent().orElse("")).stream()
+				.map(String::toLowerCase)
+				.map(word -> word.replace("@", ""))
+				.collect(Collectors.toList());
+
+		return message.getGuild()
+				.flatMapMany(Guild::getRoles)
+				.filter(role -> words.contains(role.getName()))
+				.map(Role::getId)
+				.concatWith(Flux.fromIterable(message.getRoleMentionIds()));
+	}
+
 	public static Flux<Snowflake> extractChannels(Message message) {
 		final String content = message.getContent().orElse("");
 		final List<String> words = StringUtils.split(content).stream()
@@ -129,19 +140,6 @@ public class DiscordUtils {
 				.filter(channel -> words.contains(channel.getName()))
 				.map(GuildChannel::getId)
 				.concatWith(Flux.fromIterable(DiscordUtils.extractChannelMentions(content)));
-	}
-
-	public static Flux<Snowflake> extractRoles(Message message) {
-		final List<String> words = StringUtils.split(message.getContent().orElse("")).stream()
-				.map(String::toLowerCase)
-				.map(word -> word.replace("@", ""))
-				.collect(Collectors.toList());
-
-		return message.getGuild()
-				.flatMapMany(Guild::getRoles)
-				.filter(role -> words.contains(role.getName()))
-				.map(Role::getId)
-				.concatWith(Flux.fromIterable(message.getRoleMentionIds()));
 	}
 
 	private static List<Snowflake> extractChannelMentions(String content) {
@@ -207,26 +205,8 @@ public class DiscordUtils {
 				.flatMapMany(Flux::fromIterable);
 	}
 
-	public static Mono<Long> getConnectedVoiceChannelCount(DiscordClient client) {
-		return client.getGuilds()
-				.flatMap(guild -> client.getSelf().flatMap(self -> self.asMember(guild.getId())))
-				.flatMap(DiscordUtils::getVoiceChannelId)
-				.flatMap(Mono::justOrEmpty)
-				.count();
-	}
-
 	public static String mentionChannel(Snowflake channelId) {
 		return "<#" + channelId.asLong() + ">";
-	}
-
-	public static Mono<Optional<Snowflake>> getVoiceChannelId(Mono<Member> member) {
-		return member.flatMap(DiscordUtils::getVoiceChannelId);
-	}
-
-	public static Mono<Optional<Snowflake>> getVoiceChannelId(Member member) {
-		return member.getVoiceState()
-				.map(VoiceState::getChannelId)
-				.defaultIfEmpty(Optional.empty());
 	}
 
 	// TODO: Implement

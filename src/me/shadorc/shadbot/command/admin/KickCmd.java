@@ -42,7 +42,7 @@ public class KickCmd extends AbstractCommand {
 		if(mentionedUserIds.contains(context.getAuthorId())) {
 			throw new CommandException("You cannot kick yourself.");
 		}
-		
+
 		if(mentionedUserIds.contains(context.getSelfId())) {
 			throw new CommandException("I can't (and don't want) to kick myself !");
 		}
