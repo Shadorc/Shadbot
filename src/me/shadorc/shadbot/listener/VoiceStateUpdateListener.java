@@ -1,16 +1,14 @@
 // TODO: Implement
 // package me.shadorc.shadbot.listener;
 //
-// import java.util.Optional;
-//
-// import org.apache.commons.lang3.BooleanUtils;
-//
 // import discord4j.core.event.domain.VoiceStateUpdateEvent;
+// import discord4j.core.object.VoiceState;
+// import discord4j.core.object.entity.Member;
+// import discord4j.core.object.entity.VoiceChannel;
 // import discord4j.core.object.util.Snowflake;
 // import me.shadorc.shadbot.music.GuildMusic;
 // import me.shadorc.shadbot.music.GuildMusicManager;
 // import me.shadorc.shadbot.utils.BotUtils;
-// import me.shadorc.shadbot.utils.DiscordUtils;
 // import me.shadorc.shadbot.utils.embed.log.LogUtils;
 // import me.shadorc.shadbot.utils.object.Emoji;
 // import reactor.core.publisher.Mono;
@@ -48,29 +46,25 @@
 // return;
 // }
 //
-// DiscordUtils.getVoiceChannelId(event.getClient().getSelf().flatMap(user -> user.asMember(guildId)))
-// .flatMap(Mono::justOrEmpty)
-// .flatMap(botVoiceChannel -> event.getCurrent().getGuild()
-// .flatMapMany(DiscordUtils::getMembers)
-// .filter(member -> !member.getId().equals(event.getClient().getSelfId().get()))
-// .flatMap(DiscordUtils::getVoiceChannelId)
-// .flatMap(Mono::justOrEmpty)
-// .filter(botVoiceChannel::equals)
-// .hasElements())
-// .map(BooleanUtils::negate)
-// .map(isAlone -> {
-// if(isAlone && !guildMusic.isLeavingScheduled()) {
+// event.getClient()
+// .getSelf()
+// .flatMap(user -> user.asMember(event.getCurrent().getGuildId()))
+// .flatMap(Member::getVoiceState)
+// .flatMap(VoiceState::getChannel)
+// .flatMapMany(VoiceChannel::getVoiceStates)
+// .count()
+// .flatMap(membersCount -> {
+// if(membersCount == 1 && !guildMusic.isLeavingScheduled()) {
 // guildMusic.getScheduler().getAudioPlayer().setPaused(true);
 // guildMusic.scheduleLeave();
-// return Optional.of(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.");
-// } else if(!isAlone && guildMusic.isLeavingScheduled()) {
+// return Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.";
+// } else if(membersCount != 1 && guildMusic.isLeavingScheduled()) {
 // guildMusic.getScheduler().getAudioPlayer().setPaused(false);
 // guildMusic.cancelLeave();
-// return Optional.of(Emoji.INFO + " Somebody joined me, music resumed.");
+// return Emoji.INFO + " Somebody joined me, music resumed.";
 // }
-// return Optional.empty();
+// return Mono.empty();
 // })
-// .flatMap(Mono::justOrEmpty)
 // .flatMap(content -> BotUtils.sendMessage(content.toString(), guildMusic.getMessageChannel()))
 // .subscribe();
 // }
