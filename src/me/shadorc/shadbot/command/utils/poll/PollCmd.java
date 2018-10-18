@@ -85,7 +85,11 @@ public class PollCmd extends AbstractCommand {
 						args.get(0), MIN_DURATION, MAX_DURATION));
 			}
 		} else {
-			seconds = Integer.valueOf((int) TimeUtils.parseTime(args.get(0)));
+			try {
+				seconds = Integer.valueOf((int) TimeUtils.parseTime(args.get(0)));
+			} catch (IllegalArgumentException err) {
+				throw new CommandException(err.getMessage());
+			}
 			if(!NumberUtils.isInRange(seconds, MIN_DURATION, MAX_DURATION)) {
 				throw new CommandException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
 						args.get(0), MIN_DURATION, MAX_DURATION));
