@@ -236,8 +236,7 @@ public class DiscordUtils {
 
 	public static Mono<Boolean> hasPermission(Mono<MessageChannel> channel, Snowflake memberId, Permission permission) {
 		return channel
-				.filter(chnl -> chnl instanceof TextChannel)
-				.cast(TextChannel.class)
+				.ofType(TextChannel.class)
 				.flatMap(textChannel -> textChannel.getEffectivePermissions(memberId))
 				.map(permissions -> permissions.contains(permission));
 
@@ -245,8 +244,7 @@ public class DiscordUtils {
 
 	public static Mono<Void> requirePermissions(Mono<MessageChannel> channel, Snowflake userId, Type type, Permission... permissions) {
 		return channel
-				.filter(chnl -> chnl instanceof TextChannel)
-				.cast(TextChannel.class)
+				.ofType(TextChannel.class)
 				.flatMap(textChannel -> textChannel.getEffectivePermissions(userId))
 				.flatMap(effectivePermissions -> {
 					for(Permission permission : permissions) {

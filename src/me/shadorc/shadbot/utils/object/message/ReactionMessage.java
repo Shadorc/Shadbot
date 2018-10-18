@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Snowflake;
@@ -30,7 +31,7 @@ public class ReactionMessage {
 	 *         For example, if the message is deleted during the delay, a {@code 404 Forbidden} will be thrown.
 	 */
 	public Mono<Message> sendMessage(EmbedCreateSpec embed) {
-		return BotUtils.sendMessage(embed, this.client.getMessageChannelById(this.channelId))
+		return BotUtils.sendMessage(embed, this.client.getChannelById(this.channelId).cast(MessageChannel.class))
 				// Add the reactions to the message then wait
 				.flatMap(message -> Flux.fromIterable(this.reactions)
 						.flatMap(message::addReaction)

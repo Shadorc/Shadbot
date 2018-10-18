@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.temporal.TemporalUnit;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.utils.BotUtils;
 import reactor.core.publisher.Mono;
@@ -35,7 +36,7 @@ public class TemporaryMessage {
 	 * @return A Mono representing the message sent
 	 */
 	public Mono<Void> send(String content) {
-		return BotUtils.sendMessage(content, this.client.getMessageChannelById(this.channelId))
+		return BotUtils.sendMessage(content, this.client.getChannelById(this.channelId).cast(MessageChannel.class))
 				.flatMap(message -> Mono.delay(Duration.of(this.delay, this.unit))
 						.then(message.delete()));
 	}

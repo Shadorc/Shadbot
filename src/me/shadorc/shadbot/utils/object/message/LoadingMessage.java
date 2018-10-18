@@ -9,6 +9,7 @@ import org.reactivestreams.Subscriber;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -53,7 +54,8 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Start typing in the channel until a message is send or the typing timeout seconds have passed
 	 */
 	private Flux<Long> startTyping() {
-		return this.client.getMessageChannelById(this.channelId)
+		return this.client.getChannelById(this.channelId)
+				.cast(MessageChannel.class)
 				.flatMapMany(channel -> channel.typeUntil(this))
 				.take(this.typingTimeout);
 	}
@@ -69,7 +71,7 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
 	public Mono<Message> send(String content) {
-		return BotUtils.sendMessage(content, this.client.getMessageChannelById(this.channelId))
+		return BotUtils.sendMessage(content, this.client.getChannelById(this.channelId).cast(MessageChannel.class))
 				.doAfterTerminate(this::stopTyping);
 	}
 
@@ -77,7 +79,7 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
 	public Mono<Message> send(EmbedCreateSpec embed) {
-		return BotUtils.sendMessage(embed, this.client.getMessageChannelById(this.channelId))
+		return BotUtils.sendMessage(embed, this.client.getChannelById(this.channelId).cast(MessageChannel.class))
 				.doAfterTerminate(this::stopTyping);
 	}
 

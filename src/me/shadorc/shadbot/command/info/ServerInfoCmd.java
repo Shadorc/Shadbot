@@ -53,7 +53,8 @@ public class ServerInfoCmd extends AbstractCommand {
 		}
 
 		final Mono<Void> allowedChannelsStr = Flux.fromIterable(dbGuild.getAllowedTextChannels())
-				.flatMap(context.getClient()::getTextChannelById)
+				.flatMap(context.getClient()::getChannelById)
+				.cast(TextChannel.class)
 				.map(TextChannel::getName)
 				.collectList()
 				.filter(channels -> !channels.isEmpty())

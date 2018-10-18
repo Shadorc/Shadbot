@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.object.entity.MessageChannel;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -51,7 +52,7 @@ public class LogUtils {
 	}
 
 	private static void sendLog(DiscordClient client, LogBuilder embed) {
-		BotUtils.sendMessage(embed.build(), client.getMessageChannelById(Config.LOGS_CHANNEL_ID)).subscribe();
+		BotUtils.sendMessage(embed.build(), client.getChannelById(Config.LOGS_CHANNEL_ID).cast(MessageChannel.class)).subscribe();
 	}
 
 }

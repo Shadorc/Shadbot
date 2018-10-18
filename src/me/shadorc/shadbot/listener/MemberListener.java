@@ -6,6 +6,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.database.DBGuild;
@@ -37,7 +38,7 @@ public class MemberListener {
 
 	private static void sendAutoMsg(DiscordClient client, Optional<Snowflake> channelId, Optional<String> message) {
 		if(channelId.isPresent() && message.isPresent()) {
-			BotUtils.sendMessage(message.get(), client.getMessageChannelById(channelId.get())).subscribe();
+			BotUtils.sendMessage(message.get(), client.getChannelById(channelId.get()).cast(MessageChannel.class)).subscribe();
 		}
 	}
 }
