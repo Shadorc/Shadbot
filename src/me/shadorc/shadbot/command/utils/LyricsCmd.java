@@ -35,6 +35,7 @@ public class LyricsCmd extends AbstractCommand {
 	private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
 	private static final String HOME_URL = "https://www.musixmatch.com";
 	private static final int MAX_LYRICS_LENGTH = DiscordUtils.DESCRIPTION_CONTENT_LIMIT / 2;
+	private static final int MAX_RETRY = 5;
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -55,7 +56,7 @@ public class LyricsCmd extends AbstractCommand {
 			do {
 				if(response != null) {
 					retryCount++;
-					if(retryCount == 3) {
+					if(retryCount == MAX_RETRY) {
 						LogUtils.warn(context.getClient(), String.format("[%s] %d retries, abort attempt to reload page.",
 								this.getClass().getSimpleName(), retryCount));
 						throw new HttpStatusException("musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
@@ -90,7 +91,8 @@ public class LyricsCmd extends AbstractCommand {
 			final String artist = doc.getElementsByClass("mxm-track-title__artist").text();
 			final String title = StringUtils.remove(doc.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
 			final String albumImg = "https:" + doc.getElementsByClass("banner-album-image").select("img").first().attr("src");
-			final String lyrics = StringUtils.abbreviate(doc.getElementsByClass("mxm-lyrics__content ").text(), MAX_LYRICS_LENGTH);
+			final String lyrics = StringUtils.abbreviate(
+					NetUtils.br2nl(doc.getElementsByClass("mxm-lyrics__content ").html()), MAX_LYRICS_LENGTH);
 			final String finalUrl = url;
 
 			return context.getAvatarUrl()

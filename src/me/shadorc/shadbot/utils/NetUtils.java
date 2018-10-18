@@ -12,10 +12,27 @@ import org.jsoup.Connection.Response;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.safety.Whitelist;
 
 import me.shadorc.shadbot.Config;
 
 public class NetUtils {
+
+	/**
+	 * @param html - The HTML to convert to text
+	 * @return html converted to text with br and p tags replaced by new lines
+	 */
+	public static String br2nl(String html) {
+		if(html == null) {
+			return html;
+		}
+		Document document = Jsoup.parse(html);
+		document.outputSettings(new Document.OutputSettings().prettyPrint(false));// makes html() preserve linebreaks and spacing
+		document.select("br").append("\\n");
+		document.select("p").prepend("\\n\\n");
+		String str = document.html().replaceAll("\\\\n", "\n");
+		return Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+	}
 
 	/**
 	 * @param url - URL to connect to. The protocol must be http or https
