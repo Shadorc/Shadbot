@@ -20,17 +20,17 @@ public class NetUtils {
 
 	/**
 	 * @param html - The HTML to convert to text
-	 * @return html converted to text with br and p tags replaced by new lines
+	 * @return html converted to text with new lines preserved
 	 */
 	public static String br2nl(String html) {
 		if(html == null) {
 			return html;
 		}
-		Document document = Jsoup.parse(html);
+		final Document document = Jsoup.parse(html);
 		document.outputSettings(new Document.OutputSettings().prettyPrint(false));// makes html() preserve linebreaks and spacing
 		document.select("br").append("\\n");
 		document.select("p").prepend("\\n\\n");
-		String str = document.html().replaceAll("\\\\n", "\n");
+		final String str = document.html().replaceAll("\\\\n", "\n");
 		return Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
 	}
 
