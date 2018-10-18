@@ -71,7 +71,7 @@ public class StatsCmd extends AbstractCommand {
 			embed.setDescription("No statistics yet.");
 		} else {
 			final Comparator<? super Map.Entry<String, AtomicLong>> comparator =
-					(v1, v2) -> Long.compare(v1.getValue().get(), v1.getValue().get());
+					Map.Entry.comparingByValue((v1, v2) -> Long.compare(v1.get(), v2.get()));
 			final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
 
 			embed.addField("Name", FormatUtils.format(sortedMap.keySet(), StringUtils::toLowerCase, "\n"), true)
