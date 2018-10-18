@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -20,6 +21,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.exception.MissingPermissionException.Type;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -52,7 +55,9 @@ public class PollCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		context.requireArg();
-		return context.getPermission()
+
+		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), Type.BOT, Permission.ADD_REACTIONS)
+				.then(context.getPermission())
 				.doOnSuccess(permission -> {
 					PollManager pollManager = MANAGER.get(context.getChannelId());
 					if(pollManager == null) {

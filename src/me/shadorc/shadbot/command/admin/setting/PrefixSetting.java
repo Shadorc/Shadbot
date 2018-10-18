@@ -26,7 +26,7 @@ public class PrefixSetting extends AbstractSetting {
 		if(args.get(1).length() > MAX_PREFIX_LENGTH) {
 			throw new CommandException(String.format("Prefix cannot contain more than %s characters.", MAX_PREFIX_LENGTH));
 		}
-		
+
 		if(args.get(1).contains(" ")) {
 			throw new CommandException("Prefix cannot contain spaces.");
 		}
