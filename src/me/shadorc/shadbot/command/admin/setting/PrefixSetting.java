@@ -26,6 +26,10 @@ public class PrefixSetting extends AbstractSetting {
 		if(args.get(1).length() > MAX_PREFIX_LENGTH) {
 			throw new CommandException(String.format("Prefix cannot contain more than %s characters.", MAX_PREFIX_LENGTH));
 		}
+		
+		if(args.get(1).contains(" ")) {
+			throw new CommandException("Prefix cannot contain spaces.");
+		}
 
 		DatabaseManager.getDBGuild(context.getGuildId()).setSetting(this.getSetting(), args.get(1));
 		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", args.get(1)), context.getChannel()).then();
