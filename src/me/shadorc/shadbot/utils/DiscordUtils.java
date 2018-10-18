@@ -205,8 +205,8 @@ public class DiscordUtils {
 				.flatMapMany(Flux::fromIterable);
 	}
 
-	public static String mentionChannel(Snowflake channelId) {
-		return "<#" + channelId.asLong() + ">";
+	public static String getChannelMention(Snowflake channelId) {
+		return String.format("<#%d>", channelId.asLong());
 	}
 
 	// TODO: Implement

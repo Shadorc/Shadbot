@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.admin.setting;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
@@ -64,11 +65,11 @@ public class AllowedChannelSetting extends AbstractSetting {
 
 						final List<Snowflake> textChannels = channels.stream()
 								.filter(channel -> channel.getType().equals(Type.GUILD_TEXT))
-								.map(GuildChannel::getId)
+								.map(Channel::getId)
 								.collect(Collectors.toList());
 						final List<Snowflake> voiceChannels = channels.stream()
 								.filter(channel -> channel.getType().equals(Type.GUILD_VOICE))
-								.map(GuildChannel::getId)
+								.map(Channel::getId)
 								.collect(Collectors.toList());
 
 						for(Snowflake channelId : mentionedChannels) {
@@ -80,13 +81,13 @@ public class AllowedChannelSetting extends AbstractSetting {
 						}
 
 						strBuilder.append(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
-								FormatUtils.format(mentionedChannels, DiscordUtils::mentionChannel, ", ")));
+								FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")));
 
 					} else {
 						allowedTextChannels.removeAll(mentionedChannels);
 						allowedVoiceChannels.removeAll(mentionedChannels);
 						strBuilder.append(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
-								FormatUtils.format(mentionedChannels, DiscordUtils::mentionChannel, ", ")));
+								FormatUtils.format(mentionedChannels, DiscordUtils::getChannelMention, ", ")));
 					}
 
 					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);

@@ -73,11 +73,11 @@ public class AutoMessageSetting extends AbstractSetting {
 					if(Action.ENABLE.equals(action)) {
 						dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channelId);
 						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
-								DiscordUtils.mentionChannel(channelId)), context.getChannel());
+								DiscordUtils.getChannelMention(channelId)), context.getChannel());
 					} else {
 						dbGuild.removeSetting(SettingEnum.MESSAGE_CHANNEL_ID);
 						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
-								+ "until a new channel is defined.", DiscordUtils.mentionChannel(channelId)), context.getChannel());
+								+ "until a new channel is defined.", DiscordUtils.getChannelMention(channelId)), context.getChannel());
 					}
 				});
 	}
