@@ -7,7 +7,6 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
 import discord4j.core.object.util.Permission;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -56,10 +55,10 @@ public class IamCommand extends AbstractCommand {
 							.sendMessage(embed)
 							.doOnSuccess(message -> {
 								final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
-								final Map<Snowflake, Snowflake> setting = dbGuild.getIamMessages();
+								final Map<Long, Long> setting = dbGuild.getIamMessages();
 								roles.stream()
 										.map(Role::getId)
-										.forEach(roleId -> setting.put(message.getId(), roleId));
+										.forEach(roleId -> setting.put(message.getId().asLong(), roleId.asLong()));
 								dbGuild.setSetting(SettingEnum.IAM_MESSAGES, setting);
 							});
 				})

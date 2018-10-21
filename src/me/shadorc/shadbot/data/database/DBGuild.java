@@ -85,9 +85,9 @@ public class DBGuild {
 	 */
 	@SuppressWarnings("unchecked")
 	@JsonIgnore
-	public Map<Snowflake, Snowflake> getIamMessages() {
-		return Optional.ofNullable((Map<Snowflake, Snowflake>) this.settings.get(SettingEnum.IAM_MESSAGES.toString()))
-				.orElse(new HashMap<Snowflake, Snowflake>());
+	public Map<Long, Long> getIamMessages() {
+		return Optional.ofNullable((Map<Long, Long>) this.settings.get(SettingEnum.IAM_MESSAGES.toString()))
+				.orElse(new HashMap<Long, Long>());
 	}
 
 	@JsonIgnore

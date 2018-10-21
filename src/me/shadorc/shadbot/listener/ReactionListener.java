@@ -36,9 +36,9 @@ public class ReactionListener {
 		}
 
 		guildIdOpt.ifPresent(guildId -> {
-			final Snowflake roleId = DatabaseManager.getDBGuild(guildId)
+			final Snowflake roleId = Snowflake.of(DatabaseManager.getDBGuild(guildId)
 					.getIamMessages()
-					.get(messageId);
+					.get(messageId.asLong()));
 			if(roleId != null && reaction.equals(IamCommand.REACTION)) {
 				event.getClient()
 						.getMemberById(guildId, userId)
