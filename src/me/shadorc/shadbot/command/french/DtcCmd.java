@@ -2,9 +2,11 @@ package me.shadorc.shadbot.command.french;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+
+import com.fasterxml.jackson.databind.JavaType;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.api.dtc.DtcResponse;
 import me.shadorc.shadbot.api.dtc.Quote;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -30,12 +32,15 @@ public class DtcCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			final URL url = new URL(String.format("https://api.danstonchat.com/item/rest_item/random?comments=0&key=%s",
+			final URL url = new URL(String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
 					APIKeys.get(APIKey.DTC_API_KEY)));
+
+			final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
+			final List<Quote> quotes = Utils.MAPPER.readValue(url, valueType);
 
 			Quote quote;
 			do {
-				quote = Utils.MAPPER.readValue(url, DtcResponse.class).getRoot().getQuote();
+				quote = Utils.randValue(quotes);
 			} while(quote.getContent().length() > 1000);
 
 			final String content = quote.getContent().replace("*", "\\*");
