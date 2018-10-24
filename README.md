@@ -1,3 +1,6 @@
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/52b43cdbab944fadb6f8847f85f80c6e)](https://app.codacy.com/app/Shadorc/Shadbot?utm_source=github.com&utm_medium=referral&utm_content=Shadorc/Shadbot&utm_campaign=Badge_Grade_Dashboard)
+
 <!DOCTYPE html>
 <html>
 <header>
