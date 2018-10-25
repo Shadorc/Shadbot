@@ -11,13 +11,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.nodes.Element;
 
+import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -34,7 +34,7 @@ public class LyricsCmd extends AbstractCommand {
 	// Make html() preserve linebreaks and spacing
 	private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
 	private static final String HOME_URL = "https://www.musixmatch.com";
-	private static final int MAX_LYRICS_LENGTH = DiscordUtils.DESCRIPTION_CONTENT_LIMIT / 2;
+	private static final int MAX_LYRICS_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 2;
 	private static final int MAX_RETRY = 5;
 
 	@Override

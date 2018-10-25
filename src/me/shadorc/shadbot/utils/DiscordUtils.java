@@ -39,8 +39,7 @@ import reactor.core.publisher.Mono;
 
 public class DiscordUtils {
 
-	public static final int DESCRIPTION_CONTENT_LIMIT = 2048;
-	public static final int FIELD_CONTENT_LIMIT = 1024;
+	/* Audit Log reason must be 512 or fewer in length. */
 	public static final int MAX_REASON_LENGTH = 512;
 
 	public static Mono<Void> updatePresence(DiscordClient client) {

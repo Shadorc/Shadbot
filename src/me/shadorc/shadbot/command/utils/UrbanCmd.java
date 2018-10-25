@@ -5,6 +5,8 @@ import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
 
+import discord4j.core.object.Embed;
+import discord4j.core.object.Embed.Field;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.urbandictionary.UrbanDefinition;
 import me.shadorc.shadbot.api.urbandictionary.UrbanDictionaryResponse;
@@ -13,7 +15,6 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -46,8 +47,8 @@ public class UrbanCmd extends AbstractCommand {
 
 			final UrbanDefinition urbanDefinition = urbanDictionary.getDefinitions().get(0);
 
-			final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(), DiscordUtils.DESCRIPTION_CONTENT_LIMIT);
-			final String example = StringUtils.abbreviate(urbanDefinition.getExample(), DiscordUtils.FIELD_CONTENT_LIMIT);
+			final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
+			final String example = StringUtils.abbreviate(urbanDefinition.getExample(), Field.MAX_VALUE_LENGTH);
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
