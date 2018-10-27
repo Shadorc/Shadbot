@@ -16,10 +16,12 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.data.database.DatabaseManager;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.MissingPermissionException.Type;
+import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.ReactionMessage;
@@ -32,7 +34,7 @@ public class IamCommand extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), Type.BOT, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
+		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
 				.then(Mono.zip(DiscordUtils.extractRoles(context.getMessage())
 						.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 						.collectList(),
@@ -41,15 +43,24 @@ public class IamCommand extends AbstractCommand {
 					final List<Role> roles = tuple.getT1();
 					final String avatarUrl = tuple.getT2();
 
+					final List<String> quotedElements = StringUtils.getQuotedElements(context.getArg().orElse(""));
+					if(quotedElements.size() == 0 && context.getContent().contains("\"")) {
+						throw new CommandException("One quotation mark is missing.");
+					}
+					if(quotedElements.size() > 1) {
+						throw new CommandException("You should specify only one text in quotation marks.");
+					}
+
 					if(roles.isEmpty()) {
 						throw new MissingArgumentException();
 					}
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Iam", null, avatarUrl)
-							.setDescription(String.format("Click on %s to get role(s): %s",
+							.setDescription(String.format("Click on %s to get role(s): %s%s",
 									REACTION.getRaw(),
-									FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
+									FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n"),
+									quotedElements.size() == 1 ? "\n" + quotedElements.get(0) : ""));
 
 					return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
 							.sendMessage(embed)
@@ -67,8 +78,10 @@ public class IamCommand extends AbstractCommand {
 
 	@Override
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
-		// TODO
 		return new HelpBuilder(this, context)
+				.setDescription("Send a message with a reaction, users will be able to get the role(s) associated with the message by clicking on the reaction")
+				.addArg("@role(s)", false)
+				.addArg("\"text\"", "Text to add to the message", true)
 				.build();
 	}
 
