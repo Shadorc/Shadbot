@@ -244,14 +244,14 @@ public class DiscordUtils {
 		return channel
 				.ofType(TextChannel.class)
 				.flatMap(textChannel -> textChannel.getEffectivePermissions(userId))
-				.flatMap(effectivePermissions -> {
+				.doOnSuccess(effectivePermissions -> {
 					for(Permission permission : permissions) {
 						if(!effectivePermissions.contains(permission)) {
 							throw new MissingPermissionException(userType, permission);
 						}
 					}
-					return Mono.empty();
-				});
+				})
+				.then();
 	}
 
 }
