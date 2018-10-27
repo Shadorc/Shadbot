@@ -116,7 +116,6 @@ public class DiscordUtils {
 
 	public static Flux<Snowflake> extractRoles(Message message) {
 		final List<String> words = StringUtils.split(message.getContent().orElse("")).stream()
-				.map(String::toLowerCase)
 				.map(word -> word.replace("@", ""))
 				.collect(Collectors.toList());
 
