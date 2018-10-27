@@ -17,7 +17,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.MissingPermissionException.Type;
+import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -47,8 +47,8 @@ public class KickCmd extends AbstractCommand {
 			throw new CommandException("I can't (and don't want) to kick myself !");
 		}
 
-		return DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), Type.USER, Permission.KICK_MEMBERS)
-				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), Type.BOT, Permission.KICK_MEMBERS))
+		return DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), UserType.NORMAL, Permission.KICK_MEMBERS)
+				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.KICK_MEMBERS))
 				.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
 				.flatMap(tuple -> {
 					final List<User> mentions = tuple.getT1();

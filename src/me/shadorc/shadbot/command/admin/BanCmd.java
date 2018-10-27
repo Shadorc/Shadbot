@@ -17,7 +17,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.MissingPermissionException.Type;
+import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -43,8 +43,8 @@ public class BanCmd extends AbstractCommand {
 			throw new CommandException("You cannot ban yourself.");
 		}
 
-		return DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), Type.USER, Permission.BAN_MEMBERS)
-				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), Type.BOT, Permission.BAN_MEMBERS))
+		return DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), UserType.NORMAL, Permission.BAN_MEMBERS)
+				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.BAN_MEMBERS))
 				.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
 				.flatMap(tuple -> {
 					final List<User> mentions = tuple.getT1();

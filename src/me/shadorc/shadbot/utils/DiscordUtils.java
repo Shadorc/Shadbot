@@ -31,7 +31,7 @@ import me.shadorc.shadbot.data.APIKeys.APIKey;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
-import me.shadorc.shadbot.exception.MissingPermissionException.Type;
+import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -241,14 +241,14 @@ public class DiscordUtils {
 
 	}
 
-	public static Mono<Void> requirePermissions(Mono<MessageChannel> channel, Snowflake userId, Type type, Permission... permissions) {
+	public static Mono<Void> requirePermissions(Mono<MessageChannel> channel, Snowflake userId, UserType userType, Permission... permissions) {
 		return channel
 				.ofType(TextChannel.class)
 				.flatMap(textChannel -> textChannel.getEffectivePermissions(userId))
 				.flatMap(effectivePermissions -> {
 					for(Permission permission : permissions) {
 						if(!effectivePermissions.contains(permission)) {
-							throw new MissingPermissionException(type, permission);
+							throw new MissingPermissionException(userType, permission);
 						}
 					}
 					return Mono.empty();

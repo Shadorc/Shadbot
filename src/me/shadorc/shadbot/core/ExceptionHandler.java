@@ -17,7 +17,7 @@ import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
-import me.shadorc.shadbot.exception.MissingPermissionException.Type;
+import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -136,7 +136,7 @@ public class ExceptionHandler {
 	private Mono<Message> onMissingPermissionException() {
 		final MissingPermissionException exception = (MissingPermissionException) this.err;
 		final String missingPerm = StringUtils.capitalizeEnum(exception.getPermission());
-		if(exception.getType().equals(Type.BOT)) {
+		if(exception.getType().equals(UserType.BOT)) {
 			return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
 					+ " (**%s**) I can't execute this command due to the lack of permission."
 					+ "%nPlease, check my permissions and channel-specific ones to verify that %s is checked.",
