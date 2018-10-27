@@ -11,6 +11,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
@@ -23,6 +24,8 @@ import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
@@ -40,12 +43,29 @@ public class CommandProcessor {
 		};
 
 		final Function<MessageChannel, Mono<Boolean>> canSendMessages = channel -> {
-			return DiscordUtils.hasPermission(Mono.just(channel), channel.getClient().getSelfId().get(), Permission.SEND_MESSAGES)
-					.map(canSend -> {
-						if(!canSend) {
-							LogUtils.infof("{Guild ID: %d} Shadbot could not send a message.", guildId.get().asLong());
+			final Snowflake selfId = channel.getClient().getSelfId().orElse(null);
+			if(selfId == null) {
+				return Mono.just(false);
+			}
+
+			return Mono.zip(
+					DiscordUtils.hasPermission(Mono.just(channel), selfId, Permission.SEND_MESSAGES),
+					DiscordUtils.hasPermission(Mono.just(channel), selfId, Permission.EMBED_LINKS))
+					.flatMap(tuple -> {
+						if(!tuple.getT1()) {
+							LogUtils.infof("{Guild ID: %d} Missing permission: %s",
+									guildId.get().asLong(), StringUtils.capitalizeEnum(Permission.SEND_MESSAGES));
+							return Mono.just(false);
 						}
-						return canSend;
+
+						if(!tuple.getT2()) {
+							return BotUtils.sendMessage(TextUtils.missingPermission(event.getMember().map(User::getUsername).get(),
+											Permission.EMBED_LINKS), Mono.just(channel))
+									.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
+											guildId.get().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS)))
+									.thenReturn(false);
+						}
+						return Mono.just(true);
 					});
 		};
 
