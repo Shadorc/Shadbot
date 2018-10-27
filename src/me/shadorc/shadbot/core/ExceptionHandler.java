@@ -137,10 +137,8 @@ public class ExceptionHandler {
 		final MissingPermissionException exception = (MissingPermissionException) this.err;
 		final String missingPerm = StringUtils.capitalizeEnum(exception.getPermission());
 		if(exception.getType().equals(UserType.BOT)) {
-			return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
-					+ " (**%s**) I can't execute this command due to the lack of permission."
-					+ "%nPlease, check my permissions and channel-specific ones to verify that %s is checked.",
-					context.getUsername(), String.format("**%s**", missingPerm)), context.getChannel())
+			return BotUtils.sendMessage(
+					TextUtils.missingPermission(context.getUsername(), exception.getPermission()), context.getChannel())
 					.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
 							this.context.getGuildId().asLong(), missingPerm));
 		} else {

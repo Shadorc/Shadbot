@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 
+import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -39,5 +40,12 @@ public class TextUtils {
 	 */
 	public static String cleanLavaplayerErr(FriendlyException err) {
 		return Jsoup.parse(StringUtils.remove(err.getMessage(), "Watch on YouTube")).text().trim();
+	}
+
+	public static String missingPermission(String username, Permission permission) {
+		return String.format(Emoji.ACCESS_DENIED
+				+ " (**%s**) I can't execute this command due to the lack of permission."
+				+ "%nPlease, check my permissions and channel-specific ones to verify that %s is checked.",
+				username, String.format("**%s**", StringUtils.capitalizeEnum(permission)));
 	}
 }
