@@ -28,7 +28,7 @@ import me.shadorc.shadbot.utils.object.message.ReactionMessage;
 import reactor.core.publisher.Mono;
 
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "iam" })
-public class IamCommand extends AbstractCommand {
+public class IamCmd extends AbstractCommand {
 
 	public static final Unicode REACTION = ReactionEmoji.unicode("✅");
 

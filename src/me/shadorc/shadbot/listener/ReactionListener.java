@@ -12,7 +12,7 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.command.admin.IamCommand;
+import me.shadorc.shadbot.command.admin.IamCmd;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -102,7 +102,7 @@ public class ReactionListener {
 						.getIamMessages()
 						.get(event.getMessageId().asString())))
 				.map(Snowflake::of)
-				.filter(roleId -> event.getEmoji().equals(IamCommand.REACTION))
+				.filter(roleId -> event.getEmoji().equals(IamCmd.REACTION))
 				.filterWhen(roleId -> DiscordUtils.hasPermission(event.getChannel(), event.getUserId(), Permission.MANAGE_ROLES)
 						.flatMap(hasPerm -> {
 							if(!hasPerm) {
