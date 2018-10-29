@@ -3,11 +3,15 @@ package me.shadorc.shadbot.core;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.jsoup.HttpStatusException;
 
+import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -28,43 +32,37 @@ import reactor.core.publisher.Mono;
 
 public class ExceptionHandler {
 
-	private final Throwable err;
-	private final AbstractCommand command;
-	private final Context context;
-
-	public ExceptionHandler(Throwable err, AbstractCommand command, Context context) {
-		this.err = err;
-		this.command = command;
-		this.context = context;
-	}
-
-	public Mono<Message> handle() {
-		if(ExceptionHandler.isCommandException(this.err)) {
-			return this.onCommandException();
+	public static Mono<Message> handle(Throwable err, AbstractCommand cmd, Context context) {
+		if(ExceptionHandler.isCommandException(err)) {
+			return ExceptionHandler.onCommandException((CommandException) err, cmd, context);
 		}
-		if(ExceptionHandler.isMissingArgumentException(this.err)) {
-			return this.onMissingArgumentException();
+		if(ExceptionHandler.isMissingPermission(err)) {
+			return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, cmd, context);
 		}
-		if(ExceptionHandler.isNoMusicException(this.err)) {
-			return this.onNoMusicException();
+		if(ExceptionHandler.isMissingArgumentException(err)) {
+			return ExceptionHandler.onMissingArgumentException(cmd, context);
 		}
-		if(ExceptionHandler.isUnavailable(this.err)) {
-			return this.onUnavailable();
+		if(ExceptionHandler.isNoMusicException(err)) {
+			return ExceptionHandler.onNoMusicException(cmd, context);
 		}
-		if(ExceptionHandler.isUnreacheable(this.err)) {
-			return this.onUnreacheable();
+		if(ExceptionHandler.isUnavailable(err)) {
+			return ExceptionHandler.onUnavailable(cmd, context);
 		}
-		if(ExceptionHandler.isMissingPermission(this.err)) {
-			return this.onMissingPermissionException();
+		if(ExceptionHandler.isUnreacheable(err)) {
+			return ExceptionHandler.onUnreacheable(cmd, context);
 		}
-		if(ExceptionHandler.isForbidden(this.err)) {
-			return this.onForbidden();
+		if(ExceptionHandler.isForbidden(err)) {
+			return ExceptionHandler.onForbidden((ClientException) err, context.getGuildId(), context.getChannel(), context.getUsername());
 		}
-		return this.onUnknown();
+		return ExceptionHandler.onUnknown(context.getClient(), err, cmd, context);
 	}
 
 	public static boolean isCommandException(Throwable err) {
 		return err instanceof CommandException;
+	}
+
+	public static boolean isMissingPermission(Throwable err) {
+		return err instanceof MissingPermissionException;
 	}
 
 	public static boolean isMissingArgumentException(Throwable err) {
@@ -84,10 +82,6 @@ public class ExceptionHandler {
 		return err instanceof NoRouteToHostException || err instanceof SocketTimeoutException;
 	}
 
-	public static boolean isMissingPermission(Throwable err) {
-		return err instanceof MissingPermissionException;
-	}
-
 	public static boolean isForbidden(Throwable err) {
 		return err instanceof ClientException
 				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
@@ -98,49 +92,19 @@ public class ExceptionHandler {
 				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.NOT_FOUND);
 	}
 
-	private Mono<Message> onCommandException() {
-		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_ILLEGAL_ARG, this.command);
+	public static Mono<Message> onCommandException(CommandException err, AbstractCommand cmd, Context context) {
+		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_ILLEGAL_ARG, cmd);
 		return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
-				this.context.getUsername(), this.err.getMessage()), this.context.getChannel());
+				context.getUsername(), err.getMessage()), context.getChannel());
 	}
 
-	private Mono<Message> onMissingArgumentException() {
-		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, this.command);
-		return this.command.getHelp(this.context)
-				.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, this.context.getChannel()));
-	}
-
-	private Mono<Message> onNoMusicException() {
-		return BotUtils.sendMessage(String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
-				this.context.getUsername()), this.context.getChannel());
-	}
-
-	private Mono<Message> onUnavailable() {
-		LogUtils.warn(this.context.getClient(),
-				String.format("[%s] Service unavailable.", this.command.getClass().getSimpleName()),
-				this.context.getContent());
-		return BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... "
-				+ "This is not my fault, I promise ! Try again later.",
-				this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
-	}
-
-	private Mono<Message> onUnreacheable() {
-		LogUtils.warn(this.context.getClient(),
-				String.format("[%s] Service unreachable.", this.command.getClass().getSimpleName()),
-				this.context.getContent());
-		return BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... "
-				+ "This is not my fault, I promise ! Try again later.",
-				this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
-	}
-
-	private Mono<Message> onMissingPermissionException() {
-		final MissingPermissionException exception = (MissingPermissionException) this.err;
-		final String missingPerm = StringUtils.capitalizeEnum(exception.getPermission());
-		if(exception.getType().equals(UserType.BOT)) {
+	public static Mono<Message> onMissingPermissionException(MissingPermissionException err, AbstractCommand cmd, Context context) {
+		final String missingPerm = StringUtils.capitalizeEnum(err.getPermission());
+		if(err.getType().equals(UserType.BOT)) {
 			return BotUtils.sendMessage(
-					TextUtils.missingPermission(context.getUsername(), exception.getPermission()), context.getChannel())
+					TextUtils.missingPermission(context.getUsername(), err.getPermission()), context.getChannel())
 					.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
-							this.context.getGuildId().asLong(), missingPerm));
+							context.getGuildId().asLong(), missingPerm));
 		} else {
 			return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
 					+ " (**%s**) You can't execute this command because you don't have the permission to %s.",
@@ -148,22 +112,51 @@ public class ExceptionHandler {
 		}
 	}
 
-	private Mono<Message> onForbidden() {
-		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
-				+ " (**%s**) I can't execute this command due to an unknown lack of permission.",
-				context.getUsername()), context.getChannel())
-				.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: Unknown",
-						this.context.getGuildId().asLong()));
+	public static Mono<Message> onMissingArgumentException(AbstractCommand cmd, Context context) {
+		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, cmd);
+		return cmd.getHelp(context)
+				.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, context.getChannel()));
 	}
 
-	private Mono<Message> onUnknown() {
-		LogUtils.error(this.context.getClient(),
-				this.err,
-				String.format("[%s] An unknown error occurred.", this.command.getClass().getSimpleName()),
-				this.context.getContent());
+	public static Mono<Message> onNoMusicException(AbstractCommand cmd, Context context) {
+		return BotUtils.sendMessage(String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
+				context.getUsername()), context.getChannel());
+	}
+
+	public static Mono<Message> onUnavailable(AbstractCommand cmd, Context context) {
+		LogUtils.warn(context.getClient(),
+				String.format("[%s] Service unavailable.", cmd.getClass().getSimpleName()),
+				context.getContent());
+		return BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... "
+				+ "This is not my fault, I promise ! Try again later.",
+				context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
+	}
+
+	public static Mono<Message> onUnreacheable(AbstractCommand cmd, Context context) {
+		LogUtils.warn(context.getClient(),
+				String.format("[%s] Service unreachable.", cmd.getClass().getSimpleName()),
+				context.getContent());
+		return BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... "
+				+ "This is not my fault, I promise ! Try again later.",
+				context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
+	}
+
+	public static Mono<Message> onForbidden(ClientException err, Snowflake guildId, Mono<MessageChannel> channel, String username) {
+		final Map<String, Object> responseFields = err.getErrorResponse().getFields();
+		LogUtils.infof("{Guild ID: %d} Forbidden action (error code %s, message: %s)",
+				guildId.asLong(), responseFields.get("code").toString(), responseFields.get("message").toString());
+
+		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
+				+ " (**%s**) I can't execute this command due to an unknown lack of permission.",
+				username), channel);
+	}
+
+	public static Mono<Message> onUnknown(DiscordClient client, Throwable err, AbstractCommand cmd, Context context) {
+		LogUtils.error(client, err, String.format("[%s] An unknown error occurred.", cmd.getClass().getSimpleName()),
+				context.getContent());
 		return BotUtils.sendMessage(
 				String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
-						this.context.getUsername(), this.context.getPrefix(), this.context.getCommandName()), this.context.getChannel());
+						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
 	}
 
 }

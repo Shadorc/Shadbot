@@ -127,7 +127,7 @@ public class CommandProcessor {
 				// The user is not rate limited
 				.filter(isRateLimited.negate())
 				.flatMap(cmd -> cmd.execute(context))
-				.onErrorResume(err -> new ExceptionHandler(err, command, context).handle().then())
+				.onErrorResume(err -> ExceptionHandler.handle(err, command, context).then())
 				.doOnSuccess(perm -> {
 					StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_USED, command);
 					StatsManager.VARIOUS_STATS.log(VariousEnum.COMMANDS_EXECUTED);
