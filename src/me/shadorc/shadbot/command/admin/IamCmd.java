@@ -65,7 +65,8 @@ public class IamCmd extends AbstractCommand {
 					}
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Iam", null, avatarUrl)
+							.setAuthor(String.format("Iam: %s", 
+									FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")), null, avatarUrl)
 							.setDescription(description.toString());
 
 					return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
