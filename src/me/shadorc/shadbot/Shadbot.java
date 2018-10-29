@@ -39,6 +39,7 @@ import me.shadorc.shadbot.listener.ReactionListener;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 
 public class Shadbot {
@@ -47,6 +48,9 @@ public class Shadbot {
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 
 	public static void main(String[] args) {
+		// Enable full Reactor stack-trace
+		Hooks.onOperatorDebug();
+		// Set default to Locale US
 		Locale.setDefault(Locale.US);
 
 		// If file loading or command generation has failed, abort attempt to connect the bot
