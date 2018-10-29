@@ -85,9 +85,9 @@ public class DBGuild {
 	 */
 	@SuppressWarnings("unchecked")
 	@JsonIgnore
-	public Map<Long, Long> getIamMessages() {
-		return Optional.ofNullable((Map<Long, Long>) this.settings.get(SettingEnum.IAM_MESSAGES.toString()))
-				.orElse(new HashMap<Long, Long>());
+	public Map<String, Long> getIamMessages() {
+		return (Map<String, Long>) Optional.ofNullable(this.settings.get(SettingEnum.IAM_MESSAGES.toString()))
+				.orElse(new HashMap<>());
 	}
 
 	@JsonIgnore

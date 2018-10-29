@@ -32,6 +32,8 @@ public class IamCommand extends AbstractCommand {
 
 	public static final Unicode REACTION = ReactionEmoji.unicode("✅");
 
+	// FIXME: Unknown missing perm when not admin
+
 	@Override
 	public Mono<Void> execute(Context context) {
 		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
@@ -66,10 +68,10 @@ public class IamCommand extends AbstractCommand {
 							.sendMessage(embed)
 							.doOnSuccess(message -> {
 								final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
-								final Map<Long, Long> setting = dbGuild.getIamMessages();
+								final Map<String, Long> setting = dbGuild.getIamMessages();
 								roles.stream()
 										.map(Role::getId)
-										.forEach(roleId -> setting.put(message.getId().asLong(), roleId.asLong()));
+										.forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));
 								dbGuild.setSetting(SettingEnum.IAM_MESSAGES, setting);
 							});
 				})

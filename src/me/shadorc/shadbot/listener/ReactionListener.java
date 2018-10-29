@@ -1,25 +1,28 @@
 package me.shadorc.shadbot.listener;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.command.admin.IamCommand;
-import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.data.database.DatabaseManager;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.utils.object.message.TemporaryMessage;
 import reactor.core.publisher.Mono;
 
 public class ReactionListener {
 
-	public static class ReactionEvent {
+	private static class ReactionEvent {
 		private final ReactionAddEvent reactionAddEvent;
 		private final ReactionRemoveEvent reactionRemoveEvent;
 
@@ -37,27 +40,39 @@ public class ReactionListener {
 			return reactionAddEvent == null ? reactionRemoveEvent.getClient() : reactionAddEvent.getClient();
 		}
 
-		public Mono<MessageChannel> getChannel() {
+		private Mono<Message> getMessage() {
+			return reactionAddEvent == null ? reactionRemoveEvent.getMessage() : reactionAddEvent.getMessage();
+		}
+
+		private Mono<MessageChannel> getChannel() {
 			return reactionAddEvent == null ? reactionRemoveEvent.getChannel() : reactionAddEvent.getChannel();
 		}
 
-		public Optional<Snowflake> getSelfId() {
+		private Optional<Snowflake> getSelfId() {
 			return this.getClient().getSelfId();
 		}
 
-		public Optional<Snowflake> getGuildId() {
+		private Mono<Member> getMember() {
+			return this.getClient().getMemberById(this.getChannelId(), this.getUserId());
+		}
+
+		private Snowflake getChannelId() {
+			return reactionAddEvent == null ? reactionRemoveEvent.getChannelId() : reactionAddEvent.getChannelId();
+		}
+
+		private Optional<Snowflake> getGuildId() {
 			return reactionAddEvent == null ? reactionRemoveEvent.getGuildId() : reactionAddEvent.getGuildId();
 		}
 
-		public Snowflake getUserId() {
+		private Snowflake getUserId() {
 			return reactionAddEvent == null ? reactionRemoveEvent.getUserId() : reactionAddEvent.getUserId();
 		}
 
-		public Snowflake getMessageId() {
+		private Snowflake getMessageId() {
 			return reactionAddEvent == null ? reactionRemoveEvent.getMessageId() : reactionAddEvent.getMessageId();
 		}
 
-		public ReactionEmoji getEmoji() {
+		private ReactionEmoji getEmoji() {
 			return reactionAddEvent == null ? reactionRemoveEvent.getEmoji() : reactionAddEvent.getEmoji();
 		}
 
@@ -76,34 +91,33 @@ public class ReactionListener {
 	}
 
 	public static void iam(ReactionEvent event, Action action) {
-
-		// If the bot is not the author of the message, this is not an Iam message
-		if(event.getSelfId().map(event.getUserId()::equals).orElse(false)) {
-			return;
-		}
-
-		event.getGuildId().ifPresent(guildId -> {
-			final Snowflake roleId = Optional.ofNullable(DatabaseManager.getDBGuild(guildId)
-					.getIamMessages()
-					.get(event.getMessageId().asLong()))
-					.map(Snowflake::of)
-					.orElse(null);
-
-			if(roleId != null && event.getEmoji().equals(IamCommand.REACTION)) {
-				event.getClient()
-						.getMemberById(guildId, event.getUserId())
-						.flatMap(member -> action == Action.ADD ? member.addRole(roleId) : member.removeRole(roleId))
-						.onErrorResume(ExceptionHandler::isForbidden,
-								err -> BotUtils.sendMessage(
-										String.format(Emoji.ACCESS_DENIED
+		Mono.justOrEmpty(event.getSelfId())
+				// If the bot is not the author of the message, this is not an Iam message
+				.filterWhen(selfId -> event.getMessage()
+						.map(Message::getAuthorId)
+						.flatMap(Mono::justOrEmpty)
+						.map(selfId::equals))
+				.flatMap(selfId -> Mono.justOrEmpty(event.getGuildId()))
+				.flatMap(guildId -> Mono.justOrEmpty(DatabaseManager.getDBGuild(guildId)
+						.getIamMessages()
+						.get(event.getMessageId().asString())))
+				.map(Snowflake::of)
+				.filter(roleId -> event.getEmoji().equals(IamCommand.REACTION))
+				.filterWhen(roleId -> DiscordUtils.hasPermission(event.getChannel(), event.getUserId(), Permission.MANAGE_ROLES)
+						.flatMap(hasPerm -> {
+							if(!hasPerm) {
+								return new TemporaryMessage(event.getClient(), event.getChannelId(), 10, ChronoUnit.SECONDS)
+										.send(String.format(Emoji.ACCESS_DENIED
 												+ " I can't add/remove a role due to the lack of permission."
 												+ "%nPlease, check my permissions to verify that %s is checked.",
-												String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))),
-										event.getChannel())
-										.then())
-						.subscribe();
-			}
-		});
+												String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
+										.thenReturn(hasPerm);
+							}
+							return Mono.just(hasPerm);
+						}))
+				.flatMap(roleId -> event.getMember()
+						.flatMap(member -> action == Action.ADD ? member.addRole(roleId) : member.removeRole(roleId)))
+				.subscribe();
 	}
 
 }
