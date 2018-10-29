@@ -12,7 +12,9 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import discord4j.rest.http.client.ClientException;
 import me.shadorc.shadbot.command.admin.IamCmd;
+import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -48,12 +50,18 @@ public class ReactionListener {
 			return reactionAddEvent == null ? reactionRemoveEvent.getChannel() : reactionAddEvent.getChannel();
 		}
 
-		private Optional<Snowflake> getSelfId() {
-			return this.getClient().getSelfId();
+		private Snowflake getSelfId() {
+			return this.getClient().getSelfId().orElse(null);
 		}
 
 		private Mono<Member> getMember() {
-			return this.getClient().getMemberById(this.getChannelId(), this.getUserId());
+			return this.getGuildId()
+					.map(guildId -> this.getClient().getMemberById(guildId, this.getUserId()))
+					.orElse(Mono.empty());
+		}
+
+		private Mono<String> getUsername() {
+			return this.getMember().map(Member::getUsername);
 		}
 
 		private Snowflake getChannelId() {
@@ -92,6 +100,8 @@ public class ReactionListener {
 
 	public static void iam(ReactionEvent event, Action action) {
 		Mono.justOrEmpty(event.getSelfId())
+				// It wasn't the bot that reacted
+				.filter(selfId -> !event.getUserId().equals(selfId))
 				// If the bot is not the author of the message, this is not an Iam message
 				.filterWhen(selfId -> event.getMessage()
 						.map(Message::getAuthorId)
@@ -103,12 +113,12 @@ public class ReactionListener {
 						.get(event.getMessageId().asString())))
 				.map(Snowflake::of)
 				.filter(roleId -> event.getEmoji().equals(IamCmd.REACTION))
-				.filterWhen(roleId -> DiscordUtils.hasPermission(event.getChannel(), event.getUserId(), Permission.MANAGE_ROLES)
+				.filterWhen(roleId -> DiscordUtils.hasPermission(event.getChannel(), event.getSelfId(), Permission.MANAGE_ROLES)
 						.flatMap(hasPerm -> {
 							if(!hasPerm) {
-								return new TemporaryMessage(event.getClient(), event.getChannelId(), 10, ChronoUnit.SECONDS)
+								return new TemporaryMessage(event.getClient(), event.getChannelId(), 15, ChronoUnit.SECONDS)
 										.send(String.format(Emoji.ACCESS_DENIED
-												+ " I can't add/remove a role due to the lack of permission."
+												+ " I can't add/remove a role due to a lack of permission."
 												+ "%nPlease, check my permissions to verify that %s is checked.",
 												String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
 										.thenReturn(hasPerm);
@@ -117,6 +127,11 @@ public class ReactionListener {
 						}))
 				.flatMap(roleId -> event.getMember()
 						.flatMap(member -> action == Action.ADD ? member.addRole(roleId) : member.removeRole(roleId)))
+				.onErrorResume(ExceptionHandler::isForbidden,
+						err -> event.getUsername()
+								.flatMap(username -> ExceptionHandler.onForbidden(
+										(ClientException) err, event.getGuildId().get(), event.getChannel(), username))
+								.then())
 				.subscribe();
 	}
 

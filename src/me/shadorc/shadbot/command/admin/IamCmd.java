@@ -32,8 +32,6 @@ public class IamCmd extends AbstractCommand {
 
 	public static final Unicode REACTION = ReactionEmoji.unicode("✅");
 
-	// FIXME: Unknown missing perm when not admin
-
 	@Override
 	public Mono<Void> execute(Context context) {
 		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
@@ -57,12 +55,18 @@ public class IamCmd extends AbstractCommand {
 						throw new MissingArgumentException();
 					}
 
+					final StringBuilder description = new StringBuilder();
+					if(quotedElements.size() == 0) {
+						description.append(String.format("Click on %s to get role(s): %s",
+								REACTION.getRaw(),
+								FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
+					} else {
+						description.append(quotedElements.get(0));
+					}
+
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Iam", null, avatarUrl)
-							.setDescription(String.format("Click on %s to get role(s): %s%s",
-									REACTION.getRaw(),
-									FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n"),
-									quotedElements.size() == 1 ? "\n" + quotedElements.get(0) : ""));
+							.setDescription(description.toString());
 
 					return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
 							.sendMessage(embed)
@@ -81,9 +85,11 @@ public class IamCmd extends AbstractCommand {
 	@Override
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
-				.setDescription("Send a message with a reaction, users will be able to get the role(s) associated with the message by clicking on the reaction")
+				.setDescription(
+						String.format("Send a message with a reaction, users will be able to get the role(s) "
+								+ "associated with the message by clicking on %s", REACTION.getRaw()))
 				.addArg("@role(s)", false)
-				.addArg("\"text\"", "Text to add to the message", true)
+				.addArg("\"text\"", "Replace the default text", true)
 				.build();
 	}
 
