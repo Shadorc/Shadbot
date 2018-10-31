@@ -122,6 +122,7 @@ public class AutoMessageSetting extends AbstractSetting {
 						StringUtils.toLowerCase(Type.LEAVE_MESSAGE),
 						StringUtils.toLowerCase(Type.CHANNEL)), false)
 				.addField("Info", "You don't need to specify *value* to disable a type.", false)
+				.addField("Formatting", "**{mention}** - will be replaced by the mention of the user who joined/left", false)
 				.addField("Example", String.format("`%s%s enable join_message Hello you (:`"
 						+ "%n`%s%s disable leave_message`",
 						context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()), false);
