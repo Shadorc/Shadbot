@@ -26,6 +26,7 @@ import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -113,15 +114,15 @@ public class SettingsCmd extends AbstractCommand {
 					String.join("\n\t", dbGuild.getBlacklistedCmd())));
 		}
 
-		dbGuild.getJoinMessage().ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:** %s", joinMessage)));
+		dbGuild.getJoinMessage().ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:**%n%s", joinMessage)));
 
-		dbGuild.getLeaveMessage().ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:** %s", leaveMessage)));
+		dbGuild.getLeaveMessage().ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
 
 		final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getMessageChannelId())
 				.flatMap(context.getClient()::getChannelById)
 				.ofType(GuildChannel.class)
 				.map(GuildChannel::getName)
-				.map(channel -> settingsStr.append(String.format("%n**Auto message channel:** %s", channel)))
+				.map(channel -> settingsStr.append(String.format("%n**Auto message channel:** #%s", channel)))
 				.then();
 
 		final Mono<Void> allowedChannelsStr = Flux.fromIterable(dbGuild.getAllowedTextChannels())
@@ -130,8 +131,8 @@ public class SettingsCmd extends AbstractCommand {
 				.map(GuildChannel::getName)
 				.collectList()
 				.filter(channels -> !channels.isEmpty())
-				.map(channels -> settingsStr.append(String.format("%n**Allowed channels:**%n\t%s",
-						String.join("\n\t", channels))))
+				.map(channels -> settingsStr.append(String.format("%n**Allowed channels:**%n%s",
+						FormatUtils.format(channels, channel -> String.format("#%s", channel), "\n"))))
 				.then();
 
 		final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getAutoRoles())
@@ -139,7 +140,7 @@ public class SettingsCmd extends AbstractCommand {
 				.map(Role::getMention)
 				.collectList()
 				.filter(roles -> !roles.isEmpty())
-				.map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n\t%s", String.join("\n\t", roles))))
+				.map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n%s", String.join("\n", roles))))
 				.then();
 
 		final Mono<Void> permissionsStr = Flux.fromIterable(dbGuild.getAllowedRoles())
