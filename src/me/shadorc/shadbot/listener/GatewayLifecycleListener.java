@@ -5,7 +5,6 @@ import java.time.Duration;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
-import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
@@ -13,18 +12,13 @@ import reactor.core.publisher.Flux;
 public class GatewayLifecycleListener {
 
 	public static void onGatewayLifecycleEvent(GatewayLifecycleEvent event) {
-		if(!(event instanceof ReadyEvent)) {
-			LogUtils.infof("{Shard %d} %s",
-					event.getClient().getConfig().getShardIndex(),
-					event.toString());
-		}
+		LogUtils.infof("{Shard %d} %s",
+				event.getClient().getConfig().getShardIndex(),
+				// Add space before uppercase letters
+				event.getClass().getSimpleName().replaceAll("([^_])([A-Z])", "$1 $2"));
 	}
 
 	public static void onReadyEvent(ReadyEvent event) {
-		LogUtils.infof("%s (Version: %s) is ready",
-				event.getSelf().getUsername(),
-				Config.VERSION);
-
 		final DiscordClient client = event.getClient();
 
 		Flux.interval(Duration.ofHours(2), Duration.ofHours(2))
