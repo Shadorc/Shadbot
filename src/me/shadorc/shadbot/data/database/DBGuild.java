@@ -50,22 +50,34 @@ public class DBGuild {
 
 	@JsonIgnore
 	public List<Snowflake> getAllowedTextChannels() {
-		return this.getListSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, Snowflake.class);
+		return this.getListSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, Long.class)
+				.stream()
+				.map(Snowflake::of)
+				.collect(Collectors.toList());
 	}
 
 	@JsonIgnore
 	public List<Snowflake> getAllowedVoiceChannels() {
-		return this.getListSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, Snowflake.class);
+		return this.getListSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, Long.class)
+				.stream()
+				.map(Snowflake::of)
+				.collect(Collectors.toList());
 	}
 
 	@JsonIgnore
 	public List<Snowflake> getAllowedRoles() {
-		return this.getListSetting(SettingEnum.PERMISSIONS, Snowflake.class);
+		return this.getListSetting(SettingEnum.PERMISSIONS, Long.class)
+				.stream()
+				.map(Snowflake::of)
+				.collect(Collectors.toList());
 	}
 
 	@JsonIgnore
 	public List<Snowflake> getAutoRoles() {
-		return this.getListSetting(SettingEnum.AUTO_ROLE, Snowflake.class);
+		return this.getListSetting(SettingEnum.AUTO_ROLE, Long.class)
+				.stream()
+				.map(Snowflake::of)
+				.collect(Collectors.toList());
 	}
 
 	@JsonIgnore
@@ -102,7 +114,8 @@ public class DBGuild {
 
 	@JsonIgnore
 	public Optional<Snowflake> getMessageChannelId() {
-		return Optional.ofNullable((Snowflake) this.settings.get(SettingEnum.MESSAGE_CHANNEL_ID.toString()));
+		return Optional.ofNullable((Long) this.settings.get(SettingEnum.MESSAGE_CHANNEL_ID.toString()))
+				.map(Snowflake::of);
 	}
 
 	@JsonIgnore
