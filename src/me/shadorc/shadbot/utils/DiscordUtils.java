@@ -237,7 +237,6 @@ public class DiscordUtils {
 				.ofType(TextChannel.class)
 				.flatMap(textChannel -> textChannel.getEffectivePermissions(memberId))
 				.map(permissions -> permissions.contains(permission));
-
 	}
 
 	public static Mono<Void> requirePermissions(Mono<MessageChannel> channel, Snowflake userId, UserType userType, Permission... permissions) {

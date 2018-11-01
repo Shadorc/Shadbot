@@ -64,7 +64,7 @@ public class PollManager extends AbstractGameManager {
 									"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png");
 				})
 				.flatMap(this.voteMessage::sendMessage)
-				.flatMap(message -> Mono.delay(spec.getDuration())
+				.flatMap(message -> Mono.delay(this.spec.getDuration())
 						.thenReturn(message.getId()))
 				.flatMap(messageId -> this.getContext().getClient().getMessageById(this.getContext().getChannelId(), messageId))
 				.map(Message::getReactions)

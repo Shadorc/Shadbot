@@ -70,19 +70,19 @@ public class Shadbot {
 			final DiscordClient client = builder.setShardIndex(i).build();
 			CLIENTS.add(client);
 
-			register(client, ReadyEvent.class, GatewayLifecycleListener::onReadyEvent);
-			register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
-			register(client, TextChannelDeleteEvent.class, ChannelListener::onTextChannelDelete);
-			register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
-			register(client, GuildDeleteEvent.class, GuildListener::onGuildDelete);
-			register(client, MemberJoinEvent.class, MemberListener::onMemberJoin);
-			register(client, MemberLeaveEvent.class, MemberListener::onMemberLeave);
-			register(client, MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
-			register(client, MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
+			Shadbot.register(client, ReadyEvent.class, GatewayLifecycleListener::onReadyEvent);
+			Shadbot.register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
+			Shadbot.register(client, TextChannelDeleteEvent.class, ChannelListener::onTextChannelDelete);
+			Shadbot.register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
+			Shadbot.register(client, GuildDeleteEvent.class, GuildListener::onGuildDelete);
+			Shadbot.register(client, MemberJoinEvent.class, MemberListener::onMemberJoin);
+			Shadbot.register(client, MemberLeaveEvent.class, MemberListener::onMemberLeave);
+			Shadbot.register(client, MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
+			Shadbot.register(client, MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
 			// TODO: Implement
 			// register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
-			register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
-			register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
+			Shadbot.register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
+			Shadbot.register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
 		}
 
 		Flux.interval(LottoCmd.getDelay(), Duration.ofDays(7))

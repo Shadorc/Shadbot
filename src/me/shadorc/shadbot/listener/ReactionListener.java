@@ -39,15 +39,15 @@ public class ReactionListener {
 		}
 
 		private DiscordClient getClient() {
-			return reactionAddEvent == null ? reactionRemoveEvent.getClient() : reactionAddEvent.getClient();
+			return this.reactionAddEvent == null ? this.reactionRemoveEvent.getClient() : this.reactionAddEvent.getClient();
 		}
 
 		private Mono<Message> getMessage() {
-			return reactionAddEvent == null ? reactionRemoveEvent.getMessage() : reactionAddEvent.getMessage();
+			return this.reactionAddEvent == null ? this.reactionRemoveEvent.getMessage() : this.reactionAddEvent.getMessage();
 		}
 
 		private Mono<MessageChannel> getChannel() {
-			return reactionAddEvent == null ? reactionRemoveEvent.getChannel() : reactionAddEvent.getChannel();
+			return this.reactionAddEvent == null ? this.reactionRemoveEvent.getChannel() : this.reactionAddEvent.getChannel();
 		}
 
 		private Snowflake getSelfId() {
@@ -65,23 +65,23 @@ public class ReactionListener {
 		}
 
 		private Snowflake getChannelId() {
-			return reactionAddEvent == null ? reactionRemoveEvent.getChannelId() : reactionAddEvent.getChannelId();
+			return this.reactionAddEvent == null ? this.reactionRemoveEvent.getChannelId() : this.reactionAddEvent.getChannelId();
 		}
 
 		private Optional<Snowflake> getGuildId() {
-			return reactionAddEvent == null ? reactionRemoveEvent.getGuildId() : reactionAddEvent.getGuildId();
+			return this.reactionAddEvent == null ? this.reactionRemoveEvent.getGuildId() : this.reactionAddEvent.getGuildId();
 		}
 
 		private Snowflake getUserId() {
-			return reactionAddEvent == null ? reactionRemoveEvent.getUserId() : reactionAddEvent.getUserId();
+			return this.reactionAddEvent == null ? this.reactionRemoveEvent.getUserId() : this.reactionAddEvent.getUserId();
 		}
 
 		private Snowflake getMessageId() {
-			return reactionAddEvent == null ? reactionRemoveEvent.getMessageId() : reactionAddEvent.getMessageId();
+			return this.reactionAddEvent == null ? this.reactionRemoveEvent.getMessageId() : this.reactionAddEvent.getMessageId();
 		}
 
 		private ReactionEmoji getEmoji() {
-			return reactionAddEvent == null ? reactionRemoveEvent.getEmoji() : reactionAddEvent.getEmoji();
+			return this.reactionAddEvent == null ? this.reactionRemoveEvent.getEmoji() : this.reactionAddEvent.getEmoji();
 		}
 
 	}
@@ -91,11 +91,11 @@ public class ReactionListener {
 	}
 
 	public static void onReactionAddEvent(ReactionAddEvent event) {
-		iam(new ReactionEvent(event), Action.ADD);
+		ReactionListener.iam(new ReactionEvent(event), Action.ADD);
 	}
 
 	public static void onReactionRemoveEvent(ReactionRemoveEvent event) {
-		iam(new ReactionEvent(event), Action.REMOVE);
+		ReactionListener.iam(new ReactionEvent(event), Action.REMOVE);
 	}
 
 	public static void iam(ReactionEvent event, Action action) {

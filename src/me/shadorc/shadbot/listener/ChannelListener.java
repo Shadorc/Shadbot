@@ -12,7 +12,7 @@ public class ChannelListener {
 
 	/**
 	 * Remove deleted text channels from allowed text channels setting.
-	 * 
+	 *
 	 * @param event - the event
 	 */
 	public static void onTextChannelDelete(TextChannelDeleteEvent event) {
