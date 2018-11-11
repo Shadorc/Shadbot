@@ -48,8 +48,8 @@ public class Shadbot {
 
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
-	//TODO: Update this when the bot is connected to every guilds
-	private static final AtomicBoolean IS_READY = new AtomicBoolean(true);
+	// TODO: Update this when the bot is connected to every guilds
+	private static final AtomicBoolean IS_READY = new AtomicBoolean(false);
 
 	public static void main(String[] args) {
 		// Enable full Reactor stack-trace
