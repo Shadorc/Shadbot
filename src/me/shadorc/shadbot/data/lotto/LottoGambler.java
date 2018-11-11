@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.data.lotto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
@@ -25,14 +26,17 @@ public class LottoGambler {
 		this.number = number;
 	}
 
+	@JsonIgnore
 	public Snowflake getGuildId() {
 		return Snowflake.of(this.guildId);
 	}
 
+	@JsonIgnore
 	public Snowflake getUserId() {
 		return Snowflake.of(this.userId);
 	}
 
+	@JsonIgnore
 	public int getNumber() {
 		return this.number;
 	}
