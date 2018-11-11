@@ -61,7 +61,7 @@ public class CommandProcessor {
 						if(!tuple.getT2()) {
 							return BotUtils.sendMessage(TextUtils.missingPermission(event.getMember().map(User::getUsername).get(),
 									Permission.EMBED_LINKS), Mono.just(channel))
-									.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
+									.doOnSuccess(message -> LogUtils.info("{Guild ID: %d} Missing permission: %s",
 											guildId.get().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS)))
 									.thenReturn(false);
 						}

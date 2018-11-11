@@ -87,7 +87,7 @@ public class ImageCmd extends AbstractCommand {
 				APIKeys.get(APIKey.DEVIANTART_CLIENT_ID), APIKeys.get(APIKey.DEVIANTART_API_SECRET)));
 		this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
 		this.lastTokenGeneration = System.currentTimeMillis();
-		LogUtils.infof("DeviantArt token generated: %s", this.token.getAccessToken());
+		LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
 	}
 
 	@Override

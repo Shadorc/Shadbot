@@ -143,7 +143,7 @@ public class LottoCmd extends AbstractCommand {
 	}
 
 	public static void draw(DiscordClient client) {
-		LogUtils.infof("Lottery draw started...");
+		LogUtils.info("Lottery draw started...");
 		final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
 		final List<LottoGambler> winners = LottoManager.getLotto().getGamblers().stream()
@@ -162,7 +162,7 @@ public class LottoCmd extends AbstractCommand {
 
 		}
 
-		LogUtils.infof("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
+		LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
 				winningNum, winners.size(), LottoManager.getLotto().getJackpot());
 
 		LottoManager.getLotto().setHistoric(new LottoHistoric(winners.size(), LottoManager.getLotto().getJackpot(), winningNum));

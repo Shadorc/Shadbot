@@ -47,7 +47,7 @@ public class CommandInitializer {
 			}
 		}
 
-		LogUtils.infof("%s initialized.", StringUtils.pluralOf(COMMANDS_MAP.values().stream().distinct().count(), "command"));
+		LogUtils.info("%s initialized.", StringUtils.pluralOf(COMMANDS_MAP.values().stream().distinct().count(), "command"));
 		return true;
 	}
 

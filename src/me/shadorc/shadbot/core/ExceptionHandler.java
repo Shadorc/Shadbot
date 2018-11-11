@@ -103,7 +103,7 @@ public class ExceptionHandler {
 		if(err.getType().equals(UserType.BOT)) {
 			return BotUtils.sendMessage(
 					TextUtils.missingPermission(context.getUsername(), err.getPermission()), context.getChannel())
-					.doOnSuccess(message -> LogUtils.infof("{Guild ID: %d} Missing permission: %s",
+					.doOnSuccess(message -> LogUtils.info("{Guild ID: %d} Missing permission: %s",
 							context.getGuildId().asLong(), missingPerm));
 		} else {
 			return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
@@ -143,7 +143,7 @@ public class ExceptionHandler {
 
 	public static Mono<Message> onForbidden(ClientException err, Snowflake guildId, Mono<MessageChannel> channel, String username) {
 		final Map<String, Object> responseFields = err.getErrorResponse().getFields();
-		LogUtils.infof("{Guild ID: %d} Forbidden action (error code %s, message: %s)",
+		LogUtils.info("{Guild ID: %d} Forbidden action (error code %s, message: %s)",
 				guildId.asLong(), responseFields.get("code").toString(), responseFields.get("message").toString());
 
 		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED

@@ -47,8 +47,8 @@ public class LogUtils {
 		LogUtils.sendLog(client, new LogBuilder(LogType.WARN, msg));
 	}
 
-	public static void infof(String format, Object... args) {
-		LOGGER.info(String.format(format, args));
+	public static void info(String format, Object... args) {
+		LOGGER.info(format, args);
 	}
 
 	private static void sendLog(DiscordClient client, LogBuilder embed) {

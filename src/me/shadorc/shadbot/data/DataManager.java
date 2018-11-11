@@ -44,7 +44,7 @@ public class DataManager {
 					final Runnable saveTask = () -> {
 						try {
 							method.invoke(null);
-							LogUtils.infof("%s saved.", className);
+							LogUtils.info("%s saved.", className);
 						} catch (Exception err) {
 							LogUtils.error(err, String.format("An error occurred while saving %s.", className));
 						}
@@ -59,7 +59,7 @@ public class DataManager {
 			}
 		}
 
-		LogUtils.infof("Data files initialized.");
+		LogUtils.info("Data files initialized.");
 		return true;
 	}
 

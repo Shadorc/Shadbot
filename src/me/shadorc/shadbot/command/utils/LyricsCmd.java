@@ -61,7 +61,7 @@ public class LyricsCmd extends AbstractCommand {
 								this.getClass().getSimpleName(), retryCount));
 						throw new HttpStatusException("musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
 					}
-					LogUtils.infof("[%s] URLs do not match (%s / %s), reloading page.",
+					LogUtils.info("[%s] URLs do not match (%s / %s), reloading page.",
 							this.getClass().getSimpleName(), response.url().toString(), url);
 				}
 				response = NetUtils.getResponse(url);

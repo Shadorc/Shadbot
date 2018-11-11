@@ -120,7 +120,7 @@ public class DiabloCmd extends AbstractCommand {
 				APIKeys.get(APIKey.BLIZZARD_CLIENT_ID), APIKeys.get(APIKey.BLIZZARD_CLIENT_SECRET)));
 		this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
 		this.lastTokenGeneration = System.currentTimeMillis();
-		LogUtils.infof("Blizzard token generated: %s", this.token.getAccessToken());
+		LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
 	}
 
 	@Override

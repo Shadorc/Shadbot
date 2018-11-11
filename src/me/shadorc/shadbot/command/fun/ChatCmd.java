@@ -46,7 +46,7 @@ public class ChatCmd extends AbstractCommand {
 				ERROR_COUNT.set(0);
 				return BotUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", botName, response), context.getChannel()).then();
 			} catch (IOException err) {
-				LogUtils.infof("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botName);
+				LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botName);
 			}
 		}
 

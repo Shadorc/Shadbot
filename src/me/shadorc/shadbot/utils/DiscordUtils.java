@@ -80,10 +80,10 @@ public class DiscordUtils {
 		if(Config.IS_SNAPSHOT) {
 			return Mono.empty();
 		}
-		return Mono.fromRunnable(() -> LogUtils.infof("{Shard %d} Posting statistics...", client.getConfig().getShardIndex()))
+		return Mono.fromRunnable(() -> LogUtils.info("{Shard %d} Posting statistics...", client.getConfig().getShardIndex()))
 				.then(DiscordUtils.postStatsOn(client, "https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN))
 				.then(DiscordUtils.postStatsOn(client, "https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN))
-				.then(Mono.fromRunnable(() -> LogUtils.infof("{Shard %d} Statistics posted.", client.getConfig().getShardIndex())));
+				.then(Mono.fromRunnable(() -> LogUtils.info("{Shard %d} Statistics posted.", client.getConfig().getShardIndex())));
 	}
 
 	/**

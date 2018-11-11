@@ -9,14 +9,14 @@ public class GuildListener {
 
 	public static void onGuildCreate(GuildCreateEvent event) {
 		if(Shadbot.isReady()) {
-			LogUtils.infof("Shadbot connected to a guild. (ID: %d | Users: %d)",
+			LogUtils.info("Shadbot connected to a guild. (ID: %d | Users: %d)",
 					event.getGuild().getId().asLong(),
 					event.getGuild().getMemberCount().orElse(-1));
 		}
 	}
 
 	public static void onGuildDelete(GuildDeleteEvent event) {
-		LogUtils.infof("Shadbot disconnected from a guild. (ID: %d)",
+		LogUtils.info("Shadbot disconnected from a guild. (ID: %d)",
 				event.getGuildId().asLong());
 	}
 }

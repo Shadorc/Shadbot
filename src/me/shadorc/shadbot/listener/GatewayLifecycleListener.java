@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 public class GatewayLifecycleListener {
 
 	public static void onGatewayLifecycleEvent(GatewayLifecycleEvent event) {
-		LogUtils.infof("{Shard %d} %s",
+		LogUtils.info("{Shard %d} %s",
 				event.getClient().getConfig().getShardIndex(),
 				// Add space before uppercase letters
 				event.getClass().getSimpleName().replaceAll("([^_])([A-Z])", "$1 $2"));

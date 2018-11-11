@@ -69,7 +69,7 @@ public class Shadbot {
 				.setShardCount(shardCount)
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
-		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
+		LogUtils.info("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
 		for(int index = 0; index < builder.getShardCount(); index++) {
 			final DiscordClient client = builder.setShardIndex(index).build();
 			CLIENTS.add(client);
