@@ -94,7 +94,7 @@ public class Shadbot {
 				.subscribe();
 
 		// TODO: Find a better and more consistent solution
-		Mono.delay(Duration.ofSeconds(shardCount * 7))
+		Mono.delay(Duration.ofSeconds(shardCount * 8))
 				.then(Mono.fromRunnable(() -> IS_READY.set(true)))
 				.subscribe();
 
