@@ -24,6 +24,7 @@ import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.gateway.SimpleBucket;
 import me.shadorc.shadbot.command.game.LottoCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.data.APIKeys;
@@ -60,18 +61,19 @@ public class Shadbot {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(DataManager::stop));
 
-		final int shardCount = 1;
+		final int shardCount = 11;
 		final DiscordClientBuilder builder = new DiscordClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
+				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
 				.setShardCount(shardCount)
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
 		LogUtils.infof("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
-		for(int i = 0; i < builder.getShardCount(); i++) {
-			final DiscordClient client = builder.setShardIndex(i).build();
+		for(int index = 0; index < builder.getShardCount(); index++) {
+			final DiscordClient client = builder.setShardIndex(index).build();
 			CLIENTS.add(client);
 
-			Shadbot.register(client, ReadyEvent.class, GatewayLifecycleListener::onReadyEvent);
 			Shadbot.register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
+			Shadbot.register(client, ReadyEvent.class, GatewayLifecycleListener::onReadyEvent);
 			Shadbot.register(client, TextChannelDeleteEvent.class, ChannelListener::onTextChannelDelete);
 			Shadbot.register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
 			Shadbot.register(client, GuildDeleteEvent.class, GuildListener::onGuildDelete);
@@ -80,7 +82,7 @@ public class Shadbot {
 			Shadbot.register(client, MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
 			Shadbot.register(client, MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
 			// TODO: Implement
-			// register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
+			// Shadbot.register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 			Shadbot.register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
 			Shadbot.register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
 		}
