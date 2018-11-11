@@ -91,7 +91,7 @@ public class CommandProcessor {
 				// The message starts with the correct prefix
 				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
 				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)))
-				.doOnError(ExceptionHandler::isNotFound, 
+				.doOnError(ExceptionHandler::isNotFound,
 						err -> ExceptionHandler.onNotFound((ClientException) err, guildId.get()))
 				.subscribe();
 	}
