@@ -151,6 +151,11 @@ public class ExceptionHandler {
 				username), channel);
 	}
 
+	public static void onNotFound(ClientException err, Snowflake guildId) {
+		LogUtils.info("{Guild ID: %d} %s: %s",
+				guildId.asLong(), err.getStatus().reasonPhrase(), err.getErrorResponse().getFields().get("message"));
+	}
+
 	public static Mono<Message> onUnknown(DiscordClient client, Throwable err, AbstractCommand cmd, Context context) {
 		LogUtils.error(client, err, String.format("[%s] An unknown error occurred.", cmd.getClass().getSimpleName()),
 				context.getContent());

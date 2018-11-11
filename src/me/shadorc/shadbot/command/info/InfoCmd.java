@@ -62,6 +62,7 @@ public class InfoCmd extends AbstractCommand {
 					final List<Guild> guilds = tuple.getT2();
 					final Long voiceChannelsCount = tuple.getT3();
 
+					// TODO: This needs to be unique users
 					final int membersCount = guilds.stream()
 							.map(Guild::getMemberCount)
 							.mapToInt(OptionalInt::getAsInt)
