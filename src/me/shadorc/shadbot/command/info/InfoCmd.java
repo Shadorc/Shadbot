@@ -1,12 +1,10 @@
 package me.shadorc.shadbot.command.info;
 
-import java.util.List;
-import java.util.OptionalInt;
-
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
+import discord4j.core.DiscordClient;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Guild;
@@ -26,6 +24,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -45,26 +44,29 @@ public class InfoCmd extends AbstractCommand {
 		final String d4jName = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_NAME);
 		final String d4jVersion = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_VERSION);
 
-		final Mono<Long> voiceChannelsCount = context.getClient()
+		final Mono<Long> voiceChannelsCountMono = context.getClient()
 				.getGuilds()
 				.flatMap(guild -> guild.getMemberById(context.getSelfId()))
 				.flatMap(Member::getVoiceState)
 				.flatMap(VoiceState::getChannel)
 				.count();
 
-		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
-				context.getClient().getGuilds().collectList(),
-				voiceChannelsCount)
-				.map(tuple3 -> {
-					final User owner = tuple3.getT1();
-					final List<Guild> guilds = tuple3.getT2();
-					final Long connectedVoiceChannels = tuple3.getT3();
+		final Mono<Long> guildsCountMono = Flux.fromIterable(Shadbot.getClients())
+				.flatMap(DiscordClient::getGuilds)
+				.count();
 
-					final int membersCount = guilds.stream()
-							.map(Guild::getMemberCount)
-							.map(OptionalInt::getAsInt)
-							.mapToInt(Integer::intValue)
-							.sum();
+		final Mono<Long> membersCountMono = Flux.fromIterable(Shadbot.getClients())
+				.flatMap(DiscordClient::getGuilds)
+				.map(Guild::getMembers)
+				.count();
+
+		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
+				voiceChannelsCountMono, guildsCountMono, membersCountMono)
+				.map(tuple -> {
+					final User owner = tuple.getT1();
+					final Long voiceChannelsCount = tuple.getT2();
+					final Long guildsCount = tuple.getT3();
+					final Long membersCount = tuple.getT4();
 
 					return new String("```prolog"
 							+ String.format("%n-= Performance Info =-")
@@ -80,8 +82,8 @@ public class InfoCmd extends AbstractCommand {
 							+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
 							+ String.format("%nShadbot Version: %s", Config.VERSION)
 							+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
-							+ String.format("%nServers: %s", FormatUtils.number(guilds.size()))
-							+ String.format("%nVoice Channels: %d", connectedVoiceChannels)
+							+ String.format("%nServers: %s", FormatUtils.number(guildsCount))
+							+ String.format("%nVoice Channels: %d", voiceChannelsCount)
 							+ String.format("%nUsers: %s", FormatUtils.number(membersCount))
 							+ String.format("%nPing: %dms", TimeUtils.getMillisUntil(start))
 							+ "```");

@@ -115,6 +115,13 @@ public class Shadbot {
 	}
 
 	/**
+	 * @return All the clients the bot is connected to
+	 */
+	public static List<DiscordClient> getClients() {
+		return CLIENTS;
+	}
+
+	/**
 	 * @return true when the bot is connected to all its guilds, false otherwise
 	 */
 	public static boolean isReady() {
