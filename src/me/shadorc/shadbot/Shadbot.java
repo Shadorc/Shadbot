@@ -48,11 +48,10 @@ public class Shadbot {
 
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
-	// TODO: Update this when the bot is connected to every guilds
 	private static final AtomicBoolean IS_READY = new AtomicBoolean(false);
 
 	public static void main(String[] args) {
-		// Enable full Reactor stack-trace
+		// Enable full Reactor stack-traces
 		Hooks.onOperatorDebug();
 		// Set default to Locale US
 		Locale.setDefault(Locale.US);
@@ -92,6 +91,11 @@ public class Shadbot {
 
 		Flux.interval(LottoCmd.getDelay(), Duration.ofDays(7))
 				.doOnNext(ignored -> LottoCmd.draw(CLIENTS.get(0)))
+				.subscribe();
+
+		// TODO: Find a better and more consistent solution
+		Mono.delay(Duration.ofSeconds(shardCount * 7))
+				.then(Mono.fromRunnable(() -> IS_READY.set(true)))
 				.subscribe();
 
 		// Initiate login and block
