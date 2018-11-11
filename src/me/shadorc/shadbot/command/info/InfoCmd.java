@@ -46,7 +46,7 @@ public class InfoCmd extends AbstractCommand {
 
 		final String d4jName = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_NAME);
 		final String d4jVersion = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_VERSION);
-		
+
 		final Mono<Long> voiceChannelsCountMono = Flux.fromIterable(Shadbot.getClients())
 				.flatMap(DiscordClient::getGuilds)
 				.flatMap(guild -> guild.getMemberById(context.getSelfId()))
@@ -61,7 +61,7 @@ public class InfoCmd extends AbstractCommand {
 					final User owner = tuple.getT1();
 					final List<Guild> guilds = tuple.getT2();
 					final Long voiceChannelsCount = tuple.getT3();
-					
+
 					final int membersCount = guilds.stream()
 							.map(Guild::getMemberCount)
 							.mapToInt(OptionalInt::getAsInt)
