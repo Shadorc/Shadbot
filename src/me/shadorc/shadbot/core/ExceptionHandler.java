@@ -143,8 +143,11 @@ public class ExceptionHandler {
 
 	public static Mono<Message> onForbidden(ClientException err, Snowflake guildId, Mono<MessageChannel> channel, String username) {
 		final Map<String, Object> responseFields = err.getErrorResponse().getFields();
-		LogUtils.info("{Guild ID: %d} Forbidden action (error code %s, message: %s)",
-				guildId.asLong(), responseFields.get("code").toString(), responseFields.get("message").toString());
+		LogUtils.info("{Guild ID: %d} %d %s: %s",
+				guildId.asLong(), 
+				err.getStatus().code(), 
+				err.getStatus().reasonPhrase(), 
+				responseFields.get("message").toString());
 
 		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
 				+ " (**%s**) I can't execute this command due to an unknown lack of permission.",
@@ -152,8 +155,10 @@ public class ExceptionHandler {
 	}
 
 	public static void onNotFound(ClientException err, Snowflake guildId) {
-		LogUtils.info("{Guild ID: %d} %s: %s",
-				guildId.asLong(), err.getStatus().reasonPhrase(), err.getErrorResponse().getFields().get("message"));
+		LogUtils.info("{Guild ID: %d} %d %s: %s",
+				guildId.asLong(), 
+				err.getStatus().reasonPhrase(), 
+				err.getErrorResponse().getFields().get("message"));
 	}
 
 	public static Mono<Message> onUnknown(DiscordClient client, Throwable err, AbstractCommand cmd, Context context) {
