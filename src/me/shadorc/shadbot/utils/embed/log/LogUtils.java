@@ -51,6 +51,10 @@ public class LogUtils {
 		LOGGER.info(format, args);
 	}
 
+	public static void debug(String format, Object... args) {
+		LOGGER.debug(format, args);
+	}
+
 	private static void sendLog(DiscordClient client, LogBuilder embed) {
 		BotUtils.sendMessage(embed.build(), client.getChannelById(Config.LOGS_CHANNEL_ID).cast(MessageChannel.class)).subscribe();
 	}

@@ -53,7 +53,7 @@ public class CommandProcessor {
 					DiscordUtils.hasPermission(Mono.just(channel), selfId, Permission.EMBED_LINKS))
 					.flatMap(tuple -> {
 						if(!tuple.getT1()) {
-							LogUtils.infof("{Guild ID: %d} Missing permission: %s",
+							LogUtils.debug("{Guild ID: %d} Missing permission: %s",
 									guildId.get().asLong(), StringUtils.capitalizeEnum(Permission.SEND_MESSAGES));
 							return Mono.just(false);
 						}
