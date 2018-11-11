@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,8 @@ public class Shadbot {
 
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
+	//TODO: Update this when the bot is connected to every guilds
+	private static final AtomicBoolean IS_READY = new AtomicBoolean(true);
 
 	public static void main(String[] args) {
 		// Enable full Reactor stack-trace
@@ -105,6 +108,13 @@ public class Shadbot {
 	 */
 	public static Instant getLaunchTime() {
 		return LAUNCH_TIME;
+	}
+
+	/**
+	 * @return true when the bot is connected to all its guilds, false otherwise
+	 */
+	public static boolean isReady() {
+		return IS_READY.get();
 	}
 
 	private static <T extends Event> void register(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
