@@ -9,8 +9,8 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.shadorc.shadbot.ExitCode;
 import me.shadorc.shadbot.data.annotation.DataInit;
+import me.shadorc.shadbot.utils.ExitCode;
 
 public class APIKeys {
 

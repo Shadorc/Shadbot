@@ -1,4 +1,4 @@
-package me.shadorc.shadbot;
+package me.shadorc.shadbot.utils;
 
 public enum ExitCode {
 	UNKNWON(-1),

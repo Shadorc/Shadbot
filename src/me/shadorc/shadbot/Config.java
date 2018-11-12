@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.utils.ExitCode;
 
 public class Config {
 
