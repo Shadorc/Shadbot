@@ -144,9 +144,9 @@ public class ExceptionHandler {
 	public static Mono<Message> onForbidden(ClientException err, Snowflake guildId, Mono<MessageChannel> channel, String username) {
 		final Map<String, Object> responseFields = err.getErrorResponse().getFields();
 		LogUtils.info("{Guild ID: %d} %d %s: %s",
-				guildId.asLong(), 
-				err.getStatus().code(), 
-				err.getStatus().reasonPhrase(), 
+				guildId.asLong(),
+				err.getStatus().code(),
+				err.getStatus().reasonPhrase(),
 				responseFields.get("message").toString());
 
 		return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
@@ -156,8 +156,8 @@ public class ExceptionHandler {
 
 	public static void onNotFound(ClientException err, Snowflake guildId) {
 		LogUtils.info("{Guild ID: %d} %d %s: %s",
-				guildId.asLong(), 
-				err.getStatus().reasonPhrase(), 
+				guildId.asLong(),
+				err.getStatus().reasonPhrase(),
 				err.getErrorResponse().getFields().get("message"));
 	}
 
