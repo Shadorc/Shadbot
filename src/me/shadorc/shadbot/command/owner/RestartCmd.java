@@ -10,18 +10,18 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "shutdown" })
+@Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "restart" })
 public class RestartCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		return Mono.fromRunnable(Shadbot::quit);
+		return Mono.fromRunnable(Shadbot::restart);
 	}
 
 	@Override
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
-				.setDescription("Shutdown the bot.")
+				.setDescription("Restart the bot.")
 				.build();
 	}
 
