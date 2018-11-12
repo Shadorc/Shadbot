@@ -45,7 +45,7 @@ public class Config {
 			}
 		} catch (IOException err) {
 			LOGGER.error("An error occurred while loading configuration file. Exiting.", err);
-			System.exit(1);
+			System.exit(ExitCode.FATAL_ERROR.value());
 		}
 		return properties;
 	}

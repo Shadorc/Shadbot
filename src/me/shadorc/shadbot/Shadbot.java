@@ -58,7 +58,7 @@ public class Shadbot {
 
 		// If file loading or command generation has failed, abort attempt to connect the bot
 		if(!DataManager.init() || !CommandInitializer.init()) {
-			System.exit(1);
+			System.exit(ExitCode.FATAL_ERROR.value());
 		}
 
 		Runtime.getRuntime().addShutdownHook(new Thread(DataManager::stop));
@@ -102,9 +102,18 @@ public class Shadbot {
 		Mono.when(CLIENTS.stream().map(DiscordClient::login).collect(Collectors.toList())).block();
 	}
 
-	public static void logout() {
+	private static void logout() {
 		CLIENTS.forEach(DiscordClient::logout);
-		System.exit(0);
+	}
+
+	public static void quit() {
+		Shadbot.logout();
+		System.exit(ExitCode.NORMAL.value());
+	}
+
+	public static void restart() {
+		Shadbot.logout();
+		System.exit(ExitCode.RESTART.value());
 	}
 
 	/**

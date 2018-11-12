@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.shadorc.shadbot.ExitCode;
 import me.shadorc.shadbot.data.annotation.DataInit;
 
 public class APIKeys {
@@ -41,7 +42,7 @@ public class APIKeys {
 	public static void init() throws MalformedURLException, IOException {
 		if(!API_KEYS_FILE.exists()) {
 			LOGGER.error("API keys file is missing. Exiting.");
-			System.exit(1);
+			System.exit(ExitCode.FATAL_ERROR.value());
 		}
 
 		try (FileReader reader = new FileReader(API_KEYS_FILE)) {
