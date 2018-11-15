@@ -13,6 +13,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 public class TextUtils {
 
 	public static final TextFile SPAMS = new TextFile("texts/spam.txt");
+	public static final TextFile PLAYING = new TextFile("texts/playing.txt");
 
 	public static final String PLAYLIST_LIMIT_REACHED =
 			String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "

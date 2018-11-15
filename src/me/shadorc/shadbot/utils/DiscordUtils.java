@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,8 +44,14 @@ public class DiscordUtils {
 	public static final int MAX_REASON_LENGTH = 512;
 
 	public static Mono<Void> updatePresence(DiscordClient client) {
-		return Mono.just(String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES)))
-				.flatMap(text -> client.updatePresence(Presence.online(Activity.playing(text))));
+		String text;
+		if(ThreadLocalRandom.current().nextInt(2) == 0) {
+			text = TextUtils.PLAYING.getText();
+		} else {
+			text = String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
+		}
+		return client.updatePresence(Presence.online(Activity.playing(text)));
+
 	}
 
 	/**
