@@ -27,11 +27,11 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -92,7 +92,8 @@ public class SettingsCmd extends AbstractCommand {
 			return setting.execute(context);
 		} catch (MissingArgumentException e) {
 			return this.getHelp(context, setting)
-					.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, context.getChannel()))
+					.flatMap(embed -> BotUtils.sendMessage(
+							Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", embed, context.getChannel()))
 					.then();
 		}
 	}

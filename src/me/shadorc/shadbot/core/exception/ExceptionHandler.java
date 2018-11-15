@@ -66,7 +66,8 @@ public class ExceptionHandler {
 	public static Mono<Message> onMissingArgumentException(AbstractCommand cmd, Context context) {
 		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, cmd);
 		return cmd.getHelp(context)
-				.flatMap(embed -> BotUtils.sendMessage(TextUtils.MISSING_ARG, embed, context.getChannel()));
+				.flatMap(embed -> BotUtils.sendMessage(
+						Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.", embed, context.getChannel()));
 	}
 
 	public static Mono<Message> onNoMusicException(AbstractCommand cmd, Context context) {

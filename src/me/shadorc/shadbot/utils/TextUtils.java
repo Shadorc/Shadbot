@@ -17,12 +17,8 @@ public class TextUtils {
 			String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "
 					+ "You can remove this limit by contributing to Shadbot. More info on **%s**", Config.DEFAULT_PLAYLIST_SIZE, Config.PATREON_URL);
 
-	public static final String NOT_ENOUGH_COINS = "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
-
-	public static final String[] SPAM_MESSAGES = { "Take it easy, we are not in a hurry !",
-			"Phew.. give me time to rest, you're too fast for me.",
-			"I'm not going anywhere, no need to be this fast.",
-			"I don't think everyone here want to be spammed by us, just wait a little bit." };
+	public static final String NOT_ENOUGH_COINS =
+			"You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
 
 	public static final String[] TIP_MESSAGES = { String.format("Check %slotto", Config.DEFAULT_PREFIX),
 			String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
@@ -30,7 +26,8 @@ public class TextUtils {
 			String.format("Support server: %s", Config.SUPPORT_SERVER_URL) };
 
 	public static String mustBeNsfw(String prefix) {
-		return String.format(Emoji.GREY_EXCLAMATION + " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",
+		return String.format(Emoji.GREY_EXCLAMATION
+				+ " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",
 				prefix, SettingEnum.NSFW);
 	}
 

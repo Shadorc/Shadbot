@@ -36,13 +36,11 @@ public class Rule34Cmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.isChannelNsfw()
 				.filter(Boolean.TRUE::equals)
 				.flatMap(isNsfw -> {
-
-					final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
 					try {
 						final String url = String.format("https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=%s",
 								NetUtils.encode(arg.replace(" ", "_")));
