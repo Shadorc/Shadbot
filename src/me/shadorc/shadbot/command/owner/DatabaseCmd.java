@@ -4,12 +4,12 @@ import java.util.List;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.exception.ExceptionUtils;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -30,7 +30,7 @@ public class DatabaseCmd extends AbstractCommand {
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.onErrorMap(ExceptionHandler::isForbidden, err -> new CommandException("Guild not found."))
+				.onErrorMap(ExceptionUtils::isForbidden, err -> new CommandException("Guild not found."))
 				.map(guild -> {
 					if(args.size() == 1) {
 						return DatabaseManager.getDBGuild(guild.getId()).toString();

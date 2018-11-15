@@ -5,12 +5,12 @@ import java.util.List;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.ExceptionHandler;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.exception.ExceptionUtils;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -44,7 +44,7 @@ public class SendMessageCmd extends AbstractCommand {
 
 				})
 				.then(BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel()))
-				.onErrorMap(ExceptionHandler::isNotFound, err -> new CommandException("User not found."))
+				.onErrorMap(ExceptionUtils::isNotFound, err -> new CommandException("User not found."))
 				.then();
 	}
 

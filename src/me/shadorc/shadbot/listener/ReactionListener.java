@@ -14,7 +14,8 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import me.shadorc.shadbot.command.admin.IamCmd;
-import me.shadorc.shadbot.core.ExceptionHandler;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
+import me.shadorc.shadbot.core.exception.ExceptionUtils;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -127,7 +128,7 @@ public class ReactionListener {
 						}))
 				.flatMap(roleId -> event.getMember()
 						.flatMap(member -> action == Action.ADD ? member.addRole(roleId) : member.removeRole(roleId)))
-				.onErrorResume(ExceptionHandler::isForbidden,
+				.onErrorResume(ExceptionUtils::isForbidden,
 						err -> event.getUsername()
 								.flatMap(username -> ExceptionHandler.onForbidden(
 										(ClientException) err, event.getGuildId().get(), event.getChannel(), username))

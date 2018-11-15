@@ -16,7 +16,8 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.core.ExceptionHandler;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
+import me.shadorc.shadbot.core.exception.ExceptionUtils;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -91,7 +92,7 @@ public class CommandProcessor {
 				// The message starts with the correct prefix
 				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
 				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)))
-				.doOnError(ExceptionHandler::isNotFound,
+				.doOnError(ExceptionUtils::isNotFound,
 						err -> ExceptionHandler.onNotFound((ClientException) err, guildId.get()))
 				.subscribe();
 	}

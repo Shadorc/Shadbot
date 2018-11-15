@@ -1,28 +1,19 @@
-package me.shadorc.shadbot.core;
+package me.shadorc.shadbot.core.exception;
 
-import java.net.ConnectException;
-import java.net.NoRouteToHostException;
-import java.net.SocketTimeoutException;
 import java.util.Map;
-
-import org.apache.http.HttpStatus;
-import org.jsoup.HttpStatusException;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
-import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -33,63 +24,23 @@ import reactor.core.publisher.Mono;
 public class ExceptionHandler {
 
 	public static Mono<Message> handle(Throwable err, AbstractCommand cmd, Context context) {
-		if(ExceptionHandler.isCommandException(err)) {
+		if(ExceptionUtils.isCommandException(err)) {
 			return ExceptionHandler.onCommandException((CommandException) err, cmd, context);
-		}
-		if(ExceptionHandler.isMissingPermission(err)) {
+		} else if(ExceptionUtils.isMissingPermission(err)) {
 			return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, cmd, context);
-		}
-		if(ExceptionHandler.isMissingArgumentException(err)) {
+		} else if(ExceptionUtils.isMissingArgumentException(err)) {
 			return ExceptionHandler.onMissingArgumentException(cmd, context);
-		}
-		if(ExceptionHandler.isNoMusicException(err)) {
+		} else if(ExceptionUtils.isNoMusicException(err)) {
 			return ExceptionHandler.onNoMusicException(cmd, context);
-		}
-		if(ExceptionHandler.isUnavailable(err)) {
+		} else if(ExceptionUtils.isUnavailable(err)) {
 			return ExceptionHandler.onUnavailable(cmd, context);
-		}
-		if(ExceptionHandler.isUnreacheable(err)) {
+		} else if(ExceptionUtils.isUnreacheable(err)) {
 			return ExceptionHandler.onUnreacheable(cmd, context);
-		}
-		if(ExceptionHandler.isForbidden(err)) {
+		} else if(ExceptionUtils.isForbidden(err)) {
 			return ExceptionHandler.onForbidden((ClientException) err, context.getGuildId(), context.getChannel(), context.getUsername());
+		} else {
+			return ExceptionHandler.onUnknown(context.getClient(), err, cmd, context);
 		}
-		return ExceptionHandler.onUnknown(context.getClient(), err, cmd, context);
-	}
-
-	public static boolean isCommandException(Throwable err) {
-		return err instanceof CommandException;
-	}
-
-	public static boolean isMissingPermission(Throwable err) {
-		return err instanceof MissingPermissionException;
-	}
-
-	public static boolean isMissingArgumentException(Throwable err) {
-		return err instanceof MissingArgumentException;
-	}
-
-	public static boolean isNoMusicException(Throwable err) {
-		return err instanceof NoMusicException;
-	}
-
-	public static boolean isUnavailable(Throwable err) {
-		return err instanceof ConnectException
-				|| err instanceof HttpStatusException && HttpStatusException.class.cast(err).getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE;
-	}
-
-	public static boolean isUnreacheable(Throwable err) {
-		return err instanceof NoRouteToHostException || err instanceof SocketTimeoutException;
-	}
-
-	public static boolean isForbidden(Throwable err) {
-		return err instanceof ClientException
-				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
-	}
-
-	public static boolean isNotFound(Throwable err) {
-		return err instanceof ClientException
-				&& ClientException.class.cast(err).getStatus().equals(HttpResponseStatus.NOT_FOUND);
 	}
 
 	public static Mono<Message> onCommandException(CommandException err, AbstractCommand cmd, Context context) {
