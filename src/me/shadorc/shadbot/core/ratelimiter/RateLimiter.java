@@ -12,7 +12,6 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.TemporaryMessage;
 
@@ -57,7 +56,7 @@ public class RateLimiter {
 		client.getUserById(userId)
 				.map(author -> {
 					final String username = author.getUsername();
-					final String message = Utils.randValue(TextUtils.SPAM_MESSAGES);
+					final String message = TextUtils.SPAMS.getText();
 					final String maxNum = StringUtils.pluralOf(this.max, "time");
 					final String durationStr = DurationFormatUtils.formatDurationWords(this.duration.toMillis(), true, true);
 					return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",

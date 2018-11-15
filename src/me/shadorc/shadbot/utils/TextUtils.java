@@ -7,11 +7,12 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.setting.SettingEnum;
+import me.shadorc.shadbot.data.TextFile;
 import me.shadorc.shadbot.utils.object.Emoji;
 
 public class TextUtils {
 
-	public static final String MISSING_ARG = Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.";
+	public static final TextFile SPAMS = new TextFile("texts/spam.txt");
 
 	public static final String PLAYLIST_LIMIT_REACHED =
 			String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "

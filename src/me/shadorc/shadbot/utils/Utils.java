@@ -1,6 +1,10 @@
 package me.shadorc.shadbot.utils;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -122,6 +126,15 @@ public class Utils {
 	 */
 	public static <T> T randValue(T[] array) {
 		return Utils.randValue(Arrays.asList(array));
+	}
+
+	/**
+	 * @param file - The {@link File} to read
+	 * @return a String containing the content of the
+	 * @throws IOException if an I/O error occurs reading from the stream
+	 */
+	public static String read(File file) throws IOException {
+		return new String(Files.readAllBytes(file.toPath()), Charset.forName("UTF-8"));
 	}
 
 }
