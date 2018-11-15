@@ -97,6 +97,7 @@ public class Shadbot {
 		// TODO: Find a better and more consistent solution
 		Mono.delay(Duration.ofSeconds(shardCount * 8))
 				.then(Mono.fromRunnable(() -> IS_READY.set(true)))
+				.then(Mono.fromRunnable(() -> LogUtils.info("Shadbot (Version: %s) is ready", Config.VERSION)))
 				.subscribe();
 
 		// Initiate login and block
