@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.info;
 
 import java.util.List;
+import java.util.OptionalInt;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
@@ -54,11 +55,19 @@ public class InfoCmd extends AbstractCommand {
 				.flatMap(VoiceState::getChannel)
 				.count();
 
-		final Mono<Long> membersCountMono = Flux.fromIterable(Shadbot.getClients())
+		// TODO: Use this when Store#getUsers will be available
+		// final Mono<Long> membersCountMono = Flux.fromIterable(Shadbot.getClients())
+		// .flatMap(DiscordClient::getGuilds)
+		// .flatMap(Guild::getMembers)
+		// .distinct()
+		// .count();
+
+		final Mono<Integer> membersCountMono = Flux.fromIterable(Shadbot.getClients())
 				.flatMap(DiscordClient::getGuilds)
-				.flatMap(Guild::getMembers)
-				.distinct()
-				.count();
+				.map(Guild::getMemberCount)
+				.map(OptionalInt::getAsInt)
+				.collectList()
+				.map(list -> list.stream().mapToInt(Integer::intValue).sum());
 
 		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
 				Flux.fromIterable(Shadbot.getClients()).flatMap(DiscordClient::getGuilds).collectList(),
@@ -68,9 +77,9 @@ public class InfoCmd extends AbstractCommand {
 					final User owner = tuple.getT1();
 					final List<Guild> guilds = tuple.getT2();
 					final Long voiceChannelsCount = tuple.getT3();
-					final Long membersCount = tuple.getT4();
+					final Integer membersCount = tuple.getT4();
 
-					return new String("```prolog"
+					return "```prolog"
 							+ String.format("%n-= Performance Info =-")
 							+ String.format("%nMemory: %s/%s MB", FormatUtils.number(usedMemory), FormatUtils.number(maxMemory))
 							+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
@@ -87,7 +96,7 @@ public class InfoCmd extends AbstractCommand {
 							+ String.format("%nServers: %s", FormatUtils.number(guilds.size()))
 							+ String.format("%nVoice Channels: %s", FormatUtils.number(voiceChannelsCount))
 							+ String.format("%nUsers: %s", FormatUtils.number(membersCount))
-							+ "```");
+							+ "```";
 				})
 				.flatMap(loadingMsg::send)
 				.then();
