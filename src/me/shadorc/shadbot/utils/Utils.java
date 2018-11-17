@@ -117,6 +117,9 @@ public class Utils {
 	 * @return A random element from the list
 	 */
 	public static <T> T randValue(List<T> list) {
+		if(list.isEmpty()) {
+			return null;
+		}
 		return list.get(ThreadLocalRandom.current().nextInt(list.size()));
 	}
 
