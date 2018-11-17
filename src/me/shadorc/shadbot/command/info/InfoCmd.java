@@ -85,7 +85,7 @@ public class InfoCmd extends AbstractCommand {
 							+ String.format("%nShadbot Version: %s", Config.VERSION)
 							+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
 							+ String.format("%nServers: %s", FormatUtils.number(guilds.size()))
-							+ String.format("%nVoice Channels: %d", FormatUtils.number(voiceChannelsCount))
+							+ String.format("%nVoice Channels: %s", FormatUtils.number(voiceChannelsCount))
 							+ String.format("%nUsers: %s", FormatUtils.number(membersCount))
 							+ "```");
 				})
