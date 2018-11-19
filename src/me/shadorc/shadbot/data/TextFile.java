@@ -11,16 +11,15 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class TextFile {
 
-	private final File file;
 	private final List<String> texts;
 
 	public TextFile(String path) {
-		this.file = new File(path);
 		this.texts = new ArrayList<>();
 
-		if(this.file.exists()) {
+		final File file = new File(path);
+		if(file.exists()) {
 			try {
-				this.texts.addAll(Arrays.asList(Utils.read(this.file).split("\n")));
+				this.texts.addAll(Arrays.asList(Utils.read(file).split("\n")));
 			} catch (IOException err) {
 				LogUtils.error(err, String.format("An error occurred while reading text file: %s", file.getPath()));
 			}
