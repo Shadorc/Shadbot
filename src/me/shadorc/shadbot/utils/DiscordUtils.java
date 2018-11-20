@@ -6,9 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.jsoup.Connection.Method;
@@ -94,12 +91,13 @@ public class DiscordUtils {
 	}
 
 	/**
-	 * @param homeUrl - the statistics site URL
-	 * @param token - the API token corresponding to the website
+	 * @param homeUrl - the home URL of the statistics site
+	 * @param token - the API token corresponding to the URL
 	 * @param client - the client from which to post statistics
 	 */
 	private static Mono<Void> postStatsOn(DiscordClient client, String homeUrl, APIKey token) {
-		return client.getGuilds().count()
+		return client.getGuilds()
+				.count()
 				.doOnSuccess(guildsCount -> {
 					final JSONObject content = new JSONObject()
 							.put("shard_id", client.getConfig().getShardIndex())
@@ -109,11 +107,11 @@ public class DiscordUtils {
 
 					try {
 						Jsoup.connect(url)
-								.method(Method.POST)
-								.ignoreContentType(true)
-								.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
-								.requestBody(content.toString())
-								.post();
+							.method(Method.POST)
+							.ignoreContentType(true)
+							.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
+							.requestBody(content.toString())
+							.post();
 					} catch (IOException err) {
 						Exceptions.propagate(err);
 					}
@@ -121,39 +119,32 @@ public class DiscordUtils {
 				.then();
 	}
 
-	public static Flux<Snowflake> extractRoles(Message message) {
-		final List<String> words = StringUtils.split(message.getContent().orElse("")).stream()
-				.map(word -> word.replace("@", ""))
-				.collect(Collectors.toList());
-
-		return message.getGuild()
-				.flatMapMany(Guild::getRoles)
-				.filter(role -> words.contains(role.getName()))
+	/**
+	 * @param guild - a {@link Guild} {@link Mono} containing the roles to extract
+	 * @param content - a string containing role mentions / names
+	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles
+	 */
+	public static Flux<Snowflake> extractRoles(Mono<Guild> guild, String content) {
+		final List<String> words = StringUtils.split(content);
+		return guild.flatMapMany(Guild::getRoles)
+				.filter(role -> words.contains(String.format("@%s", role.getName()))
+						|| words.contains(role.getMention()))
 				.map(Role::getId)
-				.concatWith(Flux.fromIterable(message.getRoleMentionIds()));
+				.distinct();
 	}
-
-	public static Flux<Snowflake> extractChannels(Message message) {
-		final String content = message.getContent().orElse("");
-		final List<String> words = StringUtils.split(content).stream()
-				.map(String::toLowerCase)
-				.map(word -> word.replace("#", ""))
-				.collect(Collectors.toList());
-
-		return message.getGuild()
-				.flatMapMany(Guild::getChannels)
-				.filter(channel -> words.contains(channel.getName()))
+	
+	/**
+	 * @param guild - a {@link Guild} {@link Mono} containing the channels to extract
+	 * @param content - a string containing channels mentions / names
+	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels
+	 */
+	public static Flux<Snowflake> extractChannels(Mono<Guild> guild, String content) {
+		final List<String> words = StringUtils.split(content);
+		return guild.flatMapMany(Guild::getChannels)
+				.filter(channel -> words.contains(String.format("#%s", channel.getName()))
+						|| words.contains(DiscordUtils.getChannelMention(channel.getId())))
 				.map(GuildChannel::getId)
-				.concatWith(Flux.fromIterable(DiscordUtils.extractChannelMentions(content)));
-	}
-
-	private static List<Snowflake> extractChannelMentions(String content) {
-		final Matcher matcher = Pattern.compile("<#([0-9]{1,19})>").matcher(content);
-		final List<Snowflake> channelMentions = new ArrayList<>();
-		while(matcher.find()) {
-			channelMentions.add(Snowflake.of(matcher.group(1)));
-		}
-		return channelMentions.stream().distinct().collect(Collectors.toList());
+				.distinct();
 	}
 
 	/**
@@ -163,18 +154,18 @@ public class DiscordUtils {
 	 */
 	public static Mono<Integer> bulkDelete(Mono<TextChannel> channel, List<Message> messages) {
 		switch (messages.size()) {
-			case 0:
-				return Mono.just(messages.size());
-			case 1:
-				return messages.get(0)
-						.delete()
-						.thenReturn(messages.size());
-			default:
-				return channel
-						.flatMap(channelItr -> channelItr.bulkDelete(Flux.fromIterable(messages)
-								.map(Message::getId))
-								.collectList()
-								.map(messagesNotDeleted -> messages.size() - messagesNotDeleted.size()));
+		case 0:
+			return Mono.just(messages.size());
+		case 1:
+			return messages.get(0)
+					.delete()
+					.thenReturn(messages.size());
+		default:
+			return channel
+					.flatMap(channelItr -> channelItr.bulkDelete(Flux.fromIterable(messages)
+							.map(Message::getId))
+							.collectList()
+							.map(messagesNotDeleted -> messages.size() - messagesNotDeleted.size()));
 		}
 	}
 
