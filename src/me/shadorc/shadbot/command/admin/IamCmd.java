@@ -34,31 +34,35 @@ public class IamCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
-				.then(Mono.zip(DiscordUtils.extractRoles(context.getMessage())
-						.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-						.collectList(),
-						context.getAvatarUrl()))
+		final String arg = context.requireArg();
+		
+		final List<String> quotedElements = StringUtils.getQuotedElements(arg);
+		if (quotedElements.size() == 0 && arg.contains("\"")) {
+			throw new CommandException("One quotation mark is missing.");
+		}
+		if (quotedElements.size() > 1) {
+			throw new CommandException("You should specify only one text in quotation marks.");
+		}
+		
+		final Mono<List<Role>> rolesMono = DiscordUtils.extractRoles(context.getGuild(), StringUtils.remove(arg, quotedElements))
+				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
+				.collectList();
+		
+		return DiscordUtils
+				.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.MANAGE_ROLES,
+						Permission.ADD_REACTIONS)
+				.then(Mono.zip(rolesMono, context.getAvatarUrl()))
 				.flatMap(tuple -> {
 					final List<Role> roles = tuple.getT1();
 					final String avatarUrl = tuple.getT2();
-
-					final List<String> quotedElements = StringUtils.getQuotedElements(context.getArg().orElse(""));
-					if(quotedElements.size() == 0 && context.getContent().contains("\"")) {
-						throw new CommandException("One quotation mark is missing.");
-					}
-					if(quotedElements.size() > 1) {
-						throw new CommandException("You should specify only one text in quotation marks.");
-					}
-
-					if(roles.isEmpty()) {
+					
+					if (roles.isEmpty()) {
 						throw new MissingArgumentException();
 					}
 
 					final StringBuilder description = new StringBuilder();
-					if(quotedElements.size() == 0) {
-						description.append(String.format("Click on %s to get role(s): %s",
-								REACTION.getRaw(),
+					if (quotedElements.size() == 0) {
+						description.append(String.format("Click on %s to get role(s): %s", REACTION.getRaw(),
 								FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
 					} else {
 						description.append(quotedElements.get(0));
@@ -66,7 +70,8 @@ public class IamCmd extends AbstractCommand {
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor(String.format("Iam: %s",
-									FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")), null, avatarUrl)
+									FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
+									null, avatarUrl)
 							.setDescription(description.toString());
 
 					return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
@@ -74,24 +79,19 @@ public class IamCmd extends AbstractCommand {
 							.doOnSuccess(message -> {
 								final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
 								final Map<String, Long> setting = dbGuild.getIamMessages();
-								roles.stream()
-										.map(Role::getId)
+								roles.stream().map(Role::getId)
 										.forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));
 								dbGuild.setSetting(SettingEnum.IAM_MESSAGES, setting);
 							});
-				})
-				.then();
+				}).then();
 	}
 
 	@Override
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
-				.setDescription(
-						String.format("Send a message with a reaction, users will be able to get the role(s) "
-								+ "associated with the message by clicking on %s", REACTION.getRaw()))
-				.addArg("@role(s)", false)
-				.addArg("\"text\"", "Replace the default text", true)
-				.build();
+				.setDescription(String.format("Send a message with a reaction, users will be able to get the role(s) "
+						+ "associated with the message by clicking on %s", REACTION.getRaw()))
+				.addArg("@role(s)", false).addArg("\"text\"", "Replace the default text", true).build();
 	}
 
 }
