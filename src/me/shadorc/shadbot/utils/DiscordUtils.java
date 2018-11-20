@@ -107,11 +107,11 @@ public class DiscordUtils {
 
 					try {
 						Jsoup.connect(url)
-							.method(Method.POST)
-							.ignoreContentType(true)
-							.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
-							.requestBody(content.toString())
-							.post();
+								.method(Method.POST)
+								.ignoreContentType(true)
+								.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
+								.requestBody(content.toString())
+								.post();
 					} catch (IOException err) {
 						Exceptions.propagate(err);
 					}
@@ -132,7 +132,7 @@ public class DiscordUtils {
 				.map(Role::getId)
 				.distinct();
 	}
-	
+
 	/**
 	 * @param guild - a {@link Guild} {@link Mono} containing the channels to extract
 	 * @param content - a string containing channels mentions / names
@@ -154,18 +154,18 @@ public class DiscordUtils {
 	 */
 	public static Mono<Integer> bulkDelete(Mono<TextChannel> channel, List<Message> messages) {
 		switch (messages.size()) {
-		case 0:
-			return Mono.just(messages.size());
-		case 1:
-			return messages.get(0)
-					.delete()
-					.thenReturn(messages.size());
-		default:
-			return channel
-					.flatMap(channelItr -> channelItr.bulkDelete(Flux.fromIterable(messages)
-							.map(Message::getId))
-							.collectList()
-							.map(messagesNotDeleted -> messages.size() - messagesNotDeleted.size()));
+			case 0:
+				return Mono.just(messages.size());
+			case 1:
+				return messages.get(0)
+						.delete()
+						.thenReturn(messages.size());
+			default:
+				return channel
+						.flatMap(channelItr -> channelItr.bulkDelete(Flux.fromIterable(messages)
+								.map(Message::getId))
+								.collectList()
+								.map(messagesNotDeleted -> messages.size() - messagesNotDeleted.size()));
 		}
 	}
 

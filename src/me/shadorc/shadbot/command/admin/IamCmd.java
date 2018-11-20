@@ -35,19 +35,19 @@ public class IamCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
-		
+
 		final List<String> quotedElements = StringUtils.getQuotedElements(arg);
-		if (quotedElements.size() == 0 && arg.contains("\"")) {
+		if(quotedElements.size() == 0 && arg.contains("\"")) {
 			throw new CommandException("One quotation mark is missing.");
 		}
-		if (quotedElements.size() > 1) {
+		if(quotedElements.size() > 1) {
 			throw new CommandException("You should specify only one text in quotation marks.");
 		}
-		
+
 		final Mono<List<Role>> rolesMono = DiscordUtils.extractRoles(context.getGuild(), StringUtils.remove(arg, quotedElements))
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 				.collectList();
-		
+
 		return DiscordUtils
 				.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.MANAGE_ROLES,
 						Permission.ADD_REACTIONS)
@@ -55,13 +55,13 @@ public class IamCmd extends AbstractCommand {
 				.flatMap(tuple -> {
 					final List<Role> roles = tuple.getT1();
 					final String avatarUrl = tuple.getT2();
-					
-					if (roles.isEmpty()) {
+
+					if(roles.isEmpty()) {
 						throw new MissingArgumentException();
 					}
 
 					final StringBuilder description = new StringBuilder();
-					if (quotedElements.size() == 0) {
+					if(quotedElements.size() == 0) {
 						description.append(String.format("Click on %s to get role(s): %s", REACTION.getRaw(),
 								FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
 					} else {

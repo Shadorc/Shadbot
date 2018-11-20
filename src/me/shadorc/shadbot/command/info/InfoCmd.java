@@ -50,7 +50,7 @@ public class InfoCmd extends AbstractCommand {
 				.flatMap(Member::getVoiceState)
 				.flatMap(VoiceState::getChannel)
 				.count();
-		
+
 		final Mono<Long> guildsCountMono = Flux.fromIterable(Shadbot.getClients())
 				.flatMap(DiscordClient::getGuilds)
 				.count();
