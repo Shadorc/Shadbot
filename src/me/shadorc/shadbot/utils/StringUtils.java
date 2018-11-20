@@ -19,7 +19,9 @@ public class StringUtils {
 	 *         empty results
 	 */
 	public static List<String> split(String str, int limit, String delimiter) {
-		return Arrays.stream(str.split(delimiter, limit)).map(String::trim).filter(word -> !word.isEmpty())
+		return Arrays.stream(str.split(delimiter, limit))
+				.map(String::trim)
+				.filter(word -> !word.isEmpty())
 				.collect(Collectors.toList());
 	}
 
