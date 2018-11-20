@@ -49,7 +49,7 @@ public class LyricsCmd extends AbstractCommand {
 			// Make a direct search with the artist and the title
 			String url = String.format("%s/lyrics/%s/%s", HOME_URL, artist, title);
 			Response response = this.getLyricsResponse(context.getClient(), url);
-			
+
 			// If the direct search found nothing
 			if(response.statusCode() == HttpStatus.SC_NOT_FOUND || response.body().contains("Oops! We couldn't find that page.")) {
 				url = this.getCorrectedUrl(artist, title);
@@ -60,14 +60,14 @@ public class LyricsCmd extends AbstractCommand {
 				}
 				response = this.getLyricsResponse(context.getClient(), url);
 			}
-			
+
 			final Document doc = response.parse().outputSettings(PRESERVE_FORMAT);
 			final Musixmatch musixmatch = new Musixmatch(doc);
 			final String finalUrl = url;
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Lyrics: %s - %s", 
+							.setAuthor(String.format("Lyrics: %s - %s",
 									musixmatch.getArtist(), musixmatch.getTitle()), finalUrl, avatarUrl)
 							.setThumbnail(musixmatch.getImageUrl())
 							.setDescription(musixmatch.getLyrics())
@@ -80,7 +80,7 @@ public class LyricsCmd extends AbstractCommand {
 			throw Exceptions.propagate(err);
 		}
 	}
-	
+
 	private final Response getLyricsResponse(DiscordClient client, String url) throws IOException {
 		// Sometimes Musixmatch redirects to a wrong page
 		// If the response URL and the requested URL are different, retry
@@ -92,14 +92,14 @@ public class LyricsCmd extends AbstractCommand {
 						this.getClass().getSimpleName()));
 				throw new HttpStatusException("Musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
 			}
-			
+
 			response = NetUtils.getResponse(url);
 			retryCount++;
 		} while(!response.url().toString().equalsIgnoreCase(url));
 
 		return response;
 	}
-	
+
 	private final String getCorrectedUrl(String artist, String title) throws IOException {
 		final String url = String.format("%s/search/%s-%s?", HOME_URL, artist, title);
 
