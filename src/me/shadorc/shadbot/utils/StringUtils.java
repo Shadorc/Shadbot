@@ -100,7 +100,9 @@ public class StringUtils {
 	 * @return The resulting {@code String}
 	 */
 	public static String remove(String str, String... toRemove) {
-		return str.replaceAll(Arrays.stream(toRemove).filter(replacement -> !replacement.isEmpty()).map(Pattern::quote)
+		return str.replaceAll(Arrays.stream(toRemove)
+				.filter(replacement -> !replacement.isEmpty())
+				.map(Pattern::quote)
 				.collect(Collectors.joining("|")), "");
 	}
 	
