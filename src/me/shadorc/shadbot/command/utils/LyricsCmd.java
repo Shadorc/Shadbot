@@ -101,7 +101,7 @@ public class LyricsCmd extends AbstractCommand {
 	}
 
 	private final String getCorrectedUrl(String artist, String title) throws IOException {
-		final String url = String.format("%s/search/%s-%s?", HOME_URL, artist, title);
+		final String url = String.format("%s/search/%s-%s", HOME_URL, artist, title);
 
 		// Make a search request on the site
 		final Document doc = NetUtils.getDoc(url);
