@@ -8,7 +8,7 @@ import me.shadorc.shadbot.utils.NetUtils;
 
 public class Musixmatch {
 
-	private static final int MAX_LYRICS_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 2;
+	private static final int MAX_LYRICS_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 3;
 
 	private final Document document;
 
