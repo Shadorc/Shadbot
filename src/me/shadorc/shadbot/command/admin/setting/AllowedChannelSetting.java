@@ -9,12 +9,12 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -51,7 +51,7 @@ public class AllowedChannelSetting extends AbstractSetting {
 						throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
 					}
 
-					final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
+					final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 					final List<Snowflake> allowedTextChannels = dbGuild.getAllowedTextChannels();
 					final List<Snowflake> allowedVoiceChannels = dbGuild.getAllowedVoiceChannels();
 

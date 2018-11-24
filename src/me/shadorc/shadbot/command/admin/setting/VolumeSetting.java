@@ -4,11 +4,11 @@ import java.util.List;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -32,7 +32,7 @@ public class VolumeSetting extends AbstractSetting {
 					args.get(1), MIN_VOLUME, MAX_VOLUME));
 		}
 
-		DatabaseManager.getDBGuild(context.getGuildId()).setSetting(this.getSetting(), volume);
+		Shadbot.getDatabase().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), volume);
 		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), context.getChannel()).then();
 	}
 

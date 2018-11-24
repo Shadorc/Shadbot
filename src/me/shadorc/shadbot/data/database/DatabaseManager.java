@@ -1,40 +1,36 @@
 package me.shadorc.shadbot.data.database;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.databind.JavaType;
 
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.data.DataManager;
-import me.shadorc.shadbot.data.annotation.DataInit;
-import me.shadorc.shadbot.data.annotation.DataSave;
+import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.utils.Utils;
 
-public class DatabaseManager {
+public class DatabaseManager extends Data {
 
-	private static final File FILE = new File(DataManager.SAVE_DIR, "database.json");
+	private final List<DBGuild> guilds;
 
-	private static CopyOnWriteArrayList<DBGuild> guilds;
+	public DatabaseManager() throws IOException {
+		super("database.json", Duration.ofMinutes(15), Duration.ofMinutes(15));
 
-	@DataInit
-	public static void init() throws IOException {
 		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(CopyOnWriteArrayList.class, DBGuild.class);
-		guilds = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new CopyOnWriteArrayList<>();
+		this.guilds = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), valueType) : new CopyOnWriteArrayList<>();
 	}
 
-	@DataSave(initialDelay = 15, period = 15, unit = ChronoUnit.MINUTES)
-	public static void save() throws IOException {
-		try (FileWriter writer = new FileWriter(FILE)) {
+	public void write() throws IOException {
+		try (FileWriter writer = new FileWriter(this.getFile())) {
 			writer.write(Utils.MAPPER.writeValueAsString(guilds));
 		}
 	}
 
-	public static DBGuild getDBGuild(Snowflake guildId) {
+	public DBGuild getDBGuild(Snowflake guildId) {
 		final Optional<DBGuild> dbGuildOpt = guilds.stream()
 				.filter(guild -> guild.getId().equals(guildId))
 				.findFirst();
@@ -48,8 +44,8 @@ public class DatabaseManager {
 		return dbGuild;
 	}
 
-	public static DBMember getDBMember(Snowflake guildId, Snowflake memberId) {
-		final Optional<DBMember> dbMemberOpt = DatabaseManager.getDBGuild(guildId)
+	public DBMember getDBMember(Snowflake guildId, Snowflake memberId) {
+		final Optional<DBMember> dbMemberOpt = this.getDBGuild(guildId)
 				.getMembers()
 				.stream()
 				.filter(member -> member.getId().equals(memberId))
@@ -60,7 +56,7 @@ public class DatabaseManager {
 		}
 
 		final DBMember dbMember = new DBMember(guildId, memberId);
-		DatabaseManager.getDBGuild(guildId).addMember(dbMember);
+		this.getDBGuild(guildId).addMember(dbMember);
 		return dbMember;
 	}
 

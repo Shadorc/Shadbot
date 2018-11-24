@@ -1,13 +1,13 @@
 package me.shadorc.shadbot.command.currency;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBMember;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -25,7 +25,7 @@ public class CoinsCmd extends AbstractCommand {
 				.switchIfEmpty(context.getAuthor())
 				.next()
 				.flatMap(user -> {
-					final DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId(), user.getId());
+					final DBMember dbMember = Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId());
 					final String coins = FormatUtils.coins(dbMember.getCoins());
 
 					String text;

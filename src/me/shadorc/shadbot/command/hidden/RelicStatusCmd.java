@@ -6,11 +6,11 @@ import java.util.concurrent.TimeUnit;
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -26,7 +26,7 @@ public class RelicStatusCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final List<Relic> relics = PremiumManager.getRelicsForUser(context.getAuthorId());
+		final List<Relic> relics = Shadbot.getPremium().getRelicsForUser(context.getAuthorId());
 		if(relics.isEmpty()) {
 			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
 					+ "you can help me keep it alive by making a donation on **%s**."

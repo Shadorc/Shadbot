@@ -16,10 +16,10 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.core.exception.ExceptionUtils;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
@@ -88,7 +88,7 @@ public class CommandProcessor {
 				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
 				// The message has not been intercepted
 				.filterWhen(roles -> MessageInterceptorManager.isIntercepted(event).map(BooleanUtils::negate))
-				.map(roles -> DatabaseManager.getDBGuild(guildId.get()).getPrefix())
+				.map(roles -> Shadbot.getDatabase().getDBGuild(guildId.get()).getPrefix())
 				// The message starts with the correct prefix
 				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
 				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)))

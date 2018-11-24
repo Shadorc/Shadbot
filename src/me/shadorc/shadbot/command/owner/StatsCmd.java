@@ -11,7 +11,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.data.stats.StatsManager.StatisticEnum;
+import me.shadorc.shadbot.data.stats.StatisticEnum;
 import me.shadorc.shadbot.data.stats.core.MapStatistic;
 import me.shadorc.shadbot.data.stats.core.TableStatistic;
 import me.shadorc.shadbot.exception.CommandException;

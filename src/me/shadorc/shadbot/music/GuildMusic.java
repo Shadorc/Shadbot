@@ -15,7 +15,7 @@
 // import discord4j.voice.AudioProvider;
 // import discord4j.voice.AudioReceiver;
 // import me.shadorc.shadbot.Config;
-// import me.shadorc.shadbot.data.database.DatabaseManager;
+// import me.shadorc.shadbot.data.database.Main.getDatabase();
 // import me.shadorc.shadbot.data.premium.PremiumManager;
 // import me.shadorc.shadbot.listener.music.AudioEventListener;
 // import me.shadorc.shadbot.utils.BotUtils;
@@ -47,7 +47,7 @@
 // audioPlayer.addListener(new AudioEventListener(this));
 // this.audioProvider = new MusicProvider(audioPlayer, this);
 // this.audioReceiver = new MusicReceiver();
-// this.trackScheduler = new TrackScheduler(audioPlayer, DatabaseManager.getDBGuild(guildId).getDefaultVol());
+// this.trackScheduler = new TrackScheduler(audioPlayer, Main.getDatabase().getDBGuild(guildId).getDefaultVol());
 // }
 //
 // public void scheduleLeave() {

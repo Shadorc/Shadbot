@@ -1,13 +1,13 @@
 package me.shadorc.shadbot.command.game.rps;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.exception.CommandException;
@@ -42,7 +42,7 @@ public class RpsCmd extends AbstractCommand {
 			strBuilder.append("It's a draw !");
 		} else if(userHandsign.isSuperior(botHandsign)) {
 			strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you won **%d coins**.", context.getUsername(), GAINS));
-			DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(GAINS);
+			Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(GAINS);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
 		} else {
 			strBuilder.append("I win !");

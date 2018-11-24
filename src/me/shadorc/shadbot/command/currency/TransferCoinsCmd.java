@@ -7,13 +7,13 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBMember;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -48,12 +48,12 @@ public class TransferCoinsCmd extends AbstractCommand {
 					String.format("`%s` is not a valid amount for coins.", args.get(0)));
 		}
 
-		final DBMember dbSender = DatabaseManager.getDBMember(context.getGuildId(), senderUserId);
+		final DBMember dbSender = Shadbot.getDatabase().getDBMember(context.getGuildId(), senderUserId);
 		if(dbSender.getCoins() < coins) {
 			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
 		}
 
-		final DBMember dbReceiver = DatabaseManager.getDBMember(context.getGuildId(), receiverUserId);
+		final DBMember dbReceiver = Shadbot.getDatabase().getDBMember(context.getGuildId(), receiverUserId);
 		if(dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
 			return context.getClient().getUserById(receiverUserId)
 					.flatMap(user -> BotUtils.sendMessage(String.format(

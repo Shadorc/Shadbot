@@ -10,8 +10,8 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.database.DBGuild;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 public class MemberListener {
 
 	public static void onMemberJoin(MemberJoinEvent event) {
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(event.getGuildId());
+		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId());
 
 		MemberListener.sendAutoMsg(event.getClient(), event.getMember(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage());
 
@@ -33,7 +33,7 @@ public class MemberListener {
 	}
 
 	public static void onMemberLeave(MemberLeaveEvent event) {
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(event.getGuildId());
+		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId());
 		MemberListener.sendAutoMsg(event.getClient(), event.getUser(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage());
 	}
 

@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.game.slotmachine;
 import java.util.List;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -10,8 +11,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.database.DBMember;
-import me.shadorc.shadbot.data.database.DatabaseManager;
-import me.shadorc.shadbot.data.lotto.LottoManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.exception.CommandException;
@@ -36,7 +35,7 @@ public class SlotMachineCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final DBMember dbMember = DatabaseManager.getDBMember(context.getGuildId(), context.getAuthorId());
+		final DBMember dbMember = Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId());
 
 		if(dbMember.getCoins() < PAID_COST) {
 			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
@@ -50,7 +49,7 @@ public class SlotMachineCmd extends AbstractCommand {
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
 		} else {
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
-			LottoManager.getLotto().addToJackpot(Math.abs(gains));
+			Shadbot.getLotto().addToJackpot(Math.abs(gains));
 		}
 
 		return BotUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",

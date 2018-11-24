@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
@@ -111,7 +111,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 			final float imagesRemaining = IMG_LIST.size() - this.failsCount;
 			final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
 
-			DatabaseManager.getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
+			Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
 
 			text = String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",

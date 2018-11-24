@@ -1,5 +1,6 @@
 package me.shadorc.shadbot;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -28,9 +29,12 @@ import discord4j.core.object.presence.Presence;
 import discord4j.gateway.SimpleBucket;
 import me.shadorc.shadbot.command.game.LottoCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
-import me.shadorc.shadbot.data.APIKeys;
-import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.data.DataManager;
+import me.shadorc.shadbot.data.apikey.APIKey;
+import me.shadorc.shadbot.data.apikey.APIKeys;
+import me.shadorc.shadbot.data.database.DatabaseManager;
+import me.shadorc.shadbot.data.lotto.Lotto;
+import me.shadorc.shadbot.data.lotto.LottoManager;
+import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.ChannelListener;
 import me.shadorc.shadbot.listener.GatewayLifecycleListener;
 import me.shadorc.shadbot.listener.GuildListener;
@@ -51,20 +55,35 @@ public class Shadbot {
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 	private static final AtomicBoolean IS_READY = new AtomicBoolean(false);
 
+	private static PremiumManager premiumManager;
+	private static DatabaseManager databaseManager;
+	private static LottoManager lottoManager;
+	private static APIKeys apiKeysManager;
+
 	public static void main(String[] args) {
 		// Enable full Reactor stack-traces
 		Hooks.onOperatorDebug();
 		// Set default to Locale US
 		Locale.setDefault(Locale.US);
 
-		// If file loading or command generation has failed, abort attempt to connect the bot
-		if(!DataManager.init() || !CommandInitializer.init()) {
+		try {
+			Shadbot.premiumManager = new PremiumManager();
+			Shadbot.databaseManager = new DatabaseManager();
+			Shadbot.lottoManager = new LottoManager();
+			Shadbot.apiKeysManager = new APIKeys();
+		} catch (IOException err) {
+			LogUtils.error(err, "A fatal error occurred while initializing managers.");
 			System.exit(ExitCode.FATAL_ERROR.value());
 		}
 
-		Runtime.getRuntime().addShutdownHook(new Thread(DataManager::stop));
+		// If command generation has failed, abort attempt to connect the bot
+		if(!CommandInitializer.init()) {
+			System.exit(ExitCode.FATAL_ERROR.value());
+		}
 
-		final int shardCount = 11;
+		Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
+
+		final int shardCount = 1;
 		final DiscordClientBuilder builder = new DiscordClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
 				.setShardCount(shardCount)
@@ -103,21 +122,14 @@ public class Shadbot {
 				.subscribe();
 
 		// Initiate login and block
-		Mono.when(CLIENTS.stream().map(DiscordClient::login).collect(Collectors.toList())).block();
+		Mono.when(Shadbot.CLIENTS.stream().map(DiscordClient::login).collect(Collectors.toList())).block();
 	}
 
-	private static void logout() {
-		CLIENTS.forEach(DiscordClient::logout);
-	}
-
-	public static void quit() {
-		Shadbot.logout();
-		System.exit(ExitCode.NORMAL.value());
-	}
-
-	public static void restart() {
-		Shadbot.logout();
-		System.exit(ExitCode.RESTART.value());
+	/**
+	 * @return true when the bot is connected to all its guilds, false otherwise
+	 */
+	public static boolean isReady() {
+		return IS_READY.get();
 	}
 
 	/**
@@ -134,17 +146,47 @@ public class Shadbot {
 		return CLIENTS;
 	}
 
-	/**
-	 * @return true when the bot is connected to all its guilds, false otherwise
-	 */
-	public static boolean isReady() {
-		return IS_READY.get();
+	public static PremiumManager getPremium() {
+		return premiumManager;
+	}
+
+	public static DatabaseManager getDatabase() {
+		return databaseManager;
+	}
+
+	public static Lotto getLotto() {
+		return lottoManager.getLotto();
+	}
+
+	public static APIKeys getAPIKeys() {
+		return apiKeysManager;
 	}
 
 	private static <T extends Event> void register(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
-		client.getEventDispatcher().on(eventClass)
+		client.getEventDispatcher()
+				.on(eventClass)
 				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
 				.subscribe(consumer);
+	}
+
+	private static void save() {
+		premiumManager.save();
+		databaseManager.save();
+		lottoManager.save();
+	}
+
+	private static void logout() {
+		CLIENTS.forEach(DiscordClient::logout);
+	}
+
+	public static void restart() {
+		Shadbot.logout();
+		System.exit(ExitCode.RESTART.value());
+	}
+
+	public static void quit() {
+		Shadbot.logout();
+		System.exit(ExitCode.NORMAL.value());
 	}
 
 }

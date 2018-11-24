@@ -1,35 +1,30 @@
 package me.shadorc.shadbot.data.lotto;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
 
-import me.shadorc.shadbot.data.DataManager;
-import me.shadorc.shadbot.data.annotation.DataInit;
-import me.shadorc.shadbot.data.annotation.DataSave;
+import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.utils.Utils;
 
-public class LottoManager {
+public class LottoManager extends Data {
 
-	private static final File FILE = new File(DataManager.SAVE_DIR, "lotto_data.json");
+	private Lotto lotto;
 
-	private static Lotto lotto;
+	public LottoManager() throws IOException {
+		super("lotto_data.json", Duration.ofMinutes(30), Duration.ofMinutes(30));
 
-	@DataInit
-	public static void init() throws IOException {
-		lotto = FILE.exists() ? Utils.MAPPER.readValue(FILE, Lotto.class) : new Lotto();
+		this.lotto = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), Lotto.class) : new Lotto();
 	}
 
-	@DataSave(initialDelay = 30, period = 30, unit = ChronoUnit.MINUTES)
-	public static void save() throws IOException {
-		try (FileWriter writer = new FileWriter(FILE)) {
+	public void write() throws IOException {
+		try (FileWriter writer = new FileWriter(this.getFile())) {
 			writer.write(Utils.MAPPER.writeValueAsString(lotto));
 		}
 	}
 
-	public static Lotto getLotto() {
-		return lotto;
+	public Lotto getLotto() {
+		return this.lotto;
 	}
 
 }

@@ -9,8 +9,8 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import reactor.core.publisher.Mono;
@@ -40,7 +40,7 @@ public class BotUtils {
 	}
 
 	public static boolean hasAllowedRole(Snowflake guildId, List<Role> roles) {
-		final List<Snowflake> allowedRoles = DatabaseManager.getDBGuild(guildId).getAllowedRoles();
+		final List<Snowflake> allowedRoles = Shadbot.getDatabase().getDBGuild(guildId).getAllowedRoles();
 		// If the user is an administrator OR no permissions have been set OR the role is allowed
 		return allowedRoles.isEmpty()
 				|| roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
@@ -48,19 +48,19 @@ public class BotUtils {
 	}
 
 	public static boolean isTextChannelAllowed(Snowflake guildId, Snowflake channelId) {
-		final List<Snowflake> allowedTextChannels = DatabaseManager.getDBGuild(guildId).getAllowedTextChannels();
+		final List<Snowflake> allowedTextChannels = Shadbot.getDatabase().getDBGuild(guildId).getAllowedTextChannels();
 		// If no permission has been set OR the text channel is allowed
 		return allowedTextChannels.isEmpty() || allowedTextChannels.contains(channelId);
 	}
 
 	public static boolean isVoiceChannelAllowed(Snowflake guildId, Snowflake channelId) {
-		final List<Snowflake> allowedVoiceChannels = DatabaseManager.getDBGuild(guildId).getAllowedVoiceChannels();
+		final List<Snowflake> allowedVoiceChannels = Shadbot.getDatabase().getDBGuild(guildId).getAllowedVoiceChannels();
 		// If no permission has been set OR the voice channel is allowed
 		return allowedVoiceChannels.isEmpty() || allowedVoiceChannels.contains(channelId);
 	}
 
 	public static boolean isCommandAllowed(Snowflake guildId, AbstractCommand cmd) {
-		final List<String> blacklistedCmd = DatabaseManager.getDBGuild(guildId).getBlacklistedCmd();
+		final List<String> blacklistedCmd = Shadbot.getDatabase().getDBGuild(guildId).getBlacklistedCmd();
 		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
 	}
 

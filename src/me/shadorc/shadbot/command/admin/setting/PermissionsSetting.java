@@ -7,12 +7,12 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -44,7 +44,7 @@ public class PermissionsSetting extends AbstractSetting {
 			throw new MissingArgumentException();
 		}
 
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
+		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 		final List<Snowflake> allowedRoles = dbGuild.getAllowedRoles();
 
 		Mono<Message> message;

@@ -4,13 +4,13 @@ import java.util.Comparator;
 
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBMember;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -28,7 +28,7 @@ public class LeaderboardCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		return Flux.fromIterable(DatabaseManager.getDBGuild(context.getGuildId()).getMembers())
+		return Flux.fromIterable(Shadbot.getDatabase().getDBGuild(context.getGuildId()).getMembers())
 				.filter(dbMember -> dbMember.getCoins() > 0)
 				.sort(COMPARATOR.reversed())
 				.take(10)

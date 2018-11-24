@@ -13,6 +13,7 @@ import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -22,7 +23,6 @@ import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -99,7 +99,7 @@ public class SettingsCmd extends AbstractCommand {
 	}
 
 	private Mono<EmbedCreateSpec> show(Context context) {
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
+		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 		final StringBuilder settingsStr = new StringBuilder();
 
 		if(!dbGuild.getPrefix().equals(Config.DEFAULT_PREFIX)) {

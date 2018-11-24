@@ -11,11 +11,11 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.trivia.TriviaResponse;
 import me.shadorc.shadbot.api.trivia.TriviaResult;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
@@ -95,7 +95,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		final long remainingSec = LIMITED_TIME - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(this.startTime));
 		final int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
 
-		DatabaseManager.getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
+		Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
 		StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
 
 		this.stop();

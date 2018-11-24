@@ -19,7 +19,7 @@
 // import me.shadorc.shadbot.Config;
 // import me.shadorc.shadbot.core.ExceptionHandler;
 // import me.shadorc.shadbot.core.command.CommandInitializer;
-// import me.shadorc.shadbot.data.database.DatabaseManager;
+// import me.shadorc.shadbot.data.database.Main.getDatabase();
 // import me.shadorc.shadbot.data.premium.PremiumManager;
 // import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 // import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
@@ -144,7 +144,7 @@
 // + "\nExample: 1,3,4"
 // + "\n\n" + choices)
 // .setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-// DatabaseManager.getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
+// Main.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
 // .flatMap(embed -> BotUtils.sendMessage(embed, this.guildMusic.getMessageChannel()))
 // .doOnError(ExceptionHandler::isForbidden, error -> LogUtils.cannotSpeak(this.getClass(), this.guildMusic.getGuildId()))
 // .then(Mono.fromRunnable(() -> {
@@ -182,7 +182,7 @@
 // final String content = event.getMessage().getContent().get();
 // final Snowflake authorId = member.getId();
 //
-// final String prefix = DatabaseManager.getDBGuild(this.guildMusic.getGuildId()).getPrefix();
+// final String prefix = Main.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix();
 // if(content.equals(String.format("%scancel", prefix))) {
 // this.stopWaiting();
 // return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",

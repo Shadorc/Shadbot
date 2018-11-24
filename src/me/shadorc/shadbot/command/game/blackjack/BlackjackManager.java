@@ -13,11 +13,10 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import me.shadorc.shadbot.data.database.DatabaseManager;
-import me.shadorc.shadbot.data.lotto.LottoManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
@@ -153,12 +152,12 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 						case -1:
 							gains -= player.getBet();
 							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
-							LottoManager.getLotto().addToJackpot(Math.abs(gains));
+							Shadbot.getLotto().addToJackpot(Math.abs(gains));
 							text = String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
 							break;
 					}
 
-					DatabaseManager.getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
+					Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
 					return text;
 				})
 				.collectList()
@@ -203,7 +202,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 										.thenReturn(false);
 							}
 
-							final String prefix = DatabaseManager.getDBGuild(event.getGuildId().get()).getPrefix();
+							final String prefix = Shadbot.getDatabase().getDBGuild(event.getGuildId().get()).getPrefix();
 							final String content = event.getMessage().getContent().orElse("").replace(prefix, "").toLowerCase().trim();
 							if("double down".equals(content) && player.getCards().size() != 2) {
 								return BotUtils.sendMessage(

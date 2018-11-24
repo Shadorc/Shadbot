@@ -1,9 +1,8 @@
 package me.shadorc.shadbot.data.premium;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,40 +15,37 @@ import javax.annotation.Nullable;
 import com.fasterxml.jackson.databind.JavaType;
 
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.data.DataManager;
-import me.shadorc.shadbot.data.annotation.DataInit;
-import me.shadorc.shadbot.data.annotation.DataSave;
+import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.exception.RelicActivationException;
 import me.shadorc.shadbot.utils.Utils;
 
-public class PremiumManager {
+public class PremiumManager extends Data {
 
-	private static final File FILE = new File(DataManager.SAVE_DIR, "premium_data.json");
+	private List<Relic> relics;
 
-	private static List<Relic> relics;
+	public PremiumManager() throws IOException {
+		super("premium_data.json", Duration.ofHours(1), Duration.ofHours(1));
 
-	@DataInit
-	public static void init() throws IOException {
 		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(CopyOnWriteArrayList.class, Relic.class);
-		relics = FILE.exists() ? Utils.MAPPER.readValue(FILE, valueType) : new CopyOnWriteArrayList<>();
+		this.relics = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), valueType) : new CopyOnWriteArrayList<>();
 	}
 
-	@DataSave(initialDelay = 1, period = 1, unit = ChronoUnit.HOURS)
-	public static void save() throws IOException {
-		try (FileWriter writer = new FileWriter(FILE)) {
-			writer.write(Utils.MAPPER.writeValueAsString(relics));
+	@Override
+	public void write() throws IOException {
+		try (FileWriter writer = new FileWriter(this.getFile())) {
+			writer.write(Utils.MAPPER.writeValueAsString(this.relics));
 		}
 	}
 
-	public static Relic generateRelic(RelicType type) {
+	public Relic generateRelic(RelicType type) {
 		final Relic relic = new Relic(UUID.randomUUID().toString(), TimeUnit.DAYS.toMillis(180), type);
-		relics.add(relic);
+		this.relics.add(relic);
 		return relic;
 	}
 
-	public static void activateRelic(@Nullable Snowflake guildId, Snowflake userId, String relicId) throws RelicActivationException {
-		final Optional<Relic> relicOpt = relics.stream()
+	public void activateRelic(@Nullable Snowflake guildId, Snowflake userId, String relicId) throws RelicActivationException {
+		final Optional<Relic> relicOpt = this.relics.stream()
 				.filter(relicItr -> relicItr.getId().equals(relicId))
 				.findFirst();
 
@@ -70,28 +66,28 @@ public class PremiumManager {
 		}
 	}
 
-	public static List<Relic> getRelicsForUser(Snowflake userId) {
-		return relics.stream()
+	public List<Relic> getRelicsForUser(Snowflake userId) {
+		return this.relics.stream()
 				.filter(relic -> relic.getUserId().map(userId::equals).orElse(false))
 				.collect(Collectors.toList());
 	}
 
-	public static boolean isPremium(Snowflake guildId, Snowflake userId) {
-		return PremiumManager.isGuildPremium(guildId) || PremiumManager.isUserPremium(userId);
+	public boolean isPremium(Snowflake guildId, Snowflake userId) {
+		return this.isGuildPremium(guildId) || this.isUserPremium(userId);
 	}
 
-	public static boolean isGuildPremium(Snowflake guildId) {
-		return relics.stream()
+	public boolean isGuildPremium(Snowflake guildId) {
+		return this.relics.stream()
 				.filter(relic -> relic.getGuildId().map(guildId::equals).orElse(false))
 				.anyMatch(relic -> !relic.isExpired());
 	}
 
-	public static boolean isUserPremium(Snowflake userId) {
-		return PremiumManager.getRelicsForUser(userId).stream()
-				.anyMatch(relic -> PremiumManager.isValid(relic, RelicType.USER));
+	public boolean isUserPremium(Snowflake userId) {
+		return this.getRelicsForUser(userId).stream()
+				.anyMatch(relic -> this.isValid(relic, RelicType.USER));
 	}
 
-	private static boolean isValid(Relic relic, RelicType type) {
+	private boolean isValid(Relic relic, RelicType type) {
 		return relic.getType().equals(type.toString()) && !relic.isExpired();
 	}
 

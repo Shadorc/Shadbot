@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -44,7 +44,7 @@ public class BlacklistSettingCmd extends AbstractSetting {
 					FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", ")));
 		}
 
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
+		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 		final List<String> blacklist = dbGuild.getBlacklistedCmd();
 
 		String actionVerbose;

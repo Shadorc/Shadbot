@@ -1,11 +1,11 @@
 package me.shadorc.shadbot.command.hidden;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.exception.RelicActivationException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -22,7 +22,7 @@ public class ActivateRelicCmd extends AbstractCommand {
 		return context.getGuild()
 				.flatMap(guild -> {
 					try {
-						PremiumManager.activateRelic(guild.getId(), context.getAuthorId(), arg);
+						Shadbot.getPremium().activateRelic(guild.getId(), context.getAuthorId(), arg);
 						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy !",
 								context.getUsername()), context.getChannel());
 					} catch (RelicActivationException err) {

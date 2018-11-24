@@ -5,12 +5,12 @@ import java.util.List;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
@@ -68,7 +68,7 @@ public class AutoMessageSetting extends AbstractSetting {
 						throw new MissingArgumentException();
 					}
 
-					final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
+					final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 					final Snowflake channelId = channelsMentionned.get(0);
 					if(Action.ENABLE.equals(action)) {
 						dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channelId);
@@ -83,7 +83,7 @@ public class AutoMessageSetting extends AbstractSetting {
 	}
 
 	private Mono<Message> updateMessage(Context context, SettingEnum setting, Action action, List<String> args) {
-		final DBGuild dbGuild = DatabaseManager.getDBGuild(context.getGuildId());
+		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 		if(Action.ENABLE.equals(action)) {
 			if(args.size() < 4) {
 				throw new MissingArgumentException();

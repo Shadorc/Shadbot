@@ -1,12 +1,12 @@
 package me.shadorc.shadbot.command.owner;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.exception.CommandException;
@@ -31,7 +31,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 					arg, FormatUtils.options(RelicType.class)));
 		}
 
-		final Relic relic = PremiumManager.generateRelic(type);
+		final Relic relic = Shadbot.getPremium().generateRelic(type);
 		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
 				StringUtils.capitalize(type.toString()), relic.getId()), context.getChannel())
 				.then();

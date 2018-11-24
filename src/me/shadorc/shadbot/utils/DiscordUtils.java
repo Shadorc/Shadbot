@@ -24,9 +24,9 @@ import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.APIKeys;
-import me.shadorc.shadbot.data.APIKeys.APIKey;
-import me.shadorc.shadbot.data.database.DatabaseManager;
+import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.data.apikey.APIKey;
+import me.shadorc.shadbot.data.apikey.APIKeys;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
@@ -65,7 +65,7 @@ public class DiscordUtils {
 			throw new CommandException(String.format("`%s` is not a valid amount for coins.", betStr));
 		}
 
-		if(DatabaseManager.getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
+		if(Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
 			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
 		}
 

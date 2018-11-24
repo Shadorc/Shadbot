@@ -4,13 +4,13 @@ import java.util.List;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.exception.ExceptionUtils;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -33,7 +33,7 @@ public class DatabaseCmd extends AbstractCommand {
 				.onErrorMap(ExceptionUtils::isForbidden, err -> new CommandException("Guild not found."))
 				.map(guild -> {
 					if(args.size() == 1) {
-						return DatabaseManager.getDBGuild(guild.getId()).toString();
+						return Shadbot.getDatabase().getDBGuild(guild.getId()).toString();
 					}
 
 					final Long memberId = NumberUtils.asPositiveLong(args.get(1));
@@ -41,7 +41,7 @@ public class DatabaseCmd extends AbstractCommand {
 						throw new CommandException(String.format("`%s` is not a valid member ID.", args.get(1)));
 					}
 
-					return DatabaseManager.getDBMember(guild.getId(), Snowflake.of(memberId)).toString();
+					return Shadbot.getDatabase().getDBMember(guild.getId(), Snowflake.of(memberId)).toString();
 				})
 				.flatMap(text -> BotUtils.sendMessage(text, context.getChannel()))
 				.then();

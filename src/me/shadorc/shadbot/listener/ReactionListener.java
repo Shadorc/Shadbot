@@ -13,10 +13,10 @@ import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.admin.IamCmd;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.core.exception.ExceptionUtils;
-import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -109,7 +109,7 @@ public class ReactionListener {
 						.flatMap(Mono::justOrEmpty)
 						.map(selfId::equals))
 				.flatMap(selfId -> Mono.justOrEmpty(event.getGuildId()))
-				.flatMap(guildId -> Mono.justOrEmpty(DatabaseManager.getDBGuild(guildId)
+				.flatMap(guildId -> Mono.justOrEmpty(Shadbot.getDatabase().getDBGuild(guildId)
 						.getIamMessages()
 						.get(event.getMessageId().asString())))
 				.map(Snowflake::of)
