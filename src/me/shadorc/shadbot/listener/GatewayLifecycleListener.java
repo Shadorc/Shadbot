@@ -24,11 +24,6 @@ public class GatewayLifecycleListener {
 	public static void onReadyEvent(ReadyEvent event) {
 		final DiscordClient client = event.getClient();
 
-		Flux.interval(Duration.ofHours(2), Duration.ofHours(2))
-				.flatMap(ignored -> DiscordUtils.postStats(client))
-				.doOnError(err -> LogUtils.error(client, err, "An error occurred while posting statistics."))
-				.subscribe();
-
 		Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
 				.flatMap(ignored -> DiscordUtils.updatePresence(client))
 				.doOnError(err -> LogUtils.error(client, err, "An error occurred while updating presence."))

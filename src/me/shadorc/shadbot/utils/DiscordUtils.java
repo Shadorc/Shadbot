@@ -1,15 +1,9 @@
 package me.shadorc.shadbot.utils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-
-import org.json.JSONObject;
-import org.jsoup.Connection.Method;
-import org.jsoup.Jsoup;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Guild;
@@ -25,13 +19,9 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.data.apikey.APIKey;
-import me.shadorc.shadbot.data.apikey.APIKeys;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -75,48 +65,6 @@ public class DiscordUtils {
 		}
 
 		return bet;
-	}
-
-	/**
-	 * @param client - the client from which to post statistics
-	 */
-	public static Mono<Void> postStats(DiscordClient client) {
-		if(Config.IS_SNAPSHOT) {
-			return Mono.empty();
-		}
-		return Mono.fromRunnable(() -> LogUtils.info("{Shard %d} Posting statistics...", client.getConfig().getShardIndex()))
-				.then(DiscordUtils.postStatsOn(client, "https://bots.discord.pw", APIKey.BOTS_DISCORD_PW_TOKEN))
-				.then(DiscordUtils.postStatsOn(client, "https://discordbots.org", APIKey.DISCORD_BOTS_ORG_TOKEN))
-				.then(Mono.fromRunnable(() -> LogUtils.info("{Shard %d} Statistics posted.", client.getConfig().getShardIndex())));
-	}
-
-	/**
-	 * @param homeUrl - the home URL of the statistics site
-	 * @param token - the API token corresponding to the URL
-	 * @param client - the client from which to post statistics
-	 */
-	private static Mono<Void> postStatsOn(DiscordClient client, String homeUrl, APIKey token) {
-		return client.getGuilds()
-				.count()
-				.doOnSuccess(guildsCount -> {
-					final JSONObject content = new JSONObject()
-							.put("shard_id", client.getConfig().getShardIndex())
-							.put("shard_count", client.getConfig().getShardCount())
-							.put("server_count", guildsCount);
-					final String url = String.format("%s/api/bots/%d/stats", homeUrl, client.getSelfId().get().asLong());
-
-					try {
-						Jsoup.connect(url)
-								.method(Method.POST)
-								.ignoreContentType(true)
-								.headers(Map.of("Content-Type", "application/json", "Authorization", APIKeys.get(token)))
-								.requestBody(content.toString())
-								.post();
-					} catch (IOException err) {
-						Exceptions.propagate(err);
-					}
-				})
-				.then();
 	}
 
 	/**

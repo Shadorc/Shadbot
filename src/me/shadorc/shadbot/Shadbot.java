@@ -59,6 +59,7 @@ public class Shadbot {
 	private static DatabaseManager databaseManager;
 	private static LottoManager lottoManager;
 	private static APIKeys apiKeysManager;
+	private static BotListStats botListStats;
 
 	public static void main(String[] args) {
 		// Enable full Reactor stack-traces
@@ -71,6 +72,7 @@ public class Shadbot {
 			Shadbot.databaseManager = new DatabaseManager();
 			Shadbot.lottoManager = new LottoManager();
 			Shadbot.apiKeysManager = new APIKeys();
+			Shadbot.botListStats = new BotListStats();
 		} catch (IOException err) {
 			LogUtils.error(err, "A fatal error occurred while initializing managers.");
 			System.exit(ExitCode.FATAL_ERROR.value());
@@ -176,6 +178,7 @@ public class Shadbot {
 	}
 
 	private static void logout() {
+		botListStats.stop();
 		CLIENTS.forEach(DiscordClient::logout);
 	}
 
