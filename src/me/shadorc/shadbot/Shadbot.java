@@ -105,25 +105,25 @@ public class Shadbot {
 			// Shadbot.register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 			Shadbot.register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
 			Shadbot.register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
-		
+
 			// When all the guilds have been received, register GuildListener#onGuildCreate and GatewayLifecycleListener#onGatewayLifecycleEvent
 			client.getEventDispatcher().on(ReadyEvent.class)
-			        .map(event -> event.getGuilds().size())
-			        .flatMap(size -> client.getEventDispatcher()
-			        		.on(GuildCreateEvent.class)
-			        		.take(size)
-			        		.last())
-			        .subscribe(event -> {
-			        	LogUtils.info("{Shard %d} Fully connected to Gateway.", client.getConfig().getShardIndex());
-		        		Shadbot.register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
-		        		Shadbot.register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
-			        });
+					.map(event -> event.getGuilds().size())
+					.flatMap(size -> client.getEventDispatcher()
+							.on(GuildCreateEvent.class)
+							.take(size)
+							.last())
+					.subscribe(event -> {
+						LogUtils.info("{Shard %d} Fully connected to Gateway.", client.getConfig().getShardIndex());
+						Shadbot.register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
+						Shadbot.register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
+					});
 		}
 
 		Flux.interval(LottoCmd.getDelay(), Duration.ofDays(7))
 				.doOnNext(ignored -> LottoCmd.draw(CLIENTS.get(0)))
 				.subscribe();
-		
+
 		// Initiate login and block
 		Mono.when(Shadbot.CLIENTS.stream().map(DiscordClient::login).collect(Collectors.toList())).block();
 	}
