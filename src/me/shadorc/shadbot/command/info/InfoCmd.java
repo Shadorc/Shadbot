@@ -10,6 +10,7 @@ import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.MessageEditSpec;
 import discord4j.core.util.VersionUtil;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -18,11 +19,12 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
-import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,8 +38,6 @@ public class InfoCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
 		final long uptime = TimeUtils.getMillisUntil(Shadbot.getLaunchTime());
 
 		final Runtime runtime = Runtime.getRuntime();
@@ -59,34 +59,40 @@ public class InfoCmd extends AbstractCommand {
 				.flatMap(DiscordClient::getUsers)
 				.count();
 
-		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
-				guildsCountMono, voiceChannelsCountMono, membersCountMono)
-				.map(tuple -> {
-					final User owner = tuple.getT1();
-					final Long guildsCount = tuple.getT2();
-					final Long voiceChannelsCount = tuple.getT3();
-					final Long membersCount = tuple.getT4();
+		final long start = System.currentTimeMillis();
+		return BotUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Loading info...", context.getUsername()), context.getChannel())
+				.flatMap(message -> Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
+						guildsCountMono, voiceChannelsCountMono, membersCountMono,
+						Mono.just(TimeUtils.getMillisUntil(start)))
+						.flatMap(tuple -> {
+							final User owner = tuple.getT1();
+							final Long guildsCount = tuple.getT2();
+							final Long voiceChannelsCount = tuple.getT3();
+							final Long membersCount = tuple.getT4();
+							final Long ping = tuple.getT5();
 
-					return "```prolog"
-							+ String.format("%n-= Performance Info =-")
-							+ String.format("%nMemory: %s/%s MB", FormatUtils.number(usedMemory), FormatUtils.number(maxMemory))
-							+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
-							+ String.format("%nThreads Count: %s", FormatUtils.number(Thread.activeCount()))
-							+ String.format("%n%n-= APIs Info =-")
-							+ String.format("%nJava Version: %s", System.getProperty("java.version"))
-							+ String.format("%n%s Version: %s", D4J_NAME, D4J_VERSION)
-							+ String.format("%nLavaPlayer Version: %s", PlayerLibrary.VERSION)
-							+ String.format("%n%n-= Shadbot Info =-")
-							+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true))
-							+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
-							+ String.format("%nShadbot Version: %s", Config.VERSION)
-							+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
-							+ String.format("%nServers: %s", FormatUtils.number(guildsCount))
-							+ String.format("%nVoice Channels: %s", FormatUtils.number(voiceChannelsCount))
-							+ String.format("%nUsers: %s", FormatUtils.number(membersCount))
-							+ "```";
-				})
-				.flatMap(loadingMsg::send)
+							return message.edit(new MessageEditSpec().setContent("```prolog"
+									+ String.format("%n-= Versions =-")
+									+ String.format("%nJava: %s", System.getProperty("java.version"))
+									+ String.format("%nShadbot: %s", Config.VERSION)
+									+ String.format("%n%s: %s", D4J_NAME, D4J_VERSION)
+									+ String.format("%nLavaPlayer: %s", PlayerLibrary.VERSION)
+									+ String.format("%n%n-= Performance =-")
+									+ String.format("%nMemory: %s/%s MB", FormatUtils.number(usedMemory), FormatUtils.number(maxMemory))
+									+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
+									+ String.format("%nThreads: %s", FormatUtils.number(Thread.activeCount()))
+									+ String.format("%n%n-= Shadbot =-")
+									+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true))
+									+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
+									+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
+									+ String.format("%nServers: %s", FormatUtils.number(guildsCount))
+									+ String.format("%nVoice Channels: %s", FormatUtils.number(voiceChannelsCount))
+									+ String.format("%nUsers: %s", FormatUtils.number(membersCount))
+									+ String.format("%n%n-= Internet =-")
+									+ String.format("%nPing: %dms", ping)
+									+ String.format("%nGateway Latency: %dms", context.getClient().getResponseTime())
+									+ "```"));
+						}))
 				.then();
 	}
 
