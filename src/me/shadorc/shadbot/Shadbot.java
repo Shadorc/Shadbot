@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -53,7 +52,6 @@ public class Shadbot {
 
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
-	private static final AtomicBoolean IS_READY = new AtomicBoolean(false);
 
 	private static PremiumManager premiumManager;
 	private static DatabaseManager databaseManager;
@@ -96,10 +94,8 @@ public class Shadbot {
 			final DiscordClient client = builder.setShardIndex(index).build();
 			CLIENTS.add(client);
 
-			Shadbot.register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
 			Shadbot.register(client, ReadyEvent.class, GatewayLifecycleListener::onReadyEvent);
 			Shadbot.register(client, TextChannelDeleteEvent.class, ChannelListener::onTextChannelDelete);
-			Shadbot.register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
 			Shadbot.register(client, GuildDeleteEvent.class, GuildListener::onGuildDelete);
 			Shadbot.register(client, MemberJoinEvent.class, MemberListener::onMemberJoin);
 			Shadbot.register(client, MemberLeaveEvent.class, MemberListener::onMemberLeave);
@@ -109,29 +105,27 @@ public class Shadbot {
 			// Shadbot.register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 			Shadbot.register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
 			Shadbot.register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
+		
+			// When all the guilds have been received, register GuildListener#onGuildCreate and GatewayLifecycleListener#onGatewayLifecycleEvent
+			client.getEventDispatcher().on(ReadyEvent.class)
+			        .map(event -> event.getGuilds().size())
+			        .flatMap(size -> client.getEventDispatcher()
+			        		.on(GuildCreateEvent.class)
+			        		.take(size)
+			        		.last())
+			        .subscribe(event -> {
+			        	LogUtils.info("{Shard %d} Fully connected to Gateway.", client.getConfig().getShardIndex());
+		        		Shadbot.register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
+		        		Shadbot.register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
+			        });
 		}
 
 		Flux.interval(LottoCmd.getDelay(), Duration.ofDays(7))
 				.doOnNext(ignored -> LottoCmd.draw(CLIENTS.get(0)))
 				.subscribe();
-
-		// TODO: Find a better and more consistent solution
-		Mono.delay(Duration.ofSeconds(shardCount * 8))
-				.then(Mono.fromRunnable(() -> {
-					IS_READY.set(true);
-					LogUtils.info("Shadbot (Version: %s) is ready", Config.VERSION);
-				}))
-				.subscribe();
-
+		
 		// Initiate login and block
 		Mono.when(Shadbot.CLIENTS.stream().map(DiscordClient::login).collect(Collectors.toList())).block();
-	}
-
-	/**
-	 * @return true when the bot is connected to all its guilds, false otherwise
-	 */
-	public static boolean isReady() {
-		return IS_READY.get();
 	}
 
 	/**
