@@ -30,4 +30,11 @@ public class StatsManager extends Data {
 		}
 	}
 
+	// FIXME
+	@Override
+	public Object getData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

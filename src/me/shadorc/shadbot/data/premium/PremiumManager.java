@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.data.premium;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
@@ -22,20 +21,13 @@ import me.shadorc.shadbot.utils.Utils;
 
 public class PremiumManager extends Data {
 
-	private List<Relic> relics;
+	private final List<Relic> relics;
 
 	public PremiumManager() throws IOException {
 		super("premium_data.json", Duration.ofHours(1), Duration.ofHours(1));
 
 		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(CopyOnWriteArrayList.class, Relic.class);
 		this.relics = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), valueType) : new CopyOnWriteArrayList<>();
-	}
-
-	@Override
-	public void write() throws IOException {
-		try (FileWriter writer = new FileWriter(this.getFile())) {
-			writer.write(Utils.MAPPER.writeValueAsString(this.relics));
-		}
 	}
 
 	public Relic generateRelic(RelicType type) {
@@ -89,6 +81,11 @@ public class PremiumManager extends Data {
 
 	private boolean isValid(Relic relic, RelicType type) {
 		return relic.getType().equals(type.toString()) && !relic.isExpired();
+	}
+
+	@Override
+	public Object getData() {
+		return this.relics;
 	}
 
 }

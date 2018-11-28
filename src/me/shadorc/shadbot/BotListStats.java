@@ -11,7 +11,6 @@ import org.jsoup.Jsoup;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.apikey.APIKey;
-import me.shadorc.shadbot.data.apikey.APIKeys;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.Disposable;
 import reactor.core.Exceptions;
@@ -59,7 +58,7 @@ public class BotListStats {
 							final String url = String.format("https://discordbots.org/api/bots/%d/stats", selfId);
 
 							try {
-								this.post(url, APIKeys.get(APIKey.DISCORD_BOTS_DOT_ORG_TOKEN), content);
+								this.post(url, Shadbot.getAPIKeys().get(APIKey.DISCORD_BOTS_DOT_ORG_TOKEN), content);
 							} catch (IOException err) {
 								Exceptions.propagate(err);
 							}
@@ -85,7 +84,7 @@ public class BotListStats {
 							final String url = String.format("https://bots.discord.pw/api/bots/%d/stats", selfId);
 
 							try {
-								this.post(url, APIKeys.get(APIKey.BOTS_DISCORD_DOT_PW_TOKEN), content);
+								this.post(url, Shadbot.getAPIKeys().get(APIKey.BOTS_DISCORD_DOT_PW_TOKEN), content);
 							} catch (IOException err) {
 								Exceptions.propagate(err);
 							}
@@ -110,7 +109,7 @@ public class BotListStats {
 							final String url = String.format("https://discordbotlist.com/api/bots/%d/stats", selfId);
 
 							try {
-								this.post(url, String.format("Bot %s", APIKeys.get(APIKey.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
+								this.post(url, String.format("Bot %s", Shadbot.getAPIKeys().get(APIKey.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
 							} catch (IOException err) {
 								Exceptions.propagate(err);
 							}
@@ -134,7 +133,7 @@ public class BotListStats {
 					final String url = String.format("https://divinediscordbots.com/bots/%d/stats", selfId);
 
 					try {
-						this.post(url, APIKeys.get(APIKey.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
+						this.post(url, Shadbot.getAPIKeys().get(APIKey.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
 					} catch (IOException err) {
 						Exceptions.propagate(err);
 					}
@@ -158,7 +157,7 @@ public class BotListStats {
 					final String url = String.format("https://botlist.space/bots/%d/stats", selfId);
 
 					try {
-						this.post(url, APIKeys.get(APIKey.BOT_LIST_DOT_SPACE), content);
+						this.post(url, Shadbot.getAPIKeys().get(APIKey.BOT_LIST_DOT_SPACE), content);
 					} catch (IOException err) {
 						Exceptions.propagate(err);
 					}

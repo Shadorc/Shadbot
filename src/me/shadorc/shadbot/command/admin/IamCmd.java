@@ -37,7 +37,7 @@ public class IamCmd extends AbstractCommand {
 		final String arg = context.requireArg();
 
 		final List<String> quotedElements = StringUtils.getQuotedElements(arg);
-		if(quotedElements.size() == 0 && arg.contains("\"")) {
+		if(quotedElements.isEmpty() && arg.contains("\"")) {
 			throw new CommandException("One quotation mark is missing.");
 		}
 		if(quotedElements.size() > 1) {
@@ -61,7 +61,7 @@ public class IamCmd extends AbstractCommand {
 					}
 
 					final StringBuilder description = new StringBuilder();
-					if(quotedElements.size() == 0) {
+					if(quotedElements.isEmpty()) {
 						description.append(String.format("Click on %s to get role(s): %s", REACTION.getRaw(),
 								FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
 					} else {

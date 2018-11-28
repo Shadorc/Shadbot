@@ -128,12 +128,12 @@ public class DiscordUtils {
 						|| !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
 	}
 
-	// Fix: https://github.com/Discord4J/Discord4J/issues/429
+	// FIXME: https://github.com/Discord4J/Discord4J/issues/429
 	public static Flux<Member> getMembers(Guild guild) {
 		return DiscordUtils.getMembers(Mono.just(guild));
 	}
 
-	// Fix: https://github.com/Discord4J/Discord4J/issues/429
+	// FIXME: https://github.com/Discord4J/Discord4J/issues/429
 	public static Flux<Member> getMembers(Mono<Guild> guild) {
 		return guild.flatMapMany(Guild::getMembers)
 				.collectList()

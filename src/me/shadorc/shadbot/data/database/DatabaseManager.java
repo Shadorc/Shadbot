@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.data.database;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
@@ -22,12 +21,6 @@ public class DatabaseManager extends Data {
 
 		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(CopyOnWriteArrayList.class, DBGuild.class);
 		this.guilds = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), valueType) : new CopyOnWriteArrayList<>();
-	}
-
-	public void write() throws IOException {
-		try (FileWriter writer = new FileWriter(this.getFile())) {
-			writer.write(Utils.MAPPER.writeValueAsString(guilds));
-		}
 	}
 
 	public DBGuild getDBGuild(Snowflake guildId) {
@@ -58,6 +51,11 @@ public class DatabaseManager extends Data {
 		final DBMember dbMember = new DBMember(guildId, memberId);
 		this.getDBGuild(guildId).addMember(dbMember);
 		return dbMember;
+	}
+
+	@Override
+	public Object getData() {
+		return this.guilds;
 	}
 
 }

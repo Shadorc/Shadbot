@@ -81,7 +81,7 @@ public class LyricsCmd extends AbstractCommand {
 		}
 	}
 
-	private final Response getLyricsResponse(DiscordClient client, String url) throws IOException {
+	private Response getLyricsResponse(DiscordClient client, String url) throws IOException {
 		// Sometimes Musixmatch redirects to a wrong page
 		// If the response URL and the requested URL are different, retry
 		int retryCount = 0;
@@ -100,7 +100,7 @@ public class LyricsCmd extends AbstractCommand {
 		return response;
 	}
 
-	private final String getCorrectedUrl(String artist, String title) throws IOException {
+	private String getCorrectedUrl(String artist, String title) throws IOException {
 		final String url = String.format("%s/search/%s-%s", HOME_URL, artist, title);
 
 		// Make a search request on the site

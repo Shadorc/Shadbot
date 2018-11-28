@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JavaType;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.dtc.Quote;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -14,7 +15,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.apikey.APIKey;
-import me.shadorc.shadbot.data.apikey.APIKeys;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -33,7 +33,7 @@ public class DtcCmd extends AbstractCommand {
 
 		try {
 			final URL url = new URL(String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
-					APIKeys.get(APIKey.DTC_API_KEY)));
+					Shadbot.getAPIKeys().get(APIKey.DTC_API_KEY)));
 
 			final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
 			final List<Quote> quotes = Utils.MAPPER.readValue(url, valueType);

@@ -108,7 +108,7 @@ public class StringUtils {
 	 * @return The resulting {@code String}
 	 */
 	public static String remove(String str, List<String> toRemove) {
-		return StringUtils.remove(str, toRemove.toArray(new String[toRemove.size()]));
+		return StringUtils.remove(str, toRemove.toArray(new String[0]));
 	}
 
 	/**

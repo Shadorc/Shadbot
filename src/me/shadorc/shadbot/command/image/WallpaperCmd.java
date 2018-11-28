@@ -21,13 +21,13 @@ import com.ivkos.wallhaven4j.util.exceptions.WallhavenException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.apikey.APIKey;
-import me.shadorc.shadbot.data.apikey.APIKeys;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -58,7 +58,8 @@ public class WallpaperCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		if(this.wallhaven == null) {
-			this.wallhaven = new Wallhaven(APIKeys.get(APIKey.WALLHAVEN_LOGIN), APIKeys.get(APIKey.WALLHAVEN_PASSWORD));
+			this.wallhaven = new Wallhaven(Shadbot.getAPIKeys().get(APIKey.WALLHAVEN_LOGIN),
+					Shadbot.getAPIKeys().get(APIKey.WALLHAVEN_PASSWORD));
 		}
 
 		final Options options = new Options();
@@ -81,7 +82,7 @@ public class WallpaperCmd extends AbstractCommand {
 		CommandLine cmdLine;
 		try {
 			final List<String> args = StringUtils.split(context.getArg().orElse(""));
-			cmdLine = new DefaultParser().parse(options, args.toArray(new String[args.size()]));
+			cmdLine = new DefaultParser().parse(options, args.toArray(new String[0]));
 		} catch (UnrecognizedOptionException | org.apache.commons.cli.MissingArgumentException err) {
 			loadingMsg.stopTyping();
 			throw new CommandException(String.format("%s. Use `%shelp %s` for more information.",

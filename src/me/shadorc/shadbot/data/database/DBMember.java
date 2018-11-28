@@ -11,22 +11,20 @@ import me.shadorc.shadbot.utils.NumberUtils;
 
 public class DBMember {
 
-	private Long guildId;
+	private final Long guildId;
 	@JsonProperty("id")
-	private Long id;
+	private final Long id;
 	@JsonProperty("coins")
-	private AtomicInteger coins;
-
-	public DBMember() {
-		this.guildId = null;
-		this.id = null;
-		this.coins = new AtomicInteger(0);
-	}
+	private final AtomicInteger coins;
 
 	public DBMember(Snowflake guildId, Snowflake id) {
 		this.guildId = guildId.asLong();
 		this.id = id.asLong();
 		this.coins = new AtomicInteger(0);
+	}
+
+	public DBMember() {
+		this(Snowflake.of(0L), Snowflake.of(0L));
 	}
 
 	@JsonIgnore

@@ -34,6 +34,7 @@ import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.lotto.Lotto;
 import me.shadorc.shadbot.data.lotto.LottoManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
+import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.listener.ChannelListener;
 import me.shadorc.shadbot.listener.GatewayLifecycleListener;
 import me.shadorc.shadbot.listener.GuildListener;
@@ -45,31 +46,32 @@ import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 
 public class Shadbot {
 
+	private final static int SHARD_COUNT = 1;
+
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 
-	private static PremiumManager premiumManager;
-	private static DatabaseManager databaseManager;
-	private static LottoManager lottoManager;
 	private static APIKeys apiKeysManager;
+	private static DatabaseManager databaseManager;
+	private static PremiumManager premiumManager;
+	private static LottoManager lottoManager;
+	private static StatsManager statsManager;
 	private static BotListStats botListStats;
 
 	public static void main(String[] args) {
-		// Enable full Reactor stack-traces
-		Hooks.onOperatorDebug();
 		// Set default to Locale US
 		Locale.setDefault(Locale.US);
 
 		try {
-			Shadbot.premiumManager = new PremiumManager();
-			Shadbot.databaseManager = new DatabaseManager();
-			Shadbot.lottoManager = new LottoManager();
 			Shadbot.apiKeysManager = new APIKeys();
+			Shadbot.databaseManager = new DatabaseManager();
+			Shadbot.premiumManager = new PremiumManager();
+			Shadbot.lottoManager = new LottoManager();
+			Shadbot.statsManager = new StatsManager();
 			Shadbot.botListStats = new BotListStats();
 		} catch (IOException err) {
 			LogUtils.error(err, "A fatal error occurred while initializing managers.");
@@ -83,10 +85,9 @@ public class Shadbot {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 
-		final int shardCount = 1;
-		final DiscordClientBuilder builder = new DiscordClientBuilder(APIKeys.get(APIKey.DISCORD_TOKEN))
+		final DiscordClientBuilder builder = new DiscordClientBuilder(apiKeysManager.get(APIKey.DISCORD_TOKEN))
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
-				.setShardCount(shardCount)
+				.setShardCount(SHARD_COUNT)
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
 		LogUtils.info("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
@@ -106,7 +107,8 @@ public class Shadbot {
 			Shadbot.register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
 			Shadbot.register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
 
-			// When all the guilds have been received, register GuildListener#onGuildCreate and GatewayLifecycleListener#onGatewayLifecycleEvent
+			// When all the guilds have been received, register GuildListener#onGuildCreate
+			// and GatewayLifecycleListener#onGatewayLifecycleEvent
 			client.getEventDispatcher().on(ReadyEvent.class)
 					.map(event -> event.getGuilds().size())
 					.flatMap(size -> client.getEventDispatcher()
@@ -142,20 +144,24 @@ public class Shadbot {
 		return CLIENTS;
 	}
 
-	public static PremiumManager getPremium() {
-		return premiumManager;
+	public static APIKeys getAPIKeys() {
+		return apiKeysManager;
 	}
 
 	public static DatabaseManager getDatabase() {
 		return databaseManager;
 	}
 
+	public static PremiumManager getPremium() {
+		return premiumManager;
+	}
+
 	public static Lotto getLotto() {
 		return lottoManager.getLotto();
 	}
 
-	public static APIKeys getAPIKeys() {
-		return apiKeysManager;
+	public static StatsManager getStatsManager() {
+		return statsManager;
 	}
 
 	private static <T extends Event> void register(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
@@ -166,9 +172,10 @@ public class Shadbot {
 	}
 
 	private static void save() {
-		premiumManager.save();
 		databaseManager.save();
+		premiumManager.save();
 		lottoManager.save();
+		statsManager.save();
 	}
 
 	private static void logout() {

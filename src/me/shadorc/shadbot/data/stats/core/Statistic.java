@@ -1,9 +1,12 @@
 package me.shadorc.shadbot.data.stats.core;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.utils.Utils;
 
 public abstract class Statistic<E extends Enum<E>> {
 
@@ -15,7 +18,13 @@ public abstract class Statistic<E extends Enum<E>> {
 		this.enumClass = enumClass;
 	}
 
-	public abstract void save() throws IOException;
+	public abstract Object getData();
+
+	public void save() throws IOException {
+		try (BufferedWriter writer = Files.newBufferedWriter(this.getFile().toPath())) {
+			writer.write(Utils.MAPPER.writeValueAsString(this.getData()));
+		}
+	}
 
 	public Class<E> getEnumClass() {
 		return this.enumClass;

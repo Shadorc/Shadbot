@@ -1,9 +1,12 @@
 package me.shadorc.shadbot.data;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Duration;
 
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,7 +29,13 @@ public abstract class Data {
 				.subscribe();
 	}
 
-	public abstract void write() throws IOException;
+	public abstract Object getData();
+
+	public void write() throws IOException {
+		try (BufferedWriter writer = Files.newBufferedWriter(this.getFile().toPath())) {
+			writer.write(Utils.MAPPER.writeValueAsString(this.getData()));
+		}
+	}
 
 	public void save() {
 		try {

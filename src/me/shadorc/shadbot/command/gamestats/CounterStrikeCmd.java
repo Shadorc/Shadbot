@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.gamestats.steam.player.PlayerSummariesResponse;
 import me.shadorc.shadbot.api.gamestats.steam.player.PlayerSummary;
 import me.shadorc.shadbot.api.gamestats.steam.resolver.ResolveVanityUrlResponse;
@@ -18,7 +19,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.apikey.APIKey;
-import me.shadorc.shadbot.data.apikey.APIKeys;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -51,7 +51,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 				identificator = splittedURl.get(splittedURl.size() - 1);
 			}
 
-			final String steamId;
+			String steamId;
 			// The user directly provided the ID
 			if(NumberUtils.isPositiveLong(identificator)) {
 				steamId = identificator;
@@ -59,13 +59,13 @@ public class CounterStrikeCmd extends AbstractCommand {
 			// The user provided a pseudo
 			else {
 				final URL resolveVanityUrl = new URL(String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
-						APIKeys.get(APIKey.STEAM_API_KEY), NetUtils.encode(identificator)));
+						Shadbot.getAPIKeys().get(APIKey.STEAM_API_KEY), NetUtils.encode(identificator)));
 				final ResolveVanityUrlResponse response = Utils.MAPPER.readValue(resolveVanityUrl, ResolveVanityUrlResponse.class);
 				steamId = response.getResponse().getSteamId();
 			}
 
 			final URL playerSummariesUrl = new URL(String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
-					APIKeys.get(APIKey.STEAM_API_KEY), steamId));
+					Shadbot.getAPIKeys().get(APIKey.STEAM_API_KEY), steamId));
 
 			final PlayerSummariesResponse playerSummary = Utils.MAPPER.readValue(playerSummariesUrl, PlayerSummariesResponse.class);
 
@@ -83,7 +83,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 			}
 
 			final URL userStatsUrl = new URL(String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
-					APIKeys.get(APIKey.STEAM_API_KEY), steamId));
+					Shadbot.getAPIKeys().get(APIKey.STEAM_API_KEY), steamId));
 
 			final String body = NetUtils.getBody(userStatsUrl.toString());
 			if(body.contains("500 Internal Server Error")) {

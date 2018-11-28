@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.TokenResponse;
 import me.shadorc.shadbot.api.gamestats.diablo.hero.HeroResponse;
 import me.shadorc.shadbot.api.gamestats.diablo.profile.HeroId;
@@ -19,7 +20,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.apikey.APIKey;
-import me.shadorc.shadbot.data.apikey.APIKeys;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -60,7 +60,7 @@ public class DiabloCmd extends AbstractCommand {
 
 		try {
 
-			if(this.token == null || TimeUtils.getMillisUntil(this.lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn())) {
+			if(this.isTokenExpired()) {
 				this.generateAccessToken();
 			}
 
@@ -115,12 +115,22 @@ public class DiabloCmd extends AbstractCommand {
 		}
 	}
 
-	private synchronized void generateAccessToken() throws IOException {
-		final URL url = new URL(String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-				APIKeys.get(APIKey.BLIZZARD_CLIENT_ID), APIKeys.get(APIKey.BLIZZARD_CLIENT_SECRET)));
-		this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
-		this.lastTokenGeneration = System.currentTimeMillis();
-		LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
+	private boolean isTokenExpired() {
+		return this.token == null
+				|| TimeUtils.getMillisUntil(this.lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
+	}
+
+	private void generateAccessToken() throws IOException {
+		synchronized (this) {
+			if(this.isTokenExpired()) {
+				final URL url = new URL(String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
+						Shadbot.getAPIKeys().get(APIKey.BLIZZARD_CLIENT_ID),
+						Shadbot.getAPIKeys().get(APIKey.BLIZZARD_CLIENT_SECRET)));
+				this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
+				this.lastTokenGeneration = System.currentTimeMillis();
+				LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
+			}
+		}
 	}
 
 	@Override

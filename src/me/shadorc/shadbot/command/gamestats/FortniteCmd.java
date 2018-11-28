@@ -11,6 +11,7 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.gamestats.fortnite.FortniteResponse;
 import me.shadorc.shadbot.api.gamestats.fortnite.Stats;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -19,7 +20,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.apikey.APIKey;
-import me.shadorc.shadbot.data.apikey.APIKeys;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -62,7 +62,7 @@ public class FortniteCmd extends AbstractCommand {
 					.method(Method.GET)
 					.ignoreContentType(true)
 					.ignoreHttpErrors(true)
-					.header("TRN-Api-Key", APIKeys.get(APIKey.FORTNITE_API_KEY))
+					.header("TRN-Api-Key", Shadbot.getAPIKeys().get(APIKey.FORTNITE_API_KEY))
 					.execute();
 
 			if(response.statusCode() != 200) {

@@ -31,7 +31,7 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" })
 public class PruneCmd extends AbstractCommand {
 
-	private static int MAX = 250;
+	private static final int MAX_MESSAGES = 250;
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -65,7 +65,7 @@ public class PruneCmd extends AbstractCommand {
 								argCleaned, context.getPrefix(), this.getName()));
 					}
 
-					count = count == null ? MAX : Math.min(MAX, count);
+					count = count == null ? MAX_MESSAGES : Math.min(MAX_MESSAGES, count);
 
 					final List<Snowflake> mentionIds = mentions.stream().map(User::getId).collect(Collectors.toList());
 

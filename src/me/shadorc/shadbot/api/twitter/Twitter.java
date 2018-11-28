@@ -17,6 +17,8 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class Twitter {
 
+	private static final String END_POINT_URL = "https://api.twitter.com/oauth2/token";
+
 	private String bearerToken;
 
 	public Twitter(String consumerKey, String consumerSecret) {
@@ -50,8 +52,7 @@ public class Twitter {
 		Objects.requireNonNull(consumerKey);
 		Objects.requireNonNull(consumerSecret);
 
-		final String endPointUrl = "https://api.twitter.com/oauth2/token";
-		final Document doc = Jsoup.connect(endPointUrl)
+		final Document doc = Jsoup.connect(END_POINT_URL)
 				.ignoreContentType(true)
 				.headers(Map.of("Host", "api.twitter.com",
 						"User-Agent", Config.USER_AGENT,

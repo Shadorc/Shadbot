@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.data.stats.core;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +12,7 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
 
-	private Map<String, AtomicLong> map;
+	private final Map<String, AtomicLong> map;
 
 	public MapStatistic(String fileName, Class<E> enumClass) {
 		super(fileName, enumClass);
@@ -21,8 +20,8 @@ public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
 
 		try {
 			if(this.getFile().exists()) {
-				final JavaType type = Utils.MAPPER.getTypeFactory().constructMapLikeType(HashMap.class, String.class, AtomicLong.class);
-				this.map = Utils.MAPPER.readValue(this.getFile(), type);
+				final JavaType type = Utils.MAPPER.getTypeFactory().constructMapLikeType(Map.class, String.class, AtomicLong.class);
+				this.map.putAll(Utils.MAPPER.readValue(this.getFile(), type));
 			}
 		} catch (IOException err) {
 			LogUtils.error(err, String.format("An error occurred while initializing statistic: %s", this.getFile()));
@@ -42,10 +41,8 @@ public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
 	}
 
 	@Override
-	public void save() throws IOException {
-		try (FileWriter writer = new FileWriter(this.getFile())) {
-			writer.write(Utils.MAPPER.writeValueAsString(this.map));
-		}
+	public Object getData() {
+		return this.map;
 	}
 
 }

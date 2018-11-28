@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.TokenResponse;
 import me.shadorc.shadbot.api.image.deviantart.DeviantArtResponse;
 import me.shadorc.shadbot.api.image.deviantart.Image;
@@ -15,7 +16,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.apikey.APIKey;
-import me.shadorc.shadbot.data.apikey.APIKeys;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -66,7 +66,7 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	private Image getRandomPopularImage(String encodedSearch) throws IOException {
-		if(this.token == null || TimeUtils.getMillisUntil(this.lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn())) {
+		if(this.isTokenExpired()) {
 			this.generateAccessToken();
 		}
 
@@ -82,12 +82,22 @@ public class ImageCmd extends AbstractCommand {
 		return deviantArt.getResults().isEmpty() ? null : Utils.randValue(deviantArt.getResults());
 	}
 
-	private synchronized void generateAccessToken() throws IOException {
-		final URL url = new URL(String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
-				APIKeys.get(APIKey.DEVIANTART_CLIENT_ID), APIKeys.get(APIKey.DEVIANTART_API_SECRET)));
-		this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
-		this.lastTokenGeneration = System.currentTimeMillis();
-		LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
+	private boolean isTokenExpired() {
+		return this.token == null
+				|| TimeUtils.getMillisUntil(this.lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
+	}
+
+	private void generateAccessToken() throws IOException {
+		synchronized (this) {
+			if(this.isTokenExpired()) {
+				final URL url = new URL(String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
+						Shadbot.getAPIKeys().get(APIKey.DEVIANTART_CLIENT_ID),
+						Shadbot.getAPIKeys().get(APIKey.DEVIANTART_API_SECRET)));
+				this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
+				this.lastTokenGeneration = System.currentTimeMillis();
+				LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
+			}
+		}
 	}
 
 	@Override

@@ -55,7 +55,7 @@ public class TranslateCmd extends AbstractCommand {
 		}
 
 		final List<String> langs = StringUtils.split(StringUtils.remove(arg, sourceText, "\""));
-		if(langs.size() == 0) {
+		if(langs.isEmpty()) {
 			throw new MissingArgumentException();
 		}
 

@@ -34,6 +34,9 @@ public class HangmanCmd extends AbstractCommand {
 		EASY, HARD;
 	}
 
+	private static final String HARD_WORDS_URL = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt";
+	private static final String EASY_WORDS_URL = "https://gist.githubusercontent.com/deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt";
+
 	private static final int MIN_WORD_LENGTH = 5;
 	private static final int MAX_WORD_LENGTH = 10;
 
@@ -75,17 +78,15 @@ public class HangmanCmd extends AbstractCommand {
 
 	private void load() throws IOException {
 		if(HARD_WORDS.isEmpty()) {
-			final String url = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt";
 			HARD_WORDS.addAll(
-					StringUtils.split(NetUtils.getBody(url), "\n").stream()
+					StringUtils.split(NetUtils.getBody(HARD_WORDS_URL), "\n").stream()
 							.filter(word -> NumberUtils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
 							.limit(500)
 							.collect(Collectors.toList()));
 		}
 
 		if(EASY_WORDS.isEmpty()) {
-			final String url = "https://gist.githubusercontent.com/deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt";
-			EASY_WORDS.addAll(StringUtils.split(NetUtils.getBody(url), "\n").stream()
+			EASY_WORDS.addAll(StringUtils.split(NetUtils.getBody(EASY_WORDS_URL), "\n").stream()
 					.filter(word -> NumberUtils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
 					.limit(500)
 					.collect(Collectors.toList()));

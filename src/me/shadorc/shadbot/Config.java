@@ -40,7 +40,7 @@ public class Config {
 
 	public static Properties getProperties() {
 		final Properties properties = new Properties();
-		try (InputStream inputStream = Config.class.getClassLoader().getResourceAsStream("project.properties")) {
+		try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("project.properties")) {
 			if(inputStream != null) {
 				properties.load(inputStream);
 			}
