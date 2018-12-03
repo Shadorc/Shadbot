@@ -64,7 +64,7 @@ public class DBGuild {
 
 	@JsonIgnore
 	public List<Snowflake> getAllowedRoles() {
-		return this.getListSetting(SettingEnum.PERMISSIONS, Long.class)
+		return this.getListSetting(SettingEnum.ALLOWED_ROLES, Long.class)
 				.stream()
 				.map(Snowflake::of)
 				.collect(Collectors.toList());
@@ -72,7 +72,7 @@ public class DBGuild {
 
 	@JsonIgnore
 	public List<Snowflake> getAutoRoles() {
-		return this.getListSetting(SettingEnum.AUTO_ROLE, Long.class)
+		return this.getListSetting(SettingEnum.AUTO_ROLES, Long.class)
 				.stream()
 				.map(Snowflake::of)
 				.collect(Collectors.toList());

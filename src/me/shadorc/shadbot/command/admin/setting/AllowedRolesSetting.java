@@ -23,8 +23,8 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Setting(description = "Manage role(s) that can interact with Shadbot.", setting = SettingEnum.PERMISSIONS)
-public class PermissionsSetting extends AbstractSetting {
+@Setting(description = "Manage role(s) that can interact with Shadbot.", setting = SettingEnum.ALLOWED_ROLES)
+public class AllowedRolesSetting extends AbstractSetting {
 
 	private enum Action {
 		ADD, REMOVE;

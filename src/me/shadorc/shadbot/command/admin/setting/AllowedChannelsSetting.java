@@ -25,7 +25,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 @Setting(description = "Manage channels allowed to Shadbot.", setting = SettingEnum.ALLOWED_CHANNELS)
-public class AllowedChannelSetting extends AbstractSetting {
+public class AllowedChannelsSetting extends AbstractSetting {
 
 	private enum Action {
 		ADD, REMOVE;

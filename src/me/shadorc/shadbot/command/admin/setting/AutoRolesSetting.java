@@ -23,8 +23,8 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Setting(description = "Manage auto assigned role(s).", setting = SettingEnum.AUTO_ROLE)
-public class AutoRoleSetting extends AbstractSetting {
+@Setting(description = "Manage auto assigned role(s).", setting = SettingEnum.AUTO_ROLES)
+public class AutoRolesSetting extends AbstractSetting {
 
 	private enum Action {
 		ADD, REMOVE;
