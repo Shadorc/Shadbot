@@ -34,7 +34,7 @@ public class BotListStats {
 		}
 		return Mono.fromRunnable(() -> LogUtils.info("Posting statistics..."))
 				.then(this.postOnBotListDotSpace())
-				.then(this.postOnBotsDiscordDotPw())
+				.then(this.postOnDiscordBotsDotGg())
 				.then(this.postOnDiscordBotListDotCom())
 				.then(this.postOnDiscordBotsDotOrg())
 				.then(this.postOnDivineDiscordBotsDotCom())
@@ -68,28 +68,28 @@ public class BotListStats {
 	}
 
 	/**
-	 * WebSite: https://bots.discord.pw/ <br>
-	 * Documentation: TODO
+	 * WebSite: https://discord.bots.gg/ <br>
+	 * Documentation: https://discord.bots.gg/docs/endpoints
 	 */
-	private Mono<Void> postOnBotsDiscordDotPw() {
+	private Mono<Void> postOnDiscordBotsDotGg() {
 		return Flux.fromIterable(Shadbot.getClients())
 				.flatMap(client -> client.getGuilds()
 						.count()
-						.doOnSuccess(guildsCount -> {
+						.doOnSuccess(guildCount -> {
 							final Long selfId = client.getSelfId().map(Snowflake::asLong).orElse(0L);
 							final JSONObject content = new JSONObject()
-									.put("shard_id", client.getConfig().getShardIndex())
-									.put("shard_count", client.getConfig().getShardCount())
-									.put("server_count", guildsCount);
-							final String url = String.format("https://bots.discord.pw/api/bots/%d/stats", selfId);
+									.put("shardId", client.getConfig().getShardIndex())
+									.put("shardCount", client.getConfig().getShardCount())
+									.put("guildCount", guildCount);
+							final String url = String.format("https://discord.bots.gg/api/bots/%d/stats", selfId);
 
 							try {
-								this.post(url, Shadbot.getAPIKeys().get(APIKey.BOTS_DISCORD_DOT_PW_TOKEN), content);
+								this.post(url, Shadbot.getAPIKeys().get(APIKey.DISCORD_BOTS_DOT_GG_TOKEN), content);
 							} catch (IOException err) {
 								Exceptions.propagate(err);
 							}
 						}))
-				.doOnError(err -> LogUtils.error(err, "An error occurred while posting statistics on bots.discord.pw"))
+				.doOnError(err -> LogUtils.error(err, "An error occurred while posting statistics on discord.bots.gg"))
 				.then();
 	}
 
