@@ -25,4 +25,4 @@ saves/
 stats/
 Shadbot.log
 clean.bat
-api_keys.properties
+credentials.properties

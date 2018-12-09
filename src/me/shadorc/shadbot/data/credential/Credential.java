@@ -1,6 +1,6 @@
-package me.shadorc.shadbot.data.apikey;
+package me.shadorc.shadbot.data.credential;
 
-public enum APIKey {
+public enum Credential {
 	GIPHY_API_KEY,
 	DTC_API_KEY,
 	DISCORD_TOKEN,

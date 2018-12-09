@@ -15,7 +15,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.data.apikey.APIKey;
+import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -91,8 +91,8 @@ public class ImageCmd extends AbstractCommand {
 		synchronized (this) {
 			if(this.isTokenExpired()) {
 				final URL url = new URL(String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
-						Shadbot.getAPIKeys().get(APIKey.DEVIANTART_CLIENT_ID),
-						Shadbot.getAPIKeys().get(APIKey.DEVIANTART_API_SECRET)));
+						Shadbot.getCredentials().get(Credential.DEVIANTART_CLIENT_ID),
+						Shadbot.getCredentials().get(Credential.DEVIANTART_API_SECRET)));
 				this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
 				this.lastTokenGeneration = System.currentTimeMillis();
 				LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());

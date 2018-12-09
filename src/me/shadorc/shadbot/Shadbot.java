@@ -28,8 +28,8 @@ import discord4j.core.object.presence.Presence;
 import discord4j.gateway.SimpleBucket;
 import me.shadorc.shadbot.command.game.LottoCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
-import me.shadorc.shadbot.data.apikey.APIKey;
-import me.shadorc.shadbot.data.apikey.APIKeys;
+import me.shadorc.shadbot.data.credential.Credential;
+import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.lotto.Lotto;
 import me.shadorc.shadbot.data.lotto.LottoManager;
@@ -55,7 +55,7 @@ public class Shadbot {
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 
-	private static APIKeys apiKeysManager;
+	private static Credentials credentials;
 	private static DatabaseManager databaseManager;
 	private static PremiumManager premiumManager;
 	private static LottoManager lottoManager;
@@ -67,7 +67,7 @@ public class Shadbot {
 		Locale.setDefault(Locale.US);
 
 		try {
-			Shadbot.apiKeysManager = new APIKeys();
+			Shadbot.credentials = new Credentials();
 			Shadbot.databaseManager = new DatabaseManager();
 			Shadbot.premiumManager = new PremiumManager();
 			Shadbot.lottoManager = new LottoManager();
@@ -85,7 +85,7 @@ public class Shadbot {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 
-		final DiscordClientBuilder builder = new DiscordClientBuilder(apiKeysManager.get(APIKey.DISCORD_TOKEN))
+		final DiscordClientBuilder builder = new DiscordClientBuilder(credentials.get(Credential.DISCORD_TOKEN))
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
 				.setShardCount(SHARD_COUNT)
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
@@ -144,8 +144,8 @@ public class Shadbot {
 		return CLIENTS;
 	}
 
-	public static APIKeys getAPIKeys() {
-		return apiKeysManager;
+	public static Credentials getCredentials() {
+		return credentials;
 	}
 
 	public static DatabaseManager getDatabase() {

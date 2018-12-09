@@ -19,7 +19,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.data.apikey.APIKey;
+import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -62,7 +62,7 @@ public class FortniteCmd extends AbstractCommand {
 					.method(Method.GET)
 					.ignoreContentType(true)
 					.ignoreHttpErrors(true)
-					.header("TRN-Api-Key", Shadbot.getAPIKeys().get(APIKey.FORTNITE_API_KEY))
+					.header("TRN-Api-Key", Shadbot.getCredentials().get(Credential.FORTNITE_API_KEY))
 					.execute();
 
 			if(response.statusCode() != 200) {

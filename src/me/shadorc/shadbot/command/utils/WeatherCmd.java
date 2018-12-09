@@ -11,7 +11,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.data.apikey.APIKey;
+import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -42,7 +42,7 @@ public class WeatherCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			final OWM owm = new OWM(Shadbot.getAPIKeys().get(APIKey.OPENWEATHERMAP_API_KEY));
+			final OWM owm = new OWM(Shadbot.getCredentials().get(Credential.OPENWEATHERMAP_API_KEY));
 			owm.setUnit(Unit.METRIC);
 
 			CurrentWeather currentWeather;
