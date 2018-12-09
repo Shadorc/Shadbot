@@ -22,7 +22,7 @@ public class TextUtils {
 	public static final String NOT_ENOUGH_COINS =
 			"You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
 
-	public static final String[] TIP_MESSAGES = { String.format("Check %slotto", Config.DEFAULT_PREFIX),
+	public static final String[] TIP_MESSAGES = { String.format("Check %slottery", Config.DEFAULT_PREFIX),
 			String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
 			String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
 			String.format("Support server: %s", Config.SUPPORT_SERVER_URL) };

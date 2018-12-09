@@ -26,13 +26,13 @@ import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.gateway.SimpleBucket;
-import me.shadorc.shadbot.command.game.LottoCmd;
+import me.shadorc.shadbot.command.game.LotteryCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.data.database.DatabaseManager;
-import me.shadorc.shadbot.data.lotto.Lotto;
-import me.shadorc.shadbot.data.lotto.LottoManager;
+import me.shadorc.shadbot.data.lottery.Lottery;
+import me.shadorc.shadbot.data.lottery.LotteryManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.listener.ChannelListener;
@@ -58,7 +58,7 @@ public class Shadbot {
 	private static Credentials credentials;
 	private static DatabaseManager databaseManager;
 	private static PremiumManager premiumManager;
-	private static LottoManager lottoManager;
+	private static LotteryManager lotteryManager;
 	private static StatsManager statsManager;
 	private static BotListStats botListStats;
 
@@ -70,7 +70,7 @@ public class Shadbot {
 			Shadbot.credentials = new Credentials();
 			Shadbot.databaseManager = new DatabaseManager();
 			Shadbot.premiumManager = new PremiumManager();
-			Shadbot.lottoManager = new LottoManager();
+			Shadbot.lotteryManager = new LotteryManager();
 			Shadbot.statsManager = new StatsManager();
 			Shadbot.botListStats = new BotListStats();
 		} catch (IOException err) {
@@ -122,8 +122,8 @@ public class Shadbot {
 					});
 		}
 
-		Flux.interval(LottoCmd.getDelay(), Duration.ofDays(7))
-				.doOnNext(ignored -> LottoCmd.draw(CLIENTS.get(0)))
+		Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
+				.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
 				.subscribe();
 
 		// Initiate login and block
@@ -156,8 +156,8 @@ public class Shadbot {
 		return premiumManager;
 	}
 
-	public static Lotto getLotto() {
-		return lottoManager.getLotto();
+	public static Lottery getLottery() {
+		return lotteryManager.getLottery();
 	}
 
 	public static StatsManager getStatsManager() {
@@ -174,7 +174,7 @@ public class Shadbot {
 	private static void save() {
 		databaseManager.save();
 		premiumManager.save();
-		lottoManager.save();
+		lotteryManager.save();
 		statsManager.save();
 	}
 

@@ -18,8 +18,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBMember;
-import me.shadorc.shadbot.data.lotto.LottoGambler;
-import me.shadorc.shadbot.data.lotto.LottoHistoric;
+import me.shadorc.shadbot.data.lottery.LotteryGambler;
+import me.shadorc.shadbot.data.lottery.LotteryHistoric;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -33,8 +33,8 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 @RateLimited
-@Command(category = CommandCategory.GAME, names = { "lotto" })
-public class LottoCmd extends AbstractCommand {
+@Command(category = CommandCategory.GAME, names = { "lottery", "lotto" })
+public class LotteryCmd extends AbstractCommand {
 
 	private static final int PAID_COST = 100;
 	private static final int MIN_NUM = 1;
@@ -53,8 +53,8 @@ public class LottoCmd extends AbstractCommand {
 			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
 		}
 
-		final LottoGambler gambler = Shadbot.getLotto().getGamblers().stream()
-				.filter(lottoGambler -> lottoGambler.getUserId().equals(context.getAuthorId()))
+		final LotteryGambler gambler = Shadbot.getLottery().getGamblers().stream()
+				.filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
 				.findAny()
 				.orElse(null);
 
@@ -70,30 +70,30 @@ public class LottoCmd extends AbstractCommand {
 
 		dbMember.addCoins(-PAID_COST);
 
-		Shadbot.getLotto().addGambler(context.getGuildId(), context.getAuthorId(), num);
+		Shadbot.getLottery().addGambler(context.getGuildId(), context.getAuthorId(), num);
 
 		return BotUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
 				+ "The next draw will take place in **%s**.",
-				context.getUsername(), num, FormatUtils.customDate(LottoCmd.getDelay().toMillis())), context.getChannel())
+				context.getUsername(), num, FormatUtils.customDate(LotteryCmd.getDelay().toMillis())), context.getChannel())
 				.then();
 	}
 
 	private Mono<Message> show(Context context) {
-		final List<LottoGambler> gamblers = Shadbot.getLotto().getGamblers();
+		final List<LotteryGambler> gamblers = Shadbot.getLottery().getGamblers();
 
 		return context.getAvatarUrl()
 				.map(avatarUrl -> {
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Lotto", null, avatarUrl)
+							.setAuthor("Lottery", null, avatarUrl)
 							.setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 							.setDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
-									FormatUtils.customDate(LottoCmd.getDelay().toMillis()),
+									FormatUtils.customDate(LotteryCmd.getDelay().toMillis()),
 									context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
 							.addField("Number of participants", Integer.toString(gamblers.size()), false)
-							.addField("Prize pool", FormatUtils.coins(Shadbot.getLotto().getJackpot()), false);
+							.addField("Prize pool", FormatUtils.coins(Shadbot.getLottery().getJackpot()), false);
 
-					final LottoGambler gambler = gamblers.stream()
-							.filter(lottoGambler -> lottoGambler.getUserId().equals(context.getAuthorId()))
+					final LotteryGambler gambler = gamblers.stream()
+							.filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
 							.findAny()
 							.orElse(null);
 
@@ -102,7 +102,7 @@ public class LottoCmd extends AbstractCommand {
 								"https://images.emojiterra.com/twitter/512px/1f39f.png");
 					}
 
-					final LottoHistoric historic = Shadbot.getLotto().getHistoric();
+					final LotteryHistoric historic = Shadbot.getLottery().getHistoric();
 					if(historic != null) {
 						String people;
 						switch (historic.getWinnersCount()) {
@@ -145,16 +145,16 @@ public class LottoCmd extends AbstractCommand {
 		LogUtils.info("Lottery draw started...");
 		final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
-		final List<LottoGambler> winners = Shadbot.getLotto().getGamblers().stream()
+		final List<LotteryGambler> winners = Shadbot.getLottery().getGamblers().stream()
 				.filter(gambler -> gambler.getNumber() == winningNum)
 				.collect(Collectors.toList());
 
-		for(LottoGambler winner : winners) {
+		for(LotteryGambler winner : winners) {
 			client.getUserById(winner.getUserId())
 					.flatMap(user -> {
-						final int coins = (int) Math.ceil((double) Shadbot.getLotto().getJackpot() / winners.size());
+						final int coins = (int) Math.ceil((double) Shadbot.getLottery().getJackpot() / winners.size());
 						Shadbot.getDatabase().getDBMember(winner.getGuildId(), winner.getUserId()).addCoins(coins);
-						return BotUtils.sendMessage(String.format("Congratulations, you have the winning Lotto number! You earn %s.",
+						return BotUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn %s.",
 								FormatUtils.coins(coins)), user.getPrivateChannel().cast(MessageChannel.class));
 					})
 					.subscribe();
@@ -162,12 +162,12 @@ public class LottoCmd extends AbstractCommand {
 		}
 
 		LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
-				winningNum, winners.size(), Shadbot.getLotto().getJackpot());
+				winningNum, winners.size(), Shadbot.getLottery().getJackpot());
 
-		Shadbot.getLotto().setHistoric(new LottoHistoric(winners.size(), Shadbot.getLotto().getJackpot(), winningNum));
-		Shadbot.getLotto().resetGamblers();
+		Shadbot.getLottery().setHistoric(new LotteryHistoric(winners.size(), Shadbot.getLottery().getJackpot(), winningNum));
+		Shadbot.getLottery().resetGamblers();
 		if(!winners.isEmpty()) {
-			Shadbot.getLotto().resetJackpot();
+			Shadbot.getLottery().resetJackpot();
 		}
 	}
 

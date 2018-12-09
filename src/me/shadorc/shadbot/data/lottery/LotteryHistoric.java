@@ -1,8 +1,8 @@
-package me.shadorc.shadbot.data.lotto;
+package me.shadorc.shadbot.data.lottery;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LottoHistoric {
+public class LotteryHistoric {
 
 	@JsonProperty("jackpot")
 	private final int jackpot;
@@ -11,13 +11,13 @@ public class LottoHistoric {
 	@JsonProperty("number")
 	private final int number;
 
-	public LottoHistoric(int jackpot, int winnersCount, int number) {
+	public LotteryHistoric(int jackpot, int winnersCount, int number) {
 		this.jackpot = jackpot;
 		this.winnersCount = winnersCount;
 		this.number = number;
 	}
 
-	public LottoHistoric() {
+	public LotteryHistoric() {
 		this(0, 0, 0);
 	}
 
@@ -35,7 +35,7 @@ public class LottoHistoric {
 
 	@Override
 	public String toString() {
-		return String.format("LottoHistoric [jackpot=%s, winnersCount=%s, number=%s]", this.jackpot, this.winnersCount, this.number);
+		return String.format("LotteryHistoric [jackpot=%s, winnersCount=%s, number=%s]", jackpot, winnersCount, number);
 	}
 
 }

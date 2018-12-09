@@ -39,7 +39,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 		if(ThreadLocalRandom.current().nextInt(6) == 0) {
 			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
-			Shadbot.getLotto().addToJackpot(Math.abs(gains));
+			Shadbot.getLottery().addToJackpot(Math.abs(gains));
 			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.coins(Math.abs(gains))));
 		} else {
 			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);

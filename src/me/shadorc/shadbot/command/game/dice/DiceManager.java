@@ -105,7 +105,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 					} else {
 						gains *= -1;
 						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
-						Shadbot.getLotto().addToJackpot(Math.abs(gains));
+						Shadbot.getLottery().addToJackpot(Math.abs(gains));
 					}
 					Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
 					return String.format("%s (**%s**)", user.getUsername(), FormatUtils.coins(gains));

@@ -134,7 +134,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 						return String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.coins(gains));
 					} else {
 						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
-						Shadbot.getLotto().addToJackpot(Math.abs(gains));
+						Shadbot.getLottery().addToJackpot(Math.abs(gains));
 						return String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
 					}
 				})

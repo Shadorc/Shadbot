@@ -49,7 +49,7 @@ public class SlotMachineCmd extends AbstractCommand {
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
 		} else {
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
-			Shadbot.getLotto().addToJackpot(Math.abs(gains));
+			Shadbot.getLottery().addToJackpot(Math.abs(gains));
 		}
 
 		return BotUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",

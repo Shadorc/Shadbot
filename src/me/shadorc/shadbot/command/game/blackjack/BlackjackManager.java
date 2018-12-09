@@ -152,7 +152,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 						case -1:
 							gains -= player.getBet();
 							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
-							Shadbot.getLotto().addToJackpot(Math.abs(gains));
+							Shadbot.getLottery().addToJackpot(Math.abs(gains));
 							text = String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
 							break;
 					}

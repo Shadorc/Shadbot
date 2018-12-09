@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.data.lotto;
+package me.shadorc.shadbot.data.lottery;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -12,23 +12,23 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.NumberUtils;
 
-public class Lotto {
+public class Lottery {
 
 	@JsonProperty("historic")
-	private LottoHistoric historic;
+	private LotteryHistoric historic;
 	@JsonProperty("jackpot")
 	private final AtomicInteger jackpot;
 	@JsonProperty("gamblers")
-	private final List<LottoGambler> gamblers;
+	private final List<LotteryGambler> gamblers;
 
-	public Lotto() {
+	public Lottery() {
 		this.historic = null;
 		this.jackpot = new AtomicInteger(0);
 		this.gamblers = new CopyOnWriteArrayList<>();
 	}
 
 	@Nullable
-	public LottoHistoric getHistoric() {
+	public LotteryHistoric getHistoric() {
 		return this.historic;
 	}
 
@@ -36,11 +36,11 @@ public class Lotto {
 		return this.jackpot.get();
 	}
 
-	public List<LottoGambler> getGamblers() {
+	public List<LotteryGambler> getGamblers() {
 		return this.gamblers;
 	}
 
-	public void setHistoric(LottoHistoric historic) {
+	public void setHistoric(LotteryHistoric historic) {
 		this.historic = historic;
 	}
 
@@ -50,7 +50,7 @@ public class Lotto {
 	}
 
 	public void addGambler(Snowflake guildId, Snowflake userId, int number) {
-		this.gamblers.add(new LottoGambler(guildId, userId, number));
+		this.gamblers.add(new LotteryGambler(guildId, userId, number));
 	}
 
 	public void resetJackpot() {
@@ -63,7 +63,7 @@ public class Lotto {
 
 	@Override
 	public String toString() {
-		return String.format("Lotto [historic=%s, jackpot=%s, gamblers=%s]", this.historic, this.jackpot, this.gamblers);
+		return String.format("Lottery [historic=%s, jackpot=%s, gamblers=%s]", historic, jackpot, gamblers);
 	}
 
 }

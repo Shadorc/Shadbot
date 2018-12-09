@@ -1,11 +1,11 @@
-package me.shadorc.shadbot.data.lotto;
+package me.shadorc.shadbot.data.lottery;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
 
-public class LottoGambler {
+public class LotteryGambler {
 
 	@JsonProperty("guild_id")
 	private final Long guildId;
@@ -14,13 +14,13 @@ public class LottoGambler {
 	@JsonProperty("number")
 	private final int number;
 
-	public LottoGambler(Snowflake guildId, Snowflake userId, int number) {
+	public LotteryGambler(Snowflake guildId, Snowflake userId, int number) {
 		this.guildId = guildId.asLong();
 		this.userId = userId.asLong();
 		this.number = number;
 	}
 
-	public LottoGambler() {
+	public LotteryGambler() {
 		this(Snowflake.of(0L), Snowflake.of(0L), 0);
 	}
 
@@ -41,7 +41,7 @@ public class LottoGambler {
 
 	@Override
 	public String toString() {
-		return String.format("LottoGambler [guildId=%s, userId=%s, number=%s]", this.guildId, this.userId, this.number);
+		return String.format("LotteryGambler [guildId=%s, userId=%s, number=%s]", guildId, userId, number);
 	}
 
 }
