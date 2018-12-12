@@ -89,7 +89,7 @@ public class DiscordUtils {
 		final List<String> words = StringUtils.split(content);
 		return guild.flatMapMany(Guild::getChannels)
 				.filter(channel -> words.contains(String.format("#%s", channel.getName()))
-						|| words.contains(DiscordUtils.getChannelMention(channel.getId())))
+						|| words.contains(channel.getMention()))
 				.map(GuildChannel::getId)
 				.distinct();
 	}
