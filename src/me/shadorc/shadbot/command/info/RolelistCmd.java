@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
@@ -16,7 +17,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -34,7 +34,7 @@ public class RolelistCmd extends AbstractCommand {
 		}
 
 		return context.getGuild()
-				.flatMapMany(DiscordUtils::getMembers)
+				.flatMapMany(Guild::getMembers)
 				.filter(member -> !Collections.disjoint(member.getRoleIds(), roleIds))
 				.map(Member::getUsername)
 				.collectList()

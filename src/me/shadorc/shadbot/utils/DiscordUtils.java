@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.utils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -122,31 +121,11 @@ public class DiscordUtils {
 	 * @return The members mentioned in a {@link Message}
 	 */
 	public static Flux<Member> getMembersFrom(Message message) {
-		return DiscordUtils.getMembers(message.getGuild())
+		return message.getGuild()
+				.flatMapMany(Guild::getMembers)
 				.filter(member -> message.mentionsEveryone()
 						|| message.getUserMentionIds().contains(member.getId())
 						|| !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
-	}
-
-	// FIXME: https://github.com/Discord4J/Discord4J/issues/429
-	public static Flux<Member> getMembers(Guild guild) {
-		return DiscordUtils.getMembers(Mono.just(guild));
-	}
-
-	// FIXME: https://github.com/Discord4J/Discord4J/issues/429
-	public static Flux<Member> getMembers(Mono<Guild> guild) {
-		return guild.flatMapMany(Guild::getMembers)
-				.collectList()
-				.map(list -> {
-					final List<Member> members = new ArrayList<>();
-					for(Member member : list) {
-						if(!members.stream().map(Member::getId).anyMatch(member.getId()::equals)) {
-							members.add(member);
-						}
-					}
-					return members;
-				})
-				.flatMapMany(Flux::fromIterable);
 	}
 
 	public static String getChannelMention(Snowflake channelId) {
