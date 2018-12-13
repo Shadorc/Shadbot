@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -51,6 +52,7 @@ import reactor.core.publisher.Mono;
 public class Shadbot {
 
 	private final static int SHARD_COUNT = 1;
+	private final static AtomicInteger CONNECTED_SHARDS = new AtomicInteger();
 
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
@@ -72,7 +74,6 @@ public class Shadbot {
 			Shadbot.premiumManager = new PremiumManager();
 			Shadbot.lotteryManager = new LotteryManager();
 			Shadbot.statsManager = new StatsManager();
-			Shadbot.botListStats = new BotListStats();
 		} catch (IOException err) {
 			LogUtils.error(err, "A fatal error occurred while initializing managers.");
 			System.exit(ExitCode.FATAL_ERROR.value());
@@ -106,25 +107,8 @@ public class Shadbot {
 			// Shadbot.register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 			Shadbot.register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
 			Shadbot.register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
-
-			// When all the guilds have been received, register GuildListener#onGuildCreate
-			// and GatewayLifecycleListener#onGatewayLifecycleEvent
-			client.getEventDispatcher().on(ReadyEvent.class)
-					.map(event -> event.getGuilds().size())
-					.flatMap(size -> client.getEventDispatcher()
-							.on(GuildCreateEvent.class)
-							.take(size)
-							.last())
-					.subscribe(event -> {
-						LogUtils.info("{Shard %d} Fully connected to Gateway.", client.getConfig().getShardIndex());
-						Shadbot.register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
-						Shadbot.register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
-					});
+			Shadbot.registerConnectedEvent(client);
 		}
-
-		Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
-				.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
-				.subscribe();
 
 		// Initiate login and block
 		Mono.when(Shadbot.CLIENTS.stream().map(DiscordClient::login).collect(Collectors.toList())).block();
@@ -169,6 +153,38 @@ public class Shadbot {
 				.on(eventClass)
 				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
 				.subscribe(consumer);
+	}
+
+	/**
+	 * When all guilds have been received, register GuildListener#onGuildCreate and GatewayLifecycleListener#onGatewayLifecycleEvent
+	 */
+	private static void registerConnectedEvent(DiscordClient client) {
+		client.getEventDispatcher().on(ReadyEvent.class)
+				.map(event -> event.getGuilds().size())
+				.flatMap(size -> client.getEventDispatcher()
+						.on(GuildCreateEvent.class)
+						.take(size)
+						.last())
+				.subscribe(event -> {
+					LogUtils.info("{Shard %d} Fully connected to Gateway.", client.getConfig().getShardIndex());
+					Shadbot.register(client, GuildCreateEvent.class, GuildListener::onGuildCreate);
+					Shadbot.register(client, GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
+
+					CONNECTED_SHARDS.incrementAndGet();
+					if(CONNECTED_SHARDS.get() == SHARD_COUNT) {
+						Shadbot.onFullyConnected();
+					}
+				});
+	}
+
+	private static void onFullyConnected() {
+		LogUtils.info("Shadbot is fully connected to all shards.");
+
+		Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
+				.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
+				.subscribe();
+
+		Shadbot.botListStats = new BotListStats(CLIENTS.get(0).getSelfId().get());
 	}
 
 	private static void save() {
