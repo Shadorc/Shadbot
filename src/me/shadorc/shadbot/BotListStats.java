@@ -38,6 +38,7 @@ public class BotListStats {
 				.then(this.postOnDiscordBotListDotCom())
 				.then(this.postOnDiscordBotsDotOrg())
 				.then(this.postOnDivineDiscordBotsDotCom())
+				.then(this.postOnBotsOndiscordXyz())
 				.then(Mono.fromRunnable(() -> LogUtils.info("Statistics posted.")));
 	}
 
@@ -163,6 +164,30 @@ public class BotListStats {
 					}
 				})
 				.doOnError(err -> LogUtils.error(err, "An error occurred while posting statistics on botlist.space"))
+				.then();
+	}
+
+	/**
+	 * WebSite: https://bots.ondiscord.xyz/ <br>
+	 * Documentation: https://bots.ondiscord.xyz/info/api
+	 */
+	private Mono<Void> postOnBotsOndiscordXyz() {
+		return Flux.fromIterable(Shadbot.getClients())
+				.flatMap(DiscordClient::getGuilds)
+				.count()
+				.doOnSuccess(guildCount -> {
+					final Long selfId = Shadbot.getClients().get(0).getSelfId().map(Snowflake::asLong).orElse(0L);
+					final JSONObject content = new JSONObject()
+							.put("guildCount", guildCount);
+					final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", selfId);
+
+					try {
+						this.post(url, Shadbot.getCredentials().get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
+					} catch (IOException err) {
+						Exceptions.propagate(err);
+					}
+				})
+				.doOnError(err -> LogUtils.error(err, "An error occurred while posting statistics on bots.ondiscord.xyz"))
 				.then();
 	}
 
