@@ -53,12 +53,12 @@
 // .flatMap(VoiceState::getChannel)
 // .flatMapMany(VoiceChannel::getVoiceStates)
 // .count()
-// .flatMap(membersCount -> {
-// if(membersCount == 1 && !guildMusic.isLeavingScheduled()) {
+// .flatMap(memberCount -> {
+// if(memberCount == 1 && !guildMusic.isLeavingScheduled()) {
 // guildMusic.getScheduler().getAudioPlayer().setPaused(true);
 // guildMusic.scheduleLeave();
 // return Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.";
-// } else if(membersCount != 1 && guildMusic.isLeavingScheduled()) {
+// } else if(memberCount != 1 && guildMusic.isLeavingScheduled()) {
 // guildMusic.getScheduler().getAudioPlayer().setPaused(false);
 // guildMusic.cancelLeave();
 // return Emoji.INFO + " Somebody joined me, music resumed.";

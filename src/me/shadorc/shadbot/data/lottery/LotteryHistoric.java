@@ -7,13 +7,13 @@ public class LotteryHistoric {
 	@JsonProperty("jackpot")
 	private final int jackpot;
 	@JsonProperty("winners_count")
-	private final int winnersCount;
+	private final int winnerCount;
 	@JsonProperty("number")
 	private final int number;
 
-	public LotteryHistoric(int jackpot, int winnersCount, int number) {
+	public LotteryHistoric(int jackpot, int winnerCount, int number) {
 		this.jackpot = jackpot;
-		this.winnersCount = winnersCount;
+		this.winnerCount = winnerCount;
 		this.number = number;
 	}
 
@@ -25,8 +25,8 @@ public class LotteryHistoric {
 		return this.jackpot;
 	}
 
-	public int getWinnersCount() {
-		return this.winnersCount;
+	public int getWinnerCount() {
+		return this.winnerCount;
 	}
 
 	public int getNumber() {
@@ -35,7 +35,7 @@ public class LotteryHistoric {
 
 	@Override
 	public String toString() {
-		return String.format("LotteryHistoric [jackpot=%s, winnersCount=%s, number=%s]", jackpot, winnersCount, number);
+		return String.format("LotteryHistoric [jackpot=%s, winnerCount=%s, number=%s]", jackpot, winnerCount, number);
 	}
 
 }

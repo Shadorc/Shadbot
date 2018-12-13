@@ -44,31 +44,31 @@ public class InfoCmd extends AbstractCommand {
 		final long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / MB_UNIT;
 		final long maxMemory = runtime.maxMemory() / MB_UNIT;
 
-		final Mono<Long> voiceChannelsCountMono = Flux.fromIterable(Shadbot.getClients())
+		final Mono<Long> voiceChannelCountMono = Flux.fromIterable(Shadbot.getClients())
 				.flatMap(DiscordClient::getGuilds)
 				.flatMap(guild -> guild.getMemberById(context.getSelfId()))
 				.flatMap(Member::getVoiceState)
 				.flatMap(VoiceState::getChannel)
 				.count();
 
-		final Mono<Long> guildsCountMono = Flux.fromIterable(Shadbot.getClients())
+		final Mono<Long> guildCountMono = Flux.fromIterable(Shadbot.getClients())
 				.flatMap(DiscordClient::getGuilds)
 				.count();
 
-		final Mono<Long> membersCountMono = Flux.fromIterable(Shadbot.getClients())
+		final Mono<Long> memberCountMono = Flux.fromIterable(Shadbot.getClients())
 				.flatMap(DiscordClient::getUsers)
 				.count();
 
 		final long start = System.currentTimeMillis();
 		return BotUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Loading info...", context.getUsername()), context.getChannel())
 				.flatMap(message -> Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
-						guildsCountMono, voiceChannelsCountMono, membersCountMono,
+						guildCountMono, voiceChannelCountMono, memberCountMono,
 						Mono.just(TimeUtils.getMillisUntil(start)))
 						.flatMap(tuple -> {
 							final User owner = tuple.getT1();
-							final Long guildsCount = tuple.getT2();
-							final Long voiceChannelsCount = tuple.getT3();
-							final Long membersCount = tuple.getT4();
+							final Long guildCount = tuple.getT2();
+							final Long voiceChannelCount = tuple.getT3();
+							final Long memberCount = tuple.getT4();
 							final Long ping = tuple.getT5();
 
 							return message.edit(new MessageEditSpec().setContent("```prolog"
@@ -85,9 +85,9 @@ public class InfoCmd extends AbstractCommand {
 									+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true))
 									+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
 									+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
-									+ String.format("%nServers: %s", FormatUtils.number(guildsCount))
-									+ String.format("%nVoice Channels: %s", FormatUtils.number(voiceChannelsCount))
-									+ String.format("%nUsers: %s", FormatUtils.number(membersCount))
+									+ String.format("%nServers: %s", FormatUtils.number(guildCount))
+									+ String.format("%nVoice Channels: %s", FormatUtils.number(voiceChannelCount))
+									+ String.format("%nUsers: %s", FormatUtils.number(memberCount))
 									+ String.format("%n%n-= Internet =-")
 									+ String.format("%nPing: %dms", ping)
 									+ String.format("%nGateway Latency: %dms", context.getClient().getResponseTime())

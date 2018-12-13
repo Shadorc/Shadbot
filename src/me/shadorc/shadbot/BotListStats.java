@@ -49,12 +49,12 @@ public class BotListStats {
 		return Flux.fromIterable(Shadbot.getClients())
 				.flatMap(client -> client.getGuilds()
 						.count()
-						.doOnSuccess(guildsCount -> {
+						.doOnSuccess(guildCount -> {
 							final Long selfId = client.getSelfId().map(Snowflake::asLong).orElse(0L);
 							final JSONObject content = new JSONObject()
 									.put("shard_id", client.getConfig().getShardIndex())
 									.put("shard_count", client.getConfig().getShardCount())
-									.put("server_count", guildsCount);
+									.put("server_count", guildCount);
 							final String url = String.format("https://discordbots.org/api/bots/%d/stats", selfId);
 
 							try {
@@ -101,11 +101,11 @@ public class BotListStats {
 		return Flux.fromIterable(Shadbot.getClients())
 				.flatMap(client -> client.getGuilds()
 						.count()
-						.doOnSuccess(guildsCount -> {
+						.doOnSuccess(guildCount -> {
 							final Long selfId = client.getSelfId().map(Snowflake::asLong).orElse(0L);
 							final JSONObject content = new JSONObject()
 									.put("shard_id", client.getConfig().getShardIndex())
-									.put("guilds ", guildsCount);
+									.put("guilds ", guildCount);
 							final String url = String.format("https://discordbotlist.com/api/bots/%d/stats", selfId);
 
 							try {
@@ -126,10 +126,10 @@ public class BotListStats {
 		return Flux.fromIterable(Shadbot.getClients())
 				.flatMap(DiscordClient::getGuilds)
 				.count()
-				.doOnSuccess(guildsCount -> {
+				.doOnSuccess(guildCount -> {
 					final Long selfId = Shadbot.getClients().get(0).getSelfId().map(Snowflake::asLong).orElse(0L);
 					final JSONObject content = new JSONObject()
-							.put("server_count", guildsCount);
+							.put("server_count", guildCount);
 					final String url = String.format("https://divinediscordbots.com/bots/%d/stats", selfId);
 
 					try {
@@ -150,10 +150,10 @@ public class BotListStats {
 		return Flux.fromIterable(Shadbot.getClients())
 				.flatMap(DiscordClient::getGuilds)
 				.count()
-				.doOnSuccess(guildsCount -> {
+				.doOnSuccess(guildCount -> {
 					final Long selfId = Shadbot.getClients().get(0).getSelfId().map(Snowflake::asLong).orElse(0L);
 					final JSONObject content = new JSONObject()
-							.put("server_count", guildsCount);
+							.put("server_count", guildCount);
 					final String url = String.format("https://botlist.space/bots/%d/stats", selfId);
 
 					try {

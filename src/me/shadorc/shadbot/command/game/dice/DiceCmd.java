@@ -64,7 +64,7 @@ public class DiceCmd extends AbstractCommand {
 			diceManager = new DiceManager(context, bet);
 		}
 
-		if(diceManager.getPlayersCount() == 6) {
+		if(diceManager.getPlayerCount() == 6) {
 			return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) Sorry, there are already 6 players.",
 					context.getUsername()), context.getChannel())
 					.then();

@@ -105,7 +105,7 @@ public class LotteryCmd extends AbstractCommand {
 					final LotteryHistoric historic = Shadbot.getLottery().getHistoric();
 					if(historic != null) {
 						String people;
-						switch (historic.getWinnersCount()) {
+						switch (historic.getWinnerCount()) {
 							case 0:
 								people = "nobody";
 								break;
@@ -113,7 +113,7 @@ public class LotteryCmd extends AbstractCommand {
 								people = "one person";
 								break;
 							default:
-								people = historic.getWinnersCount() + " people";
+								people = historic.getWinnerCount() + " people";
 								break;
 						}
 

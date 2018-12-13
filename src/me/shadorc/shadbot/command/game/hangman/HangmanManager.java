@@ -44,7 +44,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 	private final String word;
 	private final List<String> lettersTested;
 
-	private int failsCount;
+	private int failCount;
 
 	public HangmanManager(Context context, Difficulty difficulty) {
 		super(context);
@@ -52,7 +52,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 		this.word = HangmanCmd.getWord(difficulty);
 		this.lettersTested = new ArrayList<>();
-		this.failsCount = 0;
+		this.failCount = 0;
 	}
 
 	@Override
@@ -94,8 +94,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 								this.getContext().getPrefix(), IDLE_MIN), null);
 					}
 
-					if(this.failsCount > 0) {
-						embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failsCount) - 1));
+					if(this.failCount > 0) {
+						embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
 					}
 
 					return embed;
@@ -108,7 +108,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 		String text;
 		if(win) {
 			final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
-			final float imagesRemaining = IMG_LIST.size() - this.failsCount;
+			final float imagesRemaining = IMG_LIST.size() - this.failCount;
 			final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
 
 			Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
@@ -135,8 +135,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 		}
 
 		if(!this.word.contains(chr)) {
-			this.failsCount++;
-			if(this.failsCount == IMG_LIST.size()) {
+			this.failCount++;
+			if(this.failCount == IMG_LIST.size()) {
 				return this.showResultAndStop(false);
 			}
 		}
@@ -161,8 +161,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 			return this.showResultAndStop(true);
 		}
 
-		this.failsCount++;
-		if(this.failsCount == IMG_LIST.size()) {
+		this.failCount++;
+		if(this.failCount == IMG_LIST.size()) {
 			return this.showResultAndStop(false);
 		}
 		return this.show();

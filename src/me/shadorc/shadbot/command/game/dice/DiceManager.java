@@ -121,7 +121,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 		return this.bet;
 	}
 
-	public int getPlayersCount() {
+	public int getPlayerCount() {
 		return this.numsPlayers.size();
 	}
 
