@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.TokenResponse;
 import me.shadorc.shadbot.api.gamestats.diablo.hero.HeroResponse;
 import me.shadorc.shadbot.api.gamestats.diablo.profile.HeroId;
@@ -20,6 +19,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
+import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -124,8 +124,8 @@ public class DiabloCmd extends AbstractCommand {
 		synchronized (this) {
 			if(this.isTokenExpired()) {
 				final URL url = new URL(String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-						Shadbot.getCredentials().get(Credential.BLIZZARD_CLIENT_ID),
-						Shadbot.getCredentials().get(Credential.BLIZZARD_CLIENT_SECRET)));
+						Credentials.get(Credential.BLIZZARD_CLIENT_ID),
+						Credentials.get(Credential.BLIZZARD_CLIENT_SECRET)));
 				this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
 				this.lastTokenGeneration = System.currentTimeMillis();
 				LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());

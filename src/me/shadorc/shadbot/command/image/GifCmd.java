@@ -8,7 +8,6 @@ import org.jsoup.HttpStatusException;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.image.giphy.GiphyResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -16,6 +15,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
+import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -34,7 +34,7 @@ public class GifCmd extends AbstractCommand {
 
 		try {
 			final URL url = new URL(String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
-					Shadbot.getCredentials().get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse(""))));
+					Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse(""))));
 
 			final GiphyResponse giphy = Utils.MAPPER.readValue(url, GiphyResponse.class);
 

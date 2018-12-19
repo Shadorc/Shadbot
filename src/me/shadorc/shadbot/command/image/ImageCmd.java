@@ -6,7 +6,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.TokenResponse;
 import me.shadorc.shadbot.api.image.deviantart.DeviantArtResponse;
 import me.shadorc.shadbot.api.image.deviantart.Image;
@@ -16,6 +15,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
+import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -91,8 +91,8 @@ public class ImageCmd extends AbstractCommand {
 		synchronized (this) {
 			if(this.isTokenExpired()) {
 				final URL url = new URL(String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
-						Shadbot.getCredentials().get(Credential.DEVIANTART_CLIENT_ID),
-						Shadbot.getCredentials().get(Credential.DEVIANTART_API_SECRET)));
+						Credentials.get(Credential.DEVIANTART_CLIENT_ID),
+						Credentials.get(Credential.DEVIANTART_API_SECRET)));
 				this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
 				this.lastTokenGeneration = System.currentTimeMillis();
 				LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());

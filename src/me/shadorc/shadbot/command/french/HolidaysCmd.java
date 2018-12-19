@@ -3,7 +3,6 @@ package me.shadorc.shadbot.command.french;
 import java.io.IOException;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.twitter.Twitter;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -11,6 +10,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
+import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -25,8 +25,8 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.FRENCH, names = { "vacs", "vacances" })
 public class HolidaysCmd extends AbstractCommand {
 
-	private static final Twitter TWITTER = new Twitter(Shadbot.getCredentials().get(Credential.TWITTER_API_KEY),
-			Shadbot.getCredentials().get(Credential.TWITTER_API_SECRET));
+	private static final Twitter TWITTER = new Twitter(Credentials.get(Credential.TWITTER_API_KEY),
+			Credentials.get(Credential.TWITTER_API_SECRET));
 
 	private enum Zone {
 		A, B, C;

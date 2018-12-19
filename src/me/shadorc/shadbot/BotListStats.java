@@ -11,6 +11,7 @@ import org.jsoup.Jsoup;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.credential.Credential;
+import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
@@ -63,7 +64,7 @@ public class BotListStats {
 			final String url = String.format("https://discordbots.org/api/bots/%d/stats", selfId);
 
 			try {
-				this.post(url, Shadbot.getCredentials().get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
+				this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
 			} catch (IOException err) {
 				LogUtils.error(err, "An error occurred while posting statistics on discordbots.org");
 			}
@@ -83,7 +84,7 @@ public class BotListStats {
 			final String url = String.format("https://discord.bots.gg/api/bots/%d/stats", selfId);
 
 			try {
-				this.post(url, Shadbot.getCredentials().get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
+				this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
 			} catch (IOException err) {
 				LogUtils.error(err, "An error occurred while posting statistics on discord.bots.gg");
 			}
@@ -102,7 +103,7 @@ public class BotListStats {
 			final String url = String.format("https://discordbotlist.com/api/bots/%d/stats", selfId);
 
 			try {
-				this.post(url, String.format("Bot %s", Shadbot.getCredentials().get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
+				this.post(url, String.format("Bot %s", Credentials.get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
 			} catch (IOException err) {
 				LogUtils.error(err, "An error occurred while posting statistics on discordbotlist.com");
 			}
@@ -120,7 +121,7 @@ public class BotListStats {
 		final String url = String.format("https://divinediscordbots.com/bots/%d/stats", selfId);
 
 		try {
-			this.post(url, Shadbot.getCredentials().get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
+			this.post(url, Credentials.get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
 		} catch (IOException err) {
 			LogUtils.error(err, "An error occurred while posting statistics on divinediscordbots.com");
 		}
@@ -137,7 +138,7 @@ public class BotListStats {
 		final String url = String.format("https://botlist.space/bots/%d/stats", selfId);
 
 		try {
-			this.post(url, Shadbot.getCredentials().get(Credential.BOT_LIST_DOT_SPACE), content);
+			this.post(url, Credentials.get(Credential.BOT_LIST_DOT_SPACE), content);
 		} catch (IOException err) {
 			LogUtils.error(err, "An error occurred while posting statistics on botlist.space");
 		}
@@ -156,7 +157,7 @@ public class BotListStats {
 		final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", selfId);
 
 		try {
-			this.post(url, Shadbot.getCredentials().get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
+			this.post(url, Credentials.get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
 		} catch (IOException err) {
 			LogUtils.error(err, "An error occurred while posting statistics on bots.ondiscord.xyz");
 		}

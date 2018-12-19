@@ -21,13 +21,13 @@ import com.ivkos.wallhaven4j.util.exceptions.WallhavenException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
+import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -58,8 +58,8 @@ public class WallpaperCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		if(this.wallhaven == null) {
-			this.wallhaven = new Wallhaven(Shadbot.getCredentials().get(Credential.WALLHAVEN_LOGIN),
-					Shadbot.getCredentials().get(Credential.WALLHAVEN_PASSWORD));
+			this.wallhaven = new Wallhaven(Credentials.get(Credential.WALLHAVEN_LOGIN),
+					Credentials.get(Credential.WALLHAVEN_PASSWORD));
 		}
 
 		final Options options = new Options();

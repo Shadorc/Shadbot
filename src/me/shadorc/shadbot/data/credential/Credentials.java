@@ -8,28 +8,30 @@ import java.util.Properties;
 
 public class Credentials {
 
-	private static final Properties CREDENTIALES_PROPERTIES = new Properties();
+	private static final Properties CREDENTIALS_PROPERTIES = new Properties();
 	private static final File CREDENTIALS_FILE = new File("credentials.properties");
 
-	public Credentials() throws IOException {
+	static {
 		if(!CREDENTIALS_FILE.exists()) {
-			throw new RuntimeException("API keys file is missing. Exiting.");
+			throw new RuntimeException(String.format("%s file is missing.", CREDENTIALS_FILE.getName()));
 		}
 
 		try (BufferedReader reader = Files.newBufferedReader(CREDENTIALS_FILE.toPath())) {
-			CREDENTIALES_PROPERTIES.load(reader);
+			CREDENTIALS_PROPERTIES.load(reader);
+		} catch (IOException e) {
+			throw new RuntimeException(String.format("An error occurred while loading %s file.", CREDENTIALS_FILE.getName()));
 		}
 
 		// Check if all API keys are present
 		for(Credential key : Credential.values()) {
-			if(this.get(key) == null) {
+			if(Credentials.get(key) == null) {
 				throw new RuntimeException(String.format("%s not found.", key.toString()));
 			}
 		}
 	}
 
-	public String get(Credential key) {
-		return CREDENTIALES_PROPERTIES.getProperty(key.toString());
+	public static String get(Credential key) {
+		return CREDENTIALS_PROPERTIES.getProperty(key.toString());
 	}
 
 }
