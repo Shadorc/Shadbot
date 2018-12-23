@@ -2,9 +2,11 @@ package me.shadorc.shadbot.utils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Member;
@@ -18,6 +20,7 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
@@ -132,42 +135,53 @@ public class DiscordUtils {
 		return String.format("<#%d>", channelId.asLong());
 	}
 
-	// TODO: Implement
-	// public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
-	// return Mono.zip(DiscordUtils.getVoiceChannelId(context.getSelfAsMember()),
-	// DiscordUtils.getVoiceChannelId(context.getMessage().getAuthorAsMember()))
-	// .map(tuple2 -> {
-	// final Optional<Snowflake> botVoiceChannelId = tuple2.getT1();
-	// final Optional<Snowflake> userVoiceChannelId = tuple2.getT2();
-	//
-	// if(userVoiceChannelId.isPresent() && !BotUtils.isVoiceChannelAllowed(context.getGuildId(), userVoiceChannelId.get())) {
-	// throw new CommandException("I'm not allowed to join this voice channel.");
-	// }
-	//
-	// if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
-	// throw new CommandException("Join a voice channel before using this command.");
-	// }
-	//
-	// if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
-	// throw new CommandException(String.format("I'm currently playing music in voice channel %s"
-	// + ", join me before using this command.", DiscordUtils.mentionChannel(botVoiceChannelId.get())));
-	// }
-	//
-	// return userVoiceChannelId.get();
-	// });
-	// }
+	public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
+		final Mono<Optional<Snowflake>> botVoiceChannelIdMono = context.getSelfAsMember()
+				.flatMap(Member::getVoiceState)
+				.map(VoiceState::getChannelId)
+				.defaultIfEmpty(Optional.empty());
+
+		final Mono<Optional<Snowflake>> userVoiceChannelIdMono = context.getMember()
+				.getVoiceState()
+				.map(VoiceState::getChannelId)
+				.defaultIfEmpty(Optional.empty());
+
+		return Mono.zip(botVoiceChannelIdMono, userVoiceChannelIdMono)
+				.map(tuple -> {
+					final Optional<Snowflake> botVoiceChannelId = tuple.getT1();
+					final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
+
+					// If the user is in a voice channel but the bot is not allowed to join
+					if(userVoiceChannelId.isPresent() && !BotUtils.isVoiceChannelAllowed(context.getGuildId(), userVoiceChannelId.get())) {
+						throw new CommandException("I'm not allowed to join this voice channel.");
+					}
+
+					// If the user and the bot are not in a voice channel
+					if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
+						throw new CommandException("Join a voice channel before using this command.");
+					}
+
+					// If the user and the bot are not in the same voice channel
+					if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
+						throw new CommandException(String.format("I'm currently playing music in voice channel <#%d>"
+								+ ", join me before using this command.", botVoiceChannelId.map(Snowflake::asLong).get()));
+					}
+
+					return userVoiceChannelId.get();
+				});
+	}
 
 	public static Mono<Boolean> hasPermission(Mono<MessageChannel> channel, Snowflake memberId, Permission permission) {
 		return channel
-				.ofType(TextChannel.class)
-				.flatMap(textChannel -> textChannel.getEffectivePermissions(memberId))
+				.ofType(GuildChannel.class)
+				.flatMap(guildChannel -> guildChannel.getEffectivePermissions(memberId))
 				.map(permissions -> permissions.contains(permission));
 	}
 
 	public static Mono<Void> requirePermissions(Mono<MessageChannel> channel, Snowflake userId, UserType userType, Permission... permissions) {
 		return channel
-				.ofType(TextChannel.class)
-				.flatMap(textChannel -> textChannel.getEffectivePermissions(userId))
+				.ofType(GuildChannel.class)
+				.flatMap(guildChannel -> guildChannel.getEffectivePermissions(userId))
 				.doOnSuccess(effectivePermissions -> {
 					for(Permission permission : permissions) {
 						if(!effectivePermissions.contains(permission)) {

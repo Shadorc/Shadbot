@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.event.domain.Event;
+import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
@@ -43,6 +44,7 @@ import me.shadorc.shadbot.listener.MemberListener;
 import me.shadorc.shadbot.listener.MessageCreateListener;
 import me.shadorc.shadbot.listener.MessageUpdateListener;
 import me.shadorc.shadbot.listener.ReactionListener;
+import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
 import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -101,8 +103,7 @@ public class Shadbot {
 			Shadbot.register(client, MemberLeaveEvent.class, MemberListener::onMemberLeave);
 			Shadbot.register(client, MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
 			Shadbot.register(client, MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
-			// TODO: Implement
-			// Shadbot.register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
+			Shadbot.register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 			Shadbot.register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
 			Shadbot.register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
 			Shadbot.registerConnectedEvent(client);
