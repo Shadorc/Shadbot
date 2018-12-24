@@ -71,7 +71,6 @@ public class AudioEventListener extends AudioEventAdapter {
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
 		LogUtils.info("{Guild ID: %d} Music stuck, skipping it.", this.guildMusic.getGuildId().asLong());
 
-		// TODO: Does the music end if an error (for example permission exception) is thrown by the first sendMessage ?
 		BotUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
 				this.guildMusic.getMessageChannel())
 				.then(this.nextOrEnd())

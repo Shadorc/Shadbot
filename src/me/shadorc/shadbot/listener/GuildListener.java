@@ -7,9 +7,10 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 public class GuildListener {
 
 	public static void onGuildCreate(GuildCreateEvent event) {
-		LogUtils.info("Shadbot connected to a guild. (ID: %d | Users: %d)",
-				event.getGuild().getId().asLong(),
-				event.getGuild().getMemberCount().orElse(-1));
+		event.getGuild()
+				.getMemberCount()
+				.ifPresent(memberCount -> LogUtils.info("Shadbot connected to a guild. (ID: %d | Users: %d)",
+						event.getGuild().getId().asLong(), memberCount));
 	}
 
 	public static void onGuildDelete(GuildDeleteEvent event) {
