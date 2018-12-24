@@ -10,9 +10,11 @@ import org.reactivestreams.Subscriber;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -56,6 +58,7 @@ public class LoadingMessage implements Publisher<Void> {
 	private Flux<Long> startTyping() {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
+				.filterWhen(channel -> DiscordUtils.hasPermission(Mono.just(channel), this.client.getSelfId().get(), Permission.SEND_MESSAGES))
 				.flatMapMany(channel -> channel.typeUntil(this))
 				.take(this.typingTimeout);
 	}
