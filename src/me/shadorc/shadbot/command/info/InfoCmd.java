@@ -81,6 +81,9 @@ public class InfoCmd extends AbstractCommand {
 									+ String.format("%nMemory: %s/%s MB", FormatUtils.number(usedMemory), FormatUtils.number(maxMemory))
 									+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
 									+ String.format("%nThreads: %s", FormatUtils.number(Thread.activeCount()))
+									+ String.format("%n%n-= Internet =-")
+									+ String.format("%nPing: %dms", ping)
+									+ String.format("%nGateway Latency: %dms", context.getClient().getResponseTime())
 									+ String.format("%n%n-= Shadbot =-")
 									+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true))
 									+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
@@ -88,9 +91,6 @@ public class InfoCmd extends AbstractCommand {
 									+ String.format("%nServers: %s", FormatUtils.number(guildCount))
 									+ String.format("%nVoice Channels: %s", FormatUtils.number(voiceChannelCount))
 									+ String.format("%nUsers: %s", FormatUtils.number(memberCount))
-									+ String.format("%n%n-= Internet =-")
-									+ String.format("%nPing: %dms", ping)
-									+ String.format("%nGateway Latency: %dms", context.getClient().getResponseTime())
 									+ "```"));
 						}))
 				.then();
