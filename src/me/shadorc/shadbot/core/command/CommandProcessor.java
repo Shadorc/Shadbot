@@ -11,8 +11,6 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import me.shadorc.shadbot.Config;
@@ -25,10 +23,6 @@ import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.BotUtils;
-import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
@@ -44,33 +38,6 @@ public class CommandProcessor {
 			return CommandProcessor.onPrivateMessage(event).thenReturn(false);
 		};
 
-		final Function<MessageChannel, Mono<Boolean>> canSendMessages = channel -> {
-			final Snowflake selfId = channel.getClient().getSelfId().orElse(null);
-			if(selfId == null) {
-				return Mono.just(false);
-			}
-
-			return Mono.zip(
-					DiscordUtils.hasPermission(Mono.just(channel), selfId, Permission.SEND_MESSAGES),
-					DiscordUtils.hasPermission(Mono.just(channel), selfId, Permission.EMBED_LINKS))
-					.flatMap(tuple -> {
-						if(!tuple.getT1()) {
-							LogUtils.debug("{Guild ID: %d} Missing permission: %s",
-									guildId.get().asLong(), StringUtils.capitalizeEnum(Permission.SEND_MESSAGES));
-							return Mono.just(false);
-						}
-
-						if(!tuple.getT2()) {
-							return BotUtils.sendMessage(TextUtils.missingPermission(event.getMember().map(User::getUsername).get(),
-									Permission.EMBED_LINKS), Mono.just(channel))
-									.doOnSuccess(message -> LogUtils.info("{Guild ID: %d} Missing permission: %s",
-											guildId.get().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS)))
-									.thenReturn(false);
-						}
-						return Mono.just(true);
-					});
-		};
-
 		Mono.just(event.getMessage())
 				// The content is not a Webhook
 				.filter(message -> message.getContent().isPresent())
@@ -80,7 +47,6 @@ public class CommandProcessor {
 				.flatMap(author -> event.getMessage().getChannel())
 				// This is not a private message...
 				.filterWhen(isNotDm)
-				.filterWhen(canSendMessages)
 				// The channel is allowed
 				.filter(channel -> BotUtils.isTextChannelAllowed(guildId.get(), channel.getId()))
 				.flatMap(channel -> event.getMember().get().getRoles().collectList())

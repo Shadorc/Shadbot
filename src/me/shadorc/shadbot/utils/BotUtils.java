@@ -13,6 +13,7 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
+import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 public class BotUtils {
@@ -35,7 +36,20 @@ public class BotUtils {
 			spec.setEmbed(embed);
 		}
 
-		return channelMono.flatMap(channel -> channel.createMessage(spec))
+		return channelMono
+				.filterWhen(channel -> DiscordUtils.hasPermission(channelMono, channel.getClient().getSelfId().get(), Permission.SEND_MESSAGES))
+				.filterWhen(channel -> DiscordUtils.hasPermission(channelMono, channel.getClient().getSelfId().get(), Permission.EMBED_LINKS)
+						// Return true if the message does not contain embed even if the bot does not have permission to send embed
+						.map(canSendEmbed -> canSendEmbed || embed == null)
+						.doOnSuccess(canSendEmbed -> {
+							if(!canSendEmbed) {
+								BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed links.%nPlease, check my permissions "
+										+ "and channel-specific ones to verify that **%s** is checked.",
+										StringUtils.capitalizeEnum(Permission.EMBED_LINKS)), channelMono)
+										.subscribe();
+							}
+						}))
+				.flatMap(channel -> channel.createMessage(spec))
 				.doOnSuccess(message -> StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT));
 	}
 
