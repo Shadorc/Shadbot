@@ -5,18 +5,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import discord4j.core.DiscordClient;
 import discord4j.core.object.VoiceState;
+import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -171,24 +175,16 @@ public class DiscordUtils {
 				});
 	}
 
-	public static Mono<Boolean> hasPermission(Mono<MessageChannel> channel, Snowflake memberId, Permission permission) {
+	public static Mono<Boolean> hasPermission(Mono<? extends Channel> channel, Snowflake userId, Permission permission) {
 		return channel
-				.ofType(GuildChannel.class)
-				.flatMap(guildChannel -> guildChannel.getEffectivePermissions(memberId))
+				.flatMap(chnl -> chnl instanceof PrivateChannel ? Mono.just(PermissionSet.all()) : ((GuildChannel) chnl).getEffectivePermissions(userId))
 				.map(permissions -> permissions.contains(permission));
 	}
 
-	public static Mono<Void> requirePermissions(Mono<MessageChannel> channel, Snowflake userId, UserType userType, Permission... permissions) {
-		return channel
-				.ofType(GuildChannel.class)
-				.flatMap(guildChannel -> guildChannel.getEffectivePermissions(userId))
-				.doOnSuccess(effectivePermissions -> {
-					for(Permission permission : permissions) {
-						if(!effectivePermissions.contains(permission)) {
-							throw new MissingPermissionException(userType, permission);
-						}
-					}
-				})
+	public static Mono<Void> requirePermissions(Mono<? extends Channel> channel, Snowflake userId, UserType userType, Permission... permissions) {
+		return Flux.fromArray(permissions)
+				.filterWhen(permission -> DiscordUtils.hasPermission(channel, userId, permission).map(BooleanUtils::negate))
+				.flatMap(permission -> Mono.error(new MissingPermissionException(userType, permission)))
 				.then();
 	}
 
