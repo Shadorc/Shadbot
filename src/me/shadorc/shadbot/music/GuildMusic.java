@@ -8,7 +8,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.VoiceChannel;
@@ -129,8 +128,6 @@ public class GuildMusic {
 		return this.client.getSelf()
 				.flatMap(self -> self.asMember(this.guildId))
 				.flatMap(Member::getVoiceState)
-				.map(VoiceState::getChannelId)
-				.flatMap(Mono::justOrEmpty)
 				.hasElement();
 	}
 
