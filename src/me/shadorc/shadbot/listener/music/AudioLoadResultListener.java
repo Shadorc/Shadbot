@@ -34,6 +34,7 @@ import reactor.core.publisher.Mono;
 
 public class AudioLoadResultListener implements AudioLoadResultHandler, MessageInterceptor {
 
+	private static final int MAX_RESULTS = 5;
 	public static final String YT_SEARCH = "ytsearch: ";
 	public static final String SC_SEARCH = "scsearch: ";
 
@@ -102,7 +103,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		this.guildMusic.setDj(this.djId);
 		this.guildMusic.setWaitingForChoice(true);
 
-		final String choices = FormatUtils.numberedList(5, playlist.getTracks().size(),
+		final String choices = FormatUtils.numberedList(MAX_RESULTS, playlist.getTracks().size(),
 				count -> String.format("\t**%d.** %s",
 						count, FormatUtils.trackName(playlist.getTracks().get(count - 1).getInfo())));
 
@@ -123,7 +124,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 							.then(Mono.fromRunnable(this::stopWaiting))
 							.subscribe();
 
-					this.resultsTracks = new ArrayList<>(playlist.getTracks());
+					this.resultsTracks = new ArrayList<>(playlist.getTracks().subList(0, MAX_RESULTS));
 					MessageInterceptorManager.addInterceptor(this.guildMusic.getMessageChannelId(), this);
 				}))
 				.subscribe();
