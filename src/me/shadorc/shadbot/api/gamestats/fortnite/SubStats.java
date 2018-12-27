@@ -24,9 +24,4 @@ public class SubStats {
 		return this.ratio;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("SubStats [top1=%s, ratio=%s]", this.top1, this.ratio);
-	}
-
 }

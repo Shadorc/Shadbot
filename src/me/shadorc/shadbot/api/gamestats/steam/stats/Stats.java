@@ -17,9 +17,4 @@ public class Stats {
 		return this.value;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Stats [name=%s, value=%s]", this.name, this.value);
-	}
-
 }

@@ -19,9 +19,4 @@ public class R34Posts {
 		return this.count;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("R34Posts [posts=%s, count=%s]", this.posts, this.count);
-	}
-
 }

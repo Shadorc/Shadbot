@@ -11,9 +11,4 @@ public class SteamId {
 		return this.steamId;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("SteamId [steamId=%s]", this.steamId);
-	}
-
 }

@@ -16,9 +16,4 @@ public class GiphyResponse {
 		return this.gifs;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("GiphyResponse [gifs=%s]", this.gifs);
-	}
-
 }

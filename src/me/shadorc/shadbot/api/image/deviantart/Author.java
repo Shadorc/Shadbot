@@ -11,9 +11,4 @@ public class Author {
 		return this.username;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Author [username=%s]", this.username);
-	}
-
 }

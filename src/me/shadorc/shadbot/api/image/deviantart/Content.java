@@ -11,9 +11,4 @@ public class Content {
 		return this.source;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Content [source=%s]", this.source);
-	}
-
 }

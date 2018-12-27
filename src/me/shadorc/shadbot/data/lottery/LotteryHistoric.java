@@ -33,9 +33,4 @@ public class LotteryHistoric {
 		return this.number;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("LotteryHistoric [jackpot=%s, winnerCount=%s, number=%s]", jackpot, winnerCount, number);
-	}
-
 }

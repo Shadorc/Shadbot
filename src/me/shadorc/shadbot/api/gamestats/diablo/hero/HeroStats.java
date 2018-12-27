@@ -11,9 +11,4 @@ public class HeroStats {
 		return this.damage;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("HeroStats [damage=%s]", this.damage);
-	}
-
 }

@@ -17,9 +17,4 @@ public class Quote {
 		return this.content;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Quote [id=%s, content=%s]", this.id, this.content);
-	}
-
 }

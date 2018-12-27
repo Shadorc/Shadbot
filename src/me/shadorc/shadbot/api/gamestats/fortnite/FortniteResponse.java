@@ -22,9 +22,4 @@ public class FortniteResponse {
 		return this.stats;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("FortniteResponse [error=%s, stats=%s]", this.error, this.stats);
-	}
-
 }

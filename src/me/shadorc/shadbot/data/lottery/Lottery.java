@@ -61,9 +61,4 @@ public class Lottery {
 		this.gamblers.clear();
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Lottery [historic=%s, jackpot=%s, gamblers=%s]", historic, jackpot, gamblers);
-	}
-
 }

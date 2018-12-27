@@ -13,9 +13,4 @@ public class UrbanDictionaryResponse {
 		return this.definitions;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("UrbanDictionaryResponse [definitions=%s]", this.definitions);
-	}
-
 }

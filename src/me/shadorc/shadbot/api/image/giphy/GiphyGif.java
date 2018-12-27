@@ -11,9 +11,4 @@ public class GiphyGif {
 		return this.imageUrl;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("GiphyGif [imageUrl=%s]", this.imageUrl);
-	}
-
 }

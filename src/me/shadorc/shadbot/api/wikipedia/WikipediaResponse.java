@@ -11,9 +11,4 @@ public class WikipediaResponse {
 		return this.query;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("WikipediaResponse [query=%s]", this.query);
-	}
-
 }

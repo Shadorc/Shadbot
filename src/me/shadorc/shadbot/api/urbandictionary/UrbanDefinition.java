@@ -31,10 +31,4 @@ public class UrbanDefinition {
 		return this.permalink;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("UrbanDefinition [definition=%s, example=%s, word=%s, permalink=%s]",
-				this.definition, this.example, this.word, this.permalink);
-	}
-
 }

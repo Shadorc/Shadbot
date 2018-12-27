@@ -100,10 +100,4 @@ public class Relic {
 		this.userId = userId;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Relic [id=%s, guildId=%s, userId=%s, type=%s, duration=%s, activationTime=%s]",
-				this.id, this.guildId, this.userId, this.type, this.duration, this.activationTime);
-	}
-
 }

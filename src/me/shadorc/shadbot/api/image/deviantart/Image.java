@@ -35,10 +35,4 @@ public class Image {
 		return this.categoryPath;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Image [content=%s, author=%s, url=%s, title=%s, categoryPath=%s]",
-				this.content, this.author, this.url, this.title, this.categoryPath);
-	}
-
 }

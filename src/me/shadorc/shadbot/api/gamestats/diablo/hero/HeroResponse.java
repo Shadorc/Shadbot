@@ -40,10 +40,4 @@ public class HeroResponse {
 		return this.stats;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("HeroResponse [code=%s, name=%s, className=%s, level=%s, stats=%s]",
-				this.code, this.name, this.className, this.level, this.stats);
-	}
-
 }

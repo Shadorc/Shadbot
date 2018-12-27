@@ -13,9 +13,4 @@ public class DeviantArtResponse {
 		return this.results;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("DeviantArtResponse [results=%s]", this.results);
-	}
-
 }

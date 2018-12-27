@@ -17,9 +17,4 @@ public class WikipediaPage {
 		return this.extract;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("WikipediaPage [title=%s, extract=%s]", this.title, this.extract);
-	}
-
 }

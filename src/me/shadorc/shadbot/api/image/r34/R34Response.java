@@ -11,9 +11,4 @@ public class R34Response {
 		return this.posts;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("R34Response [posts=%s]", this.posts);
-	}
-
 }

@@ -11,8 +11,4 @@ public class ResolveVanityUrlResponse {
 		return this.response;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("ResolveVanityUrlResponse [response=%s]", this.response);
-	}
 }

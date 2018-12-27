@@ -51,10 +51,4 @@ public class Stats {
 		return Objects.requireNonNullElse(this.seasonSquadStats, SubStats.DEFAULT);
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Stats [soloStats=%s, duoStats=%s, squadStats=%s, seasonSoloStats=%s, seasonDuoStats=%s, seasonSquadStats=%s]",
-				this.soloStats, this.duoStats, this.squadStats, this.seasonSoloStats, this.seasonDuoStats, this.seasonSquadStats);
-	}
-
 }

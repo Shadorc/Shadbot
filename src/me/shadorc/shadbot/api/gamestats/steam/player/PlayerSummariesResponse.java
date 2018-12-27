@@ -11,9 +11,4 @@ public class PlayerSummariesResponse {
 		return this.response;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("PlayerSummariesResponse [response=%s]", this.response);
-	}
-
 }

@@ -11,9 +11,4 @@ public class HeroId {
 		return this.id;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("HeroId [id=%s]", this.id);
-	}
-
 }

@@ -8,15 +8,15 @@ import discord4j.core.object.util.Snowflake;
 public class LotteryGambler {
 
 	@JsonProperty("guild_id")
-	private final Long guildId;
+	private final Snowflake guildId;
 	@JsonProperty("user_id")
-	private final Long userId;
+	private final Snowflake userId;
 	@JsonProperty("number")
 	private final int number;
 
 	public LotteryGambler(Snowflake guildId, Snowflake userId, int number) {
-		this.guildId = guildId.asLong();
-		this.userId = userId.asLong();
+		this.guildId = guildId;
+		this.userId = userId;
 		this.number = number;
 	}
 
@@ -26,22 +26,17 @@ public class LotteryGambler {
 
 	@JsonIgnore
 	public Snowflake getGuildId() {
-		return Snowflake.of(this.guildId);
+		return this.guildId;
 	}
 
 	@JsonIgnore
 	public Snowflake getUserId() {
-		return Snowflake.of(this.userId);
+		return this.userId;
 	}
 
 	@JsonIgnore
 	public int getNumber() {
 		return this.number;
-	}
-
-	@Override
-	public String toString() {
-		return String.format("LotteryGambler [guildId=%s, userId=%s, number=%s]", guildId, userId, number);
 	}
 
 }

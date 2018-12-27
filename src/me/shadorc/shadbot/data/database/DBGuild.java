@@ -20,14 +20,14 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 public class DBGuild {
 
 	@JsonProperty("id")
-	private final Long id;
+	private final Snowflake guildId;
 	@JsonProperty("members")
 	private final CopyOnWriteArrayList<DBMember> members;
 	@JsonProperty("settings")
 	private final ConcurrentHashMap<String, Object> settings;
 
 	public DBGuild(Snowflake id) {
-		this.id = id.asLong();
+		this.guildId = id;
 		this.members = new CopyOnWriteArrayList<>();
 		this.settings = new ConcurrentHashMap<>();
 	}
@@ -38,7 +38,7 @@ public class DBGuild {
 
 	@JsonIgnore
 	public Snowflake getId() {
-		return Snowflake.of(this.id);
+		return this.guildId;
 	}
 
 	@JsonIgnore
@@ -141,11 +141,6 @@ public class DBGuild {
 
 	public void addMember(DBMember dbMember) {
 		this.members.add(dbMember);
-	}
-
-	@Override
-	public String toString() {
-		return String.format("DBGuild [id=%s, members=%s, settings=%s]", this.id, this.members, this.settings);
 	}
 
 }

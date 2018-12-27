@@ -13,9 +13,4 @@ public class PlayerSummaries {
 		return this.players;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("PlayerSummaries [players=%s]", this.players);
-	}
-
 }
