@@ -11,15 +11,15 @@ import me.shadorc.shadbot.utils.NumberUtils;
 
 public class DBMember {
 
-	private final Snowflake guildId;
+	private final long guildId;
 	@JsonProperty("id")
-	private final Snowflake memberId;
+	private final long memberId;
 	@JsonProperty("coins")
 	private final AtomicInteger coins;
 
 	public DBMember(Snowflake guildId, Snowflake id) {
-		this.guildId = guildId;
-		this.memberId = id;
+		this.guildId = guildId.asLong();
+		this.memberId = id.asLong();
 		this.coins = new AtomicInteger(0);
 	}
 
@@ -29,12 +29,12 @@ public class DBMember {
 
 	@JsonIgnore
 	public Snowflake getGuildId() {
-		return this.guildId;
+		return Snowflake.of(this.guildId);
 	}
 
 	@JsonIgnore
 	public Snowflake getId() {
-		return this.memberId;
+		return Snowflake.of(this.memberId);
 	}
 
 	@JsonIgnore
