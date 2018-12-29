@@ -8,8 +8,8 @@ import me.shadorc.shadbot.utils.FormatUtils;
 
 public class Quickplay {
 
-	private final static int RANKING_SIZE = 3;
-	private final static String FORMAT = "**%s**. %s (%s)";
+	private static final int RANKING_SIZE = 3;
+	private static final String FORMAT = "**%s**. %s (%s)";
 
 	@JsonProperty("played")
 	private List<HeroPlayed> played;

@@ -45,11 +45,11 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.IMAGE, names = { "wallpaper" }, alias = "wp")
 public class WallpaperCmd extends AbstractCommand {
 
-	private final static String PURITY = "purity";
-	private final static String CATEGORY = "category";
-	private final static String RATIO = "ratio";
-	private final static String RESOLUTION = "resolution";
-	private final static String KEYWORD = "keyword";
+	private static final String PURITY = "purity";
+	private static final String CATEGORY = "category";
+	private static final String RATIO = "ratio";
+	private static final String RESOLUTION = "resolution";
+	private static final String KEYWORD = "keyword";
 
 	private Wallhaven wallhaven;
 
