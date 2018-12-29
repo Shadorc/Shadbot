@@ -36,7 +36,7 @@ public class BackwardCmd extends AbstractCommand {
 						try {
 							// ... else, try to parse it
 							num = TimeUtils.parseTime(arg);
-						} catch (IllegalArgumentException err) {
+						} catch (final IllegalArgumentException err) {
 							throw new CommandException(String.format("`%s` is not a valid number / time.", arg));
 						}
 					}
@@ -45,7 +45,8 @@ public class BackwardCmd extends AbstractCommand {
 					return String.format(Emoji.CHECK_MARK + " New position set to **%s** by **%s**.",
 							FormatUtils.shortDuration(newPosition), context.getUsername());
 				})
-				.flatMap(message -> BotUtils.sendMessage(message, context.getChannel()))
+				.flatMap(message -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(message, channel)))
 				.then();
 	}
 

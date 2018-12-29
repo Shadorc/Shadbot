@@ -27,6 +27,7 @@ import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.ReactionMessage;
 import reactor.core.publisher.Mono;
 
+// TODO: Rework
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "iam" })
 public class IamCmd extends AbstractCommand {
 
@@ -44,13 +45,14 @@ public class IamCmd extends AbstractCommand {
 			throw new CommandException("You should specify only one text in quotation marks.");
 		}
 
-		final Mono<List<Role>> rolesMono = DiscordUtils.extractRoles(context.getGuild(), StringUtils.remove(arg, quotedElements))
+		final Mono<List<Role>> rolesMono = context.getGuild()
+				.flatMapMany(guild -> DiscordUtils.extractRoles(guild, StringUtils.remove(arg, quotedElements)))
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 				.collectList();
 
-		return DiscordUtils
-				.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.MANAGE_ROLES,
-						Permission.ADD_REACTIONS)
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT,
+						Permission.MANAGE_ROLES, Permission.ADD_REACTIONS))
 				.then(Mono.zip(rolesMono, context.getAvatarUrl()))
 				.flatMap(tuple -> {
 					final List<Role> roles = tuple.getT1();

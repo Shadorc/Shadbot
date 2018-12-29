@@ -34,8 +34,9 @@ public class PlayCmd extends AbstractCommand {
 		final String arg = context.requireArg();
 		final Snowflake guildId = context.getGuildId();
 
-		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(),
-				UserType.BOT, Permission.CONNECT, Permission.SPEAK)
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(),
+						UserType.BOT, Permission.CONNECT, Permission.SPEAK))
 				.then(DiscordUtils.requireSameVoiceChannel(context))
 				.flatMap(voiceChannelId -> {
 					String identifier;
@@ -65,16 +66,19 @@ public class PlayCmd extends AbstractCommand {
 						if(identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH)) {
 							return context.getClient().getUserById(guildMusic.getDjId())
 									.map(User::getUsername)
-									.flatMap(djName -> BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " (**%s**) **%s** is "
-											+ "already selecting a music, please wait for him to finish.",
-											context.getUsername(), djName), context.getChannel()))
+									.flatMap(djName -> context.getChannel()
+											.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " (**%s**) **%s** is "
+													+ "already selecting a music, please wait for him to finish.",
+													context.getUsername(), djName), channel)))
 									.then();
 						}
 					}
 
 					if(guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
 							&& !Shadbot.getPremium().isPremium(guildId, context.getAuthorId())) {
-						return BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, context.getChannel()).then();
+						return context.getChannel()
+								.flatMap(channel -> BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel))
+								.then();
 					}
 
 					guildMusic.setMessageChannel(context.getChannelId());

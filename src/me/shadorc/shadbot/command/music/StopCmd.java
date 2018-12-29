@@ -18,7 +18,9 @@ public class StopCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		context.requireGuildMusic().leaveVoiceChannel();
-		return BotUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.", context.getUsername()), context.getChannel()).then();
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.", context.getUsername()), channel))
+				.then();
 	}
 
 	@Override

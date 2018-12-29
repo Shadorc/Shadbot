@@ -38,7 +38,7 @@ public class TriviaCmd extends AbstractCommand {
 			try {
 				final URL url = new URL("https://opentdb.com/api_category.php");
 				this.categories = Utils.MAPPER.readValue(url, TriviaCategoriesResponse.class);
-			} catch (IOException err) {
+			} catch (final IOException err) {
 				throw Exceptions.propagate(err);
 			}
 		}
@@ -49,7 +49,8 @@ public class TriviaCmd extends AbstractCommand {
 							.setAuthor("Trivia categories", null, avatarUrl)
 							.addField("ID", FormatUtils.format(this.categories.getIds(), id -> Integer.toString(id), "\n"), true)
 							.addField("Name", String.join("\n", this.categories.getNames()), true))
-					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+					.flatMap(embed -> context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
@@ -65,8 +66,9 @@ public class TriviaCmd extends AbstractCommand {
 			triviaManager.start();
 			return triviaManager.show();
 		} else {
-			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Trivia game has already been started.",
-					context.getUsername()), context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Trivia game has already been started.",
+							context.getUsername()), channel))
 					.then();
 		}
 	}

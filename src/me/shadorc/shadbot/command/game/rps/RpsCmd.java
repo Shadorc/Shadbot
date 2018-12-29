@@ -48,7 +48,9 @@ public class RpsCmd extends AbstractCommand {
 			strBuilder.append("I win !");
 		}
 
-		return BotUtils.sendMessage(strBuilder.toString(), context.getChannel()).then();
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
+				.then();
 	}
 
 	@Override

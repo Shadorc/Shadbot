@@ -28,8 +28,9 @@ public class VolumeCmd extends AbstractCommand {
 				.flatMap(voiceChannelId -> {
 					final TrackScheduler scheduler = guildMusic.getTrackScheduler();
 					if(!context.getArg().isPresent()) {
-						return BotUtils.sendMessage(String.format(Emoji.SOUND + " (**%s**) Current volume level: **%d%%**",
-								context.getUsername(), scheduler.getAudioPlayer().getVolume()), context.getChannel());
+						return context.getChannel()
+								.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.SOUND + " (**%s**) Current volume level: **%d%%**",
+										context.getUsername(), scheduler.getAudioPlayer().getVolume()), channel));
 					}
 
 					final String arg = context.getArg().get();
@@ -39,9 +40,10 @@ public class VolumeCmd extends AbstractCommand {
 					}
 
 					scheduler.setVolume(volume);
-					return BotUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
-							scheduler.getAudioPlayer().getVolume(), context.getUsername()),
-							context.getChannel());
+					return context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
+									scheduler.getAudioPlayer().getVolume(), context.getUsername()),
+									channel));
 				})
 				.then();
 	}

@@ -44,46 +44,40 @@ public class KickCmd extends AbstractCommand {
 		}
 
 		if(mentionedUserIds.contains(context.getSelfId())) {
-			throw new CommandException("I can't (and don't want) to kick myself !");
+			throw new CommandException("You cannot kick me.");
 		}
 
-		return DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), UserType.NORMAL, Permission.KICK_MEMBERS)
-				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.KICK_MEMBERS))
-				.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
-				.flatMap(tuple -> {
-					final List<User> mentions = tuple.getT1();
-					final Guild guild = tuple.getT2();
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.KICK_MEMBERS)
+						.then(DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.KICK_MEMBERS))
+						.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
+						.flatMapMany(tuple -> {
+							final List<User> mentions = tuple.getT1();
+							final Guild guild = tuple.getT2();
 
-					final StringBuilder reason = new StringBuilder();
-					reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
-					if(reason.length() > DiscordUtils.MAX_REASON_LENGTH) {
-						throw new CommandException(String.format("Reason cannot exceed **%d characters**.", DiscordUtils.MAX_REASON_LENGTH));
-					}
+							final StringBuilder reason = new StringBuilder();
+							reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
 
-					if(reason.length() == 0) {
-						reason.append("Reason not specified.");
-					}
+							if(reason.length() == 0) {
+								reason.append("Reason not specified.");
+							}
 
-					Flux<Void> kickFlux = Flux.empty();
-					for(User user : mentions) {
-						if(!user.isBot()) {
-							kickFlux = kickFlux.concatWith(BotUtils.sendMessage(
-									String.format(Emoji.INFO + " You were kicked from the server **%s** by **%s**. Reason: `%s`",
-											guild.getName(), context.getUsername(), reason), user.getPrivateChannel().cast(MessageChannel.class))
-									.then());
-						}
+							if(reason.length() > DiscordUtils.MAX_REASON_LENGTH) {
+								throw new CommandException(String.format("Reason cannot exceed **%d characters**.", DiscordUtils.MAX_REASON_LENGTH));
+							}
 
-						// TODO: Add reason
-						kickFlux = kickFlux.concatWith(user.asMember(context.getGuildId())
-								.flatMap(Member::kick));
-					}
-
-					return kickFlux
-							.then(BotUtils.sendMessage(String.format(Emoji.INFO + " **%s** got kicked by **%s**. Reason: `%s`",
-									FormatUtils.format(mentions, User::getUsername, ", "), context.getUsername(), reason),
-									context.getChannel()))
-							.then();
-				});
+							return Flux.fromIterable(mentions)
+									.concatMap(user -> user.getPrivateChannel()
+											.cast(MessageChannel.class)
+											.filter(ignored -> !user.isBot())
+											.flatMap(privateChannel -> BotUtils.sendMessage(
+													String.format(Emoji.INFO + " You were kicked from the server **%s** by **%s**. Reason: `%s`",
+															guild.getName(), context.getUsername(), reason), privateChannel))
+											.then(user.asMember(context.getGuildId()))
+											// TODO: Add reason
+											.flatMap(Member::kick));
+						})
+						.then());
 	}
 
 	@Override

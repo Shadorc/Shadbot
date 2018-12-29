@@ -33,7 +33,8 @@ public class StatsCmd extends AbstractCommand {
 		if(args.get(0).equalsIgnoreCase("average")) {
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getAverageEmbed().setAuthor("Stats: average", null, avatarUrl))
-					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+					.flatMap(embed -> context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
@@ -80,7 +81,8 @@ public class StatsCmd extends AbstractCommand {
 
 		return context.getAvatarUrl()
 				.map(avatarUrl -> embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, avatarUrl))
-				.flatMap(embedItr -> BotUtils.sendMessage(embedItr, context.getChannel()))
+				.flatMap(embedItr -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embedItr, channel)))
 				.then();
 	}
 

@@ -17,9 +17,4 @@ public class TokenResponse {
 		return this.expiresIn;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("TokenResponse [accessToken=%s, expiresIn=%s]", this.accessToken, this.expiresIn);
-	}
-
 }

@@ -51,7 +51,7 @@ public class GuildMusic {
 	 */
 	public void joinVoiceChannel(Snowflake voiceChannelId) {
 		this.client.getChannelById(voiceChannelId)
-				.ofType(VoiceChannel.class)
+				.cast(VoiceChannel.class)
 				.filterWhen(ignored -> this.isInVoiceChannel().map(BooleanUtils::negate))
 				.flatMap(voiceChannel -> voiceChannel.join(this.audioProvider))
 				.subscribe(voiceConnection -> this.voiceConnection = voiceConnection);
@@ -83,7 +83,9 @@ public class GuildMusic {
 					Config.PATREON_URL));
 		}
 		this.leaveVoiceChannel();
-		return BotUtils.sendMessage(strBuilder.toString(), this.getMessageChannel()).then();
+		return this.getMessageChannel()
+				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
+				.then();
 	}
 
 	public void destroy() {
@@ -113,7 +115,7 @@ public class GuildMusic {
 	}
 
 	public Mono<MessageChannel> getMessageChannel() {
-		return this.client.getChannelById(this.messageChannelId).ofType(MessageChannel.class);
+		return this.client.getChannelById(this.messageChannelId).cast(MessageChannel.class);
 	}
 
 	public Snowflake getDjId() {

@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 public class AudioEventListener extends AudioEventAdapter {
 
 	private final GuildMusic guildMusic;
-	private AtomicInteger errorCount;
+	private final AtomicInteger errorCount;
 
 	public AudioEventListener(GuildMusic guildMusic) {
 		super();
@@ -31,7 +31,9 @@ public class AudioEventListener extends AudioEventAdapter {
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
 		final String message = String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
 				FormatUtils.trackName(track.getInfo()));
-		BotUtils.sendMessage(message, this.guildMusic.getMessageChannel()).subscribe();
+		this.guildMusic.getMessageChannel()
+				.flatMap(channel -> BotUtils.sendMessage(message, channel))
+				.subscribe();
 	}
 
 	@Override
@@ -62,7 +64,8 @@ public class AudioEventListener extends AudioEventAdapter {
 			strBuilder.append("\n" + Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until I find a music that can be played.");
 		}
 
-		BotUtils.sendMessage(strBuilder.toString(), this.guildMusic.getMessageChannel())
+		this.guildMusic.getMessageChannel()
+				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
 				.then(this.nextOrEnd())
 				.subscribe();
 	}
@@ -71,8 +74,9 @@ public class AudioEventListener extends AudioEventAdapter {
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
 		LogUtils.info("{Guild ID: %d} Music stuck, skipping it.", this.guildMusic.getGuildId().asLong());
 
-		BotUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
-				this.guildMusic.getMessageChannel())
+		this.guildMusic.getMessageChannel()
+				.flatMap(channel -> BotUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
+						channel))
 				.then(this.nextOrEnd())
 				.subscribe();
 	}

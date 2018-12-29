@@ -114,24 +114,26 @@ public class ReactionListener {
 						.get(event.getMessageId().asString())))
 				.map(Snowflake::of)
 				.filter(roleId -> event.getEmoji().equals(IamCmd.REACTION))
-				.filterWhen(roleId -> DiscordUtils.hasPermission(event.getChannel(), event.getSelfId(), Permission.MANAGE_ROLES)
-						.flatMap(hasPerm -> {
-							if(!hasPerm) {
-								return new TemporaryMessage(event.getClient(), event.getChannelId(), 15, ChronoUnit.SECONDS)
-										.send(String.format(Emoji.ACCESS_DENIED
-												+ " I can't add/remove a role due to a lack of permission."
-												+ "%nPlease, check my permissions to verify that %s is checked.",
-												String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
-										.thenReturn(hasPerm);
-							}
-							return Mono.just(hasPerm);
-						}))
+				.filterWhen(roleId -> event.getChannel()
+						.flatMap(channel -> DiscordUtils.hasPermission(channel, event.getSelfId(), Permission.MANAGE_ROLES)
+								.flatMap(hasPerm -> {
+									if(!hasPerm) {
+										return new TemporaryMessage(event.getClient(), event.getChannelId(), 15, ChronoUnit.SECONDS)
+												.send(String.format(Emoji.ACCESS_DENIED
+														+ " I can't add/remove a role due to a lack of permission."
+														+ "%nPlease, check my permissions to verify that %s is checked.",
+														String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
+												.thenReturn(hasPerm);
+									}
+									return Mono.just(hasPerm);
+								})))
 				.flatMap(roleId -> event.getMember()
 						.flatMap(member -> action == Action.ADD ? member.addRole(roleId) : member.removeRole(roleId)))
 				.onErrorResume(ExceptionUtils::isForbidden,
 						err -> event.getUsername()
-								.flatMap(username -> ExceptionHandler.onForbidden(
-										(ClientException) err, event.getGuildId().get(), event.getChannel(), username))
+								.flatMap(username -> event.getChannel()
+										.flatMap(channel -> ExceptionHandler.onForbidden(
+												(ClientException) err, event.getGuildId().get(), channel, username)))
 								.then())
 				.subscribe();
 	}

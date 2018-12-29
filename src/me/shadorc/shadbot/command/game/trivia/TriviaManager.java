@@ -47,7 +47,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 			final URL url = new URL(String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, "")));
 			final TriviaResponse response = Utils.MAPPER.readValue(url, TriviaResponse.class);
 			this.trivia = response.getResults().get(0);
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			throw Exceptions.propagate(err);
 		}
 		this.alreadyAnswered = new ConcurrentHashMap<>();
@@ -58,8 +58,9 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 	public void start() {
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		this.schedule(Mono.fromRunnable(this::stop)
-				.then(BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.", this.trivia.getCorrectAnswer()),
-						this.getContext().getChannel())),
+				.then(this.getContext().getChannel())
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
+						this.trivia.getCorrectAnswer()), channel)),
 				LIMITED_TIME, ChronoUnit.SECONDS);
 		this.startTime = System.currentTimeMillis();
 	}
@@ -86,7 +87,8 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 						.addField("Type", String.format("`%s`", this.trivia.getType()), true)
 						.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
 						.setFooter(String.format("You have %d seconds to answer.", LIMITED_TIME), null))
-				.flatMap(embed -> BotUtils.sendMessage(embed, this.getContext().getChannel()))
+				.flatMap(embed -> this.getContext().getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then();
 	}
 
@@ -99,8 +101,9 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
 
 		this.stop();
-		return BotUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won **%d coins**.",
-				member.getUsername(), gains), this.getContext().getChannel());
+		return this.getContext().getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won **%d coins**.",
+						member.getUsername(), gains), channel));
 	}
 
 	@Override
@@ -125,15 +128,17 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 
 					Mono<Message> monoMessage;
 					if(this.alreadyAnswered.containsKey(member.getId())) {
-						monoMessage = BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
-								member.getUsername()), event.getMessage().getChannel());
+						monoMessage = event.getMessage().getChannel()
+								.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
+										member.getUsername()), channel));
 						this.alreadyAnswered.put(member.getId(), true);
 					} else if(answer.equalsIgnoreCase(this.trivia.getCorrectAnswer())) {
 						monoMessage = this.win(member);
 
 					} else {
-						monoMessage = BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
-								member.getUsername()), event.getMessage().getChannel());
+						monoMessage = event.getMessage().getChannel()
+								.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
+										member.getUsername()), channel));
 						this.alreadyAnswered.put(member.getId(), false);
 					}
 

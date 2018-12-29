@@ -39,8 +39,9 @@ public class MemberListener {
 
 	private static void sendAutoMsg(DiscordClient client, User user, Optional<Snowflake> channelId, Optional<String> message) {
 		if(channelId.isPresent() && message.isPresent()) {
-			BotUtils.sendMessage(message.map(content -> content.replace("{mention}", user.getMention())).get(),
-					client.getChannelById(channelId.get()).cast(MessageChannel.class))
+			client.getChannelById(channelId.get())
+					.cast(MessageChannel.class)
+					.flatMap(channel -> BotUtils.sendMessage(message.map(content -> content.replace("{mention}", user.getMention())).get(), channel))
 					.subscribe();
 		}
 	}

@@ -62,7 +62,7 @@ public class RateLimiter {
 					return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
 							username, message, maxNum, durationStr);
 				})
-				.flatMap(text -> new TemporaryMessage(client, channelId, 10, ChronoUnit.SECONDS).send(text))
+				.flatMap(new TemporaryMessage(client, channelId, 10, ChronoUnit.SECONDS)::send)
 				.subscribe();
 	}
 

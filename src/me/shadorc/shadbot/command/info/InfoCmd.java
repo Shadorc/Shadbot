@@ -10,7 +10,6 @@ import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.spec.MessageEditSpec;
 import discord4j.core.util.VersionUtil;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -60,7 +59,8 @@ public class InfoCmd extends AbstractCommand {
 				.count();
 
 		final long start = System.currentTimeMillis();
-		return BotUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Loading info...", context.getUsername()), context.getChannel())
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Loading info...", context.getUsername()), channel))
 				.flatMap(message -> Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
 						guildCountMono, voiceChannelCountMono, memberCountMono,
 						Mono.just(TimeUtils.getMillisUntil(start)))
@@ -71,7 +71,7 @@ public class InfoCmd extends AbstractCommand {
 							final Long memberCount = tuple.getT4();
 							final Long ping = tuple.getT5();
 
-							return message.edit(new MessageEditSpec().setContent("```prolog"
+							return message.edit(spec -> spec.setContent("```prolog"
 									+ String.format("%n-= Versions =-")
 									+ String.format("%nJava: %s", System.getProperty("java.version"))
 									+ String.format("%nShadbot: %s", Config.VERSION)

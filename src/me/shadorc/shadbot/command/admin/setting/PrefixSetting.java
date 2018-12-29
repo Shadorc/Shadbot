@@ -32,7 +32,9 @@ public class PrefixSetting extends AbstractSetting {
 		}
 
 		Shadbot.getDatabase().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), args.get(1));
-		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", args.get(1)), context.getChannel()).then();
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", args.get(1)), channel))
+				.then();
 	}
 
 	@Override

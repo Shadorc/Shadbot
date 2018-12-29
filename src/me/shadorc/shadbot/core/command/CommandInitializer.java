@@ -41,7 +41,7 @@ public class CommandInitializer {
 								cmdName, COMMANDS_MAP.get(name).getClass().getSimpleName()));
 					}
 				}
-			} catch (Exception err) {
+			} catch (final Exception err) {
 				LogUtils.error(err, String.format("An error occurred while initializing command %s.", cmdName));
 				return false;
 			}

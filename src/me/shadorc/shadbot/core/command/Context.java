@@ -28,10 +28,10 @@ import reactor.core.publisher.Mono;
 
 public class Context {
 
+	private final Optional<String> arg;
+	private final String cmdName;
 	private final MessageCreateEvent event;
 	private final String prefix;
-	private final String cmdName;
-	private final Optional<String> arg;
 
 	public Context(MessageCreateEvent event, String prefix) {
 		this.event = event;
@@ -42,20 +42,42 @@ public class Context {
 		this.arg = Optional.ofNullable(splittedMsg.size() > 1 ? splittedMsg.get(1).trim() : null);
 	}
 
-	public String getPrefix() {
-		return this.prefix;
+	public Optional<String> getArg() {
+		return this.arg;
+	}
+
+	public Mono<User> getAuthor() {
+		return this.getMessage().getAuthor();
+	}
+
+	@Nullable
+	public Snowflake getAuthorId() {
+		return this.getMessage().getAuthorId().orElse(null);
+	}
+
+	public Mono<String> getAvatarUrl() {
+		return this.getAuthor().map(User::getAvatarUrl);
+	}
+
+	public Mono<MessageChannel> getChannel() {
+		return this.getMessage().getChannel();
+	}
+
+	public Snowflake getChannelId() {
+		return this.getMessage().getChannelId();
+	}
+
+	public DiscordClient getClient() {
+		return this.event.getClient();
 	}
 
 	public String getCommandName() {
 		return this.cmdName;
 	}
 
-	public Optional<String> getArg() {
-		return this.arg;
-	}
-
-	public DiscordClient getClient() {
-		return this.event.getClient();
+	@Nullable
+	public String getContent() {
+		return this.getMessage().getContent().orElse(null);
 	}
 
 	public Mono<Guild> getGuild() {
@@ -76,12 +98,31 @@ public class Context {
 		return this.event.getMessage();
 	}
 
-	public int getShardIndex() {
-		return this.getClient().getConfig().getShardIndex();
+	public Mono<CommandPermission> getPermission() {
+		// The author is the bot's owner
+		final Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
+				.map(ApplicationInfo::getOwnerId)
+				.filter(this.getAuthorId()::equals)
+				.map(bool -> CommandPermission.OWNER);
+
+		// Private message, the author is considered as an administrator
+		final Mono<CommandPermission> dmPerm = Mono.just(this.event.getGuildId())
+				.filter(guildId -> !guildId.isPresent())
+				.map(guildId -> CommandPermission.ADMIN);
+
+		// The member is an administrator
+		final Mono<CommandPermission> adminPerm = this.getChannel()
+				.flatMap(channel -> DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR))
+				.map(bool -> CommandPermission.ADMIN);
+
+		return ownerPerm
+				.switchIfEmpty(dmPerm)
+				.switchIfEmpty(adminPerm)
+				.defaultIfEmpty(CommandPermission.USER);
 	}
 
-	public int getShardCount() {
-		return this.getClient().getConfig().getShardCount();
+	public String getPrefix() {
+		return this.prefix;
 	}
 
 	public Mono<User> getSelf() {
@@ -97,66 +138,26 @@ public class Context {
 		return this.getClient().getSelfId().orElse(null);
 	}
 
-	@Nullable
-	public String getContent() {
-		return this.getMessage().getContent().orElse(null);
+	public int getShardCount() {
+		return this.getClient().getConfig().getShardCount();
 	}
 
-	public Mono<MessageChannel> getChannel() {
-		return this.getMessage().getChannel();
-	}
-
-	public Snowflake getChannelId() {
-		return this.getMessage().getChannelId();
-	}
-
-	public Mono<User> getAuthor() {
-		return this.getMessage().getAuthor();
-	}
-
-	@Nullable
-	public Snowflake getAuthorId() {
-		return this.getMessage().getAuthorId().orElse(null);
+	public int getShardIndex() {
+		return this.getClient().getConfig().getShardIndex();
 	}
 
 	public String getUsername() {
 		return this.getMember().getUsername();
 	}
 
-	public Mono<String> getAvatarUrl() {
-		return this.getAuthor().map(User::getAvatarUrl);
-	}
-
-	public Mono<CommandPermission> getPermission() {
-		// The author is the bot's owner
-		final Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
-				.map(ApplicationInfo::getOwnerId)
-				.filter(this.getAuthorId()::equals)
-				.map(bool -> CommandPermission.OWNER);
-
-		// Private message, the author is considered as an administrator
-		final Mono<CommandPermission> dmPerm = Mono.just(this.event.getGuildId())
-				.filter(guildId -> !guildId.isPresent())
-				.map(guildId -> CommandPermission.ADMIN);
-
-		// The member is an administrator
-		final Mono<CommandPermission> adminPerm = DiscordUtils.hasPermission(this.getChannel(), this.getAuthorId(), Permission.ADMINISTRATOR)
-				.map(bool -> CommandPermission.ADMIN);
-
-		return ownerPerm
-				.switchIfEmpty(dmPerm)
-				.switchIfEmpty(adminPerm)
-				.defaultIfEmpty(CommandPermission.USER);
-	}
-
-	public boolean isDm() {
-		return !this.event.getGuildId().isPresent();
-	}
-
 	public Mono<Boolean> isChannelNsfw() {
 		return this.getChannel()
 				.ofType(TextChannel.class)
 				.map(TextChannel::isNsfw);
+	}
+
+	public boolean isDm() {
+		return !this.event.getGuildId().isPresent();
 	}
 
 	public String requireArg() {
@@ -173,16 +174,16 @@ public class Context {
 		return this.requireArgs(min, max, Config.DEFAULT_COMMAND_DELIMITER);
 	}
 
-	public List<String> requireArgs(int count, String delimiter) {
-		return this.requireArgs(count, count, delimiter);
-	}
-
 	public List<String> requireArgs(int min, int max, String delimiter) {
 		final List<String> args = StringUtils.split(this.requireArg(), max, delimiter);
 		if(!NumberUtils.isInRange(args.size(), min, max)) {
 			throw new MissingArgumentException();
 		}
 		return args;
+	}
+
+	public List<String> requireArgs(int count, String delimiter) {
+		return this.requireArgs(count, count, delimiter);
 	}
 
 	public GuildMusic requireGuildMusic() {

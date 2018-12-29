@@ -44,8 +44,10 @@ public class ChatCmd extends AbstractCommand {
 			try {
 				final String response = this.talk(context.getChannelId(), BOTS.get(botName), arg);
 				ERROR_COUNT.set(0);
-				return BotUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", botName, response), context.getChannel()).then();
-			} catch (IOException err) {
+				return context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", botName, response), channel))
+						.then();
+			} catch (final IOException err) {
 				LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botName);
 			}
 		}
@@ -56,8 +58,11 @@ public class ChatCmd extends AbstractCommand {
 							this.getClass().getSimpleName(), ERROR_COUNT.get()));
 		}
 
-		return BotUtils.sendMessage(String.format(Emoji.SLEEPING + " (**%s**) Sorry, A.L.I.C.E. seems to be AFK, she'll probably come back later.",
-				context.getUsername()), context.getChannel()).then();
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(
+						String.format(Emoji.SLEEPING + " (**%s**) Sorry, A.L.I.C.E. seems to be AFK, she'll probably come back later.",
+								context.getUsername()), channel))
+				.then();
 	}
 
 	private String talk(Snowflake channelId, String botId, String input) throws UnsupportedEncodingException, IOException {

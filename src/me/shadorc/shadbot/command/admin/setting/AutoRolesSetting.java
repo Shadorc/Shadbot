@@ -54,16 +54,18 @@ public class AutoRolesSetting extends AbstractSetting {
 					.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 					.map(Role::getName)
 					.collectList()
-					.flatMap(roles -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New comers will now have role(s): %s",
-							FormatUtils.format(roles, role -> String.format("`@%s`", role), ", ")), context.getChannel()));
+					.flatMap(roles -> context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New comers will now have role(s): %s",
+									FormatUtils.format(roles, role -> String.format("`@%s`", role), ", ")), channel)));
 		} else {
 			autoRoles.removeAll(mentionedRoles);
 			message = Flux.fromIterable(mentionedRoles)
 					.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 					.map(Role::getName)
 					.collectList()
-					.flatMap(roles -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
-							FormatUtils.format(roles, role -> String.format("`@%s`", role), ", ")), context.getChannel()));
+					.flatMap(roles -> context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
+									FormatUtils.format(roles, role -> String.format("`@%s`", role), ", ")), channel)));
 		}
 
 		dbGuild.setSetting(this.getSetting(), autoRoles);

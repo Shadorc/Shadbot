@@ -23,7 +23,7 @@ public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
 				final JavaType type = Utils.MAPPER.getTypeFactory().constructMapLikeType(Map.class, String.class, AtomicLong.class);
 				this.map.putAll(Utils.MAPPER.readValue(this.getFile(), type));
 			}
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			LogUtils.error(err, String.format("An error occurred while initializing statistic: %s", this.getFile()));
 		}
 	}

@@ -26,9 +26,4 @@ public class Quickplay {
 				count, this.eliminationsPerLife.get(count - 1).getHero(), this.eliminationsPerLife.get(count - 1).getEliminationsPerLife()));
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Quickplay [played=%s, eliminationsPerLife=%s]", this.played, this.eliminationsPerLife);
-	}
-
 }

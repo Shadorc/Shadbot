@@ -41,7 +41,7 @@ public abstract class Data {
 		try {
 			this.write();
 			LogUtils.info("%s saved.", this.getFile().getName());
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			LogUtils.error(err, String.format("An error occurred while saving %s.", this.getFile().getName()));
 		}
 	}

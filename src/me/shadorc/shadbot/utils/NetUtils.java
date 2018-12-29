@@ -35,6 +35,27 @@ public class NetUtils {
 	}
 
 	/**
+	 * @param str - the string to encode as UTF-8
+	 * @return The string encoded as UTF-8
+	 * @throws UnsupportedEncodingException If the named encoding is not supported
+	 */
+	public static String encode(String str) throws UnsupportedEncodingException {
+		if(str == null || str.isEmpty()) {
+			return str;
+		}
+		return URLEncoder.encode(str, "UTF-8");
+	}
+
+	/**
+	 * @param url - URL to connect to. The protocol must be http or https
+	 * @return The {@code body} corresponding to the {@code url} with default user-agent and default timeout
+	 * @throws IOException
+	 */
+	public static String getBody(String url) throws IOException {
+		return NetUtils.getResponse(url).body();
+	}
+
+	/**
 	 * @param url - URL to connect to. The protocol must be http or https
 	 * @return The {@link Connection} corresponding to {@code url} with default user-agent and default timeout
 	 */
@@ -55,27 +76,6 @@ public class NetUtils {
 
 	/**
 	 * @param url - URL to connect to. The protocol must be http or https
-	 * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type and HTTP errors
-	 * @throws IOException
-	 */
-	public static Response getResponse(String url) throws IOException {
-		return NetUtils.getDefaultConnection(url)
-				.ignoreContentType(true)
-				.ignoreHttpErrors(true)
-				.execute();
-	}
-
-	/**
-	 * @param url - URL to connect to. The protocol must be http or https
-	 * @return The {@code body} corresponding to the {@code url} with default user-agent and default timeout
-	 * @throws IOException
-	 */
-	public static String getBody(String url) throws IOException {
-		return NetUtils.getResponse(url).body();
-	}
-
-	/**
-	 * @param url - URL to connect to. The protocol must be http or https
 	 * @return A string representing JSON
 	 * @throws HttpStatusException if the URL returns an invalid JSON
 	 */
@@ -92,15 +92,15 @@ public class NetUtils {
 	}
 
 	/**
-	 * @param str - the string to encode as UTF-8
-	 * @return The string encoded as UTF-8
-	 * @throws UnsupportedEncodingException If the named encoding is not supported
+	 * @param url - URL to connect to. The protocol must be http or https
+	 * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type and HTTP errors
+	 * @throws IOException
 	 */
-	public static String encode(String str) throws UnsupportedEncodingException {
-		if(str == null || str.isEmpty()) {
-			return str;
-		}
-		return URLEncoder.encode(str, "UTF-8");
+	public static Response getResponse(String url) throws IOException {
+		return NetUtils.getDefaultConnection(url)
+				.ignoreContentType(true)
+				.ignoreHttpErrors(true)
+				.execute();
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class NetUtils {
 			conn.connect();
 			return true;
 
-		} catch (Exception err) {
+		} catch (final Exception err) {
 			return false;
 
 		} finally {

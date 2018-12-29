@@ -23,7 +23,6 @@ public class LoadingMessage implements Publisher<Void> {
 	private final DiscordClient client;
 	private final Snowflake channelId;
 	private final Duration typingTimeout;
-
 	private final List<Subscriber<? super Void>> subscribers;
 
 	/**
@@ -58,7 +57,7 @@ public class LoadingMessage implements Publisher<Void> {
 	private Flux<Long> startTyping() {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
-				.filterWhen(channel -> DiscordUtils.hasPermission(Mono.just(channel), this.client.getSelfId().get(), Permission.SEND_MESSAGES))
+				.filterWhen(channel -> DiscordUtils.hasPermission(channel, this.client.getSelfId().get(), Permission.SEND_MESSAGES))
 				.flatMapMany(channel -> channel.typeUntil(this))
 				.take(this.typingTimeout);
 	}
@@ -74,7 +73,9 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
 	public Mono<Message> send(String content) {
-		return BotUtils.sendMessage(content, this.client.getChannelById(this.channelId).cast(MessageChannel.class))
+		return this.client.getChannelById(this.channelId)
+				.cast(MessageChannel.class)
+				.flatMap(channel -> BotUtils.sendMessage(content, channel))
 				.doAfterTerminate(this::stopTyping);
 	}
 
@@ -82,7 +83,9 @@ public class LoadingMessage implements Publisher<Void> {
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
 	public Mono<Message> send(EmbedCreateSpec embed) {
-		return BotUtils.sendMessage(embed, this.client.getChannelById(this.channelId).cast(MessageChannel.class))
+		return this.client.getChannelById(this.channelId)
+				.cast(MessageChannel.class)
+				.flatMap(channel -> BotUtils.sendMessage(embed, channel))
 				.doAfterTerminate(this::stopTyping);
 	}
 

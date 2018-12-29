@@ -37,52 +37,52 @@ public class PruneCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
-				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), UserType.NORMAL, Permission.MANAGE_MESSAGES))
-				.then(context.getMessage().getUserMentions().collectList())
-				.flatMap(mentions -> {
-					final String arg = context.getArg().orElse("");
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT,
+						Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
+						.then(DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.MANAGE_MESSAGES))
+						.then(context.getMessage().getUserMentions().collectList())
+						.flatMap(mentions -> {
+							final String arg = context.getArg().orElse("");
+							final List<String> quotedElements = StringUtils.getQuotedElements(arg);
 
-					final List<String> quotedElements = StringUtils.getQuotedElements(arg);
+							if(arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
+								throw new CommandException("You have forgotten a quote or have specified several quotes in quotation marks.");
+							}
 
-					if(arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
-						throw new CommandException("You have forgotten a quote or have specified several quotes in quotation marks.");
-					}
+							final String words = quotedElements.isEmpty() ? null : quotedElements.get(0);
 
-					final String words = quotedElements.isEmpty() ? null : quotedElements.get(0);
+							// Remove everything from argument (users mentioned and quoted words) to keep only count if specified
+							final String argCleaned = StringUtils.remove(arg,
+									FormatUtils.format(mentions, User::getMention, " "),
+									String.format("\"%s\"", words))
+									.trim();
 
-					// Remove everything from argument (users mentioned and quoted words) to keep only count if specified
-					final String argCleaned = StringUtils.remove(arg,
-							FormatUtils.format(mentions, User::getMention, " "),
-							String.format("\"%s\"", words))
-							.trim();
+							Integer count = NumberUtils.asPositiveInt(argCleaned);
+							if(!argCleaned.isEmpty() && count == null) {
+								loadingMsg.stopTyping();
+								throw new CommandException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
+										+ "please include them in quotation marks. See `%shelp %s` for more information.",
+										argCleaned, context.getPrefix(), this.getName()));
+							}
 
-					Integer count = NumberUtils.asPositiveInt(argCleaned);
-					if(!argCleaned.isEmpty() && count == null) {
-						loadingMsg.stopTyping();
-						throw new CommandException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
-								+ "please include them in quotation marks. See `%shelp %s` for more information.",
-								argCleaned, context.getPrefix(), this.getName()));
-					}
+							count = count == null ? MAX_MESSAGES : Math.min(MAX_MESSAGES, count);
 
-					count = count == null ? MAX_MESSAGES : Math.min(MAX_MESSAGES, count);
+							final List<Snowflake> mentionIds = mentions.stream().map(User::getId).collect(Collectors.toList());
 
-					final List<Snowflake> mentionIds = mentions.stream().map(User::getId).collect(Collectors.toList());
-
-					return context.getChannel()
-							.flatMapMany(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now())))
-							.take(count)
-							.filter(message -> mentions.isEmpty()
-									|| message.getAuthorId().map(mentionIds::contains).orElse(false))
-							.filter(message -> words == null
-									|| message.getContent().map(content -> content.contains(words)).orElse(false)
-									|| this.getEmbedContent(message).contains(words))
-							.collectList();
-				})
-				.flatMap(messages -> DiscordUtils.bulkDelete(context.getChannel().cast(TextChannel.class), messages))
-				.flatMap(deletedMessages -> loadingMsg.send(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
-						context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
-				.then();
+							return channel.getMessagesBefore(Snowflake.of(Instant.now()))
+									.take(count)
+									.filter(message -> mentions.isEmpty()
+											|| message.getAuthorId().map(mentionIds::contains).orElse(false))
+									.filter(message -> words == null
+											|| message.getContent().map(content -> content.contains(words)).orElse(false)
+											|| this.getEmbedContent(message).contains(words))
+									.collectList();
+						})
+						.flatMap(messages -> DiscordUtils.bulkDelete((TextChannel) channel, messages))
+						.flatMap(deletedMessages -> loadingMsg.send(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
+								context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
+						.then());
 	}
 
 	private String getEmbedContent(Message message) {

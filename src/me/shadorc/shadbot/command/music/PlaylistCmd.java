@@ -31,7 +31,8 @@ public class PlaylistCmd extends AbstractCommand {
 						.setAuthor("Playlist", null, avatarUrl)
 						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 						.setDescription(this.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist())))
-				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

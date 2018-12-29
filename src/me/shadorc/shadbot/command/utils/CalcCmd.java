@@ -28,11 +28,12 @@ public class CalcCmd extends AbstractCommand {
 		final String arg = context.requireArg();
 
 		try {
-			return BotUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
-					context.getUsername(), arg.replace("*", "\\*"), FORMATTER.format(EVALUATOR.evaluate(arg))),
-					context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
+							context.getUsername(), arg.replace("*", "\\*"), FORMATTER.format(EVALUATOR.evaluate(arg))),
+							channel))
 					.then();
-		} catch (IllegalArgumentException err) {
+		} catch (final IllegalArgumentException err) {
 			throw new CommandException(err.getMessage());
 		}
 	}

@@ -47,11 +47,11 @@ public abstract class AbstractGameManager {
 		return Mono.justOrEmpty(message.getContent())
 				// This is a cancel command
 				.filter(String.format("%scancel", this.context.getPrefix())::equals)
-				.flatMap(content -> message.getAuthorAsMember())
-				.zipWith(DiscordUtils.hasPermission(message.getChannel(), message.getAuthorId().get(), Permission.ADMINISTRATOR))
+				.flatMap(ignored -> message.getChannel())
+				.flatMap(channel -> Mono.zip(message.getAuthorAsMember(),
+						DiscordUtils.hasPermission(channel, message.getAuthorId().get(), Permission.ADMINISTRATOR)))
 				// The author is the author of the game or he is an administrator
-				.filter(memberAndIsAdmin -> this.context.getAuthorId().equals(memberAndIsAdmin.getT1().getId()) || memberAndIsAdmin.getT2())
-				.hasElement();
+				.map(tuple -> this.context.getAuthorId().equals(tuple.getT1().getId()) || tuple.getT2());
 	}
 
 	/**
@@ -64,8 +64,8 @@ public abstract class AbstractGameManager {
 				.filterWhen(this::isCancelMessage)
 				.flatMap(Message::getAuthor)
 				.map(User::getUsername)
-				.flatMap(username -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.",
-						username), message.getChannel()))
+				.flatMap(username -> this.context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", username), channel)))
 				.flatMap(ignored -> Mono.fromRunnable(this::stop))
 				// The message is intercepted, return true
 				.map(ignored -> Boolean.TRUE)
@@ -76,7 +76,7 @@ public abstract class AbstractGameManager {
 		return this.isDone.get() || this.scheduledTask == null || this.scheduledTask.isDisposed();
 	}
 
-	public void schedule(Mono<?> mono, long delay, TemporalUnit unit) {
+	public <T> void schedule(Mono<T> mono, long delay, TemporalUnit unit) {
 		this.cancelScheduledTask();
 		this.scheduledTask = Mono.delay(Duration.of(delay, unit))
 				.then(Mono.fromRunnable(() -> this.isDone.set(true)))

@@ -57,7 +57,7 @@ public class SettingsCmd extends AbstractCommand {
 							settingName, SETTINGS_MAP.get(settingCmd.getSetting()).getClass().getSimpleName()));
 					continue;
 				}
-			} catch (Exception err) {
+			} catch (final Exception err) {
 				LogUtils.error(err, String.format("An error occurred while initializing setting %s.", settingName));
 			}
 		}
@@ -69,13 +69,12 @@ public class SettingsCmd extends AbstractCommand {
 
 		if("show".equals(args.get(0))) {
 			return this.show(context)
-					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+					.flatMap(embed -> context.getChannel().flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
 		final SettingEnum settingEnum = Utils.getEnum(SettingEnum.class, args.get(0));
 		final AbstractSetting setting = SETTINGS_MAP.get(settingEnum);
-
 		if(setting == null) {
 			throw new CommandException(String.format("Setting `%s` does not exist. Use `%shelp %s` to see all available settings.",
 					args.get(0), context.getPrefix(), this.getName()));
@@ -84,16 +83,17 @@ public class SettingsCmd extends AbstractCommand {
 		final String arg = args.size() == 2 ? args.get(1) : null;
 		if("help".equals(arg)) {
 			return this.getHelp(context, setting)
-					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+					.flatMap(embed -> context.getChannel().flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
 		try {
 			return setting.execute(context);
-		} catch (MissingArgumentException e) {
+		} catch (final MissingArgumentException e) {
 			return this.getHelp(context, setting)
-					.flatMap(embed -> BotUtils.sendMessage(
-							Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", embed, context.getChannel()))
+					.flatMap(embed -> context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(
+									Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", embed, channel)))
 					.then();
 		}
 	}
@@ -116,7 +116,6 @@ public class SettingsCmd extends AbstractCommand {
 		}
 
 		dbGuild.getJoinMessage().ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:**%n%s", joinMessage)));
-
 		dbGuild.getLeaveMessage().ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
 
 		final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getMessageChannelId())

@@ -32,8 +32,9 @@ public class GenerateRelicCmd extends AbstractCommand {
 		}
 
 		final Relic relic = Shadbot.getPremium().generateRelic(type);
-		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-				StringUtils.capitalize(type.toString()), relic.getId()), context.getChannel())
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
+						StringUtils.capitalize(type.toString()), relic.getId()), channel))
 				.then();
 	}
 

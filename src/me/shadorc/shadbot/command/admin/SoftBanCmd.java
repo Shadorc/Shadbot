@@ -8,7 +8,6 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
-import discord4j.core.spec.BanQuerySpec;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -43,45 +42,41 @@ public class SoftBanCmd extends AbstractCommand {
 			throw new CommandException("You cannot softban yourself.");
 		}
 
-		return DiscordUtils.requirePermissions(context.getChannel(), context.getAuthorId(), UserType.NORMAL, Permission.BAN_MEMBERS)
-				.then(DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.BAN_MEMBERS))
-				.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
-				.flatMap(tuple -> {
-					final List<User> mentions = tuple.getT1();
-					final Guild guild = tuple.getT2();
+		if(mentionedUserIds.contains(context.getSelfId())) {
+			throw new CommandException("You cannot softban me.");
+		}
 
-					final StringBuilder reason = new StringBuilder();
-					reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
-					if(reason.length() > DiscordUtils.MAX_REASON_LENGTH) {
-						throw new CommandException(String.format("Reason cannot exceed **%d characters**.", DiscordUtils.MAX_REASON_LENGTH));
-					}
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.BAN_MEMBERS)
+						.then(DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.BAN_MEMBERS))
+						.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
+						.flatMapMany(tuple -> {
+							final List<User> mentions = tuple.getT1();
+							final Guild guild = tuple.getT2();
 
-					if(reason.length() == 0) {
-						reason.append("Reason not specified.");
-					}
+							final StringBuilder reason = new StringBuilder();
+							reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
 
-					Flux<Void> softbanFlux = Flux.empty();
-					for(User user : mentions) {
-						if(!user.isBot()) {
-							softbanFlux = softbanFlux.concatWith(BotUtils.sendMessage(
-									String.format(Emoji.INFO + " You were softbanned from the server **%s** by **%s**. Reason: `%s`",
-											guild.getName(), context.getUsername(), reason), user.getPrivateChannel().cast(MessageChannel.class))
-									.then());
-						}
+							if(reason.length() == 0) {
+								reason.append("Reason not specified.");
+							}
 
-						final BanQuerySpec banQuery = new BanQuerySpec()
-								.setReason(reason.toString())
-								.setDeleteMessageDays(7);
-						softbanFlux = softbanFlux.concatWith(user.asMember(context.getGuildId())
-								.flatMap(member -> member.ban(banQuery).then(member.unban())));
-					}
+							if(reason.length() > DiscordUtils.MAX_REASON_LENGTH) {
+								throw new CommandException(String.format("Reason cannot exceed **%d characters**.", DiscordUtils.MAX_REASON_LENGTH));
+							}
 
-					return softbanFlux
-							.then(BotUtils.sendMessage(String.format(Emoji.INFO + " **%s** got softbanned by **%s**. Reason: `%s`",
-									FormatUtils.format(mentions, User::getUsername, ", "), context.getUsername(), reason),
-									context.getChannel()))
-							.then();
-				});
+							return Flux.fromIterable(mentions)
+									.concatMap(user -> user.getPrivateChannel()
+											.cast(MessageChannel.class)
+											.filter(ignored -> !user.isBot())
+											.flatMap(privateChannel -> BotUtils.sendMessage(
+													String.format(Emoji.INFO + " You were softbanned from the server **%s** by **%s**. Reason: `%s`",
+															guild.getName(), context.getUsername(), reason), privateChannel))
+											.then(user.asMember(context.getGuildId()))
+											.flatMap(member -> member.ban(spec -> spec.setReason(reason.toString()).setDeleteMessageDays(7))
+													.then(member.unban())));
+						})
+						.then());
 	}
 
 	@Override

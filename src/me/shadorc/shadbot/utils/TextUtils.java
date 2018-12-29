@@ -12,26 +12,20 @@ import me.shadorc.shadbot.utils.object.Emoji;
 
 public class TextUtils {
 
-	public static final TextFile SPAMS = new TextFile("texts/spam.txt");
+	public static final String NOT_ENOUGH_COINS =
+			"You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
 	public static final TextFile PLAYING = new TextFile("texts/playing.txt");
 
 	public static final String PLAYLIST_LIMIT_REACHED =
 			String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "
 					+ "You can remove this limit by contributing to Shadbot. More info on **%s**", Config.DEFAULT_PLAYLIST_SIZE, Config.PATREON_URL);
 
-	public static final String NOT_ENOUGH_COINS =
-			"You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
+	public static final TextFile SPAMS = new TextFile("texts/spam.txt");
 
 	public static final String[] TIP_MESSAGES = { String.format("Check %slottery", Config.DEFAULT_PREFIX),
 			String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
 			String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
 			String.format("Support server: %s", Config.SUPPORT_SERVER_URL) };
-
-	public static String mustBeNsfw(String prefix) {
-		return String.format(Emoji.GREY_EXCLAMATION
-				+ " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",
-				prefix, SettingEnum.NSFW);
-	}
 
 	/**
 	 * @param err - the exception containing the error message to clean
@@ -46,5 +40,11 @@ public class TextUtils {
 				+ " (**%s**) I can't execute this command due to the lack of permission."
 				+ "%nPlease, check my permissions and channel-specific ones to verify that %s is checked.",
 				username, String.format("**%s**", StringUtils.capitalizeEnum(permission)));
+	}
+
+	public static String mustBeNsfw(String prefix) {
+		return String.format(Emoji.GREY_EXCLAMATION
+				+ " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",
+				prefix, SettingEnum.NSFW);
 	}
 }

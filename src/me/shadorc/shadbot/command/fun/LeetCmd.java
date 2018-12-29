@@ -33,7 +33,8 @@ public class LeetCmd extends AbstractCommand {
 				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 						.setAuthor("Leetifier", null, avatarUrl)
 						.setDescription(String.format("**Original**%n%s%n%n**Leetified**%n%s", arg, text)))
-				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

@@ -13,9 +13,4 @@ public class Games {
 		return this.quickplay.get("won").toString();
 	}
 
-	@Override
-	public String toString() {
-		return String.format("Games [quickplay=%s]", this.quickplay);
-	}
-
 }

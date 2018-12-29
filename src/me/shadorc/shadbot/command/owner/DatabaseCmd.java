@@ -43,7 +43,8 @@ public class DatabaseCmd extends AbstractCommand {
 
 					return Shadbot.getDatabase().getDBMember(guild.getId(), Snowflake.of(memberId)).toString();
 				})
-				.flatMap(text -> BotUtils.sendMessage(text, context.getChannel()))
+				.flatMap(text -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(text, channel)))
 				.then();
 	}
 

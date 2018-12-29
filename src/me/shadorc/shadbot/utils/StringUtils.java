@@ -11,47 +11,6 @@ import java.util.stream.Collectors;
 public class StringUtils {
 
 	/**
-	 * @param str - the string to split
-	 * @param limit - the result threshold
-	 * @param delimiter - the delimiting regular expression
-	 * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted using {@code delimiter} excluding
-	 *         empty results
-	 */
-	public static List<String> split(String str, int limit, String delimiter) {
-		return Arrays.stream(str.split(delimiter, limit))
-				.map(String::trim)
-				.filter(word -> !word.isEmpty())
-				.collect(Collectors.toList());
-	}
-
-	/**
-	 * @param str - the string to split
-	 * @param limit - the result threshold
-	 * @param delimiter - the delimiting regular expression
-	 * @return A endless list containing all the elements resulting of {@code str} splitted using space excluding empty results
-	 */
-	public static List<String> split(String str, int limit) {
-		return StringUtils.split(str, limit, " ");
-	}
-
-	/**
-	 * @param str - the string to split
-	 * @param delimiter - the delimiting regular expression
-	 * @return A endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding empty results
-	 */
-	public static List<String> split(String str, String delimiter) {
-		return StringUtils.split(str, -1, delimiter);
-	}
-
-	/**
-	 * @param str - the string to split
-	 * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding empty results
-	 */
-	public static List<String> split(String str) {
-		return StringUtils.split(str, -1);
-	}
-
-	/**
 	 * @param str - the String to capitalize, may be null
 	 * @return The capitalized String, null if null String input
 	 */
@@ -71,11 +30,31 @@ public class StringUtils {
 	}
 
 	/**
-	 * @param object - the object to format
-	 * @return The object converted to a lower case string
+	 * @param text - the string to check
+	 * @return A {@link List} containing the quoted elements from {@code text}
 	 */
-	public static String toLowerCase(Object object) {
-		return object.toString().toLowerCase();
+	public static List<String> getQuotedElements(String text) {
+		final List<String> matches = new ArrayList<>();
+		final Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(text);
+		while(matcher.find()) {
+			matches.add(matcher.group(1));
+		}
+		matches.removeAll(Collections.singleton(""));
+		return matches;
+	}
+
+	/**
+	 * The function returns the argument string with whitespace normalized by using {@link #trim(String)} to remove leading and trailing whitespace and
+	 * then replacing sequences of whitespace characters by a single space.
+	 *
+	 * @param str - the source String to normalize whitespaces from, may be null
+	 * @return the modified string with whitespace normalized, {@code null} if null String input
+	 */
+	public static String normalizeSpace(String str) {
+		if(str == null || str.isEmpty()) {
+			return str;
+		}
+		return str.trim().replaceAll(" +", " ");
 	}
 
 	/**
@@ -95,6 +74,15 @@ public class StringUtils {
 	 * @param toRemove - the strings to be substituted for each match
 	 * @return The resulting {@code String}
 	 */
+	public static String remove(String str, List<String> toRemove) {
+		return StringUtils.remove(str, toRemove.toArray(new String[0]));
+	}
+
+	/**
+	 * @param str - the string from which to remove patterns
+	 * @param toRemove - the strings to be substituted for each match
+	 * @return The resulting {@code String}
+	 */
 	public static String remove(String str, String... toRemove) {
 		return str.replaceAll(Arrays.stream(toRemove)
 				.filter(replacement -> !replacement.isEmpty())
@@ -103,40 +91,52 @@ public class StringUtils {
 	}
 
 	/**
-	 * @param str - the string from which to remove patterns
-	 * @param toRemove - the strings to be substituted for each match
-	 * @return The resulting {@code String}
+	 * @param str - the string to split
+	 * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding empty results
 	 */
-	public static String remove(String str, List<String> toRemove) {
-		return StringUtils.remove(str, toRemove.toArray(new String[0]));
+	public static List<String> split(String str) {
+		return StringUtils.split(str, -1);
 	}
 
 	/**
-	 * The function returns the argument string with whitespace normalized by using {@link #trim(String)} to remove leading and trailing whitespace and
-	 * then replacing sequences of whitespace characters by a single space.
-	 *
-	 * @param str - the source String to normalize whitespaces from, may be null
-	 * @return the modified string with whitespace normalized, {@code null} if null String input
+	 * @param str - the string to split
+	 * @param limit - the result threshold
+	 * @param delimiter - the delimiting regular expression
+	 * @return A endless list containing all the elements resulting of {@code str} splitted using space excluding empty results
 	 */
-	public static String normalizeSpace(String str) {
-		if(str == null || str.isEmpty()) {
-			return str;
-		}
-		return str.trim().replaceAll(" +", " ");
+	public static List<String> split(String str, int limit) {
+		return StringUtils.split(str, limit, " ");
 	}
 
 	/**
-	 * @param text - the string to check
-	 * @return A {@link List} containing the quoted elements from {@code text}
+	 * @param str - the string to split
+	 * @param limit - the result threshold
+	 * @param delimiter - the delimiting regular expression
+	 * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted using {@code delimiter} excluding
+	 *         empty results
 	 */
-	public static List<String> getQuotedElements(String text) {
-		final List<String> matches = new ArrayList<>();
-		final Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(text);
-		while(matcher.find()) {
-			matches.add(matcher.group(1));
-		}
-		matches.removeAll(Collections.singleton(""));
-		return matches;
+	public static List<String> split(String str, int limit, String delimiter) {
+		return Arrays.stream(str.split(delimiter, limit))
+				.map(String::trim)
+				.filter(word -> !word.isEmpty())
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * @param str - the string to split
+	 * @param delimiter - the delimiting regular expression
+	 * @return A endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding empty results
+	 */
+	public static List<String> split(String str, String delimiter) {
+		return StringUtils.split(str, -1, delimiter);
+	}
+
+	/**
+	 * @param object - the object to format
+	 * @return The object converted to a lower case string
+	 */
+	public static String toLowerCase(Object object) {
+		return object.toString().toLowerCase();
 	}
 
 }

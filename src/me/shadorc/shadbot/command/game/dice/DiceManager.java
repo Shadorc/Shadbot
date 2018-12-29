@@ -56,11 +56,10 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 	@Override
 	public Mono<Void> show() {
-		return this.getContext().getAvatarUrl()
-				.zipWith(Flux.fromIterable(this.numsPlayers.values())
-						.flatMap(this.getContext().getClient()::getUserById)
-						.map(User::getUsername)
-						.collectList())
+		return Mono.zip(this.getContext().getAvatarUrl(), Flux.fromIterable(this.numsPlayers.values())
+				.flatMap(this.getContext().getClient()::getUserById)
+				.map(User::getUsername)
+				.collectList())
 				.map(avatarUrlAndUsers -> {
 					final String avatarUrl = avatarUrlAndUsers.getT1();
 					final List<String> usernames = avatarUrlAndUsers.getT2();
@@ -112,7 +111,8 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 				})
 				.collectList()
 				.map(list -> this.results = String.join("\n", list))
-				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), this.getContext().getChannel()))
+				.then(this.getContext().getChannel())
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
 				.then(this.show())
 				.then(Mono.fromRunnable(this::stop));
 	}

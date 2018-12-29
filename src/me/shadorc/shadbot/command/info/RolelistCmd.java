@@ -58,7 +58,8 @@ public class RolelistCmd extends AbstractCommand {
 				})
 				.zipWith(context.getAvatarUrl())
 				.map(embedAndAvatarUrl -> embedAndAvatarUrl.getT1().setAuthor("Rolelist", null, embedAndAvatarUrl.getT2()))
-				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

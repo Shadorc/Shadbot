@@ -48,7 +48,8 @@ public class RepeatCmd extends AbstractCommand {
 
 					return String.format("%s %sRepetition %s by **%s**.", emoji, playlistRepetition, modeStr, context.getUsername());
 				})
-				.flatMap(message -> BotUtils.sendMessage(message, context.getChannel()))
+				.flatMap(message -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(message, channel)))
 				.then();
 	}
 

@@ -24,21 +24,18 @@ public class CoinsCmd extends AbstractCommand {
 				.getUserMentions()
 				.switchIfEmpty(context.getAuthor())
 				.next()
-				.flatMap(user -> {
+				.map(user -> {
 					final DBMember dbMember = Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId());
 					final String coins = FormatUtils.coins(dbMember.getCoins());
-
-					String text;
 					if(user.getId().equals(context.getAuthorId())) {
-						text = String.format("(**%s**) You have **%s**.", user.getUsername(), coins);
+						return String.format("(**%s**) You have **%s**.", user.getUsername(), coins);
 					} else {
-						text = String.format("**%s** has **%s**.", user.getUsername(), coins);
+						return String.format("**%s** has **%s**.", user.getUsername(), coins);
 					}
-
-					return BotUtils.sendMessage(Emoji.PURSE + " " + text, context.getChannel());
 				})
+				.flatMap(text -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(Emoji.PURSE + " " + text, channel)))
 				.then();
-
 	}
 
 	@Override

@@ -17,9 +17,4 @@ public class HeroEliminations {
 		return this.eliminationsPerLife;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("HeroEliminations [hero=%s, eliminationsPerLife=%s]", this.hero, this.eliminationsPerLife);
-	}
-
 }

@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.command.hidden;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
+import java.util.Collection;
+import java.util.Map;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
@@ -33,25 +33,21 @@ public class HelpCmd extends AbstractCommand {
 
 			StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_HELPED, cmd);
 			return cmd.getHelp(context)
-					.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+					.flatMap(embed -> context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
 		return context.getPermission()
-				.flatMap(authorPerm -> {
-					final Multimap<CommandCategory, String> map = LinkedHashMultimap.create();
-					return Flux.fromIterable(CommandInitializer.getCommands().values())
-							.distinct()
-							.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
-							.filter(cmd -> context.isDm() || BotUtils.isCommandAllowed(context.getGuildId(), cmd))
-							.map(cmd -> map.put(cmd.getCategory(), String.format("`%s%s`", context.getPrefix(), cmd.getName())))
-							.then()
-							.thenReturn(map);
-				})
+				.flatMap(authorPerm -> Flux.fromIterable(CommandInitializer.getCommands().values())
+						.distinct()
+						.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
+						.filter(cmd -> context.isDm() || BotUtils.isCommandAllowed(context.getGuildId(), cmd))
+						.collectMultimap(AbstractCommand::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
 				.zipWith(context.getAvatarUrl())
-				.map(mapAndAvatarUrl -> {
-					final Multimap<CommandCategory, String> map = mapAndAvatarUrl.getT1();
-					final String avatarUrl = mapAndAvatarUrl.getT2();
+				.map(tuple -> {
+					final Map<CommandCategory, Collection<String>> map = tuple.getT1();
+					final String avatarUrl = tuple.getT2();
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Shadbot Help", null, avatarUrl)
@@ -68,7 +64,8 @@ public class HelpCmd extends AbstractCommand {
 
 					return embed;
 				})
-				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

@@ -46,13 +46,14 @@ public class SuicideGirlsCmd extends AbstractCommand {
 										.setAuthor("SuicideGirls", url, avatarUrl)
 										.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
 										.setImage(imageUrl));
-					} catch (IOException err) {
+					} catch (final IOException err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(err);
 					}
 				})
 				.flatMap(loadingMsg::send)
-				.switchIfEmpty(BotUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), context.getChannel()))
+				.switchIfEmpty(context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), channel)))
 				.then();
 	}
 

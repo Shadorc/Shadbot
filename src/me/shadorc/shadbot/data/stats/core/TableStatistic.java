@@ -27,7 +27,7 @@ public class TableStatistic<E extends Enum<E>> extends Statistic<E> {
 						Utils.MAPPER.getTypeFactory().constructParametricType(Map.class, String.class, AtomicLong.class));
 				this.table.putAll(Utils.toTable(Utils.MAPPER.readValue(this.getFile(), type)));
 			}
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			LogUtils.error(err, String.format("An error occurred while initializing statistic: %s", this.getFile()));
 		}
 	}

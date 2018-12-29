@@ -55,9 +55,10 @@ public class DiceCmd extends AbstractCommand {
 		if(!isJoining) {
 			// The user tries to start a game and it has already been started
 			if(diceManager != null) {
-				return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A **Dice Game** has already been started. "
-						+ "Use `%s%s <num>` to join it.",
-						context.getUsername(), context.getPrefix(), this.getName()), context.getChannel())
+				return context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A **Dice Game** has already been started. "
+								+ "Use `%s%s <num>` to join it.",
+								context.getUsername(), context.getPrefix(), this.getName()), channel))
 						.then();
 			}
 
@@ -65,15 +66,17 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		if(diceManager.getPlayerCount() == 6) {
-			return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) Sorry, there are already 6 players.",
-					context.getUsername()), context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) Sorry, there are already 6 players.",
+							context.getUsername()), channel))
 					.then();
 		}
 
 		if(diceManager.isNumBet(num)) {
-			return BotUtils.sendMessage(
-					String.format(Emoji.GREY_EXCLAMATION + " (**%s**) This number has already been bet, please try with another one.",
-							context.getUsername()), context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(
+							String.format(Emoji.GREY_EXCLAMATION + " (**%s**) This number has already been bet, please try with another one.",
+									context.getUsername()), channel))
 					.then();
 		}
 
@@ -84,8 +87,9 @@ public class DiceCmd extends AbstractCommand {
 		if(diceManager.addPlayerIfAbsent(context.getAuthorId(), num)) {
 			return diceManager.show().then();
 		} else {
-			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-					context.getUsername()), context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+							context.getUsername()), channel))
 					.then();
 		}
 	}

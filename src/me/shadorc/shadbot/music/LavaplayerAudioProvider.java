@@ -19,7 +19,7 @@ public class LavaplayerAudioProvider extends AudioProvider {
 
 	@Override
 	public boolean provide() {
-		boolean didProvide = audioPlayer.provide(frame);
+		final boolean didProvide = this.audioPlayer.provide(this.frame);
 		if(didProvide) {
 			this.getBuffer().flip();
 		}

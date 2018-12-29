@@ -33,7 +33,9 @@ public class VolumeSetting extends AbstractSetting {
 		}
 
 		Shadbot.getDatabase().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), volume);
-		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), context.getChannel()).then();
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), channel))
+				.then();
 	}
 
 	@Override

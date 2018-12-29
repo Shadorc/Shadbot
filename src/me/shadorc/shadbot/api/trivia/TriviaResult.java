@@ -64,10 +64,4 @@ public class TriviaResult {
 		return answers;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("TriviaResult [category=%s, type=%s, difficulty=%s, question=%s, correctAnswer=%s, incorrectAnswers=%s]",
-				this.category, this.type, this.difficulty, this.question, this.correctAnswer, this.incorrectAnswers);
-	}
-
 }

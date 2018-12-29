@@ -38,6 +38,20 @@ public class Utils {
 			.setSerializationInclusion(Include.NON_EMPTY);
 
 	/**
+	 * @param enumClass - the enumeration class
+	 * @param value - the string representing the enumeration, case insensitive
+	 * @return The enumeration corresponding to the {@code value} from {@code enumClass} or null if it does not exist
+	 */
+	public static <T extends Enum<T>> T getEnum(Class<T> enumClass, String value) {
+		for(T enumeration : enumClass.getEnumConstants()) {
+			if(enumeration.toString().equalsIgnoreCase(value)) {
+				return enumeration;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found
 	 */
 	public static double getProcessCpuLoad() {
@@ -67,52 +81,6 @@ public class Utils {
 	}
 
 	/**
-	 * @param enumClass - the enumeration class
-	 * @param value - the string representing the enumeration, case insensitive
-	 * @return The enumeration corresponding to the {@code value} from {@code enumClass} or null if it does not exist
-	 */
-	public static <T extends Enum<T>> T getEnum(Class<T> enumClass, String value) {
-		for(T enumeration : enumClass.getEnumConstants()) {
-			if(enumeration.toString().equalsIgnoreCase(value)) {
-				return enumeration;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * @param map - the {@link Map} to convert
-	 * @return A {@link HashBasedTable} based on {@code map}
-	 */
-	public static <R, C, V> HashBasedTable<R, C, V> toTable(Map<R, Map<C, V>> map) {
-		final HashBasedTable<R, C, V> table = HashBasedTable.create();
-		for(R rowKey : map.keySet()) {
-			final Map<C, V> rowMap = map.get(rowKey);
-			for(C columnKey : rowMap.keySet()) {
-				final V value = rowMap.get(columnKey);
-				table.put(rowKey, columnKey, value);
-			}
-		}
-		return table;
-	}
-
-	/**
-	 * @param map - the map to sort
-	 * @param comparator - a {@link Comparator} to be used to compare stream elements
-	 * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code comparator}
-	 */
-	public static <K, V> Map<K, V> sortByValue(Map<K, V> map, Comparator<? super Entry<K, V>> comparator) {
-		return map.entrySet()
-				.stream()
-				.sorted(comparator)
-				.collect(Collectors.toMap(
-						Map.Entry::getKey,
-						Map.Entry::getValue,
-						(value1, value2) -> value1,
-						LinkedHashMap::new));
-	}
-
-	/**
 	 * @param list - the list from which to take a random element
 	 * @return A random element from the list
 	 */
@@ -138,6 +106,38 @@ public class Utils {
 	 */
 	public static String read(File file) throws IOException {
 		return new String(Files.readAllBytes(file.toPath()), Charset.forName("UTF-8"));
+	}
+
+	/**
+	 * @param map - the map to sort
+	 * @param comparator - a {@link Comparator} to be used to compare stream elements
+	 * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code comparator}
+	 */
+	public static <K, V> Map<K, V> sortByValue(Map<K, V> map, Comparator<? super Entry<K, V>> comparator) {
+		return map.entrySet()
+				.stream()
+				.sorted(comparator)
+				.collect(Collectors.toMap(
+						Map.Entry::getKey,
+						Map.Entry::getValue,
+						(value1, value2) -> value1,
+						LinkedHashMap::new));
+	}
+
+	/**
+	 * @param map - the {@link Map} to convert
+	 * @return A {@link HashBasedTable} based on {@code map}
+	 */
+	public static <R, C, V> HashBasedTable<R, C, V> toTable(Map<R, Map<C, V>> map) {
+		final HashBasedTable<R, C, V> table = HashBasedTable.create();
+		for(R rowKey : map.keySet()) {
+			final Map<C, V> rowMap = map.get(rowKey);
+			for(C columnKey : rowMap.keySet()) {
+				final V value = rowMap.get(columnKey);
+				table.put(rowKey, columnKey, value);
+			}
+		}
+		return table;
 	}
 
 }

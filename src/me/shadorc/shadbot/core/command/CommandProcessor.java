@@ -87,10 +87,11 @@ public class CommandProcessor {
 		return context.getPermission()
 				// The author has the permission to execute this command
 				.filter(userPerm -> !command.getPermission().isSuperior(userPerm))
-				.switchIfEmpty(BotUtils.sendMessage(
-						String.format(Emoji.ACCESS_DENIED + " (**%s**) You do not have the permission to execute this command.",
-								context.getUsername()), context.getChannel())
-						.then(Mono.empty()))
+				.switchIfEmpty(context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(
+								String.format(Emoji.ACCESS_DENIED + " (**%s**) You do not have the permission to execute this command.",
+										context.getUsername()), channel)
+								.then(Mono.empty())))
 				.flatMap(perm -> Mono.just(command))
 				// The command is allowed in the guild
 				.filter(cmd -> BotUtils.isCommandAllowed(guildId, cmd))
@@ -125,12 +126,9 @@ public class CommandProcessor {
 					.flatMap(Mono::justOrEmpty)
 					.take(50)
 					.collectList()
-					.flatMap(list -> {
-						if(list.stream().anyMatch(text::equalsIgnoreCase)) {
-							return Mono.empty();
-						}
-						return BotUtils.sendMessage(text, event.getMessage().getChannel());
-					})
+					.filter(list -> !list.stream().anyMatch(text::equalsIgnoreCase))
+					.flatMap(ignored -> event.getMessage().getChannel())
+					.flatMap(channel -> BotUtils.sendMessage(text, channel))
 					.then();
 		}
 	}

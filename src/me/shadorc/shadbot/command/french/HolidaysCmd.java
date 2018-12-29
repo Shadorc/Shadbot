@@ -46,7 +46,7 @@ public class HolidaysCmd extends AbstractCommand {
 		try {
 			final String holidays = StringUtils.remove(TWITTER.getLastTweet("Vacances_Zone" + zone), "#");
 			return loadingMsg.send(String.format(Emoji.BEACH + " (**%s**) %s", context.getUsername(), holidays)).then();
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

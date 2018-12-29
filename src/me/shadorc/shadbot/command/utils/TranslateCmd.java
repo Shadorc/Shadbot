@@ -109,7 +109,7 @@ public class TranslateCmd extends AbstractCommand {
 					.flatMap(embed -> loadingMsg.send(embed))
 					.then();
 
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

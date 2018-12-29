@@ -7,6 +7,7 @@ import discord4j.core.event.domain.message.MessageUpdateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import me.shadorc.shadbot.utils.TimeUtils;
+import reactor.core.publisher.Mono;
 
 public class MessageUpdateListener {
 
@@ -22,8 +23,7 @@ public class MessageUpdateListener {
 			return;
 		}
 
-		event.getMessage()
-				.zipWith(event.getMessage().flatMap(Message::getAuthorAsMember))
+		Mono.zip(event.getMessage(), event.getMessage().flatMap(Message::getAuthorAsMember))
 				.subscribe(messageAndMember -> {
 					final Message message = messageAndMember.getT1();
 					final Member member = messageAndMember.getT2();

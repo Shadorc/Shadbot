@@ -11,9 +11,4 @@ public class StatsResponse {
 		return this.stats;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("StatsResponse [stats=%s]", this.stats);
-	}
-
 }

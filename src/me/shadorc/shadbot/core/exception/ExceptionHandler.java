@@ -37,7 +37,8 @@ public class ExceptionHandler {
 		} else if(ExceptionUtils.isUnreacheable(err)) {
 			return ExceptionHandler.onUnreacheable(cmd, context);
 		} else if(ExceptionUtils.isForbidden(err)) {
-			return ExceptionHandler.onForbidden((ClientException) err, context.getGuildId(), context.getChannel(), context.getUsername());
+			return context.getChannel()
+					.flatMap(channel -> ExceptionHandler.onForbidden((ClientException) err, context.getGuildId(), channel, context.getUsername()));
 		} else {
 			return ExceptionHandler.onUnknown(context.getClient(), err, cmd, context);
 		}
@@ -45,55 +46,62 @@ public class ExceptionHandler {
 
 	public static Mono<Message> onCommandException(CommandException err, AbstractCommand cmd, Context context) {
 		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_ILLEGAL_ARG, cmd);
-		return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
-				context.getUsername(), err.getMessage()), context.getChannel());
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
+						context.getUsername(), err.getMessage()), channel));
 	}
 
 	public static Mono<Message> onMissingPermissionException(MissingPermissionException err, AbstractCommand cmd, Context context) {
 		final String missingPerm = StringUtils.capitalizeEnum(err.getPermission());
 		if(err.getType().equals(UserType.BOT)) {
-			return BotUtils.sendMessage(
-					TextUtils.missingPermission(context.getUsername(), err.getPermission()), context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(
+							TextUtils.missingPermission(context.getUsername(), err.getPermission()), channel))
 					.doOnSuccess(message -> LogUtils.info("{Guild ID: %d} Missing permission: %s",
 							context.getGuildId().asLong(), missingPerm));
 		} else {
-			return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
-					+ " (**%s**) You can't execute this command because you don't have the permission to %s.",
-					context.getUsername(), String.format("**%s**", missingPerm)), context.getChannel());
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
+							+ " (**%s**) You can't execute this command because you don't have the permission to %s.",
+							context.getUsername(), String.format("**%s**", missingPerm)), channel));
 		}
 	}
 
 	public static Mono<Message> onMissingArgumentException(AbstractCommand cmd, Context context) {
 		StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, cmd);
 		return cmd.getHelp(context)
-				.flatMap(embed -> BotUtils.sendMessage(
-						Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.", embed, context.getChannel()));
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(
+								Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.", embed, channel)));
 	}
 
 	public static Mono<Message> onNoMusicException(AbstractCommand cmd, Context context) {
-		return BotUtils.sendMessage(String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
-				context.getUsername()), context.getChannel());
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
+						context.getUsername()), channel));
 	}
 
 	public static Mono<Message> onUnavailable(AbstractCommand cmd, Context context) {
 		LogUtils.warn(context.getClient(),
 				String.format("[%s] Service unavailable.", cmd.getClass().getSimpleName()),
 				context.getContent());
-		return BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... "
-				+ "This is not my fault, I promise ! Try again later.",
-				context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... "
+						+ "This is not my fault, I promise ! Try again later.",
+						context.getUsername(), context.getPrefix(), context.getCommandName()), channel));
 	}
 
 	public static Mono<Message> onUnreacheable(AbstractCommand cmd, Context context) {
 		LogUtils.warn(context.getClient(),
 				String.format("[%s] Service unreachable.", cmd.getClass().getSimpleName()),
 				context.getContent());
-		return BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... "
-				+ "This is not my fault, I promise ! Try again later.",
-				context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... "
+						+ "This is not my fault, I promise ! Try again later.",
+						context.getUsername(), context.getPrefix(), context.getCommandName()), channel));
 	}
 
-	public static Mono<Message> onForbidden(ClientException err, Snowflake guildId, Mono<MessageChannel> channel, String username) {
+	public static Mono<Message> onForbidden(ClientException err, Snowflake guildId, MessageChannel channel, String username) {
 		final Map<String, Object> responseFields = err.getErrorResponse().getFields();
 		LogUtils.info("{Guild ID: %d} %d %s: %s",
 				guildId.asLong(),
@@ -116,9 +124,10 @@ public class ExceptionHandler {
 	public static Mono<Message> onUnknown(DiscordClient client, Throwable err, AbstractCommand cmd, Context context) {
 		LogUtils.error(client, err, String.format("[%s] An unknown error occurred.", cmd.getClass().getSimpleName()),
 				context.getContent());
-		return BotUtils.sendMessage(
-				String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
-						context.getUsername(), context.getPrefix(), context.getCommandName()), context.getChannel());
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(
+						String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
+								context.getUsername(), context.getPrefix(), context.getCommandName()), channel));
 	}
 
 }

@@ -54,8 +54,9 @@ public class AllowedRolesSetting extends AbstractSetting {
 					.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 					.map(Role::getName)
 					.collectList()
-					.flatMap(roleNames -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s will now be able to interact with me.",
-							String.join(", ", roleNames)), context.getChannel()));
+					.flatMap(roleNames -> context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s will now be able to interact with me.",
+									String.join(", ", roleNames)), channel)));
 		} else {
 			allowedRoles.removeAll(mentionedRoles);
 			message = Flux.fromIterable(mentionedRoles)
@@ -70,7 +71,8 @@ public class AllowedRolesSetting extends AbstractSetting {
 						}
 						return text.toString();
 					})
-					.flatMap(text -> BotUtils.sendMessage(text, context.getChannel()));
+					.flatMap(text -> context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(text, channel)));
 		}
 
 		dbGuild.setSetting(this.getSetting(), allowedRoles);

@@ -65,10 +65,9 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 
 	@Override
 	public Mono<Void> show() {
-		return this.getContext().getAvatarUrl()
-				.zipWith(Flux.fromIterable(this.playersPlace.keySet())
-						.flatMap(userId -> this.getContext().getClient().getUserById(userId))
-						.collectList())
+		return Mono.zip(this.getContext().getAvatarUrl(), Flux.fromIterable(this.playersPlace.keySet())
+				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
+				.collectList())
 				.map(avatarUrlAndUsers -> {
 					final String avatarUrl = avatarUrlAndUsers.getT1();
 					final List<User> users = avatarUrlAndUsers.getT2();
@@ -96,7 +95,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 
 					return embed;
 				})
-				.flatMap(embed -> this.updateableMessage.send(embed))
+				.flatMap(this.updateableMessage::send)
 				.then();
 	}
 
@@ -140,9 +139,9 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 				})
 				.collectSortedList()
 				.map(list -> this.results = String.join(", ", list))
-				.then(BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
-						winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"),
-						this.getContext().getChannel()))
+				.then(this.getContext().getChannel())
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
+						winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"), channel))
 				.then(this.show())
 				.then(Mono.fromRunnable(this::stop));
 	}

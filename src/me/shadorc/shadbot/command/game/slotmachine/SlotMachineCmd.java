@@ -52,9 +52,10 @@ public class SlotMachineCmd extends AbstractCommand {
 			Shadbot.getLottery().addToJackpot(Math.abs(gains));
 		}
 
-		return BotUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",
-				FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername(),
-				gains > 0 ? "win" : "lose", FormatUtils.coins(Math.abs(gains))), context.getChannel())
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",
+						FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername(),
+						gains > 0 ? "win" : "lose", FormatUtils.coins(Math.abs(gains))), channel))
 				.then();
 	}
 

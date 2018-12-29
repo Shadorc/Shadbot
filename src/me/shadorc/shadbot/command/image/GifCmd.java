@@ -7,7 +7,6 @@ import org.apache.http.HttpStatus;
 import org.jsoup.HttpStatusException;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.api.image.giphy.GiphyResponse;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -18,6 +17,7 @@ import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
@@ -48,12 +48,11 @@ public class GifCmd extends AbstractCommand {
 						.then();
 			}
 
-			final EmbedCreateSpec embed = new EmbedCreateSpec()
-					.setColor(Config.BOT_COLOR)
+			final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 					.setImage(giphy.getGifs().get(0).getImageUrl());
 			return loadingMsg.send(embed).then();
 
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

@@ -30,14 +30,6 @@ public class TimeUtils {
 	}
 
 	/**
-	 * @param instant - the instant to create the date-time from, not null
-	 * @return {@code instant} converted as a {@link LocalDateTime} using the {@code ZoneId.systemDefault()} time-zone
-	 */
-	public static LocalDateTime toLocalDate(Instant instant) {
-		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-	}
-
-	/**
 	 * Convert a string, case insensitive, representing time (example: 1m03s) into seconds. <br>
 	 * Supported units: s, m, h
 	 *
@@ -80,6 +72,14 @@ public class TimeUtils {
 		}
 
 		return seconds;
+	}
+
+	/**
+	 * @param instant - the instant to create the date-time from, not null
+	 * @return {@code instant} converted as a {@link LocalDateTime} using the {@code ZoneId.systemDefault()} time-zone
+	 */
+	public static LocalDateTime toLocalDate(Instant instant) {
+		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}
 
 }

@@ -19,15 +19,15 @@ public class ActivateRelicCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		return context.getGuild()
-				.flatMap(guild -> {
+		return context.getChannel()
+				.flatMap(channel -> {
 					try {
-						Shadbot.getPremium().activateRelic(guild.getId(), context.getAuthorId(), arg);
+						Shadbot.getPremium().activateRelic(context.getGuildId(), context.getAuthorId(), arg);
 						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy !",
-								context.getUsername()), context.getChannel());
-					} catch (RelicActivationException err) {
+								context.getUsername()), channel);
+					} catch (final RelicActivationException err) {
 						return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
-								context.getUsername(), err.getMessage()), context.getChannel());
+								context.getUsername(), err.getMessage()), channel);
 					}
 				})
 				.then();

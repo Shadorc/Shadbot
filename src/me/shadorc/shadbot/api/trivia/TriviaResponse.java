@@ -19,9 +19,4 @@ public class TriviaResponse {
 		return this.results;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("TriviaResponse [responseCode=%s, results=%s]", this.responseCode, this.results);
-	}
-
 }

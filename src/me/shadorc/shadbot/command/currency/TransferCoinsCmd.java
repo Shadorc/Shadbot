@@ -56,21 +56,22 @@ public class TransferCoinsCmd extends AbstractCommand {
 		final DBMember dbReceiver = Shadbot.getDatabase().getDBMember(context.getGuildId(), receiverUserId);
 		if(dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
 			return context.getClient().getUserById(receiverUserId)
-					.flatMap(user -> BotUtils.sendMessage(String.format(
-							Emoji.BANK + " (**%s**) This transfer cannot be done because %s would exceed the maximum coins cap.",
-							context.getUsername(), user.getUsername()), context.getChannel()))
+					.map(User::getUsername)
+					.flatMap(username -> context.getChannel()
+							.flatMap(channel -> BotUtils.sendMessage(String.format(
+									Emoji.BANK + " (**%s**) This transfer cannot be done because %s would exceed the maximum coins cap.",
+									context.getUsername(), username), channel)))
 					.then();
 		}
 
 		dbSender.addCoins(-coins);
 		dbReceiver.addCoins(coins);
 
-		return context.getAuthor()
-				.map(User::getMention)
-				.zipWith(context.getClient().getUserById(senderUserId).map(User::getMention))
-				.flatMap(senderAndReceiver -> BotUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
-						senderAndReceiver.getT1(), FormatUtils.coins(coins), senderAndReceiver.getT2()),
-						context.getChannel()))
+		return Mono.zip(context.getAuthor().map(User::getMention),
+				context.getClient().getUserById(senderUserId).map(User::getMention),
+				context.getChannel())
+				.flatMap(tuple -> BotUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
+						tuple.getT1(), FormatUtils.coins(coins), tuple.getT2()), tuple.getT3()))
 				.then();
 	}
 

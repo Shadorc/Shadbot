@@ -56,8 +56,9 @@ public class RouletteCmd extends AbstractCommand {
 		if(rouletteManager.addPlayer(context.getAuthorId(), bet, place)) {
 			return rouletteManager.show();
 		} else {
-			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-					context.getUsername()), context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+							context.getUsername()), channel))
 					.then();
 		}
 	}

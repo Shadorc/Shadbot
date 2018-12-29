@@ -38,8 +38,9 @@ public class BlackjackCmd extends AbstractCommand {
 		if(blackjackManager.addPlayerIfAbsent(context.getAuthorId(), bet)) {
 			return blackjackManager.computeResultsOrShow();
 		} else {
-			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-					context.getUsername()), context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+							context.getUsername()), channel))
 					.then();
 		}
 	}

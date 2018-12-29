@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Channel.Type;
-import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -36,12 +35,10 @@ public class AllowedChannelsSetting extends AbstractSetting {
 		final List<String> args = context.requireArgs(3);
 
 		return context.getGuild()
-				.flatMapMany(Guild::getChannels)
-				.collectList()
-				.zipWith(DiscordUtils.extractChannels(context.getGuild(), context.getContent()).collectList())
-				.flatMapMany(channelsAndMentioned -> {
-					final List<GuildChannel> channels = channelsAndMentioned.getT1();
-					final List<Snowflake> mentionedChannels = channelsAndMentioned.getT2();
+				.flatMap(guild -> Mono.zip(guild.getChannels().collectList(), DiscordUtils.extractChannels(guild, context.getContent()).collectList()))
+				.flatMap(tuple -> {
+					final List<GuildChannel> channels = tuple.getT1();
+					final List<Snowflake> mentionedChannels = tuple.getT2();
 					if(mentionedChannels.isEmpty()) {
 						throw new CommandException(String.format("`%s` is/are not valid channel(s).", args.get(2)));
 					}
@@ -92,7 +89,7 @@ public class AllowedChannelsSetting extends AbstractSetting {
 
 					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
 					dbGuild.setSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, allowedVoiceChannels);
-					return BotUtils.sendMessage(strBuilder.toString(), context.getChannel());
+					return context.getChannel().flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel));
 				})
 				.then();
 	}

@@ -30,6 +30,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -72,9 +73,10 @@ public class LotteryCmd extends AbstractCommand {
 
 		Shadbot.getLottery().addGambler(context.getGuildId(), context.getAuthorId(), num);
 
-		return BotUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
-				+ "The next draw will take place in **%s**.",
-				context.getUsername(), num, FormatUtils.customDate(LotteryCmd.getDelay().toMillis())), context.getChannel())
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
+						+ "The next draw will take place in **%s**.",
+						context.getUsername(), num, FormatUtils.customDate(LotteryCmd.getDelay().toMillis())), channel))
 				.then();
 	}
 
@@ -125,7 +127,8 @@ public class LotteryCmd extends AbstractCommand {
 
 					return embed;
 				})
-				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()));
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)));
 	}
 
 	public static Duration getDelay() {
@@ -149,17 +152,17 @@ public class LotteryCmd extends AbstractCommand {
 				.filter(gambler -> gambler.getNumber() == winningNum)
 				.collect(Collectors.toList());
 
-		for(LotteryGambler winner : winners) {
-			client.getUserById(winner.getUserId())
-					.flatMap(user -> {
-						final int coins = (int) Math.ceil((double) Shadbot.getLottery().getJackpot() / winners.size());
-						Shadbot.getDatabase().getDBMember(winner.getGuildId(), winner.getUserId()).addCoins(coins);
-						return BotUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn %s.",
-								FormatUtils.coins(coins)), user.getPrivateChannel().cast(MessageChannel.class));
-					})
-					.subscribe();
-
-		}
+		Flux.fromIterable(winners)
+				.flatMap(winner -> client.getUserById(winner.getUserId())
+						.flatMap(user -> {
+							final int coins = (int) Math.ceil((double) Shadbot.getLottery().getJackpot() / winners.size());
+							Shadbot.getDatabase().getDBMember(winner.getGuildId(), winner.getUserId()).addCoins(coins);
+							return user.getPrivateChannel()
+									.cast(MessageChannel.class)
+									.flatMap(privateChannel -> BotUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn %s.",
+											FormatUtils.coins(coins)), privateChannel));
+						}))
+				.subscribe();
 
 		LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
 				winningNum, winners.size(), Shadbot.getLottery().getJackpot());

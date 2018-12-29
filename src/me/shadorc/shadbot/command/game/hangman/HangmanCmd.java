@@ -57,21 +57,22 @@ public class HangmanCmd extends AbstractCommand {
 			final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 			try {
 				this.load();
-			} catch (IOException err) {
+			} catch (final IOException err) {
 				throw Exceptions.propagate(err);
 			}
 			loadingMsg.stopTyping();
 		}
 
-		HangmanManager hangmanManager = MANAGERS.putIfAbsent(context.getChannelId(), new HangmanManager(context, difficulty));
+		final HangmanManager hangmanManager = MANAGERS.putIfAbsent(context.getChannelId(), new HangmanManager(context, difficulty));
 		if(hangmanManager == null) {
-			hangmanManager = MANAGERS.get(context.getChannelId());
-			hangmanManager.start();
-			return hangmanManager.show();
+			final HangmanManager newHangmanManager = MANAGERS.get(context.getChannelId());
+			newHangmanManager.start();
+			return newHangmanManager.show();
 		} else {
-			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
-					+ " Please, wait for him to finish.",
-					context.getUsername(), hangmanManager.getContext().getUsername()), context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
+							+ " Please, wait for him to finish.",
+							context.getUsername(), hangmanManager.getContext().getUsername()), channel))
 					.then();
 		}
 	}

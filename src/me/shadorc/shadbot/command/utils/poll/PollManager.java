@@ -96,7 +96,8 @@ public class PollManager extends AbstractGameManager {
 							.setDescription(String.format("__**%s**__%s", this.spec.getQuestion(), representation.toString()));
 
 				})
-				.flatMap(embed -> BotUtils.sendMessage(embed, this.getContext().getChannel()));
+				.flatMap(embed -> this.getContext().getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)));
 	}
 
 }

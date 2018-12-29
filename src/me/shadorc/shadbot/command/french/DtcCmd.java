@@ -55,7 +55,7 @@ public class DtcCmd extends AbstractCommand {
 							.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"))))
 					.then();
 
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

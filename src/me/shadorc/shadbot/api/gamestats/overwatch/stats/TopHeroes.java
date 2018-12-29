@@ -11,9 +11,4 @@ public class TopHeroes {
 		return this.quickplay;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("TopHeroes [quickplay=%s]", this.quickplay);
-	}
-
 }

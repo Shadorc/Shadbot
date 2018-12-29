@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.command.admin.setting;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.spec.TextChannelEditSpec;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
@@ -36,23 +36,23 @@ public class NSFWSetting extends AbstractSetting {
 		return context.getChannel()
 				.cast(TextChannel.class)
 				.flatMap(channel -> {
-					boolean isNSFW = false;
+					final AtomicBoolean isNSFW = new AtomicBoolean(false);
 					switch (action) {
 						case TOGGLE:
-							isNSFW = !channel.isNsfw();
+							isNSFW.set(!channel.isNsfw());
 							break;
 						case ENABLE:
-							isNSFW = true;
+							isNSFW.set(true);
 							break;
 						case DISABLE:
-							isNSFW = false;
+							isNSFW.set(false);
 							break;
 					}
 
-					return channel.edit(new TextChannelEditSpec().setNsfw(isNSFW))
-							.then(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) This channel is now **%sSFW**.",
-									context.getUsername(), isNSFW ? "N" : ""), context.getChannel()));
+					return channel.edit(spec -> spec.setNsfw(isNSFW.get()));
 				})
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) This channel is now **%sSFW**.",
+						context.getUsername(), channel.isNsfw() ? "N" : ""), channel))
 				.then();
 	}
 

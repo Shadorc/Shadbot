@@ -23,8 +23,9 @@ public class SkipCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 
-		final Mono<Message> messageMono = BotUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.",
-				context.getUsername()), context.getChannel());
+		final Mono<Message> messageMono = context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.",
+						context.getUsername()), channel));
 
 		if(context.getArg().isPresent()) {
 			final int playlistSize = guildMusic.getTrackScheduler().getPlaylist().size();

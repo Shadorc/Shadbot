@@ -16,6 +16,7 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 public class BotListStats {
 
@@ -37,7 +38,7 @@ public class BotListStats {
 
 		return Flux.fromIterable(Shadbot.getClients())
 				.flatMap(client -> Mono.zip(Mono.just(client.getConfig().getShardIndex()), client.getGuilds().count()))
-				.collectMap(tuple -> tuple.getT1(), tuple -> tuple.getT2())
+				.collectMap(Tuple2::getT1, Tuple2::getT2)
 				.doOnSuccess(shardsInfo -> {
 					LogUtils.info("Posting statistics...");
 					this.postOnBotListDotSpace(shardsInfo);
@@ -61,11 +62,11 @@ public class BotListStats {
 					.put("shard_id", entry.getKey())
 					.put("shard_count", shardsInfo.size())
 					.put("server_count", entry.getValue());
-			final String url = String.format("https://discordbots.org/api/bots/%d/stats", selfId);
+			final String url = String.format("https://discordbots.org/api/bots/%d/stats", this.selfId);
 
 			try {
 				this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
-			} catch (IOException err) {
+			} catch (final IOException err) {
 				LogUtils.error(err, "An error occurred while posting statistics on discordbots.org");
 			}
 		}
@@ -81,11 +82,11 @@ public class BotListStats {
 					.put("shardId", entry.getKey())
 					.put("shardCount", shardsInfo.size())
 					.put("guildCount", entry.getValue());
-			final String url = String.format("https://discord.bots.gg/api/bots/%d/stats", selfId);
+			final String url = String.format("https://discord.bots.gg/api/bots/%d/stats", this.selfId);
 
 			try {
 				this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
-			} catch (IOException err) {
+			} catch (final IOException err) {
 				LogUtils.error(err, "An error occurred while posting statistics on discord.bots.gg");
 			}
 		}
@@ -100,11 +101,11 @@ public class BotListStats {
 			final JSONObject content = new JSONObject()
 					.put("shard_id", entry.getKey())
 					.put("guilds ", entry.getValue());
-			final String url = String.format("https://discordbotlist.com/api/bots/%d/stats", selfId);
+			final String url = String.format("https://discordbotlist.com/api/bots/%d/stats", this.selfId);
 
 			try {
 				this.post(url, String.format("Bot %s", Credentials.get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
-			} catch (IOException err) {
+			} catch (final IOException err) {
 				LogUtils.error(err, "An error occurred while posting statistics on discordbotlist.com");
 			}
 		}
@@ -118,11 +119,11 @@ public class BotListStats {
 		final long guildCount = shardsInfo.values().stream().mapToLong(Long::longValue).sum();
 		final JSONObject content = new JSONObject()
 				.put("server_count", guildCount);
-		final String url = String.format("https://divinediscordbots.com/bots/%d/stats", selfId);
+		final String url = String.format("https://divinediscordbots.com/bots/%d/stats", this.selfId);
 
 		try {
 			this.post(url, Credentials.get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			LogUtils.error(err, "An error occurred while posting statistics on divinediscordbots.com");
 		}
 	}
@@ -135,11 +136,11 @@ public class BotListStats {
 		final long guildCount = shardsInfo.values().stream().mapToLong(Long::longValue).sum();
 		final JSONObject content = new JSONObject()
 				.put("server_count", guildCount);
-		final String url = String.format("https://botlist.space/bots/%d/stats", selfId);
+		final String url = String.format("https://botlist.space/bots/%d/stats", this.selfId);
 
 		try {
 			this.post(url, Credentials.get(Credential.BOT_LIST_DOT_SPACE), content);
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			LogUtils.error(err, "An error occurred while posting statistics on botlist.space");
 		}
 	}
@@ -147,18 +148,18 @@ public class BotListStats {
 	/**
 	 * WebSite: https://bots.ondiscord.xyz/ <br>
 	 * Documentation: https://bots.ondiscord.xyz/info/api
-	 * 
+	 *
 	 * @param shardsInfo
 	 */
 	private void postOnBotsOndiscordXyz(Map<Integer, Long> shardsInfo) {
 		final long guildCount = shardsInfo.values().stream().mapToLong(Long::longValue).sum();
 		final JSONObject content = new JSONObject()
 				.put("guildCount", guildCount);
-		final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", selfId);
+		final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", this.selfId);
 
 		try {
 			this.post(url, Credentials.get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			LogUtils.error(err, "An error occurred while posting statistics on bots.ondiscord.xyz");
 		}
 	}
@@ -173,7 +174,7 @@ public class BotListStats {
 	}
 
 	public void stop() {
-		task.dispose();
+		this.task.dispose();
 	}
 
 }

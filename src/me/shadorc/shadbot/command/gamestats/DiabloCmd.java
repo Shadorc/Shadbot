@@ -105,11 +105,11 @@ public class DiabloCmd extends AbstractCommand {
 					.flatMap(loadingMsg::send)
 					.then();
 
-		} catch (FileNotFoundException err) {
+		} catch (final FileNotFoundException err) {
 			return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
 					context.getUsername()))
 					.then();
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

@@ -13,9 +13,9 @@ import reactor.core.publisher.Mono;
 
 public abstract class AbstractCommand {
 
-	private final List<String> names;
 	private final String alias;
 	private final CommandCategory category;
+	private final List<String> names;
 	private final CommandPermission permission;
 	private final Optional<RateLimiter> rateLimiter;
 
@@ -38,20 +38,20 @@ public abstract class AbstractCommand {
 
 	public abstract Mono<EmbedCreateSpec> getHelp(Context context);
 
-	public List<String> getNames() {
-		return this.names;
-	}
-
-	public String getName() {
-		return this.getNames().get(0);
-	}
-
 	public String getAlias() {
 		return this.alias;
 	}
 
 	public CommandCategory getCategory() {
 		return this.category;
+	}
+
+	public String getName() {
+		return this.getNames().get(0);
+	}
+
+	public List<String> getNames() {
+		return this.names;
 	}
 
 	public CommandPermission getPermission() {

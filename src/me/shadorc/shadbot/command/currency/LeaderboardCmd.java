@@ -32,8 +32,7 @@ public class LeaderboardCmd extends AbstractCommand {
 				.filter(dbMember -> dbMember.getCoins() > 0)
 				.sort(COMPARATOR.reversed())
 				.take(10)
-				.flatMap(dbMember -> context.getClient().getUserById(dbMember.getId())
-						.zipWith(Mono.just(dbMember.getCoins())))
+				.flatMap(dbMember -> Mono.zip(context.getClient().getUserById(dbMember.getId()).map(User::getUsername), Mono.just(dbMember.getCoins())))
 				.collectList()
 				.map(list -> {
 					if(list.isEmpty()) {
@@ -41,17 +40,16 @@ public class LeaderboardCmd extends AbstractCommand {
 					}
 					return FormatUtils.numberedList(10, list.size(),
 							count -> {
-								final Tuple2<User, Integer> userAndCoins = list.get(count - 1);
-								final String username = userAndCoins.getT1().getUsername();
-								final String coins = FormatUtils.coins(userAndCoins.getT2());
-								return String.format("%d. **%s** - %s", count, username, coins);
+								final Tuple2<String, Integer> tuple = list.get(count - 1);
+								return String.format("%d. **%s** - %s", count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
 							});
 				})
 				.zipWith(context.getAvatarUrl())
-				.map(msgAndAvatar -> EmbedUtils.getDefaultEmbed()
-						.setAuthor("Leaderboard", null, msgAndAvatar.getT2())
-						.setDescription(msgAndAvatar.getT1()))
-				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.map(tuple -> EmbedUtils.getDefaultEmbed()
+						.setAuthor("Leaderboard", null, tuple.getT2())
+						.setDescription(tuple.getT1()))
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

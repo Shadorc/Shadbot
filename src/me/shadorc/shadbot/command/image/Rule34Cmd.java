@@ -81,12 +81,13 @@ public class Rule34Cmd extends AbstractCommand {
 								})
 								.flatMap(loadingMsg::send);
 
-					} catch (IOException err) {
+					} catch (final IOException err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(err);
 					}
 				})
-				.switchIfEmpty(BotUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), context.getChannel()))
+				.switchIfEmpty(context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), channel)))
 				.then();
 	}
 

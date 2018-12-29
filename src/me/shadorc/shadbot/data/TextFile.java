@@ -20,7 +20,7 @@ public class TextFile {
 		if(file.exists()) {
 			try {
 				this.texts.addAll(Arrays.asList(Utils.read(file).split("\n")));
-			} catch (IOException err) {
+			} catch (final IOException err) {
 				LogUtils.error(err, String.format("An error occurred while reading text file: %s", file.getPath()));
 			}
 		}

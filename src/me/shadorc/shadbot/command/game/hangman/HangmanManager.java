@@ -122,7 +122,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 		}
 
 		return this.show()
-				.then(BotUtils.sendMessage(text, this.getContext().getChannel()))
+				.then(this.getContext().getChannel())
+				.flatMap(channel -> BotUtils.sendMessage(text, channel))
 				.then(Mono.fromRunnable(this::stop));
 	}
 

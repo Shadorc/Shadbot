@@ -49,7 +49,7 @@ public class JokeCmd extends AbstractCommand {
 								.setAuthor("Blague", "http://www.une-blague.com/", avatarUrl)
 								.setDescription(joke));
 
-					} catch (IOException err) {
+					} catch (final IOException err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(err);
 					}

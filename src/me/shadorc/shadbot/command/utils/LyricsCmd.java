@@ -75,7 +75,7 @@ public class LyricsCmd extends AbstractCommand {
 					.flatMap(loadingMsg::send)
 					.then();
 
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

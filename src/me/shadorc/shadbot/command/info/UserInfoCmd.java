@@ -74,7 +74,8 @@ public class UserInfoCmd extends AbstractCommand {
 
 					return embed;
 				})
-				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

@@ -20,7 +20,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Setting(description = "Manage auto messages on user join/leave.", setting = SettingEnum.AUTO_MESSAGE)
@@ -61,9 +60,10 @@ public class AutoMessageSetting extends AbstractSetting {
 	}
 
 	private Mono<Message> channel(Context context, Action action) {
-		return DiscordUtils.extractChannels(context.getGuild(), context.getContent())
+		return context.getGuild()
+				.flatMapMany(guild -> DiscordUtils.extractChannels(guild, context.getContent()))
 				.collectList()
-				.flatMap(channelsMentionned -> {
+				.map(channelsMentionned -> {
 					if(channelsMentionned.size() != 1) {
 						throw new MissingArgumentException();
 					}
@@ -72,18 +72,21 @@ public class AutoMessageSetting extends AbstractSetting {
 					final Snowflake channelId = channelsMentionned.get(0);
 					if(Action.ENABLE.equals(action)) {
 						dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channelId);
-						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
-								DiscordUtils.getChannelMention(channelId)), context.getChannel());
+						return String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
+								DiscordUtils.getChannelMention(channelId));
 					} else {
 						dbGuild.removeSetting(SettingEnum.MESSAGE_CHANNEL_ID);
-						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
-								+ "until a new channel is defined.", DiscordUtils.getChannelMention(channelId)), context.getChannel());
+						return String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
+								+ "until a new channel is defined.", DiscordUtils.getChannelMention(channelId));
 					}
-				});
+				})
+				.flatMap(message -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(message, channel)));
 	}
 
 	private Mono<Message> updateMessage(Context context, SettingEnum setting, Action action, List<String> args) {
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+		final StringBuilder strBuilder = new StringBuilder();
 		if(Action.ENABLE.equals(action)) {
 			if(args.size() < 4) {
 				throw new MissingArgumentException();
@@ -91,22 +94,20 @@ public class AutoMessageSetting extends AbstractSetting {
 			final String message = args.get(3);
 			dbGuild.setSetting(setting, message);
 
-			Flux<Message> warningFlux = Flux.empty();
 			if(!dbGuild.getMessageChannelId().isPresent()) {
-				warningFlux = warningFlux.concatWith(BotUtils.sendMessage(String.format(Emoji.WARNING + " You need to specify a channel "
-						+ "in which send the auto-messages. Use `%s%s %s %s <#channel>`",
-						context.getPrefix(), this.getCommandName(),
-						StringUtils.toLowerCase(Action.ENABLE), StringUtils.toLowerCase(Type.CHANNEL)), context.getChannel()));
+				strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
+						+ "in which send the auto-messages. Use `%s%s %s %s <#channel>`%n",
+						context.getPrefix(), this.getCommandName(), StringUtils.toLowerCase(Action.ENABLE), StringUtils.toLowerCase(Type.CHANNEL)));
 			}
-
-			return warningFlux.then(BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s set to `%s`",
-					StringUtils.capitalizeEnum(setting), message), context.getChannel()));
+			strBuilder.append(String.format(Emoji.CHECK_MARK + " %s set to `%s`", StringUtils.capitalizeEnum(setting), message));
 
 		} else {
 			dbGuild.removeSetting(setting);
-			return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s disabled.",
-					StringUtils.capitalizeEnum(setting)), context.getChannel());
+			strBuilder.append(String.format(Emoji.CHECK_MARK + " %s disabled.", StringUtils.capitalizeEnum(setting)));
 		}
+
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel));
 	}
 
 	@Override

@@ -28,10 +28,11 @@ public class RelicStatusCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final List<Relic> relics = Shadbot.getPremium().getRelicsForUser(context.getAuthorId());
 		if(relics.isEmpty()) {
-			return BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
-					+ "you can help me keep it alive by making a donation on **%s**."
-					+ "%nAll donations are important and really help me %s",
-					context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), context.getChannel())
+			return context.getChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
+							+ "you can help me keep it alive by making a donation on **%s**."
+							+ "%nAll donations are important and really help me %s",
+							context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), channel))
 					.then();
 		}
 
@@ -57,9 +58,9 @@ public class RelicStatusCmd extends AbstractCommand {
 				})
 				.collectList()
 				.zipWith(context.getAvatarUrl())
-				.map(fieldsAndAvatarUrl -> {
-					final List<EmbedFieldEntity> fields = fieldsAndAvatarUrl.getT1();
-					final String avatarUrl = fieldsAndAvatarUrl.getT2();
+				.map(tuple -> {
+					final List<EmbedFieldEntity> fields = tuple.getT1();
+					final String avatarUrl = tuple.getT2();
 
 					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 							.setAuthor("Contributor Status", null, avatarUrl)
@@ -70,7 +71,8 @@ public class RelicStatusCmd extends AbstractCommand {
 
 					return embed;
 				})
-				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

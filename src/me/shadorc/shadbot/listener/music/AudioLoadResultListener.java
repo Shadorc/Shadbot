@@ -59,8 +59,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	public void trackLoaded(AudioTrack track) {
 		this.guildMusic.joinVoiceChannel(this.voiceChannelId);
 		if(!this.guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst)) {
-			BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-					FormatUtils.trackName(track.getInfo())), this.guildMusic.getMessageChannel())
+			this.guildMusic.getMessageChannel()
+					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
+							FormatUtils.trackName(track.getInfo())), channel))
 					.subscribe();
 		}
 	}
@@ -89,8 +90,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	public void loadFailed(FriendlyException err) {
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
 		LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildMusic.getGuildId().asLong(), errMessage);
-		BotUtils.sendMessage(String.format(Emoji.RED_CROSS + " Sorry, %s", errMessage.toLowerCase()),
-				this.guildMusic.getMessageChannel()).subscribe();
+		this.guildMusic.getMessageChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.RED_CROSS + " Sorry, %s", errMessage.toLowerCase()), channel))
+				.subscribe();
 		this.leaveIfStopped();
 	}
 
@@ -118,7 +120,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 								+ "\n\n" + choices)
 						.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
 								Shadbot.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
-				.flatMap(embed -> BotUtils.sendMessage(embed, this.guildMusic.getMessageChannel()))
+				.flatMap(embed -> this.guildMusic.getMessageChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then(Mono.fromRunnable(() -> {
 					this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
 							.then(Mono.fromRunnable(this::stopWaiting))
@@ -146,12 +149,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		}
 
 		strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
-		BotUtils.sendMessage(strBuilder.toString(), this.guildMusic.getMessageChannel()).subscribe();
+		this.guildMusic.getMessageChannel()
+				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
+				.subscribe();
 	}
 
 	private void onNoMatches() {
-		BotUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
-				StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), this.guildMusic.getMessageChannel())
+		this.guildMusic.getMessageChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
+						StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
 				.subscribe();
 		this.leaveIfStopped();
 	}
@@ -174,8 +180,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					final String prefix = Shadbot.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix();
 					if(content.equals(String.format("%scancel", prefix))) {
 						this.stopWaiting();
-						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
-								member.getUsername()), this.guildMusic.getMessageChannel())
+						return this.guildMusic.getMessageChannel()
+								.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
+										member.getUsername()), channel))
 								.thenReturn(true);
 					}
 
@@ -215,7 +222,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					this.stopWaiting();
 					// TODO: Chain (stop only on disconnect)
 					this.guildMusic.joinVoiceChannel(this.voiceChannelId);
-					return BotUtils.sendMessage(strBuilder.toString(), this.guildMusic.getMessageChannel())
+					return this.guildMusic.getMessageChannel()
+							.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
 							.thenReturn(true);
 				});
 	}

@@ -31,7 +31,9 @@ public class ReactionMessage {
 	 *         For example, if the message is deleted during the delay, a {@code 404 Forbidden} will be thrown.
 	 */
 	public Mono<Message> sendMessage(EmbedCreateSpec embed) {
-		return BotUtils.sendMessage(embed, this.client.getChannelById(this.channelId).cast(MessageChannel.class))
+		return this.client.getChannelById(this.channelId)
+				.cast(MessageChannel.class)
+				.flatMap(channel -> BotUtils.sendMessage(embed, channel))
 				// Add the reactions to the message then wait
 				.flatMap(message -> Flux.fromIterable(this.reactions)
 						.flatMap(message::addReaction)

@@ -57,9 +57,11 @@ public class BlacklistSettingCmd extends AbstractSetting {
 		}
 
 		dbGuild.setSetting(this.getSetting(), blacklist);
-		return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` %s to the blacklist.",
-				FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "), actionVerbose),
-				context.getChannel()).then();
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` %s to the blacklist.",
+						FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "), actionVerbose),
+						channel))
+				.then();
 	}
 
 	@Override

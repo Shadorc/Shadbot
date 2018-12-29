@@ -87,7 +87,7 @@ public class WallpaperCmd extends AbstractCommand {
 			loadingMsg.stopTyping();
 			throw new CommandException(String.format("%s. Use `%shelp %s` for more information.",
 					err.getMessage(), context.getPrefix(), this.getName()));
-		} catch (ParseException err) {
+		} catch (final ParseException err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}
@@ -141,7 +141,7 @@ public class WallpaperCmd extends AbstractCommand {
 										.addField("Tags", tags, false))
 								.flatMap(loadingMsg::send)
 								.then();
-					} catch (WallhavenException err) {
+					} catch (final WallhavenException err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(Objects.requireNonNullElse(err.getCause(), err));
 					}

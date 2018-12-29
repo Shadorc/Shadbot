@@ -61,7 +61,8 @@ public class ServerInfoCmd extends AbstractCommand {
 									+ String.format("%n**Text:** %d", textChannels), true)
 							.addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true);
 				})
-				.flatMap(embed -> BotUtils.sendMessage(embed, context.getChannel()))
+				.flatMap(embed -> context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

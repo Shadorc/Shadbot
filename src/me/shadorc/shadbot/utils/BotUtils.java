@@ -8,7 +8,6 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -18,47 +17,17 @@ import reactor.core.publisher.Mono;
 
 public class BotUtils {
 
-	public static Mono<Message> sendMessage(String content, Mono<MessageChannel> channel) {
-		return BotUtils.sendMessage(content, null, channel);
-	}
-
-	public static Mono<Message> sendMessage(EmbedCreateSpec embed, Mono<MessageChannel> channel) {
-		return BotUtils.sendMessage(null, embed, channel)
-				.doOnSuccess(msg -> StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT));
-	}
-
-	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, Mono<MessageChannel> channelMono) {
-		final MessageCreateSpec spec = new MessageCreateSpec();
-		if(content != null) {
-			spec.setContent(content);
-		}
-		if(embed != null) {
-			spec.setEmbed(embed);
-		}
-
-		return channelMono
-				.filterWhen(channel -> DiscordUtils.hasPermission(channelMono, channel.getClient().getSelfId().get(), Permission.SEND_MESSAGES))
-				.filterWhen(channel -> DiscordUtils.hasPermission(channelMono, channel.getClient().getSelfId().get(), Permission.EMBED_LINKS)
-						// Return true if the message does not contain embed even if the bot does not have permission to send embed
-						.map(canSendEmbed -> canSendEmbed || embed == null)
-						.doOnSuccess(canSendEmbed -> {
-							if(!canSendEmbed) {
-								BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed links.%nPlease, check my permissions "
-										+ "and channel-specific ones to verify that **%s** is checked.",
-										StringUtils.capitalizeEnum(Permission.EMBED_LINKS)), channelMono)
-										.subscribe();
-							}
-						}))
-				.flatMap(channel -> channel.createMessage(spec))
-				.doOnSuccess(message -> StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT));
-	}
-
 	public static boolean hasAllowedRole(Snowflake guildId, List<Role> roles) {
 		final List<Snowflake> allowedRoles = Shadbot.getDatabase().getDBGuild(guildId).getAllowedRoles();
 		// If the user is an administrator OR no permissions have been set OR the role is allowed
 		return allowedRoles.isEmpty()
 				|| roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
 				|| roles.stream().anyMatch(role -> allowedRoles.contains(role.getId()));
+	}
+
+	public static boolean isCommandAllowed(Snowflake guildId, AbstractCommand cmd) {
+		final List<String> blacklistedCmd = Shadbot.getDatabase().getDBGuild(guildId).getBlacklistedCmd();
+		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
 	}
 
 	public static boolean isTextChannelAllowed(Snowflake guildId, Snowflake channelId) {
@@ -73,9 +42,48 @@ public class BotUtils {
 		return allowedVoiceChannels.isEmpty() || allowedVoiceChannels.contains(channelId);
 	}
 
-	public static boolean isCommandAllowed(Snowflake guildId, AbstractCommand cmd) {
-		final List<String> blacklistedCmd = Shadbot.getDatabase().getDBGuild(guildId).getBlacklistedCmd();
-		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
+	public static Mono<Message> sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
+		return BotUtils.sendMessage(null, embed, channel);
+	}
+
+	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, MessageChannel channel) {
+		final Snowflake selfId = channel.getClient().getSelfId().get();
+		return Mono.zip(
+				DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
+				DiscordUtils.hasPermission(channel, selfId, Permission.EMBED_LINKS))
+				.flatMap(tuple -> {
+					final boolean canSendMessage = tuple.getT1();
+					final boolean canSendEmbed = tuple.getT2();
+
+					if(!canSendMessage) {
+						return Mono.empty();
+					}
+
+					if(!canSendEmbed && embed != null) {
+						return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed links.%nPlease, check my permissions "
+								+ "and channel-specific ones to verify that **%s** is checked.",
+								StringUtils.capitalizeEnum(Permission.EMBED_LINKS)), channel);
+					}
+
+					return channel.createMessage(spec -> {
+						if(content != null) {
+							spec.setContent(content);
+						}
+						if(embed != null) {
+							spec.setEmbed(embed);
+						}
+					});
+				})
+				.doOnSuccess(message -> {
+					if(!message.getEmbeds().isEmpty()) {
+						StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);
+					}
+					StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT);
+				});
+	}
+
+	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
+		return BotUtils.sendMessage(content, null, channel);
 	}
 
 }

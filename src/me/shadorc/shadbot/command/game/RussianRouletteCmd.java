@@ -49,7 +49,9 @@ public class RussianRouletteCmd extends AbstractCommand {
 
 		Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains);
 
-		return BotUtils.sendMessage(strBuilder.toString(), context.getChannel()).then();
+		return context.getChannel()
+				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
+				.then();
 	}
 
 	@Override

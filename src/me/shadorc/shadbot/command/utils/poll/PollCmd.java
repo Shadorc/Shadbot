@@ -56,7 +56,8 @@ public class PollCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		context.requireArg();
 
-		return DiscordUtils.requirePermissions(context.getChannel(), context.getSelfId(), UserType.BOT, Permission.ADD_REACTIONS)
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.ADD_REACTIONS))
 				.then(context.getPermission())
 				.doOnSuccess(permission -> {
 					PollManager pollManager = MANAGER.get(context.getChannelId());
@@ -92,7 +93,7 @@ public class PollCmd extends AbstractCommand {
 		} else {
 			try {
 				seconds = Integer.valueOf((int) TimeUtils.parseTime(args.get(0)));
-			} catch (IllegalArgumentException err) {
+			} catch (final IllegalArgumentException err) {
 				throw new CommandException(err.getMessage());
 			}
 			if(!NumberUtils.isInRange(seconds, MIN_DURATION, MAX_DURATION)) {

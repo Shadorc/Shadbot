@@ -1,13 +1,13 @@
 package me.shadorc.shadbot.command.hidden;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
 
@@ -17,10 +17,9 @@ public class BaguetteCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final EmbedCreateSpec embed = new EmbedCreateSpec()
-				.setColor(Config.BOT_COLOR)
+		final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
 				.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg");
-		return BotUtils.sendMessage(embed, context.getChannel()).then();
+		return context.getChannel().flatMap(channel -> BotUtils.sendMessage(embed, channel)).then();
 	}
 
 	@Override

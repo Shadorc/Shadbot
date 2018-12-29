@@ -80,7 +80,7 @@ public class WeatherCmd extends AbstractCommand {
 					.flatMap(loadingMsg::send)
 					.then();
 
-		} catch (APIException err) {
+		} catch (final APIException err) {
 			if(err.getCode() == 404) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
 						context.getUsername(), args.get(0))).then();

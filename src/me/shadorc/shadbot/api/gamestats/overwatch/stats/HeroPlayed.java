@@ -17,9 +17,4 @@ public class HeroPlayed {
 		return this.played;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("HeroPlayed [hero=%s, played=%s]", this.hero, this.played);
-	}
-
 }

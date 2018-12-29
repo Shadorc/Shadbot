@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.utils;
 
 public enum ExitCode {
-	UNKNWON(-1),
-	NORMAL(0),
 	FATAL_ERROR(1),
-	RESTART(2);
+	NORMAL(0),
+	RESTART(2),
+	UNKNWON(-1);
 
 	private final int value;
 
@@ -13,6 +13,6 @@ public enum ExitCode {
 	}
 
 	public int value() {
-		return value;
+		return this.value;
 	}
 }

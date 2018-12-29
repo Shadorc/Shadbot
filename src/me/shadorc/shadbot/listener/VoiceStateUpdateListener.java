@@ -69,7 +69,8 @@ public class VoiceStateUpdateListener {
 					// Ignore the event
 					return Mono.empty();
 				})
-				.flatMap(content -> BotUtils.sendMessage(content.toString(), guildMusic.getMessageChannel()))
+				.flatMap(content -> guildMusic.getMessageChannel()
+						.flatMap(channel -> BotUtils.sendMessage(content.toString(), channel)))
 				.subscribe();
 	}
 

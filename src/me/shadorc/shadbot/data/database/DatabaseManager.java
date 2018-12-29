@@ -24,7 +24,7 @@ public class DatabaseManager extends Data {
 	}
 
 	public DBGuild getDBGuild(Snowflake guildId) {
-		final Optional<DBGuild> dbGuildOpt = guilds.stream()
+		final Optional<DBGuild> dbGuildOpt = this.guilds.stream()
 				.filter(guild -> guild.getId().equals(guildId))
 				.findFirst();
 
@@ -33,7 +33,7 @@ public class DatabaseManager extends Data {
 		}
 
 		final DBGuild dbGuild = new DBGuild(guildId);
-		guilds.add(dbGuild);
+		this.guilds.add(dbGuild);
 		return dbGuild;
 	}
 

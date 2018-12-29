@@ -161,8 +161,9 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 					return text;
 				})
 				.collectList()
-				.flatMap(results -> BotUtils.sendMessage(
-						String.format(Emoji.DICE + " __Results:__ %s", String.join(", ", results)), this.getContext().getChannel()))
+				.flatMap(results -> this.getContext().getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(
+								String.format(Emoji.DICE + " __Results:__ %s", String.join(", ", results)), channel)))
 				.then(Mono.fromRunnable(this::stop))
 				.then(this.show());
 	}
@@ -196,18 +197,20 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 								.get())
 						.flatMap(player -> {
 							if(player.isStanding()) {
-								return BotUtils.sendMessage(
-										String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't play anymore.",
-												member.getUsername()), this.getContext().getChannel())
+								return this.getContext().getChannel()
+										.flatMap(channel -> BotUtils.sendMessage(
+												String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't play anymore.",
+														member.getUsername()), channel))
 										.thenReturn(false);
 							}
 
 							final String prefix = Shadbot.getDatabase().getDBGuild(event.getGuildId().get()).getPrefix();
 							final String content = event.getMessage().getContent().orElse("").replace(prefix, "").toLowerCase().trim();
 							if("double down".equals(content) && player.getCards().size() != 2) {
-								return BotUtils.sendMessage(
-										String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a maximum of 2 cards to use `double down`.",
-												member.getUsername()), this.getContext().getChannel())
+								return this.getContext().getChannel()
+										.flatMap(channel -> BotUtils.sendMessage(
+												String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a maximum of 2 cards to use `double down`.",
+														member.getUsername()), channel))
 										.thenReturn(true);
 							}
 

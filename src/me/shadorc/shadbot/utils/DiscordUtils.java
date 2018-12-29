@@ -4,10 +4,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.BooleanUtils;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.event.domain.Event;
+import discord4j.core.event.domain.guild.GuildCreateEvent;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
@@ -20,7 +24,6 @@ import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
-import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -28,6 +31,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,15 +40,105 @@ public class DiscordUtils {
 	/* Audit Log reason must be 512 or fewer in length. */
 	public static final int MAX_REASON_LENGTH = 512;
 
-	public static Mono<Void> updatePresence(DiscordClient client) {
-		String text;
-		if(ThreadLocalRandom.current().nextInt(2) == 0) {
-			text = TextUtils.PLAYING.getText();
-		} else {
-			text = String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
+	/**
+	 * @param channel - the channel containing the messages to delete
+	 * @param messages - the {@link List} of messages to delete
+	 * @return The number of deleted messages
+	 */
+	public static Mono<Integer> bulkDelete(TextChannel channel, List<Message> messages) {
+		switch (messages.size()) {
+			case 1:
+				return messages.get(0)
+						.delete()
+						.thenReturn(messages.size());
+			default:
+				return channel.bulkDelete(Flux.fromIterable(messages).map(Message::getId))
+						.count()
+						.map(messagesNotDeleted -> messages.size() - messagesNotDeleted)
+						.cast(Integer.class);
 		}
-		return client.updatePresence(Presence.online(Activity.playing(text)));
+	}
 
+	/**
+	 * @param guild - a {@link Guild} containing the channels to extract
+	 * @param content - a string containing channels mentions / names
+	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels
+	 */
+	public static Flux<Snowflake> extractChannels(Guild guild, String content) {
+		final List<String> words = StringUtils.split(content);
+		return guild.getChannels()
+				.filter(channel -> words.contains(String.format("#%s", channel.getName())) || words.contains(channel.getMention()))
+				.map(GuildChannel::getId)
+				.distinct();
+	}
+
+	/**
+	 * @param guild - a {@link Guild} containing the roles to extract
+	 * @param content - a string containing role mentions / names
+	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles
+	 */
+	public static Flux<Snowflake> extractRoles(Guild guild, String content) {
+		final List<String> words = StringUtils.split(content);
+		return guild.getRoles()
+				.filter(role -> words.contains(String.format("@%s", role.getName())) || words.contains(role.getMention()))
+				.map(Role::getId)
+				.distinct();
+	}
+
+	/**
+	 * @param channelId - The ID of the channel to mention
+	 * @return The channel mentionned
+	 */
+	public static String getChannelMention(Snowflake channelId) {
+		return String.format("<#%d>", channelId.asLong());
+	}
+
+	/**
+	 * @param message - the message
+	 * @return The members mentioned in a {@link Message}
+	 */
+	public static Flux<Member> getMembersFrom(Message message) {
+		if(message.mentionsEveryone()) {
+			return message.getGuild().flatMapMany(Guild::getMembers);
+		}
+		return message.getGuild()
+				.flatMapMany(Guild::getMembers)
+				.filter(member -> message.getUserMentionIds().contains(member.getId())
+						|| !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
+	}
+
+	/**
+	 * @param channel - the channel
+	 * @param userId - the user ID
+	 * @param permission - the permission
+	 * @return Return true if the user has the permission in the channel, false otherwise
+	 */
+	public static Mono<Boolean> hasPermission(Channel channel, Snowflake userId, Permission permission) {
+		// An user has all the permissions in a private channel
+		if(channel instanceof PrivateChannel) {
+			return Mono.just(true);
+		}
+		return GuildChannel.class.cast(channel).getEffectivePermissions(userId).map(permissions -> permissions.contains(permission));
+	}
+
+	public static <T extends Event> void register(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
+		client.getEventDispatcher()
+				.on(eventClass)
+				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
+				.subscribe(consumer);
+	}
+
+	/**
+	 * When all guilds have been received, register GuildListener#onGuildCreate and GatewayLifecycleListener#onGatewayLifecycleEvent
+	 */
+	public static void registerFullyReadyEvent(DiscordClient client, Consumer<? super GuildCreateEvent> consumer) {
+		client.getEventDispatcher().on(ReadyEvent.class)
+				.map(event -> event.getGuilds().size())
+				.flatMap(size -> client.getEventDispatcher()
+						.on(GuildCreateEvent.class)
+						.take(size)
+						.last())
+				.subscribe(consumer);
 	}
 
 	/**
@@ -73,72 +167,18 @@ public class DiscordUtils {
 		return bet;
 	}
 
-	/**
-	 * @param guild - a {@link Guild} {@link Mono} containing the roles to extract
-	 * @param content - a string containing role mentions / names
-	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles
-	 */
-	public static Flux<Snowflake> extractRoles(Mono<Guild> guild, String content) {
-		final List<String> words = StringUtils.split(content);
-		return guild.flatMapMany(Guild::getRoles)
-				.filter(role -> words.contains(String.format("@%s", role.getName()))
-						|| words.contains(role.getMention()))
-				.map(Role::getId)
-				.distinct();
+	public static Mono<Void> requirePermissions(Channel channel, Snowflake userId, UserType userType, Permission... permissions) {
+		return Flux.fromArray(permissions)
+				.filterWhen(permission -> DiscordUtils.hasPermission(channel, userId, permission).map(BooleanUtils::negate))
+				.flatMap(permission -> Mono.error(new MissingPermissionException(userType, permission)))
+				.then();
 	}
 
 	/**
-	 * @param guild - a {@link Guild} {@link Mono} containing the channels to extract
-	 * @param content - a string containing channels mentions / names
-	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels
+	 * @param context - the context
+	 * @return The user voice channel ID if the user is in a voice channel and the bot is allowed to join or if the user is in a voice channel or if the
+	 *         user and the bot are in the same voice channel
 	 */
-	public static Flux<Snowflake> extractChannels(Mono<Guild> guild, String content) {
-		final List<String> words = StringUtils.split(content);
-		return guild.flatMapMany(Guild::getChannels)
-				.filter(channel -> words.contains(String.format("#%s", channel.getName()))
-						|| words.contains(channel.getMention()))
-				.map(GuildChannel::getId)
-				.distinct();
-	}
-
-	/**
-	 * @param channel - the channel containing the messages to delete
-	 * @param messages - the {@link List} of messages to delete
-	 * @return The number of deleted messages
-	 */
-	public static Mono<Integer> bulkDelete(Mono<TextChannel> channel, List<Message> messages) {
-		switch (messages.size()) {
-			case 0:
-				return Mono.just(messages.size());
-			case 1:
-				return messages.get(0)
-						.delete()
-						.thenReturn(messages.size());
-			default:
-				return channel
-						.flatMap(channelItr -> channelItr.bulkDelete(Flux.fromIterable(messages)
-								.map(Message::getId))
-								.collectList()
-								.map(messagesNotDeleted -> messages.size() - messagesNotDeleted.size()));
-		}
-	}
-
-	/**
-	 * @param message - the message
-	 * @return The members mentioned in a {@link Message}
-	 */
-	public static Flux<Member> getMembersFrom(Message message) {
-		return message.getGuild()
-				.flatMapMany(Guild::getMembers)
-				.filter(member -> message.mentionsEveryone()
-						|| message.getUserMentionIds().contains(member.getId())
-						|| !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
-	}
-
-	public static String getChannelMention(Snowflake channelId) {
-		return String.format("<#%d>", channelId.asLong());
-	}
-
 	public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
 		final Mono<Optional<Snowflake>> botVoiceChannelIdMono = context.getSelfAsMember()
 				.flatMap(Member::getVoiceState)
@@ -175,17 +215,15 @@ public class DiscordUtils {
 				});
 	}
 
-	public static Mono<Boolean> hasPermission(Mono<? extends Channel> channel, Snowflake userId, Permission permission) {
-		return channel
-				.flatMap(chnl -> chnl instanceof PrivateChannel ? Mono.just(PermissionSet.all()) : ((GuildChannel) chnl).getEffectivePermissions(userId))
-				.map(permissions -> permissions.contains(permission));
-	}
+	public static Mono<Void> updatePresence(DiscordClient client) {
+		String text;
+		if(ThreadLocalRandom.current().nextInt(2) == 0) {
+			text = TextUtils.PLAYING.getText();
+		} else {
+			text = String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
+		}
+		return client.updatePresence(Presence.online(Activity.playing(text)));
 
-	public static Mono<Void> requirePermissions(Mono<? extends Channel> channel, Snowflake userId, UserType userType, Permission... permissions) {
-		return Flux.fromArray(permissions)
-				.filterWhen(permission -> DiscordUtils.hasPermission(channel, userId, permission).map(BooleanUtils::negate))
-				.flatMap(permission -> Mono.error(new MissingPermissionException(userType, permission)))
-				.then();
 	}
 
 }

@@ -40,10 +40,13 @@ public class SendMessageCmd extends AbstractCommand {
 						throw new CommandException("I can't send private message to other bots.");
 					}
 
-					return BotUtils.sendMessage(args.get(1), user.getPrivateChannel().cast(MessageChannel.class));
+					return user.getPrivateChannel()
+							.cast(MessageChannel.class)
+							.flatMap(privateChannel -> BotUtils.sendMessage(args.get(1), privateChannel));
 
 				})
-				.then(BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", context.getChannel()))
+				.then(context.getChannel()
+						.flatMap(channel -> BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", channel)))
 				.onErrorMap(ExceptionUtils::isNotFound, err -> new CommandException("User not found."))
 				.then();
 	}
