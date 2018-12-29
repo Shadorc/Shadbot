@@ -25,7 +25,7 @@ public class StatsManager extends Data {
 
 	@Override
 	public void write() throws IOException {
-		for(StatisticEnum statistic : StatisticEnum.values()) {
+		for(final StatisticEnum statistic : StatisticEnum.values()) {
 			statistic.getStat().save();
 		}
 	}

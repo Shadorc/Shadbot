@@ -43,7 +43,7 @@ public class Utils {
 	 * @return The enumeration corresponding to the {@code value} from {@code enumClass} or null if it does not exist
 	 */
 	public static <T extends Enum<T>> T getEnum(Class<T> enumClass, String value) {
-		for(T enumeration : enumClass.getEnumConstants()) {
+		for(final T enumeration : enumClass.getEnumConstants()) {
 			if(enumeration.toString().equalsIgnoreCase(value)) {
 				return enumeration;
 			}
@@ -130,9 +130,9 @@ public class Utils {
 	 */
 	public static <R, C, V> HashBasedTable<R, C, V> toTable(Map<R, Map<C, V>> map) {
 		final HashBasedTable<R, C, V> table = HashBasedTable.create();
-		for(R rowKey : map.keySet()) {
+		for(final R rowKey : map.keySet()) {
 			final Map<C, V> rowMap = map.get(rowKey);
-			for(C columnKey : rowMap.keySet()) {
+			for(final C columnKey : rowMap.keySet()) {
 				final V value = rowMap.get(columnKey);
 				table.put(rowKey, columnKey, value);
 			}

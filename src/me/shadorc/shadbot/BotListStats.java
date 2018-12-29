@@ -57,7 +57,7 @@ public class BotListStats {
 	 * Documentation: https://discordbots.org/api/docs#bots
 	 */
 	private void postOnDiscordBotsDotOrg(Map<Integer, Long> shardsInfo) {
-		for(Entry<Integer, Long> entry : shardsInfo.entrySet()) {
+		for(final Entry<Integer, Long> entry : shardsInfo.entrySet()) {
 			final JSONObject content = new JSONObject()
 					.put("shard_id", entry.getKey())
 					.put("shard_count", shardsInfo.size())
@@ -77,7 +77,7 @@ public class BotListStats {
 	 * Documentation: https://discord.bots.gg/docs/endpoints
 	 */
 	private void postOnDiscordBotsDotGg(Map<Integer, Long> shardsInfo) {
-		for(Entry<Integer, Long> entry : shardsInfo.entrySet()) {
+		for(final Entry<Integer, Long> entry : shardsInfo.entrySet()) {
 			final JSONObject content = new JSONObject()
 					.put("shardId", entry.getKey())
 					.put("shardCount", shardsInfo.size())
@@ -97,7 +97,7 @@ public class BotListStats {
 	 * Documentation: https://discordbotlist.com/api-docs
 	 */
 	private void postOnDiscordBotListDotCom(Map<Integer, Long> shardsInfo) {
-		for(Entry<Integer, Long> entry : shardsInfo.entrySet()) {
+		for(final Entry<Integer, Long> entry : shardsInfo.entrySet()) {
 			final JSONObject content = new JSONObject()
 					.put("shard_id", entry.getKey())
 					.put("guilds ", entry.getValue());

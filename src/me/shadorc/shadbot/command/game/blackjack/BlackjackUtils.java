@@ -16,7 +16,7 @@ public class BlackjackUtils {
 		int aceCount = 0;
 
 		int value = 0;
-		for(Card card : cards) {
+		for(final Card card : cards) {
 			if(card.getNum() == 1) {
 				aceCount++;
 			} else {

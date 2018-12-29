@@ -69,7 +69,7 @@ public class AllowedChannelsSetting extends AbstractSetting {
 								.map(Channel::getId)
 								.collect(Collectors.toList());
 
-						for(Snowflake channelId : mentionedChannels) {
+						for(final Snowflake channelId : mentionedChannels) {
 							if(textChannels.contains(channelId) && !allowedTextChannels.contains(channelId)) {
 								allowedTextChannels.add(channelId);
 							} else if(voiceChannels.contains(channelId) && !allowedVoiceChannels.contains(channelId)) {

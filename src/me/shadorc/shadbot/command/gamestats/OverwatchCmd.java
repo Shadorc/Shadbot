@@ -77,7 +77,7 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	private Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String battletag) throws IOException {
-		for(Platform platform : Platform.values()) {
+		for(final Platform platform : Platform.values()) {
 			final Tuple3<Platform, ProfileResponse, StatsResponse> response = this.getResponse(platform.toString(), battletag);
 			if(response != null) {
 				return response;

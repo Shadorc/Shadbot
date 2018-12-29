@@ -53,7 +53,7 @@ public class TimeUtils {
 
 		long seconds = 0;
 
-		for(String match : matches) {
+		for(final String match : matches) {
 			final long time = Long.parseLong(match.replaceAll("[a-z]", ""));
 			final String unit = match.replaceAll("[0-9]", "");
 			switch (unit) {

@@ -42,7 +42,7 @@ public class SettingsCmd extends AbstractCommand {
 
 	static {
 		final Reflections reflections = new Reflections(SettingsCmd.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
-		for(Class<?> settingClass : reflections.getTypesAnnotatedWith(Setting.class)) {
+		for(final Class<?> settingClass : reflections.getTypesAnnotatedWith(Setting.class)) {
 			final String settingName = settingClass.getSimpleName();
 			if(!AbstractSetting.class.isAssignableFrom(settingClass)) {
 				LogUtils.error(String.format("An error occurred while generating setting, %s cannot be cast to %s.",

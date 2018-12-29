@@ -129,7 +129,7 @@ public class HelpBuilder {
 						embed.addField("Source", this.source, false);
 					}
 
-					for(EmbedFieldEntity field : this.fields) {
+					for(final EmbedFieldEntity field : this.fields) {
 						embed.addField(field.getName(), field.getValue(), field.isInline());
 					}
 

@@ -74,7 +74,7 @@ public class DiabloCmd extends AbstractCommand {
 			}
 
 			final List<HeroResponse> heroResponses = new ArrayList<>();
-			for(HeroId heroId : profile.getHeroeIds()) {
+			for(final HeroId heroId : profile.getHeroeIds()) {
 				final URL heroUrl = new URL(String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
 						region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken()));
 

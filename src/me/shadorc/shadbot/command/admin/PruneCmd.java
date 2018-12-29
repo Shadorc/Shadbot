@@ -87,8 +87,8 @@ public class PruneCmd extends AbstractCommand {
 
 	private String getEmbedContent(Message message) {
 		final StringBuilder strBuilder = new StringBuilder();
-		for(Embed embed : message.getEmbeds()) {
-			for(Field field : embed.getFields()) {
+		for(final Embed embed : message.getEmbeds()) {
+			for(final Field field : embed.getFields()) {
 				strBuilder.append(field.getName() + "\n" + field.getValue() + "\n");
 			}
 		}

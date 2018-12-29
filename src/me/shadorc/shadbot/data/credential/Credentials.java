@@ -23,7 +23,7 @@ public class Credentials {
 		}
 
 		// Check if all API keys are present
-		for(Credential key : Credential.values()) {
+		for(final Credential key : Credential.values()) {
 			if(Credentials.get(key) == null) {
 				throw new RuntimeException(String.format("%s not found.", key.toString()));
 			}

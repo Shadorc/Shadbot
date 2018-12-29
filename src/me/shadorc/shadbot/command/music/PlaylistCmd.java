@@ -44,7 +44,7 @@ public class PlaylistCmd extends AbstractCommand {
 		final StringBuilder playlistStr = new StringBuilder(String.format("**%s in the playlist:**\n", StringUtils.pluralOf(queue.size(), "music")));
 
 		int count = 1;
-		for(AudioTrack track : queue) {
+		for(final AudioTrack track : queue) {
 			final String name = String.format("%n\t**%d.** %s", count, FormatUtils.trackName(track.getInfo()));
 			if(playlistStr.length() + name.length() < 1800) {
 				playlistStr.append(name);

@@ -41,7 +41,7 @@ public class EmbedUtils {
 		final Map<String, AtomicLong> commandsUsed = StatsManager.COMMAND_STATS.getMap(CommandEnum.COMMAND_USED);
 
 		final Map<String, Tuple2<Float, Long>> averageMap = new HashMap<>();
-		for(String gameName : gameNames) {
+		for(final String gameName : gameNames) {
 			final long gains = moneyGained.getOrDefault(gameName, new AtomicLong(0)).get();
 			final long losses = moneyLost.getOrDefault(gameName, new AtomicLong(0)).get();
 			final long usages = commandsUsed.get(gameName).get();

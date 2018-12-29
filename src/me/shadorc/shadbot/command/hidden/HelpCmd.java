@@ -56,7 +56,7 @@ public class HelpCmd extends AbstractCommand {
 									+ "%nGet more information by using `%s%s <command>`.",
 									Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
 
-					for(CommandCategory category : CommandCategory.values()) {
+					for(final CommandCategory category : CommandCategory.values()) {
 						if(!map.get(category).isEmpty() && !category.equals(CommandCategory.HIDDEN)) {
 							embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
 						}

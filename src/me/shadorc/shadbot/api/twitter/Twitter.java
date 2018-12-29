@@ -24,7 +24,7 @@ public class Twitter {
 	public Twitter(String consumerKey, String consumerSecret) {
 		try {
 			this.bearerToken = this.requestBearerToken(consumerKey, consumerSecret);
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			LogUtils.error(err, "An error occurred while getting Twitter bearer token.");
 		}
 	}

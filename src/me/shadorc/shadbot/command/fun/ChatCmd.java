@@ -40,7 +40,7 @@ public class ChatCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		for(String botName : BOTS.keySet()) {
+		for(final String botName : BOTS.keySet()) {
 			try {
 				final String response = this.talk(context.getChannelId(), BOTS.get(botName), arg);
 				ERROR_COUNT.set(0);

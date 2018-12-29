@@ -78,7 +78,7 @@ public class PollManager extends AbstractGameManager {
 					// Reactions are not in the same order as they were when added to the message, they need to be ordered
 					final BiMap<ReactionEmoji, String> reactionsChoices = HashBiMap.create(this.spec.getChoices()).inverse();
 					final Map<String, Integer> choicesVotes = new HashMap<>();
-					for(Reaction reaction : reactions) {
+					for(final Reaction reaction : reactions) {
 						// -1 is here to ignore the reaction of the bot itself
 						choicesVotes.put(reactionsChoices.get(reaction.getEmoji()), reaction.getCount() - 1);
 					}
@@ -86,7 +86,7 @@ public class PollManager extends AbstractGameManager {
 					// Sort votes map by value in the ascending order
 					final StringBuilder representation = new StringBuilder();
 					int count = 1;
-					for(String key : Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue())).keySet()) {
+					for(final String key : Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue())).keySet()) {
 						representation.append(String.format("%n\t**%d.** %s (Votes: %d)", count, key, choicesVotes.get(key)));
 						count++;
 					}

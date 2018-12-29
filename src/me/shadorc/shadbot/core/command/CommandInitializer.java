@@ -19,7 +19,7 @@ public class CommandInitializer {
 
 	public static boolean init() {
 		final Reflections reflections = new Reflections(Shadbot.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
-		for(Class<?> cmdClass : reflections.getTypesAnnotatedWith(Command.class)) {
+		for(final Class<?> cmdClass : reflections.getTypesAnnotatedWith(Command.class)) {
 			final String cmdName = cmdClass.getSimpleName();
 			if(!AbstractCommand.class.isAssignableFrom(cmdClass)) {
 				LogUtils.error(String.format("An error occurred while generating command: %s cannot be casted to %s.",
@@ -35,7 +35,7 @@ public class CommandInitializer {
 					names.add(cmd.getAlias());
 				}
 
-				for(String name : names) {
+				for(final String name : names) {
 					if(COMMANDS_MAP.putIfAbsent(name, cmd) != null) {
 						LogUtils.error(String.format("Command name collision between %s and %s.",
 								cmdName, COMMANDS_MAP.get(name).getClass().getSimpleName()));

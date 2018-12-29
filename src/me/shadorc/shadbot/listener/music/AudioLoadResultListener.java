@@ -138,7 +138,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 		final StringBuilder strBuilder = new StringBuilder();
 		int musicsAdded = 0;
-		for(AudioTrack track : playlist.getTracks()) {
+		for(final AudioTrack track : playlist.getTracks()) {
 			this.guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst);
 			musicsAdded++;
 			if(this.guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE
@@ -191,7 +191,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					contentCleaned = StringUtils.remove(contentCleaned, CommandInitializer.getCommand("play").getNames().toArray(new String[0]));
 
 					final Set<Integer> choices = new HashSet<>();
-					for(String choiceStr : contentCleaned.split(",")) {
+					for(final String choiceStr : contentCleaned.split(",")) {
 						// If the choice is not valid, ignore the message
 						final Integer num = NumberUtils.asIntBetween(choiceStr, 1, Math.min(Config.MUSIC_SEARCHES, this.resultsTracks.size()));
 						if(num == null) {
@@ -205,7 +205,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(this.guildMusic.getGuildId(), this.guildMusic);
 
 					final StringBuilder strBuilder = new StringBuilder();
-					for(int choice : choices) {
+					for(final int choice : choices) {
 						final AudioTrack track = this.resultsTracks.get(choice - 1);
 						if(!this.guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst)) {
 							strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.%n",
