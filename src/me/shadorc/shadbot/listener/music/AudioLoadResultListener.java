@@ -106,8 +106,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		this.guildMusic.setWaitingForChoice(true);
 
 		final String choices = FormatUtils.numberedList(MAX_RESULTS, playlist.getTracks().size(),
-				count -> String.format("\t**%d.** %s",
-						count, FormatUtils.trackName(playlist.getTracks().get(count - 1).getInfo())));
+				count -> {
+					final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
+					return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
+				});
 
 		this.guildMusic.getClient().getUserById(this.guildMusic.getDjId())
 				.map(User::getAvatarUrl)
