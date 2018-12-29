@@ -103,6 +103,7 @@ public class ReactionListener {
 		Mono.justOrEmpty(event.getSelfId())
 				// It wasn't the bot that reacted
 				.filter(selfId -> !event.getUserId().equals(selfId))
+				.filter(ignored -> event.getEmoji().equals(IamCmd.REACTION))
 				// If the bot is not the author of the message, this is not an Iam message
 				.filterWhen(selfId -> event.getMessage()
 						.map(Message::getAuthorId)
@@ -113,7 +114,6 @@ public class ReactionListener {
 						.getIamMessages()
 						.get(event.getMessageId().asString())))
 				.map(Snowflake::of)
-				.filter(roleId -> event.getEmoji().equals(IamCmd.REACTION))
 				.filterWhen(roleId -> event.getChannel()
 						.flatMap(channel -> DiscordUtils.hasPermission(channel, event.getSelfId(), Permission.MANAGE_ROLES)
 								.flatMap(hasPerm -> {
