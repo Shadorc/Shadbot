@@ -178,7 +178,9 @@ public class Shadbot {
 	}
 
 	private static void logout() {
-		botListStats.stop();
+		if(botListStats != null) {
+			botListStats.stop();
+		}
 		CLIENTS.forEach(DiscordClient::logout);
 	}
 
