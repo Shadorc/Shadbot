@@ -52,7 +52,9 @@ public class LogBuilder {
 
 		if(this.err != null) {
 			embed.addField("Error type", this.err.getClass().getSimpleName(), false);
-			embed.addField("Error message", this.err.getMessage(), false);
+			if(this.err.getMessage() != null) {
+				embed.addField("Error message", this.err.getMessage(), false);
+			}
 		}
 
 		if(this.input != null) {
