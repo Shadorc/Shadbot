@@ -74,7 +74,7 @@ public class BotUtils {
 						}
 					});
 				})
-				.doOnSuccess(message -> {
+				.doOnNext(message -> {
 					if(!message.getEmbeds().isEmpty()) {
 						StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);
 					}
