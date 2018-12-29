@@ -58,9 +58,9 @@ public class GuildMusic {
 	}
 
 	public void leaveVoiceChannel() {
-		this.isInVoiceChannel()
-				.filter(BooleanUtils::isFalse)
-				.subscribe(ignored -> this.voiceConnection.disconnect());
+		if(this.voiceConnection != null) {
+			this.voiceConnection.disconnect();
+		}
 	}
 
 	public void scheduleLeave() {
@@ -82,8 +82,8 @@ public class GuildMusic {
 					+ "it will help my creator keeping me alive :heart:",
 					Config.PATREON_URL));
 		}
-		this.leaveVoiceChannel();
-		return this.getMessageChannel()
+		return Mono.fromRunnable(this::leaveVoiceChannel)
+				.then(this.getMessageChannel())
 				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
 				.then();
 	}
