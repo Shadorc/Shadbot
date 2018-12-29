@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.french;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
@@ -34,10 +33,9 @@ public class JokeCmd extends AbstractCommand {
 		return context.getAvatarUrl()
 				.flatMap(avatarUrl -> {
 					try {
-						final String url = String.format("http://www.une-blague.com/blagues-courtes.html?&p=%d",
-								ThreadLocalRandom.current().nextInt(1, 6));
+						final String url = String.format("https://www.humour.com/blagues/");
 
-						final List<String> jokes = NetUtils.getDoc(url).getElementsByClass("texte ").stream()
+						final List<String> jokes = NetUtils.getDoc(url).getElementsByClass("result-blague").select("p").stream()
 								.map(Element::html)
 								.filter(elmt -> elmt.length() < 1000)
 								.collect(Collectors.toList());
@@ -46,7 +44,7 @@ public class JokeCmd extends AbstractCommand {
 								line -> Jsoup.parse(line).text().trim(), "\n");
 
 						return loadingMsg.send(EmbedUtils.getDefaultEmbed()
-								.setAuthor("Blague", "http://www.une-blague.com/", avatarUrl)
+								.setAuthor("Blague", "https://www.humour.com/blagues/", avatarUrl)
 								.setDescription(joke));
 
 					} catch (final IOException err) {
@@ -61,7 +59,7 @@ public class JokeCmd extends AbstractCommand {
 	public Mono<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random French joke.")
-				.setSource("https://www.une-blague.com/")
+				.setSource("https://www.humour.com/blagues/")
 				.build();
 	}
 }
