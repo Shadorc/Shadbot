@@ -3,12 +3,9 @@ package me.shadorc.shadbot.music;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
@@ -18,6 +15,7 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
@@ -30,7 +28,7 @@ public class GuildMusic {
 	private final TrackScheduler trackScheduler;
 	private final AtomicBoolean isWaitingForChoice;
 
-	private VoiceConnection voiceConnection;
+	private volatile VoiceConnection voiceConnection;
 	private Disposable leaveTask;
 	private Snowflake messageChannelId;
 	private Snowflake djId;
@@ -52,14 +50,18 @@ public class GuildMusic {
 	public void joinVoiceChannel(Snowflake voiceChannelId) {
 		this.client.getChannelById(voiceChannelId)
 				.cast(VoiceChannel.class)
-				.filterWhen(ignored -> this.isInVoiceChannel().map(BooleanUtils::negate))
+				.filter(ignored -> this.voiceConnection == null)
 				.flatMap(voiceChannel -> voiceChannel.join(this.audioProvider))
-				.subscribe(voiceConnection -> this.voiceConnection = voiceConnection);
+				.subscribe(voiceConnection -> {
+					this.voiceConnection = voiceConnection;
+					LogUtils.info("{Guild ID: %d} Voice channel joined.", this.getGuildId().asLong());
+				});
 	}
 
 	public void leaveVoiceChannel() {
 		if(this.voiceConnection != null) {
 			this.voiceConnection.disconnect();
+			this.voiceConnection = null;
 		}
 	}
 
@@ -124,13 +126,6 @@ public class GuildMusic {
 
 	public boolean isWaitingForChoice() {
 		return this.isWaitingForChoice.get();
-	}
-
-	public Mono<Boolean> isInVoiceChannel() {
-		return this.client.getSelf()
-				.flatMap(self -> self.asMember(this.guildId))
-				.flatMap(Member::getVoiceState)
-				.hasElement();
 	}
 
 	public boolean isLeavingScheduled() {
