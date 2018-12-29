@@ -14,7 +14,6 @@ public class GuildListener {
 	}
 
 	public static void onGuildDelete(GuildDeleteEvent event) {
-		LogUtils.info("Shadbot disconnected from a guild. (ID: %d)",
-				event.getGuildId().asLong());
+		LogUtils.info("Shadbot disconnected from a guild. (ID: %d)", event.getGuildId().asLong());
 	}
 }

@@ -10,8 +10,10 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
@@ -20,7 +22,6 @@ import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.music.GuildMusic;
-import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -143,6 +144,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		for(final AudioTrack track : playlist.getTracks()) {
 			this.guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst);
 			musicsAdded++;
+			// The playlist limit is reached and the user / guild is not premium
 			if(this.guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE
 					&& !Shadbot.getPremium().isPremium(this.guildMusic.getGuildId(), this.djId)) {
 				strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
@@ -175,16 +177,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		return Mono.justOrEmpty(event.getMember())
 				.filter(member -> member.getId().equals(this.guildMusic.getDjId()))
 				.filter(member -> event.getMessage().getContent().isPresent())
-				.flatMap(member -> {
+				.map(Member::getUsername)
+				.flatMap(username -> {
 					final String content = event.getMessage().getContent().get();
-					final Snowflake authorId = member.getId();
-
 					final String prefix = Shadbot.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix();
 					if(content.equals(String.format("%scancel", prefix))) {
 						this.stopWaiting();
 						return this.guildMusic.getMessageChannel()
-								.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
-										member.getUsername()), channel))
+								.flatMap(channel -> BotUtils.sendMessage(
+										String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.", username), channel))
 								.thenReturn(true);
 					}
 
@@ -193,9 +194,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					contentCleaned = StringUtils.remove(contentCleaned, CommandInitializer.getCommand("play").getNames().toArray(new String[0]));
 
 					final Set<Integer> choices = new HashSet<>();
-					for(final String choiceStr : contentCleaned.split(",")) {
+					for(final String choice : contentCleaned.split(",")) {
 						// If the choice is not valid, ignore the message
-						final Integer num = NumberUtils.asIntBetween(choiceStr, 1, Math.min(Config.MUSIC_SEARCHES, this.resultsTracks.size()));
+						final Integer num = NumberUtils.asIntBetween(choice, 1, Math.min(Config.MUSIC_SEARCHES, this.resultsTracks.size()));
 						if(num == null) {
 							return Mono.just(false);
 						}
@@ -203,30 +204,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 						choices.add(num);
 					}
 
-					// If the manager was removed from the list while an user chose a music, we re-add it and join voice channel again
-					GuildMusicManager.GUILD_MUSIC_MAP.putIfAbsent(this.guildMusic.getGuildId(), this.guildMusic);
-
-					final StringBuilder strBuilder = new StringBuilder();
-					for(final int choice : choices) {
-						final AudioTrack track = this.resultsTracks.get(choice - 1);
-						if(!this.guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst)) {
-							strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.%n",
-									FormatUtils.trackName(track.getInfo())));
-						}
-
-						if(this.guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-								&& !Shadbot.getPremium().isPremium(this.guildMusic.getGuildId(), authorId)) {
-							strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED);
-							break;
-						}
-					}
+					choices.stream().forEach(choice -> this.trackLoaded(this.resultsTracks.get(choice - 1)));
 
 					this.stopWaiting();
-					// TODO: Chain (stop only on disconnect)
-					this.guildMusic.joinVoiceChannel(this.voiceChannelId);
-					return this.guildMusic.getMessageChannel()
-							.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
-							.thenReturn(true);
+					return Mono.just(true);
 				});
 	}
 
@@ -234,7 +215,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		this.stopWaitingTask.dispose();
 		MessageInterceptorManager.removeInterceptor(this.guildMusic.getMessageChannelId(), this);
 		this.guildMusic.setWaitingForChoice(false);
-		this.resultsTracks.clear();
 		this.leaveIfStopped();
 	}
 

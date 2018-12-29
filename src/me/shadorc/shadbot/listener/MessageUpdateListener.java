@@ -16,18 +16,17 @@ public class MessageUpdateListener {
 			return;
 		}
 
-		final Message oldMessage = event.getOld().get();
-
 		// If the message has been sent more than 30 seconds ago, ignore it
+		final Message oldMessage = event.getOld().get();
 		if(TimeUtils.getMillisUntil(oldMessage.getTimestamp()) > TimeUnit.SECONDS.toMillis(30)) {
 			return;
 		}
 
+		final Long guildId = event.getGuildId().get().asLong();
 		Mono.zip(event.getMessage(), event.getMessage().flatMap(Message::getAuthorAsMember))
-				.subscribe(messageAndMember -> {
-					final Message message = messageAndMember.getT1();
-					final Member member = messageAndMember.getT2();
-					final Long guildId = event.getGuildId().get().asLong();
+				.subscribe(tuple -> {
+					final Message message = tuple.getT1();
+					final Member member = tuple.getT2();
 					MessageCreateListener.onMessageCreate(new MessageCreateEvent(event.getClient(), message, guildId, member));
 				});
 	}

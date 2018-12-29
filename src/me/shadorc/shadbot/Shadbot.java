@@ -52,9 +52,8 @@ import reactor.core.publisher.Mono;
 
 public class Shadbot {
 
-	private final static AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
-	private final static int SHARD_COUNT = 1;
-
+	private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
+	private static final int SHARD_COUNT = 1;
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 
@@ -116,7 +115,7 @@ public class Shadbot {
 	 * Triggered when all the guilds have been received from a shard
 	 */
 	private static void onFullyReadyEvent(GuildCreateEvent event) {
-		LogUtils.info("{Shard %d} Fully connected to Gateway.", event.getClient().getConfig().getShardIndex());
+		LogUtils.info("{Shard %d} Fully ready.", event.getClient().getConfig().getShardIndex());
 		DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
 		DiscordUtils.register(event.getClient(), GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
 
@@ -130,7 +129,7 @@ public class Shadbot {
 	 * Triggered when all the guilds have been received on all shards
 	 */
 	private static void onFullyConnected() {
-		LogUtils.info("Shadbot is fully connected to all shards.");
+		LogUtils.info("Shadbot is connected to all guilds.");
 
 		Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
 				.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
@@ -140,7 +139,7 @@ public class Shadbot {
 	}
 
 	/**
-	 * @return The time when this class was loaded.
+	 * @return The time when this class was loaded
 	 */
 	public static Instant getLaunchTime() {
 		return LAUNCH_TIME;
@@ -163,11 +162,6 @@ public class Shadbot {
 
 	public static Lottery getLottery() {
 		return lotteryManager.getLottery();
-	}
-
-	// TODO
-	public static StatsManager getStatsManager() {
-		return statsManager;
 	}
 
 	private static void save() {

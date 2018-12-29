@@ -44,22 +44,22 @@ public class ManageCoinsCmd extends AbstractCommand {
 
 		return DiscordUtils.getMembersFrom(context.getMessage())
 				.collectList()
-				.map(users -> {
-					if(users.isEmpty()) {
+				.map(members -> {
+					if(members.isEmpty()) {
 						throw new CommandException("You must specify at least one user / role.");
 					}
 
-					final String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(users, User::getUsername, ", ");
+					final String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(members, User::getUsername, ", ");
 					switch (action) {
 						case ADD:
-							users.stream().forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
+							members.stream().forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
 							return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.coins(coins));
 						case REMOVE:
-							users.stream().forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
+							members.stream().forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
 							return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.coins(coins));
 						case RESET:
-							users.stream().forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).resetCoins());
-							return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, users.size() == 1 ? "his" : "their");
+							members.stream().forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).resetCoins());
+							return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, members.size() == 1 ? "his" : "their");
 						default:
 							return null;
 					}
