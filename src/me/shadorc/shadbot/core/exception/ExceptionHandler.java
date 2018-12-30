@@ -123,10 +123,8 @@ public class ExceptionHandler {
 	}
 
 	public static Mono<Message> onNotFound(ClientException err, Snowflake guildId) {
-		LogUtils.info("{Guild ID: %d} %d %s: %s",
-				guildId.asLong(),
-				err.getStatus().reasonPhrase(),
-				err.getErrorResponse().getFields().get("message"));
+		LogUtils.info("{Guild ID: %d} %s: %s",
+				guildId.asLong(), err.getStatus().reasonPhrase(), err.getErrorResponse().getFields().get("message").toString());
 		return Mono.empty();
 	}
 
