@@ -9,11 +9,11 @@ public class GuildListener {
 	public static void onGuildCreate(GuildCreateEvent event) {
 		event.getGuild()
 				.getMemberCount()
-				.ifPresent(memberCount -> LogUtils.info("Shadbot connected to a guild. (ID: %d | Users: %d)",
+				.ifPresent(memberCount -> LogUtils.info("{Guild ID: %d} Connected (Users: %d).",
 						event.getGuild().getId().asLong(), memberCount));
 	}
 
 	public static void onGuildDelete(GuildDeleteEvent event) {
-		LogUtils.info("Shadbot disconnected from a guild. (ID: %d)", event.getGuildId().asLong());
+		LogUtils.info("{Guild ID: %d} Disconnected.", event.getGuildId().asLong());
 	}
 }
