@@ -137,6 +137,7 @@ public class DiscordUtils {
 						.on(GuildCreateEvent.class)
 						.take(size)
 						.last())
+				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on fully ready event.")))
 				.subscribe(consumer);
 	}
 

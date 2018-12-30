@@ -23,7 +23,7 @@ public class GatewayLifecycleListener {
 
 		Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
 				.flatMap(ignored -> DiscordUtils.updatePresence(client))
-				.doOnError(err -> LogUtils.error(client, err, "An error occurred while updating presence."))
+				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred while updating presence."))
 				.subscribe();
 	}
 

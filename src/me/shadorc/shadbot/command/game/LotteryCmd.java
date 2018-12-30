@@ -162,6 +162,7 @@ public class LotteryCmd extends AbstractCommand {
 									.flatMap(privateChannel -> BotUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn %s.",
 											FormatUtils.coins(coins)), privateChannel));
 						}))
+				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred during the lottery draw."))
 				.subscribe();
 
 		LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",

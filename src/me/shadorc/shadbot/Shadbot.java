@@ -135,6 +135,7 @@ public class Shadbot {
 
 		Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
 				.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
+				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred during the lottery draw."))
 				.subscribe();
 
 		Shadbot.botListStats = new BotListStats(CLIENTS.get(0).getSelfId().get());

@@ -26,6 +26,7 @@ public abstract class Data {
 
 		Flux.interval(initialDelay, period)
 				.doOnNext(ignored -> Mono.fromRunnable(this::save))
+				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred while saving data."))
 				.subscribe();
 	}
 
