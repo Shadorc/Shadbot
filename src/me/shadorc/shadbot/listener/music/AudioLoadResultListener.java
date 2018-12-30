@@ -130,7 +130,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 							.then(Mono.fromRunnable(this::stopWaiting))
 							.subscribe();
 
-					this.resultsTracks = new ArrayList<>(playlist.getTracks().subList(0, MAX_RESULTS));
+					this.resultsTracks = new ArrayList<>(playlist.getTracks().subList(0, Math.min(MAX_RESULTS, playlist.getTracks().size())));
 					MessageInterceptorManager.addInterceptor(this.guildMusic.getMessageChannelId(), this);
 				}))
 				.subscribe();
