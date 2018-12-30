@@ -10,8 +10,10 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.exception.ExceptionUtils;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
@@ -79,7 +81,9 @@ public class BotUtils {
 						StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);
 					}
 					StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT);
-				});
+				})
+				// TODO: Remove when this issue is closed: https://github.com/Discord4J/Discord4J/issues/468
+				.doOnError(ExceptionUtils::isForbidden, err -> LogUtils.error("Forbidden action while sending message."));
 	}
 
 	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
