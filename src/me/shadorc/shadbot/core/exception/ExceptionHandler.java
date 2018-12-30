@@ -26,22 +26,30 @@ public class ExceptionHandler {
 	public static Mono<Message> handle(Throwable err, AbstractCommand cmd, Context context) {
 		if(ExceptionUtils.isCommandException(err)) {
 			return ExceptionHandler.onCommandException((CommandException) err, cmd, context);
-		} else if(ExceptionUtils.isMissingPermission(err)) {
+		}
+		if(ExceptionUtils.isMissingPermission(err)) {
 			return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, cmd, context);
-		} else if(ExceptionUtils.isMissingArgumentException(err)) {
+		}
+		if(ExceptionUtils.isMissingArgumentException(err)) {
 			return ExceptionHandler.onMissingArgumentException(cmd, context);
-		} else if(ExceptionUtils.isNoMusicException(err)) {
+		}
+		if(ExceptionUtils.isNoMusicException(err)) {
 			return ExceptionHandler.onNoMusicException(cmd, context);
-		} else if(ExceptionUtils.isUnavailable(err)) {
+		}
+		if(ExceptionUtils.isUnavailable(err)) {
 			return ExceptionHandler.onUnavailable(cmd, context);
-		} else if(ExceptionUtils.isUnreacheable(err)) {
+		}
+		if(ExceptionUtils.isUnreacheable(err)) {
 			return ExceptionHandler.onUnreacheable(cmd, context);
-		} else if(ExceptionUtils.isForbidden(err)) {
+		}
+		if(ExceptionUtils.isForbidden(err)) {
 			return context.getChannel()
 					.flatMap(channel -> ExceptionHandler.onForbidden((ClientException) err, context.getGuildId(), channel, context.getUsername()));
-		} else {
-			return ExceptionHandler.onUnknown(context.getClient(), err, cmd, context);
 		}
+		if(ExceptionUtils.isNotFound(err)) {
+			return ExceptionHandler.onNotFound((ClientException) err, context.getGuildId());
+		}
+		return ExceptionHandler.onUnknown(context.getClient(), err, cmd, context);
 	}
 
 	public static Mono<Message> onCommandException(CommandException err, AbstractCommand cmd, Context context) {
@@ -114,11 +122,12 @@ public class ExceptionHandler {
 				username), channel);
 	}
 
-	public static void onNotFound(ClientException err, Snowflake guildId) {
+	public static Mono<Message> onNotFound(ClientException err, Snowflake guildId) {
 		LogUtils.info("{Guild ID: %d} %d %s: %s",
 				guildId.asLong(),
 				err.getStatus().reasonPhrase(),
 				err.getErrorResponse().getFields().get("message"));
+		return Mono.empty();
 	}
 
 	public static Mono<Message> onUnknown(DiscordClient client, Throwable err, AbstractCommand cmd, Context context) {
