@@ -2,15 +2,12 @@ package me.shadorc.shadbot.core.command;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.BooleanUtils;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import me.shadorc.shadbot.Config;
@@ -29,37 +26,37 @@ import reactor.core.publisher.Mono;
 public class CommandProcessor {
 
 	public static void processMessageEvent(MessageCreateEvent event) {
-		final Optional<Snowflake> guildId = event.getGuildId();
+		// This is not a private channel
+		if(!event.getGuildId().isPresent()) {
+			CommandProcessor.onPrivateMessage(event).subscribe();
+			return;
+		}
 
-		final Function<MessageChannel, Mono<Boolean>> isNotDm = channel -> {
-			if(channel.getType().equals(Type.GUILD_TEXT)) {
-				return Mono.just(true);
-			}
-			return CommandProcessor.onPrivateMessage(event).thenReturn(false);
-		};
+		// The content is not a Webhook
+		if(!event.getMessage().getContent().isPresent()) {
+			return;
+		}
 
-		Mono.just(event.getMessage())
-				// The content is not a Webhook
-				.filter(message -> message.getContent().isPresent())
-				.flatMap(Message::getAuthor)
+		final Snowflake guildId = event.getGuildId().get();
+		final String content = event.getMessage().getContent().get();
+
+		event.getMessage().getAuthorAsMember()
 				// The author is not a bot
-				.filter(author -> !author.isBot())
-				.flatMap(author -> event.getMessage().getChannel())
-				// This is not a private message...
-				.filterWhen(isNotDm)
-				// The channel is allowed
-				.filter(channel -> BotUtils.isTextChannelAllowed(guildId.get(), channel.getId()))
-				.flatMap(channel -> event.getMember().get().getRoles().collectList())
+				.filter(member -> !member.isBot())
+				.flatMap(member -> member.getRoles().collectList())
 				// The role is allowed
-				.filter(roles -> BotUtils.hasAllowedRole(guildId.get(), roles))
+				.filter(roles -> BotUtils.hasAllowedRole(guildId, roles))
+				.flatMap(ignored -> event.getMessage().getChannel())
+				// The channel is allowed
+				.filter(channel -> BotUtils.isTextChannelAllowed(guildId, channel.getId()))
 				// The message has not been intercepted
-				.filterWhen(roles -> MessageInterceptorManager.isIntercepted(event).map(BooleanUtils::negate))
-				.map(roles -> Shadbot.getDatabase().getDBGuild(guildId.get()).getPrefix())
+				.filterWhen(ignored -> MessageInterceptorManager.isIntercepted(event).map(BooleanUtils::negate))
+				.map(ignored -> Shadbot.getDatabase().getDBGuild(guildId).getPrefix())
 				// The message starts with the correct prefix
-				.filter(prefix -> event.getMessage().getContent().get().startsWith(prefix))
+				.filter(prefix -> content.startsWith(prefix))
 				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)))
 				.onErrorResume(ExceptionUtils::isNotFound,
-						err -> ExceptionHandler.onNotFound((ClientException) err, guildId.get()).then())
+						err -> ExceptionHandler.onNotFound((ClientException) err, guildId).then())
 				.subscribe();
 	}
 
