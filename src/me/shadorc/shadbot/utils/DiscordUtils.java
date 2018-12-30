@@ -54,8 +54,7 @@ public class DiscordUtils {
 			default:
 				return channel.bulkDelete(Flux.fromIterable(messages).map(Message::getId))
 						.count()
-						.map(messagesNotDeleted -> messages.size() - messagesNotDeleted)
-						.cast(Integer.class);
+						.map(messagesNotDeleted -> (int) (messages.size() - messagesNotDeleted));
 		}
 	}
 
