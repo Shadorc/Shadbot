@@ -39,7 +39,7 @@ public class BotListStats {
 		return Flux.fromIterable(Shadbot.getClients())
 				.flatMap(client -> Mono.zip(Mono.just(client.getConfig().getShardIndex()), client.getGuilds().count()))
 				.collectMap(Tuple2::getT1, Tuple2::getT2)
-				.doOnSuccess(shardsInfo -> {
+				.doOnNext(shardsInfo -> {
 					LogUtils.info("Posting statistics...");
 					this.postOnBotListDotSpace(shardsInfo);
 					this.postOnDiscordBotsDotGg(shardsInfo);

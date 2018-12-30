@@ -9,11 +9,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
-import discord4j.rest.http.client.ClientException;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
-import me.shadorc.shadbot.core.exception.ExceptionUtils;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
@@ -25,22 +23,21 @@ import reactor.core.publisher.Mono;
 
 public class CommandProcessor {
 
-	public static void processMessageEvent(MessageCreateEvent event) {
+	public static Mono<Void> processMessageEvent(MessageCreateEvent event) {
 		// This is not a private channel
 		if(!event.getGuildId().isPresent()) {
-			CommandProcessor.onPrivateMessage(event).subscribe();
-			return;
+			return CommandProcessor.onPrivateMessage(event);
 		}
 
 		// The content is not a Webhook
 		if(!event.getMessage().getContent().isPresent()) {
-			return;
+			return Mono.empty();
 		}
 
 		final Snowflake guildId = event.getGuildId().get();
 		final String content = event.getMessage().getContent().get();
 
-		event.getMessage().getAuthorAsMember()
+		return event.getMessage().getAuthorAsMember()
 				// The author is not a bot
 				.filter(member -> !member.isBot())
 				.flatMap(member -> member.getRoles().collectList())
@@ -54,10 +51,7 @@ public class CommandProcessor {
 				.map(ignored -> Shadbot.getDatabase().getDBGuild(guildId).getPrefix())
 				// The message starts with the correct prefix
 				.filter(prefix -> content.startsWith(prefix))
-				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)))
-				.onErrorResume(ExceptionUtils::isNotFound,
-						err -> ExceptionHandler.onNotFound((ClientException) err, guildId).then())
-				.subscribe();
+				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)));
 	}
 
 	public static Mono<Void> executeCommand(Context context) {

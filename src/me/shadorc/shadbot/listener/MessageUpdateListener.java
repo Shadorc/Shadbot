@@ -15,26 +15,27 @@ import reactor.core.publisher.Mono;
 
 public class MessageUpdateListener {
 
-	public static void onMessageUpdateEvent(MessageUpdateEvent event) {
+	public static Mono<Void> onMessageUpdateEvent(MessageUpdateEvent event) {
 		if(!event.isContentChanged() || !event.getOld().isPresent() || !event.getGuildId().isPresent()) {
-			return;
+			return Mono.empty();
 		}
 
 		// If the message has been sent more than 30 seconds ago, ignore it
 		final Message oldMessage = event.getOld().get();
 		if(TimeUtils.getMillisUntil(oldMessage.getTimestamp()) > TimeUnit.SECONDS.toMillis(30)) {
-			return;
+			return Mono.empty();
 		}
 
 		final Snowflake guildId = event.getGuildId().get();
-		Mono.zip(event.getMessage(), event.getMessage().flatMap(Message::getAuthorAsMember))
+		return Mono.zip(event.getMessage(), event.getMessage().flatMap(Message::getAuthorAsMember))
 				.onErrorResume(ExceptionUtils::isNotFound,
 						err -> ExceptionHandler.onNotFound((ClientException) err, guildId).then(Mono.empty()))
-				.subscribe(tuple -> {
+				.doOnNext(tuple -> {
 					final Message message = tuple.getT1();
 					final Member member = tuple.getT2();
 					MessageCreateListener.onMessageCreate(new MessageCreateEvent(event.getClient(), message, guildId.asLong(), member));
-				});
+				})
+				.then();
 	}
 
 }

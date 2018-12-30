@@ -91,16 +91,16 @@ public class ReactionListener {
 		ADD, REMOVE;
 	}
 
-	public static void onReactionAddEvent(ReactionAddEvent event) {
-		ReactionListener.iam(new ReactionEvent(event), Action.ADD);
+	public static Mono<Void> onReactionAddEvent(ReactionAddEvent event) {
+		return ReactionListener.iam(new ReactionEvent(event), Action.ADD);
 	}
 
-	public static void onReactionRemoveEvent(ReactionRemoveEvent event) {
-		ReactionListener.iam(new ReactionEvent(event), Action.REMOVE);
+	public static Mono<Void> onReactionRemoveEvent(ReactionRemoveEvent event) {
+		return ReactionListener.iam(new ReactionEvent(event), Action.REMOVE);
 	}
 
-	public static void iam(ReactionEvent event, Action action) {
-		Mono.justOrEmpty(event.getSelfId())
+	public static Mono<Void> iam(ReactionEvent event, Action action) {
+		return Mono.justOrEmpty(event.getSelfId())
 				// It wasn't the bot that reacted
 				.filter(selfId -> !event.getUserId().equals(selfId))
 				.filter(ignored -> event.getEmoji().equals(IamCmd.REACTION))
@@ -134,8 +134,7 @@ public class ReactionListener {
 								.flatMap(username -> event.getChannel()
 										.flatMap(channel -> ExceptionHandler.onForbidden(
 												(ClientException) err, event.getGuildId().get(), channel, username)))
-								.then())
-				.subscribe();
+								.then());
 	}
 
 }

@@ -116,29 +116,29 @@ public class Shadbot {
 	/**
 	 * Triggered when all the guilds have been received from a shard
 	 */
-	private static void onFullyReadyEvent(GuildCreateEvent event) {
+	private static Mono<Void> onFullyReadyEvent(GuildCreateEvent event) {
 		LogUtils.info("{Shard %d} Fully ready.", event.getClient().getConfig().getShardIndex());
 		DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
 		DiscordUtils.register(event.getClient(), GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
 
 		CONNECTED_SHARDS.incrementAndGet();
 		if(CONNECTED_SHARDS.get() == SHARD_COUNT) {
-			Shadbot.onFullyConnected();
+			return Shadbot.onFullyConnected();
 		}
+		return Mono.empty();
 	}
 
 	/**
 	 * Triggered when all the guilds have been received on all shards
 	 */
-	private static void onFullyConnected() {
+	private static Mono<Void> onFullyConnected() {
 		LogUtils.info("Shadbot is connected to all guilds.");
+		Shadbot.botListStats = new BotListStats(CLIENTS.get(0).getSelfId().get());
 
-		Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
+		return Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
 				.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
 				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred during the lottery draw."))
-				.subscribe();
-
-		Shadbot.botListStats = new BotListStats(CLIENTS.get(0).getSelfId().get());
+				.then();
 	}
 
 	/**

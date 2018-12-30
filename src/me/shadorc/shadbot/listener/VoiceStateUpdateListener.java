@@ -14,39 +14,42 @@ import reactor.core.publisher.Mono;
 
 public class VoiceStateUpdateListener {
 
-	public static void onVoiceStateUpdateEvent(VoiceStateUpdateEvent event) {
-		event.getClient().getSelfId().ifPresent(selfId -> {
-			final Snowflake userId = event.getCurrent().getUserId();
-			if(userId.equals(selfId)) {
-				VoiceStateUpdateListener.onBotEvent(event);
-			} else {
-				VoiceStateUpdateListener.onUserEvent(event);
+	public static Mono<Void> onVoiceStateUpdateEvent(VoiceStateUpdateEvent event) {
+		return Mono.justOrEmpty(event.getClient().getSelfId())
+				.flatMap(selfId -> {
+					final Snowflake userId = event.getCurrent().getUserId();
+					if(userId.equals(selfId)) {
+						return VoiceStateUpdateListener.onBotEvent(event);
+					} else {
+						return VoiceStateUpdateListener.onUserEvent(event);
+					}
+				});
+	}
+
+	private static Mono<Void> onBotEvent(VoiceStateUpdateEvent event) {
+		// If the bot is no more in a voice channel and the guild music still exists, destroy it
+		return Mono.fromRunnable(() -> {
+			if(!event.getCurrent().getChannelId().isPresent()) {
+				final Snowflake guildId = event.getCurrent().getGuildId();
+				final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guildId);
+				if(guildMusic != null) {
+					guildMusic.destroy();
+					LogUtils.info("{Guild ID: %d} Voice channel left.", guildId.asLong());
+				}
 			}
 		});
 	}
 
-	private static void onBotEvent(VoiceStateUpdateEvent event) {
-		// If the bot is no more in a voice channel and the guild music still exists, destroy it
-		if(!event.getCurrent().getChannelId().isPresent()) {
-			final Snowflake guildId = event.getCurrent().getGuildId();
-			final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guildId);
-			if(guildMusic != null) {
-				guildMusic.destroy();
-				LogUtils.info("{Guild ID: %d} Voice channel left.", guildId.asLong());
-			}
-		}
-	}
-
-	private static void onUserEvent(VoiceStateUpdateEvent event) {
+	private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {
 		final Snowflake guildId = event.getCurrent().getGuildId();
 
 		final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guildId);
 		// The bot is not playing music, ignore the event
 		if(guildMusic == null) {
-			return;
+			return Mono.empty();
 		}
 
-		event.getClient()
+		return event.getClient()
 				.getSelf()
 				.flatMap(self -> self.asMember(guildId))
 				.flatMap(Member::getVoiceState)
@@ -71,7 +74,7 @@ public class VoiceStateUpdateListener {
 				})
 				.flatMap(content -> guildMusic.getMessageChannel()
 						.flatMap(channel -> BotUtils.sendMessage(content.toString(), channel)))
-				.subscribe();
+				.then();
 	}
 
 }

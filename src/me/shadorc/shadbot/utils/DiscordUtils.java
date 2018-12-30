@@ -4,9 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.reactivestreams.Publisher;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
@@ -120,25 +121,27 @@ public class DiscordUtils {
 		return GuildChannel.class.cast(channel).getEffectivePermissions(userId).map(permissions -> permissions.contains(permission));
 	}
 
-	public static <T extends Event> void register(DiscordClient client, Class<T> eventClass, Consumer<? super T> consumer) {
+	public static <T extends Event, R> void register(DiscordClient client, Class<T> eventClass, Function<? super T, ? extends Publisher<? extends R>> mapper) {
 		client.getEventDispatcher()
 				.on(eventClass)
+				.flatMap(mapper)
 				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
-				.subscribe(consumer);
+				.subscribe();
 	}
 
 	/**
 	 * When all guilds have been received, register GuildListener#onGuildCreate and GatewayLifecycleListener#onGatewayLifecycleEvent
 	 */
-	public static void registerFullyReadyEvent(DiscordClient client, Consumer<? super GuildCreateEvent> consumer) {
+	public static <R> void registerFullyReadyEvent(DiscordClient client, Function<? super GuildCreateEvent, ? extends Publisher<? extends R>> mapper) {
 		client.getEventDispatcher().on(ReadyEvent.class)
 				.map(event -> event.getGuilds().size())
 				.flatMap(size -> client.getEventDispatcher()
 						.on(GuildCreateEvent.class)
 						.take(size)
 						.last())
+				.flatMap(mapper)
 				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on fully ready event.")))
-				.subscribe(consumer);
+				.subscribe();
 	}
 
 	/**

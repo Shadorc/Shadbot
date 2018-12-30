@@ -7,6 +7,7 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
+import reactor.core.publisher.Mono;
 
 public class ChannelListener {
 
@@ -15,14 +16,16 @@ public class ChannelListener {
 	 *
 	 * @param event - the event
 	 */
-	public static void onTextChannelDelete(TextChannelDeleteEvent event) {
-		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getChannel().getGuildId());
-		final List<Snowflake> allowedChannelIds = dbGuild.getAllowedTextChannels();
-		// If the channel was an allowed channel...
-		if(allowedChannelIds.remove(event.getChannel().getId())) {
-			// ...update settings to remove the deleted one
-			dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedChannelIds);
-		}
+	public static Mono<Void> onTextChannelDelete(TextChannelDeleteEvent event) {
+		return Mono.fromRunnable(() -> {
+			final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getChannel().getGuildId());
+			final List<Snowflake> allowedChannelIds = dbGuild.getAllowedTextChannels();
+			// If the channel was an allowed channel...
+			if(allowedChannelIds.remove(event.getChannel().getId())) {
+				// ...update settings to remove the deleted one
+				dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedChannelIds);
+			}
+		});
 	}
 
 }
