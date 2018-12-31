@@ -17,8 +17,7 @@ public class VoiceStateUpdateListener {
 	public static Mono<Void> onVoiceStateUpdateEvent(VoiceStateUpdateEvent event) {
 		return Mono.justOrEmpty(event.getClient().getSelfId())
 				.flatMap(selfId -> {
-					final Snowflake userId = event.getCurrent().getUserId();
-					if(userId.equals(selfId)) {
+					if(event.getCurrent().getUserId().equals(selfId)) {
 						return VoiceStateUpdateListener.onBotEvent(event);
 					} else {
 						return VoiceStateUpdateListener.onUserEvent(event);

@@ -33,7 +33,6 @@ public class AllowedChannelsSetting extends AbstractSetting {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(3);
-
 		return context.getGuild()
 				.flatMap(guild -> Mono.zip(guild.getChannels().collectList(), DiscordUtils.extractChannels(guild, context.getContent()).collectList()))
 				.flatMap(tuple -> {
