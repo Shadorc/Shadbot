@@ -28,26 +28,29 @@ public class ReactionListener {
 	}
 
 	public static Mono<Void> onReactionAddEvent(ReactionAddEvent event) {
-		return event.getMessage().flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.ADD));
+		return event.getMessage()
+				.flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.ADD));
 	}
 
 	public static Mono<Void> onReactionRemoveEvent(ReactionRemoveEvent event) {
-		return event.getMessage().flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.REMOVE));
+		return event.getMessage()
+				.flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.REMOVE));
 	}
 
 	public static Mono<Void> iam(Message message, Snowflake userId, ReactionEmoji emoji, Action action) {
-		final Function<? super MessageChannel, ? extends Publisher<Boolean>> canManageRoles = channel -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId().get(), Permission.MANAGE_ROLES)
-				.flatMap(hasPerm -> {
-					if(!hasPerm) {
-						return new TemporaryMessage(channel.getClient(), channel.getId(), 15, ChronoUnit.SECONDS)
-								.send(String.format(Emoji.ACCESS_DENIED
-										+ " I can't add/remove a role due to a lack of permission."
-										+ "%nPlease, check my permissions to verify that %s is checked.",
-										String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
-								.thenReturn(hasPerm);
-					}
-					return Mono.just(hasPerm);
-				});
+		final Function<? super MessageChannel, ? extends Publisher<Boolean>> canManageRoles =
+				channel -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId().get(), Permission.MANAGE_ROLES)
+						.flatMap(hasPerm -> {
+							if(!hasPerm) {
+								return new TemporaryMessage(channel.getClient(), channel.getId(), 15, ChronoUnit.SECONDS)
+										.send(String.format(Emoji.ACCESS_DENIED
+												+ " I can't add/remove a role due to a lack of permission."
+												+ "%nPlease, check my permissions to verify that %s is checked.",
+												String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
+										.thenReturn(hasPerm);
+							}
+							return Mono.just(hasPerm);
+						});
 
 		return Mono.justOrEmpty(message.getClient().getSelfId())
 				// It wasn't the bot that reacted

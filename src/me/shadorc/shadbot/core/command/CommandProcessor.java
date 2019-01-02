@@ -36,7 +36,6 @@ public class CommandProcessor {
 
 		final Snowflake guildId = event.getGuildId().get();
 		final String content = event.getMessage().getContent().get();
-
 		return event.getMessage().getAuthorAsMember()
 				// The author is not a bot
 				.filter(member -> !member.isBot())
@@ -90,7 +89,7 @@ public class CommandProcessor {
 				.filter(isRateLimited.negate())
 				.flatMap(cmd -> cmd.execute(context))
 				.onErrorResume(err -> ExceptionHandler.handle(err, command, context).then())
-				.doOnSuccess(perm -> {
+				.doOnNext(perm -> {
 					StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_USED, command);
 					StatsManager.VARIOUS_STATS.log(VariousEnum.COMMANDS_EXECUTED);
 				});

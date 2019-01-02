@@ -114,7 +114,7 @@ public class Shadbot {
 	}
 
 	/**
-	 * Triggered when all the guilds have been received from a shard
+	 * Triggered when all the guilds have been received from a client
 	 */
 	private static Mono<Void> onFullyReadyEvent(GuildCreateEvent event) {
 		LogUtils.info("{Shard %d} Fully ready.", event.getClient().getConfig().getShardIndex());
@@ -129,7 +129,7 @@ public class Shadbot {
 	}
 
 	/**
-	 * Triggered when all the guilds have been received on all shards
+	 * Triggered when all the guilds have been received on all clients
 	 */
 	private static Mono<Void> onFullyConnected() {
 		LogUtils.info("Shadbot is connected to all guilds.");

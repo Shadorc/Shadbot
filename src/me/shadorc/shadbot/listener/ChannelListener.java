@@ -11,19 +11,14 @@ import reactor.core.publisher.Mono;
 
 public class ChannelListener {
 
-	/**
-	 * Remove deleted text channels from allowed text channels setting.
-	 *
-	 * @param event - the event
-	 */
 	public static Mono<Void> onTextChannelDelete(TextChannelDeleteEvent event) {
 		return Mono.fromRunnable(() -> {
 			final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getChannel().getGuildId());
-			final List<Snowflake> allowedChannelIds = dbGuild.getAllowedTextChannels();
+			final List<Snowflake> allowedTextChannelIds = dbGuild.getAllowedTextChannels();
 			// If the channel was an allowed channel...
-			if(allowedChannelIds.remove(event.getChannel().getId())) {
+			if(allowedTextChannelIds.remove(event.getChannel().getId())) {
 				// ...update settings to remove the deleted one
-				dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedChannelIds);
+				dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
 			}
 		});
 	}

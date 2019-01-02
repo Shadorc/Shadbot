@@ -8,10 +8,9 @@ import reactor.core.publisher.Mono;
 public class GuildListener {
 
 	public static Mono<Void> onGuildCreate(GuildCreateEvent event) {
-		return Mono.just(event.getGuild().getMemberCount().orElse(-1))
-				.doOnNext(memberCount -> LogUtils.info("{Guild ID: %d} Connected (Users: %d).",
-						event.getGuild().getId().asLong(), memberCount))
-				.then();
+		final long guildId = event.getGuild().getId().asLong();
+		final int memberCount = event.getGuild().getMemberCount().orElse(-1);
+		return Mono.fromRunnable(() -> LogUtils.info("{Guild ID: %d} Connected (%d users).", guildId, memberCount));
 	}
 
 	public static Mono<Void> onGuildDelete(GuildDeleteEvent event) {

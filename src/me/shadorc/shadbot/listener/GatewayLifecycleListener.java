@@ -12,10 +12,10 @@ import reactor.core.publisher.Mono;
 public class GatewayLifecycleListener {
 
 	public static Mono<Void> onGatewayLifecycleEvent(GatewayLifecycleEvent event) {
-		return Mono.fromRunnable(() -> LogUtils.info("{Shard %d} %s",
-				event.getClient().getConfig().getShardIndex(),
-				// Add space before uppercase letters
-				event.getClass().getSimpleName().replaceAll("([^_])([A-Z])", "$1 $2")));
+		final int shardIndex = event.getClient().getConfig().getShardIndex();
+		// Add space before uppercase letters
+		final String formattedEventName = event.getClass().getSimpleName().replaceAll("([^_])([A-Z])", "$1 $2");
+		return Mono.fromRunnable(() -> LogUtils.info("{Shard %d} %s", shardIndex, formattedEventName));
 	}
 
 	public static Mono<Void> onReadyEvent(ReadyEvent event) {

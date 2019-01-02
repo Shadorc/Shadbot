@@ -121,6 +121,11 @@ public class DiscordUtils {
 		return GuildChannel.class.cast(channel).getEffectivePermissions(userId).map(permissions -> permissions.contains(permission));
 	}
 
+	/**
+	 * @param client - the client on which register the event
+	 * @param eventClass - the class of the event to register
+	 * @param mapper - the mapper to execute when the event is triggered
+	 */
 	public static <T extends Event, R> void register(DiscordClient client, Class<T> eventClass, Function<? super T, ? extends Publisher<? extends R>> mapper) {
 		client.getEventDispatcher()
 				.on(eventClass)
@@ -130,7 +135,8 @@ public class DiscordUtils {
 	}
 
 	/**
-	 * When all guilds have been received, register GuildListener#onGuildCreate and GatewayLifecycleListener#onGatewayLifecycleEvent
+	 * @param client - the client on which register the event
+	 * @param mapper - the mapper to execute when the client is fully ready
 	 */
 	public static <R> void registerFullyReadyEvent(DiscordClient client, Function<? super GuildCreateEvent, ? extends Publisher<? extends R>> mapper) {
 		client.getEventDispatcher().on(ReadyEvent.class)
