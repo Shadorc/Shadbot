@@ -9,28 +9,8 @@ import org.jsoup.HttpStatusException;
 
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.MissingPermissionException;
-import me.shadorc.shadbot.exception.NoMusicException;
 
 public class ExceptionUtils {
-
-	public static boolean isCommandException(Throwable err) {
-		return err instanceof CommandException;
-	}
-
-	public static boolean isMissingPermission(Throwable err) {
-		return err instanceof MissingPermissionException;
-	}
-
-	public static boolean isMissingArgumentException(Throwable err) {
-		return err instanceof MissingArgumentException;
-	}
-
-	public static boolean isNoMusicException(Throwable err) {
-		return err instanceof NoMusicException;
-	}
 
 	public static boolean isUnavailable(Throwable err) {
 		return err instanceof ConnectException

@@ -29,10 +29,10 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -130,7 +130,7 @@ public class DiscordUtils {
 		client.getEventDispatcher()
 				.on(eventClass)
 				.flatMap(mapper)
-				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on %s.", eventClass.getSimpleName())))
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
 				.subscribe();
 	}
 
@@ -146,7 +146,7 @@ public class DiscordUtils {
 						.take(size)
 						.last())
 				.flatMap(mapper)
-				.onErrorContinue((err, obj) -> LogUtils.error(client, err, String.format("An unknown error occurred on fully ready event.")))
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
 				.subscribe();
 	}
 
