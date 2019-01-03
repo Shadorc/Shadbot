@@ -10,9 +10,11 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
+import discord4j.voice.AudioReceiver;
 import discord4j.voice.VoiceConnection;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -52,6 +54,7 @@ public class GuildMusic {
 				.cast(VoiceChannel.class)
 				.filter(ignored -> this.voiceConnection == null)
 				.flatMap(voiceChannel -> voiceChannel.join(this.audioProvider))
+				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, client))
 				.subscribe(voiceConnection -> {
 					this.voiceConnection = voiceConnection;
 					LogUtils.info("{Guild ID: %d} Voice channel joined.", this.getGuildId().asLong());
@@ -68,6 +71,7 @@ public class GuildMusic {
 	public void scheduleLeave() {
 		this.leaveTask = Mono.delay(Duration.ofMinutes(1))
 				.then(Mono.fromRunnable(this::leaveVoiceChannel))
+				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, client))
 				.subscribe();
 	}
 

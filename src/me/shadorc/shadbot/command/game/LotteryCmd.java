@@ -17,6 +17,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.data.lottery.LotteryGambler;
 import me.shadorc.shadbot.data.lottery.LotteryHistoric;
@@ -162,7 +163,7 @@ public class LotteryCmd extends AbstractCommand {
 									.flatMap(privateChannel -> BotUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn %s.",
 											FormatUtils.coins(coins)), privateChannel));
 						}))
-				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred during the lottery draw."))
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
 				.subscribe();
 
 		LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",

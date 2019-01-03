@@ -10,6 +10,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -63,6 +64,7 @@ public class RateLimiter {
 							username, message, maxNum, durationStr);
 				})
 				.flatMap(new TemporaryMessage(client, channelId, 10, ChronoUnit.SECONDS)::send)
+				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, client))
 				.subscribe();
 	}
 

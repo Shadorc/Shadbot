@@ -14,6 +14,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -36,7 +37,9 @@ public class PollManager extends AbstractGameManager {
 	@Override
 	public void start() {
 		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration().toMillis(), ChronoUnit.MILLIS);
-		this.show().subscribe();
+		this.show()
+				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.getContext().getClient()))
+				.subscribe();
 	}
 
 	@Override

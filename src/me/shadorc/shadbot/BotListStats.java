@@ -10,6 +10,7 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Jsoup;
 
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -27,7 +28,7 @@ public class BotListStats {
 		this.selfId = selfId;
 		this.task = Flux.interval(Duration.ofHours(2), Duration.ofHours(2))
 				.flatMap(ignored -> this.postStats())
-				.onErrorContinue((err, obj) -> LogUtils.error(err, "An error occurred while posting statistics."))
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, Shadbot.getClients().get(0)))
 				.subscribe();
 	}
 

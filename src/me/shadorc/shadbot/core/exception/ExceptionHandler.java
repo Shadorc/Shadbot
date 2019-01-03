@@ -21,26 +21,26 @@ import reactor.core.publisher.Mono;
 
 public class ExceptionHandler {
 
-	public static Mono<Message> handleCommandError(Throwable err, AbstractCommand cmd, Context context) {
+	public static <T> Mono<T> handleCommandError(Throwable err, AbstractCommand cmd, Context context) {
 		if(err instanceof CommandException) {
-			return ExceptionHandler.onCommandException((CommandException) err, cmd, context);
+			return ExceptionHandler.onCommandException((CommandException) err, cmd, context).then(Mono.empty());
 		}
 		if(err instanceof MissingPermissionException) {
-			return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, cmd, context);
+			return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, cmd, context).then(Mono.empty());
 		}
 		if(err instanceof MissingArgumentException) {
-			return ExceptionHandler.onMissingArgumentException(cmd, context);
+			return ExceptionHandler.onMissingArgumentException(cmd, context).then(Mono.empty());
 		}
 		if(err instanceof NoMusicException) {
-			return ExceptionHandler.onNoMusicException(cmd, context);
+			return ExceptionHandler.onNoMusicException(cmd, context).then(Mono.empty());
 		}
 		if(ExceptionUtils.isUnavailable(err)) {
-			return ExceptionHandler.onUnavailable(cmd, context);
+			return ExceptionHandler.onUnavailable(cmd, context).then(Mono.empty());
 		}
 		if(ExceptionUtils.isUnreacheable(err)) {
-			return ExceptionHandler.onUnreacheable(cmd, context);
+			return ExceptionHandler.onUnreacheable(cmd, context).then(Mono.empty());
 		}
-		return ExceptionHandler.onUnknown(err, cmd, context);
+		return ExceptionHandler.onUnknown(err, cmd, context).then(Mono.empty());
 	}
 
 	private static Mono<Message> onCommandException(CommandException err, AbstractCommand cmd, Context context) {
@@ -108,14 +108,14 @@ public class ExceptionHandler {
 								context.getUsername(), context.getPrefix(), context.getCommandName()), channel));
 	}
 
-	public static Mono<Message> handleUnknownError(Throwable err, DiscordClient client) {
+	public static <T> Mono<T> handleUnknownError(Throwable err, DiscordClient client) {
 		if(ExceptionUtils.isForbidden(err)) {
-			return ExceptionHandler.onForbidden((ClientException) err);
+			return ExceptionHandler.onForbidden((ClientException) err).then(Mono.empty());
 		}
 		if(ExceptionUtils.isNotFound(err)) {
-			return ExceptionHandler.onNotFound((ClientException) err);
+			return ExceptionHandler.onNotFound((ClientException) err).then(Mono.empty());
 		}
-		return ExceptionHandler.onUnknown(client, (ClientException) err);
+		return ExceptionHandler.onUnknown(client, err).then(Mono.empty());
 	}
 
 	private static Mono<Message> onForbidden(ClientException err) {
@@ -128,7 +128,7 @@ public class ExceptionHandler {
 				err.getErrorResponse().getFields().get("message").toString()));
 	}
 
-	private static Mono<Message> onUnknown(DiscordClient client, ClientException err) {
+	private static Mono<Message> onUnknown(DiscordClient client, Throwable err) {
 		return Mono.fromRunnable(() -> LogUtils.error(client, err, "An unknown error occurred."));
 	}
 

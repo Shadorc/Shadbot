@@ -13,9 +13,9 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -40,7 +40,7 @@ public class LoadingMessage implements Publisher<Void> {
 		this.subscribers = new ArrayList<>();
 
 		this.startTyping()
-				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred while typing."))
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
 				.subscribe();
 	}
 

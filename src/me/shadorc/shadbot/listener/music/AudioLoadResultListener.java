@@ -19,6 +19,7 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.music.GuildMusic;
@@ -63,6 +64,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 			this.guildMusic.getMessageChannel()
 					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
 							FormatUtils.trackName(track.getInfo())), channel))
+					.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, guildMusic.getClient()))
 					.subscribe();
 		}
 	}
@@ -93,6 +95,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildMusic.getGuildId().asLong(), errMessage);
 		this.guildMusic.getMessageChannel()
 				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.RED_CROSS + " Sorry, %s", errMessage.toLowerCase()), channel))
+				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
 				.subscribe();
 		this.leaveIfStopped();
 	}
@@ -128,11 +131,13 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 				.then(Mono.fromRunnable(() -> {
 					this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
 							.then(Mono.fromRunnable(this::stopWaiting))
+							.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
 							.subscribe();
 
 					this.resultsTracks = new ArrayList<>(playlist.getTracks().subList(0, Math.min(MAX_RESULTS, playlist.getTracks().size())));
 					MessageInterceptorManager.addInterceptor(this.guildMusic.getMessageChannelId(), this);
 				}))
+				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
 				.subscribe();
 	}
 
@@ -155,6 +160,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
 		this.guildMusic.getMessageChannel()
 				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
+				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
 				.subscribe();
 	}
 
@@ -162,6 +168,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		this.guildMusic.getMessageChannel()
 				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
 						StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
+				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
 				.subscribe();
 		this.leaveIfStopped();
 	}

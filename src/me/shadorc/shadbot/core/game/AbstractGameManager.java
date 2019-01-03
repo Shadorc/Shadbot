@@ -8,6 +8,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -81,6 +82,7 @@ public abstract class AbstractGameManager {
 		this.scheduledTask = Mono.delay(Duration.of(delay, unit))
 				.then(Mono.fromRunnable(() -> this.isDone.set(true)))
 				.then(mono)
+				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.getContext().getClient()))
 				.subscribe();
 	}
 

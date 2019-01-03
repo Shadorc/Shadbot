@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 
+import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
@@ -26,7 +28,7 @@ public abstract class Data {
 
 		Flux.interval(initialDelay, period)
 				.doOnNext(ignored -> Mono.fromRunnable(this::save))
-				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred while saving data."))
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, Shadbot.getClients().get(0)))
 				.subscribe();
 	}
 
