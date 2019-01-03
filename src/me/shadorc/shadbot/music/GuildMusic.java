@@ -53,7 +53,7 @@ public class GuildMusic {
 		this.client.getChannelById(voiceChannelId)
 				.cast(VoiceChannel.class)
 				.filter(ignored -> this.voiceConnection == null)
-				.flatMap(voiceChannel -> voiceChannel.join(this.audioProvider))
+				.flatMap(voiceChannel -> voiceChannel.join(this.audioProvider, AudioReceiver.NO_OP))
 				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, client))
 				.subscribe(voiceConnection -> {
 					this.voiceConnection = voiceConnection;
