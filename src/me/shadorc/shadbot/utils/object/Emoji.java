@@ -30,7 +30,6 @@ public enum Emoji {
 	DIAMONDS("diamonds"),
 
 	THERMOMETER("thermometer"),
-	BEACH("beach_umbrella"),
 	CLOUD("cloud"),
 	WIND("wind_blowing_face"),
 	RAIN("cloud_rain"),

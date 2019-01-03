@@ -1,10 +1,9 @@
 package me.shadorc.shadbot.utils;
 
 public enum ExitCode {
-	FATAL_ERROR(1),
 	NORMAL(0),
-	RESTART(2),
-	UNKNWON(-1);
+	FATAL_ERROR(1),
+	RESTART(2);
 
 	private final int value;
 
