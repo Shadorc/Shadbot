@@ -49,7 +49,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 public class Shadbot {
 
@@ -87,7 +86,6 @@ public class Shadbot {
 
 		final DiscordClientBuilder builder = new DiscordClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
-				.setEventScheduler(Schedulers.elastic())
 				.setShardCount(SHARD_COUNT)
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
