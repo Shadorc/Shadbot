@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.core.exception;
+package me.shadorc.shadbot.utils.exception;
 
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;

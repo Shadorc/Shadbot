@@ -11,7 +11,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -19,6 +18,7 @@ import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 

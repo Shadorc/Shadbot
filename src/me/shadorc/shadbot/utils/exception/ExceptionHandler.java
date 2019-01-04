@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.core.exception;
+package me.shadorc.shadbot.utils.exception;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;

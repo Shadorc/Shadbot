@@ -7,9 +7,9 @@ import java.nio.file.Files;
 import java.time.Duration;
 
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
