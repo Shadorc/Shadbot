@@ -36,7 +36,7 @@ public class RouletteCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(2);
 
-		final int bet = DiscordUtils.requireBet(context.getMember(), args.get(0), MAX_BET);
+		final int bet = Utils.requireBet(context.getMember(), args.get(0), MAX_BET);
 
 		final String place = args.get(1).toLowerCase();
 

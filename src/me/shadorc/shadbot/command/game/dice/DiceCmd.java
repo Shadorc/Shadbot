@@ -15,6 +15,7 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
@@ -49,7 +50,7 @@ public class DiceCmd extends AbstractCommand {
 		}
 
 		final String betStr = isJoining ? Integer.toString(diceManager.getBet()) : args.get(0);
-		final Integer bet = DiscordUtils.requireBet(context.getMember(), betStr, MAX_BET);
+		final Integer bet = Utils.requireBet(context.getMember(), betStr, MAX_BET);
 
 		if(!isJoining) {
 			// The user tries to start a game and it has already been started
