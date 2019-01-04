@@ -53,7 +53,7 @@ import reactor.core.publisher.Mono;
 public class Shadbot {
 
 	private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
-	private static final int SHARD_COUNT = 11;
+	private static final Integer SHARD_COUNT = 11;
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 
@@ -115,27 +115,29 @@ public class Shadbot {
 	 * Triggered when all the guilds have been received from a client
 	 */
 	private static Mono<Void> onFullyReadyEvent(GuildCreateEvent event) {
-		CONNECTED_SHARDS.incrementAndGet();
+		return Mono.fromRunnable(() -> {
+			CONNECTED_SHARDS.incrementAndGet();
 
-		LogUtils.info("{Shard %d} Fully ready. %s left...",
-				event.getClient().getConfig().getShardIndex(), StringUtils.pluralOf(SHARD_COUNT - CONNECTED_SHARDS.get(), "shard"));
-		DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
-		DiscordUtils.register(event.getClient(), GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
+			LogUtils.info("{Shard %d} Fully ready. %s left...",
+					event.getClient().getConfig().getShardIndex(), StringUtils.pluralOf(SHARD_COUNT - CONNECTED_SHARDS.get(), "shard"));
 
-		if(CONNECTED_SHARDS.get() == SHARD_COUNT) {
-			return Shadbot.onFullyConnected();
-		}
-		return Mono.empty();
+			DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
+			DiscordUtils.register(event.getClient(), GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
+		})
+				.then(Mono.just(CONNECTED_SHARDS.get()))
+				.filter(SHARD_COUNT::equals)
+				.flatMap(ignored -> Shadbot.onFullyConnected());
 	}
 
 	/**
 	 * Triggered when all the guilds have been received on all clients
 	 */
 	private static Mono<Void> onFullyConnected() {
-		LogUtils.info("Shadbot is connected to all guilds.");
-		Shadbot.botListStats = new BotListStats(CLIENTS.get(0).getSelfId().get());
-
-		return Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
+		return Mono.fromRunnable(() -> {
+			LogUtils.info("Shadbot is connected to all guilds.");
+			Shadbot.botListStats = new BotListStats(CLIENTS.get(0).getSelfId().get());
+		})
+				.thenMany(Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7)))
 				.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
 				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred during the lottery draw."))
 				.then();

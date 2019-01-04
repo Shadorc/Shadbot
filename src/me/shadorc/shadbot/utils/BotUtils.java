@@ -58,13 +58,13 @@ public class BotUtils {
 					final boolean canSendEmbed = tuple.getT2();
 
 					if(!canSendMessage) {
-						LogUtils.info("{Channel ID: %d} Missing permission: %s", 
+						LogUtils.info("{Channel ID: %d} Missing permission: %s",
 								channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.SEND_MESSAGES));
 						return Mono.empty();
 					}
 
 					if(!canSendEmbed && embed != null) {
-						LogUtils.info("{Channel ID: %d} Missing permission: %s", 
+						LogUtils.info("{Channel ID: %d} Missing permission: %s",
 								channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS));
 						return BotUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed links.%nPlease, check my permissions "
 								+ "and channel-specific ones to verify that **%s** is checked.",
