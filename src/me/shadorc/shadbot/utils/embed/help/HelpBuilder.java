@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils.embed;
+package me.shadorc.shadbot.utils.embed.help;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +12,7 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
 
 public class HelpBuilder {

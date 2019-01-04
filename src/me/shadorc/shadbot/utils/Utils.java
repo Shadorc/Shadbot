@@ -169,5 +169,5 @@ public class Utils {
 
 		return bet;
 	}
-	
+
 }
