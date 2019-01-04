@@ -38,7 +38,6 @@ import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -93,9 +92,7 @@ public class DiscordUtils {
 						StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);
 					}
 					StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT);
-				})
-				// TODO: Remove when this issue is closed: https://github.com/Discord4J/Discord4J/issues/468
-				.onErrorResume(ExceptionUtils::isForbidden, err -> Mono.fromRunnable(() -> LogUtils.error("Forbidden action while sending message.")));
+				});
 	}
 
 	/**
