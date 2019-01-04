@@ -117,11 +117,13 @@ public class Shadbot {
 	 * Triggered when all the guilds have been received from a client
 	 */
 	private static Mono<Void> onFullyReadyEvent(GuildCreateEvent event) {
-		LogUtils.info("{Shard %d} Fully ready.", event.getClient().getConfig().getShardIndex());
+		CONNECTED_SHARDS.incrementAndGet();
+
+		LogUtils.info("{Shard %d} Fully ready. %s left...",
+				event.getClient().getConfig().getShardIndex(), StringUtils.pluralOf(SHARD_COUNT - CONNECTED_SHARDS.get(), "shard"));
 		DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
 		DiscordUtils.register(event.getClient(), GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
 
-		CONNECTED_SHARDS.incrementAndGet();
 		if(CONNECTED_SHARDS.get() == SHARD_COUNT) {
 			return Shadbot.onFullyConnected();
 		}
