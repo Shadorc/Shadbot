@@ -87,7 +87,7 @@ public class BotUtils {
 					StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT);
 				})
 				// TODO: Remove when this issue is closed: https://github.com/Discord4J/Discord4J/issues/468
-				.doOnError(ExceptionUtils::isForbidden, err -> LogUtils.error("Forbidden action while sending message."));
+				.onErrorResume(ExceptionUtils::isForbidden, err -> Mono.fromRunnable(() -> LogUtils.error("Forbidden action while sending message.")));
 	}
 
 	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
