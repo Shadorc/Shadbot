@@ -26,13 +26,13 @@ public class ExceptionHandler {
 			return ExceptionHandler.onCommandException((CommandException) err, cmd, context).then(Mono.empty());
 		}
 		if(err instanceof MissingPermissionException) {
-			return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, cmd, context).then(Mono.empty());
+			return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, context).then(Mono.empty());
 		}
 		if(err instanceof MissingArgumentException) {
 			return ExceptionHandler.onMissingArgumentException(cmd, context).then(Mono.empty());
 		}
 		if(err instanceof NoMusicException) {
-			return ExceptionHandler.onNoMusicException(cmd, context).then(Mono.empty());
+			return ExceptionHandler.onNoMusicException(context).then(Mono.empty());
 		}
 		if(ExceptionUtils.isUnavailable(err)) {
 			return ExceptionHandler.onUnavailable(cmd, context).then(Mono.empty());
@@ -50,7 +50,7 @@ public class ExceptionHandler {
 						context.getUsername(), err.getMessage()), channel));
 	}
 
-	private static Mono<Message> onMissingPermissionException(MissingPermissionException err, AbstractCommand cmd, Context context) {
+	private static Mono<Message> onMissingPermissionException(MissingPermissionException err, Context context) {
 		final String missingPerm = StringUtils.capitalizeEnum(err.getPermission());
 		if(err.getType().equals(UserType.BOT)) {
 			return context.getChannel()
@@ -73,7 +73,7 @@ public class ExceptionHandler {
 						Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.", tuple.getT1(), tuple.getT2()));
 	}
 
-	private static Mono<Message> onNoMusicException(AbstractCommand cmd, Context context) {
+	private static Mono<Message> onNoMusicException(Context context) {
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
 						context.getUsername()), channel));

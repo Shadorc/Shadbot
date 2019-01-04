@@ -253,14 +253,14 @@ public class DiscordUtils {
 	}
 
 	public static Mono<Void> updatePresence(DiscordClient client) {
-		String text;
-		if(ThreadLocalRandom.current().nextInt(2) == 0) {
-			text = TextUtils.PLAYING.getText();
-		} else {
-			text = String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
-		}
-		return client.updatePresence(Presence.online(Activity.playing(text)));
-
+		return Mono.just(ThreadLocalRandom.current().nextInt(2))
+				.map(rand -> {
+					if(rand == 0) {
+						return TextUtils.PLAYING.getText();
+					}
+					return String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
+				})
+				.flatMap(text -> client.updatePresence(Presence.online(Activity.playing(text))));
 	}
 
 }
