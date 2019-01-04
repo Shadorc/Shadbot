@@ -59,7 +59,7 @@ public class PollCmd extends AbstractCommand {
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.ADD_REACTIONS))
 				.then(context.getPermission())
-				.doOnSuccess(permission -> {
+				.doOnNext(permission -> {
 					PollManager pollManager = MANAGER.get(context.getChannelId());
 					if(pollManager == null) {
 						pollManager = this.createPoll(context);

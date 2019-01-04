@@ -78,7 +78,7 @@ public class IamCmd extends AbstractCommand {
 
 					return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
 							.sendMessage(embed)
-							.doOnSuccess(message -> {
+							.doOnNext(message -> {
 								final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 								final Map<String, Long> setting = dbGuild.getIamMessages();
 								roles.stream().map(Role::getId)

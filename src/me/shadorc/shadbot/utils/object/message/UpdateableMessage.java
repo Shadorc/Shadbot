@@ -38,7 +38,7 @@ public class UpdateableMessage {
 				.then(this.client.getChannelById(this.channelId))
 				.cast(MessageChannel.class)
 				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
-				.doOnSuccess(message -> this.messageId = message.getId());
+				.doOnNext(message -> this.messageId = message.getId());
 	}
 
 }

@@ -56,7 +56,7 @@ public class ExceptionHandler {
 			return context.getChannel()
 					.flatMap(channel -> DiscordUtils.sendMessage(
 							TextUtils.missingPermission(context.getUsername(), err.getPermission()), channel))
-					.doOnSuccess(message -> LogUtils.info("{Guild ID: %d} Missing permission: %s",
+					.doOnSuccess(ignored -> LogUtils.info("{Guild ID: %d} Missing permission: %s",
 							context.getGuildId().asLong(), missingPerm));
 		} else {
 			return context.getChannel()
