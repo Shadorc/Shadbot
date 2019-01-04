@@ -12,7 +12,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.exception.ExceptionUtils;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Mono;
@@ -44,7 +44,7 @@ public class DatabaseCmd extends AbstractCommand {
 					return Shadbot.getDatabase().getDBMember(guild.getId(), Snowflake.of(memberId)).toString();
 				})
 				.flatMap(text -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(text, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
 				.then();
 	}
 

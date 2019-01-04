@@ -17,7 +17,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -62,7 +62,7 @@ public class ServerInfoCmd extends AbstractCommand {
 							.addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true);
 				})
 				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

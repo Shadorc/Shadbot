@@ -13,7 +13,7 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.database.DBGuild;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -43,6 +43,6 @@ public class MemberListener {
 		return Mono.zip(Mono.justOrEmpty(channelId), Mono.justOrEmpty(message))
 				.flatMap(tuple -> client.getChannelById(tuple.getT1())
 						.cast(MessageChannel.class)
-						.flatMap(channel -> BotUtils.sendMessage(tuple.getT2().replace("{mention}", user.getMention()), channel)));
+						.flatMap(channel -> DiscordUtils.sendMessage(tuple.getT2().replace("{mention}", user.getMention()), channel)));
 	};
 }

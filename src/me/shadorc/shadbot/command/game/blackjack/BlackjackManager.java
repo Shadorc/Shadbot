@@ -21,7 +21,7 @@ import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -162,7 +162,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 				})
 				.collectList()
 				.flatMap(results -> this.getContext().getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(
+						.flatMap(channel -> DiscordUtils.sendMessage(
 								String.format(Emoji.DICE + " __Results:__ %s", String.join(", ", results)), channel)))
 				.then(Mono.fromRunnable(this::stop))
 				.then(this.show());
@@ -198,7 +198,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 						.flatMap(player -> {
 							if(player.isStanding()) {
 								return this.getContext().getChannel()
-										.flatMap(channel -> BotUtils.sendMessage(
+										.flatMap(channel -> DiscordUtils.sendMessage(
 												String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't play anymore.",
 														member.getUsername()), channel))
 										.thenReturn(false);
@@ -208,7 +208,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 							final String content = event.getMessage().getContent().orElse("").replace(prefix, "").toLowerCase().trim();
 							if("double down".equals(content) && player.getCards().size() != 2) {
 								return this.getContext().getChannel()
-										.flatMap(channel -> BotUtils.sendMessage(
+										.flatMap(channel -> DiscordUtils.sendMessage(
 												String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a maximum of 2 cards to use `double down`.",
 														member.getUsername()), channel))
 										.thenReturn(true);

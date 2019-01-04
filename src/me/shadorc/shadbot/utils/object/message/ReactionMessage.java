@@ -9,7 +9,7 @@ import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -33,7 +33,7 @@ public class ReactionMessage {
 	public Mono<Message> sendMessage(EmbedCreateSpec embed) {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
-				.flatMap(channel -> BotUtils.sendMessage(embed, channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
 				// Add the reactions to the message then wait
 				.flatMap(message -> Flux.fromIterable(this.reactions)
 						.flatMap(message::addReaction)

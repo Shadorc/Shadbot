@@ -13,7 +13,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -56,7 +55,7 @@ public class DiceCmd extends AbstractCommand {
 			// The user tries to start a game and it has already been started
 			if(diceManager != null) {
 				return context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A **Dice Game** has already been started. "
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A **Dice Game** has already been started. "
 								+ "Use `%s%s <num>` to join it.",
 								context.getUsername(), context.getPrefix(), this.getName()), channel))
 						.then();
@@ -67,14 +66,14 @@ public class DiceCmd extends AbstractCommand {
 
 		if(diceManager.getPlayerCount() == 6) {
 			return context.getChannel()
-					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) Sorry, there are already 6 players.",
+					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) Sorry, there are already 6 players.",
 							context.getUsername()), channel))
 					.then();
 		}
 
 		if(diceManager.isNumBet(num)) {
 			return context.getChannel()
-					.flatMap(channel -> BotUtils.sendMessage(
+					.flatMap(channel -> DiscordUtils.sendMessage(
 							String.format(Emoji.GREY_EXCLAMATION + " (**%s**) This number has already been bet, please try with another one.",
 									context.getUsername()), channel))
 					.then();
@@ -88,7 +87,7 @@ public class DiceCmd extends AbstractCommand {
 			return diceManager.show().then();
 		} else {
 			return context.getChannel()
-					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
 							context.getUsername()), channel))
 					.then();
 		}

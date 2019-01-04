@@ -14,7 +14,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -87,7 +87,7 @@ public class Rule34Cmd extends AbstractCommand {
 					}
 				})
 				.switchIfEmpty(context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), channel)))
 				.then();
 	}
 

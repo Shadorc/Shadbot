@@ -10,7 +10,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -33,7 +33,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 
 		final Relic relic = Shadbot.getPremium().generateRelic(type);
 		return context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
 						StringUtils.capitalize(type.toString()), relic.getId()), channel))
 				.then();
 	}

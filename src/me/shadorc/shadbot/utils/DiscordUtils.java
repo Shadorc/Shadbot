@@ -19,6 +19,7 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.TextChannel;
@@ -26,13 +27,19 @@ import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
+import me.shadorc.shadbot.core.exception.ExceptionUtils;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -40,6 +47,56 @@ public class DiscordUtils {
 
 	/* Audit Log reason must be 512 or fewer in length. */
 	public static final int MAX_REASON_LENGTH = 512;
+
+	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
+		return DiscordUtils.sendMessage(content, null, channel);
+	}
+
+	public static Mono<Message> sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
+		return DiscordUtils.sendMessage(null, embed, channel);
+	}
+
+	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, MessageChannel channel) {
+		final Snowflake selfId = channel.getClient().getSelfId().get();
+		return Mono.zip(
+				DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
+				DiscordUtils.hasPermission(channel, selfId, Permission.EMBED_LINKS))
+				.flatMap(tuple -> {
+					final boolean canSendMessage = tuple.getT1();
+					final boolean canSendEmbed = tuple.getT2();
+
+					if(!canSendMessage) {
+						LogUtils.info("{Channel ID: %d} Missing permission: %s",
+								channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.SEND_MESSAGES));
+						return Mono.empty();
+					}
+
+					if(!canSendEmbed && embed != null) {
+						LogUtils.info("{Channel ID: %d} Missing permission: %s",
+								channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS));
+						return DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed links.%nPlease, check my permissions "
+								+ "and channel-specific ones to verify that **%s** is checked.",
+								StringUtils.capitalizeEnum(Permission.EMBED_LINKS)), channel);
+					}
+
+					return channel.createMessage(spec -> {
+						if(content != null) {
+							spec.setContent(content);
+						}
+						if(embed != null) {
+							spec.setEmbed(embed);
+						}
+					});
+				})
+				.doOnNext(message -> {
+					if(!message.getEmbeds().isEmpty()) {
+						StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);
+					}
+					StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT);
+				})
+				// TODO: Remove when this issue is closed: https://github.com/Discord4J/Discord4J/issues/468
+				.onErrorResume(ExceptionUtils::isForbidden, err -> Mono.fromRunnable(() -> LogUtils.error("Forbidden action while sending message.")));
+	}
 
 	/**
 	 * @param channel - the channel containing the messages to delete
@@ -205,7 +262,7 @@ public class DiscordUtils {
 					final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
 
 					// If the user is in a voice channel but the bot is not allowed to join
-					if(userVoiceChannelId.isPresent() && !BotUtils.isVoiceChannelAllowed(context.getGuildId(), userVoiceChannelId.get())) {
+					if(userVoiceChannelId.isPresent() && !Shadbot.getDatabase().getDBGuild(context.getGuildId()).isVoiceChannelAllowed(userVoiceChannelId.get())) {
 						throw new CommandException("I'm not allowed to join this voice channel.");
 					}
 

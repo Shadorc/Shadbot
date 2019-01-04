@@ -16,7 +16,7 @@ import discord4j.core.object.reaction.ReactionEmoji;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -100,7 +100,7 @@ public class PollManager extends AbstractGameManager {
 
 				})
 				.flatMap(embed -> this.getContext().getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embed, channel)));
+						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
 	}
 
 }

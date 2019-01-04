@@ -12,7 +12,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.exception.ExceptionUtils;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -42,11 +42,11 @@ public class SendMessageCmd extends AbstractCommand {
 
 					return user.getPrivateChannel()
 							.cast(MessageChannel.class)
-							.flatMap(privateChannel -> BotUtils.sendMessage(args.get(1), privateChannel));
+							.flatMap(privateChannel -> DiscordUtils.sendMessage(args.get(1), privateChannel));
 
 				})
 				.then(context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", channel)))
 				.onErrorMap(ExceptionUtils::isNotFound, err -> new CommandException("User not found."))
 				.then();
 	}

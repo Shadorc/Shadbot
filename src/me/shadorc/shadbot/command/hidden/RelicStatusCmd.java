@@ -13,7 +13,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -29,7 +29,7 @@ public class RelicStatusCmd extends AbstractCommand {
 		final List<Relic> relics = Shadbot.getPremium().getRelicsForUser(context.getAuthorId());
 		if(relics.isEmpty()) {
 			return context.getChannel()
-					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
+					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
 							+ "you can help me keep it alive by making a donation on **%s**."
 							+ "%nAll donations are important and really help me %s",
 							context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), channel))
@@ -72,7 +72,7 @@ public class RelicStatusCmd extends AbstractCommand {
 					return embed;
 				})
 				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

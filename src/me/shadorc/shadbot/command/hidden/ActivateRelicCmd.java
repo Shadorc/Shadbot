@@ -7,7 +7,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.RelicActivationException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
@@ -23,10 +23,10 @@ public class ActivateRelicCmd extends AbstractCommand {
 				.flatMap(channel -> {
 					try {
 						Shadbot.getPremium().activateRelic(context.getGuildId(), context.getAuthorId(), arg);
-						return BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy !",
+						return DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy !",
 								context.getUsername()), channel);
 					} catch (final RelicActivationException err) {
-						return BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
+						return DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
 								context.getUsername(), err.getMessage()), channel);
 					}
 				})

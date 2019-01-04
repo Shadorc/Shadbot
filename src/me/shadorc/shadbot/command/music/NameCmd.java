@@ -8,7 +8,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -22,7 +22,7 @@ public class NameCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final AudioTrackInfo trackInfo = context.requireGuildMusic().getTrackScheduler().getAudioPlayer().getPlayingTrack().getInfo();
 		return context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " (**%s**) Currently playing: **%s**",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " (**%s**) Currently playing: **%s**",
 						context.getUsername(), FormatUtils.trackName(trackInfo)), channel))
 				.then();
 	}

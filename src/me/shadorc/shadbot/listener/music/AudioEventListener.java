@@ -10,7 +10,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.music.GuildMusic;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -33,7 +33,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		final String message = String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
 				FormatUtils.trackName(track.getInfo()));
 		this.guildMusic.getMessageChannel()
-				.flatMap(channel -> BotUtils.sendMessage(message, channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(message, channel))
 				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, guildMusic.getClient()))
 				.subscribe();
 	}
@@ -69,7 +69,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		}
 
 		this.guildMusic.getMessageChannel()
-				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then(this.nextOrEnd())
 				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
 				.subscribe();
@@ -80,7 +80,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		LogUtils.info("{Guild ID: %d} Music stuck, skipping it.", this.guildMusic.getGuildId().asLong());
 
 		this.guildMusic.getMessageChannel()
-				.flatMap(channel -> BotUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
+				.flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
 						channel))
 				.then(this.nextOrEnd())
 				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, guildMusic.getClient()))

@@ -6,7 +6,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -20,7 +20,7 @@ public class PingCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final long start = System.currentTimeMillis();
 		return context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Testing ping...", context.getUsername()), channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Testing ping...", context.getUsername()), channel))
 				.flatMap(message -> message.edit(spec -> spec.setContent(String.format(Emoji.GEAR + " Ping: %dms", TimeUtils.getMillisUntil(start)))))
 				.then();
 	}

@@ -16,7 +16,6 @@ import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -67,7 +66,7 @@ public class PlayCmd extends AbstractCommand {
 							return context.getClient().getUserById(guildMusic.getDjId())
 									.map(User::getUsername)
 									.flatMap(djName -> context.getChannel()
-											.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " (**%s**) **%s** is "
+											.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " (**%s**) **%s** is "
 													+ "already selecting a music, please wait for him to finish.",
 													context.getUsername(), djName), channel)))
 									.then();
@@ -77,7 +76,7 @@ public class PlayCmd extends AbstractCommand {
 					if(guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
 							&& !Shadbot.getPremium().isPremium(guildId, context.getAuthorId())) {
 						return context.getChannel()
-								.flatMap(channel -> BotUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel))
+								.flatMap(channel -> DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel))
 								.then();
 					}
 

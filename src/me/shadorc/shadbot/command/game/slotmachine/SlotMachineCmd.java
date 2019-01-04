@@ -14,7 +14,7 @@ import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -53,7 +53,7 @@ public class SlotMachineCmd extends AbstractCommand {
 		}
 
 		return context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",
 						FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername(),
 						gains > 0 ? "win" : "lose", FormatUtils.coins(Math.abs(gains))), channel))
 				.then();

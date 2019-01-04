@@ -16,7 +16,7 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -58,7 +58,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 			return context.getClient().getUserById(receiverUserId)
 					.map(User::getUsername)
 					.flatMap(username -> context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(String.format(
+							.flatMap(channel -> DiscordUtils.sendMessage(String.format(
 									Emoji.BANK + " (**%s**) This transfer cannot be done because %s would exceed the maximum coins cap.",
 									context.getUsername(), username), channel)))
 					.then();
@@ -70,7 +70,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 		return Mono.zip(context.getAuthor().map(User::getMention),
 				context.getClient().getUserById(senderUserId).map(User::getMention),
 				context.getChannel())
-				.flatMap(tuple -> BotUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
+				.flatMap(tuple -> DiscordUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
 						tuple.getT1(), FormatUtils.coins(coins), tuple.getT2()), tuple.getT3()))
 				.then();
 	}

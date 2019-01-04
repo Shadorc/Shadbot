@@ -22,7 +22,7 @@ import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.data.lottery.LotteryGambler;
 import me.shadorc.shadbot.data.lottery.LotteryHistoric;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -75,7 +75,7 @@ public class LotteryCmd extends AbstractCommand {
 		Shadbot.getLottery().addGambler(context.getGuildId(), context.getAuthorId(), num);
 
 		return context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
 						+ "The next draw will take place in **%s**.",
 						context.getUsername(), num, FormatUtils.customDate(LotteryCmd.getDelay().toMillis())), channel))
 				.then();
@@ -129,7 +129,7 @@ public class LotteryCmd extends AbstractCommand {
 					return embed;
 				})
 				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embed, channel)));
+						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
 	}
 
 	public static Duration getDelay() {
@@ -160,7 +160,7 @@ public class LotteryCmd extends AbstractCommand {
 							Shadbot.getDatabase().getDBMember(winner.getGuildId(), winner.getUserId()).addCoins(coins);
 							return user.getPrivateChannel()
 									.cast(MessageChannel.class)
-									.flatMap(privateChannel -> BotUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn %s.",
+									.flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn %s.",
 											FormatUtils.coins(coins)), privateChannel));
 						}))
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))

@@ -10,7 +10,6 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.TrackScheduler;
 import me.shadorc.shadbot.music.TrackScheduler.RepeatMode;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -49,7 +48,7 @@ public class RepeatCmd extends AbstractCommand {
 					return String.format("%s %sRepetition %s by **%s**.", emoji, playlistRepetition, modeStr, context.getUsername());
 				})
 				.flatMap(message -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(message, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(message, channel)))
 				.then();
 	}
 

@@ -8,7 +8,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBMember;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -34,7 +34,7 @@ public class CoinsCmd extends AbstractCommand {
 					}
 				})
 				.flatMap(text -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(Emoji.PURSE + " " + text, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(Emoji.PURSE + " " + text, channel)))
 				.then();
 	}
 

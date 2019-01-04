@@ -8,7 +8,7 @@ import discord4j.core.object.entity.MessageChannel;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogBuilder.LogType;
 
 public class LogUtils {
@@ -55,7 +55,7 @@ public class LogUtils {
 	private static void sendLog(DiscordClient client, LogBuilder embed) {
 		client.getChannelById(Config.LOGS_CHANNEL_ID)
 				.cast(MessageChannel.class)
-				.flatMap(channel -> BotUtils.sendMessage(embed.build(), channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(embed.build(), channel))
 				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, client))
 				.subscribe();
 	}

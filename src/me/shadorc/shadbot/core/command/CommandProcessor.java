@@ -13,11 +13,12 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
@@ -34,20 +35,21 @@ public class CommandProcessor {
 			return Mono.empty();
 		}
 
-		final Snowflake guildId = event.getGuildId().get();
+
+		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId().get());
 		final String content = event.getMessage().getContent().get();
 		return event.getMessage().getAuthorAsMember()
 				// The author is not a bot
 				.filter(member -> !member.isBot())
 				.flatMap(member -> member.getRoles().collectList())
 				// The role is allowed
-				.filter(roles -> BotUtils.hasAllowedRole(guildId, roles))
+				.filter(roles -> dbGuild.hasAllowedRole(roles))
 				.flatMap(ignored -> event.getMessage().getChannel())
 				// The channel is allowed
-				.filter(channel -> BotUtils.isTextChannelAllowed(guildId, channel.getId()))
+				.filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
 				// The message has not been intercepted
 				.filterWhen(ignored -> MessageInterceptorManager.isIntercepted(event).map(BooleanUtils::negate))
-				.map(ignored -> Shadbot.getDatabase().getDBGuild(guildId).getPrefix())
+				.map(ignored -> dbGuild.getPrefix())
 				// The message starts with the correct prefix
 				.filter(prefix -> content.startsWith(prefix))
 				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)));
@@ -78,13 +80,13 @@ public class CommandProcessor {
 				// The author has the permission to execute this command
 				.filter(userPerm -> !command.getPermission().isSuperior(userPerm))
 				.switchIfEmpty(context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(
+						.flatMap(channel -> DiscordUtils.sendMessage(
 								String.format(Emoji.ACCESS_DENIED + " (**%s**) You do not have the permission to execute this command.",
 										context.getUsername()), channel)
 								.then(Mono.empty())))
 				.flatMap(perm -> Mono.just(command))
 				// The command is allowed in the guild
-				.filter(cmd -> BotUtils.isCommandAllowed(guildId, cmd))
+				.filter(cmd -> Shadbot.getDatabase().getDBGuild(guildId).isCommandAllowed(cmd))
 				// The user is not rate limited
 				.filter(isRateLimited.negate())
 				.flatMap(cmd -> cmd.execute(context))
@@ -118,7 +120,7 @@ public class CommandProcessor {
 					.collectList()
 					.filter(list -> !list.stream().anyMatch(text::equalsIgnoreCase))
 					.flatMap(ignored -> event.getMessage().getChannel())
-					.flatMap(channel -> BotUtils.sendMessage(text, channel))
+					.flatMap(channel -> DiscordUtils.sendMessage(text, channel))
 					.then();
 		}
 	}

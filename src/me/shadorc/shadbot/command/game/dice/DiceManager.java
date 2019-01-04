@@ -16,7 +16,7 @@ import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -112,7 +112,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 				.collectList()
 				.map(list -> this.results = String.join("\n", list))
 				.then(this.getContext().getChannel())
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
 				.then(this.show())
 				.then(Mono.fromRunnable(this::stop));
 	}

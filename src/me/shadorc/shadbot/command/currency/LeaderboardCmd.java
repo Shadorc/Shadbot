@@ -11,7 +11,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBMember;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -49,7 +49,7 @@ public class LeaderboardCmd extends AbstractCommand {
 						.setAuthor("Leaderboard", null, tuple.getT2())
 						.setDescription(tuple.getT1()))
 				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

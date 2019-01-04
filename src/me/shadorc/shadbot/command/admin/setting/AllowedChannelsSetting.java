@@ -15,7 +15,6 @@ import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -88,7 +87,7 @@ public class AllowedChannelsSetting extends AbstractSetting {
 
 					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
 					dbGuild.setSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, allowedVoiceChannels);
-					return context.getChannel().flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel));
+					return context.getChannel().flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
 				})
 				.then();
 	}

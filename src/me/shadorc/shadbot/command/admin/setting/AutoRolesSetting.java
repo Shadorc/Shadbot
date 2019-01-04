@@ -15,7 +15,7 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -55,7 +55,7 @@ public class AutoRolesSetting extends AbstractSetting {
 					.map(Role::getName)
 					.collectList()
 					.flatMap(roles -> context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New comers will now have role(s): %s",
+							.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " New comers will now have role(s): %s",
 									FormatUtils.format(roles, role -> String.format("`@%s`", role), ", ")), channel)));
 		} else {
 			autoRoles.removeAll(mentionedRoles);
@@ -64,7 +64,7 @@ public class AutoRolesSetting extends AbstractSetting {
 					.map(Role::getName)
 					.collectList()
 					.flatMap(roles -> context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
+							.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
 									FormatUtils.format(roles, role -> String.format("`@%s`", role), ", ")), channel)));
 		}
 

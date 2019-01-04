@@ -16,7 +16,7 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.listener.music.AudioEventListener;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Disposable;
@@ -90,7 +90,7 @@ public class GuildMusic {
 		}
 		return Mono.fromRunnable(this::leaveVoiceChannel)
 				.then(this.getMessageChannel())
-				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then();
 	}
 

@@ -12,7 +12,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -57,7 +56,7 @@ public class RouletteCmd extends AbstractCommand {
 			return rouletteManager.show();
 		} else {
 			return context.getChannel()
-					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
 							context.getUsername()), channel))
 					.then();
 		}

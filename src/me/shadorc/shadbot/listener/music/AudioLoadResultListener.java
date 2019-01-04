@@ -23,7 +23,7 @@ import me.shadorc.shadbot.core.exception.ExceptionHandler;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.music.GuildMusic;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -62,7 +62,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		this.guildMusic.joinVoiceChannel(this.voiceChannelId);
 		if(!this.guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst)) {
 			this.guildMusic.getMessageChannel()
-					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
+					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
 							FormatUtils.trackName(track.getInfo())), channel))
 					.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, guildMusic.getClient()))
 					.subscribe();
@@ -94,7 +94,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
 		LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildMusic.getGuildId().asLong(), errMessage);
 		this.guildMusic.getMessageChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.RED_CROSS + " Sorry, %s", errMessage.toLowerCase()), channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.RED_CROSS + " Sorry, %s", errMessage.toLowerCase()), channel))
 				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
 				.subscribe();
 		this.leaveIfStopped();
@@ -127,7 +127,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 						.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
 								Shadbot.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
 				.flatMap(embed -> this.guildMusic.getMessageChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then(Mono.fromRunnable(() -> {
 					this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
 							.then(Mono.fromRunnable(this::stopWaiting))
@@ -159,14 +159,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 		strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
 		this.guildMusic.getMessageChannel()
-				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
 				.subscribe();
 	}
 
 	private void onNoMatches() {
 		this.guildMusic.getMessageChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
 						StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
 				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
 				.subscribe();
@@ -191,7 +191,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					if(content.equals(String.format("%scancel", prefix))) {
 						this.stopWaiting();
 						return this.guildMusic.getMessageChannel()
-								.flatMap(channel -> BotUtils.sendMessage(
+								.flatMap(channel -> DiscordUtils.sendMessage(
 										String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.", username), channel))
 								.thenReturn(true);
 					}

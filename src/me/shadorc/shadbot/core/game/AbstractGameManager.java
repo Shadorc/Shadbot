@@ -9,7 +9,6 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Disposable;
@@ -66,7 +65,7 @@ public abstract class AbstractGameManager {
 				.flatMap(Message::getAuthor)
 				.map(User::getUsername)
 				.flatMap(username -> this.context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", username), channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", username), channel)))
 				.flatMap(ignored -> Mono.fromRunnable(this::stop))
 				// The message is intercepted, return true
 				.map(ignored -> Boolean.TRUE)

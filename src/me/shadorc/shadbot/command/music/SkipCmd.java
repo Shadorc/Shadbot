@@ -9,7 +9,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.music.GuildMusic;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
@@ -24,7 +24,7 @@ public class SkipCmd extends AbstractCommand {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 
 		final Mono<Message> messageMono = context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.",
 						context.getUsername()), channel));
 
 		if(context.getArg().isPresent()) {

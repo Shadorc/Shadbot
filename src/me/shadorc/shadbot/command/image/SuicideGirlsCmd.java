@@ -11,7 +11,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -53,7 +53,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 				})
 				.flatMap(loadingMsg::send)
 				.switchIfEmpty(context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), channel)))
 				.then();
 	}
 

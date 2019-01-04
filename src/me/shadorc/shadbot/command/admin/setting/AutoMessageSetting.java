@@ -13,7 +13,6 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -81,7 +80,7 @@ public class AutoMessageSetting extends AbstractSetting {
 					}
 				})
 				.flatMap(message -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(message, channel)));
+						.flatMap(channel -> DiscordUtils.sendMessage(message, channel)));
 	}
 
 	private Mono<Message> updateMessage(Context context, SettingEnum setting, Action action, List<String> args) {
@@ -107,7 +106,7 @@ public class AutoMessageSetting extends AbstractSetting {
 		}
 
 		return context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(strBuilder.toString(), channel));
+				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
 	}
 
 	@Override

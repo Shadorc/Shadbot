@@ -17,7 +17,6 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -69,7 +68,7 @@ public class SoftBanCmd extends AbstractCommand {
 									.concatMap(user -> user.getPrivateChannel()
 											.cast(MessageChannel.class)
 											.filter(ignored -> !user.isBot())
-											.flatMap(privateChannel -> BotUtils.sendMessage(
+											.flatMap(privateChannel -> DiscordUtils.sendMessage(
 													String.format(Emoji.INFO + " You were softbanned from the server **%s** by **%s**. Reason: `%s`",
 															guild.getName(), context.getUsername(), reason), privateChannel))
 											.then(user.asMember(context.getGuildId()))

@@ -25,7 +25,7 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -69,7 +69,7 @@ public class SettingsCmd extends AbstractCommand {
 
 		if("show".equals(args.get(0))) {
 			return this.show(context)
-					.flatMap(embed -> context.getChannel().flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+					.flatMap(embed -> context.getChannel().flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
@@ -83,7 +83,7 @@ public class SettingsCmd extends AbstractCommand {
 		final String arg = args.size() == 2 ? args.get(1) : null;
 		if("help".equals(arg)) {
 			return this.getHelp(context, setting)
-					.flatMap(embed -> context.getChannel().flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+					.flatMap(embed -> context.getChannel().flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
@@ -92,7 +92,7 @@ public class SettingsCmd extends AbstractCommand {
 		} catch (final MissingArgumentException e) {
 			return this.getHelp(context, setting)
 					.flatMap(embed -> context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(
+							.flatMap(channel -> DiscordUtils.sendMessage(
 									Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", embed, channel)))
 					.then();
 		}

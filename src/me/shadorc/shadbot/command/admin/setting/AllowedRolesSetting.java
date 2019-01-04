@@ -15,7 +15,7 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -55,7 +55,7 @@ public class AllowedRolesSetting extends AbstractSetting {
 					.map(Role::getName)
 					.collectList()
 					.flatMap(roleNames -> context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s will now be able to interact with me.",
+							.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s will now be able to interact with me.",
 									String.join(", ", roleNames)), channel)));
 		} else {
 			allowedRoles.removeAll(mentionedRoles);
@@ -72,7 +72,7 @@ public class AllowedRolesSetting extends AbstractSetting {
 						return text.toString();
 					})
 					.flatMap(text -> context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(text, channel)));
+							.flatMap(channel -> DiscordUtils.sendMessage(text, channel)));
 		}
 
 		dbGuild.setSetting(this.getSetting(), allowedRoles);

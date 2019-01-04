@@ -12,7 +12,7 @@ import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -58,7 +58,7 @@ public class BlacklistSettingCmd extends AbstractSetting {
 
 		dbGuild.setSetting(this.getSetting(), blacklist);
 		return context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` %s to the blacklist.",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` %s to the blacklist.",
 						FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "), actionVerbose),
 						channel))
 				.then();

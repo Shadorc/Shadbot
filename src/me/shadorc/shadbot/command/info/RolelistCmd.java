@@ -16,7 +16,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -59,7 +59,7 @@ public class RolelistCmd extends AbstractCommand {
 				.zipWith(context.getAvatarUrl())
 				.map(embedAndAvatarUrl -> embedAndAvatarUrl.getT1().setAuthor("Rolelist", null, embedAndAvatarUrl.getT2()))
 				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 

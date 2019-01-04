@@ -20,7 +20,7 @@ import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
@@ -59,7 +59,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		this.schedule(Mono.fromRunnable(this::stop)
 				.then(this.getContext().getChannel())
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
 						this.trivia.getCorrectAnswer()), channel)),
 				LIMITED_TIME, ChronoUnit.SECONDS);
 		this.startTime = System.currentTimeMillis();
@@ -88,7 +88,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 						.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
 						.setFooter(String.format("You have %d seconds to answer.", LIMITED_TIME), null))
 				.flatMap(embed -> this.getContext().getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 
@@ -102,7 +102,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 
 		this.stop();
 		return this.getContext().getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won **%d coins**.",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won **%d coins**.",
 						member.getUsername(), gains), channel));
 	}
 
@@ -129,7 +129,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 					Mono<Message> monoMessage;
 					if(this.alreadyAnswered.containsKey(member.getId())) {
 						monoMessage = event.getMessage().getChannel()
-								.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
+								.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
 										member.getUsername()), channel));
 						this.alreadyAnswered.put(member.getId(), true);
 					} else if(answer.equalsIgnoreCase(this.trivia.getCorrectAnswer())) {
@@ -137,7 +137,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 
 					} else {
 						monoMessage = event.getMessage().getChannel()
-								.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
+								.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
 										member.getUsername()), channel));
 						this.alreadyAnswered.put(member.getId(), false);
 					}

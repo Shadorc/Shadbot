@@ -13,8 +13,11 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 
 public class DBGuild {
@@ -129,6 +132,31 @@ public class DBGuild {
 				.stream()
 				.map(listClass::cast)
 				.collect(Collectors.toList());
+	}
+
+	public boolean hasAllowedRole(List<Role> roles) {
+		final List<Snowflake> allowedRoles = this.getAllowedRoles();
+		// If the user is an administrator OR no permissions have been set OR the role is allowed
+		return allowedRoles.isEmpty()
+				|| roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
+				|| roles.stream().anyMatch(role -> allowedRoles.contains(role.getId()));
+	}
+
+	public boolean isCommandAllowed(AbstractCommand cmd) {
+		final List<String> blacklistedCmd = this.getBlacklistedCmd();
+		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
+	}
+
+	public boolean isTextChannelAllowed(Snowflake channelId) {
+		final List<Snowflake> allowedTextChannels = this.getAllowedTextChannels();
+		// If no permission has been set OR the text channel is allowed
+		return allowedTextChannels.isEmpty() || allowedTextChannels.contains(channelId);
+	}
+
+	public boolean isVoiceChannelAllowed(Snowflake channelId) {
+		final List<Snowflake> allowedVoiceChannels = this.getAllowedVoiceChannels();
+		// If no permission has been set OR the voice channel is allowed
+		return allowedVoiceChannels.isEmpty() || allowedVoiceChannels.contains(channelId);
 	}
 
 	public void setSetting(SettingEnum setting, Object value) {

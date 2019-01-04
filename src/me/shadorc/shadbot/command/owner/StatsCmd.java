@@ -15,7 +15,7 @@ import me.shadorc.shadbot.data.stats.StatisticEnum;
 import me.shadorc.shadbot.data.stats.core.MapStatistic;
 import me.shadorc.shadbot.data.stats.core.TableStatistic;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -34,7 +34,7 @@ public class StatsCmd extends AbstractCommand {
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getAverageEmbed().setAuthor("Stats: average", null, avatarUrl))
 					.flatMap(embed -> context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
@@ -82,7 +82,7 @@ public class StatsCmd extends AbstractCommand {
 		return context.getAvatarUrl()
 				.map(avatarUrl -> embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, avatarUrl))
 				.flatMap(embedItr -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embedItr, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(embedItr, channel)))
 				.then();
 	}
 

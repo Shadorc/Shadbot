@@ -10,7 +10,7 @@ import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -51,7 +51,7 @@ public class NSFWSetting extends AbstractSetting {
 
 					return channel.edit(spec -> spec.setNsfw(isNSFW.get()));
 				})
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) This channel is now **%sSFW**.",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) This channel is now **%sSFW**.",
 						context.getUsername(), channel.isNsfw() ? "N" : ""), channel))
 				.then();
 	}

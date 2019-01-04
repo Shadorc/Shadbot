@@ -7,7 +7,7 @@ import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
@@ -72,7 +72,7 @@ public class VoiceStateUpdateListener {
 					return Mono.empty();
 				})
 				.flatMap(content -> guildMusic.getMessageChannel()
-						.flatMap(channel -> BotUtils.sendMessage(content.toString(), channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(content.toString(), channel)))
 				.then();
 	}
 

@@ -9,7 +9,6 @@ import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.TrackScheduler;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -29,7 +28,7 @@ public class VolumeCmd extends AbstractCommand {
 					final TrackScheduler scheduler = guildMusic.getTrackScheduler();
 					if(!context.getArg().isPresent()) {
 						return context.getChannel()
-								.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.SOUND + " (**%s**) Current volume level: **%d%%**",
+								.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SOUND + " (**%s**) Current volume level: **%d%%**",
 										context.getUsername(), scheduler.getAudioPlayer().getVolume()), channel));
 					}
 
@@ -41,7 +40,7 @@ public class VolumeCmd extends AbstractCommand {
 
 					scheduler.setVolume(volume);
 					return context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
+							.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
 									scheduler.getAudioPlayer().getVolume(), context.getUsername()),
 									channel));
 				})

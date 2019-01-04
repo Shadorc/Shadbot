@@ -14,7 +14,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -50,7 +50,7 @@ public class TriviaCmd extends AbstractCommand {
 							.addField("ID", FormatUtils.format(this.categories.getIds(), id -> Integer.toString(id), "\n"), true)
 							.addField("Name", String.join("\n", this.categories.getNames()), true))
 					.flatMap(embed -> context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
@@ -67,7 +67,7 @@ public class TriviaCmd extends AbstractCommand {
 			return triviaManager.show();
 		} else {
 			return context.getChannel()
-					.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Trivia game has already been started.",
+					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Trivia game has already been started.",
 							context.getUsername()), channel))
 					.then();
 		}

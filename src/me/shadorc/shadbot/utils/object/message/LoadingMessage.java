@@ -14,7 +14,6 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.exception.ExceptionHandler;
-import me.shadorc.shadbot.utils.BotUtils;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -78,7 +77,7 @@ public class LoadingMessage implements Publisher<Void> {
 	public Mono<Message> send(String content) {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
-				.flatMap(channel -> BotUtils.sendMessage(content, channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(content, channel))
 				.doAfterTerminate(this::stopTyping);
 	}
 
@@ -88,7 +87,7 @@ public class LoadingMessage implements Publisher<Void> {
 	public Mono<Message> send(EmbedCreateSpec embed) {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
-				.flatMap(channel -> BotUtils.sendMessage(embed, channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
 				.doAfterTerminate(this::stopTyping);
 	}
 

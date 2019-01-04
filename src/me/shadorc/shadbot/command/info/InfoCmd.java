@@ -9,6 +9,7 @@ import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.util.VersionUtil;
 import me.shadorc.shadbot.Config;
@@ -18,7 +19,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -60,7 +61,7 @@ public class InfoCmd extends AbstractCommand {
 
 		final long start = System.currentTimeMillis();
 		return context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Loading info...", context.getUsername()), channel))
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Loading info...", context.getUsername()), channel))
 				.flatMap(message -> Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
 						guildCountMono, voiceChannelCountMono, memberCountMono,
 						Mono.just(TimeUtils.getMillisUntil(start)))

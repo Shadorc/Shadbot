@@ -17,7 +17,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
@@ -45,7 +45,7 @@ public class ChatCmd extends AbstractCommand {
 				final String response = this.talk(context.getChannelId(), BOTS.get(botName), arg);
 				ERROR_COUNT.set(0);
 				return context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", botName, response), channel))
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", botName, response), channel))
 						.then();
 			} catch (final IOException err) {
 				LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botName);
@@ -59,7 +59,7 @@ public class ChatCmd extends AbstractCommand {
 		}
 
 		return context.getChannel()
-				.flatMap(channel -> BotUtils.sendMessage(
+				.flatMap(channel -> DiscordUtils.sendMessage(
 						String.format(Emoji.SLEEPING + " (**%s**) Sorry, A.L.I.C.E. seems to be AFK, she'll probably come back later.",
 								context.getUsername()), channel))
 				.then();

@@ -19,7 +19,7 @@ import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -140,7 +140,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 				.collectSortedList()
 				.map(list -> this.results = String.join(", ", list))
 				.then(this.getContext().getChannel())
-				.flatMap(channel -> BotUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
 						winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"), channel))
 				.then(this.show())
 				.then(Mono.fromRunnable(this::stop));

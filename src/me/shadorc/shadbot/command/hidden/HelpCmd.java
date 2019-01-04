@@ -5,6 +5,7 @@ import java.util.Map;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandInitializer;
@@ -13,7 +14,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
-import me.shadorc.shadbot.utils.BotUtils;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.HelpBuilder;
 import reactor.core.publisher.Flux;
@@ -34,7 +35,7 @@ public class HelpCmd extends AbstractCommand {
 			StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_HELPED, cmd);
 			return cmd.getHelp(context)
 					.flatMap(embed -> context.getChannel()
-							.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
@@ -42,7 +43,7 @@ public class HelpCmd extends AbstractCommand {
 				.flatMap(authorPerm -> Flux.fromIterable(CommandInitializer.getCommands().values())
 						.distinct()
 						.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
-						.filter(cmd -> context.isDm() || BotUtils.isCommandAllowed(context.getGuildId(), cmd))
+						.filter(cmd -> context.isDm() || Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd))
 						.collectMultimap(AbstractCommand::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
 				.zipWith(context.getAvatarUrl())
 				.map(tuple -> {
@@ -65,7 +66,7 @@ public class HelpCmd extends AbstractCommand {
 					return embed;
 				})
 				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> BotUtils.sendMessage(embed, channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 
