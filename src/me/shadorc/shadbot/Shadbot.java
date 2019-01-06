@@ -86,6 +86,7 @@ public class Shadbot {
 
 		final JdkStoreService sharedStore = new JdkStoreService();
 		final DiscordClientBuilder builder = new DiscordClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
+				.setEventScheduler(Schedulers.elastic())
 				.setStoreService(sharedStore)
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
 				.setShardCount(SHARD_COUNT)
