@@ -127,9 +127,7 @@ public class Shadbot {
 			DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
 			DiscordUtils.register(event.getClient(), GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
 		})
-				.then(Mono.just(CONNECTED_SHARDS.get()))
-				.filter(SHARD_COUNT::equals)
-				.flatMap(ignored -> Shadbot.onFullyConnected());
+				.then(CONNECTED_SHARDS.get() == SHARD_COUNT ? Shadbot.onFullyConnected() : Mono.empty());
 	}
 
 	/**
