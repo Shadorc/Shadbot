@@ -119,13 +119,15 @@ public class ExceptionHandler {
 	}
 
 	private static Mono<Message> onForbidden(ClientException err) {
-		return Mono.fromRunnable(() -> LogUtils.info("%d %s: %s", err.getStatus().code(), err.getStatus().reasonPhrase(),
-				err.getErrorResponse().getFields().get("message").toString()));
+		//TODO: Remove
+		LogUtils.error(err, "Debugging 403 Forbidden");
+		return Mono.fromRunnable(() -> LogUtils.info("%s: %s", err.getStatus(), err.getErrorResponse().getFields().get("message").toString()));
 	}
 
 	private static Mono<Message> onNotFound(ClientException err) {
-		return Mono.fromRunnable(() -> LogUtils.info("%d %s: %s", err.getStatus().code(), err.getStatus().reasonPhrase(),
-				err.getErrorResponse().getFields().get("message").toString()));
+		//TODO: Remove
+		LogUtils.error(err, "Debugging 404 Not found");
+		return Mono.fromRunnable(() -> LogUtils.info("%s: %s", err.getStatus(), err.getErrorResponse().getFields().get("message").toString()));
 	}
 
 	private static Mono<Message> onUnknown(DiscordClient client, Throwable err) {

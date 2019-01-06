@@ -7,7 +7,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.reactivestreams.Publisher;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
@@ -180,10 +179,11 @@ public class DiscordUtils {
 	 * @param eventClass - the class of the event to register
 	 * @param mapper - the mapper to execute when the event is triggered
 	 */
-	public static <T extends Event, R> void register(DiscordClient client, Class<T> eventClass, Function<? super T, ? extends Publisher<? extends R>> mapper) {
+	public static <T extends Event> void register(DiscordClient client, Class<T> eventClass, Function<T, Mono<Void>> mapper) {
 		client.getEventDispatcher()
 				.on(eventClass)
-				.flatMap(mapper)
+				.flatMap(event -> mapper.apply(event)
+						.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, client)))
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
 				.subscribe();
 	}
@@ -192,14 +192,15 @@ public class DiscordUtils {
 	 * @param client - the client on which register the event
 	 * @param mapper - the mapper to execute when the client is fully ready
 	 */
-	public static <R> void registerFullyReadyEvent(DiscordClient client, Function<? super GuildCreateEvent, ? extends Publisher<? extends R>> mapper) {
+	public static void registerFullyReadyEvent(DiscordClient client, Function<GuildCreateEvent, Mono<Void>> mapper) {
 		client.getEventDispatcher().on(ReadyEvent.class)
 				.map(event -> event.getGuilds().size())
 				.flatMap(size -> client.getEventDispatcher()
 						.on(GuildCreateEvent.class)
 						.take(size)
 						.last())
-				.flatMap(mapper)
+				.flatMap(event -> mapper.apply(event)
+						.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, client)))
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
 				.subscribe();
 	}

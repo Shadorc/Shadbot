@@ -34,9 +34,9 @@ public class MemberListener {
 
 	}
 
-	public static Mono<Message> onMemberLeave(MemberLeaveEvent event) {
+	public static Mono<Void> onMemberLeave(MemberLeaveEvent event) {
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId());
-		return MemberListener.sendAutoMsg(event.getClient(), event.getUser(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage());
+		return MemberListener.sendAutoMsg(event.getClient(), event.getUser(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage()).then();
 	}
 
 	private static Mono<Message> sendAutoMsg(DiscordClient client, User user, Optional<Snowflake> channelId, Optional<String> message) {
