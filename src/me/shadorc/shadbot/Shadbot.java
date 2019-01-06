@@ -84,7 +84,9 @@ public class Shadbot {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 
+		final JdkStoreService sharedStore = new JdkStoreService();
 		final DiscordClientBuilder builder = new DiscordClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
+				.setStoreService(sharedStore)
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
 				.setShardCount(SHARD_COUNT)
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
