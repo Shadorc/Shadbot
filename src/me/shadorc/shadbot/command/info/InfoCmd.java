@@ -9,7 +9,6 @@ import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.util.VersionUtil;
 import me.shadorc.shadbot.Config;

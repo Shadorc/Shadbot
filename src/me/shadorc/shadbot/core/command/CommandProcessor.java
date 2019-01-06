@@ -35,7 +35,6 @@ public class CommandProcessor {
 			return Mono.empty();
 		}
 
-
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId().get());
 		final String content = event.getMessage().getContent().get();
 		return event.getMessage().getAuthorAsMember()
