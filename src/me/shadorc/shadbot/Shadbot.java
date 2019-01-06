@@ -99,7 +99,7 @@ public class Shadbot {
 			final DiscordClient client = builder.setShardIndex(index).build();
 			CLIENTS.add(client);
 
-			DiscordUtils.register(client, ReadyEvent.class, GatewayLifecycleListener::onReadyEvent);
+			DiscordUtils.register(client, ReadyEvent.class, ReadyListener::onReadyEvent);
 			DiscordUtils.register(client, TextChannelDeleteEvent.class, ChannelListener::onTextChannelDelete);
 			DiscordUtils.register(client, GuildDeleteEvent.class, GuildListener::onGuildDelete);
 			DiscordUtils.register(client, MemberJoinEvent.class, MemberListener::onMemberJoin);
