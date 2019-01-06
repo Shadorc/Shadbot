@@ -120,16 +120,12 @@ public class Shadbot {
 	 * Triggered when all the guilds have been received from a client
 	 */
 	private static Mono<Void> onFullyReadyEvent(GuildCreateEvent event) {
-		return Mono.fromRunnable(() -> {
-			CONNECTED_SHARDS.incrementAndGet();
+		CONNECTED_SHARDS.incrementAndGet();
 
-			LogUtils.info("{Shard %d} Fully ready. %s left...",
-					event.getClient().getConfig().getShardIndex(), StringUtils.pluralOf(SHARD_COUNT - CONNECTED_SHARDS.get(), "shard"));
+		LogUtils.info("{Shard %d} Fully ready.", event.getClient().getConfig().getShardIndex());
 
-			DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
-			DiscordUtils.register(event.getClient(), GatewayLifecycleEvent.class, GatewayLifecycleListener::onGatewayLifecycleEvent);
-		})
-				.then(CONNECTED_SHARDS.get() == SHARD_COUNT ? Shadbot.onFullyConnected() : Mono.empty());
+		DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
+		return CONNECTED_SHARDS.get() == SHARD_COUNT ? Shadbot.onFullyConnected() : Mono.empty();
 	}
 
 	/**
@@ -140,10 +136,9 @@ public class Shadbot {
 			LogUtils.info("Shadbot is connected to all guilds.");
 			Shadbot.botListStats = new BotListStats(CLIENTS.get(0).getSelfId().get());
 		})
-				.thenMany(Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7)))
-				.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
-				.onErrorContinue((err, obj) -> LogUtils.error(err, "An unknown error occurred during the lottery draw."))
-				.then();
+				.and(Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
+						.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
+						.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, CLIENTS.get(0))));
 	}
 
 	/**
