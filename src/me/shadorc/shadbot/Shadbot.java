@@ -55,7 +55,7 @@ import reactor.core.scheduler.Schedulers;
 public class Shadbot {
 
 	private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
-	private static final Integer SHARD_COUNT = 11;
+	private static final int SHARD_COUNT = 11;
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 
