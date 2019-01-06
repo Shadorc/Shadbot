@@ -34,7 +34,7 @@ public class AudioEventListener extends AudioEventAdapter {
 				FormatUtils.trackName(track.getInfo()));
 		this.guildMusic.getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(message, channel))
-				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, guildMusic.getClient()))
+				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.guildMusic.getClient()))
 				.subscribe();
 	}
 
@@ -43,7 +43,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		if(endReason.mayStartNext) {
 			this.errorCount.set(0); // Everything seems to be fine, reset error counter.
 			this.nextOrEnd()
-					.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, guildMusic.getClient()))
+					.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.guildMusic.getClient()))
 					.subscribe();
 		}
 	}
@@ -71,7 +71,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		this.guildMusic.getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then(this.nextOrEnd())
-				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, guildMusic.getClient()))
+				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, this.guildMusic.getClient()))
 				.subscribe();
 	}
 
@@ -83,7 +83,7 @@ public class AudioEventListener extends AudioEventAdapter {
 				.flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
 						channel))
 				.then(this.nextOrEnd())
-				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, guildMusic.getClient()))
+				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.guildMusic.getClient()))
 				.subscribe();
 	}
 
