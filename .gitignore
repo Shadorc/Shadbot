@@ -23,6 +23,6 @@ Thumbs.db
 # Project Files
 saves/
 stats/
-Shadbot.log
+Shadbot.log*
 clean.bat
 credentials.properties
