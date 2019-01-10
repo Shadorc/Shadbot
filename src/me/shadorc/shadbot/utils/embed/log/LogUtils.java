@@ -57,7 +57,7 @@ public class LogUtils {
 				.cast(MessageChannel.class)
 				.flatMap(channel -> DiscordUtils.sendMessage(embed.build(), channel))
 				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, client))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
 	}
 
 }

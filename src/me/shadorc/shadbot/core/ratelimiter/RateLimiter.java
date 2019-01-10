@@ -65,7 +65,7 @@ public class RateLimiter {
 				})
 				.flatMap(new TemporaryMessage(client, channelId, 10, ChronoUnit.SECONDS)::send)
 				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, client))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
 	}
 
 }

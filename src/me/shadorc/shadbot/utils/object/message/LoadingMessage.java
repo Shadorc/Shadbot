@@ -40,7 +40,7 @@ public class LoadingMessage implements Publisher<Void> {
 
 		this.startTyping()
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
 	}
 
 	/**

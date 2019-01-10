@@ -164,7 +164,7 @@ public class LotteryCmd extends AbstractCommand {
 											FormatUtils.coins(coins)), privateChannel));
 						}))
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
 
 		LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
 				winningNum, winners.size(), Shadbot.getLottery().getJackpot());

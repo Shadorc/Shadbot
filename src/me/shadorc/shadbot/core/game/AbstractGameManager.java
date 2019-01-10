@@ -82,7 +82,7 @@ public abstract class AbstractGameManager {
 				.then(Mono.fromRunnable(() -> this.isDone.set(true)))
 				.then(mono)
 				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.getContext().getClient()))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.getContext().getClient()));
 	}
 
 	public void cancelScheduledTask() {

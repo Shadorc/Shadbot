@@ -35,7 +35,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		this.guildMusic.getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(message, channel))
 				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.guildMusic.getClient()))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.guildMusic.getClient()));
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class AudioEventListener extends AudioEventAdapter {
 			this.errorCount.set(0); // Everything seems to be fine, reset error counter.
 			this.nextOrEnd()
 					.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.guildMusic.getClient()))
-					.subscribe();
+					.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.guildMusic.getClient()));
 		}
 	}
 
@@ -72,7 +72,7 @@ public class AudioEventListener extends AudioEventAdapter {
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then(this.nextOrEnd())
 				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, this.guildMusic.getClient()))
-				.subscribe();
+				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(thr, this.guildMusic.getClient()));
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class AudioEventListener extends AudioEventAdapter {
 						channel))
 				.then(this.nextOrEnd())
 				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.guildMusic.getClient()))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.guildMusic.getClient()));
 	}
 
 	private Mono<Void> nextOrEnd() {

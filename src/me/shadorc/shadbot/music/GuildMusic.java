@@ -72,7 +72,7 @@ public class GuildMusic {
 		this.leaveTask = Mono.delay(Duration.ofMinutes(1))
 				.then(Mono.fromRunnable(this::leaveVoiceChannel))
 				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, this.client))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.client));
 	}
 
 	public void cancelLeave() {

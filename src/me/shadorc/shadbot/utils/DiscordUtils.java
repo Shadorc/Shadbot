@@ -185,7 +185,7 @@ public class DiscordUtils {
 				.flatMap(event -> mapper.apply(event)
 						.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, client)))
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class DiscordUtils {
 				.flatMap(event -> mapper.apply(event)
 						.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, client)))
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
-				.subscribe();
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
 	}
 
 	public static Mono<Void> requirePermissions(Channel channel, Snowflake userId, UserType userType, Permission... permissions) {
