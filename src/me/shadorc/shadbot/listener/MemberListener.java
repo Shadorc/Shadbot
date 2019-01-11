@@ -23,14 +23,13 @@ public class MemberListener {
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId());
 		return Mono.just(MemberListener.sendAutoMsg(event.getClient(), event.getMember(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage()))
 				// Add auto-role(s) to the new member
-				.then(event.getGuild())
-				.flatMap(guild -> Mono.justOrEmpty(event.getClient().getSelfId())
-						.flatMap(selfId -> guild.getMemberById(selfId)))
-				.flatMap(Member::getBasePermissions)
-				.filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
-				.flatMapMany(ignored -> Flux.fromIterable(dbGuild.getAutoRoles()))
-				.flatMap(roleId -> event.getMember().addRole(roleId))
-				.then();
+				.and(event.getGuild()
+						.flatMap(guild -> Mono.justOrEmpty(event.getClient().getSelfId())
+								.flatMap(selfId -> guild.getMemberById(selfId)))
+						.flatMap(Member::getBasePermissions)
+						.filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
+						.flatMapMany(ignored -> Flux.fromIterable(dbGuild.getAutoRoles()))
+						.flatMap(roleId -> event.getMember().addRole(roleId)));
 
 	}
 
