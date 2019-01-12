@@ -37,7 +37,7 @@ public class CommandProcessor {
 
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId().get());
 		final String content = event.getMessage().getContent().get();
-		return event.getMessage().getAuthorAsMember()
+		return Mono.justOrEmpty(event.getMember())
 				// The author is not a bot
 				.filter(member -> !member.isBot())
 				.flatMap(member -> member.getRoles().collectList())
