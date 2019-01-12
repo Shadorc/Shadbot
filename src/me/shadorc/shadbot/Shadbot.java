@@ -25,6 +25,7 @@ import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.gateway.SimpleBucket;
+import discord4j.rest.request.SingleRouterFactory;
 import me.shadorc.shadbot.command.game.LotteryCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.data.credential.Credential;
@@ -42,8 +43,6 @@ import me.shadorc.shadbot.listener.MessageUpdateListener;
 import me.shadorc.shadbot.listener.ReactionListener;
 import me.shadorc.shadbot.listener.ReadyListener;
 import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
-import me.shadorc.shadbot.store.ShardJdkStoreService;
-import me.shadorc.shadbot.store.ShardStoreRegistry;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -87,9 +86,10 @@ public class Shadbot {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 
-		final ShardStoreRegistry registry = new ShardStoreRegistry();
+		// final ShardStoreRegistry registry = new ShardStoreRegistry();
 		final DiscordClientBuilder builder = new DiscordClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
 				.setEventScheduler(Schedulers.elastic())
+				.setRouterFactory(new SingleRouterFactory())
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
 				.setShardCount(SHARD_COUNT)
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
@@ -97,7 +97,8 @@ public class Shadbot {
 		LogUtils.info("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
 		for(int index = 0; index < builder.getShardCount(); index++) {
 			final DiscordClient client = builder.setShardIndex(index)
-					.setStoreService(new ShardJdkStoreService(registry))
+					// FIXME
+					// .setStoreService(new ShardJdkStoreService(registry))
 					.build();
 			CLIENTS.add(client);
 
