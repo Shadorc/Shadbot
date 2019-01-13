@@ -43,6 +43,8 @@ import me.shadorc.shadbot.listener.MessageUpdateListener;
 import me.shadorc.shadbot.listener.ReactionListener;
 import me.shadorc.shadbot.listener.ReadyListener;
 import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
+import me.shadorc.shadbot.store.ShardJdkStoreService;
+import me.shadorc.shadbot.store.ShardStoreRegistry;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -85,7 +87,7 @@ public class Shadbot {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 
-		// final ShardStoreRegistry registry = new ShardStoreRegistry();
+		final ShardStoreRegistry registry = new ShardStoreRegistry();
 		final DiscordClientBuilder builder = new DiscordClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
 				.setEventScheduler(Schedulers.elastic())
 				.setRouterFactory(new SingleRouterFactory())
@@ -96,8 +98,7 @@ public class Shadbot {
 		LogUtils.info("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
 		for(int index = 0; index < builder.getShardCount(); index++) {
 			final DiscordClient client = builder.setShardIndex(index)
-					// FIXME
-					// .setStoreService(new ShardJdkStoreService(registry))
+					.setStoreService(new ShardJdkStoreService(registry))
 					.build();
 			CLIENTS.add(client);
 
