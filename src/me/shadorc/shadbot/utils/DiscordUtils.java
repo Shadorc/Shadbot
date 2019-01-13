@@ -8,6 +8,13 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.BooleanUtils;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+
+import discord4j.common.jackson.PossibleModule;
+import discord4j.common.jackson.UnknownPropertyHandler;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
@@ -27,6 +34,15 @@ import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.RestClient;
+import discord4j.rest.http.ExchangeStrategies;
+import discord4j.rest.http.client.DiscordWebClient;
+import discord4j.rest.json.response.GatewayResponse;
+import discord4j.rest.request.DefaultRouter;
+import discord4j.rest.route.Routes;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaders;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
@@ -40,6 +56,7 @@ import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 public class DiscordUtils {
 
@@ -92,6 +109,27 @@ public class DiscordUtils {
 					}
 					StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT);
 				});
+	}
+
+	public static Mono<Integer> getRecommendedShardCount(String token) {
+		final ObjectMapper mapper = new ObjectMapper()
+				.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+				.addHandler(new UnknownPropertyHandler(false))
+				.registerModules(new PossibleModule(), new Jdk8Module());
+
+		final HttpHeaders defaultHeaders = new DefaultHttpHeaders();
+		defaultHeaders.add(HttpHeaderNames.CONTENT_TYPE, "application/json");
+		defaultHeaders.add(HttpHeaderNames.AUTHORIZATION, "Bot " + token);
+		defaultHeaders.add(HttpHeaderNames.USER_AGENT, "DiscordBot(https://discord4j.com, v3)");
+
+		final HttpClient httpClient = HttpClient.create().baseUrl(Routes.BASE_URL).compress(true);
+
+		final DiscordWebClient webClient = new DiscordWebClient(httpClient, defaultHeaders,
+				ExchangeStrategies.withJacksonDefaults(mapper));
+
+		final RestClient restClient = new RestClient(new DefaultRouter(webClient));
+
+		return restClient.getGatewayService().getGatewayBot().map(GatewayResponse::getShards);
 	}
 
 	/**

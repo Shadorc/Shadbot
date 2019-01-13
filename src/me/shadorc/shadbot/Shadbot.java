@@ -55,7 +55,6 @@ import reactor.core.scheduler.Schedulers;
 public class Shadbot {
 
 	private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
-	private static final int SHARD_COUNT = 11;
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 
@@ -91,7 +90,7 @@ public class Shadbot {
 				.setEventScheduler(Schedulers.elastic())
 				.setRouterFactory(new SingleRouterFactory())
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
-				.setShardCount(SHARD_COUNT)
+				.setShardCount(DiscordUtils.getRecommendedShardCount(Credentials.get(Credential.DISCORD_TOKEN)).block())
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
 		LogUtils.info("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
@@ -128,7 +127,7 @@ public class Shadbot {
 		LogUtils.info("{Shard %d} Fully ready.", event.getClient().getConfig().getShardIndex());
 
 		DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
-		return CONNECTED_SHARDS.get() == SHARD_COUNT ? Shadbot.onFullyConnected() : Mono.empty();
+		return CONNECTED_SHARDS.get() == event.getClient().getConfig().getShardCount() ? Shadbot.onFullyConnected() : Mono.empty();
 	}
 
 	/**
