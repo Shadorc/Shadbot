@@ -69,10 +69,12 @@
 		</plugins>
 	</build>
 	<repositories>
+		<!-- lavaplayer repository -->
 		<repository>
 			<id>jcenter</id>
 			<url>http://jcenter.bintray.com</url>
 		</repository>
+		<!-- Discord4J repository -->
 		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
@@ -83,11 +85,6 @@
 			<groupId>com.github.Discord4J</groupId>
 			<artifactId>Discord4J</artifactId>
 			<version>v3-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.Discord4J.Stores</groupId>
-			<artifactId>stores-jdk</artifactId>
-			<version>master-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
