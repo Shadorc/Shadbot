@@ -30,8 +30,10 @@ public class ShardAwareStore<K extends Comparable<K>, V extends Serializable> im
 	@Override
 	public Mono<Void> save(Publisher<Tuple2<K, V>> entryStream) {
 		return Flux.from(entryStream)
-				.doOnNext(t -> this.valueStore.save(t.getT1(), t.getT2()))
-				.doOnNext(t -> this.keySet.add(t.getT1()))
+				.flatMap(t -> {
+					this.keySet.add(t.getT1());
+					return this.valueStore.save(t.getT1(), t.getT2());
+				})
 				.then();
 	}
 
@@ -59,16 +61,20 @@ public class ShardAwareStore<K extends Comparable<K>, V extends Serializable> im
 	@Override
 	public Mono<Void> delete(Publisher<K> ids) {
 		return Flux.from(ids)
-				.doOnNext(this.valueStore::delete)
-				.doOnNext(this.keySet::remove)
+				.flatMap(id -> {
+					this.keySet.remove(id);
+					return this.valueStore.delete(id);
+				})
 				.then();
 	}
 
 	@Override
 	public Mono<Void> deleteInRange(K start, K end) {
 		return this.valueStore.keys().filter(new WithinRangePredicate<>(start, end))
-				.doOnNext(this.valueStore::delete)
-				.doOnNext(this.keySet::remove)
+				.flatMap(id -> {
+					this.keySet.remove(id);
+					return this.valueStore.delete(id);
+				})
 				.then();
 	}
 
