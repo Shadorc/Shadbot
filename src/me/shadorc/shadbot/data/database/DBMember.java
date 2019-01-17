@@ -49,4 +49,9 @@ public class DBMember {
 		this.coins.set(0);
 	}
 
+	@Override
+	public String toString() {
+		return String.format("DBMember [guildId=%s, memberId=%s, coins=%s]", guildId, memberId, coins);
+	}
+
 }

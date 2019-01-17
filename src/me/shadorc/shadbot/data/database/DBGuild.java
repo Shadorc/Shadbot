@@ -160,4 +160,9 @@ public class DBGuild {
 		this.members.add(dbMember);
 	}
 
+	@Override
+	public String toString() {
+		return String.format("DBGuild [guildId=%s, members=%s, settings=%s]", guildId, members, settings);
+	}
+
 }
