@@ -51,7 +51,7 @@ public class DBMember {
 
 	@Override
 	public String toString() {
-		return String.format("DBMember [guildId=%s, memberId=%s, coins=%s]", guildId, memberId, coins);
+		return String.format("DBMember [guildId=%s, memberId=%s, coins=%s]", this.guildId, this.memberId, this.coins);
 	}
 
 }

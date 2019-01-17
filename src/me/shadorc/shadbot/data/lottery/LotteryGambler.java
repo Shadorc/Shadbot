@@ -1,8 +1,8 @@
 package me.shadorc.shadbot.data.lottery;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
 

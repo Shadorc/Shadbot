@@ -39,7 +39,7 @@ public class BotListStats {
 			return Mono.empty();
 		}
 
-		return clients.get(0).getGuilds()
+		return this.clients.get(0).getGuilds()
 				.count()
 				.doOnNext(guildCount -> {
 					LogUtils.info("Posting statistics...");
@@ -102,7 +102,7 @@ public class BotListStats {
 	 * Documentation: https://discordbotlist.com/api-docs
 	 */
 	private void postOnDiscordBotListDotCom(Long guildCount) {
-		for(final DiscordClient client : clients) {
+		for(final DiscordClient client : this.clients) {
 			final JSONObject content = new JSONObject()
 					.put("shard_id", client.getConfig().getShardIndex())
 					.put("guilds ", guildCount);
@@ -121,7 +121,7 @@ public class BotListStats {
 	 * Documentation: https://discord.bots.gg/docs/endpoints
 	 */
 	private void postOnDiscordBotsDotGg(Long guildCount) {
-		for(final DiscordClient client : clients) {
+		for(final DiscordClient client : this.clients) {
 			final JSONObject content = new JSONObject()
 					.put("shardId", client.getConfig().getShardIndex())
 					.put("shardCount", client.getConfig().getShardCount())
@@ -141,7 +141,7 @@ public class BotListStats {
 	 * Documentation: https://discordbots.org/api/docs#bots
 	 */
 	private void postOnDiscordBotsDotOrg(Long guildCount) {
-		for(final DiscordClient client : clients) {
+		for(final DiscordClient client : this.clients) {
 			final JSONObject content = new JSONObject()
 					.put("shard_id", client.getConfig().getShardIndex())
 					.put("shard_count", client.getConfig().getShardCount())

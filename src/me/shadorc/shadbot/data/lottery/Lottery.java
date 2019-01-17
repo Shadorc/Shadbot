@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
