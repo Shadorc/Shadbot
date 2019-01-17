@@ -2,13 +2,15 @@ package me.shadorc.shadbot.data.database;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.NumberUtils;
 
+@JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class DBMember {
 
 	private final long guildId;
@@ -27,17 +29,14 @@ public class DBMember {
 		this(Snowflake.of(0L), Snowflake.of(0L));
 	}
 
-	@JsonIgnore
 	public Snowflake getGuildId() {
 		return Snowflake.of(this.guildId);
 	}
 
-	@JsonIgnore
 	public Snowflake getId() {
 		return Snowflake.of(this.memberId);
 	}
 
-	@JsonIgnore
 	public int getCoins() {
 		return this.coins.get();
 	}

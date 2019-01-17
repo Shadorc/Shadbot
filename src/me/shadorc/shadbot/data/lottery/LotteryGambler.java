@@ -1,10 +1,12 @@
 package me.shadorc.shadbot.data.lottery;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 import discord4j.core.object.util.Snowflake;
 
+@JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class LotteryGambler {
 
 	@JsonProperty("guild_id")
@@ -24,17 +26,14 @@ public class LotteryGambler {
 		this(Snowflake.of(0L), Snowflake.of(0L), 0);
 	}
 
-	@JsonIgnore
 	public Snowflake getGuildId() {
 		return Snowflake.of(this.guildId);
 	}
 
-	@JsonIgnore
 	public Snowflake getUserId() {
 		return Snowflake.of(this.userId);
 	}
 
-	@JsonIgnore
 	public int getNumber() {
 		return this.number;
 	}
