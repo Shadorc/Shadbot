@@ -137,7 +137,7 @@ public class Shadbot {
 	private static Mono<Void> onFullyConnected() {
 		return Mono.fromRunnable(() -> {
 			LogUtils.info("Shadbot is connected to all guilds.");
-			Shadbot.botListStats = new BotListStats(CLIENTS.get(0).getSelfId().get());
+			Shadbot.botListStats = new BotListStats(CLIENTS);
 		})
 				.and(Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
 						.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
