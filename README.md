@@ -36,7 +36,7 @@
     </ul>
     <hr>
     <h2>Licence</h2>
-    <p>Copyright (C) 2018 <b>Shadorc</b>
+    <p>Copyright (C) 2019 <b>Shadorc</b>
         <pre>
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
