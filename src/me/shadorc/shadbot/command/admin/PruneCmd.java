@@ -31,7 +31,7 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" })
 public class PruneCmd extends AbstractCommand {
 
-	private static final int MAX_MESSAGES = 250;
+	private static final int MAX_MESSAGES = 1_000;
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -101,7 +101,7 @@ public class PruneCmd extends AbstractCommand {
 				.setDescription("Delete messages.")
 				.addArg("@user(s)", "from these users", true)
 				.addArg("\"words\"", "containing these words", true)
-				.addArg("number", "number of messages to delete (max: 100)", true)
+				.addArg("number", String.format("number of messages to delete (max: %d)", MAX_MESSAGES), true)
 				.setExample(String.format("Delete **15** messages from user **@Shadbot** containing **hi guys**:"
 						+ "%n`%s%s @Shadbot \"hi guys\" 15`", context.getPrefix(), this.getName()))
 				.addField("Info", "Messages older than 2 weeks cannot be deleted.", false)
