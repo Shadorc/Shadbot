@@ -46,7 +46,7 @@ public class BanCmd extends AbstractCommand {
 		}
 
 		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.BAN_MEMBERS)
+				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.BAN_MEMBERS)
 						.then(DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.BAN_MEMBERS))
 						.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
 						.flatMapMany(tuple -> {
@@ -65,16 +65,23 @@ public class BanCmd extends AbstractCommand {
 							}
 
 							return Flux.fromIterable(mentions)
-									.concatMap(user -> user.getPrivateChannel()
+									.filter(user -> !user.isBot())
+									.flatMap(user -> user.asMember(context.getGuildId()))
+									.concatMap(member -> member.getPrivateChannel()
 											.cast(MessageChannel.class)
-											.filter(ignored -> !user.isBot())
 											.flatMap(privateChannel -> DiscordUtils.sendMessage(
 													String.format(Emoji.INFO + " You were banned from the server **%s** by **%s**. Reason: `%s`",
 															guild.getName(), context.getUsername(), reason), privateChannel))
-											.then(user.asMember(context.getGuildId()))
-											.flatMap(member -> member.ban(spec -> spec.setReason(reason.toString()).setDeleteMessageDays(7))));
+											.then(member.ban(spec -> spec.setReason(reason.toString()).setDeleteMessageDays(7)))
+											.thenReturn(member));
 						})
-						.then());
+						.collectList()
+						.flatMap(members -> DiscordUtils.sendMessage(
+								String.format(Emoji.INFO + " **%s** banned %s.",
+										context.getUsername(),
+										FormatUtils.format(members, member -> String.format("**%s**", member.getUsername()), ", ")),
+								channel)))
+				.then();
 	}
 
 	@Override

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
@@ -47,7 +46,7 @@ public class KickCmd extends AbstractCommand {
 		}
 
 		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.KICK_MEMBERS)
+				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.KICK_MEMBERS)
 						.then(DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.KICK_MEMBERS))
 						.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
 						.flatMapMany(tuple -> {
@@ -66,17 +65,23 @@ public class KickCmd extends AbstractCommand {
 							}
 
 							return Flux.fromIterable(mentions)
-									.concatMap(user -> user.getPrivateChannel()
+									.filter(user -> !user.isBot())
+									.flatMap(user -> user.asMember(context.getGuildId()))
+									.concatMap(member -> member.getPrivateChannel()
 											.cast(MessageChannel.class)
-											.filter(ignored -> !user.isBot())
 											.flatMap(privateChannel -> DiscordUtils.sendMessage(
 													String.format(Emoji.INFO + " You were kicked from the server **%s** by **%s**. Reason: `%s`",
 															guild.getName(), context.getUsername(), reason), privateChannel))
-											.then(user.asMember(context.getGuildId()))
-											// TODO: Add reason
-											.flatMap(Member::kick));
+											.then(member.kick(/* TODO spec -> spec.setReason(reason.toString()) */))
+											.thenReturn(member));
 						})
-						.then());
+						.collectList()
+						.flatMap(members -> DiscordUtils.sendMessage(
+								String.format(Emoji.INFO + " **%s** kicked %s.",
+										context.getUsername(),
+										FormatUtils.format(members, member -> String.format("**%s**", member.getUsername()), ", ")),
+								channel)))
+				.then();
 	}
 
 	@Override
