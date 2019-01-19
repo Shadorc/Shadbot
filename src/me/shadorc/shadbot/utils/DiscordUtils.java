@@ -245,8 +245,9 @@ public class DiscordUtils {
 
 	public static Mono<Void> requirePermissions(Channel channel, Snowflake userId, UserType userType, Permission... permissions) {
 		return Flux.fromArray(permissions)
-				.filterWhen(permission -> DiscordUtils.hasPermission(channel, userId, permission).map(BooleanUtils::negate))
-				.flatMap(permission -> Mono.error(new MissingPermissionException(userType, permission)))
+				.flatMap(permission -> DiscordUtils.hasPermission(channel, userId, permission)
+						.filter(BooleanUtils::isTrue)
+						.switchIfEmpty(Mono.error(new MissingPermissionException(userType, permission))))
 				.then();
 	}
 
