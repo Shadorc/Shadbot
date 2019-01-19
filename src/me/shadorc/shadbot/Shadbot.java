@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -53,12 +55,14 @@ import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.netty.ConnectionObserver.State;
 
 public class Shadbot {
 
 	private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
+	private static final Map<Integer, State> SHARDS_STATES = new ConcurrentHashMap<>();
 
 	private static DatabaseManager databaseManager;
 	private static PremiumManager premiumManager;
@@ -92,6 +96,7 @@ public class Shadbot {
 				.setEventScheduler(Schedulers.elastic())
 				.setRouterFactory(new SingleRouterFactory())
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
+				.setGatewayObserver((state, identifyOption) -> SHARDS_STATES.put(identifyOption.getShardIndex(), state))
 				.setShardCount(DiscordUtils.getRecommendedShardCount(Credentials.get(Credential.DISCORD_TOKEN)).block())
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
@@ -156,6 +161,10 @@ public class Shadbot {
 	 */
 	public static List<DiscordClient> getClients() {
 		return CLIENTS;
+	}
+
+	public static Map<Integer, State> getShardsStates() {
+		return SHARDS_STATES;
 	}
 
 	public static DatabaseManager getDatabase() {
