@@ -27,7 +27,6 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.ReactionMessage;
 import reactor.core.publisher.Mono;
 
-// TODO: Rework
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "iam" })
 public class IamCmd extends AbstractCommand {
 
@@ -52,40 +51,41 @@ public class IamCmd extends AbstractCommand {
 
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT,
-						Permission.MANAGE_ROLES, Permission.ADD_REACTIONS))
-				.then(Mono.zip(rolesMono, context.getAvatarUrl()))
-				.flatMap(tuple -> {
-					final List<Role> roles = tuple.getT1();
-					final String avatarUrl = tuple.getT2();
+						Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
+						.then(Mono.zip(rolesMono, context.getAvatarUrl()))
+						.flatMap(tuple -> {
+							final List<Role> roles = tuple.getT1();
+							final String avatarUrl = tuple.getT2();
 
-					if(roles.isEmpty()) {
-						throw new MissingArgumentException();
-					}
+							if(roles.isEmpty()) {
+								throw new MissingArgumentException();
+							}
 
-					final StringBuilder description = new StringBuilder();
-					if(quotedElements.isEmpty()) {
-						description.append(String.format("Click on %s to get role(s): %s", REACTION.getRaw(),
-								FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
-					} else {
-						description.append(quotedElements.get(0));
-					}
+							final StringBuilder description = new StringBuilder();
+							if(quotedElements.isEmpty()) {
+								description.append(String.format("Click on %s to get role(s): %s", REACTION.getRaw(),
+										FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
+							} else {
+								description.append(quotedElements.get(0));
+							}
 
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Iam: %s",
-									FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
-									null, avatarUrl)
-							.setDescription(description.toString());
+							final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+									.setAuthor(String.format("Iam: %s",
+											FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
+											null, avatarUrl)
+									.setDescription(description.toString());
 
-					return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
-							.sendMessage(embed)
-							.doOnNext(message -> {
-								final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
-								final Map<String, Long> setting = dbGuild.getIamMessages();
-								roles.stream().map(Role::getId)
-										.forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));
-								dbGuild.setSetting(SettingEnum.IAM_MESSAGES, setting);
-							});
-				}).then();
+							return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
+									.sendMessage(embed)
+									.doOnNext(message -> {
+										final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+										final Map<String, Long> setting = dbGuild.getIamMessages();
+										roles.stream().map(Role::getId)
+												.forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));
+										dbGuild.setSetting(SettingEnum.IAM_MESSAGES, setting);
+									});
+						}))
+				.then();
 	}
 
 	@Override

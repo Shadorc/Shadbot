@@ -46,8 +46,7 @@ public class KickCmd extends AbstractCommand {
 		}
 
 		return context.getChannel()
-				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.KICK_MEMBERS)
-						.then(DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.KICK_MEMBERS))
+				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.KICK_MEMBERS)
 						.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
 						.flatMapMany(tuple -> {
 							final List<User> mentions = tuple.getT1();

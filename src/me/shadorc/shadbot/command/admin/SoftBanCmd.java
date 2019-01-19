@@ -46,8 +46,7 @@ public class SoftBanCmd extends AbstractCommand {
 		}
 
 		return context.getChannel()
-				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.BAN_MEMBERS)
-						.then(DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.BAN_MEMBERS))
+				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.BAN_MEMBERS)
 						.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
 						.flatMapMany(tuple -> {
 							final List<User> mentions = tuple.getT1();

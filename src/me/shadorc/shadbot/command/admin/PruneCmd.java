@@ -40,7 +40,6 @@ public class PruneCmd extends AbstractCommand {
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT,
 						Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
-						.then(DiscordUtils.requirePermissions(channel, context.getAuthorId(), UserType.NORMAL, Permission.MANAGE_MESSAGES))
 						.then(context.getMessage().getUserMentions().collectList())
 						.flatMap(mentions -> {
 							final String arg = context.getArg().orElse("");
@@ -81,8 +80,8 @@ public class PruneCmd extends AbstractCommand {
 						})
 						.flatMap(messages -> DiscordUtils.bulkDelete((TextChannel) channel, messages))
 						.flatMap(deletedMessages -> loadingMsg.send(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
-								context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
-						.then());
+								context.getUsername(), StringUtils.pluralOf(deletedMessages, "message")))))
+				.then();
 	}
 
 	private String getEmbedContent(Message message) {
