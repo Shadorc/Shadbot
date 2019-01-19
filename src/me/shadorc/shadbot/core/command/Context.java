@@ -103,17 +103,17 @@ public class Context {
 		final Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
 				.map(ApplicationInfo::getOwnerId)
 				.filter(this.getAuthorId()::equals)
-				.map(bool -> CommandPermission.OWNER);
+				.map(ignored -> CommandPermission.OWNER);
 
 		// Private message, the author is considered as an administrator
 		final Mono<CommandPermission> dmPerm = Mono.just(this.event.getGuildId())
 				.filter(guildId -> !guildId.isPresent())
-				.map(guildId -> CommandPermission.ADMIN);
+				.map(ignored -> CommandPermission.ADMIN);
 
 		// The member is an administrator
 		final Mono<CommandPermission> adminPerm = this.getChannel()
-				.flatMap(channel -> DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR))
-				.map(bool -> CommandPermission.ADMIN);
+				.filterWhen(channel -> DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR))
+				.map(ignored -> CommandPermission.ADMIN);
 
 		return ownerPerm
 				.switchIfEmpty(dmPerm)
