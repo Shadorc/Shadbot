@@ -117,6 +117,9 @@ public class ExceptionHandler {
 		if(ExceptionUtils.isNotFound(err)) {
 			return ExceptionHandler.onNotFound((ClientException) err).then(Mono.empty());
 		}
+		if(ExceptionUtils.isInternalServerError(err)) {
+			return ExceptionHandler.onInternalServerError((ClientException) err).then(Mono.empty());
+		}
 		return ExceptionHandler.onUnknown(client, err).then(Mono.empty());
 	}
 
@@ -126,6 +129,11 @@ public class ExceptionHandler {
 	}
 
 	private static Mono<Void> onNotFound(ClientException err) {
+		return Mono.fromRunnable(() -> LogUtils.info("%s: %s (URL: %s)",
+				err.getStatus(), err.getErrorResponse().getFields().get("message").toString(), err.getRequest().url()));
+	}
+	
+	private static Mono<Void> onInternalServerError(ClientException err) {
 		return Mono.fromRunnable(() -> LogUtils.info("%s: %s (URL: %s)",
 				err.getStatus(), err.getErrorResponse().getFields().get("message").toString(), err.getRequest().url()));
 	}
