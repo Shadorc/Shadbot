@@ -9,12 +9,13 @@ import reactor.core.publisher.Mono;
 public class GuildListener {
 
 	public static Mono<Void> onGuildCreate(GuildCreateEvent event) {
-		if(Shadbot.getShards().get(event.getClient().getConfig().getShardIndex()).isFullyReady()) {
-			final long guildId = event.getGuild().getId().asLong();
-			final int memberCount = event.getGuild().getMemberCount().orElse(-1);
-			return Mono.fromRunnable(() -> LogUtils.info("{Guild ID: %d} Connected (%d users).", guildId, memberCount));
-		}
-		return Mono.empty();
+		return Mono.fromRunnable(() -> {
+			if(Shadbot.getShards().get(event.getClient().getConfig().getShardIndex()).isFullyReady()) {
+				final long guildId = event.getGuild().getId().asLong();
+				final int memberCount = event.getGuild().getMemberCount().orElse(-1);
+				LogUtils.info("{Guild ID: %d} Connected (%d users).", guildId, memberCount);
+			}
+		});
 	}
 
 	public static Mono<Void> onGuildDelete(GuildDeleteEvent event) {
