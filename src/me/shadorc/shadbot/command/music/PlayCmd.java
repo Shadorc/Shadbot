@@ -34,61 +34,56 @@ public class PlayCmd extends AbstractCommand {
 		final Snowflake guildId = context.getGuildId();
 
 		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(),
-						UserType.BOT, Permission.CONNECT, Permission.SPEAK))
-				.then(DiscordUtils.requireSameVoiceChannel(context))
-				.flatMap(voiceChannelId -> {
-					String identifier;
-					// If this is a SoundCloud search...
-					if(arg.startsWith("soundcloud ")) {
-						identifier = AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");
-					}
-					// ... else if the argument is an URL...
-					else if(NetUtils.isValidUrl(arg)) {
-						identifier = arg;
-					}
-					// ...else, search on YouTube
-					else {
-						identifier = AudioLoadResultListener.YT_SEARCH + arg;
-					}
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.CONNECT, Permission.SPEAK)
+						.then(DiscordUtils.requireSameVoiceChannel(context))
+						.flatMap(voiceChannelId -> {
+							String identifier;
+							// If this is a SoundCloud search...
+							if(arg.startsWith("soundcloud ")) {
+								identifier = AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");
+							}
+							// ... else if the argument is an URL...
+							else if(NetUtils.isValidUrl(arg)) {
+								identifier = arg;
+							}
+							// ...else, search on YouTube
+							else {
+								identifier = AudioLoadResultListener.YT_SEARCH + arg;
+							}
 
-					GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guildId);
+							GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guildId);
+							if(guildMusic == null) {
+								guildMusic = GuildMusicManager.createGuildMusic(context.getClient(), guildId);
+							} else if(guildMusic.isWaitingForChoice()) {
+								if(guildMusic.getDjId().equals(context.getAuthorId())) {
+									return Mono.error(new CommandException(String.format("You're already selecting a music. "
+											+ "Enter a number or use `%scancel` to cancel the selection.", context.getPrefix()));
+								}
 
-					if(guildMusic == null) {
-						guildMusic = GuildMusicManager.createGuildMusic(context.getClient(), guildId);
-					} else if(guildMusic.isWaitingForChoice()) {
-						if(guildMusic.getDjId().equals(context.getAuthorId())) {
-							throw new CommandException(String.format("You're already selecting a music. "
-									+ "Enter a number or use `%scancel` to cancel the selection.", context.getPrefix()));
-						}
-
-						if(identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH)) {
-							return context.getClient().getUserById(guildMusic.getDjId())
-									.map(User::getUsername)
-									.flatMap(djName -> context.getChannel()
-											.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " (**%s**) **%s** is "
+								if(identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH)) {
+									return context.getClient().getUserById(guildMusic.getDjId())
+											.map(User::getUsername)
+											.flatMap(djName -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " (**%s**) **%s** is "
 													+ "already selecting a music, please wait for him to finish.",
-													context.getUsername(), djName), channel)))
-									.then();
-						}
-					}
+													context.getUsername(), djName), channel))
+											.then();
+								}
+							}
 
-					if(guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-							&& !Shadbot.getPremium().isPremium(guildId, context.getAuthorId())) {
-						return context.getChannel()
-								.flatMap(channel -> DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel))
-								.then();
-					}
+							if(guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
+									&& !Shadbot.getPremium().isPremium(guildId, context.getAuthorId())) {
+								return DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel).then();
+							}
 
-					guildMusic.setMessageChannel(context.getChannelId());
+							guildMusic.setMessageChannel(context.getChannelId());
 
-					final boolean putFirst = context.getCommandName().endsWith("first");
-					final AudioLoadResultListener resultListener = new AudioLoadResultListener(
-							guildMusic, context.getAuthorId(), voiceChannelId, identifier, putFirst);
-					GuildMusicManager.AUDIO_PLAYER_MANAGER.loadItemOrdered(guildMusic, identifier, resultListener);
+							final boolean putFirst = context.getCommandName().endsWith("first");
+							final AudioLoadResultListener resultListener = new AudioLoadResultListener(
+									guildMusic, context.getAuthorId(), voiceChannelId, identifier, putFirst);
+							GuildMusicManager.AUDIO_PLAYER_MANAGER.loadItemOrdered(guildMusic, identifier, resultListener);
 
-					return Mono.empty();
-				});
+							return Mono.empty();
+						}));
 	}
 
 	@Override
