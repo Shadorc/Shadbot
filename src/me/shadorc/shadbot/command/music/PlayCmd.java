@@ -56,7 +56,7 @@ public class PlayCmd extends AbstractCommand {
 								guildMusic = GuildMusicManager.createGuildMusic(context.getClient(), guildId);
 							} else if(guildMusic.isWaitingForChoice()) {
 								if(guildMusic.getDjId().equals(context.getAuthorId())) {
-									return Mono.error(new CommandException(String.format("You're already selecting a music. "
+									throw new CommandException(String.format("You're already selecting a music. "
 											+ "Enter a number or use `%scancel` to cancel the selection.", context.getPrefix()));
 								}
 
