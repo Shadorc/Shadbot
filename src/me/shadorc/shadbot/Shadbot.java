@@ -3,8 +3,6 @@ package me.shadorc.shadbot;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,23 +11,14 @@ import java.util.stream.Collectors;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
-import discord4j.core.event.domain.VoiceStateUpdateEvent;
-import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
-import discord4j.core.event.domain.guild.GuildDeleteEvent;
-import discord4j.core.event.domain.guild.MemberJoinEvent;
-import discord4j.core.event.domain.guild.MemberLeaveEvent;
-import discord4j.core.event.domain.lifecycle.ReadyEvent;
-import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.event.domain.message.MessageUpdateEvent;
-import discord4j.core.event.domain.message.ReactionAddEvent;
-import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.gateway.SimpleBucket;
 import discord4j.rest.request.SingleRouterFactory;
 import me.shadorc.shadbot.command.game.LotteryCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
+import me.shadorc.shadbot.core.shard.Shard;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.data.database.DatabaseManager;
@@ -37,14 +26,6 @@ import me.shadorc.shadbot.data.lottery.Lottery;
 import me.shadorc.shadbot.data.lottery.LotteryManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.listener.ChannelListener;
-import me.shadorc.shadbot.listener.GuildListener;
-import me.shadorc.shadbot.listener.MemberListener;
-import me.shadorc.shadbot.listener.MessageCreateListener;
-import me.shadorc.shadbot.listener.MessageUpdateListener;
-import me.shadorc.shadbot.listener.ReactionListener;
-import me.shadorc.shadbot.listener.ReadyListener;
-import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
 import me.shadorc.shadbot.store.ShardJdkStoreService;
 import me.shadorc.shadbot.store.ShardStoreRegistry;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -55,14 +36,12 @@ import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.netty.ConnectionObserver.State;
 
 public class Shadbot {
 
 	private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
 	private static final Instant LAUNCH_TIME = Instant.now();
-	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
-	private static final Map<Integer, State> SHARDS_STATES = new ConcurrentHashMap<>();
+	private static final Map<Integer, Shard> SHARDS = new ConcurrentHashMap<>();
 
 	private static DatabaseManager databaseManager;
 	private static PremiumManager premiumManager;
@@ -96,7 +75,6 @@ public class Shadbot {
 				.setEventScheduler(Schedulers.elastic())
 				.setRouterFactory(new SingleRouterFactory())
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
-				.setGatewayObserver((state, identifyOption) -> SHARDS_STATES.put(identifyOption.getShardIndex(), state))
 				.setShardCount(DiscordUtils.getRecommendedShardCount(Credentials.get(Credential.DISCORD_TOKEN)).block())
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
@@ -105,35 +83,26 @@ public class Shadbot {
 			final DiscordClient client = builder.setShardIndex(index)
 					.setStoreService(new ShardJdkStoreService(registry))
 					.build();
-			CLIENTS.add(client);
-
-			DiscordUtils.register(client, ReadyEvent.class, ReadyListener::onReadyEvent);
-			DiscordUtils.register(client, TextChannelDeleteEvent.class, ChannelListener::onTextChannelDelete);
-			DiscordUtils.register(client, GuildDeleteEvent.class, GuildListener::onGuildDelete);
-			DiscordUtils.register(client, MemberJoinEvent.class, MemberListener::onMemberJoin);
-			DiscordUtils.register(client, MemberLeaveEvent.class, MemberListener::onMemberLeave);
-			DiscordUtils.register(client, MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
-			DiscordUtils.register(client, MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
-			DiscordUtils.register(client, VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
-			DiscordUtils.register(client, ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
-			DiscordUtils.register(client, ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
-			DiscordUtils.registerFullyReadyEvent(client, Shadbot::onFullyReadyEvent);
+			SHARDS.put(index, new Shard(client));
 		}
 
 		// Initiate login and block
-		Mono.when(Shadbot.CLIENTS.stream().map(DiscordClient::login).collect(Collectors.toList())).block();
+		Mono.when(Shadbot.SHARDS.values()
+				.stream()
+				.map(Shard::getClient)
+				.map(DiscordClient::login)
+				.collect(Collectors.toList()))
+				.block();
 	}
 
 	/**
 	 * Triggered when all the guilds have been received from a client
 	 */
-	private static Mono<Void> onFullyReadyEvent(GuildCreateEvent event) {
-		CONNECTED_SHARDS.incrementAndGet();
-
-		LogUtils.info("{Shard %d} Fully ready.", event.getClient().getConfig().getShardIndex());
-
-		DiscordUtils.register(event.getClient(), GuildCreateEvent.class, GuildListener::onGuildCreate);
-		return CONNECTED_SHARDS.get() == event.getClient().getConfig().getShardCount() ? Shadbot.onFullyConnected() : Mono.empty();
+	public static Mono<Void> onFullyReadyEvent(GuildCreateEvent event) {
+		return Mono.fromRunnable(() -> LogUtils.info("{Shard %d} Fully ready.", event.getClient().getConfig().getShardIndex()))
+				.thenReturn(CONNECTED_SHARDS.incrementAndGet())
+				.filter(connectedShards -> connectedShards == event.getClient().getConfig().getShardCount())
+				.flatMap(ignored -> Shadbot.onFullyConnected());
 	}
 
 	/**
@@ -142,11 +111,11 @@ public class Shadbot {
 	private static Mono<Void> onFullyConnected() {
 		return Mono.fromRunnable(() -> {
 			LogUtils.info("Shadbot is connected to all guilds.");
-			Shadbot.botListStats = new BotListStats(CLIENTS);
+			Shadbot.botListStats = new BotListStats(SHARDS.values().stream().map(Shard::getClient).collect(Collectors.toList()));
 		})
 				.and(Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
-						.doOnNext(ignored -> LotteryCmd.draw(CLIENTS.get(0)))
-						.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, CLIENTS.get(0))));
+						.doOnNext(ignored -> LotteryCmd.draw(Shadbot.getClient()))
+						.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, Shadbot.getClient())));
 	}
 
 	/**
@@ -157,14 +126,14 @@ public class Shadbot {
 	}
 
 	/**
-	 * @return All the clients the bot is connected to
+	 * @return All the shards the bot is connected to
 	 */
-	public static List<DiscordClient> getClients() {
-		return CLIENTS;
+	public static Map<Integer, Shard> getShards() {
+		return SHARDS;
 	}
 
-	public static Map<Integer, State> getShardsStates() {
-		return SHARDS_STATES;
+	public static DiscordClient getClient() {
+		return SHARDS.values().stream().findAny().orElseThrow().getClient();
 	}
 
 	public static DatabaseManager getDatabase() {
@@ -190,7 +159,7 @@ public class Shadbot {
 		if(botListStats != null) {
 			botListStats.stop();
 		}
-		CLIENTS.forEach(DiscordClient::logout);
+		SHARDS.values().stream().map(Shard::getClient).forEach(DiscordClient::logout);
 	}
 
 	public static void restart() {

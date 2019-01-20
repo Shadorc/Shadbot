@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.BooleanUtils;
 
@@ -16,9 +15,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import discord4j.common.jackson.PossibleModule;
 import discord4j.common.jackson.UnknownPropertyHandler;
 import discord4j.core.DiscordClient;
-import discord4j.core.event.domain.Event;
-import discord4j.core.event.domain.guild.GuildCreateEvent;
-import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
@@ -52,7 +48,6 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -210,37 +205,6 @@ public class DiscordUtils {
 			return Mono.just(true);
 		}
 		return GuildChannel.class.cast(channel).getEffectivePermissions(userId).map(permissions -> permissions.contains(permission));
-	}
-
-	/**
-	 * @param client - the client on which register the event
-	 * @param eventClass - the class of the event to register
-	 * @param mapper - the mapper to execute when the event is triggered
-	 */
-	public static <T extends Event> void register(DiscordClient client, Class<T> eventClass, Function<T, Mono<Void>> mapper) {
-		client.getEventDispatcher()
-				.on(eventClass)
-				.flatMap(event -> mapper.apply(event)
-						.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, client)))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
-	}
-
-	/**
-	 * @param client - the client on which register the event
-	 * @param mapper - the mapper to execute when the client is fully ready
-	 */
-	public static void registerFullyReadyEvent(DiscordClient client, Function<GuildCreateEvent, Mono<Void>> mapper) {
-		client.getEventDispatcher().on(ReadyEvent.class)
-				.map(event -> event.getGuilds().size())
-				.flatMap(size -> client.getEventDispatcher()
-						.on(GuildCreateEvent.class)
-						.take(size)
-						.last())
-				.flatMap(event -> mapper.apply(event)
-						.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, client)))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
 	}
 
 	public static Mono<Void> requirePermissions(Channel channel, Snowflake userId, UserType userType, Permission... permissions) {
