@@ -30,7 +30,7 @@ public class ExceptionUtils {
 		return err instanceof ClientException
 				&& ((ClientException) err).getStatus().equals(HttpResponseStatus.NOT_FOUND);
 	}
-	
+
 	public static boolean isInternalServerError(Throwable err) {
 		return err instanceof ClientException
 				&& ((ClientException) err).getStatus().equals(HttpResponseStatus.INTERNAL_SERVER_ERROR);

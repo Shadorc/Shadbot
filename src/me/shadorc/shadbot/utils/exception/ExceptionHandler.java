@@ -132,7 +132,7 @@ public class ExceptionHandler {
 		return Mono.fromRunnable(() -> LogUtils.info("%s: %s (URL: %s)",
 				err.getStatus(), err.getErrorResponse().getFields().get("message").toString(), err.getRequest().url()));
 	}
-	
+
 	private static Mono<Void> onInternalServerError(ClientException err) {
 		return Mono.fromRunnable(() -> LogUtils.info("%s: %s (URL: %s)",
 				err.getStatus(), err.getErrorResponse().getFields().get("message").toString(), err.getRequest().url()));
