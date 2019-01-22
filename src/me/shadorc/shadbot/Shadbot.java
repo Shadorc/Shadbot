@@ -115,7 +115,7 @@ public class Shadbot {
 		})
 				.and(Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
 						.doOnNext(ignored -> LotteryCmd.draw(Shadbot.getClient()))
-						.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, Shadbot.getClient())));
+						.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err)));
 	}
 
 	/**

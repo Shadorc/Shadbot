@@ -65,8 +65,8 @@ public class Shard {
 		this.getClient().getEventDispatcher()
 				.on(eventClass)
 				.flatMap(event -> mapper.apply(event)
-						.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.client)))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.client));
+						.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err))))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
 	private void registerFullyReadyEvent() {
@@ -79,10 +79,10 @@ public class Shard {
 						.last())
 				.flatMap(event -> {
 					this.isFullyReady.set(true);
-					return Shadbot.onFullyReadyEvent(event);
+					return Shadbot.onFullyReadyEvent(event)
+							.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err)));
 				})
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, this.client))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.client));
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
 	private Mono<Void> onGatewayLifecycleEvent(GatewayLifecycleEvent event) {

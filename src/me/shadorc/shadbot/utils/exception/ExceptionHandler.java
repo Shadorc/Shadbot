@@ -110,36 +110,13 @@ public class ExceptionHandler {
 										context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
 	}
 
-	public static <T> Mono<T> handleUnknownError(Throwable err, DiscordClient client) {
-		if(ExceptionUtils.isForbidden(err)) {
-			return ExceptionHandler.onForbidden((ClientException) err).then(Mono.empty());
+	public static void handleUnknownError(DiscordClient client, Throwable err) {
+		if(ExceptionUtils.isForbidden(err) || ExceptionUtils.isNotFound(err) || ExceptionUtils.isInternalServerError(err)) {
+			final ClientException clientErr = (ClientException) err;
+			LogUtils.info("%s: %s (URL: %s)",
+					clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url());
 		}
-		if(ExceptionUtils.isNotFound(err)) {
-			return ExceptionHandler.onNotFound((ClientException) err).then(Mono.empty());
-		}
-		if(ExceptionUtils.isInternalServerError(err)) {
-			return ExceptionHandler.onInternalServerError((ClientException) err).then(Mono.empty());
-		}
-		return ExceptionHandler.onUnknown(client, err).then(Mono.empty());
-	}
-
-	private static Mono<Void> onForbidden(ClientException err) {
-		return Mono.fromRunnable(() -> LogUtils.info("%s: %s (URL: %s)",
-				err.getStatus(), err.getErrorResponse().getFields().get("message").toString(), err.getRequest().url()));
-	}
-
-	private static Mono<Void> onNotFound(ClientException err) {
-		return Mono.fromRunnable(() -> LogUtils.info("%s: %s (URL: %s)",
-				err.getStatus(), err.getErrorResponse().getFields().get("message").toString(), err.getRequest().url()));
-	}
-
-	private static Mono<Void> onInternalServerError(ClientException err) {
-		return Mono.fromRunnable(() -> LogUtils.info("%s: %s (URL: %s)",
-				err.getStatus(), err.getErrorResponse().getFields().get("message").toString(), err.getRequest().url()));
-	}
-
-	private static Mono<Void> onUnknown(DiscordClient client, Throwable err) {
-		return Mono.fromRunnable(() -> LogUtils.error(client, err, "An unknown error occurred."));
+		LogUtils.error(client, err, "An unknown error occurred.");
 	}
 
 }

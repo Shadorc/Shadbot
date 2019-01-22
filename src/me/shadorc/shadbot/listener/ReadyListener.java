@@ -13,7 +13,7 @@ public class ReadyListener {
 	public static Mono<Void> onReadyEvent(ReadyEvent event) {
 		return Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
 				.flatMap(ignored -> DiscordUtils.updatePresence(event.getClient()))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, event.getClient()))
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(event.getClient(), err))
 				.then();
 	}
 

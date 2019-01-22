@@ -54,11 +54,12 @@ public class GuildMusic {
 				.cast(VoiceChannel.class)
 				.filter(ignored -> this.voiceConnection == null)
 				.flatMap(voiceChannel -> voiceChannel.join(this.audioProvider, AudioReceiver.NO_OP))
-				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, this.client))
-				.subscribe(voiceConnection -> {
+				.doOnNext(voiceConnection -> {
 					this.voiceConnection = voiceConnection;
 					LogUtils.info("{Guild ID: %d} Voice channel joined.", this.getGuildId().asLong());
-				});
+				})
+				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err)))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
 	public void leaveVoiceChannel() {
@@ -71,8 +72,8 @@ public class GuildMusic {
 	public void scheduleLeave() {
 		this.leaveTask = Mono.delay(Duration.ofMinutes(1))
 				.then(Mono.fromRunnable(this::leaveVoiceChannel))
-				.onErrorResume(thr -> ExceptionHandler.handleUnknownError(thr, this.client))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.client));
+				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err)))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
 	public void cancelLeave() {

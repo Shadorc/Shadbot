@@ -30,8 +30,8 @@ public class BotListStats {
 		this.selfId = clients.get(0).getSelfId().get();
 		this.task = Flux.interval(Duration.ofHours(2), Duration.ofHours(2))
 				.flatMap(ignored -> this.postStats())
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, clients.get(0)))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, clients.get(0)));
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 	}
 
 	private Mono<Void> postStats() {

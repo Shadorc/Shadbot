@@ -81,8 +81,8 @@ public abstract class AbstractGameManager {
 		this.scheduledTask = Mono.delay(Duration.of(delay, unit))
 				.then(Mono.fromRunnable(() -> this.isDone.set(true)))
 				.then(mono)
-				.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.getContext().getClient()))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.getContext().getClient()));
+				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err)))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
 	}
 
 	public void cancelScheduledTask() {

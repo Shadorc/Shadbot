@@ -232,27 +232,27 @@ public class DiscordUtils {
 				.defaultIfEmpty(Optional.empty());
 
 		return Mono.zip(botVoiceChannelIdMono, userVoiceChannelIdMono)
-				.flatMap(tuple -> {
+				.map(tuple -> {
 					final Optional<Snowflake> botVoiceChannelId = tuple.getT1();
 					final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
 
 					// If the user is in a voice channel but the bot is not allowed to join
 					if(userVoiceChannelId.isPresent() && !Shadbot.getDatabase().getDBGuild(context.getGuildId()).isVoiceChannelAllowed(userVoiceChannelId.get())) {
-						return Mono.error(new CommandException("I'm not allowed to join this voice channel."));
+						throw new CommandException("I'm not allowed to join this voice channel.");
 					}
 
 					// If the user and the bot are not in a voice channel
 					if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
-						return Mono.error(new CommandException("Join a voice channel before using this command."));
+						throw new CommandException("Join a voice channel before using this command.");
 					}
 
 					// If the user and the bot are not in the same voice channel
 					if(botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
-						return Mono.error(new CommandException(String.format("I'm currently playing music in voice channel <#%d>"
-								+ ", join me before using this command.", botVoiceChannelId.map(Snowflake::asLong).get())));
+						throw new CommandException(String.format("I'm currently playing music in voice channel <#%d>"
+								+ ", join me before using this command.", botVoiceChannelId.map(Snowflake::asLong).get()));
 					}
 
-					return Mono.justOrEmpty(userVoiceChannelId);
+					return userVoiceChannelId.get();
 				});
 	}
 

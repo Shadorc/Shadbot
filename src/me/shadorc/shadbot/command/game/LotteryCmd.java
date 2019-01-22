@@ -163,8 +163,8 @@ public class LotteryCmd extends AbstractCommand {
 									.flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn %s.",
 											FormatUtils.coins(coins)), privateChannel));
 						}))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(client, err))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 
 		LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
 				winningNum, winners.size(), Shadbot.getLottery().getJackpot());

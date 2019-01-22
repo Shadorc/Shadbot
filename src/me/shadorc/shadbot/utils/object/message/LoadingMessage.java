@@ -39,8 +39,8 @@ public class LoadingMessage implements Publisher<Void> {
 		this.subscribers = new ArrayList<>();
 
 		this.startTyping()
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, client))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, client));
+				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(client, err)))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 	}
 
 	/**
