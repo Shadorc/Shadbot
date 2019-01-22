@@ -66,7 +66,6 @@ public class Shard {
 				.on(eventClass)
 				.flatMap(event -> mapper.apply(event)
 						.onErrorResume(err -> ExceptionHandler.handleUnknownError(err, this.client)))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err, this.client))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(err, this.client));
 	}
 
