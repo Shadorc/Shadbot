@@ -10,7 +10,6 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
-import discord4j.voice.AudioReceiver;
 import discord4j.voice.VoiceConnection;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -53,7 +52,7 @@ public class GuildMusic {
 		this.client.getChannelById(voiceChannelId)
 				.cast(VoiceChannel.class)
 				.filter(ignored -> this.voiceConnection == null)
-				.flatMap(voiceChannel -> voiceChannel.join(this.audioProvider, AudioReceiver.NO_OP))
+				.flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(this.audioProvider)))
 				.doOnNext(voiceConnection -> {
 					this.voiceConnection = voiceConnection;
 					LogUtils.info("{Guild ID: %d} Voice channel joined.", this.getGuildId().asLong());
