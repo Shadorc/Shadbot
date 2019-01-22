@@ -69,7 +69,8 @@ public class SettingsCmd extends AbstractCommand {
 
 		if("show".equals(args.get(0))) {
 			return this.show(context)
-					.flatMap(embed -> context.getChannel().flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+					.flatMap(embed -> context.getChannel()
+							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
@@ -83,19 +84,18 @@ public class SettingsCmd extends AbstractCommand {
 		final String arg = args.size() == 2 ? args.get(1) : null;
 		if("help".equals(arg)) {
 			return this.getHelp(context, setting)
-					.flatMap(embed -> context.getChannel().flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+					.flatMap(embed -> context.getChannel()
+							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 					.then();
 		}
 
-		try {
-			return setting.execute(context);
-		} catch (final MissingArgumentException e) {
-			return this.getHelp(context, setting)
-					.flatMap(embed -> context.getChannel()
-							.flatMap(channel -> DiscordUtils.sendMessage(
-									Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", embed, channel)))
-					.then();
-		}
+		return setting.execute(context)
+				.onErrorResume(err -> err instanceof MissingArgumentException,
+						err -> this.getHelp(context, setting)
+								.flatMap(embed -> context.getChannel()
+										.flatMap(channel -> DiscordUtils.sendMessage(
+												Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", embed, channel)))
+								.then());
 	}
 
 	private Mono<EmbedCreateSpec> show(Context context) {
