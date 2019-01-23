@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
-import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.gateway.SimpleBucket;
@@ -98,10 +97,10 @@ public class Shadbot {
 	/**
 	 * Triggered when all the guilds have been received from a client
 	 */
-	public static Mono<Void> onFullyReadyEvent(GuildCreateEvent event) {
-		return Mono.fromRunnable(() -> LogUtils.info("{Shard %d} Fully ready.", event.getClient().getConfig().getShardIndex()))
+	public static Mono<Void> onFullyReadyEvent(DiscordClient client) {
+		return Mono.fromRunnable(() -> LogUtils.info("{Shard %d} Fully ready.", client.getConfig().getShardIndex()))
 				.thenReturn(CONNECTED_SHARDS.incrementAndGet())
-				.filter(connectedShards -> connectedShards == event.getClient().getConfig().getShardCount())
+				.filter(connectedShards -> connectedShards == client.getConfig().getShardCount())
 				.flatMap(ignored -> Shadbot.onFullyConnected());
 	}
 

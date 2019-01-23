@@ -73,13 +73,13 @@ public class Shard {
 		this.getClient().getEventDispatcher()
 				.on(ReadyEvent.class)
 				.map(event -> event.getGuilds().size())
-				.flatMap(size -> this.client.getEventDispatcher()
+				.flatMap(size -> this.getClient().getEventDispatcher()
 						.on(GuildCreateEvent.class)
 						.take(size)
-						.last())
-				.flatMap(event -> {
+						.collectList())
+				.flatMap(guilds -> {
 					this.isFullyReady.set(true);
-					return Shadbot.onFullyReadyEvent(event)
+					return Shadbot.onFullyReadyEvent(this.getClient())
 							.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err)));
 				})
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
