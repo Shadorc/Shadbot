@@ -98,7 +98,15 @@ public class Shard {
 			} else if(event instanceof ReconnectEvent) {
 				this.state = State.RETRY_SUCCEEDED;
 			}
-			this.isFullyReady.set(false);
+			
+			switch(this.state) {
+				case RETRY_SUCCEEDED:
+					this.isFullyReady.set(true);
+					break;
+				default:
+					this.isFullyReady.set(false);
+					break;
+			}
 		});
 	}
 
