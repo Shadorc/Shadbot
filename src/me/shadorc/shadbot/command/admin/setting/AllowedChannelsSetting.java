@@ -56,7 +56,7 @@ public class AllowedChannelsSetting extends AbstractSetting {
 					final StringBuilder strBuilder = new StringBuilder();
 					if(Action.ADD.equals(action)) {
 						if(allowedTextChannels.isEmpty()
-								&& mentionedChannelIds.stream().noneMatch(channelId -> channelId.equals(context.getChannelId()))) {
+								&& mentionedChannelIds.stream().noneMatch(channelId -> channelId.equals(context.getChannelId().asLong()))) {
 							strBuilder.append(Emoji.WARNING + " You did not mentioned this channel. "
 									+ "I will not reply here until this channel is added to the list of allowed channels.\n");
 						}
@@ -70,14 +70,14 @@ public class AllowedChannelsSetting extends AbstractSetting {
 							}
 						}
 
-						strBuilder.append(String.format(Emoji.CHECK_MARK + " Channel %s added to allowed channels.",
-								FormatUtils.format(mentionedChannels, channelId -> String.format("<#%d>", channelId), ", ")));
+						strBuilder.append(String.format(Emoji.CHECK_MARK + " %s added to allowed channels.",
+								FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
 
 					} else {
 						allowedTextChannels.removeAll(mentionedChannelIds);
 						allowedVoiceChannels.removeAll(mentionedChannelIds);
-						strBuilder.append(String.format(Emoji.CHECK_MARK + " Channel %s removed from allowed channels.",
-								FormatUtils.format(mentionedChannels, channelId -> String.format("<#%d>", channelId), ", ")));
+						strBuilder.append(String.format(Emoji.CHECK_MARK + " %s removed from allowed channels.",
+								FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
 					}
 
 					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
