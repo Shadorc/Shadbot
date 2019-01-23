@@ -172,14 +172,6 @@ public class DiscordUtils {
 	}
 
 	/**
-	 * @param channelId - The ID of the channel to mention
-	 * @return The channel mentionned
-	 */
-	public static String getChannelMention(Snowflake channelId) {
-		return String.format("<#%d>", channelId.asLong());
-	}
-
-	/**
 	 * @param message - the message
 	 * @return The members mentioned in a {@link Message}
 	 */

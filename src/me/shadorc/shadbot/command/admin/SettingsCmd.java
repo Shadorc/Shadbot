@@ -11,6 +11,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -119,6 +120,7 @@ public class SettingsCmd extends AbstractCommand {
 		dbGuild.getLeaveMessage().ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
 
 		final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getMessageChannelId())
+				.map(Snowflake::of)
 				.flatMap(context.getClient()::getChannelById)
 				.ofType(GuildChannel.class)
 				.map(GuildChannel::getName)
@@ -126,6 +128,7 @@ public class SettingsCmd extends AbstractCommand {
 				.then();
 
 		final Mono<Void> allowedChannelsStr = Flux.fromIterable(dbGuild.getAllowedTextChannels())
+				.map(Snowflake::of)
 				.flatMap(context.getClient()::getChannelById)
 				.ofType(GuildChannel.class)
 				.map(GuildChannel::getName)
@@ -136,6 +139,7 @@ public class SettingsCmd extends AbstractCommand {
 				.then();
 
 		final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getAutoRoles())
+				.map(Snowflake::of)
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 				.map(Role::getMention)
 				.collectList()
@@ -144,6 +148,7 @@ public class SettingsCmd extends AbstractCommand {
 				.then();
 
 		final Mono<Void> permissionsStr = Flux.fromIterable(dbGuild.getAllowedRoles())
+				.map(Snowflake::of)
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 				.map(Role::getMention)
 				.collectList()

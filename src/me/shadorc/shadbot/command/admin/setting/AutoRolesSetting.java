@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.command.admin.setting;
 
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
@@ -39,18 +39,19 @@ public class AutoRolesSetting extends AbstractSetting {
 			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
 		}
 
-		final Set<Snowflake> mentionedRoles = context.getMessage().getRoleMentionIds();
+		final List<Long> mentionedRoles = context.getMessage().getRoleMentionIds().stream().map(Snowflake::asLong).collect(Collectors.toList());
 		if(mentionedRoles.isEmpty()) {
 			throw new MissingArgumentException();
 		}
 
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
-		final List<Snowflake> autoRoles = dbGuild.getAutoRoles();
+		final List<Long> autoRoles = dbGuild.getAutoRoles();
 
 		Mono<Message> message;
 		if(Action.ADD.equals(action)) {
 			autoRoles.addAll(mentionedRoles);
 			message = Flux.fromIterable(autoRoles)
+					.map(Snowflake::of)
 					.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 					.map(Role::getName)
 					.collectList()
@@ -60,6 +61,7 @@ public class AutoRolesSetting extends AbstractSetting {
 		} else {
 			autoRoles.removeAll(mentionedRoles);
 			message = Flux.fromIterable(mentionedRoles)
+					.map(Snowflake::of)
 					.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 					.map(Role::getName)
 					.collectList()

@@ -29,6 +29,7 @@ public class MemberListener {
 						.flatMap(Member::getBasePermissions)
 						.filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
 						.flatMapMany(ignored -> Flux.fromIterable(dbGuild.getAutoRoles()))
+						.map(Snowflake::of)
 						.flatMap(roleId -> event.getMember().addRole(roleId)));
 
 	}
@@ -38,8 +39,8 @@ public class MemberListener {
 		return MemberListener.sendAutoMsg(event.getClient(), event.getUser(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage()).then();
 	}
 
-	private static Mono<Message> sendAutoMsg(DiscordClient client, User user, Optional<Snowflake> channelId, Optional<String> message) {
-		return Mono.zip(Mono.justOrEmpty(channelId), Mono.justOrEmpty(message))
+	private static Mono<Message> sendAutoMsg(DiscordClient client, User user, Optional<Long> channelId, Optional<String> message) {
+		return Mono.zip(Mono.justOrEmpty(channelId).map(Snowflake::of), Mono.justOrEmpty(message))
 				.flatMap(tuple -> client.getChannelById(tuple.getT1())
 						.cast(MessageChannel.class)
 						.flatMap(channel -> DiscordUtils.sendMessage(tuple.getT2().replace("{mention}", user.getMention()), channel)));

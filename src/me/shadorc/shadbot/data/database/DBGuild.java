@@ -49,32 +49,20 @@ public class DBGuild {
 		return this.members;
 	}
 
-	public List<Snowflake> getAllowedTextChannels() {
-		return this.getListSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, Long.class)
-				.stream()
-				.map(Snowflake::of)
-				.collect(Collectors.toList());
+	public List<Long> getAllowedTextChannels() {
+		return this.getListSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, Long.class);
 	}
 
-	public List<Snowflake> getAllowedVoiceChannels() {
-		return this.getListSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, Long.class)
-				.stream()
-				.map(Snowflake::of)
-				.collect(Collectors.toList());
+	public List<Long> getAllowedVoiceChannels() {
+		return this.getListSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, Long.class);
 	}
 
-	public List<Snowflake> getAllowedRoles() {
-		return this.getListSetting(SettingEnum.ALLOWED_ROLES, Long.class)
-				.stream()
-				.map(Snowflake::of)
-				.collect(Collectors.toList());
+	public List<Long> getAllowedRoles() {
+		return this.getListSetting(SettingEnum.ALLOWED_ROLES, Long.class);
 	}
 
-	public List<Snowflake> getAutoRoles() {
-		return this.getListSetting(SettingEnum.AUTO_ROLES, Long.class)
-				.stream()
-				.map(Snowflake::of)
-				.collect(Collectors.toList());
+	public List<Long> getAutoRoles() {
+		return this.getListSetting(SettingEnum.AUTO_ROLES, Long.class);
 	}
 
 	public List<String> getBlacklistedCmd() {
@@ -104,9 +92,8 @@ public class DBGuild {
 		return Optional.ofNullable((String) this.settings.get(SettingEnum.LEAVE_MESSAGE.toString()));
 	}
 
-	public Optional<Snowflake> getMessageChannelId() {
-		return Optional.ofNullable((Long) this.settings.get(SettingEnum.MESSAGE_CHANNEL_ID.toString()))
-				.map(Snowflake::of);
+	public Optional<Long> getMessageChannelId() {
+		return Optional.ofNullable((Long) this.settings.get(SettingEnum.MESSAGE_CHANNEL_ID.toString()));
 	}
 
 	public String getPrefix() {
@@ -124,11 +111,11 @@ public class DBGuild {
 	}
 
 	public boolean hasAllowedRole(List<Role> roles) {
-		final List<Snowflake> allowedRoles = this.getAllowedRoles();
+		final List<Long> allowedRoles = this.getAllowedRoles();
 		// If the user is an administrator OR no permissions have been set OR the role is allowed
 		return allowedRoles.isEmpty()
 				|| roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
-				|| roles.stream().anyMatch(role -> allowedRoles.contains(role.getId()));
+				|| roles.stream().anyMatch(role -> allowedRoles.contains(role.getId().asLong()));
 	}
 
 	public boolean isCommandAllowed(AbstractCommand cmd) {
@@ -137,15 +124,15 @@ public class DBGuild {
 	}
 
 	public boolean isTextChannelAllowed(Snowflake channelId) {
-		final List<Snowflake> allowedTextChannels = this.getAllowedTextChannels();
+		final List<Long> allowedTextChannels = this.getAllowedTextChannels();
 		// If no permission has been set OR the text channel is allowed
-		return allowedTextChannels.isEmpty() || allowedTextChannels.contains(channelId);
+		return allowedTextChannels.isEmpty() || allowedTextChannels.contains(channelId.asLong());
 	}
 
 	public boolean isVoiceChannelAllowed(Snowflake channelId) {
-		final List<Snowflake> allowedVoiceChannels = this.getAllowedVoiceChannels();
+		final List<Long> allowedVoiceChannels = this.getAllowedVoiceChannels();
 		// If no permission has been set OR the voice channel is allowed
-		return allowedVoiceChannels.isEmpty() || allowedVoiceChannels.contains(channelId);
+		return allowedVoiceChannels.isEmpty() || allowedVoiceChannels.contains(channelId.asLong());
 	}
 
 	public void setSetting(SettingEnum setting, Object value) {

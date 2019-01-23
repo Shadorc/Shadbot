@@ -2,8 +2,8 @@ package me.shadorc.shadbot.command.admin.setting;
 
 import java.util.List;
 
+import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
@@ -61,22 +61,23 @@ public class AutoMessageSetting extends AbstractSetting {
 	private Mono<Message> channel(Context context, Action action) {
 		return context.getGuild()
 				.flatMapMany(guild -> DiscordUtils.extractChannels(guild, context.getContent()))
+				.flatMap(channelId -> context.getClient().getChannelById(channelId))
 				.collectList()
-				.map(channelsMentionned -> {
-					if(channelsMentionned.size() != 1) {
+				.map(mentionedChannels -> {
+					if(mentionedChannels.size() != 1) {
 						throw new MissingArgumentException();
 					}
 
 					final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
-					final Snowflake channelId = channelsMentionned.get(0);
+					final Channel channel = mentionedChannels.get(0);
 					if(Action.ENABLE.equals(action)) {
-						dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channelId);
+						dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channel.getId());
 						return String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
-								DiscordUtils.getChannelMention(channelId));
+								channel.getMention());
 					} else {
 						dbGuild.removeSetting(SettingEnum.MESSAGE_CHANNEL_ID);
 						return String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
-								+ "until a new channel is defined.", DiscordUtils.getChannelMention(channelId));
+								+ "until a new channel is defined.", channel.getMention());
 					}
 				})
 				.flatMap(message -> context.getChannel()

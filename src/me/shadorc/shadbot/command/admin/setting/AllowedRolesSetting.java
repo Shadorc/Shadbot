@@ -46,17 +46,19 @@ public class AllowedRolesSetting extends AbstractSetting {
 					}
 
 					final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
-					final List<Snowflake> allowedRoles = dbGuild.getAllowedRoles();
-					
-					System.err.println(mentionedRoles);
+					final List<Long> allowedRoles = dbGuild.getAllowedRoles();
+					final List<Long> mentionedRoleIds = mentionedRoles.stream()
+							.map(Role::getId)
+							.map(Snowflake::asLong)
+							.collect(Collectors.toList());
 
 					final StringBuilder strBuilder = new StringBuilder();
 					if(Action.ADD.equals(action)) {
-						allowedRoles.addAll(mentionedRoles.stream().map(Role::getId).collect(Collectors.toList()));
+						allowedRoles.addAll(mentionedRoleIds);
 						strBuilder.append(String.format(Emoji.CHECK_MARK + " %s will now be able to interact with me.",
 								FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
 					} else {
-						allowedRoles.removeAll(mentionedRoles.stream().map(Role::getId).collect(Collectors.toList()));
+						allowedRoles.removeAll(mentionedRoleIds);
 						strBuilder.append(String.format(Emoji.CHECK_MARK + " %s will not be able to interact with me anymore.",
 								FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
 						if(allowedRoles.isEmpty()) {
