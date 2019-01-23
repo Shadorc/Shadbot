@@ -31,7 +31,7 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" })
 public class PruneCmd extends AbstractCommand {
 
-	private static final int MAX_MESSAGES = 1_000;
+	private static final int MAX_MESSAGES = 100;
 
 	@Override
 	public Mono<Void> execute(Context context) {
