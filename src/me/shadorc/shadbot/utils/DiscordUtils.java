@@ -147,13 +147,13 @@ public class DiscordUtils {
 
 	/**
 	 * @param guild - a {@link Guild} containing the channels to extract
-	 * @param content - a string containing channels mentions / names
+	 * @param str - a string containing channels mentions / names
 	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels
 	 */
-	public static Flux<Snowflake> extractChannels(Guild guild, String content) {
-		final List<String> words = StringUtils.split(content);
+	public static Flux<Snowflake> extractChannels(Guild guild, String str) {
+		final List<String> words = StringUtils.split(StringUtils.remove(str, "#"));
 		return guild.getChannels()
-				.filter(channel -> words.contains(String.format("#%s", channel.getName())) || words.contains(channel.getMention()))
+				.filter(channel -> words.contains(String.format("%s", channel.getName())) || words.contains(channel.getMention()))
 				.map(GuildChannel::getId)
 				.distinct();
 	}
