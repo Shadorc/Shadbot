@@ -160,13 +160,13 @@ public class DiscordUtils {
 
 	/**
 	 * @param guild - a {@link Guild} containing the roles to extract
-	 * @param content - a string containing role mentions / names
+	 * @param str - a string containing role mentions / names
 	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles
 	 */
-	public static Flux<Snowflake> extractRoles(Guild guild, String content) {
-		final List<String> words = StringUtils.split(content);
+	public static Flux<Snowflake> extractRoles(Guild guild, String str) {
+		final List<String> words = StringUtils.split(StringUtils.remove(str, "@"));
 		return guild.getRoles()
-				.filter(role -> words.contains(String.format("@%s", role.getName())) || words.contains(role.getMention()))
+				.filter(role -> words.contains(String.format("%s", role.getName())) || words.contains(role.getMention()))
 				.map(Role::getId)
 				.distinct();
 	}
