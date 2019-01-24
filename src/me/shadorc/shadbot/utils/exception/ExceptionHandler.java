@@ -115,8 +115,9 @@ public class ExceptionHandler {
 			final ClientException clientErr = (ClientException) err;
 			LogUtils.info("%s: %s (URL: %s)",
 					clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url());
+		} else {
+			LogUtils.error(client, err, "An unknown error occurred.");
 		}
-		LogUtils.error(client, err, "An unknown error occurred.");
 	}
 
 }
