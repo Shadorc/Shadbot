@@ -106,8 +106,8 @@ public class DiabloCmd extends AbstractCommand {
 					.then();
 
 		} catch (final FileNotFoundException err) {
-			return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
-					context.getUsername()))
+			return loadingMsg.send(
+					String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.", context.getUsername()))
 					.then();
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();

@@ -79,7 +79,10 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 			final PlayerSummary player = players.get(0);
 			if(player.getCommunityVisibilityState() != 3) {
-				return loadingMsg.send(Emoji.ACCESS_DENIED + " This profile is private, more info here: " + PRIVACY_HELP_URL).then();
+				return loadingMsg.send(
+						String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private, more info here: %s",
+								context.getUsername(), PRIVACY_HELP_URL))
+						.then();
 			}
 
 			final URL userStatsUrl = new URL(String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
@@ -87,14 +90,19 @@ public class CounterStrikeCmd extends AbstractCommand {
 
 			final String body = NetUtils.getBody(userStatsUrl.toString());
 			if(body.contains("500 Internal Server Error")) {
-				return loadingMsg.send(Emoji.ACCESS_DENIED + " The game details of this profile are not public, more info here: " + PRIVACY_HELP_URL)
+				return loadingMsg.send(
+						String.format(Emoji.ACCESS_DENIED + " (**%s**) The game details of this profile are not public, more info here: %s",
+								context.getUsername(), PRIVACY_HELP_URL))
 						.then();
 			}
 
 			final UserStatsForGameResponse userStats = Utils.MAPPER.readValue(userStatsUrl, UserStatsForGameResponse.class);
 
 			if(userStats.getPlayerStats() == null || userStats.getPlayerStats().getStats() == null) {
-				return loadingMsg.send(Emoji.MAGNIFYING_GLASS + " This user doesn't play Counter-Strike: Global Offensive.").then();
+				return loadingMsg.send(
+						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Counter-Strike: Global Offensive.",
+								context.getUsername()))
+						.then();
 			}
 
 			final List<Stats> stats = userStats.getPlayerStats().getStats();

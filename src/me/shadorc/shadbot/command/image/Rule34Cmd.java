@@ -57,7 +57,9 @@ public class Rule34Cmd extends AbstractCommand {
 
 						final List<String> tags = StringUtils.split(post.getTags(), " ");
 						if(post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
-							return loadingMsg.send(Emoji.WARNING + " I don't display images containing children or tagged with `loli` or `shota`.");
+							return loadingMsg.send(
+									String.format(Emoji.WARNING + " (**%s**) I don't display images containing children or tagged with `loli` or `shota`.",
+											context.getUsername()));
 						}
 
 						final String formattedtags = org.apache.commons.lang3.StringUtils.truncate(
