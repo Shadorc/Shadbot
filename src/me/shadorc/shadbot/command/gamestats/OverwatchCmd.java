@@ -55,6 +55,12 @@ public class OverwatchCmd extends AbstractCommand {
 			final ProfileResponse profile = response.getT2();
 			final Quickplay topHeroes = response.getT3().getStats().getTopHeroes().getQuickplay();
 
+			if(profile.isPrivate()) {
+				return loadingMsg.send(
+						String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private.", context.getUsername()))
+						.then();
+			}
+
 			return context.getAvatarUrl()
 					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 							.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
