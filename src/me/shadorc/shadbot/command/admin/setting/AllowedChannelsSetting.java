@@ -31,18 +31,19 @@ public class AllowedChannelsSetting extends AbstractSetting {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(3);
+
+		final Action action = Utils.getEnum(Action.class, args.get(1));
+		if(action == null) {
+			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
+		}
+
 		return context.getGuild()
 				.flatMapMany(guild -> DiscordUtils.extractChannels(guild, args.get(2)))
 				.flatMap(channelId -> context.getClient().getChannelById(channelId))
 				.collectList()
-				.flatMap(mentionedChannels -> {
+				.map(mentionedChannels -> {
 					if(mentionedChannels.isEmpty()) {
-						throw new CommandException(String.format("`%s` is not a valid channel.", args.get(2)));
-					}
-
-					final Action action = Utils.getEnum(Action.class, args.get(1));
-					if(action == null) {
-						throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
+						throw new CommandException(String.format("Channel `%s` not found.", args.get(2)));
 					}
 
 					final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
@@ -82,9 +83,11 @@ public class AllowedChannelsSetting extends AbstractSetting {
 
 					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
 					dbGuild.setSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, allowedVoiceChannels);
-					return context.getChannel()
-							.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
+
+					return strBuilder.toString();
 				})
+				.flatMap(text -> context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
 				.then();
 	}
 
