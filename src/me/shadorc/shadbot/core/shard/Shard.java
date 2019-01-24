@@ -11,7 +11,6 @@ import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
-import discord4j.core.event.domain.lifecycle.ConnectEvent;
 import discord4j.core.event.domain.lifecycle.DisconnectEvent;
 import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
@@ -87,19 +86,19 @@ public class Shard {
 
 	private Mono<Void> onGatewayLifecycleEvent(GatewayLifecycleEvent event) {
 		return Mono.fromRunnable(() -> {
-			if(event instanceof ConnectEvent) {
-				this.state = State.CONNECTED;
-			} else if(event instanceof DisconnectEvent) {
+			if(event instanceof DisconnectEvent) {
 				this.state = State.DISCONNECTED;
-			} else if(event instanceof ReconnectFailEvent) {
-				this.state = State.RETRY_FAILED;
 			} else if(event instanceof ReconnectStartEvent) {
 				this.state = State.RETRY_STARTED;
+			} else if(event instanceof ReconnectFailEvent) {
+				this.state = State.RETRY_FAILED;
 			} else if(event instanceof ReconnectEvent) {
 				this.state = State.RETRY_SUCCEEDED;
+			} else {
+				this.state = State.CONNECTED;
 			}
-			
-			switch(this.state) {
+
+			switch (this.state) {
 				case RETRY_SUCCEEDED:
 					this.isFullyReady.set(true);
 					break;
