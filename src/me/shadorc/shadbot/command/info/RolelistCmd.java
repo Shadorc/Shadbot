@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.info;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import discord4j.core.object.entity.Guild;
@@ -15,7 +14,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -28,36 +27,43 @@ public class RolelistCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final Set<Snowflake> roleIds = context.getMessage().getRoleMentionIds();
-		if(roleIds.isEmpty()) {
-			throw new MissingArgumentException();
-		}
+		final String arg = context.requireArg();
 
 		return context.getGuild()
-				.flatMapMany(Guild::getMembers)
-				.filter(member -> !Collections.disjoint(member.getRoleIds(), roleIds))
-				.map(Member::getUsername)
+				.flatMapMany(guild -> DiscordUtils.extractRoles(guild, arg))
+				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 				.collectList()
-				.zipWith(context.getMessage().getRoleMentions().collectList())
-				.map(usernamesAndRoles -> {
-					final List<String> usernames = usernamesAndRoles.getT1().stream().distinct().collect(Collectors.toList());
-					final List<Role> roles = usernamesAndRoles.getT2();
-
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed();
-
-					if(usernames.isEmpty()) {
-						return embed.setDescription(
-								String.format("There is nobody with %s.", roleIds.size() == 1 ? "this role" : "these roles"));
+				.flatMap(mentionedRoles -> {
+					if(mentionedRoles.isEmpty()) {
+						throw new CommandException(String.format("Role `%s` not found.", arg));
 					}
 
-					FormatUtils.createColumns(usernames, 25).stream()
-							.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
+					final List<Snowflake> mentionedRoleIds = mentionedRoles.stream()
+							.map(Role::getId)
+							.collect(Collectors.toList());
 
-					return embed.setDescription(String.format("Members with role(s): **%s**",
-							FormatUtils.format(roles, Role::getName, ", ")));
+					return context.getGuild()
+							.flatMapMany(Guild::getMembers)
+							.filter(member -> !Collections.disjoint(member.getRoleIds(), mentionedRoleIds))
+							.map(Member::getUsername)
+							.distinct()
+							.collectList()
+							.flatMap(usernames -> context.getAvatarUrl()
+									.map(avatarUrl -> {
+										final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
+												.setAuthor(String.format("Rolelist: %s", FormatUtils.format(mentionedRoles, Role::getName, ", ")), null, avatarUrl);
+
+										if(usernames.isEmpty()) {
+											return embed.setDescription(
+													String.format("There is nobody with %s.", mentionedRoleIds.size() == 1 ? "this role" : "these roles"));
+										}
+
+										FormatUtils.createColumns(usernames, 25).stream()
+												.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
+
+										return embed;
+									}));
 				})
-				.zipWith(context.getAvatarUrl())
-				.map(embedAndAvatarUrl -> embedAndAvatarUrl.getT1().setAuthor("Rolelist", null, embedAndAvatarUrl.getT2()))
 				.flatMap(embed -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
