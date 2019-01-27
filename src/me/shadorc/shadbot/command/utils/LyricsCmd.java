@@ -47,31 +47,22 @@ public class LyricsCmd extends AbstractCommand {
 			final String artist = NetUtils.encode(args.get(0).replace(" ", "-"));
 			final String title = NetUtils.encode(args.get(1).replace(" ", "-"));
 
-			// Make a direct search with the artist and the title
-			String url = String.format("%s/lyrics/%s/%s", HOME_URL, artist, title);
-			Response response = this.getLyricsResponse(context.getClient(), url);
-
-			// If the direct search found nothing
-			if(response.statusCode() == HttpStatus.SC_NOT_FOUND || response.body().contains("Oops! We couldn't find that page.")) {
-				url = this.getCorrectedUrl(artist, title);
-				if(url == null) {
-					return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
-							context.getUsername(), context.getArg().get()))
-							.then();
-				}
-				response = this.getLyricsResponse(context.getClient(), url);
+			final String url = this.getCorrectedUrl(artist, title);
+			if(url == null) {
+				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+						context.getUsername(), context.getArg().get()))
+						.then();
 			}
 
-			final Document doc = response.parse().outputSettings(PRESERVE_FORMAT);
+			final Document doc = this.getLyricsDocument(context.getClient(), url).outputSettings(PRESERVE_FORMAT);
 			final Musixmatch musixmatch = new Musixmatch(doc);
-			final String finalUrl = url;
 			
 			return context.getAvatarUrl()
 					.map(avatarUrl -> {
 						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
 							EmbedUtils.getDefaultEmbed().accept(embed);
 							embed.setAuthor(String.format("Lyrics: %s - %s",
-										musixmatch.getArtist(), musixmatch.getTitle()), finalUrl, avatarUrl)
+										musixmatch.getArtist(), musixmatch.getTitle()), url, avatarUrl)
 								.setThumbnail(musixmatch.getImageUrl())
 								.setDescription(musixmatch.getLyrics())
 								.setFooter("Click on the title to see the full version", "https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png");
@@ -88,7 +79,7 @@ public class LyricsCmd extends AbstractCommand {
 		}
 	}
 
-	private Response getLyricsResponse(DiscordClient client, String url) throws IOException {
+	private Document getLyricsDocument(DiscordClient client, String url) throws IOException {
 		// Sometimes Musixmatch redirects to a wrong page
 		// If the response URL and the requested URL are different, retry
 		int retryCount = 0;
@@ -104,7 +95,7 @@ public class LyricsCmd extends AbstractCommand {
 			retryCount++;
 		} while(!response.url().toString().equalsIgnoreCase(url));
 
-		return response;
+		return response.parse();
 	}
 
 	private String getCorrectedUrl(String artist, String title) throws IOException {
