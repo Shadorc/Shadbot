@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.annotation.Command;
@@ -36,7 +37,7 @@ public abstract class AbstractCommand {
 
 	public abstract Mono<Void> execute(Context context);
 
-	public abstract Mono<EmbedCreateSpec> getHelp(Context context);
+	public abstract Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context);
 
 	public String getAlias() {
 		return this.alias;

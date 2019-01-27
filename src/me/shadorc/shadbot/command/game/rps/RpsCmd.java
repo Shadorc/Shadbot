@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.game.rps;
 
+import java.util.function.Consumer;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -54,7 +56,7 @@ public class RpsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Play a Rock–paper–scissors game.")
 				.addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.json.JSONArray;
 
@@ -101,12 +102,18 @@ public class TranslateCmd extends AbstractCommand {
 			}
 
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor("Translation", null, avatarUrl)
-							.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
-									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)), sourceText,
-									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)), translatedText.toString())))
-					.flatMap(embed -> loadingMsg.send(embed))
+					.map(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor("Translation", null, avatarUrl)
+								.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
+										StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)), sourceText,
+										StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)), translatedText.toString()));
+						};
+						
+						return embedConsumer;
+					})
+					.flatMap(loadingMsg::send)
 					.then();
 
 		} catch (final IOException err) {
@@ -120,7 +127,7 @@ public class TranslateCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Translate a text from a language to another.")
 				.addArg("fromLang", "source language, by leaving it blank the language will be automatically detected", true)

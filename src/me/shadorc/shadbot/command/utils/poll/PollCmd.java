@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -123,7 +124,7 @@ public class PollCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Create a poll.")
 				.addArg("duration", false)

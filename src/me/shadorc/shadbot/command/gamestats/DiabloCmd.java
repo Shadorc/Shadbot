@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.TokenResponse;
@@ -89,19 +90,25 @@ public class DiabloCmd extends AbstractCommand {
 			Collections.reverse(heroResponses);
 
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor("Diablo 3 Stats", null, avatarUrl)
-							.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
-							.setDescription(String.format("Stats for **%s** (Guild: **%s**)"
-									+ "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
-									+ "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
-									profile.getBattleTag(), profile.getGuildName(),
-									profile.getParagonLevel(), profile.getParagonLevelSeasonHardcore(),
-									profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
-							.addField("Heroes", FormatUtils.format(heroResponses,
-									hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
-							.addField("Damage", FormatUtils.format(heroResponses,
-									hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true))
+					.map(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor("Diablo 3 Stats", null, avatarUrl)
+								.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
+								.setDescription(String.format("Stats for **%s** (Guild: **%s**)"
+										+ "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
+										+ "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
+										profile.getBattleTag(), profile.getGuildName(),
+										profile.getParagonLevel(), profile.getParagonLevelSeasonHardcore(),
+										profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
+								.addField("Heroes", FormatUtils.format(heroResponses,
+										hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
+								.addField("Damage", FormatUtils.format(heroResponses,
+										hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true);
+						};
+
+						return embedConsumer;
+					})
 					.flatMap(loadingMsg::send)
 					.then();
 
@@ -134,7 +141,7 @@ public class DiabloCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Diablo 3.")
 				.addArg("region", String.format("user's region (%s)", FormatUtils.format(Region.class, ", ")), false)

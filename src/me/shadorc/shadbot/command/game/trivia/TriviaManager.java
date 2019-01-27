@@ -6,11 +6,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.trivia.TriviaResponse;
 import me.shadorc.shadbot.api.trivia.TriviaResult;
@@ -80,13 +82,19 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 						count -> String.format("\t**%d**. %s", count, this.trivia.getAnswers().get(count - 1))));
 
 		return this.getContext().getAvatarUrl()
-				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-						.setAuthor("Trivia", null, avatarUrl)
-						.setDescription(description)
-						.addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
-						.addField("Type", String.format("`%s`", this.trivia.getType()), true)
-						.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
-						.setFooter(String.format("You have %d seconds to answer.", LIMITED_TIME), null))
+				.map(avatarUrl -> {
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Trivia", null, avatarUrl)
+							.setDescription(description)
+							.addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
+							.addField("Type", String.format("`%s`", this.trivia.getType()), true)
+							.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
+							.setFooter(String.format("You have %d seconds to answer.", LIMITED_TIME), null);
+					};
+					
+					return embedConsumer;
+				})
 				.flatMap(embed -> this.getContext().getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();

@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.admin.setting;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Message;
@@ -111,9 +112,10 @@ public class AutoMessageSetting extends AbstractSetting {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(Context context) {
-		return EmbedUtils.getDefaultEmbed()
-				.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", context.getPrefix(), this.getCommandName()), false)
+	public Consumer<? super EmbedCreateSpec> getHelp(Context context) {
+		return embed -> { 
+			EmbedUtils.getDefaultEmbed().accept(embed);
+			embed.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", context.getPrefix(), this.getCommandName()), false)
 				.addField("Argument", String.format("**action** - %s"
 						+ "%n**type** - %s"
 						+ "%n**value** - a message for *%s* and *%s* or a #channel for *%s*",
@@ -127,5 +129,6 @@ public class AutoMessageSetting extends AbstractSetting {
 				.addField("Example", String.format("`%s%s enable join_message Hello you (:`"
 						+ "%n`%s%s disable leave_message`",
 						context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()), false);
+		};
 	}
 }

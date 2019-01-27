@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.info;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
@@ -25,7 +26,7 @@ import reactor.core.publisher.Mono;
 @RateLimited
 @Command(category = CommandCategory.INFO, names = { "userinfo", "user_info", "user-info" })
 public class UserInfoCmd extends AbstractCommand {
-
+// TODO: add loading message
 	private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
 
 	@Override
@@ -54,25 +55,27 @@ public class UserInfoCmd extends AbstractCommand {
 					final String joinDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(member.getJoinTime()).format(this.dateFormatter),
 							FormatUtils.longDuration(member.getJoinTime()));
-
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)
+					
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)
 							.setThumbnail(member.getAvatarUrl())
 							.addField("Display name", member.getDisplayName(), true)
 							.addField("User ID", member.getId().asString(), true)
 							.addField("Creation date", creationDate, true)
 							.addField("Join date", joinDate, true);
 
-					if(!roles.isEmpty()) {
-						embed.addField("Roles", FormatUtils.format(roles, Role::getMention, "\n"), true);
-					}
+						if(!roles.isEmpty()) {
+							embed.addField("Roles", FormatUtils.format(roles, Role::getMention, "\n"), true);
+						}
+	
+						embed.addField("Status", StringUtils.capitalize(presence.getStatus().getValue()), true);
+						presence.getActivity()
+								.map(Activity::getName)
+								.ifPresent(details -> embed.addField("Playing text", details, true));
+					};
 
-					embed.addField("Status", StringUtils.capitalize(presence.getStatus().getValue()), true);
-					presence.getActivity()
-							.map(Activity::getName)
-							.ifPresent(details -> embed.addField("Playing text", details, true));
-
-					return embed;
+					return embedConsumer;
 				})
 				.flatMap(embed -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
@@ -80,7 +83,7 @@ public class UserInfoCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show info about an user.")
 				.addArg("@user", true)

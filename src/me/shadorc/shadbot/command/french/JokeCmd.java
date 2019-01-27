@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.french;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
@@ -42,10 +43,14 @@ public class JokeCmd extends AbstractCommand {
 
 						final String joke = FormatUtils.format(Utils.randValue(jokes).split("<br>"),
 								line -> Jsoup.parse(line).text().trim(), "\n");
+						
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor("Blague", "https://www.humour.com/blagues/", avatarUrl)
+								.setDescription(joke);
+						};
 
-						return loadingMsg.send(EmbedUtils.getDefaultEmbed()
-								.setAuthor("Blague", "https://www.humour.com/blagues/", avatarUrl)
-								.setDescription(joke));
+						return loadingMsg.send(embedConsumer);
 
 					} catch (final IOException err) {
 						loadingMsg.stopTyping();
@@ -56,7 +61,7 @@ public class JokeCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random French joke.")
 				.setSource("https://www.humour.com/blagues/")

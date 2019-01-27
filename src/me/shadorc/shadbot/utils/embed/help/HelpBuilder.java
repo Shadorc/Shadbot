@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.common.json.EmbedFieldEntity;
@@ -99,47 +100,49 @@ public class HelpBuilder {
 		return this;
 	}
 
-	public Mono<EmbedCreateSpec> build() {
+	public Mono<Consumer<? super EmbedCreateSpec>> build() {
 		return this.context.getAvatarUrl()
 				.map(avatarUrl -> {
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Help for %s command", this.cmd.getName()), null, avatarUrl)
-							.addField("Usage", this.getUsage(), false);
-
-					if(this.description != null) {
-						embed.setDescription(this.description);
-					}
-
-					if(this.thumbnail != null) {
-						embed.setThumbnail(this.thumbnail);
-					}
-
-					if(!this.getArguments().isEmpty()) {
-						embed.addField("Arguments", this.getArguments(), false);
-					}
-
-					if(this.example != null) {
-						embed.addField("Example", this.example, false);
-					}
-
-					if(this.gains != null) {
-						embed.addField("Gains", this.gains, false);
-					}
-
-					if(this.source != null) {
-						embed.addField("Source", this.source, false);
-					}
-
-					for(final EmbedFieldEntity field : this.fields) {
-						embed.addField(field.getName(), field.getValue(), field.isInline());
-					}
-
-					if(!this.cmd.getAlias().isEmpty()) {
-						embed.setFooter(String.format("Alias: %s", this.cmd.getAlias()), null);
-					}
-
-					return embed;
-				});
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor(String.format("Help for %s command", this.cmd.getName()), null, avatarUrl);
+						embed.addField("Usage", this.getUsage(), false);
+	
+						if(this.description != null) {
+							embed.setDescription(this.description);
+						}
+	
+						if(this.thumbnail != null) {
+							embed.setThumbnail(this.thumbnail);
+						}
+	
+						if(!this.getArguments().isEmpty()) {
+							embed.addField("Arguments", this.getArguments(), false);
+						}
+	
+						if(this.example != null) {
+							embed.addField("Example", this.example, false);
+						}
+	
+						if(this.gains != null) {
+							embed.addField("Gains", this.gains, false);
+						}
+	
+						if(this.source != null) {
+							embed.addField("Source", this.source, false);
+						}
+	
+						for(final EmbedFieldEntity field : this.fields) {
+							embed.addField(field.getName(), field.getValue(), field.isInline());
+						}
+	
+						if(!this.cmd.getAlias().isEmpty()) {
+							embed.setFooter(String.format("Alias: %s", this.cmd.getAlias()), null);
+						}
+					};
+					
+					return embedConsumer;
+			});
 	}
 
 	private String getUsage() {

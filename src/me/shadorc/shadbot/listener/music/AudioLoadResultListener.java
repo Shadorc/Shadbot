@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -16,6 +17,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
@@ -114,20 +116,26 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
 					return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
 				});
-
+		
 		this.guildMusic.getClient().getUserById(this.guildMusic.getDjId())
 				.map(User::getAvatarUrl)
-				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-						.setAuthor(playlist.getName(), null, avatarUrl)
-						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-						.setDescription("**Select a music by typing the corresponding number.**"
-								+ "\nYou can choose several musics by separating them with a comma."
-								+ "\nExample: 1,3,4"
-								+ "\n\n" + choices)
-						.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-								Shadbot.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null))
-				.flatMap(embed -> this.guildMusic.getMessageChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+				.map(avatarUrl -> { 
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor(playlist.getName(), null, avatarUrl);
+						embed.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png");
+						embed.setDescription("**Select a music by typing the corresponding number.**"
+									+ "\nYou can choose several musics by separating them with a comma."
+									+ "\nExample: 1,3,4"
+									+ "\n\n" + choices);
+						embed.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
+									Shadbot.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null);
+					};
+					
+					return embedConsumer;
+				})
+				.flatMap(embedConsumer -> this.guildMusic.getMessageChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
 				.then(Mono.fromRunnable(() -> {
 					this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
 							.then(Mono.fromRunnable(this::stopWaiting))

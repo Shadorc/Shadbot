@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.game.hangman;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -77,28 +78,30 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 		return this.getContext().getAvatarUrl()
 				.map(avatarUrl -> {
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Hangman Game", null, avatarUrl)
-							.setThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")
-							.setDescription("Type letters or enter a word if you think you've guessed it.")
-							.addField("Word", this.getRepresentation(this.word), false);
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Hangman Game", null, avatarUrl)
+								.setThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")
+								.setDescription("Type letters or enter a word if you think you've guessed it.")
+								.addField("Word", this.getRepresentation(this.word), false);
+						
+						if(!missedLetters.isEmpty()) {
+							embed.addField("Misses", String.join(", ", missedLetters), false);
+						}
+						
+						if(this.isTaskDone()) {
+							embed.setFooter("Finished.", null);
+						} else {
+							embed.setFooter(String.format("Use %scancel to cancel this game (Automatically cancelled in %d min in case of inactivity)",
+									this.getContext().getPrefix(), IDLE_MIN), null);
+						}
+						
+						if(this.failCount > 0) {
+							embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
+						}
+					};
 
-					if(!missedLetters.isEmpty()) {
-						embed.addField("Misses", String.join(", ", missedLetters), false);
-					}
-
-					if(this.isTaskDone()) {
-						embed.setFooter("Finished.", null);
-					} else {
-						embed.setFooter(String.format("Use %scancel to cancel this game (Automatically cancelled in %d min in case of inactivity)",
-								this.getContext().getPrefix(), IDLE_MIN), null);
-					}
-
-					if(this.failCount > 0) {
-						embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
-					}
-
-					return embed;
+					return embedConsumer;
 				})
 				.flatMap(this.updateableMessage::send)
 				.then();

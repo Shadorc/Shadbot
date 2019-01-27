@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.admin;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
@@ -69,14 +70,16 @@ public class IamCmd extends AbstractCommand {
 								description.append(quotedElements.get(0));
 							}
 
-							final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-									.setAuthor(String.format("Iam: %s",
+							final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+								EmbedUtils.getDefaultEmbed().accept(embed);
+								embed.setAuthor(String.format("Iam: %s",
 											FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
 											null, avatarUrl)
 									.setDescription(description.toString());
+							};
 
 							return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
-									.sendMessage(embed)
+									.sendMessage(embedConsumer)
 									.doOnNext(message -> {
 										final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 										final Map<String, Long> setting = dbGuild.getIamMessages();
@@ -89,7 +92,7 @@ public class IamCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription(String.format("Send a message with a reaction, users will be able to get the role(s) "
 						+ "associated with the message by clicking on %s", REACTION.getRaw()))

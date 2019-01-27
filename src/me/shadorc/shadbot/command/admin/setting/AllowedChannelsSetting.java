@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.admin.setting;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.object.entity.Channel;
@@ -92,13 +93,15 @@ public class AllowedChannelsSetting extends AbstractSetting {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(Context context) {
-		return EmbedUtils.getDefaultEmbed()
-				.addField("Usage", String.format("`%s%s <action> <#channel(s)>`", context.getPrefix(), this.getCommandName()), false)
+	public Consumer<? super EmbedCreateSpec> getHelp(Context context) {
+		return embed -> {
+			EmbedUtils.getDefaultEmbed().accept(embed);
+			embed.addField("Usage", String.format("`%s%s <action> <#channel(s)>`", context.getPrefix(), this.getCommandName()), false)
 				.addField("Argument", String.format("**action** - %s%n**channel(s)** - the (voice) channel(s) to %s",
 						FormatUtils.format(Action.class, "/"),
 						FormatUtils.format(Action.class, "/")), false)
 				.addField("Example", String.format("`%s%s add #general`", context.getPrefix(), this.getCommandName()), false);
+		};
 	}
 
 }

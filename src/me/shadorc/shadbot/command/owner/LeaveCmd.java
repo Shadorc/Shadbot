@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.owner;
 
+import java.util.function.Consumer;
+
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -36,7 +38,7 @@ public class LeaveCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Leave a guild.")
 				.addArg("guildID", false)

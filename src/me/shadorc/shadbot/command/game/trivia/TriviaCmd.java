@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.game.trivia;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -45,10 +46,15 @@ public class TriviaCmd extends AbstractCommand {
 
 		if("categories".equalsIgnoreCase(context.getArg().orElse(null))) {
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor("Trivia categories", null, avatarUrl)
-							.addField("ID", FormatUtils.format(this.categories.getIds(), id -> Integer.toString(id), "\n"), true)
-							.addField("Name", String.join("\n", this.categories.getNames()), true))
+					.map(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor("Trivia categories", null, avatarUrl)
+								.addField("ID", FormatUtils.format(this.categories.getIds(), id -> Integer.toString(id), "\n"), true)
+								.addField("Name", String.join("\n", this.categories.getNames()), true);
+						};
+						return embedConsumer;
+					})
 					.flatMap(embed -> context.getChannel()
 							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 					.then();
@@ -74,7 +80,7 @@ public class TriviaCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Start a Trivia game in which everyone can participate.")
 				.addArg("categoryID", "the category ID of the question", true)

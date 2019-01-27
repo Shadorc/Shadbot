@@ -2,10 +2,12 @@ package me.shadorc.shadbot.command.info;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -41,36 +43,43 @@ public class RolelistCmd extends AbstractCommand {
 					final List<Snowflake> mentionedRoleIds = mentionedRoles.stream()
 							.map(Role::getId)
 							.collect(Collectors.toList());
-
-					return context.getGuild()
+					
+					final Mono<List<String>> usernameList = context.getGuild()
 							.flatMapMany(Guild::getMembers)
 							.filter(member -> !Collections.disjoint(member.getRoleIds(), mentionedRoleIds))
 							.map(Member::getUsername)
 							.distinct()
-							.collectList()
-							.flatMap(usernames -> context.getAvatarUrl()
-									.map(avatarUrl -> {
-										final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-												.setAuthor(String.format("Rolelist: %s", FormatUtils.format(mentionedRoles, Role::getName, ", ")), null, avatarUrl);
-
-										if(usernames.isEmpty()) {
-											return embed.setDescription(
-													String.format("There is nobody with %s.", mentionedRoleIds.size() == 1 ? "this role" : "these roles"));
-										}
-
-										FormatUtils.createColumns(usernames, 25).stream()
-												.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
-
-										return embed;
-									}));
+							.collectList();
+					
+					return Mono.zip(usernameList, context.getAvatarUrl(), context.getChannel())
+							.flatMap(tuple -> {
+								final String avatarUrl = tuple.getT2();
+								final List<String> usernames = tuple.getT1();
+								final MessageChannel channel = tuple.getT3();
+								
+								final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+									EmbedUtils.getDefaultEmbed().accept(embed);
+									embed.setAuthor(String.format("Rolelist: %s", FormatUtils.format(mentionedRoles, Role::getName, ", ")), 
+											null, avatarUrl);
+									
+									if(usernames.isEmpty()) {
+										embed.setDescription(
+												String.format("There is nobody with %s.", mentionedRoleIds.size() == 1 ? "this role" : "these roles"));
+										return;
+									}
+									
+									FormatUtils.createColumns(usernames, 25).stream()
+										.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
+								};
+								
+								return DiscordUtils.sendMessage(embedConsumer, channel);
+							});
 				})
-				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a list of members with specific role(s).")
 				.addArg("@role(s)", false)

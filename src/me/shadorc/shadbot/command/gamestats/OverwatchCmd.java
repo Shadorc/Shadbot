@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.gamestats.overwatch.profile.ProfileResponse;
@@ -62,17 +63,23 @@ public class OverwatchCmd extends AbstractCommand {
 			}
 
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
-									StringUtils.toLowerCase(platform), profile.getUsername()), avatarUrl)
-							.setThumbnail(profile.getPortrait())
-							.setDescription(String.format("Stats for user **%s**", profile.getUsername()))
-							.addField("Level", profile.getLevel(), true)
-							.addField("Competitive rank", profile.getRank(), true)
-							.addField("Games won", profile.getGames().getQuickplayWon(), true)
-							.addField("Time played", profile.getQuickplayPlaytime(), true)
-							.addField("Top hero (Time played)", topHeroes.getPlayed(), true)
-							.addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true))
+					.map(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
+										StringUtils.toLowerCase(platform), profile.getUsername()), avatarUrl)
+								.setThumbnail(profile.getPortrait())
+								.setDescription(String.format("Stats for user **%s**", profile.getUsername()))
+								.addField("Level", profile.getLevel(), true)
+								.addField("Competitive rank", profile.getRank(), true)
+								.addField("Games won", profile.getGames().getQuickplayWon(), true)
+								.addField("Time played", profile.getQuickplayPlaytime(), true)
+								.addField("Top hero (Time played)", topHeroes.getPlayed(), true)
+								.addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true);
+						};
+						
+						return embedConsumer;
+					})
 					.flatMap(loadingMsg::send)
 					.then();
 
@@ -119,7 +126,7 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Overwatch.")
 				.addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")), true)

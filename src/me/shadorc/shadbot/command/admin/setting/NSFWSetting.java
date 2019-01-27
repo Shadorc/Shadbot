@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.admin.setting;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.util.Permission;
@@ -53,12 +54,14 @@ public class NSFWSetting extends AbstractSetting {
 	}
 
 	@Override
-	public EmbedCreateSpec getHelp(Context context) {
-		return EmbedUtils.getDefaultEmbed()
-				.addField("Usage", String.format("`%s%s <action>`", context.getPrefix(), this.getCommandName()), false)
+	public Consumer<? super EmbedCreateSpec> getHelp(Context context) {
+		return embed -> {
+			EmbedUtils.getDefaultEmbed().accept(embed);
+			embed.addField("Usage", String.format("`%s%s <action>`", context.getPrefix(), this.getCommandName()), false)
 				.addField("Argument", String.format("**action** - %s",
 						FormatUtils.format(Action.class, "/")), false)
 				.addField("Example", String.format("`%s%s toggle`", context.getPrefix(), this.getCommandName()), false);
+		};
 	}
 
 }

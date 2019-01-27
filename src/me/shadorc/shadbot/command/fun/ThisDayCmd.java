@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.fun;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -52,11 +53,16 @@ public class ThisDayCmd extends AbstractCommand {
 					.collect(Collectors.joining("\n\n"));
 
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("On This Day: %s", date), HOME_URL, avatarUrl)
-							.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-							.setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH)))
-					.flatMap(loadingMsg::send)
+					.flatMap(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor(String.format("On This Day: %s", date), HOME_URL, avatarUrl)
+								.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
+								.setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH));
+						};
+						
+						return loadingMsg.send(embedConsumer);
+					})
 					.then();
 
 		} catch (final IOException err) {
@@ -66,7 +72,7 @@ public class ThisDayCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show significant events of the day.")
 				.setSource(HOME_URL)

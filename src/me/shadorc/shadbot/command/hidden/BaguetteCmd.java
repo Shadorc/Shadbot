@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.hidden;
 
+import java.util.function.Consumer;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -17,13 +19,18 @@ public class BaguetteCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-				.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg");
-		return context.getChannel().flatMap(channel -> DiscordUtils.sendMessage(embed, channel)).then();
+		final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+			EmbedUtils.getDefaultEmbed().accept(embed);
+			embed.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg");
+		};
+
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+				.then();
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("This command doesn't exist.")
 				.build();

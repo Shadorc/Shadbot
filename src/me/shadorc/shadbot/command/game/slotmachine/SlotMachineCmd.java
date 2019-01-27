@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.game.slotmachine;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
@@ -60,7 +61,7 @@ public class SlotMachineCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Play slot machine.")
 				.addField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)

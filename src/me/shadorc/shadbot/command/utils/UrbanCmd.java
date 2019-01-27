@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.utils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,11 +52,17 @@ public class UrbanCmd extends AbstractCommand {
 			final String example = StringUtils.abbreviate(urbanDefinition.getExample(), Field.MAX_VALUE_LENGTH);
 
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Urban Dictionary: %s", urbanDefinition.getWord()), urbanDefinition.getPermalink(), avatarUrl)
-							.setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
-							.setDescription(definition)
-							.addField("Example", example, false))
+					.map(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor(String.format("Urban Dictionary: %s", urbanDefinition.getWord()), urbanDefinition.getPermalink(), avatarUrl)
+								.setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
+								.setDescription(definition)
+								.addField("Example", example, false);
+						};
+						
+						return embedConsumer;
+					})
 					.flatMap(loadingMsg::send)
 					.then();
 
@@ -67,7 +74,7 @@ public class UrbanCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show Urban Dictionary definition for a search.")
 				.addArg("search", false)

@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.DiscordClient;
@@ -86,29 +87,30 @@ public class LotteryCmd extends AbstractCommand {
 
 		return context.getAvatarUrl()
 				.map(avatarUrl -> {
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Lottery", null, avatarUrl)
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Lottery", null, avatarUrl)
 							.setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 							.setDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
 									FormatUtils.customDate(LotteryCmd.getDelay().toMillis()),
 									context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
 							.addField("Number of participants", Integer.toString(gamblers.size()), false)
 							.addField("Prize pool", FormatUtils.coins(Shadbot.getLottery().getJackpot()), false);
-
-					final LotteryGambler gambler = gamblers.stream()
-							.filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
-							.findAny()
-							.orElse(null);
-
-					if(gambler != null) {
-						embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
-								"https://images.emojiterra.com/twitter/512px/1f39f.png");
-					}
-
-					final LotteryHistoric historic = Shadbot.getLottery().getHistoric();
-					if(historic != null) {
-						String people;
-						switch (historic.getWinnerCount()) {
+						
+						final LotteryGambler gambler = gamblers.stream()
+								.filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
+								.findAny()
+								.orElse(null);
+						
+						if(gambler != null) {
+							embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
+									"https://images.emojiterra.com/twitter/512px/1f39f.png");
+						}
+						
+						final LotteryHistoric historic = Shadbot.getLottery().getHistoric();
+						if(historic != null) {
+							String people;
+							switch (historic.getWinnerCount()) {
 							case 0:
 								people = "nobody";
 								break;
@@ -118,15 +120,17 @@ public class LotteryCmd extends AbstractCommand {
 							default:
 								people = historic.getWinnerCount() + " people";
 								break;
+							}
+							
+							embed.addField("Historic",
+									String.format("Last week, the prize pool contained **%s**, the winning number was **%d** and **%s won**.",
+											FormatUtils.coins(historic.getJackpot()), historic.getNumber(), people),
+									false);
 						}
+					};
+					
 
-						embed.addField("Historic",
-								String.format("Last week, the prize pool contained **%s**, the winning number was **%d** and **%s won**.",
-										FormatUtils.coins(historic.getJackpot()), historic.getNumber(), people),
-								false);
-					}
-
-					return embed;
+					return embedConsumer;
 				})
 				.flatMap(embed -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
@@ -177,7 +181,7 @@ public class LotteryCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Buy a ticket for the lottery or display the current lottery status.")
 				.addArg("num", String.format("must be between %d and %d", MIN_NUM, MAX_NUM), true)

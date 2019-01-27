@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.utils;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -66,17 +67,23 @@ public class WeatherCmd extends AbstractCommand {
 			final String countryCode = currentWeather.getSystemData().getCountryCode();
 
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
-									String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
-									avatarUrl)
-							.setThumbnail(weather.getIconLink())
-							.setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
-							.addField(Emoji.CLOUD + " Clouds", StringUtils.capitalize(weather.getDescription()), true)
-							.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
-							.addField(Emoji.RAIN + " Rain", rain, true)
-							.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
-							.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true))
+					.map(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
+										String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
+										avatarUrl)
+								.setThumbnail(weather.getIconLink())
+								.setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
+								.addField(Emoji.CLOUD + " Clouds", StringUtils.capitalize(weather.getDescription()), true)
+								.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
+								.addField(Emoji.RAIN + " Rain", rain, true)
+								.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
+								.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true);
+						};
+						
+						return embedConsumer;
+					})
 					.flatMap(loadingMsg::send)
 					.then();
 
@@ -121,7 +128,7 @@ public class WeatherCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show weather report for a city.")
 				.setDelimiter(", ")

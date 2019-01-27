@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.music;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.function.Consumer;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
@@ -25,14 +26,20 @@ public class PlaylistCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
-
+		
 		return context.getAvatarUrl()
-				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-						.setAuthor("Playlist", null, avatarUrl)
-						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-						.setDescription(this.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist())))
-				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+				.map(avatarUrl -> {
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Playlist", null, avatarUrl)
+							.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
+							.setDescription(this.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist()));
+					};
+					
+					return embedConsumer;
+				})
+				.flatMap(embedConsumer -> context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
 				.then();
 	}
 
@@ -58,7 +65,7 @@ public class PlaylistCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show current playlist.")
 				.build();

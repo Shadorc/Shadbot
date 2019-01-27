@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.music;
 
+import java.util.function.Consumer;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -36,7 +38,7 @@ public class PauseCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Pause current music. Use this command again to resume.")
 				.build();

@@ -2,6 +2,7 @@ package me.shadorc.shadbot.core.setting;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
@@ -21,7 +22,7 @@ public abstract class AbstractSetting {
 
 	public abstract Mono<Void> execute(Context context);
 
-	public abstract EmbedCreateSpec getHelp(Context context);
+	public abstract Consumer<? super EmbedCreateSpec> getHelp(Context context);
 
 	public String getDescription() {
 		return this.description;

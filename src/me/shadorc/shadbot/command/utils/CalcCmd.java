@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.utils;
 
 import java.text.DecimalFormat;
+import java.util.function.Consumer;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
 
@@ -39,7 +40,7 @@ public class CalcCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Calculate an expression.")
 				.addArg("expression", false)

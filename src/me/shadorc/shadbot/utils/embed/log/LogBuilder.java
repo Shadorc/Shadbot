@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.utils.embed.log;
 
 import java.awt.Color;
+import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
@@ -33,35 +34,38 @@ public class LogBuilder {
 		this(type, message, null, null);
 	}
 
-	public EmbedCreateSpec build() {
-		final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-				.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeEnum(this.type), Config.VERSION), null, null)
-				.setDescription(this.message);
+	public Consumer<? super EmbedCreateSpec> build() {
+		return embed -> {
+			EmbedUtils.getDefaultEmbed().accept(embed);
+			embed.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeEnum(this.type), Config.VERSION), null, null);
+			embed.setDescription(this.message);
 
-		switch (this.type) {
-			case ERROR:
-				embed.setColor(Color.RED);
-				break;
-			case WARN:
-				embed.setColor(Color.ORANGE);
-				break;
-			case INFO:
-				embed.setColor(Color.GREEN);
-				break;
-		}
-
-		if(this.err != null) {
-			embed.addField("Error type", this.err.getClass().getSimpleName(), false);
-			if(this.err.getMessage() != null) {
-				embed.addField("Error message", this.err.getMessage(), false);
+			switch (this.type) {
+				case ERROR:
+					embed.setColor(Color.RED);
+					break;
+				case WARN:
+					embed.setColor(Color.ORANGE);
+					break;
+				case INFO:
+					embed.setColor(Color.GREEN);
+					break;
+				default:
+					embed.setColor(Color.BLUE);
+					break;
 			}
-		}
-
-		if(this.input != null) {
-			embed.addField("Input", this.input, false);
-		}
-
-		return embed;
+	
+			if(this.err != null) {
+				embed.addField("Error type", this.err.getClass().getSimpleName(), false);
+				if(this.err.getMessage() != null) {
+					embed.addField("Error message", this.err.getMessage(), false);
+				}
+			}
+	
+			if(this.input != null) {
+				embed.addField("Input", this.input, false);
+			}
+		};
 	}
 
 }

@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.music;
 
+import java.util.function.Consumer;
+
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -28,7 +30,7 @@ public class NameCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show current music name.")
 				.build();

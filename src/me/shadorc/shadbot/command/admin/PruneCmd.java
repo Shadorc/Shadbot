@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.admin;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.object.Embed;
@@ -95,7 +96,7 @@ public class PruneCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Delete messages.")
 				.addArg("@user(s)", "from these users", true)

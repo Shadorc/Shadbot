@@ -4,6 +4,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
@@ -63,25 +64,28 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 				.map(avatarUrlAndUsers -> {
 					final String avatarUrl = avatarUrlAndUsers.getT1();
 					final List<String> usernames = avatarUrlAndUsers.getT2();
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Dice Game", null, avatarUrl)
+					
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Dice Game", null, avatarUrl)
 							.setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 							.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
 									this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
 							.addField("Player", String.join("\n", usernames), true)
 							.addField("Number", FormatUtils.format(this.numsPlayers.keySet(), Object::toString, "\n"), true);
+						
+						if(this.isTaskDone()) {
+							embed.setFooter("Finished.", null);
+						} else {
+							embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+						}
+						
+						if(this.results != null) {
+							embed.addField("Results", this.results, false);
+						}
+					};
 
-					if(this.isTaskDone()) {
-						embed.setFooter("Finished.", null);
-					} else {
-						embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
-					}
-
-					if(this.results != null) {
-						embed.addField("Results", this.results, false);
-					}
-
-					return embed;
+					return embedConsumer;
 				})
 				.flatMap(this.updateableMessage::send)
 				.then();

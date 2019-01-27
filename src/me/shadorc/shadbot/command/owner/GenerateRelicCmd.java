@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.owner;
 
+import java.util.function.Consumer;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -39,7 +41,7 @@ public class GenerateRelicCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Generate a relic.")
 				.addArg(RelicType.values(), false)

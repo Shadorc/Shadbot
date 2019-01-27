@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.json.XML;
 
@@ -67,19 +68,21 @@ public class Rule34Cmd extends AbstractCommand {
 
 						return context.getAvatarUrl()
 								.map(avatarUrl -> {
-									final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-											.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), avatarUrl)
-											.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
-											.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
-											.addField("Tags", formattedtags, false)
-											.setImage(post.getFileUrl())
-											.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
+									final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+										EmbedUtils.getDefaultEmbed().accept(embed);
+										embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), avatarUrl)
+												.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
+												.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
+												.addField("Tags", formattedtags, false)
+												.setImage(post.getFileUrl())
+												.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
 
-									if(!post.getSource().isEmpty()) {
-										embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
-									}
+										if(!post.getSource().isEmpty()) {
+											embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
+										}
+									};
 
-									return embed;
+									return embedConsumer;
 								})
 								.flatMap(loadingMsg::send);
 
@@ -94,7 +97,7 @@ public class Rule34Cmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random image corresponding to a tag from Rule34 website.")
 				.setSource("https://www.rule34.xxx/")

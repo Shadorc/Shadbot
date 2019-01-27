@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.image;
 import java.awt.Dimension;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -134,11 +135,16 @@ public class WallpaperCmd extends AbstractCommand {
 								tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 
 						return context.getAvatarUrl()
-								.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-										.setAuthor("Wallpaper", wallpaper.getUrl(), avatarUrl)
-										.setImage(wallpaper.getImageUrl())
-										.addField("Resolution", wallpaper.getResolution().toString(), false)
-										.addField("Tags", tags, false))
+								.map(avatarUrl -> {
+									final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+										EmbedUtils.getDefaultEmbed().accept(embed);
+										embed.setAuthor("Wallpaper", wallpaper.getUrl(), avatarUrl)
+											.setImage(wallpaper.getImageUrl())
+											.addField("Resolution", wallpaper.getResolution().toString(), false)
+											.addField("Tags", tags, false);
+									};
+									return embedConsumer;
+								})
 								.flatMap(loadingMsg::send)
 								.then();
 					} catch (final WallhavenException err) {
@@ -176,7 +182,7 @@ public class WallpaperCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Search for a wallpaper.")
 				.setUsage(String.format("[-p %s] [-c %s] [-rat %s] [-res %s] [-k %s]", PURITY, CATEGORY, RATIO, RESOLUTION, KEYWORD))

@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.hidden;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
@@ -49,21 +50,23 @@ public class HelpCmd extends AbstractCommand {
 				.map(tuple -> {
 					final Map<CommandCategory, Collection<String>> map = tuple.getT1();
 					final String avatarUrl = tuple.getT2();
-
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Shadbot Help", null, avatarUrl)
+					
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Shadbot Help", null, avatarUrl)
 							.setDescription(String.format("Any issues, questions or suggestions ?"
 									+ " Join the [support server.](%s)"
 									+ "%nGet more information by using `%s%s <command>`.",
 									Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
 
-					for(final CommandCategory category : CommandCategory.values()) {
-						if(map.get(category) != null && !map.get(category).isEmpty() && !category.equals(CommandCategory.HIDDEN)) {
-							embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
+						for(final CommandCategory category : CommandCategory.values()) {
+							if(map.get(category) != null && !map.get(category).isEmpty() && !category.equals(CommandCategory.HIDDEN)) {
+								embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
+							}
 						}
-					}
-
-					return embed;
+					};
+					
+					return embedConsumer;
 				})
 				.flatMap(embed -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
@@ -71,7 +74,7 @@ public class HelpCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show the list of available commands.")
 				.build();

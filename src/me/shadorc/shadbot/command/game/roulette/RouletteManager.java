@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -72,8 +73,9 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 					final String avatarUrl = avatarUrlAndUsers.getT1();
 					final List<User> users = avatarUrlAndUsers.getT2();
 
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Roulette Game", null, avatarUrl)
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Roulette Game", null, avatarUrl)
 							.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
 							.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
 									+ "%n%n**Place** is a `number between 1 and 36`, %s",
@@ -82,18 +84,19 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 							.addField("Player (Bet)", FormatUtils.format(users,
 									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.coins(this.playersPlace.get(user.getId()).getT1())), "\n"), true)
 							.addField("Place", this.playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
+						
+						if(this.results != null) {
+							embed.addField("Results", this.results, false);
+						}
+						
+						if(this.isTaskDone()) {
+							embed.setFooter("Finished", null);
+						} else {
+							embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+						}
+					};
 
-					if(this.results != null) {
-						embed.addField("Results", this.results, false);
-					}
-
-					if(this.isTaskDone()) {
-						embed.setFooter("Finished", null);
-					} else {
-						embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
-					}
-
-					return embed;
+					return embedConsumer;
 				})
 				.flatMap(this.updateableMessage::send)
 				.then();

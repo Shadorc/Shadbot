@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.TokenResponse;
@@ -49,14 +50,18 @@ public class ImageCmd extends AbstractCommand {
 			}
 
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), avatarUrl)
-							.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
-							.addField("Title", image.getTitle(), false)
-							.addField("Author", image.getAuthor().getUsername(), false)
-							.addField("Category", image.getCategoryPath(), false)
-							.setImage(image.getContent().getSource()))
-					.flatMap(loadingMsg::send)
+					.flatMap(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), avatarUrl)
+								.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
+								.addField("Title", image.getTitle(), false)
+								.addField("Author", image.getAuthor().getUsername(), false)
+								.addField("Category", image.getCategoryPath(), false)
+								.setImage(image.getContent().getSource());
+						};
+						return loadingMsg.send(embedConsumer);
+					})
 					.then();
 
 		} catch (final IOException err) {
@@ -101,7 +106,7 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Search for a random image on DeviantArt.")
 				.addArg("search", false)

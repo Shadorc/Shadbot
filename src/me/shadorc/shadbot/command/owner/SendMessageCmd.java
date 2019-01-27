@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.owner;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
@@ -52,7 +53,7 @@ public class SendMessageCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Send a private message to an user.")
 				.addArg("userID", false)

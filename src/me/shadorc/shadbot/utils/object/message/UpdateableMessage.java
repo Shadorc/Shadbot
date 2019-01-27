@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.utils.object.message;
 
+import java.util.function.Consumer;
+
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
@@ -31,7 +33,7 @@ public class UpdateableMessage {
 	 *
 	 * @param embed - the embed to send
 	 */
-	public Mono<Message> send(EmbedCreateSpec embed) {
+	public Mono<Message> send(Consumer<? super EmbedCreateSpec> embed) {
 		return Mono.justOrEmpty(this.messageId)
 				.flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
 				.flatMap(Message::delete)

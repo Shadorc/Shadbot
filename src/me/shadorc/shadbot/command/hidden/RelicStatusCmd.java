@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.hidden;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -62,14 +63,16 @@ public class RelicStatusCmd extends AbstractCommand {
 					final List<EmbedFieldEntity> fields = tuple.getT1();
 					final String avatarUrl = tuple.getT2();
 
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Contributor Status", null, avatarUrl)
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Contributor Status", null, avatarUrl)
 							.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
 
-					fields.stream()
-							.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
+						fields.stream()
+								.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
+					};
 
-					return embed;
+					return embedConsumer;
 				})
 				.flatMap(embed -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
@@ -77,7 +80,7 @@ public class RelicStatusCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show your contributor status.")
 				.build();

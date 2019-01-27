@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.BooleanUtils;
 
@@ -62,11 +63,11 @@ public class DiscordUtils {
 		return DiscordUtils.sendMessage(content, null, channel);
 	}
 
-	public static Mono<Message> sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
+	public static Mono<Message> sendMessage(Consumer<? super EmbedCreateSpec> embed, MessageChannel channel) {
 		return DiscordUtils.sendMessage(null, embed, channel);
 	}
 
-	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, MessageChannel channel) {
+	public static Mono<Message> sendMessage(String content, Consumer<? super EmbedCreateSpec> embed, MessageChannel channel) {
 		final Snowflake selfId = channel.getClient().getSelfId().get();
 		return Mono.zip(
 				DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),

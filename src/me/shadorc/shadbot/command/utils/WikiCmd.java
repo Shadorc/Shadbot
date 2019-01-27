@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.utils;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -61,12 +62,18 @@ public class WikiCmd extends AbstractCommand {
 			final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
 
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
-									String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
-									avatarUrl)
-							.setThumbnail("https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png")
-							.setDescription(extract))
+					.map(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
+										String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
+										avatarUrl)
+								.setThumbnail("https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png")
+								.setDescription(extract);
+						};
+						
+						return embedConsumer;
+					})
 					.flatMap(loadingMsg::send)
 					.then();
 
@@ -77,7 +84,7 @@ public class WikiCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show Wikipedia description for a search.")
 				.addArg("search", false)

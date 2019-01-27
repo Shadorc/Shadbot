@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.currency;
 
 import java.util.Comparator;
+import java.util.function.Consumer;
 
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -45,16 +46,22 @@ public class LeaderboardCmd extends AbstractCommand {
 							});
 				})
 				.zipWith(context.getAvatarUrl())
-				.map(tuple -> EmbedUtils.getDefaultEmbed()
-						.setAuthor("Leaderboard", null, tuple.getT2())
-						.setDescription(tuple.getT1()))
+				.map(tuple -> {
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Leaderboard", null, tuple.getT2())
+							.setDescription(tuple.getT1());
+					};
+					
+					return embedConsumer;
+				})
 				.flatMap(embed -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show coins leaderboard for this server.")
 				.build();

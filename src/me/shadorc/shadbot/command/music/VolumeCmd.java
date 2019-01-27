@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.music;
 
+import java.util.function.Consumer;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -48,7 +50,7 @@ public class VolumeCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show or change current volume level.")
 				.addArg("volume", "must be between 0 and 100", true)

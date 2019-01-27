@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.music;
 
+import java.util.function.Consumer;
+
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -48,7 +50,7 @@ public class SkipCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Skip current music and play the next one if it exists."
 						+ "\nYou can also directly skip to a music in the playlist by specifying its number.")

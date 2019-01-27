@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.admin;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -99,7 +100,7 @@ public class SettingsCmd extends AbstractCommand {
 								.then());
 	}
 
-	private Mono<EmbedCreateSpec> show(Context context) {
+	private Mono<Consumer<? super EmbedCreateSpec>> show(Context context) {
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 		final StringBuilder settingsStr = new StringBuilder();
 
@@ -161,21 +162,33 @@ public class SettingsCmd extends AbstractCommand {
 				.then(autoRolesStr)
 				.then(permissionsStr)
 				.then(context.getAvatarUrl())
-				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-						.setAuthor("Settings", null, avatarUrl)
-						.setDescription(
-								settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString()));
+				.map(avatarUrl -> {
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Settings", null, avatarUrl)
+							.setDescription(
+									settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString());
+					};
+					
+					return embedConsumer;
+				});
 	}
 
-	private Mono<EmbedCreateSpec> getHelp(Context context, AbstractSetting setting) {
+	private Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context, AbstractSetting setting) {
 		return context.getAvatarUrl()
-				.map(avatarUrl -> setting.getHelp(context)
-						.setAuthor(String.format("Help for setting: %s", setting.getName()), null, avatarUrl)
-						.setDescription(String.format("**%s**", setting.getDescription())));
+				.map(avatarUrl -> {
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						setting.getHelp(context).accept(embed);
+						embed.setAuthor(String.format("Help for setting: %s", setting.getName()), null, avatarUrl)
+							.setDescription(String.format("**%s**", setting.getDescription()));
+					};
+					
+					return embedConsumer;
+				});
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		final HelpBuilder embed = new HelpBuilder(this, context)
 				.setThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
 				.setDescription("Change Shadbot's settings for this server.")

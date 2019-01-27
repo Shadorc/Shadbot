@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.currency;
 
+import java.util.function.Consumer;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -39,7 +41,7 @@ public class CoinsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show how many coins an user has.")
 				.addArg("@user", "if not specified, it will show your coins", true)

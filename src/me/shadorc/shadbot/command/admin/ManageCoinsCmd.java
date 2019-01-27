@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.admin;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -69,7 +70,7 @@ public class ManageCoinsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Manage user(s) coins.")
 				.addArg("action", FormatUtils.format(Action.class, " / "), false)

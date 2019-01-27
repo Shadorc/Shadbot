@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.admin;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.MessageChannel;
@@ -84,7 +85,7 @@ public class BanCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Ban user(s) and delete his/their messages from the last 7 days.")
 				.addArg("@user(s)", false)

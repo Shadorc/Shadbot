@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -88,25 +89,27 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 				.map(fieldsAndAvatarUrl -> {
 					final List<EmbedFieldEntity> fields = fieldsAndAvatarUrl.getT1();
 					final String avatarUrl = fieldsAndAvatarUrl.getT2();
+					
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor("Blackjack Game", null, avatarUrl)
+								.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
+								.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
+										+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
+										this.getContext().getPrefix(), this.getContext().getCommandName()))
+								.addField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? this.dealerCards : this.dealerCards.subList(0, 1)), true);
 
-					final EmbedCreateSpec embed = EmbedUtils.getDefaultEmbed()
-							.setAuthor("Blackjack Game", null, avatarUrl)
-							.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
-							.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
-									+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
-									this.getContext().getPrefix(), this.getContext().getCommandName()))
-							.addField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? this.dealerCards : this.dealerCards.subList(0, 1)), true);
+							if(this.isTaskDone()) {
+								embed.setFooter("Finished", null);
+							} else {
+								final long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(this.startTime));
+								embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingTime), null);
+							}
+		
+							fields.stream().forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
+					};
 
-					if(this.isTaskDone()) {
-						embed.setFooter("Finished", null);
-					} else {
-						final long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(this.startTime));
-						embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingTime), null);
-					}
-
-					fields.stream().forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
-
-					return embed;
+					return embedConsumer;
 				})
 				.flatMap(this.updateableMessage::send)
 				.then();

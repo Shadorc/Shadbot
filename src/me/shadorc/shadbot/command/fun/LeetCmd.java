@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.fun;
 
+import java.util.function.Consumer;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -30,16 +32,22 @@ public class LeetCmd extends AbstractCommand {
 				.replace("T", "7");
 
 		return context.getAvatarUrl()
-				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-						.setAuthor("Leetifier", null, avatarUrl)
-						.setDescription(String.format("**Original**%n%s%n%n**Leetified**%n%s", arg, text)))
-				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+				.map(avatarUrl -> {
+					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+						EmbedUtils.getDefaultEmbed().accept(embed);
+						embed.setAuthor("Leetifier", null, avatarUrl)
+							.setDescription(String.format("**Original**%n%s%n%n**Leetified**%n%s", arg, text));
+					};
+					
+					return embedConsumer;
+				})
+				.flatMap(embedConsumer -> context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
 				.then();
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Leetify a text.")
 				.addArg("text", false)

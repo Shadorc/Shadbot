@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.gamestats;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.http.HttpStatus;
 import org.jsoup.Connection.Method;
@@ -93,13 +94,17 @@ public class FortniteCmd extends AbstractCommand {
 
 			return context.getAvatarUrl()
 					.map(avatarUrl -> {
-						return EmbedUtils.getDefaultEmbed()
-								.setAuthor("Fortnite Stats",
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor("Fortnite Stats",
 										String.format("https://fortnitetracker.com/profile/%s/%s",
 												StringUtils.toLowerCase(platform), encodedNickname),
 										avatarUrl)
 								.setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
 								.setDescription(description);
+						};
+						
+						return embedConsumer;
 					})
 					.flatMap(loadingMsg::send)
 					.then();
@@ -111,7 +116,7 @@ public class FortniteCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Fortnite.")
 				.addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")),

@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.utils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.http.HttpStatus;
 import org.jsoup.Connection.Response;
@@ -64,14 +65,20 @@ public class LyricsCmd extends AbstractCommand {
 			final Document doc = response.parse().outputSettings(PRESERVE_FORMAT);
 			final Musixmatch musixmatch = new Musixmatch(doc);
 			final String finalUrl = url;
-
+			
 			return context.getAvatarUrl()
-					.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-							.setAuthor(String.format("Lyrics: %s - %s",
-									musixmatch.getArtist(), musixmatch.getTitle()), finalUrl, avatarUrl)
-							.setThumbnail(musixmatch.getImageUrl())
-							.setDescription(musixmatch.getLyrics())
-							.setFooter("Click on the title to see the full version", "https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png"))
+					.map(avatarUrl -> {
+						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+							EmbedUtils.getDefaultEmbed().accept(embed);
+							embed.setAuthor(String.format("Lyrics: %s - %s",
+										musixmatch.getArtist(), musixmatch.getTitle()), finalUrl, avatarUrl)
+								.setThumbnail(musixmatch.getImageUrl())
+								.setDescription(musixmatch.getLyrics())
+								.setFooter("Click on the title to see the full version", "https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png");
+						};
+						
+						return embedConsumer;
+					})
 					.flatMap(loadingMsg::send)
 					.then();
 
@@ -115,7 +122,7 @@ public class LyricsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show lyrics for a song.")
 				.setDelimiter(" - ")

@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -42,10 +43,15 @@ public class SuicideGirlsCmd extends AbstractCommand {
 						final String url = girl.getElementsByClass("facebook-share").attr("href");
 
 						return context.getAvatarUrl()
-								.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-										.setAuthor("SuicideGirls", url, avatarUrl)
-										.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
-										.setImage(imageUrl));
+								.map(avatarUrl -> {
+									final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+										EmbedUtils.getDefaultEmbed().accept(embed);
+										embed.setAuthor("SuicideGirls", url, avatarUrl)
+											.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
+											.setImage(imageUrl);
+									};
+									return embedConsumer;
+								});
 					} catch (final IOException err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(err);
@@ -58,7 +64,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random Suicide Girl image.")
 				.setSource("https://www.suicidegirls.com/")

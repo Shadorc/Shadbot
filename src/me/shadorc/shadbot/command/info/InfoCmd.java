@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.info;
 
+import java.util.function.Consumer;
+
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
@@ -49,7 +51,9 @@ public class InfoCmd extends AbstractCommand {
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
-				context.getClient().getGuilds().count(), context.getClient().getUsers().count(), voiceChannelCountMono)
+				context.getClient().getGuilds().count(),
+				context.getClient().getUsers().count(), 
+				voiceChannelCountMono)
 				.flatMap(tuple -> {
 					final long start = System.currentTimeMillis();
 					return loadingMsg.send(String.format(Emoji.GEAR + " (**%s**) Testing ping...", context.getUsername()))
@@ -86,7 +90,7 @@ public class InfoCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show Shadbot's info.")
 				.build();

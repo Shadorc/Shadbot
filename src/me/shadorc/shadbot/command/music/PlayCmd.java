@@ -1,5 +1,7 @@
 package me.shadorc.shadbot.command.music;
 
+import java.util.function.Consumer;
+
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
@@ -87,7 +89,7 @@ public class PlayCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<EmbedCreateSpec> getHelp(Context context) {
+	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Play the music(s) from the url, search terms or playlist.")
 				.setFullUsage(String.format("%s%s[first] [soundcloud] <url>", context.getPrefix(), this.getName()))
