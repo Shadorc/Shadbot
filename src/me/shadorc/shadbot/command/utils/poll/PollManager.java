@@ -72,7 +72,7 @@ public class PollManager extends AbstractGameManager {
 					
 					return embedConsumer;
 				})
-				.flatMap(this.voteMessage::sendMessage)
+				.flatMap(this.voteMessage::send)
 				.flatMap(message -> Mono.delay(this.spec.getDuration())
 						.thenReturn(message.getId()))
 				.flatMap(messageId -> this.getContext().getClient().getMessageById(this.getContext().getChannelId(), messageId))
