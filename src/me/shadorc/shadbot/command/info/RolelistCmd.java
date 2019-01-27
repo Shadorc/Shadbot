@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -51,11 +50,10 @@ public class RolelistCmd extends AbstractCommand {
 							.distinct()
 							.collectList();
 					
-					return Mono.zip(usernameList, context.getAvatarUrl(), context.getChannel())
-							.flatMap(tuple -> {
+					return Mono.zip(usernameList, context.getAvatarUrl())
+							.map(tuple -> {
 								final String avatarUrl = tuple.getT2();
 								final List<String> usernames = tuple.getT1();
-								final MessageChannel channel = tuple.getT3();
 								
 								final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
 									EmbedUtils.getDefaultEmbed().accept(embed);
@@ -72,8 +70,10 @@ public class RolelistCmd extends AbstractCommand {
 										.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
 								};
 								
-								return DiscordUtils.sendMessage(embedConsumer, channel);
-							});
+								return embedConsumer;
+							})
+							.flatMap(embedConsumer -> context.getChannel()
+									.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)));
 				})
 				.then();
 	}
