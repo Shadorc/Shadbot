@@ -9,7 +9,6 @@ import discord4j.core.object.Region;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Image.Format;
@@ -19,11 +18,11 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
 @RateLimited
@@ -33,21 +32,20 @@ public class ServerInfoCmd extends AbstractCommand {
 	private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
 
 	@Override
-	// TODO; add loading message
 	public Mono<Void> execute(Context context) {
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+		
 		return Mono.zip(context.getGuild(),
 				context.getGuild().flatMap(Guild::getOwner),
 				context.getGuild().flatMapMany(Guild::getChannels).collectList(),
 				context.getGuild().flatMap(Guild::getRegion),
-				context.getAvatarUrl(),
-				context.getChannel())
-				.flatMap(tuple -> {
+				context.getAvatarUrl())
+				.map(tuple -> {
 					final Guild guild = tuple.getT1();
 					final Member owner = tuple.getT2();
 					final List<GuildChannel> channels = tuple.getT3();
 					final Region region = tuple.getT4();
 					final String avatarUrl = tuple.getT5();
-					final MessageChannel channel = tuple.getT6();
 
 					final String creationDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(guild.getId().getTimestamp()).format(this.dateFormatter),
@@ -66,8 +64,10 @@ public class ServerInfoCmd extends AbstractCommand {
 							.addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), true)
 							.addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true);
 					};
-					return DiscordUtils.sendMessage(embedConsumer, channel);
+					
+					return embedConsumer;
 				})
+				.flatMap(loadingMsg::send)
 				.then();
 	}
 

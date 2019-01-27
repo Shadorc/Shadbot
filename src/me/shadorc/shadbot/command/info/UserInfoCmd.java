@@ -15,22 +15,23 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
 @RateLimited
 @Command(category = CommandCategory.INFO, names = { "userinfo", "user_info", "user-info" })
 public class UserInfoCmd extends AbstractCommand {
-// TODO: add loading message
-	private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
+
+	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
 
 	@Override
 	public Mono<Void> execute(Context context) {
+		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		final Mono<Member> memberMono = context.getMessage()
 				.getUserMentions()
@@ -49,11 +50,11 @@ public class UserInfoCmd extends AbstractCommand {
 					final String avatarUrl = tuple4.getT4();
 
 					final String creationDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(member.getId().getTimestamp()).format(this.dateFormatter),
+							TimeUtils.toLocalDate(member.getId().getTimestamp()).format(DATE_FORMATTER),
 							FormatUtils.longDuration(member.getId().getTimestamp()));
 
 					final String joinDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(member.getJoinTime()).format(this.dateFormatter),
+							TimeUtils.toLocalDate(member.getJoinTime()).format(DATE_FORMATTER),
 							FormatUtils.longDuration(member.getJoinTime()));
 					
 					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
@@ -77,8 +78,7 @@ public class UserInfoCmd extends AbstractCommand {
 
 					return embedConsumer;
 				})
-				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+				.flatMap(loadingMsg::send)
 				.then();
 	}
 
