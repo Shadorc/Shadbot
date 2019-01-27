@@ -72,7 +72,7 @@ public class KickCmd extends AbstractCommand {
 											.flatMap(privateChannel -> DiscordUtils.sendMessage(
 													String.format(Emoji.INFO + " You were kicked from the server **%s** by **%s**. Reason: `%s`",
 															guild.getName(), context.getUsername(), reason), privateChannel))
-											.then(member.kick(/* TODO spec -> spec.setReason(reason.toString()) */))
+											.then(member.kick(reason.toString()))
 											.thenReturn(member));
 						})
 						.collectList()
