@@ -2,9 +2,11 @@ package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.TokenResponse;
@@ -84,7 +86,11 @@ public class ImageCmd extends AbstractCommand {
 				encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken()));
 
 		final DeviantArtResponse deviantArt = Utils.MAPPER.readValue(url, DeviantArtResponse.class);
-		return deviantArt.getResults().isEmpty() ? null : Utils.randValue(deviantArt.getResults());
+		final List<Image> images = deviantArt.getResults().stream()
+				.filter(image -> image.getContent() != null)
+				.collect(Collectors.toList());
+		
+		return images.isEmpty() ? null : Utils.randValue(images);
 	}
 
 	private boolean isTokenExpired() {

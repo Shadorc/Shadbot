@@ -1,9 +1,12 @@
 package me.shadorc.shadbot.api.image.deviantart;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Image {
 
+	@Nullable
 	@JsonProperty("content")
 	private Content content;
 	@JsonProperty("author")
