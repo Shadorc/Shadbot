@@ -3,7 +3,6 @@ package me.shadorc.shadbot.utils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -268,14 +267,8 @@ public class DiscordUtils {
 	}
 
 	public static Mono<Void> updatePresence(DiscordClient client) {
-		return Mono.just(ThreadLocalRandom.current().nextInt(2))
-				.map(rand -> {
-					if(rand == 0) {
-						return TextUtils.PLAYING.getText();
-					}
-					return String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
-				})
-				.flatMap(text -> client.updatePresence(Presence.online(Activity.playing(text))));
+		return client.updatePresence(Presence.online(Activity.playing(
+				String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES)))));
 	}
 
 }

@@ -14,7 +14,6 @@ public class TextUtils {
 
 	public static final String NOT_ENOUGH_COINS =
 			"You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
-	public static final TextFile PLAYING = new TextFile("texts/playing.txt");
 
 	public static final String PLAYLIST_LIMIT_REACHED =
 			String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "
