@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
@@ -48,10 +49,13 @@ public class BanCmd extends AbstractCommand {
 
 		return context.getChannel()
 				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.BAN_MEMBERS)
-						.then(Mono.zip(context.getMessage().getUserMentions().collectList(), context.getGuild()))
+						.then(Mono.zip(context.getMessage().getUserMentions().collectList(), 
+								context.getGuild(),
+								context.getSelfAsMember()))
 						.flatMapMany(tuple -> {
 							final List<User> mentions = tuple.getT1();
 							final Guild guild = tuple.getT2();
+							final Member self = tuple.getT3();
 
 							final StringBuilder reason = new StringBuilder();
 							reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
@@ -69,6 +73,12 @@ public class BanCmd extends AbstractCommand {
 									.flatMap(user -> user.asMember(context.getGuildId()))
 									.concatMap(member -> member.getPrivateChannel()
 											.cast(MessageChannel.class)
+											.filterWhen(ignored -> DiscordUtils.isUserHigher(guild, self, member))
+											.switchIfEmpty(Mono.error(new CommandException(
+													String.format("I cannot ban **%s** because he is higher in the role hierarchy than me.", member.getUsername()))))
+											.filterWhen(ignored -> DiscordUtils.isUserHigher(guild, context.getMember(), member))
+											.switchIfEmpty(Mono.error(new CommandException(
+													String.format("You cannot ban **%s** because he is higher in the role hierarchy than you.", member.getUsername()))))
 											.flatMap(privateChannel -> DiscordUtils.sendMessage(
 													String.format(Emoji.INFO + " You were banned from the server **%s** by **%s**. Reason: `%s`",
 															guild.getName(), context.getUsername(), reason), privateChannel))
