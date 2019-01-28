@@ -90,14 +90,15 @@ public class SettingsCmd extends AbstractCommand {
 							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 					.then();
 		}
-
-		return setting.execute(context)
-				.onErrorResume(err -> err instanceof MissingArgumentException,
-						err -> this.getHelp(context, setting)
-								.flatMap(embed -> context.getChannel()
-										.flatMap(channel -> DiscordUtils.sendMessage(
-												Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", embed, channel)))
-								.then());
+		
+		try {
+			return setting.execute(context);
+		} catch (MissingArgumentException err) {
+			 return Mono.zip(this.getHelp(context, setting), context.getChannel())
+				.flatMap(tuple -> DiscordUtils.sendMessage(
+						Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", tuple.getT1(), tuple.getT2()))
+				.then();
+		}
 	}
 
 	private Mono<Consumer<? super EmbedCreateSpec>> show(Context context) {
