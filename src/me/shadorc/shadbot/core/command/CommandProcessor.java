@@ -90,7 +90,7 @@ public class CommandProcessor {
 				.filter(isRateLimited.negate())
 				.flatMap(cmd -> cmd.execute(context))
 				.onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context))
-				.doOnNext(perm -> {
+				.doOnTerminate(() -> {
 					StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_USED, command);
 					StatsManager.VARIOUS_STATS.log(VariousEnum.COMMANDS_EXECUTED);
 				});
