@@ -121,7 +121,7 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	private URL getUrl(String endpoint, Platform platform, String username) throws MalformedURLException {
-		return new URL(String.format("http://ow-api.herokuapp.com/%s/%s/global/%s",
+		return new URL(String.format("http://overwatchy.com/%s/%s/global/%s",
 				endpoint, StringUtils.toLowerCase(platform), username));
 	}
 
