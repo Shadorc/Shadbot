@@ -85,13 +85,6 @@ public class Shadbot {
 			SHARDS.put(index, new Shard(client));
 		}
 
-		Flux.interval(Duration.ofHours(3), Duration.ofHours(3))
-				.flatMap(ignored -> Flux.fromIterable(SHARDS.values())
-						.map(Shard::getClient)
-						.doOnNext(DiscordClient::reconnect))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
-
 		// Initiate login and block
 		Mono.when(Shadbot.SHARDS.values()
 				.stream()
