@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.command.utils;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.apache.http.HttpStatus;
@@ -11,6 +11,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.nodes.Element;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+
 import discord4j.core.DiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.musixmatch.Musixmatch;
@@ -19,6 +21,9 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
+import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.music.GuildMusic;
+import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
@@ -39,18 +44,30 @@ public class LyricsCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final List<String> args = context.requireArgs(2, "-");
+		final Optional<String> arg = context.getArg();
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			final String artist = NetUtils.encode(args.get(0).replace(" ", "-"));
-			final String title = NetUtils.encode(args.get(1).replace(" ", "-"));
-
-			final String url = this.getCorrectedUrl(artist, title);
+			String search;
+			if(arg.isPresent()) {
+				search = arg.get();
+			}
+			else {
+				final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(context.getGuildId());
+				if(guildMusic == null) {
+					throw new MissingArgumentException();
+				}
+				
+				final AudioTrackInfo info = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack().getInfo();
+				// Remove from title (case insensitive): official, video, music, [, ], (, )
+				search = info.title.replaceAll("(?i)official|video|music|\\[|\\]|\\(|\\)", "");
+			}
+			
+			final String url = this.getCorrectedUrl(search);
 			if(url == null) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
-						context.getUsername(), context.getArg().get()))
+						context.getUsername(), search))
 						.then();
 			}
 
@@ -98,12 +115,12 @@ public class LyricsCmd extends AbstractCommand {
 		return response.parse();
 	}
 
-	private String getCorrectedUrl(String artist, String title) throws IOException {
-		final String url = String.format("%s/search/%s-%s", HOME_URL, artist, title);
+	private String getCorrectedUrl(String search) throws IOException {
+		final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
 
 		// Make a search request on the site
 		final Document doc = NetUtils.getDoc(url);
-		final Element trackList = doc.getElementsByClass("tracks list").first();
+		final Element trackList = doc.getElementsByClass("media-card-title").first();
 		if(trackList == null) {
 			return null;
 		}
@@ -115,10 +132,9 @@ public class LyricsCmd extends AbstractCommand {
 	@Override
 	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
 		return new HelpBuilder(this, context)
-				.setDescription("Show lyrics for a song.")
-				.setDelimiter(" - ")
-				.addArg("artist", false)
-				.addArg("title", false)
+				.setDescription("Show lyrics for a song."
+						+ "\nCan also be used without argument when a music is being played to find corresponding lyrics.")
+				.addArg("search", true)
 				.setSource(HOME_URL)
 				.build();
 	}

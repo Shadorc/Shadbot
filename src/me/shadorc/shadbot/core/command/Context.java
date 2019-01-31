@@ -182,10 +182,6 @@ public class Context {
 		return args;
 	}
 
-	public List<String> requireArgs(int count, String delimiter) {
-		return this.requireArgs(count, count, delimiter);
-	}
-
 	public GuildMusic requireGuildMusic() {
 		final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(this.getGuildId());
 		if(guildMusic == null || guildMusic.getTrackScheduler().isStopped()) {
