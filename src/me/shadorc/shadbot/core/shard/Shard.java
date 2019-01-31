@@ -31,6 +31,8 @@ import me.shadorc.shadbot.listener.MessageUpdateListener;
 import me.shadorc.shadbot.listener.ReactionListener;
 import me.shadorc.shadbot.listener.ReadyListener;
 import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
+import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Mono;
 
@@ -106,6 +108,9 @@ public class Shard {
 					this.isFullyReady.set(false);
 					break;
 			}
+			
+			LogUtils.info("{Shard %d} New state: %s / fully ready: %s.", 
+					event.getClient().getConfig().getShardIndex(), StringUtils.capitalizeEnum(this.state), this.isFullyReady());
 		});
 	}
 
