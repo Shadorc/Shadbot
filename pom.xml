@@ -84,7 +84,7 @@
 		<dependency>
 			<groupId>com.github.Discord4J</groupId>
 			<artifactId>Discord4J</artifactId>
-			<version>v3-SNAPSHOT</version>
+			<version>ad3a2a8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

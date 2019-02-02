@@ -55,9 +55,6 @@ import reactor.netty.http.client.HttpClient;
 
 public class DiscordUtils {
 
-	/* Audit Log reason must be 512 or fewer in length. */
-	public static final int MAX_REASON_LENGTH = 512;
-
 	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
 		return DiscordUtils.sendMessage(content, null, channel);
 	}

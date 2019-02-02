@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import discord4j.core.object.audit.AuditLogEntry;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
@@ -64,8 +65,8 @@ public class KickCmd extends AbstractCommand {
 								reason.append("Reason not specified.");
 							}
 
-							if(reason.length() > DiscordUtils.MAX_REASON_LENGTH) {
-								throw new CommandException(String.format("Reason cannot exceed **%d characters**.", DiscordUtils.MAX_REASON_LENGTH));
+							if(reason.length() > AuditLogEntry.MAX_REASON_LENGTH) {
+								throw new CommandException(String.format("Reason cannot exceed **%d characters**.", AuditLogEntry.MAX_REASON_LENGTH));
 							}
 
 							return Flux.fromIterable(mentions)
