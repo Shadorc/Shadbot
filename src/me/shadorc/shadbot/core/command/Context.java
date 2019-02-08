@@ -151,7 +151,7 @@ public class Context {
 	}
 
 	public String getUsername() {
-		return this.getMember().getUsername();
+		return this.getAuthor().getUsername();
 	}
 
 	public Mono<Boolean> isChannelNsfw() {
