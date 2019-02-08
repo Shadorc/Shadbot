@@ -31,7 +31,7 @@ public class ReactionMessage {
 	 * @return A {@link Mono} containing a {@link Message} with {@link Reaction} added. If an error is received, it is emitted through the {@code Mono}.
 	 *         For example, if the message is deleted during the delay, a {@code 404 Forbidden} will be thrown.
 	 */
-	public Mono<Message> send(Consumer<? super EmbedCreateSpec> embed) {
+	public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
 				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))

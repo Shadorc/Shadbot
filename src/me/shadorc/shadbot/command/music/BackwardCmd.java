@@ -51,7 +51,7 @@ public class BackwardCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Fast backward current song a specified amount of time.")
 				.addArg("time", "can be seconds or time (e.g. 72 or 1m12s)", false)

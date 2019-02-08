@@ -120,7 +120,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		this.guildMusic.getClient().getUserById(this.guildMusic.getDjId())
 				.map(User::getAvatarUrl)
 				.map(avatarUrl -> { 
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+					final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
 						EmbedUtils.getDefaultEmbed().accept(embed);
 						embed.setAuthor(playlist.getName(), null, avatarUrl);
 						embed.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png");

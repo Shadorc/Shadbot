@@ -35,19 +35,17 @@ public class UserInfoCmd extends AbstractCommand {
 
 		final Mono<Member> memberMono = context.getMessage()
 				.getUserMentions()
-				.switchIfEmpty(context.getAuthor())
+				.switchIfEmpty(Mono.just(context.getAuthor()))
 				.next()
 				.flatMap(user -> user.asMember(context.getGuildId()));
 
 		return Mono.zip(memberMono,
 				memberMono.flatMap(Member::getPresence),
-				memberMono.flatMapMany(Member::getRoles).collectList(),
-				context.getAvatarUrl())
+				memberMono.flatMapMany(Member::getRoles).collectList())
 				.map(tuple4 -> {
 					final Member member = tuple4.getT1();
 					final Presence presence = tuple4.getT2();
 					final List<Role> roles = tuple4.getT3();
-					final String avatarUrl = tuple4.getT4();
 
 					final String creationDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(member.getId().getTimestamp()).format(DATE_FORMATTER),
@@ -57,9 +55,9 @@ public class UserInfoCmd extends AbstractCommand {
 							TimeUtils.toLocalDate(member.getJoinTime()).format(DATE_FORMATTER),
 							FormatUtils.longDuration(member.getJoinTime()));
 					
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+					final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
 						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)
+						embed.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, context.getAvatarUrl())
 							.setThumbnail(member.getAvatarUrl())
 							.addField("Display name", member.getDisplayName(), true)
 							.addField("User ID", member.getId().asString(), true)
@@ -83,7 +81,7 @@ public class UserInfoCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show info about an user.")
 				.addArg("@user", true)

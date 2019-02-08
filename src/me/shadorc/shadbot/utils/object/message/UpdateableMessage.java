@@ -35,7 +35,7 @@ public class UpdateableMessage {
 	 *
 	 * @param embed - the embed to send
 	 */
-	public Mono<Message> send(Consumer<? super EmbedCreateSpec> embed) {
+	public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
 		return Mono.justOrEmpty(this.messageId)
 				.flatMap(messageId -> this.client.getMessageById(this.channelId, messageId)
 						.onErrorResume(ExceptionUtils::isNotFound, err -> Mono.fromRunnable(() -> LogUtils.debug(err.toString()))))

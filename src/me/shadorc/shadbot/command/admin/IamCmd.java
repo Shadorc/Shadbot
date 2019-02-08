@@ -53,11 +53,8 @@ public class IamCmd extends AbstractCommand {
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT,
 						Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
-						.then(Mono.zip(rolesMono, context.getAvatarUrl()))
-						.flatMap(tuple -> {
-							final List<Role> roles = tuple.getT1();
-							final String avatarUrl = tuple.getT2();
-
+						.then(rolesMono)
+						.flatMap(roles -> {
 							if(roles.isEmpty()) {
 								throw new MissingArgumentException();
 							}
@@ -70,13 +67,11 @@ public class IamCmd extends AbstractCommand {
 								description.append(quotedElements.get(0));
 							}
 
-							final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-								EmbedUtils.getDefaultEmbed().accept(embed);
-								embed.setAuthor(String.format("Iam: %s",
+							final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+									.andThen(embed -> embed.setAuthor(String.format("Iam: %s",
 											FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
-											null, avatarUrl)
-									.setDescription(description.toString());
-							};
+											null, context.getAvatarUrl())
+									.setDescription(description.toString()));
 
 							return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
 									.send(embedConsumer)
@@ -92,7 +87,7 @@ public class IamCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription(String.format("Send a message with a reaction, users will be able to get the role(s) "
 						+ "associated with the message by clicking on %s", REACTION.getRaw()))

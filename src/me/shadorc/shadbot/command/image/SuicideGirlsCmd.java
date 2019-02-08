@@ -42,29 +42,25 @@ public class SuicideGirlsCmd extends AbstractCommand {
 						final String imageUrl = girl.select("noscript").attr("data-retina");
 						final String url = girl.getElementsByClass("facebook-share").attr("href");
 
-						return context.getAvatarUrl()
-								.map(avatarUrl -> {
-									final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-										EmbedUtils.getDefaultEmbed().accept(embed);
-										embed.setAuthor("SuicideGirls", url, avatarUrl)
-											.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
-											.setImage(imageUrl);
-									};
-									return embedConsumer;
-								});
+						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+								.andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
+										.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
+										.setImage(imageUrl));
+						
+						return loadingMsg.send(embedConsumer);
+
 					} catch (final IOException err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(err);
 					}
 				})
-				.flatMap(loadingMsg::send)
 				.switchIfEmpty(context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), channel)))
 				.then();
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random Suicide Girl image.")
 				.setSource("https://www.suicidegirls.com/")

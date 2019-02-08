@@ -76,7 +76,7 @@ public class AllowedRolesSetting extends AbstractSetting {
 	}
 
 	@Override
-	public Consumer<? super EmbedCreateSpec> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return embed -> {
 			EmbedUtils.getDefaultEmbed().accept(embed);
 			embed.addField("Usage", String.format("`%s%s <action> <role(s)>`", context.getPrefix(), this.getCommandName()), false)

@@ -21,11 +21,11 @@ import reactor.util.function.Tuples;
 
 public class EmbedUtils {
 
-	public static Consumer<? super EmbedCreateSpec> getDefaultEmbed() {
+	public static Consumer<EmbedCreateSpec> getDefaultEmbed() {
 		return spec -> spec.setColor(Config.BOT_COLOR);
 	}
 
-	public static Consumer<? super EmbedCreateSpec> getAverageEmbed() {
+	public static Consumer<EmbedCreateSpec> getAverageEmbed() {
 		return embed -> {
 			final Map<String, AtomicLong> moneyGained = StatsManager.MONEY_STATS.getMap(MoneyEnum.MONEY_GAINED);
 			final Map<String, AtomicLong> moneyLost = StatsManager.MONEY_STATS.getMap(MoneyEnum.MONEY_LOST);

@@ -59,11 +59,11 @@ public class DiscordUtils {
 		return DiscordUtils.sendMessage(content, null, channel);
 	}
 
-	public static Mono<Message> sendMessage(Consumer<? super EmbedCreateSpec> embed, MessageChannel channel) {
+	public static Mono<Message> sendMessage(Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
 		return DiscordUtils.sendMessage(null, embed, channel);
 	}
 
-	public static Mono<Message> sendMessage(String content, Consumer<? super EmbedCreateSpec> embed, MessageChannel channel) {
+	public static Mono<Message> sendMessage(String content, Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
 		final Snowflake selfId = channel.getClient().getSelfId().get();
 		return Mono.zip(
 				DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),

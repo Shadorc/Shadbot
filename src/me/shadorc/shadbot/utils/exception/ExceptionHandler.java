@@ -68,9 +68,9 @@ public class ExceptionHandler {
 
 	private static Mono<Void> onMissingArgumentException(AbstractCommand cmd, Context context) {
 		return Mono.fromRunnable(() -> StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, cmd))
-				.and(Mono.zip(cmd.getHelp(context), context.getChannel())
-						.flatMap(tuple -> DiscordUtils.sendMessage(
-								Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.", tuple.getT1(), tuple.getT2())));
+				.and(context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(
+								Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.", cmd.getHelp(context), channel)));
 	}
 
 	private static Mono<Void> onNoMusicException(Context context) {

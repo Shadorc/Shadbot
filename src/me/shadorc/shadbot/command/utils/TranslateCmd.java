@@ -101,20 +101,13 @@ public class TranslateCmd extends AbstractCommand {
 						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
-			return context.getAvatarUrl()
-					.map(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor("Translation", null, avatarUrl)
-								.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
-										StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)), sourceText,
-										StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)), translatedText.toString()));
-						};
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
+							.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
+									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)), sourceText,
+									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)), translatedText.toString())));
 						
-						return embedConsumer;
-					})
-					.flatMap(loadingMsg::send)
-					.then();
+			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();
@@ -127,7 +120,7 @@ public class TranslateCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Translate a text from a language to another.")
 				.addArg("fromLang", "source language, by leaving it blank the language will be automatically detected", true)

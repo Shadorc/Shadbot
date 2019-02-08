@@ -47,21 +47,14 @@ public class DtcCmd extends AbstractCommand {
 			final String content = quote.getContent().replace("*", "\\*");
 			final String id = quote.getId();
 
-			return context.getAvatarUrl()
-					.map(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor("Quote DansTonChat",
-										String.format("https://danstonchat.com/%s.html", id),
-										avatarUrl)
-								.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-								.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"));
-						};
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setAuthor("Quote DansTonChat",
+							String.format("https://danstonchat.com/%s.html", id),
+							context.getAvatarUrl())
+					.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+					.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n")));
 						
-						return embedConsumer;
-					})
-					.flatMap(loadingMsg::send)
-					.then();
+			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();
@@ -79,7 +72,7 @@ public class DtcCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random quote from DansTonChat.com")
 				.setSource("https://www.danstonchat.com/")

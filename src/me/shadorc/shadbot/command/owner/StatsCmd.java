@@ -32,17 +32,11 @@ public class StatsCmd extends AbstractCommand {
 		final List<String> args = context.requireArgs(1, 2);
 
 		if(args.get(0).equalsIgnoreCase("average")) {
-			return context.getAvatarUrl()
-					.map(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getAverageEmbed().accept(embed);
-							embed.setAuthor("Stats: average", null, avatarUrl);
-						};
-						
-						return embedConsumer;
-					})
-					.flatMap(embedConsumer -> context.getChannel()
-							.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getAverageEmbed()
+					.andThen(embed -> embed.setAuthor("Stats: average", null, context.getAvatarUrl()));
+
+			return context.getChannel()
+					.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
 					.then();
 		}
 
@@ -74,33 +68,29 @@ public class StatsCmd extends AbstractCommand {
 			}
 		}
 
-		return context.getAvatarUrl()
-				.map(avatarUrl -> {
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, avatarUrl);
+		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> {
+					embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, context.getAvatarUrl());
+			
+					if(map == null || map.isEmpty()) {
+						embed.setDescription("No statistics yet.");
+					} else {
+						final Comparator<? super Map.Entry<String, AtomicLong>> comparator =
+								Map.Entry.comparingByValue((v1, v2) -> Long.compare(v1.get(), v2.get()));
+						final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
 						
-						if(map == null || map.isEmpty()) {
-							embed.setDescription("No statistics yet.");
-						} else {
-							final Comparator<? super Map.Entry<String, AtomicLong>> comparator =
-									Map.Entry.comparingByValue((v1, v2) -> Long.compare(v1.get(), v2.get()));
-							final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
-							
-							embed.addField("Name", FormatUtils.format(sortedMap.keySet(), StringUtils::toLowerCase, "\n"), true)
-								.addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.number(Long.parseLong(value.toString())), "\n"), true);
-						}
-					};
-					
-					return embedConsumer;
-				})
-				.flatMap(embedConsumer -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
+						embed.addField("Name", FormatUtils.format(sortedMap.keySet(), StringUtils::toLowerCase, "\n"), true)
+							.addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.number(Long.parseLong(value.toString())), "\n"), true);
+					}
+				});
+
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
 				.then();
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show statistics for the specified category.")
 				.addArg("category", FormatUtils.options(StatisticEnum.class), false)

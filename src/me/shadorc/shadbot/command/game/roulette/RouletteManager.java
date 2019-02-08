@@ -5,13 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
 import me.shadorc.shadbot.core.command.Context;
@@ -66,16 +63,12 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 
 	@Override
 	public Mono<Void> show() {
-		return Mono.zip(this.getContext().getAvatarUrl(), Flux.fromIterable(this.playersPlace.keySet())
+		return Flux.fromIterable(this.playersPlace.keySet())
 				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
-				.collectList())
-				.map(avatarUrlAndUsers -> {
-					final String avatarUrl = avatarUrlAndUsers.getT1();
-					final List<User> users = avatarUrlAndUsers.getT2();
-
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Roulette Game", null, avatarUrl)
+				.collectList()
+				.map(users -> EmbedUtils.getDefaultEmbed()
+						.andThen(embed -> {
+						embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
 							.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
 							.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
 									+ "%n%n**Place** is a `number between 1 and 36`, %s",
@@ -94,10 +87,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 						} else {
 							embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
 						}
-					};
-
-					return embedConsumer;
-				})
+				}))
 				.flatMap(this.updateableMessage::send)
 				.then();
 	}

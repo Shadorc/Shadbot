@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
@@ -44,14 +45,20 @@ public abstract class AbstractGameManager {
 	 * @return A {@link Mono} that returns true if the {@link Message} is a valid cancel command, false otherwise
 	 */
 	private Mono<Boolean> isCancelMessage(Message message) {
-		return Mono.justOrEmpty(message.getContent())
-				// This is a cancel command
-				.filter(String.format("%scancel", this.context.getPrefix())::equals)
-				.flatMap(ignored -> message.getChannel())
-				.flatMap(channel -> Mono.zip(message.getAuthorAsMember(),
-						DiscordUtils.hasPermission(channel, message.getAuthorId().get(), Permission.ADMINISTRATOR)))
+		if(message.getAuthor().isEmpty() || message.getContent().isEmpty()) {
+			return Mono.just(false);
+		}
+		
+		final String content = message.getContent().get();
+		if(!String.format("%scancel", this.context.getPrefix()).equals(content)) {
+			return Mono.just(false);
+		}
+		
+		final Snowflake authorId = message.getAuthor().get().getId();
+		return message.getChannel()
+				.flatMap(channel -> DiscordUtils.hasPermission(channel, authorId, Permission.ADMINISTRATOR))
 				// The author is the author of the game or he is an administrator
-				.map(tuple -> this.context.getAuthorId().equals(tuple.getT1().getId()) || tuple.getT2());
+				.map(isAdmin -> this.context.getAuthorId().equals(authorId) || isAdmin);
 	}
 
 	/**
@@ -62,7 +69,8 @@ public abstract class AbstractGameManager {
 	public Mono<Boolean> cancelOrDo(Message message, Mono<Boolean> mono) {
 		return Mono.just(message)
 				.filterWhen(this::isCancelMessage)
-				.flatMap(Message::getAuthor)
+				.map(Message::getAuthor)
+				.flatMap(Mono::justOrEmpty)
 				.map(User::getUsername)
 				.flatMap(username -> this.context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", username), channel)))

@@ -1,7 +1,5 @@
 package me.shadorc.shadbot.command.hidden;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -34,9 +32,8 @@ public class HelpCmd extends AbstractCommand {
 			}
 
 			StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_HELPED, cmd);
-			return cmd.getHelp(context)
-					.flatMap(embed -> context.getChannel()
-							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+			return context.getChannel()
+					.flatMap(channel -> DiscordUtils.sendMessage(cmd.getHelp(context), channel))
 					.then();
 		}
 
@@ -46,35 +43,27 @@ public class HelpCmd extends AbstractCommand {
 						.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
 						.filter(cmd -> context.isDm() || Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd))
 						.collectMultimap(AbstractCommand::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
-				.zipWith(context.getAvatarUrl())
-				.map(tuple -> {
-					final Map<CommandCategory, Collection<String>> map = tuple.getT1();
-					final String avatarUrl = tuple.getT2();
-					
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Shadbot Help", null, avatarUrl)
-							.setDescription(String.format("Any issues, questions or suggestions ?"
-									+ " Join the [support server.](%s)"
-									+ "%nGet more information by using `%s%s <command>`.",
-									Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
-
-						for(final CommandCategory category : CommandCategory.values()) {
-							if(map.get(category) != null && !map.get(category).isEmpty() && !category.equals(CommandCategory.HIDDEN)) {
-								embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
-							}
-						}
-					};
-					
-					return embedConsumer;
-				})
-				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+				.map(map -> EmbedUtils.getDefaultEmbed()
+						.andThen(embed -> {
+								embed.setAuthor("Shadbot Help", null, context.getAvatarUrl())
+									.setDescription(String.format("Any issues, questions or suggestions ?"
+											+ " Join the [support server.](%s)"
+											+ "%nGet more information by using `%s%s <command>`.",
+											Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
+		
+								for(final CommandCategory category : CommandCategory.values()) {
+									if(map.get(category) != null && !map.get(category).isEmpty() && !category.equals(CommandCategory.HIDDEN)) {
+										embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
+									}
+								}
+							}))
+				.flatMap(embedConsumer -> context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
 				.then();
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show the list of available commands.")
 				.build();

@@ -134,19 +134,14 @@ public class WallpaperCmd extends AbstractCommand {
 						final String tags = FormatUtils.format(wallpaper.getTags(),
 								tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 
-						return context.getAvatarUrl()
-								.map(avatarUrl -> {
-									final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-										EmbedUtils.getDefaultEmbed().accept(embed);
-										embed.setAuthor("Wallpaper", wallpaper.getUrl(), avatarUrl)
-											.setImage(wallpaper.getImageUrl())
-											.addField("Resolution", wallpaper.getResolution().toString(), false)
-											.addField("Tags", tags, false);
-									};
-									return embedConsumer;
-								})
-								.flatMap(loadingMsg::send)
-								.then();
+						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+								.andThen(embed -> embed.setAuthor("Wallpaper", wallpaper.getUrl(), context.getAvatarUrl())
+										.setImage(wallpaper.getImageUrl())
+										.addField("Resolution", wallpaper.getResolution().toString(), false)
+										.addField("Tags", tags, false));
+
+						return loadingMsg.send(embedConsumer).then();
+
 					} catch (final WallhavenException err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(Objects.requireNonNullElse(err.getCause(), err));
@@ -182,7 +177,7 @@ public class WallpaperCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Search for a wallpaper.")
 				.setUsage(String.format("[-p %s] [-c %s] [-rat %s] [-res %s] [-k %s]", PURITY, CATEGORY, RATIO, RESOLUTION, KEYWORD))

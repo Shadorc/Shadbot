@@ -58,29 +58,21 @@ public class RelicStatusCmd extends AbstractCommand {
 					return new EmbedFieldEntity(titleBld.toString(), contentBld.toString(), false);
 				})
 				.collectList()
-				.zipWith(context.getAvatarUrl())
-				.map(tuple -> {
-					final List<EmbedFieldEntity> fields = tuple.getT1();
-					final String avatarUrl = tuple.getT2();
-
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Contributor Status", null, avatarUrl)
-							.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
-
-						fields.stream()
-								.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
-					};
-
-					return embedConsumer;
-				})
+				.map(fields -> EmbedUtils.getDefaultEmbed()
+						.andThen(embed -> {
+							embed.setAuthor("Contributor Status", null, context.getAvatarUrl())
+								.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
+	
+							fields.stream()
+									.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
+						}))
 				.flatMap(embed -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show your contributor status.")
 				.build();

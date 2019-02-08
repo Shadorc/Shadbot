@@ -92,22 +92,15 @@ public class FortniteCmd extends AbstractCommand {
 					+ String.format(format, "K/D lifetime", stats.getSoloStats().getRatio(), stats.getDuoStats().getRatio(), stats.getSquadStats().getRatio())
 					+ "```";
 
-			return context.getAvatarUrl()
-					.map(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor("Fortnite Stats",
+						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+								.andThen(embed -> embed.setAuthor("Fortnite Stats",
 										String.format("https://fortnitetracker.com/profile/%s/%s",
 												StringUtils.toLowerCase(platform), encodedNickname),
-										avatarUrl)
+										context.getAvatarUrl())
 								.setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
-								.setDescription(description);
-						};
-						
-						return embedConsumer;
-					})
-					.flatMap(loadingMsg::send)
-					.then();
+								.setDescription(description));
+					
+					return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();
@@ -116,7 +109,7 @@ public class FortniteCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Fortnite.")
 				.addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")),

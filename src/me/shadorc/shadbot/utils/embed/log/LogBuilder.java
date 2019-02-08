@@ -34,7 +34,7 @@ public class LogBuilder {
 		this(type, message, null, null);
 	}
 
-	public Consumer<? super EmbedCreateSpec> build() {
+	public Consumer<EmbedCreateSpec> build() {
 		return embed -> {
 			EmbedUtils.getDefaultEmbed().accept(embed);
 			embed.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeEnum(this.type), Config.VERSION), null, null);

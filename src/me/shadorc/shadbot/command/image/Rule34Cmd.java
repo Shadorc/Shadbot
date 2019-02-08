@@ -66,25 +66,21 @@ public class Rule34Cmd extends AbstractCommand {
 						final String formattedtags = org.apache.commons.lang3.StringUtils.truncate(
 								FormatUtils.format(tags, tag -> String.format("`%s`", tag), " "), MAX_TAGS_LENGTH);
 
-						return context.getAvatarUrl()
-								.map(avatarUrl -> {
-									final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-										EmbedUtils.getDefaultEmbed().accept(embed);
-										embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), avatarUrl)
-												.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
-												.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
-												.addField("Tags", formattedtags, false)
-												.setImage(post.getFileUrl())
-												.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
+						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+								.andThen(embed -> {
+									embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
+										.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
+										.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
+										.addField("Tags", formattedtags, false)
+										.setImage(post.getFileUrl())
+										.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
 
 										if(!post.getSource().isEmpty()) {
 											embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
 										}
-									};
+								});
 
-									return embedConsumer;
-								})
-								.flatMap(loadingMsg::send);
+						return loadingMsg.send(embedConsumer).then();
 
 					} catch (final IOException err) {
 						loadingMsg.stopTyping();
@@ -97,7 +93,7 @@ public class Rule34Cmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random image corresponding to a tag from Rule34 website.")
 				.setSource("https://www.rule34.xxx/")

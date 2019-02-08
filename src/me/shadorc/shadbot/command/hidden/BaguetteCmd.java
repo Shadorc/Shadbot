@@ -19,7 +19,7 @@ public class BaguetteCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+		final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
 			EmbedUtils.getDefaultEmbed().accept(embed);
 			embed.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg");
 		};
@@ -30,7 +30,7 @@ public class BaguetteCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("This command doesn't exist.")
 				.build();

@@ -66,26 +66,19 @@ public class WeatherCmd extends AbstractCommand {
 			final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ? String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
 			final String countryCode = currentWeather.getSystemData().getCountryCode();
 
-			return context.getAvatarUrl()
-					.map(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
-										String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
-										avatarUrl)
-								.setThumbnail(weather.getIconLink())
-								.setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
-								.addField(Emoji.CLOUD + " Clouds", StringUtils.capitalize(weather.getDescription()), true)
-								.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
-								.addField(Emoji.RAIN + " Rain", rain, true)
-								.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
-								.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true);
-						};
-						
-						return embedConsumer;
-					})
-					.flatMap(loadingMsg::send)
-					.then();
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
+							String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
+							context.getAvatarUrl())
+							.setThumbnail(weather.getIconLink())
+							.setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
+							.addField(Emoji.CLOUD + " Clouds", StringUtils.capitalize(weather.getDescription()), true)
+							.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
+							.addField(Emoji.RAIN + " Rain", rain, true)
+							.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
+							.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true));
+			
+			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final APIException err) {
 			if(err.getCode() == 404) {
@@ -128,7 +121,7 @@ public class WeatherCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show weather report for a city.")
 				.setDelimiter(", ")

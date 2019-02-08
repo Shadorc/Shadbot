@@ -14,7 +14,6 @@ import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import reactor.core.publisher.Mono;
 
 public class HelpBuilder {
 
@@ -100,49 +99,45 @@ public class HelpBuilder {
 		return this;
 	}
 
-	public Mono<Consumer<? super EmbedCreateSpec>> build() {
-		return this.context.getAvatarUrl()
-				.map(avatarUrl -> {
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor(String.format("Help for %s command", this.cmd.getName()), null, avatarUrl);
-						embed.addField("Usage", this.getUsage(), false);
-	
-						if(this.description != null) {
-							embed.setDescription(this.description);
-						}
-	
-						if(this.thumbnail != null) {
-							embed.setThumbnail(this.thumbnail);
-						}
-	
-						if(!this.getArguments().isEmpty()) {
-							embed.addField("Arguments", this.getArguments(), false);
-						}
-	
-						if(this.example != null) {
-							embed.addField("Example", this.example, false);
-						}
-	
-						if(this.gains != null) {
-							embed.addField("Gains", this.gains, false);
-						}
-	
-						if(this.source != null) {
-							embed.addField("Source", this.source, false);
-						}
-	
-						for(final EmbedFieldEntity field : this.fields) {
-							embed.addField(field.getName(), field.getValue(), field.isInline());
-						}
-	
-						if(!this.cmd.getAlias().isEmpty()) {
-							embed.setFooter(String.format("Alias: %s", this.cmd.getAlias()), null);
-						}
-					};
-					
-					return embedConsumer;
-			});
+	public Consumer<EmbedCreateSpec> build() {
+		return embed -> {
+			EmbedUtils.getDefaultEmbed().accept(embed);
+			embed.setAuthor(String.format("Help for %s command", this.cmd.getName()), 
+					null, this.context.getAvatarUrl());
+			embed.addField("Usage", this.getUsage(), false);
+
+			if(this.description != null) {
+				embed.setDescription(this.description);
+			}
+
+			if(this.thumbnail != null) {
+				embed.setThumbnail(this.thumbnail);
+			}
+
+			if(!this.getArguments().isEmpty()) {
+				embed.addField("Arguments", this.getArguments(), false);
+			}
+
+			if(this.example != null) {
+				embed.addField("Example", this.example, false);
+			}
+
+			if(this.gains != null) {
+				embed.addField("Gains", this.gains, false);
+			}
+
+			if(this.source != null) {
+				embed.addField("Source", this.source, false);
+			}
+
+			for(final EmbedFieldEntity field : this.fields) {
+				embed.addField(field.getName(), field.getValue(), field.isInline());
+			}
+
+			if(!this.cmd.getAlias().isEmpty()) {
+				embed.setFooter(String.format("Alias: %s", this.cmd.getAlias()), null);
+			}
+		};
 	}
 
 	private String getUsage() {

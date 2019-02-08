@@ -27,19 +27,13 @@ public class PlaylistCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 		
-		return context.getAvatarUrl()
-				.map(avatarUrl -> {
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Playlist", null, avatarUrl)
-							.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-							.setDescription(this.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist()));
-					};
-					
-					return embedConsumer;
-				})
-				.flatMap(embedConsumer -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
+		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> embed.setAuthor("Playlist", null, context.getAvatarUrl())
+						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
+						.setDescription(this.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist())));
+		
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
 				.then();
 	}
 
@@ -65,7 +59,7 @@ public class PlaylistCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show current playlist.")
 				.build();

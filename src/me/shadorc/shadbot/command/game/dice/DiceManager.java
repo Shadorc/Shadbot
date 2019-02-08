@@ -1,15 +1,12 @@
 package me.shadorc.shadbot.command.game.dice;
 
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
@@ -57,17 +54,13 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 	@Override
 	public Mono<Void> show() {
-		return Mono.zip(this.getContext().getAvatarUrl(), Flux.fromIterable(this.numsPlayers.values())
+		return Flux.fromIterable(this.numsPlayers.values())
 				.flatMap(this.getContext().getClient()::getUserById)
 				.map(User::getUsername)
-				.collectList())
-				.map(avatarUrlAndUsers -> {
-					final String avatarUrl = avatarUrlAndUsers.getT1();
-					final List<String> usernames = avatarUrlAndUsers.getT2();
-					
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Dice Game", null, avatarUrl)
+				.collectList()
+				.map(usernames -> EmbedUtils.getDefaultEmbed()
+						.andThen(embed -> {
+						embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
 							.setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
 							.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
 									this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
@@ -83,10 +76,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 						if(this.results != null) {
 							embed.addField("Results", this.results, false);
 						}
-					};
-
-					return embedConsumer;
-				})
+					}))
 				.flatMap(this.updateableMessage::send)
 				.then();
 	}

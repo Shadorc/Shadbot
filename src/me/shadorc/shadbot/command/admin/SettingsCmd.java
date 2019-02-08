@@ -85,23 +85,22 @@ public class SettingsCmd extends AbstractCommand {
 
 		final String arg = args.size() == 2 ? args.get(1) : null;
 		if("help".equals(arg)) {
-			return this.getHelp(context, setting)
-					.flatMap(embed -> context.getChannel()
-							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+			return context.getChannel()
+							.flatMap(channel -> DiscordUtils.sendMessage(this.getHelp(context, setting), channel))
 					.then();
 		}
 		
 		try {
 			return setting.execute(context);
 		} catch (MissingArgumentException err) {
-			 return Mono.zip(this.getHelp(context, setting), context.getChannel())
-				.flatMap(tuple -> DiscordUtils.sendMessage(
-						Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", tuple.getT1(), tuple.getT2()))
+			 return context.getChannel()
+					 .flatMap(channel -> DiscordUtils.sendMessage(
+						Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", this.getHelp(context, setting), channel))
 				.then();
 		}
 	}
 
-	private Mono<Consumer<? super EmbedCreateSpec>> show(Context context) {
+	private Mono<Consumer<EmbedCreateSpec>> show(Context context) {
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 		final StringBuilder settingsStr = new StringBuilder();
 
@@ -162,34 +161,20 @@ public class SettingsCmd extends AbstractCommand {
 				.then(allowedChannelsStr)
 				.then(autoRolesStr)
 				.then(permissionsStr)
-				.then(context.getAvatarUrl())
-				.map(avatarUrl -> {
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Settings", null, avatarUrl)
+				.then(Mono.just(EmbedUtils.getDefaultEmbed()
+						.andThen(embed -> embed.setAuthor("Settings", null, context.getAvatarUrl())
 							.setDescription(
-									settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString());
-					};
-					
-					return embedConsumer;
-				});
+									settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString()))));
 	}
 
-	private Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context, AbstractSetting setting) {
-		return context.getAvatarUrl()
-				.map(avatarUrl -> {
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						setting.getHelp(context).accept(embed);
-						embed.setAuthor(String.format("Help for setting: %s", setting.getName()), null, avatarUrl)
-							.setDescription(String.format("**%s**", setting.getDescription()));
-					};
-					
-					return embedConsumer;
-				});
+	private Consumer<EmbedCreateSpec> getHelp(Context context, AbstractSetting setting) {
+					return setting.getHelp(context)
+							.andThen(embed -> embed.setAuthor(String.format("Help for setting: %s", setting.getName()), null, context.getAvatarUrl())
+							.setDescription(String.format("**%s**", setting.getDescription())));
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		final HelpBuilder embed = new HelpBuilder(this, context)
 				.setThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
 				.setDescription("Change Shadbot's settings for this server.")

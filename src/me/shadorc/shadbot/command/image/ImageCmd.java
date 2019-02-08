@@ -51,20 +51,15 @@ public class ImageCmd extends AbstractCommand {
 						.then();
 			}
 
-			return context.getAvatarUrl()
-					.flatMap(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), avatarUrl)
-								.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
-								.addField("Title", image.getTitle(), false)
-								.addField("Author", image.getAuthor().getUsername(), false)
-								.addField("Category", image.getCategoryPath(), false)
-								.setImage(image.getContent().getSource());
-						};
-						return loadingMsg.send(embedConsumer);
-					})
-					.then();
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
+							.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
+							.addField("Title", image.getTitle(), false)
+							.addField("Author", image.getAuthor().getUsername(), false)
+							.addField("Category", image.getCategoryPath(), false)
+							.setImage(image.getContent().getSource()));
+			
+			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();
@@ -112,7 +107,7 @@ public class ImageCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Search for a random image on DeviantArt.")
 				.addArg("search", false)

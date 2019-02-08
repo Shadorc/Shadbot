@@ -85,11 +85,9 @@ public class LotteryCmd extends AbstractCommand {
 	private Mono<Message> show(Context context) {
 		final List<LotteryGambler> gamblers = Shadbot.getLottery().getGamblers();
 
-		return context.getAvatarUrl()
-				.map(avatarUrl -> {
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Lottery", null, avatarUrl)
+					final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+							.andThen(embed -> {
+						embed.setAuthor("Lottery", null, context.getAvatarUrl())
 							.setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
 							.setDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
 									FormatUtils.customDate(LotteryCmd.getDelay().toMillis()),
@@ -127,13 +125,10 @@ public class LotteryCmd extends AbstractCommand {
 											FormatUtils.coins(historic.getJackpot()), historic.getNumber(), people),
 									false);
 						}
-					};
-					
-
-					return embedConsumer;
-				})
-				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
+							});
+						
+				return context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel));
 	}
 
 	public static Duration getDelay() {
@@ -181,7 +176,7 @@ public class LotteryCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Buy a ticket for the lottery or display the current lottery status.")
 				.addArg("num", String.format("must be between %d and %d", MIN_NUM, MAX_NUM), true)

@@ -7,6 +7,7 @@ import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
@@ -51,10 +52,10 @@ public class ReactionListener {
 		return Mono.justOrEmpty(message.getClient().getSelfId())
 				// It wasn't the bot that reacted
 				.filter(selfId -> !userId.equals(selfId))
-				// If this is the correct reaction
-				.filter(selfId -> emoji.equals(IamCmd.REACTION))
 				// If the bot is not the author of the message, this is not an Iam message
-				.filterWhen(selfId -> Mono.justOrEmpty(message.getAuthorId()).map(selfId::equals))
+				.filter(selfId -> message.getAuthor().map(User::getId).map(selfId::equals).orElse(false))
+				// If this is the correct reaction
+				.filter(ignored -> emoji.equals(IamCmd.REACTION))
 				.flatMap(selfId -> message.getGuild().flatMap(guild -> guild.getMemberById(selfId)))
 				.filterWhen(canManageRoles)
 				.flatMap(member -> Mono.justOrEmpty(Shadbot.getDatabase()

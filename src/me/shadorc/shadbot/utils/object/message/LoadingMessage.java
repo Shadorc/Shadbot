@@ -85,7 +85,7 @@ public class LoadingMessage implements Publisher<Void> {
 	/**
 	 * Send a message and stop typing when the message has been send or an error occurred
 	 */
-	public Mono<Message> send(Consumer<? super EmbedCreateSpec> embed) {
+	public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
 				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))

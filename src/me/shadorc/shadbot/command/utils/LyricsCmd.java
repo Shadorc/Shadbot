@@ -74,21 +74,15 @@ public class LyricsCmd extends AbstractCommand {
 			final Document doc = this.getLyricsDocument(context.getClient(), url).outputSettings(PRESERVE_FORMAT);
 			final Musixmatch musixmatch = new Musixmatch(doc);
 			
-			return context.getAvatarUrl()
-					.map(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor(String.format("Lyrics: %s - %s",
-										musixmatch.getArtist(), musixmatch.getTitle()), url, avatarUrl)
-								.setThumbnail(musixmatch.getImageUrl())
-								.setDescription(musixmatch.getLyrics())
-								.setFooter("Click on the title to see the full version", "https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png");
-						};
-						
-						return embedConsumer;
-					})
-					.flatMap(loadingMsg::send)
-					.then();
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
+							musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
+							.setThumbnail(musixmatch.getImageUrl())
+							.setDescription(musixmatch.getLyrics())
+							.setFooter("Click on the title to see the full version", 
+									"https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png"));
+			
+			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();
@@ -130,7 +124,7 @@ public class LyricsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show lyrics for a song."
 						+ "\nCan also be used without argument when a music is being played to find corresponding lyrics.")

@@ -111,26 +111,19 @@ public class CounterStrikeCmd extends AbstractCommand {
 			final Map<String, Integer> statsMap = new HashMap<>();
 			stats.forEach(stat -> statsMap.put(stat.getName(), stat.getValue()));
 
-			return context.getAvatarUrl()
-					.map(avatarUrl -> { 
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor("Counter-Strike: Global Offensive Stats",
-										"http://steamcommunity.com/profiles/" + steamId,
-										avatarUrl)
-								.setThumbnail(player.getAvatarFull())
-								.setDescription(String.format("Stats for **%s**", player.getPersonaName()))
-								.addField("Kills", statsMap.get("total_kills").toString(), true)
-								.addField("Deaths", statsMap.get("total_deaths").toString(), true)
-								.addField("Total wins", statsMap.get("total_wins").toString(), true)
-								.addField("Total MVP", statsMap.get("total_mvps").toString(), true)
-								.addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), false);
-						};
-						
-						return embedConsumer;
-					})
-					.flatMap(loadingMsg::send)
-					.then();
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setAuthor("Counter-Strike: Global Offensive Stats",
+							"http://steamcommunity.com/profiles/" + steamId,
+							context.getAvatarUrl())
+					.setThumbnail(player.getAvatarFull())
+					.setDescription(String.format("Stats for **%s**", player.getPersonaName()))
+					.addField("Kills", statsMap.get("total_kills").toString(), true)
+					.addField("Deaths", statsMap.get("total_deaths").toString(), true)
+					.addField("Total wins", statsMap.get("total_wins").toString(), true)
+					.addField("Total MVP", statsMap.get("total_mvps").toString(), true)
+					.addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), false));
+
+			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();
@@ -140,7 +133,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Counter-Strike: Global Offensive.")
 				.addArg("steamID", "steam ID, custom ID or profile URL", false)

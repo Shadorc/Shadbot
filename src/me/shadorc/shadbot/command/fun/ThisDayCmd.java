@@ -52,18 +52,12 @@ public class ThisDayCmd extends AbstractCommand {
 					.map(Document::text)
 					.collect(Collectors.joining("\n\n"));
 
-			return context.getAvatarUrl()
-					.flatMap(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor(String.format("On This Day: %s", date), HOME_URL, avatarUrl)
-								.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-								.setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH));
-						};
-						
-						return loadingMsg.send(embedConsumer);
-					})
-					.then();
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setAuthor(String.format("On This Day: %s", date), HOME_URL, context.getAvatarUrl())
+							.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
+							.setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH)));
+			
+			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();
@@ -72,7 +66,7 @@ public class ThisDayCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show significant events of the day.")
 				.setSource(HOME_URL)

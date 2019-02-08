@@ -22,7 +22,7 @@ public abstract class AbstractSetting {
 
 	public abstract Mono<Void> execute(Context context);
 
-	public abstract Consumer<? super EmbedCreateSpec> getHelp(Context context);
+	public abstract Consumer<EmbedCreateSpec> getHelp(Context context);
 
 	public String getDescription() {
 		return this.description;

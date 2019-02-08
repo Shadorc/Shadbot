@@ -24,7 +24,7 @@ public class CoinsCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		return context.getMessage()
 				.getUserMentions()
-				.switchIfEmpty(context.getAuthor())
+				.switchIfEmpty(Mono.just(context.getAuthor()))
 				.next()
 				.map(user -> {
 					final DBMember dbMember = Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId());
@@ -41,7 +41,7 @@ public class CoinsCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show how many coins an user has.")
 				.addArg("@user", "if not specified, it will show your coins", true)

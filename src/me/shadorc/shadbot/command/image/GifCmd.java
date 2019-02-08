@@ -49,7 +49,7 @@ public class GifCmd extends AbstractCommand {
 						.then();
 			}
 			
-			final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+			final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
 				EmbedUtils.getDefaultEmbed().accept(embed);
 				embed.setImage(giphy.getGifs().get(0).getImageUrl());
 			};
@@ -64,7 +64,7 @@ public class GifCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show a random gif")
 				.addArg("tag", "the tag to search", true)

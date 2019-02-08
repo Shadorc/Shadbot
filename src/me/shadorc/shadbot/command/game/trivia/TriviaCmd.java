@@ -45,18 +45,13 @@ public class TriviaCmd extends AbstractCommand {
 		}
 
 		if("categories".equalsIgnoreCase(context.getArg().orElse(null))) {
-			return context.getAvatarUrl()
-					.map(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor("Trivia categories", null, avatarUrl)
+						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+								.andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
 								.addField("ID", FormatUtils.format(this.categories.getIds(), id -> Integer.toString(id), "\n"), true)
-								.addField("Name", String.join("\n", this.categories.getNames()), true);
-						};
-						return embedConsumer;
-					})
-					.flatMap(embed -> context.getChannel()
-							.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+								.addField("Name", String.join("\n", this.categories.getNames()), true));
+						
+					return context.getChannel()
+							.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
 					.then();
 		}
 
@@ -80,7 +75,7 @@ public class TriviaCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Start a Trivia game in which everyone can participate.")
 				.addArg("categoryID", "the category ID of the question", true)

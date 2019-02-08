@@ -6,14 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
@@ -85,14 +83,9 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 							BlackjackUtils.formatCards(player.getCards()), true);
 				})
 				.collectList()
-				.zipWith(this.getContext().getAvatarUrl())
-				.map(fieldsAndAvatarUrl -> {
-					final List<EmbedFieldEntity> fields = fieldsAndAvatarUrl.getT1();
-					final String avatarUrl = fieldsAndAvatarUrl.getT2();
-					
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor("Blackjack Game", null, avatarUrl)
+				.map(fields -> EmbedUtils.getDefaultEmbed()
+							.andThen(embed -> {
+							embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())
 								.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
 								.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
 										+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
@@ -107,10 +100,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 							}
 		
 							fields.stream().forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
-					};
-
-					return embedConsumer;
-				})
+							}))
 				.flatMap(this.updateableMessage::send)
 				.then();
 	}

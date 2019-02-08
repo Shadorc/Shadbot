@@ -45,23 +45,16 @@ public class LeaderboardCmd extends AbstractCommand {
 								return String.format("%d. **%s** - %s", count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
 							});
 				})
-				.zipWith(context.getAvatarUrl())
-				.map(tuple -> {
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Leaderboard", null, tuple.getT2())
-							.setDescription(tuple.getT1());
-					};
-					
-					return embedConsumer;
-				})
+				.map(description -> EmbedUtils.getDefaultEmbed()
+						.andThen(embed -> embed.setAuthor("Leaderboard", null, context.getAvatarUrl())
+							.setDescription(description)))
 				.flatMap(embed -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show coins leaderboard for this server.")
 				.build();

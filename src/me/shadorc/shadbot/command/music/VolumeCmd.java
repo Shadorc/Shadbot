@@ -50,7 +50,7 @@ public class VolumeCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show or change current volume level.")
 				.addArg("volume", "must be between 0 and 100", true)

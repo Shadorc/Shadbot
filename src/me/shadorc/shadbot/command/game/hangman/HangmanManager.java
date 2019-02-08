@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
@@ -76,11 +77,9 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 				.map(String::toUpperCase)
 				.collect(Collectors.toList());
 
-		return this.getContext().getAvatarUrl()
-				.map(avatarUrl -> {
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Hangman Game", null, avatarUrl)
+					final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+							.andThen(embed -> {
+						embed.setAuthor("Hangman Game", null, this.getContext().getAvatarUrl())
 								.setThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")
 								.setDescription("Type letters or enter a word if you think you've guessed it.")
 								.addField("Word", this.getRepresentation(this.word), false);
@@ -99,12 +98,9 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 						if(this.failCount > 0) {
 							embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
 						}
-					};
-
-					return embedConsumer;
-				})
-				.flatMap(this.updateableMessage::send)
-				.then();
+					});
+					
+				return this.updateableMessage.send(embedConsumer).then();
 	}
 
 	private Mono<Void> showResultAndStop(boolean win) {
@@ -180,7 +176,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		return this.cancelOrDo(event.getMessage(), Mono.just(event.getMessage().getAuthorId().get())
+		return this.cancelOrDo(event.getMessage(), 
+				Mono.justOrEmpty(event.getMessage().getAuthor().map(User::getId))
 				.flatMap(authorId -> {
 					final Context context = this.getContext();
 

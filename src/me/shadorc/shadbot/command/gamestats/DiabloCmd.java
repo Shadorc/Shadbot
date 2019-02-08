@@ -89,11 +89,8 @@ public class DiabloCmd extends AbstractCommand {
 			heroResponses.sort((hero1, hero2) -> Double.compare(hero1.getStats().getDamage(), hero2.getStats().getDamage()));
 			Collections.reverse(heroResponses);
 
-			return context.getAvatarUrl()
-					.map(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor("Diablo 3 Stats", null, avatarUrl)
+						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+								.andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
 								.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
 								.setDescription(String.format("Stats for **%s** (Guild: **%s**)"
 										+ "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
@@ -104,13 +101,9 @@ public class DiabloCmd extends AbstractCommand {
 								.addField("Heroes", FormatUtils.format(heroResponses,
 										hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
 								.addField("Damage", FormatUtils.format(heroResponses,
-										hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true);
-						};
-
-						return embedConsumer;
-					})
-					.flatMap(loadingMsg::send)
-					.then();
+										hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true));
+					
+						return loadingMsg.send(embedConsumer).then();
 
 		} catch (final FileNotFoundException err) {
 			return loadingMsg.send(
@@ -141,7 +134,7 @@ public class DiabloCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Diablo 3.")
 				.addArg("region", String.format("user's region (%s)", FormatUtils.format(Region.class, ", ")), false)

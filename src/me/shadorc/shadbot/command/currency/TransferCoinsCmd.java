@@ -68,16 +68,16 @@ public class TransferCoinsCmd extends AbstractCommand {
 		dbSender.addCoins(-coins);
 		dbReceiver.addCoins(coins);
 
-		return Mono.zip(context.getAuthor().map(User::getMention),
-				context.getClient().getUserById(senderUserId).map(User::getMention),
-				context.getChannel())
-				.flatMap(tuple -> DiscordUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
-						tuple.getT1(), FormatUtils.coins(coins), tuple.getT2()), tuple.getT3()))
+		return context.getClient().getUserById(senderUserId)
+				.map(User::getMention)
+				.flatMap(senderMention -> context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
+						context.getAuthor().getMention(), FormatUtils.coins(coins), senderMention), channel)))
 				.then();
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Transfer coins to the mentioned user.")
 				.addArg("coins", false)

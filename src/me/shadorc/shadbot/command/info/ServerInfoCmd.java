@@ -38,14 +38,12 @@ public class ServerInfoCmd extends AbstractCommand {
 		return Mono.zip(context.getGuild(),
 				context.getGuild().flatMap(Guild::getOwner),
 				context.getGuild().flatMapMany(Guild::getChannels).collectList(),
-				context.getGuild().flatMap(Guild::getRegion),
-				context.getAvatarUrl())
+				context.getGuild().flatMap(Guild::getRegion))
 				.map(tuple -> {
 					final Guild guild = tuple.getT1();
 					final Member owner = tuple.getT2();
 					final List<GuildChannel> channels = tuple.getT3();
 					final Region region = tuple.getT4();
-					final String avatarUrl = tuple.getT5();
 
 					final String creationDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(guild.getId().getTimestamp()).format(this.dateFormatter),
@@ -53,9 +51,9 @@ public class ServerInfoCmd extends AbstractCommand {
 					final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
 					final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
+					final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
 						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
+						embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, context.getAvatarUrl())
 							.setThumbnail(guild.getIconUrl(Format.JPEG).get())
 							.addField("Owner", owner.getUsername(), true)
 							.addField("Server ID", guild.getId().asString(), true)
@@ -72,7 +70,7 @@ public class ServerInfoCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show info about this server.")
 				.build();

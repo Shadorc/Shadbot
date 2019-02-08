@@ -64,7 +64,7 @@ public class RouletteCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Play a roulette game in which everyone can participate.")
 				.addArg("bet", false)

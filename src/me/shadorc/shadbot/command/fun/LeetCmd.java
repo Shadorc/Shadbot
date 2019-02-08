@@ -31,23 +31,17 @@ public class LeetCmd extends AbstractCommand {
 				.replace("S", "5")
 				.replace("T", "7");
 
-		return context.getAvatarUrl()
-				.map(avatarUrl -> {
-					final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor("Leetifier", null, avatarUrl)
-							.setDescription(String.format("**Original**%n%s%n%n**Leetified**%n%s", arg, text));
-					};
-					
-					return embedConsumer;
-				})
-				.flatMap(embedConsumer -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
+		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> embed.setAuthor("Leetifier", null, context.getAvatarUrl())
+						.setDescription(String.format("**Original**%n%s%n%n**Leetified**%n%s", arg, text)));
+
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
 				.then();
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Leetify a text.")
 				.addArg("text", false)

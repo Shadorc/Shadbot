@@ -55,7 +55,7 @@ public class RepeatCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Toggle song/playlist repetition.")
 				.setUsage("[song/playlist]")

@@ -62,12 +62,9 @@ public class OverwatchCmd extends AbstractCommand {
 						.then();
 			}
 
-			return context.getAvatarUrl()
-					.map(avatarUrl -> {
-						final Consumer<? super EmbedCreateSpec> embedConsumer = embed -> {
-							EmbedUtils.getDefaultEmbed().accept(embed);
-							embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
-										StringUtils.toLowerCase(platform), profile.getUsername()), avatarUrl)
+						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+								.andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
+										StringUtils.toLowerCase(platform), profile.getUsername()), context.getAvatarUrl())
 								.setThumbnail(profile.getPortrait())
 								.setDescription(String.format("Stats for user **%s**", profile.getUsername()))
 								.addField("Level", profile.getLevel(), true)
@@ -75,13 +72,9 @@ public class OverwatchCmd extends AbstractCommand {
 								.addField("Games won", profile.getGames().getQuickplayWon(), true)
 								.addField("Time played", profile.getQuickplayPlaytime(), true)
 								.addField("Top hero (Time played)", topHeroes.getPlayed(), true)
-								.addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true);
-						};
-						
-						return embedConsumer;
-					})
-					.flatMap(loadingMsg::send)
-					.then();
+								.addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true));
+
+						return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();
@@ -126,7 +119,7 @@ public class OverwatchCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Show player's stats for Overwatch.")
 				.addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")), true)

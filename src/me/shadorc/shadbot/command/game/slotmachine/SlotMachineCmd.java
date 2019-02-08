@@ -61,7 +61,7 @@ public class SlotMachineCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Play slot machine.")
 				.addField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)

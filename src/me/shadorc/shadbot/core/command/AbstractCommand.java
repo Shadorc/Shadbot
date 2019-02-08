@@ -37,7 +37,7 @@ public abstract class AbstractCommand {
 
 	public abstract Mono<Void> execute(Context context);
 
-	public abstract Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context);
+	public abstract Consumer<EmbedCreateSpec> getHelp(Context context);
 
 	public String getAlias() {
 		return this.alias;

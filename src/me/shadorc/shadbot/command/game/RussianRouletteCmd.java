@@ -56,7 +56,7 @@ public class RussianRouletteCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Play Russian roulette.")
 				.addArg("bet", String.format("You can't bet more than **%s**.", FormatUtils.coins(MAX_BET)), false)

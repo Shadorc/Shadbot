@@ -73,7 +73,7 @@ public class PruneCmd extends AbstractCommand {
 							return channel.getMessagesBefore(Snowflake.of(Instant.now()))
 									.take(count)
 									.filter(message -> mentions.isEmpty()
-											|| message.getAuthorId().map(mentionIds::contains).orElse(false))
+											|| message.getAuthor().map(User::getId).map(mentionIds::contains).orElse(false))
 									.filter(message -> words == null
 											|| message.getContent().map(content -> content.contains(words)).orElse(false)
 											|| this.getEmbedContent(message).contains(words))
@@ -96,7 +96,7 @@ public class PruneCmd extends AbstractCommand {
 	}
 
 	@Override
-	public Mono<Consumer<? super EmbedCreateSpec>> getHelp(Context context) {
+	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Delete messages.")
 				.addArg("@user(s)", "from these users", true)
