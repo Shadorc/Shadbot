@@ -41,13 +41,11 @@ public class VolumeSetting extends AbstractSetting {
 
 	@Override
 	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return embed -> {
-			EmbedUtils.getDefaultEmbed().accept(embed);
-			embed.addField("Usage", String.format("`%s%s <volume>`", context.getPrefix(), this.getCommandName()), false)
-					.addField("Argument", String.format("**volume** - min: %d / max: %d / default: %d",
-							MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME), false)
-					.addField("Example", String.format("`%s%s 42`", context.getPrefix(), this.getCommandName()), false);
-		};
+		return EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> embed.addField("Usage", String.format("`%s%s <volume>`", context.getPrefix(), this.getCommandName()), false)
+						.addField("Argument", String.format("**volume** - min: %d / max: %d / default: %d",
+								MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME), false)
+						.addField("Example", String.format("`%s%s 42`", context.getPrefix(), this.getCommandName()), false));
 	}
 
 }

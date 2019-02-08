@@ -40,12 +40,10 @@ public class PrefixSetting extends AbstractSetting {
 
 	@Override
 	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return embed -> {
-			EmbedUtils.getDefaultEmbed().accept(embed);
-			embed.addField("Usage", String.format("`%s%s <prefix>`", context.getPrefix(), this.getCommandName()), false)
-					.addField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
-					.addField("Example", String.format("`%s%s !`", context.getPrefix(), this.getCommandName()), false);
-		};
+		return EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> embed.addField("Usage", String.format("`%s%s <prefix>`", context.getPrefix(), this.getCommandName()), false)
+						.addField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
+						.addField("Example", String.format("`%s%s !`", context.getPrefix(), this.getCommandName()), false));
 	}
 
 }

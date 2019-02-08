@@ -55,26 +55,24 @@ public class UserInfoCmd extends AbstractCommand {
 							TimeUtils.toLocalDate(member.getJoinTime()).format(DATE_FORMATTER),
 							FormatUtils.longDuration(member.getJoinTime()));
 
-					final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
-						EmbedUtils.getDefaultEmbed().accept(embed);
-						embed.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, context.getAvatarUrl())
-								.setThumbnail(member.getAvatarUrl())
-								.addField("Display name", member.getDisplayName(), true)
-								.addField("User ID", member.getId().asString(), true)
-								.addField("Creation date", creationDate, true)
-								.addField("Join date", joinDate, true);
+					return EmbedUtils.getDefaultEmbed()
+							.andThen(embed -> {
+								embed.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, context.getAvatarUrl())
+										.setThumbnail(member.getAvatarUrl())
+										.addField("Display name", member.getDisplayName(), true)
+										.addField("User ID", member.getId().asString(), true)
+										.addField("Creation date", creationDate, true)
+										.addField("Join date", joinDate, true);
 
-						if(!roles.isEmpty()) {
-							embed.addField("Roles", FormatUtils.format(roles, Role::getMention, "\n"), true);
-						}
+								if(!roles.isEmpty()) {
+									embed.addField("Roles", FormatUtils.format(roles, Role::getMention, "\n"), true);
+								}
 
-						embed.addField("Status", StringUtils.capitalize(presence.getStatus().getValue()), true);
-						presence.getActivity()
-								.map(Activity::getName)
-								.ifPresent(details -> embed.addField("Playing text", details, true));
-					};
-
-					return embedConsumer;
+								embed.addField("Status", StringUtils.capitalize(presence.getStatus().getValue()), true);
+								presence.getActivity()
+										.map(Activity::getName)
+										.ifPresent(details -> embed.addField("Playing text", details, true));
+							});
 				})
 				.flatMap(loadingMsg::send)
 				.then();

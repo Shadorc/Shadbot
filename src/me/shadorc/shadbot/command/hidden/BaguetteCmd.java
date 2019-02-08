@@ -19,10 +19,8 @@ public class BaguetteCmd extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
-			EmbedUtils.getDefaultEmbed().accept(embed);
-			embed.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg");
-		};
+		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> embed.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg"));
 
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))

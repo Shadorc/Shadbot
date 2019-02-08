@@ -100,44 +100,44 @@ public class HelpBuilder {
 	}
 
 	public Consumer<EmbedCreateSpec> build() {
-		return embed -> {
-			EmbedUtils.getDefaultEmbed().accept(embed);
-			embed.setAuthor(String.format("Help for %s command", this.cmd.getName()),
-					null, this.context.getAvatarUrl());
-			embed.addField("Usage", this.getUsage(), false);
+		return EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> {
+					embed.setAuthor(String.format("Help for %s command", this.cmd.getName()),
+							null, this.context.getAvatarUrl());
+					embed.addField("Usage", this.getUsage(), false);
 
-			if(this.description != null) {
-				embed.setDescription(this.description);
-			}
+					if(this.description != null) {
+						embed.setDescription(this.description);
+					}
 
-			if(this.thumbnail != null) {
-				embed.setThumbnail(this.thumbnail);
-			}
+					if(this.thumbnail != null) {
+						embed.setThumbnail(this.thumbnail);
+					}
 
-			if(!this.getArguments().isEmpty()) {
-				embed.addField("Arguments", this.getArguments(), false);
-			}
+					if(!this.getArguments().isEmpty()) {
+						embed.addField("Arguments", this.getArguments(), false);
+					}
 
-			if(this.example != null) {
-				embed.addField("Example", this.example, false);
-			}
+					if(this.example != null) {
+						embed.addField("Example", this.example, false);
+					}
 
-			if(this.gains != null) {
-				embed.addField("Gains", this.gains, false);
-			}
+					if(this.gains != null) {
+						embed.addField("Gains", this.gains, false);
+					}
 
-			if(this.source != null) {
-				embed.addField("Source", this.source, false);
-			}
+					if(this.source != null) {
+						embed.addField("Source", this.source, false);
+					}
 
-			for(final EmbedFieldEntity field : this.fields) {
-				embed.addField(field.getName(), field.getValue(), field.isInline());
-			}
+					for(final EmbedFieldEntity field : this.fields) {
+						embed.addField(field.getName(), field.getValue(), field.isInline());
+					}
 
-			if(!this.cmd.getAlias().isEmpty()) {
-				embed.setFooter(String.format("Alias: %s", this.cmd.getAlias()), null);
-			}
-		};
+					if(!this.cmd.getAlias().isEmpty()) {
+						embed.setFooter(String.format("Alias: %s", this.cmd.getAlias()), null);
+					}
+				});
 	}
 
 	private String getUsage() {

@@ -67,13 +67,11 @@ public class BlacklistSettingCmd extends AbstractSetting {
 
 	@Override
 	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return embed -> {
-			EmbedUtils.getDefaultEmbed().accept(embed);
-			embed.addField("Usage", String.format("`%s%s <action> <command(s)>`", context.getPrefix(), this.getCommandName()), false)
-					.addField("Argument", String.format("**action** - %s",
-							FormatUtils.format(Action.class, "/")), false)
-					.addField("Example", String.format("`%s%s add rule34 russian_roulette`", context.getPrefix(), this.getCommandName()), false);
-		};
+		return EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <command(s)>`", context.getPrefix(), this.getCommandName()), false)
+						.addField("Argument", String.format("**action** - %s",
+								FormatUtils.format(Action.class, "/")), false)
+						.addField("Example", String.format("`%s%s add rule34 russian_roulette`", context.getPrefix(), this.getCommandName()), false));
 	}
 
 }

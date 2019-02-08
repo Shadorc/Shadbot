@@ -49,10 +49,8 @@ public class GifCmd extends AbstractCommand {
 						.then();
 			}
 
-			final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
-				EmbedUtils.getDefaultEmbed().accept(embed);
-				embed.setImage(giphy.getGifs().get(0).getImageUrl());
-			};
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl()));
 
 			return loadingMsg.send(embedConsumer)
 					.then();
