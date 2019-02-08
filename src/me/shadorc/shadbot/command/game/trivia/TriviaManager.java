@@ -81,16 +81,16 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 				FormatUtils.numberedList(this.trivia.getAnswers().size(), this.trivia.getAnswers().size(),
 						count -> String.format("\t**%d**. %s", count, this.trivia.getAnswers().get(count - 1))));
 
-					final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-							.andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
-							.setDescription(description)
-							.addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
-							.addField("Type", String.format("`%s`", this.trivia.getType()), true)
-							.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
-							.setFooter(String.format("You have %d seconds to answer.", LIMITED_TIME), null));
-				
-					return this.getContext().getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
+						.setDescription(description)
+						.addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
+						.addField("Type", String.format("`%s`", this.trivia.getType()), true)
+						.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
+						.setFooter(String.format("You have %d seconds to answer.", LIMITED_TIME), null));
+
+		return this.getContext().getChannel()
+				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
 				.then();
 	}
 

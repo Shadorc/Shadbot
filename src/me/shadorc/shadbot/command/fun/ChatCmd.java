@@ -46,7 +46,7 @@ public class ChatCmd extends AbstractCommand {
 		if(arg.length() > MAX_CHARACTERS) {
 			throw new CommandException(String.format("The message must not exceed **%d characters**.", MAX_CHARACTERS));
 		}
-		
+
 		for(final String botName : BOTS.keySet()) {
 			try {
 				final String response = this.talk(context.getChannelId(), BOTS.get(botName), arg);

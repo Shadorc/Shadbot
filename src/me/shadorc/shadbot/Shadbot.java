@@ -46,7 +46,7 @@ public class Shadbot {
 	private static final Map<Integer, Shard> SHARDS = new ConcurrentHashMap<>();
 
 	public static final AtomicLong OWNER_ID = new AtomicLong(0L);
-	
+
 	private static DatabaseManager databaseManager;
 	private static PremiumManager premiumManager;
 	private static LotteryManager lotteryManager;
@@ -88,14 +88,14 @@ public class Shadbot {
 					.setStoreService(new ShardJdkStoreService(registry))
 					.build();
 			SHARDS.put(index, new Shard(client));
-			
+
 			// TODO: Find better way
 			if(index == 0) {
 				client.getApplicationInfo()
-					.map(ApplicationInfo::getOwnerId)
-					.map(Snowflake::asLong)
-					.doOnNext(OWNER_ID::set)
-					.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+						.map(ApplicationInfo::getOwnerId)
+						.map(Snowflake::asLong)
+						.doOnNext(OWNER_ID::set)
+						.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 			}
 		}
 

@@ -61,8 +61,8 @@ public class RelicStatusCmd extends AbstractCommand {
 				.map(fields -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> {
 							embed.setAuthor("Contributor Status", null, context.getAvatarUrl())
-								.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
-	
+									.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
+
 							fields.stream()
 									.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
 						}))

@@ -45,13 +45,13 @@ public class TriviaCmd extends AbstractCommand {
 		}
 
 		if("categories".equalsIgnoreCase(context.getArg().orElse(null))) {
-						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-								.andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
-								.addField("ID", FormatUtils.format(this.categories.getIds(), id -> Integer.toString(id), "\n"), true)
-								.addField("Name", String.join("\n", this.categories.getNames()), true));
-						
-					return context.getChannel()
-							.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
+							.addField("ID", FormatUtils.format(this.categories.getIds(), id -> Integer.toString(id), "\n"), true)
+							.addField("Name", String.join("\n", this.categories.getNames()), true));
+
+			return context.getChannel()
+					.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
 					.then();
 		}
 

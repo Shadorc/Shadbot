@@ -108,8 +108,8 @@ public class Shard {
 					this.isFullyReady.set(false);
 					break;
 			}
-			
-			LogUtils.info("{Shard %d} New state: %s / fully ready: %s.", 
+
+			LogUtils.info("{Shard %d} New state: %s / fully ready: %s.",
 					event.getClient().getConfig().getShardIndex(), StringUtils.capitalizeEnum(this.state), this.isFullyReady());
 		});
 	}

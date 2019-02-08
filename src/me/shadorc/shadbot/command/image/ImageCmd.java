@@ -58,7 +58,7 @@ public class ImageCmd extends AbstractCommand {
 							.addField("Author", image.getAuthor().getUsername(), false)
 							.addField("Category", image.getCategoryPath(), false)
 							.setImage(image.getContent().getSource()));
-			
+
 			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
@@ -84,7 +84,7 @@ public class ImageCmd extends AbstractCommand {
 		final List<Image> images = deviantArt.getResults().stream()
 				.filter(image -> image.getContent() != null)
 				.collect(Collectors.toList());
-		
+
 		return images.isEmpty() ? null : Utils.randValue(images);
 	}
 

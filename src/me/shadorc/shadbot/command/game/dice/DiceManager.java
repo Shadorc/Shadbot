@@ -60,23 +60,23 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 				.collectList()
 				.map(usernames -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> {
-						embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
-							.setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
-							.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
-									this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
-							.addField("Player", String.join("\n", usernames), true)
-							.addField("Number", FormatUtils.format(this.numsPlayers.keySet(), Object::toString, "\n"), true);
-						
-						if(this.isTaskDone()) {
-							embed.setFooter("Finished.", null);
-						} else {
-							embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
-						}
-						
-						if(this.results != null) {
-							embed.addField("Results", this.results, false);
-						}
-					}))
+							embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
+									.setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
+									.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
+											this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
+									.addField("Player", String.join("\n", usernames), true)
+									.addField("Number", FormatUtils.format(this.numsPlayers.keySet(), Object::toString, "\n"), true);
+
+							if(this.isTaskDone()) {
+								embed.setFooter("Finished.", null);
+							} else {
+								embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+							}
+
+							if(this.results != null) {
+								embed.addField("Results", this.results, false);
+							}
+						}))
 				.flatMap(this.updateableMessage::send)
 				.then();
 	}

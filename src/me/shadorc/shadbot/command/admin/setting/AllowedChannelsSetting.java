@@ -97,10 +97,10 @@ public class AllowedChannelsSetting extends AbstractSetting {
 		return embed -> {
 			EmbedUtils.getDefaultEmbed().accept(embed);
 			embed.addField("Usage", String.format("`%s%s <action> <#channel(s)>`", context.getPrefix(), this.getCommandName()), false)
-				.addField("Argument", String.format("**action** - %s%n**channel(s)** - the (voice) channel(s) to %s",
-						FormatUtils.format(Action.class, "/"),
-						FormatUtils.format(Action.class, "/")), false)
-				.addField("Example", String.format("`%s%s add #general`", context.getPrefix(), this.getCommandName()), false);
+					.addField("Argument", String.format("**action** - %s%n**channel(s)** - the (voice) channel(s) to %s",
+							FormatUtils.format(Action.class, "/"),
+							FormatUtils.format(Action.class, "/")), false)
+					.addField("Example", String.format("`%s%s add #general`", context.getPrefix(), this.getCommandName()), false);
 		};
 	}
 

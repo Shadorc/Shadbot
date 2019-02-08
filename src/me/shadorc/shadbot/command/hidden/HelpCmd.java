@@ -45,18 +45,18 @@ public class HelpCmd extends AbstractCommand {
 						.collectMultimap(AbstractCommand::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
 				.map(map -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> {
-								embed.setAuthor("Shadbot Help", null, context.getAvatarUrl())
+							embed.setAuthor("Shadbot Help", null, context.getAvatarUrl())
 									.setDescription(String.format("Any issues, questions or suggestions ?"
 											+ " Join the [support server.](%s)"
 											+ "%nGet more information by using `%s%s <command>`.",
 											Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
-		
-								for(final CommandCategory category : CommandCategory.values()) {
-									if(map.get(category) != null && !map.get(category).isEmpty() && !category.equals(CommandCategory.HIDDEN)) {
-										embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
-									}
+
+							for(final CommandCategory category : CommandCategory.values()) {
+								if(map.get(category) != null && !map.get(category).isEmpty() && !category.equals(CommandCategory.HIDDEN)) {
+									embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
 								}
-							}))
+							}
+						}))
 				.flatMap(embedConsumer -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
 				.then();

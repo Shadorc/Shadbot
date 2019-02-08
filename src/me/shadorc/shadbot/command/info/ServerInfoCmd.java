@@ -34,7 +34,7 @@ public class ServerInfoCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-		
+
 		return Mono.zip(context.getGuild(),
 				context.getGuild().flatMap(Guild::getOwner),
 				context.getGuild().flatMapMany(Guild::getChannels).collectList(),
@@ -54,15 +54,15 @@ public class ServerInfoCmd extends AbstractCommand {
 					final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
 						EmbedUtils.getDefaultEmbed().accept(embed);
 						embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, context.getAvatarUrl())
-							.setThumbnail(guild.getIconUrl(Format.JPEG).get())
-							.addField("Owner", owner.getUsername(), true)
-							.addField("Server ID", guild.getId().asString(), true)
-							.addField("Creation date", creationDate, true)
-							.addField("Region", region.getName(), true)
-							.addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), true)
-							.addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true);
+								.setThumbnail(guild.getIconUrl(Format.JPEG).get())
+								.addField("Owner", owner.getUsername(), true)
+								.addField("Server ID", guild.getId().asString(), true)
+								.addField("Creation date", creationDate, true)
+								.addField("Region", region.getName(), true)
+								.addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), true)
+								.addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true);
 					};
-					
+
 					return embedConsumer;
 				})
 				.flatMap(loadingMsg::send)

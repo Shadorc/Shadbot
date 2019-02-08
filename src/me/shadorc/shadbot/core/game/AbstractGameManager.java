@@ -48,12 +48,12 @@ public abstract class AbstractGameManager {
 		if(message.getAuthor().isEmpty() || message.getContent().isEmpty()) {
 			return Mono.just(false);
 		}
-		
+
 		final String content = message.getContent().get();
 		if(!String.format("%scancel", this.context.getPrefix()).equals(content)) {
 			return Mono.just(false);
 		}
-		
+
 		final Snowflake authorId = message.getAuthor().get().getId();
 		return message.getChannel()
 				.flatMap(channel -> DiscordUtils.hasPermission(channel, authorId, Permission.ADMINISTRATOR))

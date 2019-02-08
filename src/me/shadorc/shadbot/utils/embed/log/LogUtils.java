@@ -52,7 +52,7 @@ public class LogUtils {
 	public static void info(String format, Object... args) {
 		LOGGER.info(String.format(format, args));
 	}
-	
+
 	public static void debug(String format, Object... args) {
 		LOGGER.debug(String.format(format, args));
 	}

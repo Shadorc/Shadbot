@@ -56,24 +56,24 @@ public class PollManager extends AbstractGameManager {
 		for(int i = 0; i < this.spec.getChoices().size(); i++) {
 			representation.append(String.format("%n\t**%d.** %s", i + 1, this.spec.getChoices().keySet().toArray()[i]));
 		}
-		
+
 		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-				.andThen(embed -> embed.setAuthor(String.format("Poll by %s)", this.getContext().getUsername()), 
+				.andThen(embed -> embed.setAuthor(String.format("Poll by %s)", this.getContext().getUsername()),
 						null, this.getContext().getAvatarUrl())
 						.setDescription(String.format("Vote using: `%s%s <choice>`%n%n__**%s**__%s",
-							this.getContext().getPrefix(), this.getContext().getCommandName(),
-							this.spec.getQuestion(), representation.toString()))
+								this.getContext().getPrefix(), this.getContext().getCommandName(),
+								this.spec.getQuestion(), representation.toString()))
 						.setFooter(String.format("You have %s to vote.",
-							FormatUtils.shortDuration(this.spec.getDuration().toMillis())),
-							"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png"));
+								FormatUtils.shortDuration(this.spec.getDuration().toMillis())),
+								"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png"));
 
 		return this.voteMessage.send(embedConsumer)
-			.flatMap(message -> Mono.delay(this.spec.getDuration())
-					.thenReturn(message.getId()))
-			.flatMap(messageId -> this.getContext().getClient().getMessageById(this.getContext().getChannelId(), messageId))
-			.map(Message::getReactions)
-			.flatMap(this::sendResults)
-			.then();
+				.flatMap(message -> Mono.delay(this.spec.getDuration())
+						.thenReturn(message.getId()))
+				.flatMap(messageId -> this.getContext().getClient().getMessageById(this.getContext().getChannelId(), messageId))
+				.map(Message::getReactions)
+				.flatMap(this::sendResults)
+				.then();
 	}
 
 	private Mono<Message> sendResults(Set<Reaction> reactions) {
@@ -92,14 +92,14 @@ public class PollManager extends AbstractGameManager {
 			representation.append(String.format("%n\t**%d.** %s (Votes: %d)", count, key, choicesVotes.get(key)));
 			count++;
 		}
-		
+
 		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-				.andThen(embed -> embed.setAuthor(String.format("Poll results (Author: %s)", this.getContext().getUsername()), 
+				.andThen(embed -> embed.setAuthor(String.format("Poll results (Author: %s)", this.getContext().getUsername()),
 						null, this.getContext().getAvatarUrl())
-					.setDescription(String.format("__**%s**__%s", this.spec.getQuestion(), representation.toString())));
-					
+						.setDescription(String.format("__**%s**__%s", this.spec.getQuestion(), representation.toString())));
+
 		return this.getContext().getChannel()
-			.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel));
+				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel));
 	}
 
 }

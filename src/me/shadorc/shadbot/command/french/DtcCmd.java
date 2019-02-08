@@ -51,9 +51,9 @@ public class DtcCmd extends AbstractCommand {
 					.andThen(embed -> embed.setAuthor("Quote DansTonChat",
 							String.format("https://danstonchat.com/%s.html", id),
 							context.getAvatarUrl())
-					.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-					.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n")));
-						
+							.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+							.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n")));
+
 			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {

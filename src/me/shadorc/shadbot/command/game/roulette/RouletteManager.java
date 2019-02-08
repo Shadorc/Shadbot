@@ -68,26 +68,26 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 				.collectList()
 				.map(users -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> {
-						embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
-							.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
-							.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
-									+ "%n%n**Place** is a `number between 1 and 36`, %s",
-									this.getContext().getPrefix(), this.getContext().getCommandName(),
-									FormatUtils.format(Place.values(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", ")))
-							.addField("Player (Bet)", FormatUtils.format(users,
-									user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.coins(this.playersPlace.get(user.getId()).getT1())), "\n"), true)
-							.addField("Place", this.playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
-						
-						if(this.results != null) {
-							embed.addField("Results", this.results, false);
-						}
-						
-						if(this.isTaskDone()) {
-							embed.setFooter("Finished", null);
-						} else {
-							embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
-						}
-				}))
+							embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
+									.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
+									.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
+											+ "%n%n**Place** is a `number between 1 and 36`, %s",
+											this.getContext().getPrefix(), this.getContext().getCommandName(),
+											FormatUtils.format(Place.values(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", ")))
+									.addField("Player (Bet)", FormatUtils.format(users,
+											user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.coins(this.playersPlace.get(user.getId()).getT1())), "\n"), true)
+									.addField("Place", this.playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
+
+							if(this.results != null) {
+								embed.addField("Results", this.results, false);
+							}
+
+							if(this.isTaskDone()) {
+								embed.setFooter("Finished", null);
+							} else {
+								embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+							}
+						}))
 				.flatMap(this.updateableMessage::send)
 				.then();
 	}

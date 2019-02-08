@@ -116,22 +116,22 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
 					return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
 				});
-		
+
 		this.guildMusic.getClient().getUserById(this.guildMusic.getDjId())
 				.map(User::getAvatarUrl)
-				.map(avatarUrl -> { 
+				.map(avatarUrl -> {
 					final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
 						EmbedUtils.getDefaultEmbed().accept(embed);
 						embed.setAuthor(playlist.getName(), null, avatarUrl);
 						embed.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png");
 						embed.setDescription("**Select a music by typing the corresponding number.**"
-									+ "\nYou can choose several musics by separating them with a comma."
-									+ "\nExample: 1,3,4"
-									+ "\n\n" + choices);
+								+ "\nYou can choose several musics by separating them with a comma."
+								+ "\nExample: 1,3,4"
+								+ "\n\n" + choices);
 						embed.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-									Shadbot.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null);
+								Shadbot.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null);
 					};
-					
+
 					return embedConsumer;
 				})
 				.flatMap(embedConsumer -> this.guildMusic.getMessageChannel()

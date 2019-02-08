@@ -41,10 +41,10 @@ public class JokeCmd extends AbstractCommand {
 
 			final String joke = FormatUtils.format(Utils.randValue(jokes).split("<br>"),
 					line -> Jsoup.parse(line).text().trim(), "\n");
-			
+
 			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Blague", "https://www.humour.com/blagues/", context.getAvatarUrl())
-					.setDescription(joke));
+							.setDescription(joke));
 
 			return loadingMsg.send(embedConsumer).then();
 

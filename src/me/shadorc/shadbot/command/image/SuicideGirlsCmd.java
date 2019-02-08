@@ -46,7 +46,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 								.andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
 										.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
 										.setImage(imageUrl));
-						
+
 						return loadingMsg.send(embedConsumer);
 
 					} catch (final IOException err) {

@@ -50,7 +50,7 @@ public class BanCmd extends AbstractCommand {
 
 		return context.getChannel()
 				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.BAN_MEMBERS)
-						.then(Mono.zip(context.getMessage().getUserMentions().collectList(), 
+						.then(Mono.zip(context.getMessage().getUserMentions().collectList(),
 								context.getGuild(),
 								context.getSelfAsMember()))
 						.flatMapMany(tuple -> {

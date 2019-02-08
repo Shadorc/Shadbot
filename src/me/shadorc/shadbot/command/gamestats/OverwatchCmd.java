@@ -62,19 +62,19 @@ public class OverwatchCmd extends AbstractCommand {
 						.then();
 			}
 
-						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-								.andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
-										StringUtils.toLowerCase(platform), profile.getUsername()), context.getAvatarUrl())
-								.setThumbnail(profile.getPortrait())
-								.setDescription(String.format("Stats for user **%s**", profile.getUsername()))
-								.addField("Level", profile.getLevel(), true)
-								.addField("Competitive rank", profile.getRank(), true)
-								.addField("Games won", profile.getGames().getQuickplayWon(), true)
-								.addField("Time played", profile.getQuickplayPlaytime(), true)
-								.addField("Top hero (Time played)", topHeroes.getPlayed(), true)
-								.addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true));
+			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
+							StringUtils.toLowerCase(platform), profile.getUsername()), context.getAvatarUrl())
+							.setThumbnail(profile.getPortrait())
+							.setDescription(String.format("Stats for user **%s**", profile.getUsername()))
+							.addField("Level", profile.getLevel(), true)
+							.addField("Competitive rank", profile.getRank(), true)
+							.addField("Games won", profile.getGames().getQuickplayWon(), true)
+							.addField("Time played", profile.getQuickplayPlaytime(), true)
+							.addField("Top hero (Time played)", topHeroes.getPlayed(), true)
+							.addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true));
 
-						return loadingMsg.send(embedConsumer).then();
+			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {
 			loadingMsg.stopTyping();

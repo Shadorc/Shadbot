@@ -36,33 +36,33 @@ public class RolelistCmd extends AbstractCommand {
 					if(mentionedRoleIds.isEmpty()) {
 						throw new CommandException(String.format("Role `%s` not found.", arg));
 					}
-					
+
 					final Mono<List<Role>> mentionedRoles = Flux.fromIterable(mentionedRoleIds)
 							.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 							.collectList();
-					
+
 					final Mono<List<String>> usernames = context.getGuild()
 							.flatMapMany(Guild::getMembers)
 							.filter(member -> !Collections.disjoint(member.getRoleIds(), mentionedRoleIds))
 							.map(Member::getUsername)
 							.distinct()
 							.collectList();
-					
+
 					return Mono.zip(mentionedRoles, usernames);
 				})
 				.map(tuple -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> {
-							embed.setAuthor(String.format("Rolelist: %s", FormatUtils.format(tuple.getT1(), Role::getName, ", ")), 
+							embed.setAuthor(String.format("Rolelist: %s", FormatUtils.format(tuple.getT1(), Role::getName, ", ")),
 									null, context.getAvatarUrl());
-				
+
 							if(tuple.getT2().isEmpty()) {
 								embed.setDescription(
 										String.format("There is nobody with %s.", tuple.getT1().size() == 1 ? "this role" : "these roles"));
 								return;
 							}
-							
+
 							FormatUtils.createColumns(tuple.getT2(), 25).stream()
-								.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
+									.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
 						}))
 				.flatMap(embedConsumer -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))

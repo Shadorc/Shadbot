@@ -52,18 +52,17 @@ public class LyricsCmd extends AbstractCommand {
 			String search;
 			if(arg.isPresent()) {
 				search = arg.get();
-			}
-			else {
+			} else {
 				final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(context.getGuildId());
 				if(guildMusic == null) {
 					throw new MissingArgumentException();
 				}
-				
+
 				final AudioTrackInfo info = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack().getInfo();
 				// Remove from title (case insensitive): official, video, music, [, ], (, )
 				search = info.title.replaceAll("(?i)official|video|music|\\[|\\]|\\(|\\)", "");
 			}
-			
+
 			final String url = this.getCorrectedUrl(search);
 			if(url == null) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
@@ -73,15 +72,15 @@ public class LyricsCmd extends AbstractCommand {
 
 			final Document doc = this.getLyricsDocument(context.getClient(), url).outputSettings(PRESERVE_FORMAT);
 			final Musixmatch musixmatch = new Musixmatch(doc);
-			
+
 			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
 							musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
 							.setThumbnail(musixmatch.getImageUrl())
 							.setDescription(musixmatch.getLyrics())
-							.setFooter("Click on the title to see the full version", 
+							.setFooter("Click on the title to see the full version",
 									"https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png"));
-			
+
 			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {

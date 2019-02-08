@@ -71,7 +71,7 @@ public class IamCmd extends AbstractCommand {
 									.andThen(embed -> embed.setAuthor(String.format("Iam: %s",
 											FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
 											null, context.getAvatarUrl())
-									.setDescription(description.toString()));
+											.setDescription(description.toString()));
 
 							return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
 									.send(embedConsumer)

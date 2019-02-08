@@ -54,20 +54,20 @@ public class UserInfoCmd extends AbstractCommand {
 					final String joinDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(member.getJoinTime()).format(DATE_FORMATTER),
 							FormatUtils.longDuration(member.getJoinTime()));
-					
+
 					final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
 						EmbedUtils.getDefaultEmbed().accept(embed);
 						embed.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, context.getAvatarUrl())
-							.setThumbnail(member.getAvatarUrl())
-							.addField("Display name", member.getDisplayName(), true)
-							.addField("User ID", member.getId().asString(), true)
-							.addField("Creation date", creationDate, true)
-							.addField("Join date", joinDate, true);
+								.setThumbnail(member.getAvatarUrl())
+								.addField("Display name", member.getDisplayName(), true)
+								.addField("User ID", member.getId().asString(), true)
+								.addField("Creation date", creationDate, true)
+								.addField("Join date", joinDate, true);
 
 						if(!roles.isEmpty()) {
 							embed.addField("Roles", FormatUtils.format(roles, Role::getMention, "\n"), true);
 						}
-	
+
 						embed.addField("Status", StringUtils.capitalize(presence.getStatus().getValue()), true);
 						presence.getActivity()
 								.map(Activity::getName)

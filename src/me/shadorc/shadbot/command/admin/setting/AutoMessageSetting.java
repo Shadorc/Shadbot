@@ -113,22 +113,22 @@ public class AutoMessageSetting extends AbstractSetting {
 
 	@Override
 	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return embed -> { 
+		return embed -> {
 			EmbedUtils.getDefaultEmbed().accept(embed);
 			embed.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", context.getPrefix(), this.getCommandName()), false)
-				.addField("Argument", String.format("**action** - %s"
-						+ "%n**type** - %s"
-						+ "%n**value** - a message for *%s* and *%s* or a #channel for *%s*",
-						FormatUtils.format(Action.class, "/"),
-						FormatUtils.format(Type.class, "/"),
-						StringUtils.toLowerCase(Type.JOIN_MESSAGE),
-						StringUtils.toLowerCase(Type.LEAVE_MESSAGE),
-						StringUtils.toLowerCase(Type.CHANNEL)), false)
-				.addField("Info", "You don't need to specify *value* to disable a type.", false)
-				.addField("Formatting", "**{mention}** - will be replaced by the mention of the user who joined/left", false)
-				.addField("Example", String.format("`%s%s enable join_message Hello you (:`"
-						+ "%n`%s%s disable leave_message`",
-						context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()), false);
+					.addField("Argument", String.format("**action** - %s"
+							+ "%n**type** - %s"
+							+ "%n**value** - a message for *%s* and *%s* or a #channel for *%s*",
+							FormatUtils.format(Action.class, "/"),
+							FormatUtils.format(Type.class, "/"),
+							StringUtils.toLowerCase(Type.JOIN_MESSAGE),
+							StringUtils.toLowerCase(Type.LEAVE_MESSAGE),
+							StringUtils.toLowerCase(Type.CHANNEL)), false)
+					.addField("Info", "You don't need to specify *value* to disable a type.", false)
+					.addField("Formatting", "**{mention}** - will be replaced by the mention of the user who joined/left", false)
+					.addField("Example", String.format("`%s%s enable join_message Hello you (:`"
+							+ "%n`%s%s disable leave_message`",
+							context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()), false);
 		};
 	}
 }

@@ -86,17 +86,17 @@ public class SettingsCmd extends AbstractCommand {
 		final String arg = args.size() == 2 ? args.get(1) : null;
 		if("help".equals(arg)) {
 			return context.getChannel()
-							.flatMap(channel -> DiscordUtils.sendMessage(this.getHelp(context, setting), channel))
+					.flatMap(channel -> DiscordUtils.sendMessage(this.getHelp(context, setting), channel))
 					.then();
 		}
-		
+
 		try {
 			return setting.execute(context);
 		} catch (MissingArgumentException err) {
-			 return context.getChannel()
-					 .flatMap(channel -> DiscordUtils.sendMessage(
-						Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", this.getHelp(context, setting), channel))
-				.then();
+			return context.getChannel()
+					.flatMap(channel -> DiscordUtils.sendMessage(
+							Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", this.getHelp(context, setting), channel))
+					.then();
 		}
 	}
 
@@ -163,14 +163,14 @@ public class SettingsCmd extends AbstractCommand {
 				.then(permissionsStr)
 				.then(Mono.just(EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> embed.setAuthor("Settings", null, context.getAvatarUrl())
-							.setDescription(
-									settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString()))));
+								.setDescription(
+										settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString()))));
 	}
 
 	private Consumer<EmbedCreateSpec> getHelp(Context context, AbstractSetting setting) {
-					return setting.getHelp(context)
-							.andThen(embed -> embed.setAuthor(String.format("Help for setting: %s", setting.getName()), null, context.getAvatarUrl())
-							.setDescription(String.format("**%s**", setting.getDescription())));
+		return setting.getHelp(context)
+				.andThen(embed -> embed.setAuthor(String.format("Help for setting: %s", setting.getName()), null, context.getAvatarUrl())
+						.setDescription(String.format("**%s**", setting.getDescription())));
 	}
 
 	@Override

@@ -102,7 +102,7 @@ public class HelpBuilder {
 	public Consumer<EmbedCreateSpec> build() {
 		return embed -> {
 			EmbedUtils.getDefaultEmbed().accept(embed);
-			embed.setAuthor(String.format("Help for %s command", this.cmd.getName()), 
+			embed.setAuthor(String.format("Help for %s command", this.cmd.getName()),
 					null, this.context.getAvatarUrl());
 			embed.addField("Usage", this.getUsage(), false);
 

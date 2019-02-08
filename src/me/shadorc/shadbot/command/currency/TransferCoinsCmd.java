@@ -72,7 +72,7 @@ public class TransferCoinsCmd extends AbstractCommand {
 				.map(User::getMention)
 				.flatMap(senderMention -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
-						context.getAuthor().getMention(), FormatUtils.coins(coins), senderMention), channel)))
+								context.getAuthor().getMention(), FormatUtils.coins(coins), senderMention), channel)))
 				.then();
 	}
 

@@ -106,7 +106,7 @@ public class TranslateCmd extends AbstractCommand {
 							.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
 									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)), sourceText,
 									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)), translatedText.toString())));
-						
+
 			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {

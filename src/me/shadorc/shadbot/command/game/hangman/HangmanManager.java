@@ -77,30 +77,30 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 				.map(String::toUpperCase)
 				.collect(Collectors.toList());
 
-					final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-							.andThen(embed -> {
-						embed.setAuthor("Hangman Game", null, this.getContext().getAvatarUrl())
-								.setThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")
-								.setDescription("Type letters or enter a word if you think you've guessed it.")
-								.addField("Word", this.getRepresentation(this.word), false);
-						
-						if(!missedLetters.isEmpty()) {
-							embed.addField("Misses", String.join(", ", missedLetters), false);
-						}
-						
-						if(this.isTaskDone()) {
-							embed.setFooter("Finished.", null);
-						} else {
-							embed.setFooter(String.format("Use %scancel to cancel this game (Automatically cancelled in %d min in case of inactivity)",
-									this.getContext().getPrefix(), IDLE_MIN), null);
-						}
-						
-						if(this.failCount > 0) {
-							embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
-						}
-					});
-					
-				return this.updateableMessage.send(embedConsumer).then();
+		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> {
+					embed.setAuthor("Hangman Game", null, this.getContext().getAvatarUrl())
+							.setThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")
+							.setDescription("Type letters or enter a word if you think you've guessed it.")
+							.addField("Word", this.getRepresentation(this.word), false);
+
+					if(!missedLetters.isEmpty()) {
+						embed.addField("Misses", String.join(", ", missedLetters), false);
+					}
+
+					if(this.isTaskDone()) {
+						embed.setFooter("Finished.", null);
+					} else {
+						embed.setFooter(String.format("Use %scancel to cancel this game (Automatically cancelled in %d min in case of inactivity)",
+								this.getContext().getPrefix(), IDLE_MIN), null);
+					}
+
+					if(this.failCount > 0) {
+						embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
+					}
+				});
+
+		return this.updateableMessage.send(embedConsumer).then();
 	}
 
 	private Mono<Void> showResultAndStop(boolean win) {
@@ -176,33 +176,33 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		return this.cancelOrDo(event.getMessage(), 
+		return this.cancelOrDo(event.getMessage(),
 				Mono.justOrEmpty(event.getMessage().getAuthor().map(User::getId))
-				.flatMap(authorId -> {
-					final Context context = this.getContext();
+						.flatMap(authorId -> {
+							final Context context = this.getContext();
 
-					if(!authorId.equals(context.getAuthorId())) {
-						return Mono.just(false);
-					}
+							if(!authorId.equals(context.getAuthorId())) {
+								return Mono.just(false);
+							}
 
-					final String content = event.getMessage().getContent().get().toLowerCase().trim();
+							final String content = event.getMessage().getContent().get().toLowerCase().trim();
 
-					// Check only if content is an unique word/letter
-					if(!content.matches("[a-z]+")) {
-						return Mono.just(false);
-					}
+							// Check only if content is an unique word/letter
+							if(!content.matches("[a-z]+")) {
+								return Mono.just(false);
+							}
 
-					Mono<Void> checkMono = Mono.empty();
-					if(content.length() == 1 && !this.rateLimiter.isLimitedAndWarn(
-							context.getClient(), context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
-						checkMono = this.checkLetter(content);
-					} else if(content.length() == this.word.length() && !this.rateLimiter.isLimitedAndWarn(
-							context.getClient(), context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
-						checkMono = this.checkWord(content);
-					}
+							Mono<Void> checkMono = Mono.empty();
+							if(content.length() == 1 && !this.rateLimiter.isLimitedAndWarn(
+									context.getClient(), context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
+								checkMono = this.checkLetter(content);
+							} else if(content.length() == this.word.length() && !this.rateLimiter.isLimitedAndWarn(
+									context.getClient(), context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
+								checkMono = this.checkWord(content);
+							}
 
-					return checkMono.thenReturn(false);
-				}));
+							return checkMono.thenReturn(false);
+						}));
 	}
 
 }

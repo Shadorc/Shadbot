@@ -71,16 +71,16 @@ public class StatsCmd extends AbstractCommand {
 		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
 				.andThen(embed -> {
 					embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, context.getAvatarUrl());
-			
+
 					if(map == null || map.isEmpty()) {
 						embed.setDescription("No statistics yet.");
 					} else {
 						final Comparator<? super Map.Entry<String, AtomicLong>> comparator =
 								Map.Entry.comparingByValue((v1, v2) -> Long.compare(v1.get(), v2.get()));
 						final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
-						
+
 						embed.addField("Name", FormatUtils.format(sortedMap.keySet(), StringUtils::toLowerCase, "\n"), true)
-							.addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.number(Long.parseLong(value.toString())), "\n"), true);
+								.addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.number(Long.parseLong(value.toString())), "\n"), true);
 					}
 				});
 

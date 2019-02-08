@@ -54,14 +54,14 @@ public class LogBuilder {
 					embed.setColor(Color.BLUE);
 					break;
 			}
-	
+
 			if(this.err != null) {
 				embed.addField("Error type", this.err.getClass().getSimpleName(), false);
 				if(this.err.getMessage() != null) {
 					embed.addField("Error message", this.err.getMessage(), false);
 				}
 			}
-	
+
 			if(this.input != null) {
 				embed.addField("Input", this.input, false);
 			}

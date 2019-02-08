@@ -52,7 +52,7 @@ public class InfoCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
 				context.getClient().getGuilds().count(),
-				context.getClient().getUsers().count(), 
+				context.getClient().getUsers().count(),
 				voiceChannelCountMono)
 				.flatMap(tuple -> {
 					final long start = System.currentTimeMillis();

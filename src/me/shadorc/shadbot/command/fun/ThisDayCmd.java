@@ -56,7 +56,7 @@ public class ThisDayCmd extends AbstractCommand {
 					.andThen(embed -> embed.setAuthor(String.format("On This Day: %s", date), HOME_URL, context.getAvatarUrl())
 							.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
 							.setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH)));
-			
+
 			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final IOException err) {

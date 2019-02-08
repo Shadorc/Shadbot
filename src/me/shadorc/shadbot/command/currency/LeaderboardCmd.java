@@ -47,7 +47,7 @@ public class LeaderboardCmd extends AbstractCommand {
 				})
 				.map(description -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> embed.setAuthor("Leaderboard", null, context.getAvatarUrl())
-							.setDescription(description)))
+								.setDescription(description)))
 				.flatMap(embed -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
 				.then();

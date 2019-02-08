@@ -21,17 +21,17 @@ public class GatewayEventFilter extends TurboFilter {
 
 	@Override
 	public FilterReply decide(Marker marker, Logger logger, Level level, String format, Object[] params, Throwable t) {
-		if (params != null && logger.getName().startsWith("discord4j.gateway.inbound")) {
-			for (Object param : params) {
-				if (param instanceof GatewayPayload) {
+		if(params != null && logger.getName().startsWith("discord4j.gateway.inbound")) {
+			for(Object param : params) {
+				if(param instanceof GatewayPayload) {
 					GatewayPayload<?> payload = (GatewayPayload<?>) param;
-					if (Opcode.DISPATCH.equals(payload.getOp())) {
-						if (excludedEvents != null) {
-							if (excludedEvents.contains(payload.getType())) {
+					if(Opcode.DISPATCH.equals(payload.getOp())) {
+						if(excludedEvents != null) {
+							if(excludedEvents.contains(payload.getType())) {
 								return FilterReply.DENY;
 							}
-						} else if (includedEvents != null) {
-							if (!includedEvents.contains(payload.getType())) {
+						} else if(includedEvents != null) {
+							if(!includedEvents.contains(payload.getType())) {
 								return FilterReply.DENY;
 							}
 						}
@@ -52,10 +52,10 @@ public class GatewayEventFilter extends TurboFilter {
 
 	@Override
 	public void start() {
-		if (exclude != null && exclude.trim().length() > 0) {
+		if(exclude != null && exclude.trim().length() > 0) {
 			excludedEvents = Arrays.asList(exclude.split("[;,]"));
 			super.start();
-		} else if (include != null && include.trim().length() > 0) {
+		} else if(include != null && include.trim().length() > 0) {
 			includedEvents = Arrays.asList(include.split("[;,]"));
 			super.start();
 		}

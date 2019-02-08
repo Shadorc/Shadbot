@@ -48,7 +48,7 @@ public class GifCmd extends AbstractCommand {
 						context.getUsername(), context.getArg().orElse("random search")))
 						.then();
 			}
-			
+
 			final Consumer<EmbedCreateSpec> embedConsumer = embed -> {
 				EmbedUtils.getDefaultEmbed().accept(embed);
 				embed.setImage(giphy.getGifs().get(0).getImageUrl());

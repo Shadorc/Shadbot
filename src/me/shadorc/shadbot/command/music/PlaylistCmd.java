@@ -26,12 +26,12 @@ public class PlaylistCmd extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
-		
+
 		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
 				.andThen(embed -> embed.setAuthor("Playlist", null, context.getAvatarUrl())
 						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 						.setDescription(this.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist())));
-		
+
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
 				.then();

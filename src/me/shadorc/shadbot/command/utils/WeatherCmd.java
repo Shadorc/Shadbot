@@ -77,7 +77,7 @@ public class WeatherCmd extends AbstractCommand {
 							.addField(Emoji.RAIN + " Rain", rain, true)
 							.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
 							.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true));
-			
+
 			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final APIException err) {

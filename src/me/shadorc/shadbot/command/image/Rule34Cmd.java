@@ -69,15 +69,15 @@ public class Rule34Cmd extends AbstractCommand {
 						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
 								.andThen(embed -> {
 									embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
-										.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
-										.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
-										.addField("Tags", formattedtags, false)
-										.setImage(post.getFileUrl())
-										.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
+											.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
+											.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
+											.addField("Tags", formattedtags, false)
+											.setImage(post.getFileUrl())
+											.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
 
-										if(!post.getSource().isEmpty()) {
-											embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
-										}
+									if(!post.getSource().isEmpty()) {
+										embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
+									}
 								});
 
 						return loadingMsg.send(embedConsumer).then();
