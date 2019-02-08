@@ -46,17 +46,18 @@ public class Context {
 		return this.arg;
 	}
 
-	public Mono<User> getAuthor() {
-		return this.getMessage().getAuthor();
+	@Nullable
+	public User getAuthor() {
+		return this.getMessage().getAuthor().orElse(null);
 	}
 
 	@Nullable
 	public Snowflake getAuthorId() {
-		return this.getMessage().getAuthorId().orElse(null);
+		return this.getAuthor().getId();
 	}
 
-	public Mono<String> getAvatarUrl() {
-		return this.getAuthor().map(User::getAvatarUrl);
+	public String getAvatarUrl() {
+		return this.getAuthor().getAvatarUrl();
 	}
 
 	public Mono<MessageChannel> getChannel() {
