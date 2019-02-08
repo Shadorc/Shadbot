@@ -7,7 +7,8 @@ import javax.annotation.Nullable;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.ApplicationInfo;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
@@ -17,6 +18,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.music.GuildMusic;
@@ -101,14 +103,15 @@ public class Context {
 
 	public Mono<CommandPermission> getPermission() {
 		// The author is the bot's owner
-		final Mono<CommandPermission> ownerPerm = this.getClient().getApplicationInfo()
-				.map(ApplicationInfo::getOwnerId)
-				.filter(this.getAuthorId()::equals)
+		final Mono<CommandPermission> ownerPerm = Mono.just(Shadbot.OWNER_ID.get())
+				.map(Snowflake::of)
+				.filter(this.getAuthor().getId()::equals)
 				.map(ignored -> CommandPermission.OWNER);
 
 		// Private message, the author is considered as an administrator
-		final Mono<CommandPermission> dmPerm = Mono.just(this.event.getGuildId())
-				.filter(guildId -> !guildId.isPresent())
+		final Mono<CommandPermission> dmPerm = this.getChannel()
+				.map(Channel::getType)
+				.filter(Type.DM::equals)
 				.map(ignored -> CommandPermission.ADMIN);
 
 		// The member is an administrator

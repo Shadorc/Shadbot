@@ -7,12 +7,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
+import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.core.object.util.Snowflake;
 import discord4j.gateway.SimpleBucket;
 import discord4j.rest.request.SingleRouterFactory;
 import me.shadorc.shadbot.command.game.LotteryCmd;
@@ -42,6 +45,8 @@ public class Shadbot {
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final Map<Integer, Shard> SHARDS = new ConcurrentHashMap<>();
 
+	public static final AtomicLong OWNER_ID = new AtomicLong(0L);
+	
 	private static DatabaseManager databaseManager;
 	private static PremiumManager premiumManager;
 	private static LotteryManager lotteryManager;
@@ -83,6 +88,15 @@ public class Shadbot {
 					.setStoreService(new ShardJdkStoreService(registry))
 					.build();
 			SHARDS.put(index, new Shard(client));
+			
+			// TODO: Find better way
+			if(index == 0) {
+				client.getApplicationInfo()
+					.map(ApplicationInfo::getOwnerId)
+					.map(Snowflake::asLong)
+					.doOnNext(OWNER_ID::set)
+					.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+			}
 		}
 
 		// Initiate login and block
