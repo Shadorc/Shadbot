@@ -21,22 +21,21 @@ import reactor.core.publisher.Mono;
 
 public class LoadingMessage implements Publisher<Void> {
 
+	private final static Duration TYPING_TIMEOUT = Duration.ofSeconds(30);
+
 	private final DiscordClient client;
 	private final Snowflake channelId;
-	private final Duration typingTimeout;
 	private final List<Subscriber<? super Void>> subscribers;
 
 	/**
-	 * Start typing until a message is send or the typing timeout have passed
+	 * Start typing until a message is send or 30 seconds have passed
 	 *
 	 * @param client - the Discord client
 	 * @param channelId - the Channel ID in which send the message
-	 * @param typingTimeout - the duration before a message is send
 	 */
-	public LoadingMessage(DiscordClient client, Snowflake channelId, Duration typingTimeout) {
+	public LoadingMessage(DiscordClient client, Snowflake channelId) {
 		this.client = client;
 		this.channelId = channelId;
-		this.typingTimeout = typingTimeout;
 		this.subscribers = new ArrayList<>();
 
 		this.startTyping()
@@ -45,24 +44,14 @@ public class LoadingMessage implements Publisher<Void> {
 	}
 
 	/**
-	 * Start typing until a message is send Start typing until a message is send or 30 seconds have passed
-	 *
-	 * @param client - the Discord client
-	 * @param channelId - the Channel ID in which send the message
-	 */
-	public LoadingMessage(DiscordClient client, Snowflake channelId) {
-		this(client, channelId, Duration.ofSeconds(30));
-	}
-
-	/**
-	 * Start typing in the channel until a message is send or the typing timeout seconds have passed
+	 * Start typing in the channel until a message is send or the typing timeout have passed
 	 */
 	private Flux<Long> startTyping() {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
 				.filterWhen(channel -> DiscordUtils.hasPermission(channel, this.client.getSelfId().get(), Permission.SEND_MESSAGES))
 				.flatMapMany(channel -> channel.typeUntil(this))
-				.take(this.typingTimeout);
+				.take(TYPING_TIMEOUT);
 	}
 
 	/**
@@ -73,7 +62,7 @@ public class LoadingMessage implements Publisher<Void> {
 	}
 
 	/**
-	 * Send a message and stop typing when the message has been send or an error occurred
+	 * Send a message and stop typing when the message has been sent or an error occurred
 	 */
 	public Mono<Message> send(String content) {
 		return this.client.getChannelById(this.channelId)
@@ -83,7 +72,7 @@ public class LoadingMessage implements Publisher<Void> {
 	}
 
 	/**
-	 * Send a message and stop typing when the message has been send or an error occurred
+	 * Send a message and stop typing when the message has been sent or an error occurred
 	 */
 	public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
 		return this.client.getChannelById(this.channelId)
