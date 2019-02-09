@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.image;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -82,7 +81,7 @@ public class Rule34Cmd extends AbstractCommand {
 
 						return loadingMsg.send(embedConsumer).then();
 
-					} catch (final IOException err) {
+					} catch (final Exception err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(err);
 					}

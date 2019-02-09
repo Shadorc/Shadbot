@@ -47,6 +47,7 @@ public class PruneCmd extends AbstractCommand {
 							final List<String> quotedElements = StringUtils.getQuotedElements(arg);
 
 							if(arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
+								loadingMsg.stopTyping();
 								throw new CommandException("You have forgotten a quote or have specified several quotes in quotation marks.");
 							}
 

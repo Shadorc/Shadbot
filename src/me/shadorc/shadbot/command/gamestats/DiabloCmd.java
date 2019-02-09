@@ -71,6 +71,7 @@ public class DiabloCmd extends AbstractCommand {
 			final ProfileResponse profile = Utils.MAPPER.readValue(url, ProfileResponse.class);
 
 			if("NOTFOUND".equals(profile.getCode())) {
+				loadingMsg.stopTyping();
 				throw new FileNotFoundException();
 			}
 
@@ -109,7 +110,7 @@ public class DiabloCmd extends AbstractCommand {
 			return loadingMsg.send(
 					String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.", context.getUsername()))
 					.then();
-		} catch (final IOException err) {
+		} catch (final Exception err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

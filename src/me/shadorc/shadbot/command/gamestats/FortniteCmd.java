@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.gamestats;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.function.Consumer;
@@ -67,6 +66,7 @@ public class FortniteCmd extends AbstractCommand {
 					.execute();
 
 			if(response.statusCode() != 200) {
+				loadingMsg.stopTyping();
 				throw new HttpStatusException("Fortnite API did not return a valid status code.",
 						HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
 			}
@@ -102,7 +102,7 @@ public class FortniteCmd extends AbstractCommand {
 
 			return loadingMsg.send(embedConsumer).then();
 
-		} catch (final IOException err) {
+		} catch (final Exception err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

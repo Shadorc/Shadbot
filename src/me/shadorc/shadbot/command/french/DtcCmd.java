@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.french;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.function.Consumer;
@@ -56,7 +55,7 @@ public class DtcCmd extends AbstractCommand {
 
 			return loadingMsg.send(embedConsumer).then();
 
-		} catch (final IOException err) {
+		} catch (final Exception err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

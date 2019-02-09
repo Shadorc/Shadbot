@@ -55,6 +55,7 @@ public class LyricsCmd extends AbstractCommand {
 			} else {
 				final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(context.getGuildId());
 				if(guildMusic == null) {
+					loadingMsg.stopTyping();
 					throw new MissingArgumentException();
 				}
 
@@ -83,7 +84,7 @@ public class LyricsCmd extends AbstractCommand {
 
 			return loadingMsg.send(embedConsumer).then();
 
-		} catch (final IOException err) {
+		} catch (final Exception err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

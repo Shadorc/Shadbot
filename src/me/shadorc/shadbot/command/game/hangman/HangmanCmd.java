@@ -58,7 +58,8 @@ public class HangmanCmd extends AbstractCommand {
 			final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 			try {
 				this.load();
-			} catch (final IOException err) {
+			} catch (final Exception err) {
+				loadingMsg.stopTyping();
 				throw Exceptions.propagate(err);
 			}
 			loadingMsg.stopTyping();

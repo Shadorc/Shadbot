@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.image;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 import org.jsoup.nodes.Document;
@@ -49,7 +48,7 @@ public class SuicideGirlsCmd extends AbstractCommand {
 
 						return loadingMsg.send(embedConsumer);
 
-					} catch (final IOException err) {
+					} catch (final Exception err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(err);
 					}

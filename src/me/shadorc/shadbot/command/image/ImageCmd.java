@@ -61,7 +61,7 @@ public class ImageCmd extends AbstractCommand {
 
 			return loadingMsg.send(embedConsumer).then();
 
-		} catch (final IOException err) {
+		} catch (final Exception err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

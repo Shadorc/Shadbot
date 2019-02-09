@@ -9,7 +9,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
 import com.ivkos.wallhaven4j.Wallhaven;
@@ -18,7 +17,6 @@ import com.ivkos.wallhaven4j.models.misc.Resolution;
 import com.ivkos.wallhaven4j.models.misc.enums.Category;
 import com.ivkos.wallhaven4j.models.misc.enums.Purity;
 import com.ivkos.wallhaven4j.models.wallpaper.Wallpaper;
-import com.ivkos.wallhaven4j.util.exceptions.WallhavenException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -88,7 +86,7 @@ public class WallpaperCmd extends AbstractCommand {
 			loadingMsg.stopTyping();
 			throw new CommandException(String.format("%s. Use `%shelp %s` for more information.",
 					err.getMessage(), context.getPrefix(), this.getName()));
-		} catch (final ParseException err) {
+		} catch (final Exception err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}
@@ -142,7 +140,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 						return loadingMsg.send(embedConsumer).then();
 
-					} catch (final WallhavenException err) {
+					} catch (final Exception err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(Objects.requireNonNullElse(err.getCause(), err));
 					}

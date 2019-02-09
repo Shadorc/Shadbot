@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.image;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.function.Consumer;
 
@@ -40,6 +39,7 @@ public class GifCmd extends AbstractCommand {
 			final GiphyResponse giphy = Utils.MAPPER.readValue(url, GiphyResponse.class);
 
 			if(giphy.getGifs() == null) {
+				loadingMsg.stopTyping();
 				throw new HttpStatusException("Giphy did not return valid JSON.", HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
 			}
 
@@ -52,10 +52,9 @@ public class GifCmd extends AbstractCommand {
 			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl()));
 
-			return loadingMsg.send(embedConsumer)
-					.then();
+			return loadingMsg.send(embedConsumer).then();
 
-		} catch (final IOException err) {
+		} catch (final Exception err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}
