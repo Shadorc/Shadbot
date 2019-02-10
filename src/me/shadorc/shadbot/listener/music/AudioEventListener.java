@@ -69,6 +69,7 @@ public class AudioEventListener extends AudioEventAdapter {
 		}
 
 		this.guildMusic.getMessageChannel()
+				.filter(ignored -> strBuilder.length() > 0)
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then(this.nextOrEnd())
 				.onErrorResume(thr -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), thr)))
