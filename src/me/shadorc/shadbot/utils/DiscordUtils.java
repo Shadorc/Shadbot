@@ -216,8 +216,8 @@ public class DiscordUtils {
 	}
 
 	private static Mono<Boolean> hasHigherRoles(List<Role> roles1, List<Role> roles2) {
-		return Mono.zip(Flux.fromIterable(roles1).flatMap(Role::getPosition).sort().last().defaultIfEmpty(0),
-				Flux.fromIterable(roles2).flatMap(Role::getPosition).sort().last().defaultIfEmpty(0))
+		return Mono.zip(Flux.fromIterable(roles1).flatMap(Role::getPosition).sort().defaultIfEmpty(0).last(),
+				Flux.fromIterable(roles2).flatMap(Role::getPosition).sort().defaultIfEmpty(0).last())
 				.map(tuple -> tuple.getT1() > tuple.getT2());
 	}
 
