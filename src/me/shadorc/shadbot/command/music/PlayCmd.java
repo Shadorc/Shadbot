@@ -14,7 +14,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
@@ -36,7 +35,7 @@ public class PlayCmd extends AbstractCommand {
 		final Snowflake guildId = context.getGuildId();
 
 		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.CONNECT, Permission.SPEAK)
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK)
 						.then(DiscordUtils.requireSameVoiceChannel(context))
 						.flatMap(voiceChannelId -> {
 							String identifier;

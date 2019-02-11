@@ -22,7 +22,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
@@ -58,7 +57,7 @@ public class PollCmd extends AbstractCommand {
 		context.requireArg();
 
 		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.ADD_REACTIONS))
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.ADD_REACTIONS))
 				.then(context.getPermission())
 				.doOnNext(permission -> {
 					PollManager pollManager = MANAGER.get(context.getChannelId());

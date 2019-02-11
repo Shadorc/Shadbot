@@ -11,7 +11,6 @@ import me.shadorc.shadbot.core.setting.AbstractSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -36,7 +35,7 @@ public class NSFWSetting extends AbstractSetting {
 		}
 
 		return context.getChannel().cast(TextChannel.class)
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.MANAGE_CHANNELS)
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_CHANNELS)
 						.then(Mono.fromSupplier(() -> {
 							switch (action) {
 								case TOGGLE:

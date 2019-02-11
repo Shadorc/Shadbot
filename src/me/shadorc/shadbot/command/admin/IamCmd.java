@@ -19,7 +19,6 @@ import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -51,8 +50,7 @@ public class IamCmd extends AbstractCommand {
 				.collectList();
 
 		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT,
-						Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
 						.then(rolesMono)
 						.flatMap(roles -> {
 							if(roles.isEmpty()) {

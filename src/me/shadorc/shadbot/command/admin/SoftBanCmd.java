@@ -19,7 +19,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
-import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -49,7 +48,7 @@ public class SoftBanCmd extends AbstractCommand {
 		}
 
 		return context.getChannel()
-				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT, Permission.BAN_MEMBERS)
+				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, Permission.BAN_MEMBERS)
 						.then(Mono.zip(context.getMessage().getUserMentions().collectList(),
 								context.getGuild(),
 								context.getSelfAsMember()))

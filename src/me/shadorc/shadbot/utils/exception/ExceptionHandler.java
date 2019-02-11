@@ -9,7 +9,6 @@ import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
-import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -51,19 +50,11 @@ public class ExceptionHandler {
 
 	private static Mono<Void> onMissingPermissionException(MissingPermissionException err, Context context) {
 		final String missingPerm = StringUtils.capitalizeEnum(err.getPermission());
-		if(err.getType().equals(UserType.BOT)) {
-			return Mono.fromRunnable(() -> LogUtils.info("{Guild ID: %d} Missing permission: %s",
-					context.getGuildId().asLong(), missingPerm))
-					.and(context.getChannel()
-							.flatMap(channel -> DiscordUtils.sendMessage(
-									TextUtils.missingPermission(context.getUsername(), err.getPermission()), channel)));
-		} else {
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED
-							+ " (**%s**) You can't execute this command because you don't have the permission to %s.",
-							context.getUsername(), String.format("**%s**", missingPerm)), channel))
-					.then();
-		}
+		return Mono.fromRunnable(() -> LogUtils.info("{Guild ID: %d} Missing permission: %s",
+				context.getGuildId().asLong(), missingPerm))
+				.and(context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(
+								TextUtils.missingPermission(context.getUsername(), err.getPermission()), channel)));
 	}
 
 	private static Mono<Void> onMissingArgumentException(AbstractCommand cmd, Context context) {

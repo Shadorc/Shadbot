@@ -46,7 +46,6 @@ import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
-import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
@@ -196,11 +195,11 @@ public class DiscordUtils {
 		return GuildChannel.class.cast(channel).getEffectivePermissions(userId).map(permissions -> permissions.contains(permission));
 	}
 
-	public static Mono<Void> requirePermissions(Channel channel, Snowflake userId, UserType userType, Permission... permissions) {
+	public static Mono<Void> requirePermissions(Channel channel, Permission... permissions) {
 		return Flux.fromArray(permissions)
-				.flatMap(permission -> DiscordUtils.hasPermission(channel, userId, permission)
+				.flatMap(permission -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId().get(), permission)
 						.filter(BooleanUtils::isTrue)
-						.switchIfEmpty(Mono.error(new MissingPermissionException(userType, permission))))
+						.switchIfEmpty(Mono.error(new MissingPermissionException(permission))))
 				.then();
 	}
 

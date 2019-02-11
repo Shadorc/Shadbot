@@ -19,7 +19,6 @@ import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
-import me.shadorc.shadbot.exception.MissingPermissionException.UserType;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -39,8 +38,7 @@ public class PruneCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, context.getSelfId(), UserType.BOT,
-						Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
+				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
 						.then(context.getMessage().getUserMentions().collectList())
 						.flatMap(mentions -> {
 							final String arg = context.getArg().orElse("");
