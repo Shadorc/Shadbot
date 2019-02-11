@@ -28,15 +28,12 @@ public class CalcCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		try {
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
-							context.getUsername(), arg.replace("*", "\\*"), FORMATTER.format(EVALUATOR.evaluate(arg))),
-							channel))
-					.then();
-		} catch (final IllegalArgumentException err) {
-			throw new CommandException(err.getMessage());
-		}
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
+						context.getUsername(), arg.replace("*", "\\*"), FORMATTER.format(EVALUATOR.evaluate(arg))),
+						channel))
+				.onErrorResume(IllegalArgumentException.class, err -> Mono.error(new CommandException(err.getMessage())))
+				.then();
 	}
 
 	@Override
