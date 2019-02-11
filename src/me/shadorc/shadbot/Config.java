@@ -15,7 +15,7 @@ public class Config {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
 
-	public static final Properties PROPERTIES = Config.getProperties();
+	private static final Properties PROPERTIES = Config.getProperties();
 
 	public static final String VERSION = PROPERTIES.getProperty("version");
 	public static final boolean IS_SNAPSHOT = VERSION.endsWith("SNAPSHOT");
@@ -38,7 +38,7 @@ public class Config {
 	public static final Snowflake LOGS_CHANNEL_ID = Snowflake.of(PROPERTIES.getProperty("id.channel.log"));
 	public static final Color BOT_COLOR = Color.decode(PROPERTIES.getProperty("color"));
 
-	public static Properties getProperties() {
+	private static Properties getProperties() {
 		final Properties properties = new Properties();
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("project.properties")) {
 			if(inputStream != null) {

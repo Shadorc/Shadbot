@@ -34,7 +34,7 @@ public class ReactionListener {
 				.flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.REMOVE));
 	}
 
-	public static Mono<Void> iam(Message message, Snowflake userId, ReactionEmoji emoji, Action action) {
+	private static Mono<Void> iam(Message message, Snowflake userId, ReactionEmoji emoji, Action action) {
 		final Function<Member, Mono<Boolean>> canManageRoles =
 				member -> member.getBasePermissions()
 						.flatMap(permission -> {

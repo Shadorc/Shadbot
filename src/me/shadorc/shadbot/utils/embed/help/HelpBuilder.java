@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.utils.embed.help;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -86,12 +85,8 @@ public class HelpBuilder {
 		return this.addArg(name, null, isFacultative);
 	}
 
-	public <T> HelpBuilder addArg(Collection<T> options, boolean isFacultative) {
-		return this.addArg(FormatUtils.format(options, Object::toString, "|"), null, isFacultative);
-	}
-
 	public <T> HelpBuilder addArg(T[] options, boolean isFacultative) {
-		return this.addArg(List.of(options), isFacultative);
+		return this.addArg(FormatUtils.format(options, Object::toString, "|"), null, isFacultative);
 	}
 
 	public HelpBuilder addField(String name, String value, boolean inline) {
