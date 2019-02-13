@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.MessageChannel;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogBuilder.LogType;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
@@ -14,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 public class LogUtils {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Shadbot.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger("shadbot");
 
 	public static void error(DiscordClient client, Throwable err, String msg, String input) {
 		LOGGER.error(String.format("%s (Input: %s)", msg, input), err);
