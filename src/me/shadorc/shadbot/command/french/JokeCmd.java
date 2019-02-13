@@ -26,14 +26,16 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.FRENCH, names = { "blague", "joke" })
 public class JokeCmd extends AbstractCommand {
 
+	private static final String HOME_URL = "https://www.humour.com/blagues/";
+
 	@Override
 	public Mono<Void> execute(Context context) {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			final String url = String.format("https://www.humour.com/blagues/");
-
-			final List<String> jokes = NetUtils.getDoc(url).getElementsByClass("result-blague").select("p").stream()
+			final List<String> jokes = NetUtils.getDoc(HOME_URL)
+					.getElementsByClass("gag__content")
+					.stream()
 					.map(Element::html)
 					.filter(elmt -> elmt.length() < 1000)
 					.collect(Collectors.toList());
