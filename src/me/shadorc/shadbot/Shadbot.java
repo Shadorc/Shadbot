@@ -17,6 +17,7 @@ import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.gateway.SimpleBucket;
+import discord4j.gateway.retry.RetryOptions;
 import discord4j.rest.request.SingleRouterFactory;
 import me.shadorc.shadbot.command.game.LotteryCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
@@ -79,6 +80,8 @@ public class Shadbot {
 				.setEventScheduler(Schedulers.elastic())
 				.setRouterFactory(new SingleRouterFactory())
 				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
+				.setRetryOptions(new RetryOptions(Duration.ofSeconds(2), Duration.ofSeconds(120),
+						Integer.MAX_VALUE, Schedulers.elastic()))
 				.setShardCount(DiscordUtils.getRecommendedShardCount(Credentials.get(Credential.DISCORD_TOKEN)).block())
 				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
 
