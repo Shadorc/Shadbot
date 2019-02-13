@@ -6,12 +6,12 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
+import discord4j.common.GitProperties;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.util.VersionUtil;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.AbstractCommand;
@@ -32,8 +32,8 @@ import reactor.core.publisher.Mono;
 public class InfoCmd extends AbstractCommand {
 
 	private static final int MB_UNIT = 1024 * 1024;
-	private static final String D4J_NAME = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_NAME);
-	private static final String D4J_VERSION = VersionUtil.getProperties().getProperty(VersionUtil.APPLICATION_VERSION);
+	private static final String D4J_NAME = GitProperties.getProperties().getProperty(GitProperties.APPLICATION_NAME);
+	private static final String D4J_VERSION = GitProperties.getProperties().getProperty(GitProperties.APPLICATION_VERSION);
 
 	@Override
 	public Mono<Void> execute(Context context) {
