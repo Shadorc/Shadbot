@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.object.entity.ApplicationInfo;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
-import discord4j.gateway.SimpleBucket;
+import discord4j.core.shard.ShardingClientBuilder;
 import discord4j.gateway.retry.RetryOptions;
-import discord4j.rest.request.SingleRouterFactory;
 import me.shadorc.shadbot.command.game.LotteryCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.shard.Shard;
@@ -29,11 +29,7 @@ import me.shadorc.shadbot.data.lottery.Lottery;
 import me.shadorc.shadbot.data.lottery.LotteryManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.store.ShardJdkStoreService;
-import me.shadorc.shadbot.store.ShardStoreRegistry;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.ExitCode;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
@@ -75,40 +71,37 @@ public class Shadbot {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 
-		final ShardStoreRegistry registry = new ShardStoreRegistry();
-		final DiscordClientBuilder builder = new DiscordClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
-				.setEventScheduler(Schedulers.elastic())
-				.setRouterFactory(new SingleRouterFactory())
-				.setGatewayLimiter(new SimpleBucket(1, Duration.ofSeconds(6)))
-				.setRetryOptions(new RetryOptions(Duration.ofSeconds(2), Duration.ofSeconds(120),
-						Integer.MAX_VALUE, Schedulers.elastic()))
-				.setShardCount(DiscordUtils.getRecommendedShardCount(Credentials.get(Credential.DISCORD_TOKEN)).block())
-				.setInitialPresence(Presence.idle(Activity.playing("Connecting...")));
+		LogUtils.info("Connecting...");
+		new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
+				.build()
+				.map(builder -> builder.setEventScheduler(Schedulers.elastic())
+						.setRetryOptions(new RetryOptions(Duration.ofSeconds(2), Duration.ofSeconds(120),
+								Integer.MAX_VALUE, Schedulers.elastic()))
+						.setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
+				.map(DiscordClientBuilder::build)
+				.doOnNext(client -> {
+					final int shardIndex = client.getConfig().getShardIndex();
+					SHARDS.put(shardIndex, new Shard(client));
 
-		LogUtils.info("Connecting to %s...", StringUtils.pluralOf(builder.getShardCount(), "shard"));
-		for(int index = 0; index < builder.getShardCount(); index++) {
-			final DiscordClient client = builder.setShardIndex(index)
-					.setStoreService(new ShardJdkStoreService(registry))
-					.build();
-			SHARDS.put(index, new Shard(client));
+					Flux.interval(Duration.ofMinutes(10), Duration.ofMinutes(10))
+							.doOnNext(i -> LogUtils.debug("Sending ping on shard %d...", shardIndex))
+							.flatMap(i -> client.getChannelById(Snowflake.of(339318275320184833L))
+									.cast(MessageChannel.class)
+									.flatMap(channel -> channel.createMessage("Shard n°" + shardIndex + " ping: " + i)))
+							.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(client, err))
+							.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 
-			// TODO: Find better way
-			if(index == 0) {
-				client.getApplicationInfo()
-						.map(ApplicationInfo::getOwnerId)
-						.map(Snowflake::asLong)
-						.doOnNext(OWNER_ID::set)
-						.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
-			}
-		}
-
-		// Initiate login and block
-		Mono.when(Shadbot.SHARDS.values()
-				.stream()
-				.map(Shard::getClient)
-				.map(DiscordClient::login)
-				.collect(Collectors.toList()))
-				.block();
+					// TODO: Find better way
+					if(shardIndex == 0) {
+						client.getApplicationInfo()
+								.map(ApplicationInfo::getOwnerId)
+								.map(Snowflake::asLong)
+								.doOnNext(OWNER_ID::set)
+								.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+					}
+				})
+				.flatMap(DiscordClient::login)
+				.blockLast();
 	}
 
 	/**
