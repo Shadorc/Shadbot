@@ -11,12 +11,14 @@ import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
+import discord4j.core.event.domain.lifecycle.ConnectEvent;
 import discord4j.core.event.domain.lifecycle.DisconnectEvent;
 import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.lifecycle.ReconnectEvent;
 import discord4j.core.event.domain.lifecycle.ReconnectFailEvent;
 import discord4j.core.event.domain.lifecycle.ReconnectStartEvent;
+import discord4j.core.event.domain.lifecycle.ResumeEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.MessageUpdateEvent;
 import discord4j.core.event.domain.message.ReactionAddEvent;
@@ -31,7 +33,6 @@ import me.shadorc.shadbot.listener.MessageUpdateListener;
 import me.shadorc.shadbot.listener.ReactionListener;
 import me.shadorc.shadbot.listener.ReadyListener;
 import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Mono;
@@ -88,7 +89,13 @@ public class Shard {
 
 	private Mono<Void> onGatewayLifecycleEvent(GatewayLifecycleEvent event) {
 		return Mono.fromRunnable(() -> {
-			if(event instanceof DisconnectEvent) {
+			if(event instanceof ConnectEvent) {
+				this.state = State.CONNECTED;
+			} else if(event instanceof ResumeEvent) {
+				this.state = State.CONNECTED;
+			} else if(event instanceof ReadyEvent) {
+				this.state = State.CONNECTED;
+			} else if(event instanceof DisconnectEvent) {
 				this.state = State.DISCONNECTED;
 			} else if(event instanceof ReconnectStartEvent) {
 				this.state = State.RETRY_STARTED;
@@ -96,8 +103,6 @@ public class Shard {
 				this.state = State.RETRY_FAILED;
 			} else if(event instanceof ReconnectEvent) {
 				this.state = State.RETRY_SUCCEEDED;
-			} else {
-				this.state = State.CONNECTED;
 			}
 
 			switch (this.state) {
@@ -109,17 +114,14 @@ public class Shard {
 					break;
 			}
 
-			LogUtils.info("{Shard %d} New state: %s / fully ready: %s.",
-					event.getClient().getConfig().getShardIndex(), StringUtils.capitalizeEnum(this.state), this.isFullyReady());
+			LogUtils.info("{Shard %d} New event: %s / fully ready: %s.",
+					event.getClient().getConfig().getShardIndex(),
+					event.getClass().getSimpleName(), this.isFullyReady());
 		});
 	}
 
 	public DiscordClient getClient() {
 		return this.client;
-	}
-
-	public State getState() {
-		return this.state;
 	}
 
 	public boolean isFullyReady() {
