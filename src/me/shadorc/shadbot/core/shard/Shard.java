@@ -24,7 +24,10 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.MessageUpdateEvent;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
+import discord4j.core.object.presence.Activity;
+import discord4j.core.object.presence.Presence;
 import discord4j.gateway.retry.GatewayStateChange.State;
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.listener.ChannelListener;
 import me.shadorc.shadbot.listener.GuildListener;
@@ -33,7 +36,8 @@ import me.shadorc.shadbot.listener.MessageCreateListener;
 import me.shadorc.shadbot.listener.MessageUpdateListener;
 import me.shadorc.shadbot.listener.ReactionListener;
 import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
-import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.TextUtils;
+import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
@@ -70,8 +74,10 @@ public class Shard {
 		this.getClient().getEventDispatcher()
 				.on(ReadyEvent.class)
 				.next()
+				.doOnNext(ignored -> LogUtils.info("{Shard %d} Presence updater scheduled.", this.getClient().getConfig().getShardIndex()))
 				.flatMapMany(ignored -> Flux.interval(Duration.ZERO, Duration.ofMinutes(30)))
-				.flatMap(ignored -> DiscordUtils.updatePresence(this.getClient()))
+				.flatMap(ignored -> this.getClient().updatePresence(Presence.online(Activity.playing(
+						String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES))))))
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(this.getClient(), err))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getClient(), err));
 	}

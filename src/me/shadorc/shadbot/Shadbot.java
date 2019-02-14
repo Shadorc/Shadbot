@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.object.entity.ApplicationInfo;
-import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
@@ -37,11 +36,11 @@ import reactor.core.scheduler.Schedulers;
 
 public class Shadbot {
 
+	public static final AtomicLong OWNER_ID = new AtomicLong(0L);
+
 	private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
 	private static final Instant LAUNCH_TIME = Instant.now();
 	private static final Map<Integer, Shard> SHARDS = new ConcurrentHashMap<>();
-
-	public static final AtomicLong OWNER_ID = new AtomicLong(0L);
 
 	private static DatabaseManager databaseManager;
 	private static PremiumManager premiumManager;
@@ -88,16 +87,7 @@ public class Shadbot {
 					final int shardIndex = client.getConfig().getShardIndex();
 					SHARDS.put(shardIndex, new Shard(client));
 
-					// TODO : Remove
-					Flux.interval(Duration.ofMinutes(10), Duration.ofMinutes(10))
-							.doOnNext(i -> LogUtils.debug("Sending ping on shard %d...", shardIndex))
-							.flatMap(i -> client.getChannelById(Snowflake.of(339318275320184833L))
-									.cast(MessageChannel.class)
-									.flatMap(channel -> channel.createMessage("Shard n°" + shardIndex + " ping: " + i)))
-							.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(client, err))
-							.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
-
-					// TODO: Find better way
+					// Store owner's ID
 					if(shardIndex == 0) {
 						client.getApplicationInfo()
 								.map(ApplicationInfo::getOwnerId)

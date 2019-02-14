@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 import org.apache.commons.lang3.BooleanUtils;
 
-import discord4j.core.DiscordClient;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
@@ -18,12 +17,9 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.TextChannel;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -222,11 +218,6 @@ public class DiscordUtils {
 
 					return userVoiceChannelId.get();
 				});
-	}
-
-	public static Mono<Void> updatePresence(DiscordClient client) {
-		return client.updatePresence(Presence.online(Activity.playing(
-				String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES)))));
 	}
 
 }
