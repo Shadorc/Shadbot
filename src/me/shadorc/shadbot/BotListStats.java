@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.jsoup.Connection.Method;
@@ -11,6 +12,7 @@ import org.jsoup.Jsoup;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.core.shard.Shard;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -21,13 +23,11 @@ import reactor.core.publisher.Mono;
 
 public class BotListStats {
 
-	private final List<DiscordClient> clients;
 	private final Snowflake selfId;
 	private final Disposable task;
 
-	public BotListStats(List<DiscordClient> clients) {
-		this.clients = clients;
-		this.selfId = clients.get(0).getSelfId().get();
+	public BotListStats() {
+		this.selfId = Shadbot.getClient().getSelfId().get();
 		this.task = Flux.interval(Duration.ofHours(2), Duration.ofHours(2))
 				.flatMap(ignored -> this.postStats())
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
@@ -39,7 +39,8 @@ public class BotListStats {
 			return Mono.empty();
 		}
 
-		return this.clients.get(0).getGuilds()
+		return Shadbot.getClient()
+				.getGuilds()
 				.count()
 				.doOnNext(guildCount -> {
 					LogUtils.info("Posting statistics...");
@@ -102,7 +103,8 @@ public class BotListStats {
 	 * Documentation: https://discordbotlist.com/api-docs
 	 */
 	private void postOnDiscordBotListDotCom(Long guildCount) {
-		for(final DiscordClient client : this.clients) {
+		final List<DiscordClient> clients = Shadbot.getShards().values().stream().map(Shard::getClient).collect(Collectors.toList());
+		for(final DiscordClient client : clients) {
 			final JSONObject content = new JSONObject()
 					.put("shard_id", client.getConfig().getShardIndex())
 					.put("guilds ", guildCount);
@@ -121,7 +123,8 @@ public class BotListStats {
 	 * Documentation: https://discord.bots.gg/docs/endpoints
 	 */
 	private void postOnDiscordBotsDotGg(Long guildCount) {
-		for(final DiscordClient client : this.clients) {
+		final List<DiscordClient> clients = Shadbot.getShards().values().stream().map(Shard::getClient).collect(Collectors.toList());
+		for(final DiscordClient client : clients) {
 			final JSONObject content = new JSONObject()
 					.put("shardId", client.getConfig().getShardIndex())
 					.put("shardCount", client.getConfig().getShardCount())
@@ -141,7 +144,8 @@ public class BotListStats {
 	 * Documentation: https://discordbots.org/api/docs#bots
 	 */
 	private void postOnDiscordBotsDotOrg(Long guildCount) {
-		for(final DiscordClient client : this.clients) {
+		final List<DiscordClient> clients = Shadbot.getShards().values().stream().map(Shard::getClient).collect(Collectors.toList());
+		for(final DiscordClient client : clients) {
 			final JSONObject content = new JSONObject()
 					.put("shard_id", client.getConfig().getShardIndex())
 					.put("shard_count", client.getConfig().getShardCount())

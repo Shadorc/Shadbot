@@ -3,13 +3,11 @@ package me.shadorc.shadbot;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -115,17 +113,13 @@ public class Shadbot {
 	/**
 	 * Triggered when all the guilds have been received from a client
 	 */
-	public static Mono<Void> onFullyReadyEvent(DiscordClient client) {
-		return Mono.fromRunnable(() -> LogUtils.info("{Shard %d} Fully ready.", client.getConfig().getShardIndex()))
-				.and(Mono.fromRunnable(() -> {
-					if(CONNECTED_SHARDS.incrementAndGet() == client.getConfig().getShardCount()) {
-						LogUtils.info("Shadbot is connected to all guilds.");
-						if(Shadbot.botListStats == null) {
-							final List<DiscordClient> clients = SHARDS.values().stream().map(Shard::getClient).collect(Collectors.toList());
-							Shadbot.botListStats = new BotListStats(clients);
-						}
-					}
-				}));
+	public static void onFullyReadyEvent(DiscordClient client) {
+		LogUtils.info("{Shard %d} Fully ready.", client.getConfig().getShardIndex());
+		if(CONNECTED_SHARDS.incrementAndGet() == client.getConfig().getShardCount()) {
+			LogUtils.info("Shadbot is connected to all guilds.");
+			Shadbot.botListStats = new BotListStats();
+			LogUtils.info("Bot list stats scheduler started.");
+		}
 	}
 
 	/**

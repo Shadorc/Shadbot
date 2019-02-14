@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.core.shard;
 
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
@@ -31,10 +32,11 @@ import me.shadorc.shadbot.listener.MemberListener;
 import me.shadorc.shadbot.listener.MessageCreateListener;
 import me.shadorc.shadbot.listener.MessageUpdateListener;
 import me.shadorc.shadbot.listener.ReactionListener;
-import me.shadorc.shadbot.listener.ReadyListener;
 import me.shadorc.shadbot.listener.VoiceStateUpdateListener;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class Shard {
@@ -48,8 +50,10 @@ public class Shard {
 		this.client = client;
 		this.isFullyReady = new AtomicBoolean(false);
 
+		this.registerReadyEvent();
+		this.registerFullyReadyEvent();
+
 		this.register(GatewayLifecycleEvent.class, this::onGatewayLifecycleEvent);
-		this.register(ReadyEvent.class, ReadyListener::onReadyEvent);
 		this.register(TextChannelDeleteEvent.class, ChannelListener::onTextChannelDelete);
 		this.register(GuildCreateEvent.class, GuildListener::onGuildCreate);
 		this.register(GuildDeleteEvent.class, GuildListener::onGuildDelete);
@@ -60,15 +64,16 @@ public class Shard {
 		this.register(VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
 		this.register(ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
 		this.register(ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
-		this.registerFullyReadyEvent();
 	}
 
-	private <T extends Event> void register(Class<T> eventClass, Function<T, Mono<Void>> mapper) {
+	private void registerReadyEvent() {
 		this.getClient().getEventDispatcher()
-				.on(eventClass)
-				.flatMap(event -> mapper.apply(event)
-						.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err))))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
+				.on(ReadyEvent.class)
+				.next()
+				.flatMapMany(ignored -> Flux.interval(Duration.ZERO, Duration.ofMinutes(30)))
+				.flatMap(ignored -> DiscordUtils.updatePresence(this.getClient()))
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(this.getClient(), err))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getClient(), err));
 	}
 
 	private void registerFullyReadyEvent() {
@@ -79,11 +84,18 @@ public class Shard {
 						.on(GuildCreateEvent.class)
 						.take(size)
 						.collectList())
-				.flatMap(guilds -> {
+				.doOnNext(guilds -> {
 					this.isFullyReady.set(true);
-					return Shadbot.onFullyReadyEvent(this.getClient())
-							.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err)));
+					Shadbot.onFullyReadyEvent(this.getClient());
 				})
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
+	}
+
+	private <T extends Event> void register(Class<T> eventClass, Function<T, Mono<Void>> mapper) {
+		this.getClient().getEventDispatcher()
+				.on(eventClass)
+				.flatMap(event -> mapper.apply(event)
+						.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err))))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
