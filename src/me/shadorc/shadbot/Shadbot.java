@@ -164,20 +164,24 @@ public class Shadbot {
 		statsManager.save();
 	}
 
-	private static void logout() {
+	private static Mono<Void> logout() {
 		if(botListStats != null) {
 			botListStats.stop();
 		}
-		SHARDS.values().stream().map(Shard::getClient).forEach(DiscordClient::logout);
+		
+		return Flux.fromIterable(SHARDS.values())
+				.map(Shard::getClient)
+				.flatMap(DiscordClient::logout)
+				.then();
 	}
 
 	public static void restart() {
-		Shadbot.logout();
+		Shadbot.logout().block();
 		System.exit(ExitCode.RESTART.value());
 	}
 
 	public static void quit() {
-		Shadbot.logout();
+		Shadbot.logout().block();
 		System.exit(ExitCode.NORMAL.value());
 	}
 
