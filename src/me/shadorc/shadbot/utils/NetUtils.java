@@ -108,20 +108,24 @@ public class NetUtils {
 	 * @return true if the string is a valid and reachable URL, false otherwise
 	 */
 	public static boolean isValidUrl(String url) {
+		boolean isValid;
+		
 		HttpURLConnection conn = null;
 		try {
 			conn = (HttpURLConnection) new URL(url).openConnection();
+			conn.setConnectTimeout(Config.DEFAULT_TIMEOUT);
+			conn.setReadTimeout(Config.DEFAULT_TIMEOUT);
 			conn.connect();
-			return true;
-
+			isValid = true;
 		} catch (final Exception err) {
-			return false;
-
-		} finally {
-			if(conn != null) {
-				conn.disconnect();
-			}
+			isValid = false;
 		}
+		
+		if(conn != null) {
+			conn.disconnect();
+		}
+		
+		return isValid;
 	}
 
 }
