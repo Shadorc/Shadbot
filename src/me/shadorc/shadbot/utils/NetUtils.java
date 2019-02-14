@@ -109,7 +109,7 @@ public class NetUtils {
 	 */
 	public static boolean isValidUrl(String url) {
 		boolean isValid;
-		
+
 		HttpURLConnection conn = null;
 		try {
 			conn = (HttpURLConnection) new URL(url).openConnection();
@@ -120,11 +120,11 @@ public class NetUtils {
 		} catch (final Exception err) {
 			isValid = false;
 		}
-		
+
 		if(conn != null) {
 			conn.disconnect();
 		}
-		
+
 		return isValid;
 	}
 
