@@ -83,6 +83,11 @@ public class PollCmd extends AbstractCommand {
 	private PollManager createPoll(Context context) {
 		final List<String> args = context.requireArgs(2);
 
+		final int countMatches = StringUtils.countMatches(args.get(1), "\"");
+		if(countMatches == 0 || countMatches % 2 != 0) {
+			throw new CommandException("Question and choices must be enclosed in quotation marks.");
+		}
+
 		Integer seconds;
 		if(NumberUtils.isPositiveLong(args.get(0))) {
 			seconds = NumberUtils.asIntBetween(args.get(0), MIN_DURATION, MAX_DURATION);
@@ -103,14 +108,17 @@ public class PollCmd extends AbstractCommand {
 		}
 
 		final List<String> substrings = Arrays.asList(StringUtils.substringsBetween(args.get(1), "\"", "\""));
-		if(substrings.isEmpty() || StringUtils.countMatches(args.get(1), "\"") % 2 != 0) {
-			throw new CommandException("Question and choices cannot be empty and must be enclosed in quotation marks.");
+		if(substrings.size() != substrings.stream().filter(str -> !str.isBlank()).count()) {
+			throw new CommandException("Question or choice cannot be blank.");
 		}
 
 		// Remove duplicate choices
-		final List<String> choices = substrings.subList(1, substrings.size()).stream().distinct().collect(Collectors.toList());
+		final List<String> choices = substrings.stream()
+				.skip(1)
+				.distinct()
+				.collect(Collectors.toList());
 		if(!NumberUtils.isInRange(choices.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
-			throw new CommandException(String.format("You must specify between %d and %d different non-empty choices.",
+			throw new CommandException(String.format("You must specify between %d and %d different non-empty choices and one question.",
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}
 
