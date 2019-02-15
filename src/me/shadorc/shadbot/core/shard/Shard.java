@@ -74,11 +74,11 @@ public class Shard {
 		this.getClient().getEventDispatcher()
 				.on(ReadyEvent.class)
 				.next()
-				.doOnNext(ignored -> LogUtils.info("{Shard %d} Presence updater scheduled.", this.getClient().getConfig().getShardIndex()))
-				.flatMapMany(ignored -> Flux.interval(Duration.ZERO, Duration.ofMinutes(30)))
-				.flatMap(ignored -> this.getClient().updatePresence(Presence.online(Activity.playing(
-						String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES))))))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(this.getClient(), err))
+				.doOnNext(event -> LogUtils.info("{Shard %d} Presence updater scheduled.", event.getClient().getConfig().getShardIndex()))
+				.flatMapMany(event -> Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
+						.flatMap(ignored -> event.getClient().updatePresence(Presence.online(Activity.playing(
+								String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES))))))
+						.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(event.getClient(), err)))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getClient(), err));
 	}
 
