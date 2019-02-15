@@ -107,8 +107,10 @@ public class Shadbot {
 		LogUtils.info("{Shard %d} Fully ready.", client.getConfig().getShardIndex());
 		if(CONNECTED_SHARDS.incrementAndGet() == client.getConfig().getShardCount()) {
 			LogUtils.info("Shadbot is connected to all guilds.");
-			Shadbot.botListStats = new BotListStats();
-			LogUtils.info("Bot list stats scheduler started.");
+			if(!Config.IS_SNAPSHOT) {
+				Shadbot.botListStats = new BotListStats();
+				LogUtils.info("Bot list stats scheduler started.");
+			}
 		}
 	}
 

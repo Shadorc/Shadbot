@@ -35,10 +35,6 @@ public class BotListStats {
 	}
 
 	private Mono<Void> postStats() {
-		if(Config.IS_SNAPSHOT) {
-			return Mono.empty();
-		}
-
 		return Shadbot.getClient()
 				.getGuilds()
 				.count()
