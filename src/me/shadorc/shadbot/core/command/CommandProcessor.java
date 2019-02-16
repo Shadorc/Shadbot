@@ -54,7 +54,7 @@ public class CommandProcessor {
 				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)));
 	}
 
-	public static Mono<Void> executeCommand(Context context) {
+	private static Mono<Void> executeCommand(Context context) {
 		final AbstractCommand command = CommandInitializer.getCommand(context.getCommandName());
 		if(command == null) {
 			return Mono.empty();
