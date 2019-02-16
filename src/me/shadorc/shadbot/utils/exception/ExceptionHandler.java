@@ -32,7 +32,7 @@ public class ExceptionHandler {
 		if(err instanceof NoMusicException) {
 			return ExceptionHandler.onNoMusicException(context);
 		}
-		if(ExceptionUtils.isUnavailable(err)) {
+		if(ExceptionUtils.isUnavailable(err) || ExceptionUtils.isInternalServerError(err)) {
 			return ExceptionHandler.onUnavailable(cmd, context);
 		}
 		if(ExceptionUtils.isUnreacheable(err)) {
