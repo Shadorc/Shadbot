@@ -36,7 +36,8 @@ public class SendMessageCmd extends AbstractCommand {
 		}
 
 		return context.getClient().getUserById(Snowflake.of(userId))
-				.onErrorMap(ExceptionUtils::isForbidden, err -> new CommandException("User not found."))
+				.onErrorMap(ExceptionUtils::isDiscordForbidden,
+						err -> new CommandException("User not found."))
 				.flatMap(user -> {
 					if(user.isBot()) {
 						throw new CommandException("I can't send private message to other bots.");

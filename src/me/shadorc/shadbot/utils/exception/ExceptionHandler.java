@@ -102,7 +102,7 @@ public class ExceptionHandler {
 	}
 
 	public static void handleUnknownError(DiscordClient client, Throwable err) {
-		if(ExceptionUtils.isForbidden(err) || ExceptionUtils.isNotFound(err) || ExceptionUtils.isInternalServerError(err)) {
+		if(ExceptionUtils.isKnownDiscordError(err)) {
 			final ClientException clientErr = (ClientException) err;
 			LogUtils.info("%s: %s (URL: %s)",
 					clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url());

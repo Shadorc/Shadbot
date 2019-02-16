@@ -38,7 +38,7 @@ public class UpdateableMessage {
 	public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
 		return Mono.justOrEmpty(this.messageId)
 				.flatMap(messageId -> this.client.getMessageById(this.channelId, messageId)
-						.onErrorResume(ExceptionUtils::isNotFound, err -> Mono.fromRunnable(() -> LogUtils.debug(err.toString()))))
+						.onErrorResume(ExceptionUtils::isDiscordNotFound, err -> Mono.fromRunnable(() -> LogUtils.debug(err.toString()))))
 				.flatMap(Message::delete)
 				.then(this.client.getChannelById(this.channelId))
 				.cast(MessageChannel.class)

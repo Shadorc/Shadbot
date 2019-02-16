@@ -31,7 +31,8 @@ public class DatabaseCmd extends AbstractCommand {
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.onErrorMap(ExceptionUtils::isForbidden, err -> new CommandException("Guild not found."))
+				.onErrorMap(ExceptionUtils::isDiscordForbidden,
+						err -> new CommandException("Guild not found."))
 				.map(guild -> {
 					if(args.size() == 1) {
 						return Shadbot.getDatabase().getDBGuild(guild.getId()).toString();

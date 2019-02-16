@@ -31,7 +31,8 @@ public class LeaveCmd extends AbstractCommand {
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.onErrorMap(ExceptionUtils::isForbidden, err -> new CommandException("Guild not found."))
+				.onErrorMap(ExceptionUtils::isDiscordForbidden,
+						err -> new CommandException("Guild not found."))
 				.flatMap(Guild::leave)
 				.and(context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " Guild left.", channel)));
