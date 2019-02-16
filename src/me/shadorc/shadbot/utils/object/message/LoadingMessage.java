@@ -68,6 +68,7 @@ public class LoadingMessage implements Publisher<Void> {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
 				.flatMap(channel -> DiscordUtils.sendMessage(content, channel))
+				.timeout(TYPING_TIMEOUT)
 				.doAfterTerminate(this::stopTyping);
 	}
 
@@ -78,6 +79,7 @@ public class LoadingMessage implements Publisher<Void> {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
 				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
+				.timeout(TYPING_TIMEOUT)
 				.doAfterTerminate(this::stopTyping);
 	}
 
