@@ -105,9 +105,11 @@ public class DiscordUtils {
 	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels
 	 */
 	public static Flux<Snowflake> extractChannels(Guild guild, String str) {
-		final List<String> words = StringUtils.split(StringUtils.remove(str, "#"));
+		final List<String> words = StringUtils.split(str);
 		return guild.getChannels()
-				.filter(channel -> words.contains(String.format("%s", channel.getName())) || words.contains(channel.getMention()))
+				.filter(channel -> words.contains(String.format("%s", channel.getName())) 
+						|| words.contains(String.format("#%s", channel.getName()))
+						|| words.contains(channel.getMention()))
 				.map(GuildChannel::getId)
 				.distinct();
 	}
@@ -118,9 +120,11 @@ public class DiscordUtils {
 	 * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles
 	 */
 	public static Flux<Snowflake> extractRoles(Guild guild, String str) {
-		final List<String> words = StringUtils.split(StringUtils.remove(str, "@"));
+		final List<String> words = StringUtils.split(str);
 		return guild.getRoles()
-				.filter(role -> words.contains(String.format("%s", role.getName())) || words.contains(role.getMention()))
+				.filter(role -> words.contains(String.format("%s", role.getName())) 
+						|| words.contains(String.format("@%s", role.getName()))
+						|| words.contains(role.getMention()))
 				.map(Role::getId)
 				.distinct();
 	}
