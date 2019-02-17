@@ -72,7 +72,7 @@ public class AutoMessageSetting extends AbstractSetting {
 					final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 					final Channel channel = mentionedChannels.get(0);
 					if(Action.ENABLE.equals(action)) {
-						dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channel.getId());
+						dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channel.getId().asLong());
 						return String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
 								channel.getMention());
 					} else {
