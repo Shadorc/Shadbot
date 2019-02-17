@@ -107,7 +107,7 @@ public class DiscordUtils {
 	public static Flux<Snowflake> extractChannels(Guild guild, String str) {
 		final List<String> words = StringUtils.split(str);
 		return guild.getChannels()
-				.filter(channel -> words.contains(String.format("%s", channel.getName())) 
+				.filter(channel -> words.contains(String.format("%s", channel.getName()))
 						|| words.contains(String.format("#%s", channel.getName()))
 						|| words.contains(channel.getMention()))
 				.map(GuildChannel::getId)
@@ -122,7 +122,7 @@ public class DiscordUtils {
 	public static Flux<Snowflake> extractRoles(Guild guild, String str) {
 		final List<String> words = StringUtils.split(str);
 		return guild.getRoles()
-				.filter(role -> words.contains(String.format("%s", role.getName())) 
+				.filter(role -> words.contains(String.format("%s", role.getName()))
 						|| words.contains(String.format("@%s", role.getName()))
 						|| words.contains(role.getMention()))
 				.map(Role::getId)
