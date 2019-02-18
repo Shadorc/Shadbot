@@ -1,8 +1,8 @@
 package me.shadorc.shadbot.api.image.deviantart;
 
-import javax.annotation.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import reactor.util.annotation.Nullable;
 
 public class Image {
 

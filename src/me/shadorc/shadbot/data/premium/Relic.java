@@ -3,14 +3,13 @@ package me.shadorc.shadbot.data.premium;
 import java.util.Optional;
 import java.util.OptionalLong;
 
-import javax.annotation.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.utils.TimeUtils;
+import reactor.util.annotation.Nullable;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class Relic {

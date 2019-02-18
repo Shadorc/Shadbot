@@ -2,9 +2,9 @@ package me.shadorc.shadbot.api.image.giphy;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import reactor.util.annotation.Nullable;
 
 public class GiphyResponse {
 

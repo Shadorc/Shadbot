@@ -9,8 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
-
 import com.fasterxml.jackson.databind.JavaType;
 
 import discord4j.core.object.util.Snowflake;
@@ -18,6 +16,7 @@ import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.exception.RelicActivationException;
 import me.shadorc.shadbot.utils.Utils;
+import reactor.util.annotation.Nullable;
 
 public class PremiumManager extends Data {
 

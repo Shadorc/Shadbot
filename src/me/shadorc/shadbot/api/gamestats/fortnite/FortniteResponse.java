@@ -2,9 +2,9 @@ package me.shadorc.shadbot.api.gamestats.fortnite;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import reactor.util.annotation.Nullable;
 
 public class FortniteResponse {
 
