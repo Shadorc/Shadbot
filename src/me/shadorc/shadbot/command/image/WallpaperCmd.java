@@ -10,6 +10,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.http.HttpStatus;
+import org.jsoup.HttpStatusException;
 
 import com.ivkos.wallhaven4j.Wallhaven;
 import com.ivkos.wallhaven4j.models.misc.Ratio;
@@ -17,6 +19,7 @@ import com.ivkos.wallhaven4j.models.misc.Resolution;
 import com.ivkos.wallhaven4j.models.misc.enums.Category;
 import com.ivkos.wallhaven4j.models.misc.enums.Purity;
 import com.ivkos.wallhaven4j.models.wallpaper.Wallpaper;
+import com.ivkos.wallhaven4j.util.exceptions.ConnectionException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -139,7 +142,9 @@ public class WallpaperCmd extends AbstractCommand {
 										.addField("Tags", tags, false));
 
 						return loadingMsg.send(embedConsumer).then();
-
+					} catch (final ConnectionException err) {
+						loadingMsg.stopTyping();
+						throw Exceptions.propagate(new HttpStatusException("Wallhaven is unavailable.", HttpStatus.SC_SERVICE_UNAVAILABLE, "https://alpha.wallhaven.cc/"));
 					} catch (final Exception err) {
 						loadingMsg.stopTyping();
 						throw Exceptions.propagate(Objects.requireNonNullElse(err.getCause(), err));
