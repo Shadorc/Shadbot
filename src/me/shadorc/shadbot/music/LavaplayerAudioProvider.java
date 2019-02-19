@@ -1,5 +1,8 @@
 package me.shadorc.shadbot.music;
 
+import java.nio.ByteBuffer;
+
+import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
 
@@ -12,7 +15,7 @@ public class LavaplayerAudioProvider extends AudioProvider {
 	private final MutableAudioFrame frame;
 
 	public LavaplayerAudioProvider(AudioPlayer audioPlayer) {
-		super();
+		super(ByteBuffer.allocate(StandardAudioDataFormats.DISCORD_OPUS.maximumChunkSize()));
 		this.audioPlayer = audioPlayer;
 		this.frame = new MutableAudioFrame();
 		this.frame.setBuffer(this.getBuffer());
