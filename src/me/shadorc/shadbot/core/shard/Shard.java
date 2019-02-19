@@ -152,7 +152,6 @@ public class Shard {
 			}
 
 			this.logger.info("New event: {} / fully ready: {}.",
-					event.getClient().getConfig().getShardIndex(),
 					event.getClass().getSimpleName(), this.isFullyReady());
 		});
 	}
