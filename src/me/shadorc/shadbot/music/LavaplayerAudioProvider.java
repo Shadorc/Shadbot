@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
 
 import discord4j.voice.AudioProvider;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class LavaplayerAudioProvider extends AudioProvider {
 
@@ -23,6 +24,7 @@ public class LavaplayerAudioProvider extends AudioProvider {
 		if(didProvide) {
 			this.getBuffer().flip();
 		}
+		LogUtils.trace("Providing audio data: %s", this.frame.toString());
 		return didProvide;
 	}
 

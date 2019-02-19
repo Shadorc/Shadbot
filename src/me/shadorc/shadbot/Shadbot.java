@@ -99,7 +99,6 @@ public class Shadbot {
 	 * Triggered when all the guilds have been received from a client
 	 */
 	public static void onFullyReadyEvent(DiscordClient client) {
-		LogUtils.info("{Shard %d} Fully ready.", client.getConfig().getShardIndex());
 		if(CONNECTED_SHARDS.incrementAndGet() == client.getConfig().getShardCount()) {
 			LogUtils.info("Shadbot is connected to all guilds.");
 			if(!Config.IS_SNAPSHOT) {

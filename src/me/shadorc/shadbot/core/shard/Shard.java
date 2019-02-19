@@ -42,17 +42,22 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 public class Shard {
 
 	private final DiscordClient client;
 	private final AtomicBoolean isFullyReady;
+	private final Logger logger;
 
 	private volatile State state;
 
 	public Shard(DiscordClient client) {
 		this.client = client;
 		this.isFullyReady = new AtomicBoolean(false);
+		this.logger = Loggers.getLogger(String.format("shadbot.shard.%d",
+				this.getClient().getConfig().getShardIndex()));
 
 		this.registerReadyEvent();
 		this.registerFullyReadyEvent();
@@ -74,10 +79,13 @@ public class Shard {
 		this.getClient().getEventDispatcher()
 				.on(ReadyEvent.class)
 				.next()
-				.doOnNext(event -> LogUtils.info("{Shard %d} Presence updater scheduled.", event.getClient().getConfig().getShardIndex()))
+				.doOnNext(event -> this.logger.debug("Presence updater scheduled."))
 				.flatMapMany(event -> Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
-						.flatMap(ignored -> event.getClient().updatePresence(Presence.online(Activity.playing(
-								String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES))))))
+						.flatMap(ignored -> {
+							final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
+							this.logger.debug("Updating presence to: {}", presence);
+							return event.getClient().updatePresence(Presence.online(Activity.playing(presence)));
+						})
 						.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(event.getClient(), err)))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getClient(), err));
 	}
@@ -91,6 +99,7 @@ public class Shard {
 						.take(size)
 						.collectList())
 				.doOnNext(guilds -> {
+					this.logger.info("Fully ready.");
 					this.isFullyReady.set(true);
 					Shadbot.onFullyReadyEvent(this.getClient());
 				})
@@ -101,6 +110,16 @@ public class Shard {
 		this.getClient().getEventDispatcher()
 				.on(eventClass)
 				.flatMap(event -> mapper.apply(event)
+						.thenReturn(event.toString())
+						.elapsed()
+						.doOnNext(tuple -> {
+							this.logger.debug("{} took {}ms to be processed.", tuple.getT2(), tuple.getT1());
+							if(tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
+								LogUtils.warn(this.getClient(),
+										String.format("%s took a long time to be processed (%dms).",
+												tuple.getT2(), tuple.getT1()));
+							}
+						})
 						.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err))))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
@@ -132,7 +151,7 @@ public class Shard {
 					break;
 			}
 
-			LogUtils.info("{Shard %d} New event: %s / fully ready: %s.",
+			this.logger.info("New event: {} / fully ready: {}.",
 					event.getClient().getConfig().getShardIndex(),
 					event.getClass().getSimpleName(), this.isFullyReady());
 		});

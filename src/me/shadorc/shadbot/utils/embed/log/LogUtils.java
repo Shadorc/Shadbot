@@ -53,7 +53,15 @@ public class LogUtils {
 	}
 
 	public static void debug(String format, Object... args) {
-		LOGGER.debug(String.format(format, args));
+		if(LOGGER.isDebugEnabled()) {
+			LOGGER.debug(String.format(format, args));
+		}
+	}
+
+	public static void trace(String format, Object... args) {
+		if(LOGGER.isTraceEnabled()) {
+			LOGGER.trace(String.format(format, args));
+		}
 	}
 
 	private static void sendLog(DiscordClient client, LogBuilder embed) {
