@@ -57,7 +57,9 @@ public class ReactionListener {
 				// If this is the correct reaction
 				.filter(ignored -> emoji.equals(IamCmd.REACTION))
 				.flatMap(selfId -> message.getGuild().flatMap(guild -> guild.getMemberById(selfId)))
+				// If the bot can manage roles
 				.filterWhen(canManageRoles)
+				.flatMap(ignored -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
 				.flatMap(member -> Mono.justOrEmpty(Shadbot.getDatabase()
 						.getDBGuild(member.getGuildId())
 						.getIamMessages()
