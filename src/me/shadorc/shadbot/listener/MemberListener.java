@@ -43,6 +43,9 @@ public class MemberListener {
 		return Mono.zip(Mono.justOrEmpty(channelId).map(Snowflake::of), Mono.justOrEmpty(message))
 				.flatMap(tuple -> client.getChannelById(tuple.getT1())
 						.cast(MessageChannel.class)
-						.flatMap(channel -> DiscordUtils.sendMessage(tuple.getT2().replace("{mention}", user.getMention()), channel)));
+						.flatMap(channel -> DiscordUtils.sendMessage(tuple.getT2()
+								.replace("{username}", user.getUsername())
+								.replace("{userId}", user.getId().asString())
+								.replace("{mention}", user.getMention()), channel)));
 	};
 }
