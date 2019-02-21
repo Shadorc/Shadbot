@@ -21,7 +21,7 @@ public class MemberListener {
 
 	public static Mono<Void> onMemberJoin(MemberJoinEvent event) {
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId());
-		return Mono.just(MemberListener.sendAutoMsg(event.getClient(), event.getMember(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage()))
+		return MemberListener.sendAutoMsg(event.getClient(), event.getMember(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage())
 				// Add auto-role(s) to the new member
 				.and(event.getGuild()
 						.flatMap(guild -> Mono.justOrEmpty(event.getClient().getSelfId())
