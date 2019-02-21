@@ -58,12 +58,6 @@ public class LogUtils {
 		}
 	}
 
-	public static void trace(String format, Object... args) {
-		if(LOGGER.isTraceEnabled()) {
-			LOGGER.trace(String.format(format, args));
-		}
-	}
-
 	private static void sendLog(DiscordClient client, LogBuilder embed) {
 		client.getChannelById(Config.LOGS_CHANNEL_ID)
 				.cast(MessageChannel.class)
