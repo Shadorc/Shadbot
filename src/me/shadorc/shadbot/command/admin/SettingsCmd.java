@@ -9,8 +9,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
-import discord4j.common.json.EmbedFieldEntity;
-import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -28,7 +27,6 @@ import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
@@ -117,26 +115,25 @@ public class SettingsCmd extends AbstractCommand {
 					String.join("\n\t", dbGuild.getBlacklistedCmd())));
 		}
 
-		dbGuild.getJoinMessage().ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:**%n%s", joinMessage)));
-		dbGuild.getLeaveMessage().ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
+		dbGuild.getJoinMessage()
+			.ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:**%n%s", joinMessage)));
+		dbGuild.getLeaveMessage()
+			.ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
 
 		final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getMessageChannelId())
 				.map(Snowflake::of)
 				.flatMap(context.getClient()::getChannelById)
-				.ofType(GuildChannel.class)
-				.map(GuildChannel::getName)
-				.map(channel -> settingsStr.append(String.format("%n**Auto message channel:** #%s", channel)))
+				.map(Channel::getMention)
+				.map(channel -> settingsStr.append(String.format("%n**Auto message channel:** %s", channel)))
 				.then();
 
 		final Mono<Void> allowedChannelsStr = Flux.fromIterable(dbGuild.getAllowedTextChannels())
 				.map(Snowflake::of)
 				.flatMap(context.getClient()::getChannelById)
-				.ofType(GuildChannel.class)
-				.map(GuildChannel::getName)
+				.map(Channel::getMention)
 				.collectList()
 				.filter(channels -> !channels.isEmpty())
-				.map(channels -> settingsStr.append(String.format("%n**Allowed channels:**%n%s",
-						FormatUtils.format(channels, channel -> String.format("#%s", channel), "\n"))))
+				.map(channels -> settingsStr.append(String.format("%n**Allowed channels:**%n\t%s", String.join("\n\t", channels))))
 				.then();
 
 		final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getAutoRoles())
@@ -145,26 +142,26 @@ public class SettingsCmd extends AbstractCommand {
 				.map(Role::getMention)
 				.collectList()
 				.filter(roles -> !roles.isEmpty())
-				.map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n%s", String.join("\n", roles))))
+				.map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n\t%s", String.join("\n\t", roles))))
 				.then();
 
-		final Mono<Void> permissionsStr = Flux.fromIterable(dbGuild.getAllowedRoles())
+		final Mono<Void> allowedRolesStr = Flux.fromIterable(dbGuild.getAllowedRoles())
 				.map(Snowflake::of)
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 				.map(Role::getMention)
 				.collectList()
 				.filter(roles -> !roles.isEmpty())
-				.map(roles -> settingsStr.append(String.format("%n**Permissions:**%n\t%s", String.join("\n\t", roles))))
+				.map(roles -> settingsStr.append(String.format("%n**Allowed roles:**%n\t%s", String.join("\n\t", roles))))
 				.then();
 
 		return autoMessageChannelStr
 				.then(allowedChannelsStr)
 				.then(autoRolesStr)
-				.then(permissionsStr)
-				.then(Mono.just(EmbedUtils.getDefaultEmbed()
+				.then(allowedRolesStr)
+				.thenReturn(EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> embed.setAuthor("Settings", null, context.getAvatarUrl())
 								.setDescription(
-										settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString()))));
+										settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString())));
 	}
 
 	private Consumer<EmbedCreateSpec> getHelp(Context context, AbstractSetting setting) {
@@ -186,8 +183,9 @@ public class SettingsCmd extends AbstractCommand {
 						context.getPrefix(), this.getName()), false);
 
 		SETTINGS_MAP.values().stream()
-				.map(setting -> new EmbedFieldEntity(String.format("Name: %s", setting.getName()), setting.getDescription(), false))
-				.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
+				.forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()), 
+						setting.getDescription(), 
+						false));
 
 		return embed.build();
 	}
