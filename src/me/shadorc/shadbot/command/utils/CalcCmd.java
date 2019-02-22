@@ -32,7 +32,7 @@ public class CalcCmd extends AbstractCommand {
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
 						context.getUsername(), arg.replace("*", "\\*"), FORMATTER.format(EVALUATOR.evaluate(arg))),
 						channel))
-				.onErrorResume(IllegalArgumentException.class, err -> Mono.error(new CommandException(err.getMessage())))
+				.onErrorMap(IllegalArgumentException.class, err -> new CommandException(err.getMessage()))
 				.then();
 	}
 
