@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.game.trivia;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -17,6 +16,7 @@ import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -29,6 +29,8 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.GAME, names = { "trivia" })
 public class TriviaCmd extends AbstractCommand {
 
+	private static final String CATEGORY_URL = "https://opentdb.com/api_category.php";
+
 	protected static final ConcurrentHashMap<Snowflake, TriviaManager> MANAGERS = new ConcurrentHashMap<>();
 
 	private TriviaCategoriesResponse categories;
@@ -37,8 +39,7 @@ public class TriviaCmd extends AbstractCommand {
 	public Mono<Void> execute(Context context) {
 		if(this.categories == null) {
 			try {
-				final URL url = new URL("https://opentdb.com/api_category.php");
-				this.categories = Utils.MAPPER.readValue(url, TriviaCategoriesResponse.class);
+				this.categories = Utils.MAPPER.readValue(NetUtils.getJSON(CATEGORY_URL), TriviaCategoriesResponse.class);
 			} catch (final IOException err) {
 				throw Exceptions.propagate(err);
 			}

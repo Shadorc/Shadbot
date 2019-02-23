@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.http.HttpStatus;
-import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.HttpStatusException;
-import org.jsoup.Jsoup;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.gamestats.fortnite.FortniteResponse;
@@ -22,6 +20,7 @@ import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -58,12 +57,8 @@ public class FortniteCmd extends AbstractCommand {
 			final URL url = new URL(String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
 					StringUtils.toLowerCase(platform), encodedNickname));
 
-			final Response response = Jsoup.connect(url.toString())
-					.method(Method.GET)
-					.ignoreContentType(true)
-					.ignoreHttpErrors(true)
-					.header("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY))
-					.execute();
+			final Response response = NetUtils.getResponse(url.toString())
+					.header("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY));
 
 			if(response.statusCode() != 200) {
 				loadingMsg.stopTyping();

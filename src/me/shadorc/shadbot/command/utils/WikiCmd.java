@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.utils;
 
-import java.net.URL;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -36,7 +35,7 @@ public class WikiCmd extends AbstractCommand {
 
 		try {
 			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-			final URL url = new URL(String.format("https://en.wikipedia.org/w/api.php?"
+			final String url = String.format("https://en.wikipedia.org/w/api.php?"
 					+ "format=json"
 					+ "&action=query"
 					+ "&titles=%s"
@@ -45,9 +44,9 @@ public class WikiCmd extends AbstractCommand {
 					+ "&explaintext=true"
 					+ "&exintro=true"
 					+ "&exsentences=5",
-					NetUtils.encode(arg)));
+					NetUtils.encode(arg));
 
-			final WikipediaResponse wikipedia = Utils.MAPPER.readValue(url, WikipediaResponse.class);
+			final WikipediaResponse wikipedia = Utils.MAPPER.readValue(NetUtils.getJSON(url), WikipediaResponse.class);
 			final Map<String, WikipediaPage> pages = wikipedia.getQuery().getPages();
 			final String pageId = pages.keySet().toArray()[0].toString();
 			final WikipediaPage page = pages.get(pageId);

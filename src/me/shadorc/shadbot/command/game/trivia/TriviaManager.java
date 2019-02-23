@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.game.trivia;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +23,7 @@ import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -46,8 +46,8 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 	public TriviaManager(Context context, Integer categoryId) {
 		super(context);
 		try {
-			final URL url = new URL(String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, "")));
-			final TriviaResponse response = Utils.MAPPER.readValue(url, TriviaResponse.class);
+			final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, ""));
+			final TriviaResponse response = Utils.MAPPER.readValue(NetUtils.getJSON(url), TriviaResponse.class);
 			this.trivia = response.getResults().get(0);
 		} catch (final IOException err) {
 			throw Exceptions.propagate(err);

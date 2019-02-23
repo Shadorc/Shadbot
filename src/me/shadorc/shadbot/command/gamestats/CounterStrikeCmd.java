@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.gamestats;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,16 +57,16 @@ public class CounterStrikeCmd extends AbstractCommand {
 			}
 			// The user provided a pseudo
 			else {
-				final URL resolveVanityUrl = new URL(String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
-						Credentials.get(Credential.STEAM_API_KEY), NetUtils.encode(identificator)));
-				final ResolveVanityUrlResponse response = Utils.MAPPER.readValue(resolveVanityUrl, ResolveVanityUrlResponse.class);
+				final String resolveVanityUrl = String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
+						Credentials.get(Credential.STEAM_API_KEY), NetUtils.encode(identificator));
+				final ResolveVanityUrlResponse response = Utils.MAPPER.readValue(NetUtils.getJSON(resolveVanityUrl), ResolveVanityUrlResponse.class);
 				steamId = response.getResponse().getSteamId();
 			}
 
-			final URL playerSummariesUrl = new URL(String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
-					Credentials.get(Credential.STEAM_API_KEY), steamId));
+			final String playerSummariesUrl = String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
+					Credentials.get(Credential.STEAM_API_KEY), steamId);
 
-			final PlayerSummariesResponse playerSummary = Utils.MAPPER.readValue(playerSummariesUrl, PlayerSummariesResponse.class);
+			final PlayerSummariesResponse playerSummary = Utils.MAPPER.readValue(NetUtils.getJSON(playerSummariesUrl), PlayerSummariesResponse.class);
 
 			// Search users matching the steamId
 			final List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
@@ -85,10 +84,10 @@ public class CounterStrikeCmd extends AbstractCommand {
 						.then();
 			}
 
-			final URL userStatsUrl = new URL(String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
-					Credentials.get(Credential.STEAM_API_KEY), steamId));
+			final String userStatsUrl = String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
+					Credentials.get(Credential.STEAM_API_KEY), steamId);
 
-			final String body = NetUtils.getBody(userStatsUrl.toString());
+			final String body = NetUtils.getBody(userStatsUrl);
 			if(body.contains("500 Internal Server Error")) {
 				return loadingMsg.send(
 						String.format(Emoji.ACCESS_DENIED + " (**%s**) The game details of this profile are not public, more info here: %s",
@@ -96,7 +95,7 @@ public class CounterStrikeCmd extends AbstractCommand {
 						.then();
 			}
 
-			final UserStatsForGameResponse userStats = Utils.MAPPER.readValue(userStatsUrl, UserStatsForGameResponse.class);
+			final UserStatsForGameResponse userStats = Utils.MAPPER.readValue(NetUtils.getJSON(userStatsUrl), UserStatsForGameResponse.class);
 
 			if(userStats.getPlayerStats() == null || userStats.getPlayerStats().getStats() == null) {
 				return loadingMsg.send(

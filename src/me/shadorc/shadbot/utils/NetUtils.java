@@ -48,15 +48,6 @@ public class NetUtils {
 
 	/**
 	 * @param url - URL to connect to. The protocol must be http or https
-	 * @return The {@code body} corresponding to the {@code url} with default user-agent and default timeout
-	 * @throws IOException
-	 */
-	public static String getBody(String url) throws IOException {
-		return NetUtils.getResponse(url).body();
-	}
-
-	/**
-	 * @param url - URL to connect to. The protocol must be http or https
 	 * @return The {@link Connection} corresponding to {@code url} with default user-agent and default timeout
 	 */
 	private static Connection getDefaultConnection(String url) {
@@ -76,6 +67,27 @@ public class NetUtils {
 
 	/**
 	 * @param url - URL to connect to. The protocol must be http or https
+	 * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type and HTTP errors
+	 * @throws IOException - on error
+	 */
+	public static Response getResponse(String url) throws IOException {
+		return NetUtils.getDefaultConnection(url)
+				.ignoreContentType(true)
+				.ignoreHttpErrors(true)
+				.execute();
+	}
+
+	/**
+	 * @param url - URL to connect to. The protocol must be http or https
+	 * @return The {@code body} corresponding to the {@code url} with default user-agent and default timeout
+	 * @throws IOException - on error
+	 */
+	public static String getBody(String url) throws IOException {
+		return NetUtils.getResponse(url).body();
+	}
+
+	/**
+	 * @param url - URL to connect to. The protocol must be http or https
 	 * @return A string representing JSON
 	 * @throws HttpStatusException if the URL returns an invalid JSON
 	 */
@@ -89,18 +101,6 @@ public class NetUtils {
 					url);
 		}
 		return json;
-	}
-
-	/**
-	 * @param url - URL to connect to. The protocol must be http or https
-	 * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type and HTTP errors
-	 * @throws IOException
-	 */
-	public static Response getResponse(String url) throws IOException {
-		return NetUtils.getDefaultConnection(url)
-				.ignoreContentType(true)
-				.ignoreHttpErrors(true)
-				.execute();
 	}
 
 	/**

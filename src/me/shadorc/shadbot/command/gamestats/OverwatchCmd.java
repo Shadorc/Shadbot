@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.gamestats;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -17,6 +16,7 @@ import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -102,20 +102,20 @@ public class OverwatchCmd extends AbstractCommand {
 					platformStr, FormatUtils.options(Platform.class)));
 		}
 
-		final ProfileResponse profile = Utils.MAPPER.readValue(this.getUrl("profile", platform, username), ProfileResponse.class);
+		final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("profile", platform, username)), ProfileResponse.class);
 		if(profile.getUsername() == null) {
 			return null;
 		}
-		final StatsResponse stats = Utils.MAPPER.readValue(this.getUrl("stats", platform, username), StatsResponse.class);
+		final StatsResponse stats = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("stats", platform, username)), StatsResponse.class);
 		if(stats.getStats() == null) {
 			return null;
 		}
 		return Tuples.of(platform, profile, stats);
 	}
 
-	private URL getUrl(String endpoint, Platform platform, String username) throws MalformedURLException {
-		return new URL(String.format("http://overwatchy.com/%s/%s/global/%s",
-				endpoint, StringUtils.toLowerCase(platform), username));
+	private String getUrl(String endpoint, Platform platform, String username) throws MalformedURLException {
+		return String.format("http://overwatchy.com/%s/%s/global/%s",
+				endpoint, StringUtils.toLowerCase(platform), username);
 	}
 
 	@Override

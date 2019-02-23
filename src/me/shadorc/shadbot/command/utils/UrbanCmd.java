@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.utils;
 
-import java.net.URL;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,9 +34,9 @@ public class UrbanCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			final URL url = new URL(String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(arg)));
+			final String url = String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(arg));
 
-			final UrbanDictionaryResponse urbanDictionary = Utils.MAPPER.readValue(url, UrbanDictionaryResponse.class);
+			final UrbanDictionaryResponse urbanDictionary = Utils.MAPPER.readValue(NetUtils.getJSON(url), UrbanDictionaryResponse.class);
 
 			if(urbanDictionary.getDefinitions().isEmpty()) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",

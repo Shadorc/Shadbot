@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.image;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -72,15 +71,15 @@ public class ImageCmd extends AbstractCommand {
 			this.generateAccessToken();
 		}
 
-		final URL url = new URL(String.format("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
+		final String url = String.format("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
 				+ "q=%s"
 				+ "&timerange=alltime"
 				+ "&limit=25" // The pagination limit (min: 1 max: 50)
 				+ "&offset=%d" // The pagination offset (min: 0 max: 50000)
 				+ "&access_token=%s",
-				encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken()));
+				encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken());
 
-		final DeviantArtResponse deviantArt = Utils.MAPPER.readValue(url, DeviantArtResponse.class);
+		final DeviantArtResponse deviantArt = Utils.MAPPER.readValue(NetUtils.getJSON(url), DeviantArtResponse.class);
 		final List<Image> images = deviantArt.getResults().stream()
 				.filter(image -> image.getContent() != null)
 				.collect(Collectors.toList());
@@ -96,10 +95,10 @@ public class ImageCmd extends AbstractCommand {
 	private void generateAccessToken() throws IOException {
 		synchronized (this) {
 			if(this.isTokenExpired()) {
-				final URL url = new URL(String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
+				final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
 						Credentials.get(Credential.DEVIANTART_CLIENT_ID),
-						Credentials.get(Credential.DEVIANTART_API_SECRET)));
-				this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
+						Credentials.get(Credential.DEVIANTART_API_SECRET));
+				this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
 				this.lastTokenGeneration = System.currentTimeMillis();
 				LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
 			}

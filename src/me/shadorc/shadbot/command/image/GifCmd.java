@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.image;
 
-import java.net.URL;
 import java.util.function.Consumer;
 
 import org.apache.http.HttpStatus;
@@ -33,10 +32,10 @@ public class GifCmd extends AbstractCommand {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		try {
-			final URL url = new URL(String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
-					Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse(""))));
+			final String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
+					Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
 
-			final GiphyResponse giphy = Utils.MAPPER.readValue(url, GiphyResponse.class);
+			final GiphyResponse giphy = Utils.MAPPER.readValue(NetUtils.getJSON(url), GiphyResponse.class);
 
 			if(giphy.getGifs() == null) {
 				loadingMsg.stopTyping();

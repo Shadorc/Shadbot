@@ -2,7 +2,6 @@ package me.shadorc.shadbot.command.gamestats;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,10 +64,10 @@ public class DiabloCmd extends AbstractCommand {
 				this.generateAccessToken();
 			}
 
-			final URL url = new URL(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
-					region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken()));
+			final String url = String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
+					region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken());
 
-			final ProfileResponse profile = Utils.MAPPER.readValue(url, ProfileResponse.class);
+			final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(url), ProfileResponse.class);
 
 			if("NOTFOUND".equals(profile.getCode())) {
 				loadingMsg.stopTyping();
@@ -77,10 +76,10 @@ public class DiabloCmd extends AbstractCommand {
 
 			final List<HeroResponse> heroResponses = new ArrayList<>();
 			for(final HeroId heroId : profile.getHeroeIds()) {
-				final URL heroUrl = new URL(String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
-						region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken()));
+				final String heroUrl = String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
+						region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken());
 
-				final HeroResponse hero = Utils.MAPPER.readValue(heroUrl, HeroResponse.class);
+				final HeroResponse hero = Utils.MAPPER.readValue(NetUtils.getJSON(heroUrl), HeroResponse.class);
 				if(hero.getCode() == null) {
 					heroResponses.add(hero);
 				}
@@ -124,10 +123,10 @@ public class DiabloCmd extends AbstractCommand {
 	private void generateAccessToken() throws IOException {
 		synchronized (this) {
 			if(this.isTokenExpired()) {
-				final URL url = new URL(String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
+				final String url = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
 						Credentials.get(Credential.BLIZZARD_CLIENT_ID),
-						Credentials.get(Credential.BLIZZARD_CLIENT_SECRET)));
-				this.token = Utils.MAPPER.readValue(url, TokenResponse.class);
+						Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
+				this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
 				this.lastTokenGeneration = System.currentTimeMillis();
 				LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
 			}
