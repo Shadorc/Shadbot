@@ -116,9 +116,9 @@ public class SettingsCmd extends AbstractCommand {
 		}
 
 		dbGuild.getJoinMessage()
-			.ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:**%n%s", joinMessage)));
+				.ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:**%n%s", joinMessage)));
 		dbGuild.getLeaveMessage()
-			.ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
+				.ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
 
 		final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getMessageChannelId())
 				.map(Snowflake::of)
@@ -183,8 +183,8 @@ public class SettingsCmd extends AbstractCommand {
 						context.getPrefix(), this.getName()), false);
 
 		SETTINGS_MAP.values().stream()
-				.forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()), 
-						setting.getDescription(), 
+				.forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()),
+						setting.getDescription(),
 						false));
 
 		return embed.build();
