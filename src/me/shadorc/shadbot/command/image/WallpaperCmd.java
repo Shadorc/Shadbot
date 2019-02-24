@@ -2,8 +2,9 @@ package me.shadorc.shadbot.command.image;
 
 import java.awt.Dimension;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -53,45 +54,47 @@ public class WallpaperCmd extends AbstractCommand {
 	private static final String RESOLUTION = "resolution";
 	private static final String KEYWORD = "keyword";
 
+	private static final Options OPTIONS;
+
 	private Wallhaven wallhaven;
+
+	static {
+		OPTIONS = new Options();
+
+		OPTIONS.addOption("p", PURITY, true, FormatUtils.format(Purity.class, ", "));
+		OPTIONS.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
+
+		final Option ratioOption = new Option("rat", RATIO, true, "image ratio");
+		ratioOption.setValueSeparator('x');
+		OPTIONS.addOption(ratioOption);
+
+		final Option resOption = new Option("res", RESOLUTION, true, "image resolution");
+		resOption.setValueSeparator('x');
+		OPTIONS.addOption(resOption);
+
+		final Option keyOption = new Option("k", KEYWORD, true, KEYWORD);
+		keyOption.setValueSeparator(',');
+		OPTIONS.addOption(keyOption);
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {
+		CommandLine cmdLine;
+		try {
+			final List<String> args = StringUtils.split(context.getArg().orElse(""));
+			cmdLine = new DefaultParser().parse(OPTIONS, args.toArray(new String[0]));
+		} catch (final UnrecognizedOptionException | org.apache.commons.cli.MissingArgumentException err) {
+			throw new CommandException(String.format("%s. Use `%shelp %s` for more information.",
+					err.getMessage(), context.getPrefix(), this.getName()));
+		} catch (final Exception err) {
+			throw Exceptions.propagate(err);
+		}
+
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		if(this.wallhaven == null) {
 			this.wallhaven = new Wallhaven(Credentials.get(Credential.WALLHAVEN_LOGIN),
 					Credentials.get(Credential.WALLHAVEN_PASSWORD));
-		}
-
-		final Options options = new Options();
-
-		options.addOption("p", PURITY, true, FormatUtils.format(Purity.class, ", "));
-		options.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
-
-		final Option ratioOption = new Option("rat", RATIO, true, "image ratio");
-		ratioOption.setValueSeparator('x');
-		options.addOption(ratioOption);
-
-		final Option resOption = new Option("res", RESOLUTION, true, "image resolution");
-		resOption.setValueSeparator('x');
-		options.addOption(resOption);
-
-		final Option keyOption = new Option("k", KEYWORD, true, KEYWORD);
-		keyOption.setValueSeparator(',');
-		options.addOption(keyOption);
-
-		CommandLine cmdLine;
-		try {
-			final List<String> args = StringUtils.split(context.getArg().orElse(""));
-			cmdLine = new DefaultParser().parse(options, args.toArray(new String[0]));
-		} catch (UnrecognizedOptionException | org.apache.commons.cli.MissingArgumentException err) {
-			loadingMsg.stopTyping();
-			throw new CommandException(String.format("%s. Use `%shelp %s` for more information.",
-					err.getMessage(), context.getPrefix(), this.getName()));
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
 		}
 
 		return context.isChannelNsfw()
@@ -122,34 +125,29 @@ public class WallpaperCmd extends AbstractCommand {
 						queryBuilder.keywords(cmdLine.getOptionValues(KEYWORD));
 					}
 
-					try {
-						final List<Wallpaper> wallpapers = this.wallhaven.search(queryBuilder.pages(1).build());
-						if(wallpapers.isEmpty()) {
-							return loadingMsg.send(
-									String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
-											context.getUsername(), context.getContent()))
-									.then();
-						}
-
-						final Wallpaper wallpaper = Utils.randValue(wallpapers);
-						final String tags = FormatUtils.format(wallpaper.getTags(),
-								tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
-
-						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-								.andThen(embed -> embed.setAuthor("Wallpaper", wallpaper.getUrl(), context.getAvatarUrl())
-										.setImage(wallpaper.getImageUrl())
-										.addField("Resolution", wallpaper.getResolution().toString(), false)
-										.addField("Tags", tags, false));
-
-						return loadingMsg.send(embedConsumer).then();
-					} catch (final ConnectionException err) {
-						loadingMsg.stopTyping();
-						throw Exceptions.propagate(new HttpStatusException("Wallhaven is unavailable.", HttpStatus.SC_SERVICE_UNAVAILABLE, "https://alpha.wallhaven.cc/"));
-					} catch (final Exception err) {
-						loadingMsg.stopTyping();
-						throw Exceptions.propagate(Objects.requireNonNullElse(err.getCause(), err));
+					final List<Wallpaper> wallpapers = this.wallhaven.search(queryBuilder.pages(1).build());
+					if(wallpapers.isEmpty()) {
+						return loadingMsg.send(
+								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
+										context.getUsername(), context.getContent()))
+								.then();
 					}
-				});
+
+					final Wallpaper wallpaper = Utils.randValue(wallpapers);
+					final String tags = FormatUtils.format(wallpaper.getTags(),
+							tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
+
+					final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+							.andThen(embed -> embed.setAuthor("Wallpaper", wallpaper.getUrl(), context.getAvatarUrl())
+									.setImage(wallpaper.getImageUrl())
+									.addField("Resolution", wallpaper.getResolution().toString(), false)
+									.addField("Tags", tags, false));
+
+					return loadingMsg.send(embedConsumer).then();
+				})
+				.onErrorMap(err -> err instanceof ConnectionException || err instanceof SSLPeerUnverifiedException,
+						err -> new HttpStatusException("Wallhaven is unavailable.", HttpStatus.SC_SERVICE_UNAVAILABLE, "https://alpha.wallhaven.cc/"))
+				.doOnTerminate(() -> loadingMsg.stopTyping());
 	}
 
 	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) {
