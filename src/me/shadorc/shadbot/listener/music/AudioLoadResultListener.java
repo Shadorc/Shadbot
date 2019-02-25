@@ -114,11 +114,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
 					return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
 				});
+		
+		final String playlistName = playlist.getName();
+		final String name = playlistName == null || playlistName.isBlank() ? "Playlist" : playlistName;
 
 		this.guildMusic.getClient().getUserById(this.guildMusic.getDjId())
 				.map(User::getAvatarUrl)
 				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
-						.andThen(embed -> embed.setAuthor(playlist.getName(), null, avatarUrl)
+						.andThen(embed -> embed.setAuthor(name, null, avatarUrl)
 								.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 								.setDescription("**Select a music by typing the corresponding number.**"
 										+ "\nYou can choose several musics by separating them with a comma."
