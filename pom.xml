@@ -141,7 +141,7 @@
 			<artifactId>reflections</artifactId>
 			<version>0.9.11</version>
 		</dependency>
-		<!-- DurationFormatUtils, StringUtils, BooleanUtils -->
+		<!-- DurationFormatUtils, StringUtils -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>

@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
@@ -47,7 +45,7 @@ public class CommandProcessor {
 				// The channel is allowed
 				.filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
 				// The message has not been intercepted
-				.filterWhen(ignored -> MessageInterceptorManager.isIntercepted(event).map(BooleanUtils::negate))
+				.filterWhen(ignored -> MessageInterceptorManager.isIntercepted(event).map(Boolean.FALSE::equals))
 				.map(ignored -> dbGuild.getPrefix())
 				// The message starts with the correct prefix
 				.filter(prefix -> content.startsWith(prefix))

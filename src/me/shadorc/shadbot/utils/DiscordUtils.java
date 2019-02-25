@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
@@ -154,13 +152,14 @@ public class DiscordUtils {
 		if(channel instanceof PrivateChannel) {
 			return Mono.just(true);
 		}
-		return GuildChannel.class.cast(channel).getEffectivePermissions(userId).map(permissions -> permissions.contains(permission));
+		return GuildChannel.class.cast(channel).getEffectivePermissions(userId)
+				.map(permissions -> permissions.contains(permission));
 	}
 
 	public static Mono<Void> requirePermissions(Channel channel, Permission... permissions) {
 		return Flux.fromArray(permissions)
 				.flatMap(permission -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId().get(), permission)
-						.filter(BooleanUtils::isTrue)
+						.filter(Boolean.TRUE::equals)
 						.switchIfEmpty(Mono.error(new MissingPermissionException(permission))))
 				.then();
 	}
