@@ -114,7 +114,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
 					return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
 				});
-		
+
 		final String playlistName = playlist.getName();
 		final String name = playlistName == null || playlistName.isBlank() ? "Playlist" : playlistName;
 
