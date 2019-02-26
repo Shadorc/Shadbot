@@ -19,9 +19,8 @@ public class VoiceStateUpdateListener {
 				.flatMap(selfId -> {
 					if(event.getCurrent().getUserId().equals(selfId)) {
 						return VoiceStateUpdateListener.onBotEvent(event);
-					} else {
-						return VoiceStateUpdateListener.onUserEvent(event);
 					}
+					return VoiceStateUpdateListener.onUserEvent(event);
 				});
 	}
 
