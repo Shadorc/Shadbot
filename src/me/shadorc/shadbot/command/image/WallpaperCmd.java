@@ -4,8 +4,6 @@ import java.awt.Dimension;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
@@ -21,6 +19,7 @@ import com.ivkos.wallhaven4j.models.misc.enums.Category;
 import com.ivkos.wallhaven4j.models.misc.enums.Purity;
 import com.ivkos.wallhaven4j.models.wallpaper.Wallpaper;
 import com.ivkos.wallhaven4j.util.exceptions.ConnectionException;
+import com.ivkos.wallhaven4j.util.exceptions.WallhavenException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -145,7 +144,7 @@ public class WallpaperCmd extends AbstractCommand {
 
 					return loadingMsg.send(embedConsumer).then();
 				})
-				.onErrorMap(err -> err instanceof ConnectionException || err instanceof SSLPeerUnverifiedException,
+				.onErrorMap(err -> err instanceof WallhavenException && err.getCause() != null && err.getCause() instanceof ConnectionException,
 						err -> new HttpStatusException("Wallhaven is unavailable.", HttpStatus.SC_SERVICE_UNAVAILABLE, "https://alpha.wallhaven.cc/"))
 				.doOnTerminate(() -> loadingMsg.stopTyping());
 	}
