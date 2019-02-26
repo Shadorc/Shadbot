@@ -16,6 +16,7 @@ import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.shard.ShardingClientBuilder;
+import discord4j.gateway.retry.RetryOptions;
 import me.shadorc.shadbot.command.game.LotteryCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.shard.Shard;
@@ -31,6 +32,7 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 public class Shadbot {
 
@@ -76,7 +78,9 @@ public class Shadbot {
 		LogUtils.info("Connecting...");
 		new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
 				.build()
-				.map(builder -> builder.setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
+				.map(builder -> builder.setRetryOptions(new RetryOptions(Duration.ofSeconds(2), Duration.ofSeconds(120),
+						Integer.MAX_VALUE, Schedulers.elastic()))
+						.setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
 				.map(DiscordClientBuilder::build)
 				.doOnNext(client -> {
 					final int shardIndex = client.getConfig().getShardIndex();
