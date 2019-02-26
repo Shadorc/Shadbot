@@ -102,12 +102,12 @@ public class ExceptionHandler {
 	}
 
 	public static void handleUnknownError(DiscordClient client, Throwable err) {
-		if(ExceptionUtils.isKnownDiscordError(err)) {
-			final ClientException clientErr = (ClientException) err;
-			LogUtils.info("%s: %s (URL: %s)",
-					clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url());
-		} else if(err.getMessage().equals("syscall:read(..) failed: Connection reset by peer")) {
+		if(err.getMessage().equals("syscall:read(..) failed: Connection reset by peer")) {
 			LogUtils.info(err.toString());
+		} else if(ExceptionUtils.isKnownDiscordError(err)) {
+			final ClientException clientErr = (ClientException) err;
+			LogUtils.error(client, err, String.format("%s: %s (URL: %s)",
+					clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url()));
 		} else {
 			LogUtils.error(client, err, "An unknown error occurred.");
 		}
