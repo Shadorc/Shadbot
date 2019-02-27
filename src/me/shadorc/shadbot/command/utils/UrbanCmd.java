@@ -50,10 +50,14 @@ public class UrbanCmd extends AbstractCommand {
 			final String example = StringUtils.abbreviate(urbanDefinition.getExample(), Field.MAX_VALUE_LENGTH);
 
 			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-					.andThen(embed -> embed.setAuthor(String.format("Urban Dictionary: %s", urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())
-							.setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
-							.setDescription(definition)
-							.addField("Example", example, false));
+					.andThen(embed -> {
+						embed.setAuthor(String.format("Urban Dictionary: %s", urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())
+								.setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
+								.setDescription(definition);
+						if(!example.isBlank()) {
+							embed.addField("Example", example, false);
+						}
+					});
 
 			return loadingMsg.send(embedConsumer).then();
 
