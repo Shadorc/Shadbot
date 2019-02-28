@@ -8,6 +8,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -94,10 +95,10 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 					if(num == winningNum) {
 						gains *= this.numsPlayers.size() + DiceCmd.MULTIPLIER;
-						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
 					} else {
 						gains *= -1;
-						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
+						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), Math.abs(gains));
 						Shadbot.getLottery().addToJackpot(Math.abs(gains));
 					}
 					Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);

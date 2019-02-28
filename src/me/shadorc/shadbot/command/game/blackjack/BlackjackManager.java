@@ -13,6 +13,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
@@ -136,7 +137,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 					switch (result) {
 						case 1:
 							gains += (int) Math.ceil(player.getBet() * WIN_MULTIPLIER);
-							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
 							text = String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.coins(gains));
 							break;
 						case 0:
@@ -144,7 +145,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 							break;
 						case -1:
 							gains -= player.getBet();
-							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getContext().getCommandName(), Math.abs(gains));
+							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), Math.abs(gains));
 							Shadbot.getLottery().addToJackpot(Math.abs(gains));
 							text = String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
 							break;

@@ -11,6 +11,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
+import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
@@ -111,7 +112,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 			final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
 
 			Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
-			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
 
 			text = String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
 					this.getContext().getUsername(), FormatUtils.coins(gains));

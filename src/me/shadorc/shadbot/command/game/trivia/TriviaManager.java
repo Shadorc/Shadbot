@@ -15,6 +15,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.trivia.TriviaResponse;
 import me.shadorc.shadbot.api.trivia.TriviaResult;
+import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -100,7 +101,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 		final int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
 
 		Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
-		StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getContext().getCommandName(), gains);
+		StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
 
 		this.stop();
 		return this.getContext().getChannel()
