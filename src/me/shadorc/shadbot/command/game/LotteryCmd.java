@@ -30,7 +30,7 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -53,7 +53,7 @@ public class LotteryCmd extends AbstractCommand {
 
 		final DBMember dbMember = Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId());
 		if(dbMember.getCoins() < PAID_COST) {
-			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
+			return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
 		}
 
 		final LotteryGambler gambler = Shadbot.getLottery().getGamblers().stream()
@@ -62,13 +62,13 @@ public class LotteryCmd extends AbstractCommand {
 				.orElse(null);
 
 		if(gambler != null) {
-			throw new CommandException("You're already participating.");
+			return Mono.error(new CommandException("You're already participating."));
 		}
 
 		final Integer num = NumberUtils.asIntBetween(arg, MIN_NUM, MAX_NUM);
 		if(num == null) {
-			throw new CommandException(String.format("`%s` is not a valid number, it must be between %d and %d.",
-					arg, MIN_NUM, MAX_NUM));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
+					arg, MIN_NUM, MAX_NUM)));
 		}
 
 		dbMember.addCoins(-PAID_COST);
@@ -144,7 +144,7 @@ public class LotteryCmd extends AbstractCommand {
 		return Duration.ofMillis(TimeUtils.getMillisUntil(nextDate.toInstant()));
 	}
 
-	public static void draw(DiscordClient client) {
+	public static Mono<Void> draw(DiscordClient client) {
 		LogUtils.info("Lottery draw started...");
 		final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
@@ -152,27 +152,27 @@ public class LotteryCmd extends AbstractCommand {
 				.filter(gambler -> gambler.getNumber() == winningNum)
 				.collect(Collectors.toList());
 
-		Flux.fromIterable(winners)
-				.flatMap(winner -> client.getUserById(winner.getUserId())
-						.flatMap(user -> {
-							final int coins = (int) Math.ceil((double) Shadbot.getLottery().getJackpot() / winners.size());
-							Shadbot.getDatabase().getDBMember(winner.getGuildId(), winner.getUserId()).addCoins(coins);
-							return user.getPrivateChannel()
-									.cast(MessageChannel.class)
-									.flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn %s.",
-											FormatUtils.coins(coins)), privateChannel));
-						}))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(client, err))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
-
 		LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
 				winningNum, winners.size(), Shadbot.getLottery().getJackpot());
 
-		Shadbot.getLottery().setHistoric(new LotteryHistoric(winners.size(), Shadbot.getLottery().getJackpot(), winningNum));
-		Shadbot.getLottery().resetGamblers();
-		if(!winners.isEmpty()) {
-			Shadbot.getLottery().resetJackpot();
-		}
+		return Flux.fromIterable(winners)
+				.flatMap(winner -> client.getMemberById(winner.getGuildId(), winner.getUserId()))
+				.flatMap(member -> {
+					final int coins = (int) Math.ceil((double) Shadbot.getLottery().getJackpot() / winners.size());
+					Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
+					return member.getPrivateChannel()
+							.cast(MessageChannel.class)
+							.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.empty())
+							.flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn **%s**.",
+									FormatUtils.coins(coins)), privateChannel));
+				})
+				.then(Mono.fromRunnable(() -> {
+					Shadbot.getLottery().setHistoric(new LotteryHistoric(Shadbot.getLottery().getJackpot(), winners.size(), winningNum));
+					Shadbot.getLottery().resetGamblers();
+					if(!winners.isEmpty()) {
+						Shadbot.getLottery().resetJackpot();
+					}
+				}));
 	}
 
 	@Override
