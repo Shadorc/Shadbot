@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.admin;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import discord4j.core.object.audit.AuditLogEntry;
 import discord4j.core.object.entity.Guild;
@@ -23,6 +24,7 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -53,43 +55,55 @@ public class KickCmd extends AbstractCommand {
 								context.getGuild(),
 								context.getSelfAsMember()))
 						.flatMapMany(tuple -> {
-							final List<User> mentions = tuple.getT1();
+							final List<User> mentionedUsers = tuple.getT1();
 							final Guild guild = tuple.getT2();
 							final Member self = tuple.getT3();
 
 							final StringBuilder reason = new StringBuilder();
-							reason.append(StringUtils.remove(arg, FormatUtils.format(mentions, User::getMention, " ")).trim());
+							final List<String> mentions = mentionedUsers.stream()
+									.map(User::getMention)
+									.collect(Collectors.toList());
+							reason.append(StringUtils.remove(arg, mentions).trim());
 
 							if(reason.length() == 0) {
 								reason.append("Reason not specified.");
 							}
 
 							if(reason.length() > AuditLogEntry.MAX_REASON_LENGTH) {
-								throw new CommandException(String.format("Reason cannot exceed **%d characters**.", AuditLogEntry.MAX_REASON_LENGTH));
+								return Flux.error(new CommandException(
+										String.format("Reason cannot exceed **%d characters**.", AuditLogEntry.MAX_REASON_LENGTH)));
 							}
 
-							return Flux.fromIterable(mentions)
+							return Flux.fromIterable(mentionedUsers)
 									.filter(user -> !user.isBot())
 									.flatMap(user -> user.asMember(context.getGuildId()))
 									.concatMap(member -> member.getPrivateChannel()
 											.cast(MessageChannel.class)
 											.filterWhen(ignored -> DiscordUtils.isUserHigher(guild, self, member))
-											.switchIfEmpty(Mono.error(new CommandException(
-													String.format("I cannot kick **%s** because he is higher in the role hierarchy than me.", member.getUsername()))))
+											.switchIfEmpty(DiscordUtils.sendMessage(
+													String.format(Emoji.WARNING + " (**%s**) I cannot kick **%s** because he is higher in the role hierarchy than me.",
+															context.getUsername(), member.getUsername()), channel)
+													.then(Mono.empty()))
 											.filterWhen(ignored -> DiscordUtils.isUserHigher(guild, context.getMember(), member))
-											.switchIfEmpty(Mono.error(new CommandException(
-													String.format("You cannot kick **%s** because he is higher in the role hierarchy than you.", member.getUsername()))))
+											.switchIfEmpty(DiscordUtils.sendMessage(
+													String.format(Emoji.WARNING + " (**%s**) You cannot kick **%s** because he is higher in the role hierarchy than you.",
+															context.getUsername(), member.getUsername()), channel)
+													.then(Mono.empty()))
 											.flatMap(privateChannel -> DiscordUtils.sendMessage(
 													String.format(Emoji.INFO + " You were kicked from the server **%s** by **%s**. Reason: `%s`",
 															guild.getName(), context.getUsername(), reason), privateChannel))
+											.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> DiscordUtils.sendMessage(
+													String.format(Emoji.WARNING + " (**%s**) I could not send a message to **%s**.",
+															context.getUsername(), member.getUsername()), channel))
 											.then(member.kick(reason.toString()))
 											.thenReturn(member));
 						})
+						.map(Member::getUsername)
 						.collectList()
-						.flatMap(members -> DiscordUtils.sendMessage(
+						.flatMap(memberUsernames -> DiscordUtils.sendMessage(
 								String.format(Emoji.INFO + " **%s** kicked %s.",
 										context.getUsername(),
-										FormatUtils.format(members, member -> String.format("**%s**", member.getUsername()), ", ")),
+										FormatUtils.format(memberUsernames, username -> String.format("**%s**", username), ", ")),
 								channel)))
 				.then();
 	}
