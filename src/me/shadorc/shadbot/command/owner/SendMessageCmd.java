@@ -45,8 +45,9 @@ public class SendMessageCmd extends AbstractCommand {
 
 					return user.getPrivateChannel()
 							.cast(MessageChannel.class)
-							.flatMap(privateChannel -> DiscordUtils.sendMessage(args.get(1), privateChannel));
-
+							.flatMap(privateChannel -> DiscordUtils.sendMessage(args.get(1), privateChannel))
+							.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.error(
+									new CommandException("I'm not allowed to send a private message to this user.")));
 				})
 				.then(context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", channel)))
