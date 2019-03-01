@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
+import org.apache.http.HttpStatus;
+
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.AbstractCommand;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -81,7 +83,7 @@ public class WeatherCmd extends AbstractCommand {
 			return loadingMsg.send(embedConsumer).then();
 
 		} catch (final Exception err) {
-			if(err instanceof APIException && ((APIException) err).getCode() == 404) {
+			if(err instanceof APIException && ((APIException) err).getCode() == HttpStatus.SC_NOT_FOUND) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
 						context.getUsername(), args.get(0))).then();
 			}

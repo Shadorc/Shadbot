@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
@@ -41,8 +42,8 @@ public class DiabloCmd extends AbstractCommand {
 		EU, US, TW, KR;
 	}
 
+	private final AtomicLong lastTokenGeneration = new AtomicLong(0);
 	private TokenResponse token;
-	private long lastTokenGeneration;
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -117,20 +118,16 @@ public class DiabloCmd extends AbstractCommand {
 
 	private boolean isTokenExpired() {
 		return this.token == null
-				|| TimeUtils.getMillisUntil(this.lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
+				|| TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
 	}
 
 	private void generateAccessToken() throws IOException {
-		synchronized (this) {
-			if(this.isTokenExpired()) {
-				final String url = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-						Credentials.get(Credential.BLIZZARD_CLIENT_ID),
-						Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
-				this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
-				this.lastTokenGeneration = System.currentTimeMillis();
-				LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
-			}
-		}
+		final String url = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
+				Credentials.get(Credential.BLIZZARD_CLIENT_ID),
+				Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
+		this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
+		this.lastTokenGeneration.set(System.currentTimeMillis());
+		LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -33,8 +34,8 @@ import reactor.core.publisher.Mono;
 @Command(category = CommandCategory.IMAGE, names = { "image" })
 public class ImageCmd extends AbstractCommand {
 
+	private AtomicLong lastTokenGeneration = new AtomicLong(0);
 	private TokenResponse token;
-	private long lastTokenGeneration;
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -89,20 +90,16 @@ public class ImageCmd extends AbstractCommand {
 
 	private boolean isTokenExpired() {
 		return this.token == null
-				|| TimeUtils.getMillisUntil(this.lastTokenGeneration) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
+				|| TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
 	}
 
 	private void generateAccessToken() throws IOException {
-		synchronized (this) {
-			if(this.isTokenExpired()) {
-				final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
-						Credentials.get(Credential.DEVIANTART_CLIENT_ID),
-						Credentials.get(Credential.DEVIANTART_API_SECRET));
-				this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
-				this.lastTokenGeneration = System.currentTimeMillis();
-				LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
-			}
-		}
+		final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
+				Credentials.get(Credential.DEVIANTART_CLIENT_ID),
+				Credentials.get(Credential.DEVIANTART_API_SECRET));
+		this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
+		this.lastTokenGeneration.set(System.currentTimeMillis());
+		LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
 	}
 
 	@Override

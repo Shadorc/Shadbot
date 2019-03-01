@@ -25,7 +25,6 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.core.publisher.Mono;
-import reactor.util.annotation.Nullable;
 
 public class Context {
 
@@ -47,12 +46,10 @@ public class Context {
 		return this.arg;
 	}
 
-	@Nullable
 	public User getAuthor() {
-		return this.getMessage().getAuthor().orElse(null);
+		return this.getMessage().getAuthor().orElseThrow();
 	}
 
-	@Nullable
 	public Snowflake getAuthorId() {
 		return this.getAuthor().getId();
 	}
@@ -77,23 +74,20 @@ public class Context {
 		return this.cmdName;
 	}
 
-	@Nullable
 	public String getContent() {
-		return this.getMessage().getContent().orElse(null);
+		return this.getMessage().getContent().orElseThrow();
 	}
 
 	public Mono<Guild> getGuild() {
 		return this.event.getGuild();
 	}
 
-	@Nullable
 	public Snowflake getGuildId() {
-		return this.event.getGuildId().orElse(null);
+		return this.event.getGuildId().orElseThrow();
 	}
 
-	@Nullable
 	public Member getMember() {
-		return this.event.getMember().orElse(null);
+		return this.event.getMember().orElseThrow();
 	}
 
 	public Message getMessage() {
@@ -102,9 +96,8 @@ public class Context {
 
 	public Mono<CommandPermission> getPermission() {
 		// The author is the bot's owner
-		final Mono<CommandPermission> ownerPerm = Mono.just(Shadbot.OWNER_ID.get())
-				.map(Snowflake::of)
-				.filter(this.getAuthor().getId()::equals)
+		final Mono<CommandPermission> ownerPerm = Mono.just(this.getAuthorId())
+				.filter(Snowflake.of(Shadbot.OWNER_ID.get())::equals)
 				.map(ignored -> CommandPermission.OWNER);
 
 		// Private message, the author is considered as an administrator
@@ -136,9 +129,8 @@ public class Context {
 		return this.getSelf().flatMap(self -> self.asMember(this.getGuildId()));
 	}
 
-	@Nullable
 	public Snowflake getSelfId() {
-		return this.getClient().getSelfId().orElse(null);
+		return this.getClient().getSelfId().orElseThrow();
 	}
 
 	public int getShardCount() {
@@ -157,10 +149,6 @@ public class Context {
 		return this.getChannel()
 				.ofType(TextChannel.class)
 				.map(TextChannel::isNsfw);
-	}
-
-	public boolean isDm() {
-		return !this.event.getGuildId().isPresent();
 	}
 
 	public String requireArg() {

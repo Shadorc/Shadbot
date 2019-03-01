@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.fun;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -47,15 +48,15 @@ public class ChatCmd extends AbstractCommand {
 			throw new CommandException(String.format("The message must not exceed **%d characters**.", MAX_CHARACTERS));
 		}
 
-		for(final String botName : BOTS.keySet()) {
+		for(final Entry<String, String> bot : BOTS.entrySet()) {
 			try {
-				final String response = this.talk(context.getChannelId(), BOTS.get(botName), arg);
+				final String response = this.talk(context.getChannelId(), bot.getValue(), arg);
 				ERROR_COUNT.set(0);
 				return context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", botName, response), channel))
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", bot.getKey(), response), channel))
 						.then();
 			} catch (final IOException err) {
-				LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botName);
+				LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), bot.getKey());
 			}
 		}
 

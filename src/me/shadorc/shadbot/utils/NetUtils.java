@@ -117,7 +117,7 @@ public class NetUtils {
 			conn.setReadTimeout(Config.DEFAULT_TIMEOUT);
 			conn.connect();
 			isValid = true;
-		} catch (final Exception err) {
+		} catch (final IOException err) {
 			isValid = false;
 		}
 

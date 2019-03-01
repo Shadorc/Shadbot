@@ -127,7 +127,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 					if(playerValue > 21) {
 						result = -1;
 					} else if(dealerValue <= 21) {
-						result = Integer.valueOf(playerValue).compareTo(dealerValue);
+						result = Integer.compare(playerValue, dealerValue);
 					} else {
 						result = 1;
 					}
@@ -140,14 +140,14 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
 							text = String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.coins(gains));
 							break;
-						case 0:
-							text = String.format("**%s** (Draw)", user.getUsername());
-							break;
 						case -1:
 							gains -= player.getBet();
 							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), Math.abs(gains));
 							Shadbot.getLottery().addToJackpot(Math.abs(gains));
 							text = String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
+							break;
+						default:
+							text = String.format("**%s** (Draw)", user.getUsername());
 							break;
 					}
 

@@ -134,11 +134,9 @@ public class Utils {
 	 */
 	public static <R, C, V> HashBasedTable<R, C, V> toTable(Map<R, Map<C, V>> map) {
 		final HashBasedTable<R, C, V> table = HashBasedTable.create();
-		for(final R rowKey : map.keySet()) {
-			final Map<C, V> rowMap = map.get(rowKey);
-			for(final C columnKey : rowMap.keySet()) {
-				final V value = rowMap.get(columnKey);
-				table.put(rowKey, columnKey, value);
+		for(final Entry<R, Map<C, V>> rowEntry : map.entrySet()) {
+			for(final Entry<C, V> columnEntry : rowEntry.getValue().entrySet()) {
+				table.put(rowEntry.getKey(), columnEntry.getKey(), columnEntry.getValue());
 			}
 		}
 		return table;

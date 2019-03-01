@@ -2,6 +2,8 @@ package me.shadorc.shadbot.command.hidden;
 
 import java.util.function.Consumer;
 
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -41,7 +43,8 @@ public class HelpCmd extends AbstractCommand {
 				.flatMap(authorPerm -> Flux.fromIterable(CommandInitializer.getCommands().values())
 						.distinct()
 						.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
-						.filter(cmd -> context.isDm() || Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd))
+						.filterWhen(cmd -> context.getChannel().map(Channel::getType)
+								.map(type -> type.equals(Type.DM) || Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd)))
 						.collectMultimap(AbstractCommand::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
 				.map(map -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> {
