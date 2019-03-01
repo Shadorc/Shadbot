@@ -17,6 +17,7 @@ import me.shadorc.shadbot.listener.music.AudioEventListener;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
@@ -121,7 +122,9 @@ public class GuildMusic {
 	}
 
 	public Mono<MessageChannel> getMessageChannel() {
-		return this.client.getChannelById(this.messageChannelId).cast(MessageChannel.class);
+		return this.client.getChannelById(this.messageChannelId)
+				.cast(MessageChannel.class)
+				.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.empty());
 	}
 
 	public Snowflake getDjId() {
