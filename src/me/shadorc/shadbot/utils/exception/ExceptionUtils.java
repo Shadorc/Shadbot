@@ -13,28 +13,31 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 public class ExceptionUtils {
 
 	public static boolean isUnavailable(Throwable err) {
-		return err instanceof ConnectException
-				|| err instanceof HttpStatusException
-						&& ((HttpStatusException) err).getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE;
+		if(err instanceof HttpStatusException) {
+			HttpStatusException thr = (HttpStatusException) err;
+			return thr.getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE;
+		}
+		return err instanceof ConnectException;
 	}
 
 	public static boolean isInternalServerError(Throwable err) {
-		return err instanceof HttpStatusException
-				&& ((HttpStatusException) err).getStatusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR;
+		if(err instanceof HttpStatusException) {
+			HttpStatusException thr = (HttpStatusException) err;
+			return thr.getStatusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR;
+		}
+		return false;
 	}
 
 	public static boolean isUnreacheable(Throwable err) {
 		return err instanceof NoRouteToHostException || err instanceof SocketTimeoutException;
 	}
 
-	public static boolean isDiscordNotFound(Throwable err) {
-		return err instanceof ClientException
-				&& ((ClientException) err).getStatus().equals(HttpResponseStatus.NOT_FOUND);
-	}
-
 	public static boolean isDiscordForbidden(Throwable err) {
-		return err instanceof ClientException
-				&& ((ClientException) err).getStatus().equals(HttpResponseStatus.FORBIDDEN);
+		if(err instanceof ClientException) {
+			ClientException thr = (ClientException) err;
+			return thr.getStatus().equals(HttpResponseStatus.FORBIDDEN);
+		}
+		return false;
 	}
 
 	public static boolean isKnownDiscordError(Throwable err) {
