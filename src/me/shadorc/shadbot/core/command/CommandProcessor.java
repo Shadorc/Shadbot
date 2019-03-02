@@ -2,7 +2,6 @@ package me.shadorc.shadbot.core.command;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
@@ -33,23 +32,39 @@ public class CommandProcessor {
 			return Mono.empty();
 		}
 
-		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId().get());
 		final String content = event.getMessage().getContent().get();
+		final Snowflake guildId = event.getGuildId().get();
+		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(guildId);
 		return Mono.justOrEmpty(event.getMember())
 				// The author is not a bot
 				.filter(member -> !member.isBot())
-				.flatMap(member -> member.getRoles().collectList())
 				// The role is allowed
+				.flatMap(member -> member.getRoles().collectList())
 				.filter(roles -> dbGuild.hasAllowedRole(roles))
-				.flatMap(ignored -> event.getMessage().getChannel())
 				// The channel is allowed
+				.flatMap(ignored -> event.getMessage().getChannel())
 				.filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
 				// The message has not been intercepted
 				.filterWhen(ignored -> MessageInterceptorManager.isIntercepted(event).map(Boolean.FALSE::equals))
-				.map(ignored -> dbGuild.getPrefix())
 				// The message starts with the correct prefix
+				.map(ignored -> dbGuild.getPrefix())
 				.filter(prefix -> content.startsWith(prefix))
+				// Execute the command
 				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)));
+	}
+
+	private static boolean isRateLimited(Context context, BaseCmd cmd) {
+		final Optional<RateLimiter> rateLimiter = cmd.getRateLimiter();
+		if(!rateLimiter.isPresent()) {
+			return false;
+		}
+
+		if(rateLimiter.get().isLimitedAndWarn(context.getClient(),
+				context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
+			StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_LIMITED, cmd);
+			return true;
+		}
+		return false;
 	}
 
 	private static Mono<Void> executeCommand(Context context) {
@@ -57,21 +72,6 @@ public class CommandProcessor {
 		if(command == null) {
 			return Mono.empty();
 		}
-
-		final Snowflake guildId = context.getGuildId();
-
-		final Predicate<? super BaseCmd> isRateLimited = cmd -> {
-			final Optional<RateLimiter> rateLimiter = cmd.getRateLimiter();
-			if(!rateLimiter.isPresent()) {
-				return false;
-			}
-
-			if(rateLimiter.get().isLimitedAndWarn(context.getClient(), guildId, context.getChannelId(), context.getAuthorId())) {
-				StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_LIMITED, cmd);
-				return true;
-			}
-			return false;
-		};
 
 		return context.getPermission()
 				// The author has the permission to execute this command
@@ -83,9 +83,9 @@ public class CommandProcessor {
 								.then(Mono.empty())))
 				.flatMap(perm -> Mono.just(command))
 				// The command is allowed in the guild
-				.filter(cmd -> Shadbot.getDatabase().getDBGuild(guildId).isCommandAllowed(cmd))
+				.filter(cmd -> Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd))
 				// The user is not rate limited
-				.filter(isRateLimited.negate())
+				.filter(cmd -> !CommandProcessor.isRateLimited(context, cmd))
 				.flatMap(cmd -> cmd.execute(context))
 				.onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context))
 				.doOnTerminate(() -> {
