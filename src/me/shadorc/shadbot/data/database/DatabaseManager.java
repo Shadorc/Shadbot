@@ -3,8 +3,9 @@ package me.shadorc.shadbot.data.database;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.JavaType;
 
@@ -14,27 +15,23 @@ import me.shadorc.shadbot.utils.Utils;
 
 public class DatabaseManager extends Data {
 
-	private final List<DBGuild> guilds;
+	private final Map<Snowflake, DBGuild> guildsMap;
 
 	public DatabaseManager() throws IOException {
 		super("database.json", Duration.ofMinutes(15), Duration.ofMinutes(15));
 
-		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(CopyOnWriteArrayList.class, DBGuild.class);
-		this.guilds = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), valueType) : new CopyOnWriteArrayList<>();
+		this.guildsMap = new ConcurrentHashMap<>();
+		if(this.getFile().exists()) {
+			final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, DBGuild.class);
+			final List<DBGuild> guilds = Utils.MAPPER.readValue(this.getFile(), valueType);
+			for(final DBGuild guild : guilds) {
+				guildsMap.put(guild.getId(), guild);
+			}
+		}
 	}
 
 	public DBGuild getDBGuild(Snowflake guildId) {
-		final Optional<DBGuild> dbGuildOpt = this.guilds.stream()
-				.filter(guild -> guild.getId().equals(guildId))
-				.findFirst();
-
-		if(dbGuildOpt.isPresent()) {
-			return dbGuildOpt.get();
-		}
-
-		final DBGuild dbGuild = new DBGuild(guildId);
-		this.guilds.add(dbGuild);
-		return dbGuild;
+		return this.guildsMap.computeIfAbsent(guildId, DBGuild::new);
 	}
 
 	public DBMember getDBMember(Snowflake guildId, Snowflake memberId) {
@@ -55,7 +52,7 @@ public class DatabaseManager extends Data {
 
 	@Override
 	public Object getData() {
-		return this.guilds;
+		return this.guildsMap.values();
 	}
 
 }
