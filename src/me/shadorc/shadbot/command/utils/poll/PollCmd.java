@@ -15,12 +15,10 @@ import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -28,29 +26,24 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.UTILS, names = { "poll" })
-public class PollCmd extends AbstractCommand {
+public class PollCmd extends BaseCmd {
 
 	protected static final ConcurrentHashMap<Snowflake, PollManager> MANAGER = new ConcurrentHashMap<>();
 
-	private static final List<ReactionEmoji> NUMBER_EMOJI = List.of(
-			ReactionEmoji.unicode("\u0030\u20E3"),
-			ReactionEmoji.unicode("\u0031\u20E3"),
-			ReactionEmoji.unicode("\u0032\u20E3"),
-			ReactionEmoji.unicode("\u0033\u20E3"),
-			ReactionEmoji.unicode("\u0034\u20E3"),
-			ReactionEmoji.unicode("\u0035\u20E3"),
-			ReactionEmoji.unicode("\u0036\u20E3"),
-			ReactionEmoji.unicode("\u0037\u20E3"),
-			ReactionEmoji.unicode("\u0038\u20E3"),
-			ReactionEmoji.unicode("\u0039\u20E3"),
-			ReactionEmoji.unicode("\u0040\u20E3"));
+	private static final List<String> NUMBER_UNICODE = List.of(
+			"\u0030\u20E3", "\u0031\u20E3", "\u0032\u20E3", "\u0033\u20E3", "\u0034\u20E3",
+			"\u0035\u20E3", "\u0036\u20E3", "\u0037\u20E3", "\u0038\u20E3", "\u0039\u20E3",
+			"\u0040\u20E3");
 
 	private static final int MIN_CHOICES_NUM = 2;
 	private static final int MAX_CHOICES_NUM = 10;
 	private static final int MIN_DURATION = 10;
 	private static final int MAX_DURATION = 3600;
+
+	public PollCmd() {
+		super(CommandCategory.UTILS, List.of("poll"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -124,7 +117,7 @@ public class PollCmd extends AbstractCommand {
 
 		final Map<String, ReactionEmoji> choicesReactions = new HashMap<>();
 		for(int i = 0; i < choices.size(); i++) {
-			choicesReactions.put(choices.get(i), NUMBER_EMOJI.get(i + 1));
+			choicesReactions.put(choices.get(i), ReactionEmoji.unicode(NUMBER_UNICODE.get(i + 1)));
 		}
 
 		return new PollManager(context, new PollCreateSpec(Duration.ofSeconds(seconds), substrings.get(0), choicesReactions));

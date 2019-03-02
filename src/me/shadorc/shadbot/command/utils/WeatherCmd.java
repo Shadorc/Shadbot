@@ -8,11 +8,9 @@ import java.util.function.Consumer;
 import org.apache.http.HttpStatus;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -32,11 +30,16 @@ import net.aksingh.owmjapis.model.param.Weather;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.UTILS, names = { "weather" })
-public class WeatherCmd extends AbstractCommand {
+public class WeatherCmd extends BaseCmd {
 
-	private final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Locale.ENGLISH);
+	private final SimpleDateFormat dateFormatter;
+
+	public WeatherCmd() {
+		super(CommandCategory.UTILS, List.of("weather"));
+		this.setDefaultRateLimiter();
+
+		this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Locale.ENGLISH);
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

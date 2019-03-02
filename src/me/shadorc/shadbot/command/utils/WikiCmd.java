@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.utils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -9,11 +10,9 @@ import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.wikipedia.WikipediaPage;
 import me.shadorc.shadbot.api.wikipedia.WikipediaResponse;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -23,9 +22,12 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.UTILS, names = { "wiki", "wikipedia" })
-public class WikiCmd extends AbstractCommand {
+public class WikiCmd extends BaseCmd {
+
+	public WikiCmd() {
+		super(CommandCategory.UTILS, List.of("wiki", "wikipedia"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

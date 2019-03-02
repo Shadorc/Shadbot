@@ -1,28 +1,30 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.GAME, names = { "blackjack" }, alias = "bj")
-public class BlackjackCmd extends AbstractCommand {
+public class BlackjackCmd extends BaseCmd {
 
 	protected static final ConcurrentHashMap<Snowflake, BlackjackManager> MANAGERS = new ConcurrentHashMap<>();
 
 	private static final int MAX_BET = 250_000;
+
+	public BlackjackCmd() {
+		super(CommandCategory.GAME, List.of("blackjack"), "bj");
+		this.setGameRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

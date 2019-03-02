@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.utils;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -9,11 +10,9 @@ import discord4j.core.object.Embed.Field;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.urbandictionary.UrbanDefinition;
 import me.shadorc.shadbot.api.urbandictionary.UrbanDictionaryResponse;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -23,9 +22,12 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.UTILS, names = { "urban" }, alias = "ud")
-public class UrbanCmd extends AbstractCommand {
+public class UrbanCmd extends BaseCmd {
+
+	public UrbanCmd() {
+		super(CommandCategory.UTILS, List.of("urban"), "ud");
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

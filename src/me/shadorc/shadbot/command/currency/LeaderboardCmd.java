@@ -1,16 +1,15 @@
 package me.shadorc.shadbot.command.currency;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -20,12 +19,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
-@RateLimited
-@Command(category = CommandCategory.CURRENCY, names = { "leaderboard" })
-public class LeaderboardCmd extends AbstractCommand {
+public class LeaderboardCmd extends BaseCmd {
 
 	private static final Comparator<DBMember> COMPARATOR =
 			(user1, user2) -> Integer.compare(user1.getCoins(), user2.getCoins());
+
+	public LeaderboardCmd() {
+		super(CommandCategory.CURRENCY, List.of("leaderboard"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

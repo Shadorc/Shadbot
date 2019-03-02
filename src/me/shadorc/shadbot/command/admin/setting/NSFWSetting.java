@@ -7,9 +7,8 @@ import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.setting.AbstractSetting;
+import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
-import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -18,11 +17,14 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@Setting(description = "Manage current channel's NSFW state.", setting = SettingEnum.NSFW)
-public class NSFWSetting extends AbstractSetting {
+public class NSFWSetting extends BaseSetting {
 
 	private enum Action {
 		TOGGLE, ENABLE, DISABLE;
+	}
+
+	public NSFWSetting() {
+		super(Setting.NSFW, "Manage current channel's NSFW state.");
 	}
 
 	@Override

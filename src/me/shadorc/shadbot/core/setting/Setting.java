@@ -1,16 +1,25 @@
 package me.shadorc.shadbot.core.setting;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public enum Setting {
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Setting {
+	PREFIX,
+	DEFAULT_VOLUME,
+	NSFW,
+	ALLOWED_CHANNELS,
+	ALLOWED_TEXT_CHANNELS,
+	ALLOWED_VOICE_CHANNELS,
+	ALLOWED_ROLES,
+	BLACKLIST,
+	AUTO_MESSAGE,
+	MESSAGE_CHANNEL_ID,
+	JOIN_MESSAGE,
+	LEAVE_MESSAGE,
+	AUTO_ROLES,
+	IAM_MESSAGES;
 
-	String description();
-
-	SettingEnum setting();
+	@Override
+	public String toString() {
+		return super.toString().toLowerCase();
+	}
 
 }

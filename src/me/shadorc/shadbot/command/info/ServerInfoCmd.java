@@ -13,11 +13,9 @@ import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Image.Format;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -25,11 +23,16 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.INFO, names = { "serverinfo", "server_info", "server-info" })
-public class ServerInfoCmd extends AbstractCommand {
+public class ServerInfoCmd extends BaseCmd {
 
-	private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
+	private final DateTimeFormatter dateFormatter;
+
+	public ServerInfoCmd() {
+		super(CommandCategory.INFO, List.of("server_info", "server-info", "serverinfo"));
+		this.setDefaultRateLimiter();
+
+		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

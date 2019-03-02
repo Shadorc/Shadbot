@@ -11,11 +11,9 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -26,19 +24,21 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.UTILS, names = { "translate", "translation", "trans" })
-public class TranslateCmd extends AbstractCommand {
+public class TranslateCmd extends BaseCmd {
 
 	private static final String AUTO = "auto";
 	private static final int CHARACTERS_LIMIT = 150;
 
-	private static final BiMap<String, String> LANG_ISO_MAP = HashBiMap.create();
+	private final BiMap<String, String> langIsoMap;
 
-	static {
+	public TranslateCmd() {
+		super(CommandCategory.UTILS, List.of("translate", "translation", "trans"));
+		this.setDefaultRateLimiter();
+
+		this.langIsoMap = HashBiMap.create();
 		Arrays.stream(Locale.getISOLanguages())
-				.forEach(iso -> LANG_ISO_MAP.put(new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(), iso));
-		LANG_ISO_MAP.put(AUTO, AUTO);
+				.forEach(iso -> this.langIsoMap.put(new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(), iso));
+		this.langIsoMap.put(AUTO, AUTO);
 	}
 
 	@Override
@@ -103,8 +103,8 @@ public class TranslateCmd extends AbstractCommand {
 			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
 							.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
-									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langFrom)), sourceText,
-									StringUtils.capitalize(LANG_ISO_MAP.inverse().get(langTo)), translatedText.toString())));
+									StringUtils.capitalize(langIsoMap.inverse().get(langFrom)), sourceText,
+									StringUtils.capitalize(langIsoMap.inverse().get(langTo)), translatedText.toString())));
 
 			return loadingMsg.send(embedConsumer).then();
 
@@ -115,7 +115,7 @@ public class TranslateCmd extends AbstractCommand {
 	}
 
 	private String toISO(String lang) {
-		return LANG_ISO_MAP.containsValue(lang) ? lang : LANG_ISO_MAP.get(lang);
+		return langIsoMap.containsValue(lang) ? lang : langIsoMap.get(lang);
 	}
 
 	@Override

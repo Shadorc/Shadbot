@@ -11,11 +11,9 @@ import org.jsoup.HttpStatusException;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.gamestats.fortnite.FortniteResponse;
 import me.shadorc.shadbot.api.gamestats.fortnite.Stats;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
@@ -30,12 +28,15 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.GAMESTATS, names = { "fortnite" })
-public class FortniteCmd extends AbstractCommand {
+public class FortniteCmd extends BaseCmd {
 
 	private enum Platform {
 		PC, XBL, PSN;
+	}
+
+	public FortniteCmd() {
+		super(CommandCategory.GAMESTATS, List.of("fortnite"));
+		this.setDefaultRateLimiter();
 	}
 
 	@Override

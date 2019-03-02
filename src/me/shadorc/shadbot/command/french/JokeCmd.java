@@ -8,11 +8,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -22,11 +20,14 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.FRENCH, names = { "blague", "joke" })
-public class JokeCmd extends AbstractCommand {
+public class JokeCmd extends BaseCmd {
 
 	private static final String HOME_URL = "https://www.humour.com/blagues/";
+
+	public JokeCmd() {
+		super(CommandCategory.FRENCH, List.of("blague", "joke"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

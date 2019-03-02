@@ -1,15 +1,15 @@
 package me.shadorc.shadbot.command.owner;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -18,8 +18,11 @@ import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "leave" })
-public class LeaveCmd extends AbstractCommand {
+public class LeaveCmd extends BaseCmd {
+
+	public LeaveCmd() {
+		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("leave"));
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -13,11 +14,11 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -29,8 +30,12 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "softban" })
-public class SoftBanCmd extends AbstractCommand {
+public class SoftBanCmd extends BaseCmd {
+
+	public SoftBanCmd() {
+		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("softban"));
+		this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

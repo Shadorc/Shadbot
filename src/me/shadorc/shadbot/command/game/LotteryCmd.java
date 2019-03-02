@@ -13,11 +13,9 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.data.lottery.LotteryGambler;
 import me.shadorc.shadbot.data.lottery.LotteryHistoric;
@@ -35,13 +33,16 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.GAME, names = { "lottery", "lotto" })
-public class LotteryCmd extends AbstractCommand {
+public class LotteryCmd extends BaseCmd {
 
 	private static final int PAID_COST = 100;
 	private static final int MIN_NUM = 1;
 	private static final int MAX_NUM = 100;
+
+	public LotteryCmd() {
+		super(CommandCategory.GAME, List.of("lottery", "lotto"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

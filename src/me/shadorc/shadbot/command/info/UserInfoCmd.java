@@ -10,11 +10,9 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
@@ -23,11 +21,16 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.INFO, names = { "userinfo", "user_info", "user-info" })
-public class UserInfoCmd extends AbstractCommand {
+public class UserInfoCmd extends BaseCmd {
 
-	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
+	private final DateTimeFormatter dateFormatter;
+
+	public UserInfoCmd() {
+		super(CommandCategory.INFO, List.of("user_info", "user-info", "userinfo"));
+		this.setDefaultRateLimiter();
+
+		this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -48,11 +51,11 @@ public class UserInfoCmd extends AbstractCommand {
 					final List<Role> roles = tuple4.getT3();
 
 					final String creationDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(member.getId().getTimestamp()).format(DATE_FORMATTER),
+							TimeUtils.toLocalDate(member.getId().getTimestamp()).format(dateFormatter),
 							FormatUtils.longDuration(member.getId().getTimestamp()));
 
 					final String joinDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(member.getJoinTime()).format(DATE_FORMATTER),
+							TimeUtils.toLocalDate(member.getJoinTime()).format(dateFormatter),
 							FormatUtils.longDuration(member.getJoinTime()));
 
 					return EmbedUtils.getDefaultEmbed()

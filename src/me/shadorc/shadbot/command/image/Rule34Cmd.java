@@ -9,11 +9,9 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.image.r34.R34Post;
 import me.shadorc.shadbot.api.image.r34.R34Posts;
 import me.shadorc.shadbot.api.image.r34.R34Response;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -27,11 +25,14 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.IMAGE, names = { "rule34" }, alias = "r34")
-public class Rule34Cmd extends AbstractCommand {
+public class Rule34Cmd extends BaseCmd {
 
 	private static final int MAX_TAGS_LENGTH = 400;
+
+	public Rule34Cmd() {
+		super(CommandCategory.IMAGE, List.of("rule34"), "r34");
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

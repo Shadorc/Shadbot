@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.info;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -14,11 +15,9 @@ import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -27,13 +26,16 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.INFO, names = { "info" })
-public class InfoCmd extends AbstractCommand {
+public class InfoCmd extends BaseCmd {
 
-	private static final int MB_UNIT = 1024 * 1024;
 	private static final String D4J_NAME = GitProperties.getProperties().getProperty(GitProperties.APPLICATION_NAME);
 	private static final String D4J_VERSION = GitProperties.getProperties().getProperty(GitProperties.APPLICATION_VERSION);
+	private static final int MB_UNIT = 1024 * 1024;
+
+	public InfoCmd() {
+		super(CommandCategory.INFO, List.of("info"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
@@ -13,11 +14,11 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -28,10 +29,14 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "prune" })
-public class PruneCmd extends AbstractCommand {
+public class PruneCmd extends BaseCmd {
 
 	private static final int MAX_MESSAGES = 100;
+
+	public PruneCmd() {
+		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("prune"));
+		this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

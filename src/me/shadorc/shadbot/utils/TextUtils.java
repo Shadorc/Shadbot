@@ -6,7 +6,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.core.setting.SettingEnum;
+import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.TextFile;
 import me.shadorc.shadbot.utils.object.Emoji;
 
@@ -44,6 +44,6 @@ public class TextUtils {
 	public static String mustBeNsfw(String prefix) {
 		return String.format(Emoji.GREY_EXCLAMATION
 				+ " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",
-				prefix, SettingEnum.NSFW);
+				prefix, Setting.NSFW);
 	}
 }

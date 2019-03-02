@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -17,7 +17,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 public class HelpBuilder {
 
 	private final Context context;
-	private final AbstractCommand cmd;
+	private final BaseCmd cmd;
 	private final List<Argument> args;
 	private final List<EmbedFieldEntity> fields;
 
@@ -29,7 +29,7 @@ public class HelpBuilder {
 	private String source;
 	private String delimiter;
 
-	public HelpBuilder(AbstractCommand cmd, Context context) {
+	public HelpBuilder(BaseCmd cmd, Context context) {
 		this.context = context;
 		this.cmd = cmd;
 		this.args = new ArrayList<>();

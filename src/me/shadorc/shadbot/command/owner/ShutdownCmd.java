@@ -1,19 +1,22 @@
 package me.shadorc.shadbot.command.owner;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "shutdown" })
-public class ShutdownCmd extends AbstractCommand {
+public class ShutdownCmd extends BaseCmd {
+
+	public ShutdownCmd() {
+		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("shutdown"));
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

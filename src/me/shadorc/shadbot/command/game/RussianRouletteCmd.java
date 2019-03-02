@@ -1,16 +1,14 @@
 package me.shadorc.shadbot.command.game;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -20,13 +18,16 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
-@Command(category = CommandCategory.GAME, names = { "russian_roulette", "russian-roulette", "russianroulette" }, alias = "rr")
-public class RussianRouletteCmd extends AbstractCommand {
+public class RussianRouletteCmd extends BaseCmd {
 
 	private static final int MAX_BET = 250_000;
 	private static final float WIN_MULTIPLIER = 2.03f;
 	private static final float LOSE_MULTIPLIER = 10f;
+
+	public RussianRouletteCmd() {
+		super(CommandCategory.GAME, List.of("russian_roulette", "russian-roulette", "russianroulette"), "rr");
+		this.setGameRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

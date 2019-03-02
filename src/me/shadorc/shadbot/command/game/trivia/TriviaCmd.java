@@ -1,18 +1,16 @@
 package me.shadorc.shadbot.command.game.trivia;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.trivia.category.TriviaCategoriesResponse;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -25,15 +23,20 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
-@Command(category = CommandCategory.GAME, names = { "trivia" })
-public class TriviaCmd extends AbstractCommand {
+public class TriviaCmd extends BaseCmd {
 
 	private static final String CATEGORY_URL = "https://opentdb.com/api_category.php";
 
 	protected static final ConcurrentHashMap<Snowflake, TriviaManager> MANAGERS = new ConcurrentHashMap<>();
 
 	private TriviaCategoriesResponse categories;
+
+	public TriviaCmd() {
+		super(CommandCategory.GAME, List.of("trivia"));
+		this.setGameRateLimiter();
+
+		this.categories = null;
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

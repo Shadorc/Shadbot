@@ -10,9 +10,8 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.setting.AbstractSetting;
+import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
-import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -22,11 +21,14 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@Setting(description = "Manage channels allowed to Shadbot.", setting = SettingEnum.ALLOWED_CHANNELS)
-public class AllowedChannelsSetting extends AbstractSetting {
+public class AllowedChannelsSetting extends BaseSetting {
 
 	private enum Action {
 		ADD, REMOVE;
+	}
+
+	public AllowedChannelsSetting() {
+		super(Setting.ALLOWED_CHANNELS, "Manage channels allowed to Shadbot.");
 	}
 
 	@Override
@@ -82,8 +84,8 @@ public class AllowedChannelsSetting extends AbstractSetting {
 								FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
 					}
 
-					dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
-					dbGuild.setSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, allowedVoiceChannels);
+					dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
+					dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannels);
 
 					return strBuilder.toString();
 				})

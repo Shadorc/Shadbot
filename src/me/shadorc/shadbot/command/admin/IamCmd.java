@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.admin;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -10,12 +11,12 @@ import discord4j.core.object.reaction.ReactionEmoji.Unicode;
 import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.setting.SettingEnum;
+import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -27,10 +28,14 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.ReactionMessage;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "iam" })
-public class IamCmd extends AbstractCommand {
+public class IamCmd extends BaseCmd {
 
 	public static final Unicode REACTION = ReactionEmoji.unicode("✅");
+
+	public IamCmd() {
+		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("iam"));
+		this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -78,7 +83,7 @@ public class IamCmd extends AbstractCommand {
 										final Map<String, Long> setting = dbGuild.getIamMessages();
 										roles.stream().map(Role::getId)
 												.forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));
-										dbGuild.setSetting(SettingEnum.IAM_MESSAGES, setting);
+										dbGuild.setSetting(Setting.IAM_MESSAGES, setting);
 									});
 						}))
 				.then();

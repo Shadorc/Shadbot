@@ -6,11 +6,10 @@ import java.util.function.Consumer;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -18,8 +17,11 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "database" })
-public class DatabaseCmd extends AbstractCommand {
+public class DatabaseCmd extends BaseCmd {
+
+	public DatabaseCmd() {
+		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("database"));
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

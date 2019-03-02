@@ -62,10 +62,7 @@ public class Shadbot {
 			System.exit(ExitCode.FATAL_ERROR.value());
 		}
 
-		// If command generation has failed, abort attempt to connect the bot
-		if(!CommandInitializer.init()) {
-			System.exit(ExitCode.FATAL_ERROR.value());
-		}
+		CommandInitializer.initialize();
 
 		Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 

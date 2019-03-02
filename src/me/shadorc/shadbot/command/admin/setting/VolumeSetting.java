@@ -7,9 +7,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.setting.AbstractSetting;
+import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
-import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
@@ -17,11 +16,14 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@Setting(description = "Manage music default volume.", setting = SettingEnum.DEFAULT_VOLUME)
-public class VolumeSetting extends AbstractSetting {
+public class VolumeSetting extends BaseSetting {
 
 	private static final int MIN_VOLUME = 1;
 	private static final int MAX_VOLUME = 75;
+
+	public VolumeSetting() {
+		super(Setting.DEFAULT_VOLUME, "Manage music default volume.");
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

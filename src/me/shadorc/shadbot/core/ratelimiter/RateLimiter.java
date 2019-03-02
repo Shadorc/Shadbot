@@ -19,19 +19,16 @@ import reactor.core.publisher.Mono;
 
 public class RateLimiter {
 
-	public static final int DEFAULT_COOLDOWN = 5;
-	public static final int GAME_COOLDOWN = 5;
-
 	private final ConcurrentHashMap<Snowflake, LimitedGuild> guildsLimitedMap;
 	private final int max;
 	private final Duration duration;
 	private final Bandwidth bandwidth;
 
-	public RateLimiter(int max, int cooldown, ChronoUnit unit) {
+	public RateLimiter(int max, Duration duration) {
 		this.guildsLimitedMap = new ConcurrentHashMap<>();
 		this.max = max;
-		this.duration = Duration.of(cooldown, unit);
-		this.bandwidth = Bandwidth.classic(max, Refill.intervally(max, this.duration));
+		this.duration = duration;
+		this.bandwidth = Bandwidth.classic(this.max, Refill.intervally(this.max, this.duration));
 	}
 
 	public boolean isLimitedAndWarn(DiscordClient client, Snowflake guildId, Snowflake channelId, Snowflake userId) {

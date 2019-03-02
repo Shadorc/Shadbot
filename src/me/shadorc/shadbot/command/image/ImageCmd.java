@@ -12,11 +12,9 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.TokenResponse;
 import me.shadorc.shadbot.api.image.deviantart.DeviantArtResponse;
 import me.shadorc.shadbot.api.image.deviantart.Image;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -30,12 +28,18 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.IMAGE, names = { "image" })
-public class ImageCmd extends AbstractCommand {
+public class ImageCmd extends BaseCmd {
 
-	private AtomicLong lastTokenGeneration = new AtomicLong(0);
+	private final AtomicLong lastTokenGeneration;
 	private TokenResponse token;
+
+	public ImageCmd() {
+		super(CommandCategory.IMAGE, List.of("image"));
+		this.setDefaultRateLimiter();
+
+		this.lastTokenGeneration = new AtomicLong(0);
+		this.token = null;
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

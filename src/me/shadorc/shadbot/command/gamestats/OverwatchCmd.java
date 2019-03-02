@@ -9,11 +9,9 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.gamestats.overwatch.profile.ProfileResponse;
 import me.shadorc.shadbot.api.gamestats.overwatch.stats.Quickplay;
 import me.shadorc.shadbot.api.gamestats.overwatch.stats.StatsResponse;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -28,12 +26,15 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
-@RateLimited
-@Command(category = CommandCategory.GAMESTATS, names = { "overwatch" }, alias = "ow")
-public class OverwatchCmd extends AbstractCommand {
+public class OverwatchCmd extends BaseCmd {
 
 	private enum Platform {
 		PC, PSN, XBL;
+	}
+
+	public OverwatchCmd() {
+		super(CommandCategory.GAMESTATS, List.of("overwatch"), "ow");
+		this.setDefaultRateLimiter();
 	}
 
 	@Override

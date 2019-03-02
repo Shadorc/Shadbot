@@ -23,11 +23,9 @@ import com.ivkos.wallhaven4j.util.exceptions.WallhavenException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
@@ -43,9 +41,7 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.IMAGE, names = { "wallpaper" }, alias = "wp")
-public class WallpaperCmd extends AbstractCommand {
+public class WallpaperCmd extends BaseCmd {
 
 	private static final String PURITY = "purity";
 	private static final String CATEGORY = "category";
@@ -53,27 +49,29 @@ public class WallpaperCmd extends AbstractCommand {
 	private static final String RESOLUTION = "resolution";
 	private static final String KEYWORD = "keyword";
 
-	private static final Options OPTIONS;
-
+	private final Options options;
 	private Wallhaven wallhaven;
 
-	static {
-		OPTIONS = new Options();
+	public WallpaperCmd() {
+		super(CommandCategory.IMAGE, List.of("wallpaper"), "wp");
+		this.setDefaultRateLimiter();
 
-		OPTIONS.addOption("p", PURITY, true, FormatUtils.format(Purity.class, ", "));
-		OPTIONS.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
+		this.options = new Options();
+
+		options.addOption("p", PURITY, true, FormatUtils.format(Purity.class, ", "));
+		options.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
 
 		final Option ratioOption = new Option("rat", RATIO, true, "image ratio");
 		ratioOption.setValueSeparator('x');
-		OPTIONS.addOption(ratioOption);
+		options.addOption(ratioOption);
 
 		final Option resOption = new Option("res", RESOLUTION, true, "image resolution");
 		resOption.setValueSeparator('x');
-		OPTIONS.addOption(resOption);
+		options.addOption(resOption);
 
 		final Option keyOption = new Option("k", KEYWORD, true, KEYWORD);
 		keyOption.setValueSeparator(',');
-		OPTIONS.addOption(keyOption);
+		options.addOption(keyOption);
 	}
 
 	@Override
@@ -81,7 +79,7 @@ public class WallpaperCmd extends AbstractCommand {
 		CommandLine cmdLine;
 		try {
 			final List<String> args = StringUtils.split(context.getArg().orElse(""));
-			cmdLine = new DefaultParser().parse(OPTIONS, args.toArray(new String[0]));
+			cmdLine = new DefaultParser().parse(options, args.toArray(new String[0]));
 		} catch (final UnrecognizedOptionException | org.apache.commons.cli.MissingArgumentException err) {
 			throw new CommandException(String.format("%s. Use `%shelp %s` for more information.",
 					err.getMessage(), context.getPrefix(), this.getName()));

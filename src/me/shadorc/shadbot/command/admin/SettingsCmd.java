@@ -1,13 +1,10 @@
 package me.shadorc.shadbot.command.admin;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
 
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Role;
@@ -15,14 +12,21 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.command.admin.setting.AllowedChannelsSetting;
+import me.shadorc.shadbot.command.admin.setting.AllowedRolesSetting;
+import me.shadorc.shadbot.command.admin.setting.AutoMessageSetting;
+import me.shadorc.shadbot.command.admin.setting.AutoRolesSetting;
+import me.shadorc.shadbot.command.admin.setting.BlacklistSettingCmd;
+import me.shadorc.shadbot.command.admin.setting.NSFWSetting;
+import me.shadorc.shadbot.command.admin.setting.PrefixSetting;
+import me.shadorc.shadbot.command.admin.setting.VolumeSetting;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.setting.AbstractSetting;
+import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
-import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -35,30 +39,25 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "setting", "settings" })
-public class SettingsCmd extends AbstractCommand {
+public class SettingsCmd extends BaseCmd {
 
-	private static final Map<SettingEnum, AbstractSetting> SETTINGS_MAP = new HashMap<>();
+	private final Map<Setting, BaseSetting> settingsMap;
 
-	static {
-		final Reflections reflections = new Reflections(SettingsCmd.class.getPackage().getName(), new SubTypesScanner(), new TypeAnnotationsScanner());
-		for(final Class<?> settingClass : reflections.getTypesAnnotatedWith(Setting.class)) {
-			final String settingName = settingClass.getSimpleName();
-			if(!AbstractSetting.class.isAssignableFrom(settingClass)) {
-				LogUtils.error(String.format("An error occurred while generating setting, %s cannot be cast to %s.",
-						settingName, AbstractSetting.class.getSimpleName()));
-				continue;
-			}
+	public SettingsCmd() {
+		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("setting", "settings"));
+		this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
 
-			try {
-				final AbstractSetting settingCmd = (AbstractSetting) settingClass.getConstructor().newInstance();
-				if(SETTINGS_MAP.putIfAbsent(settingCmd.getSetting(), settingCmd) != null) {
-					LogUtils.error(String.format("Command name collision between %s and %s",
-							settingName, SETTINGS_MAP.get(settingCmd.getSetting()).getClass().getSimpleName()));
-					continue;
-				}
-			} catch (final Exception err) {
-				LogUtils.error(err, String.format("An error occurred while initializing setting %s.", settingName));
+		this.settingsMap = new HashMap<>();
+		this.add(new AllowedChannelsSetting(), new AllowedRolesSetting(), new AutoMessageSetting(),
+				new AutoRolesSetting(), new BlacklistSettingCmd(), new NSFWSetting(), new PrefixSetting(),
+				new VolumeSetting());
+	}
+
+	private void add(BaseSetting... settings) {
+		for(BaseSetting setting : settings) {
+			if(settingsMap.putIfAbsent(setting.getSetting(), setting) != null) {
+				LogUtils.error(String.format("Command name collision between %s and %s",
+						setting.getName(), settingsMap.get(setting.getSetting()).getClass().getSimpleName()));
 			}
 		}
 	}
@@ -74,8 +73,8 @@ public class SettingsCmd extends AbstractCommand {
 					.then();
 		}
 
-		final SettingEnum settingEnum = Utils.getEnum(SettingEnum.class, args.get(0));
-		final AbstractSetting setting = SETTINGS_MAP.get(settingEnum);
+		final Setting settingEnum = Utils.getEnum(Setting.class, args.get(0));
+		final BaseSetting setting = settingsMap.get(settingEnum);
 		if(setting == null) {
 			throw new CommandException(String.format("Setting `%s` does not exist. Use `%shelp %s` to see all available settings.",
 					args.get(0), context.getPrefix(), this.getName()));
@@ -164,7 +163,7 @@ public class SettingsCmd extends AbstractCommand {
 										settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString())));
 	}
 
-	private Consumer<EmbedCreateSpec> getHelp(Context context, AbstractSetting setting) {
+	private Consumer<EmbedCreateSpec> getHelp(Context context, BaseSetting setting) {
 		return setting.getHelp(context)
 				.andThen(embed -> embed.setAuthor(String.format("Help for setting: %s", setting.getName()), null, context.getAvatarUrl())
 						.setDescription(String.format("**%s**", setting.getDescription())));
@@ -182,7 +181,7 @@ public class SettingsCmd extends AbstractCommand {
 				.addField("Current settings", String.format("`%s%s show`",
 						context.getPrefix(), this.getName()), false);
 
-		SETTINGS_MAP.values().stream()
+		settingsMap.values().stream()
 				.forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()),
 						setting.getDescription(),
 						false));

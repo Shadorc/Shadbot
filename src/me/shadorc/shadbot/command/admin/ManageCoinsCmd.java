@@ -1,16 +1,17 @@
 package me.shadorc.shadbot.command.admin;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
+import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -20,11 +21,15 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.ADMIN, permission = CommandPermission.ADMIN, names = { "manage_coins", "manage-coins", "managecoins" })
-public class ManageCoinsCmd extends AbstractCommand {
+public class ManageCoinsCmd extends BaseCmd {
 
 	private enum Action {
 		ADD, REMOVE, RESET;
+	}
+
+	public ManageCoinsCmd() {
+		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("manage_coins", "manage-coins", "managecoins"));
+		this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
 	}
 
 	@Override

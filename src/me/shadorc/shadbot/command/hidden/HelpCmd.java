@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.hidden;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Channel;
@@ -7,12 +8,10 @@ import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -21,14 +20,17 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.HIDDEN, names = { "help" })
-public class HelpCmd extends AbstractCommand {
+public class HelpCmd extends BaseCmd {
+
+	public HelpCmd() {
+		super(CommandCategory.HIDDEN, List.of("help"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {
 		if(context.getArg().isPresent()) {
-			final AbstractCommand cmd = CommandInitializer.getCommand(context.getArg().get());
+			final BaseCmd cmd = CommandInitializer.getCommand(context.getArg().get());
 			if(cmd == null) {
 				return Mono.empty();
 			}
@@ -42,10 +44,10 @@ public class HelpCmd extends AbstractCommand {
 		return context.getPermission()
 				.flatMap(authorPerm -> Flux.fromIterable(CommandInitializer.getCommands().values())
 						.distinct()
-						.filter(cmd -> !cmd.getPermission().isSuperior(authorPerm))
+						.filter(cmd -> !cmd.getPermission().isHigher(authorPerm))
 						.filterWhen(cmd -> context.getChannel().map(Channel::getType)
 								.map(type -> type.equals(Type.DM) || Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd)))
-						.collectMultimap(AbstractCommand::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
+						.collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
 				.map(map -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> {
 							embed.setAuthor("Shadbot Help", null, context.getAvatarUrl())

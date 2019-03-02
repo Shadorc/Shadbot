@@ -8,19 +8,21 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "logger" })
-public class LoggerCmd extends AbstractCommand {
+public class LoggerCmd extends BaseCmd {
+
+	public LoggerCmd() {
+		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("logger"));
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

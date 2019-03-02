@@ -7,11 +7,9 @@ import com.fasterxml.jackson.databind.JavaType;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.dtc.Quote;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -23,9 +21,12 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.FRENCH, names = { "dtc" })
-public class DtcCmd extends AbstractCommand {
+public class DtcCmd extends BaseCmd {
+
+	public DtcCmd() {
+		super(CommandCategory.FRENCH, List.of("dtc"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

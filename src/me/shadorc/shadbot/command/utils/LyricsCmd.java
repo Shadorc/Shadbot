@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.utils;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -16,11 +17,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import discord4j.core.DiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.musixmatch.Musixmatch;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
@@ -33,14 +32,17 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.UTILS, names = { "lyrics" })
-public class LyricsCmd extends AbstractCommand {
+public class LyricsCmd extends BaseCmd {
 
 	// Make html() preserve linebreaks and spacing
 	private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
 	private static final String HOME_URL = "https://www.musixmatch.com";
 	private static final int MAX_RETRY = 5;
+
+	public LyricsCmd() {
+		super(CommandCategory.UTILS, List.of("lyrics"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

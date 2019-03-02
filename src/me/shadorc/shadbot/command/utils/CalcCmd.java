@@ -1,28 +1,33 @@
 package me.shadorc.shadbot.command.utils;
 
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.function.Consumer;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.UTILS, names = { "calc", "math" })
-public class CalcCmd extends AbstractCommand {
+public class CalcCmd extends BaseCmd {
 
-	private static final DoubleEvaluator EVALUATOR = new DoubleEvaluator();
-	private static final DecimalFormat FORMATTER = new DecimalFormat("#.##");
+	private final DoubleEvaluator evaluator;
+	private final DecimalFormat formatter;
+
+	public CalcCmd() {
+		super(CommandCategory.UTILS, List.of("calc", "math"));
+		this.setDefaultRateLimiter();
+
+		this.evaluator = new DoubleEvaluator();
+		this.formatter = new DecimalFormat("#.##");
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -30,7 +35,7 @@ public class CalcCmd extends AbstractCommand {
 
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
-						context.getUsername(), arg.replace("*", "\\*"), FORMATTER.format(EVALUATOR.evaluate(arg))),
+						context.getUsername(), arg.replace("*", "\\*"), this.formatter.format(this.evaluator.evaluate(arg))),
 						channel))
 				.onErrorMap(IllegalArgumentException.class, err -> new CommandException(err.getMessage()))
 				.then();

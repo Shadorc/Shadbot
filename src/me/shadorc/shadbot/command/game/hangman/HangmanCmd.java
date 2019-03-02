@@ -9,11 +9,9 @@ import java.util.stream.Collectors;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -27,9 +25,7 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.GAME, names = { "hangman" })
-public class HangmanCmd extends AbstractCommand {
+public class HangmanCmd extends BaseCmd {
 
 	protected enum Difficulty {
 		EASY, HARD;
@@ -44,6 +40,11 @@ public class HangmanCmd extends AbstractCommand {
 	protected static final ConcurrentHashMap<Snowflake, HangmanManager> MANAGERS = new ConcurrentHashMap<>();
 	protected static final List<String> HARD_WORDS = new ArrayList<>();
 	protected static final List<String> EASY_WORDS = new ArrayList<>();
+
+	public HangmanCmd() {
+		super(CommandCategory.GAME, List.of("hangman"));
+		this.setGameRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

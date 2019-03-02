@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 
 	public BlackjackManager(Context context) {
 		super(context);
-		this.rateLimiter = new RateLimiter(1, 2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(2));
 		this.players = new CopyOnWriteArrayList<>();
 		this.dealerCards = new ArrayList<>();
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());

@@ -1,15 +1,13 @@
 package me.shadorc.shadbot.command.game.rps;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.exception.CommandException;
@@ -20,11 +18,14 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
-@Command(category = CommandCategory.GAME, names = { "rps" })
-public class RpsCmd extends AbstractCommand {
+public class RpsCmd extends BaseCmd {
 
 	private static final int GAINS = 170;
+
+	public RpsCmd() {
+		super(CommandCategory.GAME, List.of("rps"));
+		this.setGameRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

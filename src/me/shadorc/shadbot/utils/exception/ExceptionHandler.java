@@ -2,7 +2,7 @@ package me.shadorc.shadbot.utils.exception;
 
 import discord4j.core.DiscordClient;
 import discord4j.rest.http.client.ClientException;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 
 public class ExceptionHandler {
 
-	public static Mono<Void> handleCommandError(Throwable err, AbstractCommand cmd, Context context) {
+	public static Mono<Void> handleCommandError(Throwable err, BaseCmd cmd, Context context) {
 		if(err instanceof CommandException) {
 			return ExceptionHandler.onCommandException((CommandException) err, cmd, context);
 		}
@@ -41,7 +41,7 @@ public class ExceptionHandler {
 		return ExceptionHandler.onUnknown(err, cmd, context);
 	}
 
-	private static Mono<Void> onCommandException(CommandException err, AbstractCommand cmd, Context context) {
+	private static Mono<Void> onCommandException(CommandException err, BaseCmd cmd, Context context) {
 		return Mono.fromRunnable(() -> StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_ILLEGAL_ARG, cmd))
 				.and(context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
@@ -57,7 +57,7 @@ public class ExceptionHandler {
 								TextUtils.missingPermission(context.getUsername(), err.getPermission()), channel)));
 	}
 
-	private static Mono<Void> onMissingArgumentException(AbstractCommand cmd, Context context) {
+	private static Mono<Void> onMissingArgumentException(BaseCmd cmd, Context context) {
 		return Mono.fromRunnable(() -> StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, cmd))
 				.and(context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(
@@ -71,7 +71,7 @@ public class ExceptionHandler {
 				.then();
 	}
 
-	private static Mono<Void> onUnavailable(AbstractCommand cmd, Context context) {
+	private static Mono<Void> onUnavailable(BaseCmd cmd, Context context) {
 		return Mono.fromRunnable(() -> LogUtils.warn(context.getClient(),
 				String.format("{Guild ID: %d} [%s] Service unavailable.", context.getGuildId().asLong(), cmd.getClass().getSimpleName()),
 				context.getContent()))
@@ -81,7 +81,7 @@ public class ExceptionHandler {
 								context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
 	}
 
-	private static Mono<Void> onUnreacheable(AbstractCommand cmd, Context context) {
+	private static Mono<Void> onUnreacheable(BaseCmd cmd, Context context) {
 		return Mono.fromRunnable(() -> LogUtils.warn(context.getClient(),
 				String.format("{Guild ID: %d} [%s] Service unreachable.", context.getGuildId().asLong(), cmd.getClass().getSimpleName()),
 				context.getContent()))
@@ -91,7 +91,7 @@ public class ExceptionHandler {
 								context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
 	}
 
-	private static Mono<Void> onUnknown(Throwable err, AbstractCommand cmd, Context context) {
+	private static Mono<Void> onUnknown(Throwable err, BaseCmd cmd, Context context) {
 		return Mono.fromRunnable(() -> LogUtils.error(context.getClient(), err,
 				String.format("{Guild ID: %d} [%s] An unknown error occurred.", context.getGuildId().asLong(), cmd.getClass().getSimpleName()),
 				context.getContent()))

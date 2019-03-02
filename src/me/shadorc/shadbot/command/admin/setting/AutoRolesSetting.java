@@ -9,9 +9,8 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.setting.AbstractSetting;
+import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
-import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -21,11 +20,14 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@Setting(description = "Manage auto assigned role(s).", setting = SettingEnum.AUTO_ROLES)
-public class AutoRolesSetting extends AbstractSetting {
+public class AutoRolesSetting extends BaseSetting {
 
 	private enum Action {
 		ADD, REMOVE;
+	}
+
+	public AutoRolesSetting() {
+		super(Setting.AUTO_ROLES, "Manage auto assigned role(s).");
 	}
 
 	@Override

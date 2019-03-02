@@ -6,12 +6,9 @@ import java.util.function.Consumer;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -21,14 +18,17 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 2)
-@Command(category = CommandCategory.GAME, names = { "dice" })
-public class DiceCmd extends AbstractCommand {
+public class DiceCmd extends BaseCmd {
 
 	protected static final ConcurrentHashMap<Snowflake, DiceManager> MANAGERS = new ConcurrentHashMap<>();
 
 	protected static final float MULTIPLIER = 4.5f;
 	private static final int MAX_BET = 250_000;
+
+	public DiceCmd() {
+		super(CommandCategory.GAME, List.of("dice"));
+		this.setGameRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

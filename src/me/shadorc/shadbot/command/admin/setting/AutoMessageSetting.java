@@ -8,9 +8,8 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.setting.AbstractSetting;
+import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
-import me.shadorc.shadbot.core.setting.SettingEnum;
 import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
@@ -22,8 +21,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@Setting(description = "Manage auto messages on user join/leave.", setting = SettingEnum.AUTO_MESSAGE)
-public class AutoMessageSetting extends AbstractSetting {
+public class AutoMessageSetting extends BaseSetting {
 
 	private enum Action {
 		ENABLE, DISABLE;
@@ -31,6 +29,10 @@ public class AutoMessageSetting extends AbstractSetting {
 
 	private enum Type {
 		CHANNEL, JOIN_MESSAGE, LEAVE_MESSAGE;
+	}
+
+	public AutoMessageSetting() {
+		super(Setting.AUTO_MESSAGE, "Manage auto messages on user join/leave.");
 	}
 
 	@Override
@@ -51,9 +53,9 @@ public class AutoMessageSetting extends AbstractSetting {
 			case CHANNEL:
 				return this.channel(context, action).then();
 			case JOIN_MESSAGE:
-				return this.updateMessage(context, SettingEnum.JOIN_MESSAGE, action, args).then();
+				return this.updateMessage(context, Setting.JOIN_MESSAGE, action, args).then();
 			case LEAVE_MESSAGE:
-				return this.updateMessage(context, SettingEnum.LEAVE_MESSAGE, action, args).then();
+				return this.updateMessage(context, Setting.LEAVE_MESSAGE, action, args).then();
 			default:
 				return Mono.empty();
 		}
@@ -72,11 +74,11 @@ public class AutoMessageSetting extends AbstractSetting {
 					final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 					final Channel channel = mentionedChannels.get(0);
 					if(Action.ENABLE.equals(action)) {
-						dbGuild.setSetting(SettingEnum.MESSAGE_CHANNEL_ID, channel.getId().asLong());
+						dbGuild.setSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong());
 						return String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
 								channel.getMention());
 					} else {
-						dbGuild.removeSetting(SettingEnum.MESSAGE_CHANNEL_ID);
+						dbGuild.removeSetting(Setting.MESSAGE_CHANNEL_ID);
 						return String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
 								+ "until a new channel is defined.", channel.getMention());
 					}
@@ -85,7 +87,7 @@ public class AutoMessageSetting extends AbstractSetting {
 						.flatMap(channel -> DiscordUtils.sendMessage(message, channel)));
 	}
 
-	private Mono<Message> updateMessage(Context context, SettingEnum setting, Action action, List<String> args) {
+	private Mono<Message> updateMessage(Context context, Setting setting, Action action, List<String> args) {
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
 		final StringBuilder strBuilder = new StringBuilder();
 		if(Action.ENABLE.equals(action)) {

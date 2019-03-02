@@ -1,16 +1,15 @@
 package me.shadorc.shadbot.command.music;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -19,9 +18,12 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.MUSIC, names = { "playlist" })
-public class PlaylistCmd extends AbstractCommand {
+public class PlaylistCmd extends BaseCmd {
+
+	public PlaylistCmd() {
+		super(CommandCategory.MUSIC, List.of("playlist"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

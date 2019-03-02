@@ -4,7 +4,7 @@ import java.util.List;
 
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.setting.SettingEnum;
+import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
 import reactor.core.publisher.Mono;
 
@@ -17,7 +17,7 @@ public class ChannelListener {
 			// If the channel was an allowed channel...
 			if(allowedTextChannelIds.remove(event.getChannel().getId().asLong())) {
 				// ...update settings to remove the deleted one
-				dbGuild.setSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
+				dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
 			}
 		});
 	}

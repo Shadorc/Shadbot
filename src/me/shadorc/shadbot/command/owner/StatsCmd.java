@@ -7,11 +7,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
 import me.shadorc.shadbot.data.stats.StatisticEnum;
 import me.shadorc.shadbot.data.stats.core.MapStatistic;
 import me.shadorc.shadbot.data.stats.core.TableStatistic;
@@ -24,8 +23,11 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
-@Command(category = CommandCategory.OWNER, permission = CommandPermission.OWNER, names = { "stats" })
-public class StatsCmd extends AbstractCommand {
+public class StatsCmd extends BaseCmd {
+
+	public StatsCmd() {
+		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("stats"));
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

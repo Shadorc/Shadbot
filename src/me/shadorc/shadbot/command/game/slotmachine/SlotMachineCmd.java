@@ -5,12 +5,9 @@ import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
@@ -23,9 +20,7 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
-@Command(category = CommandCategory.GAME, names = { "slot_machine", "slot-machine", "slotmachine" }, alias = "sm")
-public class SlotMachineCmd extends AbstractCommand {
+public class SlotMachineCmd extends BaseCmd {
 
 	private static final int PAID_COST = 10;
 
@@ -33,6 +28,11 @@ public class SlotMachineCmd extends AbstractCommand {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, // Winning chance : 12.5%
 			SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL, // Winning chance : 5.3%
 			SlotOptions.GIFT }; // Winning chance : 0.2%
+
+	public SlotMachineCmd() {
+		super(CommandCategory.GAME, List.of("slot_machine", "slot-machine", "slotmachine"), "sm");
+		this.setGameRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

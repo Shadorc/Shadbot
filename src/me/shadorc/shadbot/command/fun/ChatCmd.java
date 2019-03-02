@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.fun;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,11 +15,9 @@ import org.json.XML;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.pandorabots.ChatBotResponse;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -28,17 +27,23 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.FUN, names = { "chat" })
-public class ChatCmd extends AbstractCommand {
+public class ChatCmd extends BaseCmd {
 
 	private static final Map<String, String> BOTS = Map.of("Marvin", "efc39100ce34d038", "Chomsky", "b0dafd24ee35a477",
 			"R.I.V.K.A", "ea373c261e3458c6", "Lisa", "b0a6a41a5e345c23");
 	private static final int MAX_ERROR_COUNT = 10;
 	private static final int MAX_CHARACTERS = 250;
 
-	private static final ConcurrentHashMap<Snowflake, String> CHANNELS_CUSTID = new ConcurrentHashMap<>();
-	private static final AtomicInteger ERROR_COUNT = new AtomicInteger();
+	private final ConcurrentHashMap<Snowflake, String> channelsCustid;
+	private final AtomicInteger errorCount;
+
+	public ChatCmd() {
+		super(CommandCategory.FUN, List.of("chat"));
+		this.setDefaultRateLimiter();
+
+		this.channelsCustid = new ConcurrentHashMap<>();
+		this.errorCount = new AtomicInteger(0);
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -51,7 +56,7 @@ public class ChatCmd extends AbstractCommand {
 		for(final Entry<String, String> bot : BOTS.entrySet()) {
 			try {
 				final String response = this.talk(context.getChannelId(), bot.getValue(), arg);
-				ERROR_COUNT.set(0);
+				errorCount.set(0);
 				return context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", bot.getKey(), response), channel))
 						.then();
@@ -60,10 +65,10 @@ public class ChatCmd extends AbstractCommand {
 			}
 		}
 
-		if(ERROR_COUNT.incrementAndGet() >= MAX_ERROR_COUNT) {
+		if(errorCount.incrementAndGet() >= MAX_ERROR_COUNT) {
 			LogUtils.error(context.getClient(),
 					String.format("{%s} No artificial intelligence responds (Error count: %d).",
-							this.getClass().getSimpleName(), ERROR_COUNT.get()));
+							this.getClass().getSimpleName(), errorCount.get()));
 		}
 
 		return context.getChannel()
@@ -75,10 +80,10 @@ public class ChatCmd extends AbstractCommand {
 
 	private String talk(Snowflake channelId, String botId, String input) throws UnsupportedEncodingException, IOException {
 		final String url = String.format("https://www.pandorabots.com/pandora/talk-xml?botid=%s&input=%s&custid=%s",
-				botId, NetUtils.encode(input), CHANNELS_CUSTID.getOrDefault(channelId, ""));
+				botId, NetUtils.encode(input), channelsCustid.getOrDefault(channelId, ""));
 		final JSONObject resultObj = XML.toJSONObject(NetUtils.getDoc(url).html()).getJSONObject("result");
 		final ChatBotResponse chat = Utils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class);
-		CHANNELS_CUSTID.put(channelId, chat.getCustId());
+		channelsCustid.put(channelId, chat.getCustId());
 		return chat.getResponse();
 	}
 

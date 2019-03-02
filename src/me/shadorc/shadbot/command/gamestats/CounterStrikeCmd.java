@@ -11,11 +11,9 @@ import me.shadorc.shadbot.api.gamestats.steam.player.PlayerSummary;
 import me.shadorc.shadbot.api.gamestats.steam.resolver.ResolveVanityUrlResponse;
 import me.shadorc.shadbot.api.gamestats.steam.stats.Stats;
 import me.shadorc.shadbot.api.gamestats.steam.stats.UserStatsForGameResponse;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -29,11 +27,14 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.GAMESTATS, names = { "cs", "csgo" })
-public class CounterStrikeCmd extends AbstractCommand {
+public class CounterStrikeCmd extends BaseCmd {
 
 	private static final String PRIVACY_HELP_URL = "https://support.steampowered.com/kb_article.php?ref=4113-YUDH-6401";
+
+	public CounterStrikeCmd() {
+		super(CommandCategory.GAMESTATS, List.of("cs", "csgo"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

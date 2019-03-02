@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.collect.HashBasedTable;
 
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
@@ -41,7 +41,7 @@ public class TableStatistic<E extends Enum<E>> extends Statistic<E> {
 		}
 	}
 
-	public void log(E rowKey, AbstractCommand cmd) {
+	public void log(E rowKey, BaseCmd cmd) {
 		this.log(rowKey, cmd.getName(), 1);
 	}
 

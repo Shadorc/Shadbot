@@ -6,12 +6,9 @@ import java.util.function.Consumer;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
-import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -21,9 +18,7 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-@RateLimited(cooldown = RateLimiter.GAME_COOLDOWN, max = 1)
-@Command(category = CommandCategory.GAME, names = { "roulette" })
-public class RouletteCmd extends AbstractCommand {
+public class RouletteCmd extends BaseCmd {
 
 	public enum Place {
 		RED, BLACK, ODD, EVEN, LOW, HIGH;
@@ -32,6 +27,11 @@ public class RouletteCmd extends AbstractCommand {
 	protected static final ConcurrentHashMap<Snowflake, RouletteManager> MANAGERS = new ConcurrentHashMap<>();
 
 	private static final int MAX_BET = 250_000;
+
+	public RouletteCmd() {
+		super(CommandCategory.GAME, List.of("roulette"));
+		this.setGameRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

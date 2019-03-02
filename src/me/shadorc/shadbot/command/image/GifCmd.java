@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.image;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.http.HttpStatus;
@@ -7,11 +8,9 @@ import org.jsoup.HttpStatusException;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.image.giphy.GiphyResponse;
-import me.shadorc.shadbot.core.command.AbstractCommand;
+import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.command.annotation.Command;
-import me.shadorc.shadbot.core.command.annotation.RateLimited;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -23,9 +22,12 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-@RateLimited
-@Command(category = CommandCategory.IMAGE, names = { "gif" })
-public class GifCmd extends AbstractCommand {
+public class GifCmd extends BaseCmd {
+
+	public GifCmd() {
+		super(CommandCategory.IMAGE, List.of("gif"));
+		this.setDefaultRateLimiter();
+	}
 
 	@Override
 	public Mono<Void> execute(Context context) {

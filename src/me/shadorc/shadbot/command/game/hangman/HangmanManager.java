@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.game.hangman;
 
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	public HangmanManager(Context context, Difficulty difficulty) {
 		super(context);
-		this.rateLimiter = new RateLimiter(3, 2, ChronoUnit.SECONDS);
+		this.rateLimiter = new RateLimiter(3, Duration.ofSeconds(2));
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 		this.word = HangmanCmd.getWord(difficulty);
 		this.lettersTested = new ArrayList<>();

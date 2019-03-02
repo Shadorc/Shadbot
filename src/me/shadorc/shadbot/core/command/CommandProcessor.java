@@ -53,14 +53,14 @@ public class CommandProcessor {
 	}
 
 	private static Mono<Void> executeCommand(Context context) {
-		final AbstractCommand command = CommandInitializer.getCommand(context.getCommandName());
+		final BaseCmd command = CommandInitializer.getCommand(context.getCommandName());
 		if(command == null) {
 			return Mono.empty();
 		}
 
 		final Snowflake guildId = context.getGuildId();
 
-		final Predicate<? super AbstractCommand> isRateLimited = cmd -> {
+		final Predicate<? super BaseCmd> isRateLimited = cmd -> {
 			final Optional<RateLimiter> rateLimiter = cmd.getRateLimiter();
 			if(!rateLimiter.isPresent()) {
 				return false;
@@ -75,7 +75,7 @@ public class CommandProcessor {
 
 		return context.getPermission()
 				// The author has the permission to execute this command
-				.filter(userPerm -> !command.getPermission().isSuperior(userPerm))
+				.filter(userPerm -> !command.getPermission().isHigher(userPerm))
 				.switchIfEmpty(context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(
 								String.format(Emoji.ACCESS_DENIED + " (**%s**) You do not have the permission to execute this command.",

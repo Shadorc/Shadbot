@@ -18,8 +18,8 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.core.command.AbstractCommand;
-import me.shadorc.shadbot.core.setting.SettingEnum;
+import me.shadorc.shadbot.core.command.BaseCmd;
+import me.shadorc.shadbot.core.setting.Setting;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class DBGuild {
@@ -50,28 +50,28 @@ public class DBGuild {
 	}
 
 	public List<Long> getAllowedTextChannels() {
-		return this.getListSetting(SettingEnum.ALLOWED_TEXT_CHANNELS, Long.class);
+		return this.getListSetting(Setting.ALLOWED_TEXT_CHANNELS, Long.class);
 	}
 
 	public List<Long> getAllowedVoiceChannels() {
-		return this.getListSetting(SettingEnum.ALLOWED_VOICE_CHANNELS, Long.class);
+		return this.getListSetting(Setting.ALLOWED_VOICE_CHANNELS, Long.class);
 	}
 
 	public List<Long> getAllowedRoles() {
-		return this.getListSetting(SettingEnum.ALLOWED_ROLES, Long.class);
+		return this.getListSetting(Setting.ALLOWED_ROLES, Long.class);
 	}
 
 	public List<Long> getAutoRoles() {
-		return this.getListSetting(SettingEnum.AUTO_ROLES, Long.class);
+		return this.getListSetting(Setting.AUTO_ROLES, Long.class);
 	}
 
 	public List<String> getBlacklistedCmd() {
-		return this.getListSetting(SettingEnum.BLACKLIST, String.class);
+		return this.getListSetting(Setting.BLACKLIST, String.class);
 	}
 
 	public Integer getDefaultVol() {
 		return Integer.parseInt(Objects.toString(
-				this.settings.get(SettingEnum.DEFAULT_VOLUME.toString()),
+				this.settings.get(Setting.DEFAULT_VOLUME.toString()),
 				Integer.toString(Config.DEFAULT_VOLUME)));
 	}
 
@@ -80,29 +80,29 @@ public class DBGuild {
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, Long> getIamMessages() {
-		return (Map<String, Long>) Optional.ofNullable(this.settings.get(SettingEnum.IAM_MESSAGES.toString()))
+		return (Map<String, Long>) Optional.ofNullable(this.settings.get(Setting.IAM_MESSAGES.toString()))
 				.orElse(new HashMap<>());
 	}
 
 	public Optional<String> getJoinMessage() {
-		return Optional.ofNullable((String) this.settings.get(SettingEnum.JOIN_MESSAGE.toString()));
+		return Optional.ofNullable((String) this.settings.get(Setting.JOIN_MESSAGE.toString()));
 	}
 
 	public Optional<String> getLeaveMessage() {
-		return Optional.ofNullable((String) this.settings.get(SettingEnum.LEAVE_MESSAGE.toString()));
+		return Optional.ofNullable((String) this.settings.get(Setting.LEAVE_MESSAGE.toString()));
 	}
 
 	public Optional<Long> getMessageChannelId() {
-		return Optional.ofNullable((Long) this.settings.get(SettingEnum.MESSAGE_CHANNEL_ID.toString()));
+		return Optional.ofNullable((Long) this.settings.get(Setting.MESSAGE_CHANNEL_ID.toString()));
 	}
 
 	public String getPrefix() {
 		return Objects.toString(
-				this.settings.get(SettingEnum.PREFIX.toString()),
+				this.settings.get(Setting.PREFIX.toString()),
 				Config.DEFAULT_PREFIX);
 	}
 
-	private <T> List<T> getListSetting(SettingEnum setting, Class<T> listClass) {
+	private <T> List<T> getListSetting(Setting setting, Class<T> listClass) {
 		return Optional.ofNullable((List<?>) this.settings.get(setting.toString()))
 				.orElse(new ArrayList<>())
 				.stream()
@@ -118,7 +118,7 @@ public class DBGuild {
 				|| roles.stream().anyMatch(role -> allowedRoles.contains(role.getId().asLong()));
 	}
 
-	public boolean isCommandAllowed(AbstractCommand cmd) {
+	public boolean isCommandAllowed(BaseCmd cmd) {
 		final List<String> blacklistedCmd = this.getBlacklistedCmd();
 		return cmd.getNames().stream().noneMatch(blacklistedCmd::contains);
 	}
@@ -135,11 +135,11 @@ public class DBGuild {
 		return allowedVoiceChannels.isEmpty() || allowedVoiceChannels.contains(channelId.asLong());
 	}
 
-	public void setSetting(SettingEnum setting, Object value) {
+	public void setSetting(Setting setting, Object value) {
 		this.settings.put(setting.toString(), value);
 	}
 
-	public void removeSetting(SettingEnum setting) {
+	public void removeSetting(Setting setting) {
 		this.settings.remove(setting.toString());
 	}
 
