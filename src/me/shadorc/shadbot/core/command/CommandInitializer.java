@@ -3,13 +3,13 @@ package me.shadorc.shadbot.core.command;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import me.shadorc.shadbot.command.admin.BanCmd;
 import me.shadorc.shadbot.command.admin.IamCmd;
-import me.shadorc.shadbot.command.admin.KickCmd;
 import me.shadorc.shadbot.command.admin.ManageCoinsCmd;
 import me.shadorc.shadbot.command.admin.PruneCmd;
 import me.shadorc.shadbot.command.admin.SettingsCmd;
-import me.shadorc.shadbot.command.admin.SoftBanCmd;
+import me.shadorc.shadbot.command.admin.member.BanCmd;
+import me.shadorc.shadbot.command.admin.member.KickCmd;
+import me.shadorc.shadbot.command.admin.member.SoftBanCmd;
 import me.shadorc.shadbot.command.currency.CoinsCmd;
 import me.shadorc.shadbot.command.currency.LeaderboardCmd;
 import me.shadorc.shadbot.command.currency.TransferCoinsCmd;
@@ -86,7 +86,7 @@ public class CommandInitializer {
 				// Fun Commands
 				new ChatCmd(), new ThisDayCmd(), new LeetCmd(),
 				// Image Commands
-				new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(), 
+				new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(),
 				new Rule34Cmd(),
 				// Game Commands
 				new RpsCmd(), new HangmanCmd(), new TriviaCmd(), new RussianRouletteCmd(),
@@ -95,19 +95,19 @@ public class CommandInitializer {
 				// Currency Commands
 				new CoinsCmd(), new LeaderboardCmd(), new TransferCoinsCmd(),
 				// Music Commands
-				new PlayCmd(), new PauseCmd(), new StopCmd(), new SkipCmd(), new RepeatCmd(), 
-				new BackwardCmd(), new ForwardCmd(), new VolumeCmd(), new NameCmd(), 
+				new PlayCmd(), new PauseCmd(), new StopCmd(), new SkipCmd(), new RepeatCmd(),
+				new BackwardCmd(), new ForwardCmd(), new VolumeCmd(), new NameCmd(),
 				new PlaylistCmd(), new ShuffleCmd(), new ClearCmd(),
 				// Game Stats Commands
 				new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
 				// Info Commands
-				new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(), 
+				new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
 				new RolelistCmd(),
 				// French Commands
 				new JokeCmd(), new DtcCmd(),
 				// Admin Commands
-				new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(), 
-				new IamCmd(), new SettingsCmd(), 
+				new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
+				new IamCmd(), new SettingsCmd(),
 				// Owner Commands
 				new LoggerCmd(), new StatsCmd(), new RestartCmd(), new LeaveCmd(),
 				new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(), new DatabaseCmd(),

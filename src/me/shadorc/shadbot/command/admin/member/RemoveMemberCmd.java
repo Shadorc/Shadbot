@@ -1,9 +1,9 @@
-package me.shadorc.shadbot.command.admin;
+package me.shadorc.shadbot.command.admin.member;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import discord4j.core.object.audit.AuditLogEntry;
@@ -13,7 +13,6 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -24,17 +23,25 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class BanCmd extends BaseCmd {
+public abstract class RemoveMemberCmd extends BaseCmd {
 
-	public BanCmd() {
-		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("ban"));
+	private final Permission permission;
+	private final String conjugatedVerb;
+	private final BiFunction<Member, String, Mono<Void>> action;
+
+	public RemoveMemberCmd(String name, Permission permission, String conjugatedVerb,
+			BiFunction<Member, String, Mono<Void>> action) {
+		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of(name));
 		this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+
+		this.permission = permission;
+		this.conjugatedVerb = conjugatedVerb;
+		this.action = action;
 	}
 
 	@Override
@@ -47,15 +54,15 @@ public class BanCmd extends BaseCmd {
 		}
 
 		if(mentionedUserIds.contains(context.getAuthorId())) {
-			throw new CommandException("You cannot ban yourself.");
+			throw new CommandException(String.format("You cannot %s yourself.", this.getName()));
 		}
 
 		if(mentionedUserIds.contains(context.getSelfId())) {
-			throw new CommandException("You cannot ban me.");
+			throw new CommandException(String.format("You cannot %s me.", this.getName()));
 		}
 
 		return context.getChannel()
-				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, Permission.BAN_MEMBERS)
+				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, this.permission)
 						.then(Mono.zip(context.getMessage().getUserMentions().collectList(),
 								context.getGuild(),
 								context.getSelfAsMember()))
@@ -86,40 +93,32 @@ public class BanCmd extends BaseCmd {
 											.cast(MessageChannel.class)
 											.filterWhen(ignored -> DiscordUtils.isUserHigher(guild, self, member))
 											.switchIfEmpty(DiscordUtils.sendMessage(
-													String.format(Emoji.WARNING + " (**%s**) I cannot ban **%s** because he is higher in the role hierarchy than me.",
-															context.getUsername(), member.getUsername()), channel)
+													String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in the role hierarchy than me.",
+															context.getUsername(), this.getName(), member.getUsername()), channel)
 													.then(Mono.empty()))
 											.filterWhen(ignored -> DiscordUtils.isUserHigher(guild, context.getMember(), member))
 											.switchIfEmpty(DiscordUtils.sendMessage(
-													String.format(Emoji.WARNING + " (**%s**) You cannot ban **%s** because he is higher in the role hierarchy than you.",
-															context.getUsername(), member.getUsername()), channel)
+													String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher in the role hierarchy than you.",
+															context.getUsername(), this.getName(), member.getUsername()), channel)
 													.then(Mono.empty()))
 											.flatMap(privateChannel -> DiscordUtils.sendMessage(
-													String.format(Emoji.INFO + " You were banned from the server **%s** by **%s**. Reason: `%s`",
-															guild.getName(), context.getUsername(), reason), privateChannel))
+													String.format(Emoji.INFO + " You were %s from the server **%s** by **%s**. Reason: `%s`",
+															this.conjugatedVerb, guild.getName(), context.getUsername(), reason), privateChannel))
 											.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> DiscordUtils.sendMessage(
 													String.format(Emoji.WARNING + " (**%s**) I could not send a message to **%s**.",
 															context.getUsername(), member.getUsername()), channel))
-											.then(member.ban(spec -> spec.setReason(reason.toString()).setDeleteMessageDays(7)))
+											.then(this.action.apply(member, reason.toString()))
 											.thenReturn(member));
 						})
 						.map(Member::getUsername)
 						.collectList()
 						.flatMap(memberUsernames -> DiscordUtils.sendMessage(
-								String.format(Emoji.INFO + " **%s** banned %s.",
+								String.format(Emoji.INFO + " **%s** %s %s.",
 										context.getUsername(),
+										this.conjugatedVerb,
 										FormatUtils.format(memberUsernames, username -> String.format("**%s**", username), ", ")),
 								channel)))
 				.then();
-	}
-
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Ban user(s) and delete his/their messages from the last 7 days.")
-				.addArg("@user(s)", false)
-				.addArg("reason", true)
-				.build();
 	}
 
 }
