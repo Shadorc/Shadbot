@@ -116,7 +116,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		final String playlistName = playlist.getName();
 		final String name = playlistName == null || playlistName.isBlank() ? "Playlist" : playlistName;
 
-		this.guildMusic.getClient().getUserById(this.guildMusic.getDjId())
+		this.guildMusic.getClient()
+				.getUserById(this.guildMusic.getDjId())
 				.map(User::getAvatarUrl)
 				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> embed.setAuthor(name, null, avatarUrl)
@@ -129,17 +130,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 										Shadbot.getDatabase().getDBGuild(this.guildMusic.getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null)))
 				.flatMap(embedConsumer -> this.guildMusic.getMessageChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
-				// TODO
 				.then(Mono.fromRunnable(() -> {
 					this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
-							.then(Mono.fromRunnable(this::stopWaiting))
-							.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err)))
+							.doOnNext(ignored -> this.stopWaiting())
 							.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err));
 
 					this.resultsTracks = new ArrayList<>(playlist.getTracks().subList(0, Math.min(MAX_RESULTS, playlist.getTracks().size())));
 					MessageInterceptorManager.addInterceptor(this.guildMusic.getMessageChannelId(), this);
 				}))
-				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err)))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err));
 	}
 

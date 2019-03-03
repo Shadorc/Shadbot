@@ -70,7 +70,7 @@ public class GuildMusic {
 
 	public void scheduleLeave() {
 		this.leaveTask = Mono.delay(Duration.ofMinutes(1))
-				.then(Mono.fromRunnable(this::leaveVoiceChannel))
+				.doOnNext(ignored -> this.leaveVoiceChannel())
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
