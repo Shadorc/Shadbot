@@ -27,6 +27,7 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class PruneCmd extends BaseCmd {
@@ -45,13 +46,13 @@ public class PruneCmd extends BaseCmd {
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
 						.then(context.getMessage().getUserMentions().collectList())
-						.flatMap(mentions -> {
+						.flatMapMany(mentions -> {
 							final String arg = context.getArg().orElse("");
 							final List<String> quotedElements = StringUtils.getQuotedElements(arg);
 
 							if(arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
 								loadingMsg.stopTyping();
-								throw new CommandException("You have forgotten a quote or have specified several quotes in quotation marks.");
+								return Flux.error(new CommandException("You have forgotten a quote or have specified several quotes in quotation marks."));
 							}
 
 							final String words = quotedElements.isEmpty() ? null : quotedElements.get(0);
@@ -65,9 +66,9 @@ public class PruneCmd extends BaseCmd {
 							Integer count = NumberUtils.asPositiveInt(argCleaned);
 							if(!argCleaned.isEmpty() && count == null) {
 								loadingMsg.stopTyping();
-								throw new CommandException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
+								return Flux.error(new CommandException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
 										+ "please include them in quotation marks. See `%shelp %s` for more information.",
-										argCleaned, context.getPrefix(), this.getName()));
+										argCleaned, context.getPrefix(), this.getName())));
 							}
 
 							count = count == null ? MAX_MESSAGES : Math.min(MAX_MESSAGES, count);
@@ -80,10 +81,13 @@ public class PruneCmd extends BaseCmd {
 											|| message.getAuthor().map(User::getId).map(mentionIds::contains).orElse(false))
 									.filter(message -> words == null
 											|| message.getContent().map(content -> content.contains(words)).orElse(false)
-											|| this.getEmbedContent(message).contains(words))
-									.collectList();
+											|| this.getEmbedContent(message).contains(words));
 						})
-						.flatMap(messages -> DiscordUtils.bulkDelete((TextChannel) channel, messages))
+						.map(Message::getId)
+						.collectList()
+						.flatMap(messageIds -> ((TextChannel) channel).bulkDelete(Flux.fromIterable(messageIds))
+								.count()
+								.map(messagesNotDeleted -> (int) (messageIds.size() - messagesNotDeleted)))
 						.flatMap(deletedMessages -> loadingMsg.send(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
 								context.getUsername(), StringUtils.pluralOf(deletedMessages, "message")))))
 				.then();

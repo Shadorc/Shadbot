@@ -14,7 +14,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -77,24 +76,6 @@ public class DiscordUtils {
 					}
 					StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT);
 				});
-	}
-
-	/**
-	 * @param channel - the channel containing the messages to delete
-	 * @param messages - the {@link List} of messages to delete
-	 * @return The number of deleted messages
-	 */
-	public static Mono<Integer> bulkDelete(TextChannel channel, List<Message> messages) {
-		switch (messages.size()) {
-			case 1:
-				return messages.get(0)
-						.delete()
-						.thenReturn(messages.size());
-			default:
-				return channel.bulkDelete(Flux.fromIterable(messages).map(Message::getId))
-						.count()
-						.map(messagesNotDeleted -> (int) (messages.size() - messagesNotDeleted));
-		}
 	}
 
 	/**
