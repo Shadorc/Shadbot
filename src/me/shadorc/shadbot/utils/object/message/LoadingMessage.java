@@ -38,9 +38,7 @@ public class LoadingMessage implements Publisher<Void> {
 		this.channelId = channelId;
 		this.subscribers = new ArrayList<>();
 
-		this.startTyping()
-				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(client, err)))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+		this.startTyping().subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 	}
 
 	/**

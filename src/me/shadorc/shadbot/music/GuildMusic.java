@@ -58,7 +58,6 @@ public class GuildMusic {
 					this.voiceConnection = voiceConnection;
 					LogUtils.info("{Guild ID: %d} Voice channel joined.", this.getGuildId().asLong());
 				})
-				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err)))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
@@ -72,7 +71,6 @@ public class GuildMusic {
 	public void scheduleLeave() {
 		this.leaveTask = Mono.delay(Duration.ofMinutes(1))
 				.then(Mono.fromRunnable(this::leaveVoiceChannel))
-				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err)))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 

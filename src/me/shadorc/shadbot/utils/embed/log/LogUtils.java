@@ -9,7 +9,6 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogBuilder.LogType;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
-import reactor.core.publisher.Mono;
 
 public class LogUtils {
 
@@ -62,7 +61,6 @@ public class LogUtils {
 		client.getChannelById(Config.LOGS_CHANNEL_ID)
 				.cast(MessageChannel.class)
 				.flatMap(channel -> DiscordUtils.sendMessage(embed.build(), channel))
-				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(client, err)))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 	}
 

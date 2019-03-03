@@ -42,7 +42,6 @@ public class AudioEventListener extends AudioEventAdapter {
 		if(endReason.mayStartNext) {
 			this.errorCount.set(0); // Everything seems to be fine, reset error counter.
 			this.nextOrEnd()
-					.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err)))
 					.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err));
 		}
 	}
@@ -71,7 +70,6 @@ public class AudioEventListener extends AudioEventAdapter {
 				.filter(ignored -> strBuilder.length() > 0)
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then(this.nextOrEnd())
-				.onErrorResume(thr -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), thr)))
 				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), thr));
 	}
 
@@ -83,7 +81,6 @@ public class AudioEventListener extends AudioEventAdapter {
 				.flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
 						channel))
 				.then(this.nextOrEnd())
-				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err)))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err));
 	}
 

@@ -40,7 +40,6 @@ public class PollManager extends AbstractGameManager {
 	public void start() {
 		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration().toMillis(), ChronoUnit.MILLIS);
 		this.show()
-				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err)))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
 	}
 

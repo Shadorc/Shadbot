@@ -79,11 +79,9 @@ public class Shard {
 		this.getClient().getEventDispatcher()
 				.on(ReadyEvent.class)
 				.next()
-				.doOnNext(event -> this.logger.debug("Presence updater scheduled."))
 				.flatMapMany(event -> Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
 						.flatMap(ignored -> {
 							final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
-							this.logger.debug("Updating presence to: {}", presence);
 							return event.getClient().updatePresence(Presence.online(Activity.playing(presence)));
 						})
 						.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(event.getClient(), err)))

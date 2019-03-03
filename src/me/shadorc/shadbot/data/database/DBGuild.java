@@ -149,7 +149,7 @@ public class DBGuild {
 
 	@Override
 	public String toString() {
-		return String.format("DBGuild [guildId=%s, members=%s, settings=%s]", 
+		return String.format("DBGuild [guildId=%s, members=%s, settings=%s]",
 				this.guildId, this.members, this.settings);
 	}
 

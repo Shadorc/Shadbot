@@ -28,7 +28,6 @@ public abstract class Data {
 
 		Flux.interval(initialDelay, period)
 				.doOnNext(ignored -> Mono.fromRunnable(this::save))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 	}
 

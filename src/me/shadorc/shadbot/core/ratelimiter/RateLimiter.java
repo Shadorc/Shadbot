@@ -15,7 +15,6 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.TemporaryMessage;
-import reactor.core.publisher.Mono;
 
 public class RateLimiter {
 
@@ -62,7 +61,6 @@ public class RateLimiter {
 							username, message, maxNum, durationStr);
 				})
 				.flatMap(new TemporaryMessage(client, channelId, 10, ChronoUnit.SECONDS)::send)
-				.onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(client, err)))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 	}
 
