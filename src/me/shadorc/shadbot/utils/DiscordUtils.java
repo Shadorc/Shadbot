@@ -24,6 +24,7 @@ import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -70,6 +71,8 @@ public class DiscordUtils {
 						}
 					});
 				})
+				// 403 Forbidden probably means that the bot is not in the guild anymore
+				.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.empty())
 				.doOnNext(message -> {
 					if(!message.getEmbeds().isEmpty()) {
 						StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);
