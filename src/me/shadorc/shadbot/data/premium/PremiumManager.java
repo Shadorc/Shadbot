@@ -25,8 +25,11 @@ public class PremiumManager extends Data {
 	public PremiumManager() throws IOException {
 		super("premium_data.json", Duration.ofHours(1), Duration.ofHours(1));
 
-		final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(CopyOnWriteArrayList.class, Relic.class);
-		this.relics = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), valueType) : new CopyOnWriteArrayList<>();
+		this.relics = new CopyOnWriteArrayList<>();
+		if(this.getFile().exists()) {
+			final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Relic.class);
+			this.relics.addAll(Utils.MAPPER.readValue(this.getFile(), valueType));
+		}
 	}
 
 	public Relic generateRelic(RelicType type) {
