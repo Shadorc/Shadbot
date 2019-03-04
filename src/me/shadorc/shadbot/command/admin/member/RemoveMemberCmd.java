@@ -3,7 +3,6 @@ package me.shadorc.shadbot.command.admin.member;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import discord4j.core.object.audit.AuditLogEntry;
@@ -23,26 +22,24 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public abstract class RemoveMemberCmd extends BaseCmd {
 
-	private final Permission permission;
 	private final String conjugatedVerb;
-	private final BiFunction<Member, String, Mono<Void>> action;
+	private final Permission permission;
 
-	public RemoveMemberCmd(String name, Permission permission, String conjugatedVerb,
-			BiFunction<Member, String, Mono<Void>> action) {
+	public RemoveMemberCmd(String name, String conjugatedVerb, Permission permission) {
 		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of(name));
 		this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
 
-		this.permission = permission;
 		this.conjugatedVerb = conjugatedVerb;
-		this.action = action;
+		this.permission = permission;
 	}
+
+	public abstract Mono<Void> action(Member member, String reason);
 
 	@Override
 	public Mono<Void> execute(Context context) {
@@ -107,7 +104,7 @@ public abstract class RemoveMemberCmd extends BaseCmd {
 											.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> DiscordUtils.sendMessage(
 													String.format(Emoji.WARNING + " (**%s**) I could not send a message to **%s**.",
 															context.getUsername(), member.getUsername()), channel))
-											.then(this.action.apply(member, reason.toString()))
+											.then(this.action(member, reason.toString()))
 											.thenReturn(member));
 						})
 						.map(Member::getUsername)
