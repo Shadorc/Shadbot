@@ -17,8 +17,8 @@ public class LimitedGuild {
 	}
 
 	public LimitedUser getUser(Snowflake userId) {
-		this.limitedUsersMap.putIfAbsent(userId, new LimitedUser(Bucket4j.builder().addLimit(this.bandwidth).build()));
-		return this.limitedUsersMap.get(userId);
+		return this.limitedUsersMap.computeIfAbsent(userId,
+				id -> new LimitedUser(Bucket4j.builder().addLimit(this.bandwidth).build()));
 	}
 
 }

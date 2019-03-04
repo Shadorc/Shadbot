@@ -31,9 +31,7 @@ public class RateLimiter {
 	}
 
 	public boolean isLimitedAndWarn(DiscordClient client, Snowflake guildId, Snowflake channelId, Snowflake userId) {
-		this.guildsLimitedMap.putIfAbsent(guildId, new LimitedGuild(this.bandwidth));
-
-		final LimitedUser limitedUser = this.guildsLimitedMap.get(guildId)
+		final LimitedUser limitedUser = this.guildsLimitedMap.computeIfAbsent(guildId, id -> new LimitedGuild(this.bandwidth))
 				.getUser(userId);
 
 		// The token could not been consumed, the user is limited
