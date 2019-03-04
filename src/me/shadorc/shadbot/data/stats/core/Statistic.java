@@ -21,7 +21,8 @@ public abstract class Statistic<E extends Enum<E>> {
 	public abstract Object getData();
 
 	public void save() throws IOException {
-		if(!this.getFile().getParentFile().mkdirs() || !this.getFile().createNewFile()) {
+		if(!this.getFile().getParentFile().exists() && !this.getFile().getParentFile().mkdirs()
+				|| !this.getFile().exists() && !this.getFile().createNewFile()) {
 			throw new IOException("The folder or the file could not be created.");
 		}
 		try (BufferedWriter writer = Files.newBufferedWriter(this.getFile().toPath())) {
