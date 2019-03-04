@@ -102,7 +102,7 @@ public class ExceptionHandler {
 	}
 
 	public static void handleUnknownError(DiscordClient client, Throwable err) {
-		if(err.getMessage().equals("syscall:read(..) failed: Connection reset by peer")) {
+		if(err.getMessage() != null && err.getMessage().equals("syscall:read(..) failed: Connection reset by peer")) {
 			LogUtils.info(err.toString());
 		} else if(ExceptionUtils.isKnownDiscordError(err)) {
 			final ClientException clientErr = (ClientException) err;
