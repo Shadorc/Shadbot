@@ -129,7 +129,7 @@ public class HelpBuilder {
 						embed.addField(field.getName(), field.getValue(), field.isInline());
 					}
 
-					if(!this.cmd.getAlias().isEmpty()) {
+					if(this.cmd.getAlias() != null) {
 						embed.setFooter(String.format("Alias: %s", this.cmd.getAlias()), null);
 					}
 				});
