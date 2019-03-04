@@ -101,6 +101,7 @@ public class ExceptionHandler {
 										context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
 	}
 
+	// Warning: If an error occurred in this method while processing an error, the error will not be logged
 	public static void handleUnknownError(DiscordClient client, Throwable err) {
 		if(err.getMessage() != null && err.getMessage().equals("syscall:read(..) failed: Connection reset by peer")) {
 			LogUtils.info(err.toString());

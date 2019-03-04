@@ -101,7 +101,7 @@ public abstract class RemoveMemberCmd extends BaseCmd {
 											.flatMap(privateChannel -> DiscordUtils.sendMessage(
 													String.format(Emoji.INFO + " You were %s from the server **%s** by **%s**. Reason: `%s`",
 															this.conjugatedVerb, guild.getName(), context.getUsername(), reason), privateChannel))
-											.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> DiscordUtils.sendMessage(
+											.switchIfEmpty(DiscordUtils.sendMessage(
 													String.format(Emoji.WARNING + " (**%s**) I could not send a message to **%s**.",
 															context.getUsername(), member.getUsername()), channel))
 											.then(this.action(member, reason.toString()))

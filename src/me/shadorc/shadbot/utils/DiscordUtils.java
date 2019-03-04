@@ -71,7 +71,7 @@ public class DiscordUtils {
 						}
 					});
 				})
-				// 403 Forbidden probably means that the bot is not in the guild anymore
+				// 403 Forbidden means that the bot is not in the guild
 				.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.empty())
 				.doOnNext(message -> {
 					if(!message.getEmbeds().isEmpty()) {

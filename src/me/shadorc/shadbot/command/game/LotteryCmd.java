@@ -163,9 +163,9 @@ public class LotteryCmd extends BaseCmd {
 					Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
 					return member.getPrivateChannel()
 							.cast(MessageChannel.class)
-							.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.empty())
 							.flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn **%s**.",
-									FormatUtils.coins(coins)), privateChannel));
+									FormatUtils.coins(coins)), privateChannel))
+							.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.empty());
 				})
 				.then(Mono.fromRunnable(() -> {
 					Shadbot.getLottery().setHistoric(new LotteryHistoric(Shadbot.getLottery().getJackpot(), winners.size(), winningNum));
