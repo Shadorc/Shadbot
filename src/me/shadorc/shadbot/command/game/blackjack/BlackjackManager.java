@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
-import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
@@ -32,7 +32,6 @@ import reactor.core.publisher.Mono;
 
 public class BlackjackManager extends GameManager {
 
-	private static final Duration GAME_DURATION = Duration.ofMinutes(1);
 	private static final float WIN_MULTIPLIER = 1.15f;
 
 	private final RateLimiter rateLimiter;
@@ -43,7 +42,7 @@ public class BlackjackManager extends GameManager {
 	private long startTime;
 
 	public BlackjackManager(GameCmd<BlackjackManager> gameCmd, Context context) {
-		super(gameCmd, context);
+		super(gameCmd, context, Duration.ofMinutes(1));
 		this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(2));
 		this.players = new CopyOnWriteArrayList<>();
 		this.dealerCards = new ArrayList<>();
@@ -57,45 +56,35 @@ public class BlackjackManager extends GameManager {
 			this.dealerCards.add(Card.pick());
 		}
 
-		this.schedule(this.computeResults(), GAME_DURATION);
+		this.schedule(this.computeResults());
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		this.startTime = System.currentTimeMillis();
 	}
 
 	@Override
 	public Mono<Void> show() {
-		return Flux.fromIterable(this.players)
-				.flatMap(player -> Mono.zip(Mono.just(player), this.getContext().getClient().getUserById(player.getUserId())))
-				.map(playerAndUser -> {
-					final BlackjackPlayer player = playerAndUser.getT1();
-					final User user = playerAndUser.getT2();
-					final String stand = player.isStanding() ? " (Stand)" : "";
-					final String doubleDown = player.isDoubleDown() ? " (Double down)" : "";
+		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> {
+					embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())
+							.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
+							.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
+									+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
+									this.getContext().getPrefix(), this.getContext().getCommandName()))
+							.addField("Dealer's hand", BlackjackUtils.formatCards(this.isScheduled() ? this.dealerCards.subList(0, 1) : this.dealerCards), true);
 
-					return new EmbedFieldEntity(String.format("%s's hand%s%s", user.getUsername(), stand, doubleDown),
-							BlackjackUtils.formatCards(player.getCards()), true);
-				})
-				.collectList()
-				.map(fields -> EmbedUtils.getDefaultEmbed()
-						.andThen(embed -> {
-							embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())
-									.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
-									.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
-											+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
-											this.getContext().getPrefix(), this.getContext().getCommandName()))
-									.addField("Dealer's hand", BlackjackUtils.formatCards(this.isTaskDone() ? this.dealerCards : this.dealerCards.subList(0, 1)), true);
+					if(this.isScheduled()) {
+						final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+						embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingDuration.toSeconds()), null);
+					} else {
+						embed.setFooter("Finished", null);
+					}
 
-							if(this.isTaskDone()) {
-								embed.setFooter("Finished", null);
-							} else {
-								final Duration remainingDuration = GAME_DURATION.minusMillis(TimeUtils.getMillisUntil(this.startTime));
-								embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingDuration.toSeconds()), null);
-							}
+					this.players.stream()
+							.map(BlackjackPlayer::formatHand)
+							.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
+				});
 
-							fields.stream().forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
-						}))
-				.flatMap(this.updateableMessage::send)
-				.then();
+		return this.updateableMessage.send(embedConsumer).then();
 	}
 
 	public Mono<Void> computeResultsOrShow() {
@@ -108,10 +97,7 @@ public class BlackjackManager extends GameManager {
 	private Mono<Void> computeResults() {
 		final int dealerValue = BlackjackUtils.getValue(this.dealerCards);
 		return Flux.fromIterable(this.players)
-				.flatMap(player -> Mono.zip(Mono.just(player), this.getContext().getClient().getUserById(player.getUserId())))
-				.map(playerAndUser -> {
-					final BlackjackPlayer player = playerAndUser.getT1();
-					final User user = playerAndUser.getT2();
+				.map(player -> {
 					final int playerValue = BlackjackUtils.getValue(player.getCards());
 
 					// -1 = Lose | 0 = Draw | 1 = Win
@@ -125,25 +111,25 @@ public class BlackjackManager extends GameManager {
 					}
 
 					int gains = 0;
-					String text = "";
+					final StringBuilder text = new StringBuilder();
 					switch (result) {
 						case 1:
 							gains += (int) Math.ceil(player.getBet() * WIN_MULTIPLIER);
 							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
-							text = String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.coins(gains));
+							text.append(String.format("**%s** (Gains: **%s**)", player.getUsername(), FormatUtils.coins(gains)));
 							break;
 						case -1:
 							gains -= player.getBet();
 							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), Math.abs(gains));
 							Shadbot.getLottery().addToJackpot(Math.abs(gains));
-							text = String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
+							text.append(String.format("**%s** (Losses: **%s**)", player.getUsername(), FormatUtils.coins(Math.abs(gains))));
 							break;
 						default:
-							text = String.format("**%s** (Draw)", user.getUsername());
+							text.append(String.format("**%s** (Draw)", player.getUsername()));
 							break;
 					}
 
-					Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
+					Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), player.getUserId()).addCoins(gains);
 					return text;
 				})
 				.collectList()
@@ -154,11 +140,11 @@ public class BlackjackManager extends GameManager {
 				.then(this.show());
 	}
 
-	public boolean addPlayerIfAbsent(Snowflake userId, int bet) {
+	public boolean addPlayerIfAbsent(Snowflake userId, String username, int bet) {
 		if(this.players.stream().map(BlackjackPlayer::getUserId).anyMatch(userId::equals)) {
 			return false;
 		}
-		return this.players.add(new BlackjackPlayer(userId, bet));
+		return this.players.add(new BlackjackPlayer(userId, username, bet));
 	}
 
 	public boolean isFinished() {

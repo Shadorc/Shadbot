@@ -37,7 +37,6 @@ public class TriviaManager extends GameManager {
 
 	protected static final int MIN_GAINS = 100;
 	protected static final int MAX_BONUS = 100;
-	protected static final Duration GAME_DURATION = Duration.ofSeconds(30);
 
 	private final TriviaResult trivia;
 	private final Map<Snowflake, Boolean> alreadyAnswered;
@@ -45,7 +44,7 @@ public class TriviaManager extends GameManager {
 	private long startTime;
 
 	public TriviaManager(GameCmd<TriviaManager> gameCmd, Context context, Integer categoryId) {
-		super(gameCmd, context);
+		super(gameCmd, context, Duration.ofSeconds(30));
 		try {
 			final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, ""));
 			final TriviaResponse response = Utils.MAPPER.readValue(NetUtils.getJSON(url), TriviaResponse.class);
@@ -63,8 +62,7 @@ public class TriviaManager extends GameManager {
 		this.schedule(Mono.fromRunnable(this::stop)
 				.then(this.getContext().getChannel())
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
-						this.trivia.getCorrectAnswer()), channel)),
-				GAME_DURATION);
+						this.trivia.getCorrectAnswer()), channel)));
 		this.startTime = System.currentTimeMillis();
 	}
 
@@ -81,7 +79,7 @@ public class TriviaManager extends GameManager {
 						.addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
 						.addField("Type", String.format("`%s`", this.trivia.getType()), true)
 						.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
-						.setFooter(String.format("You have %d seconds to answer.", GAME_DURATION.toSeconds()), null));
+						.setFooter(String.format("You have %d seconds to answer.", this.getDuration().toSeconds()), null));
 
 		return this.getContext().getChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
@@ -89,9 +87,9 @@ public class TriviaManager extends GameManager {
 	}
 
 	private Mono<Message> win(Member member) {
-		final float coinsPerSec = (float) MAX_BONUS / GAME_DURATION.toSeconds();
-		final Duration remainingDuration = GAME_DURATION.minusMillis(TimeUtils.getMillisUntil(this.startTime));
-		final int gains = MIN_GAINS + (int) Math.ceil(remainingDuration.toSeconds() * coinsPerSec);
+		final float coinsPerSec = (float) MAX_BONUS / this.getDuration().toSeconds();
+		final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+		final int gains = (int) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
 
 		Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
 		StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);

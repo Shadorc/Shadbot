@@ -25,8 +25,6 @@ import reactor.core.publisher.Mono;
 
 public class DiceManager extends GameManager {
 
-	private static final Duration GAME_DURATION = Duration.ofSeconds(30);
-
 	private final int bet;
 	private final ConcurrentHashMap<Integer, Snowflake> numsPlayers;
 	private final UpdateableMessage updateableMessage;
@@ -34,7 +32,7 @@ public class DiceManager extends GameManager {
 	private String results;
 
 	public DiceManager(GameCmd<DiceManager> gameCmd, Context context, int bet) {
-		super(gameCmd, context);
+		super(gameCmd, context, Duration.ofSeconds(30));
 		this.bet = bet;
 		this.numsPlayers = new ConcurrentHashMap<>();
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
@@ -42,7 +40,7 @@ public class DiceManager extends GameManager {
 
 	@Override
 	public void start() {
-		this.schedule(this.rollTheDice(), GAME_DURATION);
+		this.schedule(this.rollTheDice());
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 	}
 
@@ -61,10 +59,10 @@ public class DiceManager extends GameManager {
 									.addField("Player", String.join("\n", usernames), true)
 									.addField("Number", FormatUtils.format(this.numsPlayers.keySet(), Object::toString, "\n"), true);
 
-							if(this.isTaskDone()) {
-								embed.setFooter("Finished.", null);
+							if(this.isScheduled()) {
+								embed.setFooter(String.format("You have %d seconds to make your bets.", this.getDuration().toSeconds()), null);
 							} else {
-								embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION.toSeconds()), null);
+								embed.setFooter("Finished.", null);
 							}
 
 							if(this.results != null) {

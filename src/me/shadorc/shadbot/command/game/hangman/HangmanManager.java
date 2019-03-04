@@ -40,7 +40,6 @@ public class HangmanManager extends GameManager {
 
 	protected static final int MIN_GAINS = 200;
 	protected static final int MAX_BONUS = 200;
-	protected static final Duration IDLE_DURATION = Duration.ofMinutes(1);
 
 	private final RateLimiter rateLimiter;
 	private final UpdateableMessage updateableMessage;
@@ -50,7 +49,7 @@ public class HangmanManager extends GameManager {
 	private int failCount;
 
 	public HangmanManager(GameCmd<HangmanManager> gameCmd, Context context, Difficulty difficulty) {
-		super(gameCmd, context);
+		super(gameCmd, context, Duration.ofMinutes(1));
 		this.rateLimiter = new RateLimiter(3, Duration.ofSeconds(2));
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 		this.word = HangmanCmd.getWord(difficulty);
@@ -60,7 +59,7 @@ public class HangmanManager extends GameManager {
 
 	@Override
 	public void start() {
-		this.schedule(Mono.fromRunnable(this::stop), IDLE_DURATION);
+		this.schedule(Mono.fromRunnable(this::stop));
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 	}
 
@@ -82,11 +81,11 @@ public class HangmanManager extends GameManager {
 						embed.addField("Misses", String.join(", ", missedLetters), false);
 					}
 
-					if(this.isTaskDone()) {
-						embed.setFooter("Finished.", null);
-					} else {
+					if(this.isScheduled()) {
 						embed.setFooter(String.format("Use %scancel to cancel this game (Automatically cancelled in %d min in case of inactivity)",
-								this.getContext().getPrefix(), IDLE_DURATION.toMinutes()), null);
+								this.getContext().getPrefix(), this.getDuration().toMinutes()), null);
+					} else {
+						embed.setFooter("Finished.", null);
 					}
 
 					if(this.failCount > 0) {
@@ -122,7 +121,7 @@ public class HangmanManager extends GameManager {
 
 	private Mono<Void> checkLetter(String chr) {
 		// Reset IDLE timer
-		this.schedule(Mono.fromRunnable(this::stop), IDLE_DURATION);
+		this.schedule(Mono.fromRunnable(this::stop));
 
 		if(this.lettersTested.contains(chr)) {
 			return Mono.empty();
@@ -147,7 +146,7 @@ public class HangmanManager extends GameManager {
 
 	private Mono<Void> checkWord(String word) {
 		// Reset IDLE timer
-		this.schedule(Mono.fromRunnable(this::stop), IDLE_DURATION);
+		this.schedule(Mono.fromRunnable(this::stop));
 
 		// If the word has been guessed
 		if(this.word.equalsIgnoreCase(word)) {

@@ -35,8 +35,6 @@ public class RouletteManager extends GameManager {
 
 	protected static final List<Integer> RED_NUMS = List.of(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36);
 
-	private static final Duration GAME_DURATION = Duration.ofSeconds(30);
-
 	// User ID, Tuple2<Bet, Place>
 	private final ConcurrentHashMap<Snowflake, Tuple2<Integer, String>> playersPlace;
 	private final UpdateableMessage updateableMessage;
@@ -44,14 +42,14 @@ public class RouletteManager extends GameManager {
 	private String results;
 
 	public RouletteManager(GameCmd<RouletteManager> gameCmd, Context context) {
-		super(gameCmd, context);
+		super(gameCmd, context, Duration.ofSeconds(30));
 		this.playersPlace = new ConcurrentHashMap<>();
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 	}
 
 	@Override
 	public void start() {
-		this.schedule(this.spin(), GAME_DURATION);
+		this.schedule(this.spin());
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 	}
 
@@ -76,10 +74,10 @@ public class RouletteManager extends GameManager {
 								embed.addField("Results", this.results, false);
 							}
 
-							if(this.isTaskDone()) {
-								embed.setFooter("Finished", null);
+							if(this.isScheduled()) {
+								embed.setFooter(String.format("You have %d seconds to make your bets.", this.getDuration().toSeconds()), null);
 							} else {
-								embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION.toSeconds()), null);
+								embed.setFooter("Finished", null);
 							}
 						}))
 				.flatMap(this.updateableMessage::send)

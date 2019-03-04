@@ -33,7 +33,7 @@ public class BlackjackCmd extends GameCmd<BlackjackManager> {
 					return manager;
 				});
 
-		if(blackjackManager.addPlayerIfAbsent(context.getAuthorId(), bet)) {
+		if(blackjackManager.addPlayerIfAbsent(context.getAuthorId(), context.getUsername(), bet)) {
 			return blackjackManager.computeResultsOrShow();
 		} else {
 			return context.getChannel()

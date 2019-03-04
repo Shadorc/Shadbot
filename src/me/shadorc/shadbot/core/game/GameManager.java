@@ -19,15 +19,15 @@ public abstract class GameManager implements MessageInterceptor {
 
 	private final GameCmd<?> gameCmd;
 	private final Context context;
-	// Used to ensure the veracity of isTaskDone, certain conditions may lead to the task
-	// being completed without the Mono being disposed or null leading to isTaskDone returning false
-	private final AtomicBoolean isDone;
+	private final Duration duration;
+	private final AtomicBoolean isScheduled;
 	private Disposable scheduledTask;
 
-	public GameManager(GameCmd<?> gameCmd, Context context) {
+	public GameManager(GameCmd<?> gameCmd, Context context, Duration duration) {
 		this.gameCmd = gameCmd;
 		this.context = context;
-		this.isDone = new AtomicBoolean(false);
+		this.duration = duration;
+		this.isScheduled = new AtomicBoolean(false);
 	}
 
 	public abstract void start();
@@ -40,23 +40,28 @@ public abstract class GameManager implements MessageInterceptor {
 
 	public abstract Mono<Void> show();
 
-	public Context getContext() {
-		return this.context;
+	/**
+	 * Schedule a {@link Mono} that will be triggered when the game duration is elapsed.
+	 * 
+	 * @param mono - The {@link Mono} to trigger after the game duration has elapsed.
+	 */
+	public <T> void schedule(Mono<T> mono) {
+		this.cancelScheduledTask();
+		this.isScheduled.set(true);
+		this.scheduledTask = Mono.delay(this.getDuration())
+				.doOnNext(ignored -> this.isScheduled.set(false))
+				.then(mono)
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
 	}
 
 	/**
-	 * @param message - the {@link Message} to check
-	 * @return A {@link Mono} that returns true if the {@link Message} is a valid cancel command, false otherwise
+	 * Cancel the current task, if scheduled.
 	 */
-	private Mono<Boolean> isCancelMessage(Message message) {
-		return Mono.just(message)
-				.filter(msg -> msg.getAuthor().isPresent() && msg.getContent().isPresent())
-				.filter(msg -> msg.getContent().get().equals(String.format("%scancel", this.context.getPrefix())))
-				.flatMap(msg -> msg.getChannel()
-						.flatMap(channel -> DiscordUtils.hasPermission(channel, message.getAuthor().get().getId(), Permission.ADMINISTRATOR))
-						// The author is the author of the game or he is an administrator
-						.map(isAdmin -> this.context.getAuthorId().equals(message.getAuthor().get().getId()) || isAdmin))
-				.defaultIfEmpty(false);
+	public void cancelScheduledTask() {
+		this.isScheduled.set(false);
+		if(this.scheduledTask != null) {
+			this.scheduledTask.dispose();
+		}
 	}
 
 	/**
@@ -78,22 +83,34 @@ public abstract class GameManager implements MessageInterceptor {
 				.switchIfEmpty(mono);
 	}
 
-	public boolean isTaskDone() {
-		return this.isDone.get() || this.scheduledTask == null || this.scheduledTask.isDisposed();
+	/**
+	 * @param message - the {@link Message} to check
+	 * @return A {@link Mono} that returns true if the {@link Message} is a valid cancel command, false otherwise
+	 */
+	private Mono<Boolean> isCancelMessage(Message message) {
+		return Mono.just(message)
+				.filter(msg -> msg.getAuthor().isPresent() && msg.getContent().isPresent())
+				.filter(msg -> msg.getContent().get().equals(String.format("%scancel", this.context.getPrefix())))
+				.flatMap(msg -> msg.getChannel()
+						.flatMap(channel -> DiscordUtils.hasPermission(channel, message.getAuthor().get().getId(), Permission.ADMINISTRATOR))
+						// The author is the author of the game or he is an administrator
+						.map(isAdmin -> this.context.getAuthorId().equals(message.getAuthor().get().getId()) || isAdmin))
+				.defaultIfEmpty(false);
 	}
 
-	public <T> void schedule(Mono<T> mono, Duration duration) {
-		this.cancelScheduledTask();
-		this.scheduledTask = Mono.delay(duration)
-				.doOnNext(ignored -> this.isDone.set(true))
-				.then(mono)
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
+	/**
+	 * @return {@code true} if a task is currently scheduled, {@code false} otherwise.
+	 */
+	public boolean isScheduled() {
+		return this.isScheduled.get();
 	}
 
-	public void cancelScheduledTask() {
-		if(this.scheduledTask != null) {
-			this.scheduledTask.dispose();
-		}
+	public Context getContext() {
+		return this.context;
+	}
+
+	public Duration getDuration() {
+		return this.duration;
 	}
 
 }
