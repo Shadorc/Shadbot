@@ -58,8 +58,11 @@ public class FortniteCmd extends BaseCmd {
 			final URL url = new URL(String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
 					StringUtils.toLowerCase(platform), encodedNickname));
 
-			final Response response = NetUtils.getResponse(url.toString())
-					.header("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY));
+			final Response response = NetUtils.getDefaultConnection(url.toString())
+					.ignoreContentType(true)
+					.ignoreHttpErrors(true)
+					.header("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY))
+					.execute();
 
 			if(response.statusCode() != 200) {
 				loadingMsg.stopTyping();

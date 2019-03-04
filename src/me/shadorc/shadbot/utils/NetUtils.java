@@ -50,7 +50,7 @@ public class NetUtils {
 	 * @param url - URL to connect to. The protocol must be http or https
 	 * @return The {@link Connection} corresponding to {@code url} with default user-agent and default timeout
 	 */
-	private static Connection getDefaultConnection(String url) {
+	public static Connection getDefaultConnection(String url) {
 		return Jsoup.connect(url)
 				.userAgent(Config.USER_AGENT)
 				.timeout(Config.DEFAULT_TIMEOUT);
