@@ -115,7 +115,7 @@ public class CommandInitializer {
 				new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd());
 	}
 
-	public static void add(BaseCmd... cmds) {
+	private static void add(BaseCmd... cmds) {
 		for(final BaseCmd cmd : cmds) {
 			for(final String name : cmd.getNames()) {
 				if(COMMANDS_MAP.putIfAbsent(name, cmd) != null) {

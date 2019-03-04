@@ -36,7 +36,7 @@ public class Card {
 		}
 	}
 
-	public Card(int num, Sign sign) {
+	private Card(int num, Sign sign) {
 		this.num = num;
 		this.sign = sign;
 		switch (num) {

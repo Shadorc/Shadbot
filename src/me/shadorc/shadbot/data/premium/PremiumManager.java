@@ -76,7 +76,7 @@ public class PremiumManager extends Data {
 				.anyMatch(relic -> !relic.isExpired());
 	}
 
-	public boolean isUserPremium(Snowflake userId) {
+	private boolean isUserPremium(Snowflake userId) {
 		return this.getRelicsForUser(userId).stream()
 				.anyMatch(relic -> this.isValid(relic, RelicType.USER));
 	}

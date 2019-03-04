@@ -13,7 +13,6 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -39,7 +38,7 @@ public class HangmanManager extends GameManager {
 			"https://upload.wikimedia.org/wikipedia/commons/d/d6/Hangman-6.png");
 
 	protected static final int MIN_GAINS = 200;
-	protected static final int MAX_BONUS = 200;
+	private static final int MAX_BONUS = 200;
 
 	private final RateLimiter rateLimiter;
 	private final UpdateableMessage updateableMessage;
@@ -48,11 +47,11 @@ public class HangmanManager extends GameManager {
 
 	private int failCount;
 
-	public HangmanManager(GameCmd<HangmanManager> gameCmd, Context context, Difficulty difficulty) {
+	public HangmanManager(HangmanCmd gameCmd, Context context, Difficulty difficulty) {
 		super(gameCmd, context, Duration.ofMinutes(1));
 		this.rateLimiter = new RateLimiter(3, Duration.ofSeconds(2));
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
-		this.word = HangmanCmd.getWord(difficulty);
+		this.word = gameCmd.getWord(difficulty);
 		this.lettersTested = new ArrayList<>();
 		this.failCount = 0;
 	}

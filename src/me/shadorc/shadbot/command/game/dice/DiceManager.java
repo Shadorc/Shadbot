@@ -73,7 +73,7 @@ public class DiceManager extends GameManager {
 				.then();
 	}
 
-	public Mono<Void> rollTheDice() {
+	private Mono<Void> rollTheDice() {
 		final int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
 		return Flux.fromIterable(this.numsPlayers.values())
 				.flatMap(this.getContext().getClient()::getUserById)

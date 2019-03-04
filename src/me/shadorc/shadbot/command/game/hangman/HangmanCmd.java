@@ -1,10 +1,9 @@
+
 package me.shadorc.shadbot.command.game.hangman;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
@@ -12,13 +11,9 @@ import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -28,17 +23,17 @@ public class HangmanCmd extends GameCmd<HangmanManager> {
 		EASY, HARD;
 	}
 
-	private static final String HARD_WORDS_URL = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt";
-	private static final String EASY_WORDS_URL = "https://gist.githubusercontent.com/deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt";
+	protected static final int MIN_WORD_LENGTH = 5;
+	protected static final int MAX_WORD_LENGTH = 10;
 
-	private static final int MIN_WORD_LENGTH = 5;
-	private static final int MAX_WORD_LENGTH = 10;
-
-	protected static final List<String> HARD_WORDS = new ArrayList<>();
-	protected static final List<String> EASY_WORDS = new ArrayList<>();
+	private final WordsList easyWords;
+	private final WordsList hardWords;
 
 	public HangmanCmd() {
 		super(List.of("hangman"));
+
+		this.easyWords = new WordsList("https://gist.githubusercontent.com/deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt");
+		this.hardWords = new WordsList("https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt");
 	}
 
 	@Override
@@ -50,15 +45,14 @@ public class HangmanCmd extends GameCmd<HangmanManager> {
 					context.getArg().get(), FormatUtils.options(Difficulty.class)));
 		}
 
-		if(HARD_WORDS.isEmpty() || EASY_WORDS.isEmpty()) {
-			final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-			try {
-				this.load();
-			} catch (final Exception err) {
-				loadingMsg.stopTyping();
-				throw Exceptions.propagate(err);
+		try {
+			if(difficulty.equals(Difficulty.EASY) && !this.easyWords.isLoaded()) {
+				this.easyWords.load();
+			} else if(difficulty.equals(Difficulty.HARD) && !this.hardWords.isLoaded()) {
+				this.hardWords.load();
 			}
-			loadingMsg.stopTyping();
+		} catch (IOException err) {
+			throw Exceptions.propagate(err);
 		}
 
 		final HangmanManager hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanManager(this, context, difficulty));
@@ -75,25 +69,15 @@ public class HangmanCmd extends GameCmd<HangmanManager> {
 		}
 	}
 
-	private void load() throws IOException {
-		if(HARD_WORDS.isEmpty()) {
-			HARD_WORDS.addAll(
-					StringUtils.split(NetUtils.getBody(HARD_WORDS_URL), "\n").stream()
-							.filter(word -> NumberUtils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
-							.limit(500)
-							.collect(Collectors.toList()));
+	protected String getWord(Difficulty difficulty) {
+		switch (difficulty) {
+			case EASY:
+				return this.easyWords.getRandomWord();
+			case HARD:
+				return this.hardWords.getRandomWord();
+			default:
+				throw new RuntimeException(String.format("Unknown difficulty: %s", difficulty.toString()));
 		}
-
-		if(EASY_WORDS.isEmpty()) {
-			EASY_WORDS.addAll(StringUtils.split(NetUtils.getBody(EASY_WORDS_URL), "\n").stream()
-					.filter(word -> NumberUtils.isInRange(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
-					.limit(500)
-					.collect(Collectors.toList()));
-		}
-	}
-
-	protected static String getWord(Difficulty difficulty) {
-		return difficulty.equals(Difficulty.EASY) ? Utils.randValue(EASY_WORDS) : Utils.randValue(HARD_WORDS);
 	}
 
 	@Override

@@ -54,7 +54,7 @@ public class PollManager {
 		this.pollCmd.getManagers().remove(this.getContext().getChannelId());
 	}
 
-	public Mono<Void> show() {
+	private Mono<Void> show() {
 		final StringBuilder representation = new StringBuilder();
 		for(int i = 0; i < this.spec.getChoices().size(); i++) {
 			representation.append(String.format("%n\t**%d.** %s", i + 1, this.spec.getChoices().keySet().toArray()[i]));
@@ -79,14 +79,14 @@ public class PollManager {
 				.then();
 	}
 
-	public <T> void schedule(Mono<T> mono, long delay, TemporalUnit unit) {
+	private <T> void schedule(Mono<T> mono, long delay, TemporalUnit unit) {
 		this.cancelScheduledTask();
 		this.scheduledTask = Mono.delay(Duration.of(delay, unit))
 				.then(mono)
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
 	}
 
-	public void cancelScheduledTask() {
+	private void cancelScheduledTask() {
 		if(this.scheduledTask != null) {
 			this.scheduledTask.dispose();
 		}

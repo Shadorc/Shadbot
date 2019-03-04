@@ -37,7 +37,7 @@ public class BaguetteCmd extends BaseCmd {
 	}
 
 	// Essential part of Shadbot (Thanks to @Bluerin)
-	public String howToDoAChocolateCake() {
+	public static String howToDoAChocolateCake() {
 		final String meal = "50g farine";
 		final String chocolate = "200g chocolat";
 		final String eggs = "3 oeufs";

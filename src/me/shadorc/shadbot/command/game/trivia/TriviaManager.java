@@ -36,7 +36,7 @@ import reactor.core.publisher.Mono;
 public class TriviaManager extends GameManager {
 
 	protected static final int MIN_GAINS = 100;
-	protected static final int MAX_BONUS = 100;
+	private static final int MAX_BONUS = 100;
 
 	private final TriviaResult trivia;
 	private final Map<Snowflake, Boolean> alreadyAnswered;

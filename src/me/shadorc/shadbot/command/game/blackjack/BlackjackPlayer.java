@@ -42,7 +42,7 @@ public class BlackjackPlayer {
 		this.stand();
 	}
 
-	public void addCards(List<Card> cards) {
+	private void addCards(List<Card> cards) {
 		if(this.isStanding()) {
 			return;
 		}

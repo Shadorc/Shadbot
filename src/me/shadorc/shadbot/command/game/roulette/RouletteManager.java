@@ -33,7 +33,7 @@ import reactor.util.function.Tuples;
 
 public class RouletteManager extends GameManager {
 
-	protected static final List<Integer> RED_NUMS = List.of(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36);
+	private static final List<Integer> RED_NUMS = List.of(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36);
 
 	// User ID, Tuple2<Bet, Place>
 	private final ConcurrentHashMap<Snowflake, Tuple2<Integer, String>> playersPlace;
@@ -84,7 +84,7 @@ public class RouletteManager extends GameManager {
 				.then();
 	}
 
-	public Mono<Void> spin() {
+	private Mono<Void> spin() {
 		final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
 		return Flux.fromIterable(this.playersPlace.keySet())
 				.flatMap(this.getContext().getClient()::getUserById)
