@@ -1,29 +1,23 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.BaseCmd;
-import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-public class BlackjackCmd extends BaseCmd {
-
-	protected static final ConcurrentHashMap<Snowflake, BlackjackManager> MANAGERS = new ConcurrentHashMap<>();
+public class BlackjackCmd extends GameCmd<BlackjackManager> {
 
 	private static final int MAX_BET = 250_000;
 
 	public BlackjackCmd() {
-		super(CommandCategory.GAME, List.of("blackjack"), "bj");
-		this.setGameRateLimiter();
+		super(List.of("blackjack"), "bj");
 	}
 
 	@Override
@@ -32,11 +26,12 @@ public class BlackjackCmd extends BaseCmd {
 
 		final Integer bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
 
-		BlackjackManager blackjackManager = MANAGERS.putIfAbsent(context.getChannelId(), new BlackjackManager(context));
-		if(blackjackManager == null) {
-			blackjackManager = MANAGERS.get(context.getChannelId());
-			blackjackManager.start();
-		}
+		final BlackjackManager blackjackManager = this.getManagers().computeIfAbsent(context.getChannelId(),
+				channelId -> {
+					final BlackjackManager manager = new BlackjackManager(this, context);
+					manager.start();
+					return manager;
+				});
 
 		if(blackjackManager.addPlayerIfAbsent(context.getAuthorId(), bet)) {
 			return blackjackManager.computeResultsOrShow();

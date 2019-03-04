@@ -28,8 +28,6 @@ import reactor.core.publisher.Mono;
 
 public class PollCmd extends BaseCmd {
 
-	protected static final ConcurrentHashMap<Snowflake, PollManager> MANAGER = new ConcurrentHashMap<>();
-
 	private static final List<String> NUMBER_UNICODE = List.of(
 			"\u0030\u20E3", "\u0031\u20E3", "\u0032\u20E3", "\u0033\u20E3", "\u0034\u20E3",
 			"\u0035\u20E3", "\u0036\u20E3", "\u0037\u20E3", "\u0038\u20E3", "\u0039\u20E3",
@@ -40,9 +38,13 @@ public class PollCmd extends BaseCmd {
 	private static final int MIN_DURATION = 10;
 	private static final int MAX_DURATION = 3600;
 
+	private final Map<Snowflake, PollManager> managers;
+
 	public PollCmd() {
 		super(CommandCategory.UTILS, List.of("poll"));
 		this.setDefaultRateLimiter();
+
+		this.managers = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -53,13 +55,14 @@ public class PollCmd extends BaseCmd {
 				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.ADD_REACTIONS))
 				.then(context.getPermission())
 				.doOnNext(permission -> {
-					PollManager pollManager = MANAGER.get(context.getChannelId());
-					if(pollManager == null) {
-						pollManager = this.createPoll(context);
-						if(MANAGER.putIfAbsent(context.getChannelId(), pollManager) == null) {
-							pollManager.start();
-						}
-					} else if(this.isCancelMsg(context, permission, pollManager)) {
+					final PollManager pollManager = this.managers.computeIfAbsent(context.getChannelId(),
+							channelId -> {
+								final PollManager manager = this.createPoll(context);
+								manager.start();
+								return manager;
+							});
+
+					if(this.isCancelMsg(context, permission, pollManager)) {
 						pollManager.stop();
 					}
 				})
@@ -69,7 +72,7 @@ public class PollCmd extends BaseCmd {
 	private boolean isCancelMsg(Context context, CommandPermission perm, PollManager pollManager) {
 		final boolean isAuthor = context.getAuthorId().equals(pollManager.getContext().getAuthorId());
 		final boolean isAdmin = perm.equals(CommandPermission.ADMIN);
-		final boolean isCancelMsg = context.getArg().map(arg -> arg.matches("stop|cancel")).get();
+		final boolean isCancelMsg = context.getArg().map(arg -> arg.matches("stop|cancel")).orElse(false);
 		return isCancelMsg && (isAuthor || isAdmin);
 	}
 
@@ -120,7 +123,7 @@ public class PollCmd extends BaseCmd {
 			choicesReactions.put(choices.get(i), ReactionEmoji.unicode(NUMBER_UNICODE.get(i + 1)));
 		}
 
-		return new PollManager(context, new PollCreateSpec(Duration.ofSeconds(seconds), substrings.get(0), choicesReactions));
+		return new PollManager(this, context, new PollCreateSpec(Duration.ofSeconds(seconds), substrings.get(0), choicesReactions));
 	}
 
 	@Override
@@ -139,5 +142,9 @@ public class PollCmd extends BaseCmd {
 						+ "%n**choices** - must be in quotation marks, min: %d, max: %d",
 						MIN_DURATION, MAX_DURATION, MIN_CHOICES_NUM, MAX_CHOICES_NUM), false)
 				.build();
+	}
+
+	public Map<Snowflake, PollManager> getManagers() {
+		return this.managers;
 	}
 }

@@ -1,6 +1,8 @@
 package me.shadorc.shadbot.command.utils.poll;
 
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,40 +18,42 @@ import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.game.AbstractGameManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.object.message.ReactionMessage;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
-public class PollManager extends AbstractGameManager {
+public class PollManager {
 
+	private final PollCmd pollCmd;
+	private final Context context;
 	private final PollCreateSpec spec;
 	private final ReactionMessage voteMessage;
+	private Disposable scheduledTask;
 
-	public PollManager(Context context, PollCreateSpec spec) {
-		super(context);
+	public PollManager(PollCmd pollCmd, Context context, PollCreateSpec spec) {
+		this.pollCmd = pollCmd;
+		this.context = context;
 		this.spec = spec;
 		this.voteMessage = new ReactionMessage(context.getClient(), context.getChannelId(), spec.getChoices().values());
+		this.scheduledTask = null;
 	}
 
-	@Override
 	public void start() {
 		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration().toMillis(), ChronoUnit.MILLIS);
 		this.show()
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
 	}
 
-	@Override
 	public void stop() {
 		this.cancelScheduledTask();
-		PollCmd.MANAGER.remove(this.getContext().getChannelId());
+		this.pollCmd.getManagers().remove(this.getContext().getChannelId());
 	}
 
-	@Override
 	public Mono<Void> show() {
 		final StringBuilder representation = new StringBuilder();
 		for(int i = 0; i < this.spec.getChoices().size(); i++) {
@@ -73,6 +77,23 @@ public class PollManager extends AbstractGameManager {
 				.map(Message::getReactions)
 				.flatMap(this::sendResults)
 				.then();
+	}
+
+	public <T> void schedule(Mono<T> mono, long delay, TemporalUnit unit) {
+		this.cancelScheduledTask();
+		this.scheduledTask = Mono.delay(Duration.of(delay, unit))
+				.then(mono)
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
+	}
+
+	public void cancelScheduledTask() {
+		if(this.scheduledTask != null) {
+			this.scheduledTask.dispose();
+		}
+	}
+
+	public Context getContext() {
+		return this.context;
 	}
 
 	private Mono<Message> sendResults(Set<Reaction> reactions) {

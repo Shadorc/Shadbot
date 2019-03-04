@@ -1,14 +1,11 @@
 package me.shadorc.shadbot.command.game.dice;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.BaseCmd;
-import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -18,16 +15,13 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-public class DiceCmd extends BaseCmd {
-
-	protected static final ConcurrentHashMap<Snowflake, DiceManager> MANAGERS = new ConcurrentHashMap<>();
+public class DiceCmd extends GameCmd<DiceManager> {
 
 	protected static final float MULTIPLIER = 4.5f;
 	private static final int MAX_BET = 250_000;
 
 	public DiceCmd() {
-		super(CommandCategory.GAME, List.of("dice"));
-		this.setGameRateLimiter();
+		super(List.of("dice"));
 	}
 
 	@Override
@@ -43,7 +37,7 @@ public class DiceCmd extends BaseCmd {
 			throw new CommandException(String.format("`%s` is not a valid number, must be between 1 and 6.", numStr));
 		}
 
-		DiceManager diceManager = MANAGERS.get(context.getChannelId());
+		DiceManager diceManager = this.getManagers().get(context.getChannelId());
 
 		// The user tries to join a game and no game are currently playing
 		if(isJoining && diceManager == null) {
@@ -63,7 +57,7 @@ public class DiceCmd extends BaseCmd {
 						.then();
 			}
 
-			diceManager = new DiceManager(context, bet);
+			diceManager = new DiceManager(this, context, bet);
 		}
 
 		if(diceManager.getPlayerCount() == 6) {
@@ -81,12 +75,12 @@ public class DiceCmd extends BaseCmd {
 					.then();
 		}
 
-		if(MANAGERS.putIfAbsent(context.getChannelId(), diceManager) == null) {
+		if(this.getManagers().putIfAbsent(context.getChannelId(), diceManager) == null) {
 			diceManager.start();
 		}
 
 		if(diceManager.addPlayerIfAbsent(context.getAuthorId(), num)) {
-			return diceManager.show().then();
+			return diceManager.show();
 		} else {
 			return context.getChannel()
 					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",

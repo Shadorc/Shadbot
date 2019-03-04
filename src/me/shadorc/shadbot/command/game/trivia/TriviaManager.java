@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.command.game.trivia;
 
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -17,10 +17,10 @@ import me.shadorc.shadbot.api.trivia.TriviaResponse;
 import me.shadorc.shadbot.api.trivia.TriviaResult;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.game.AbstractGameManager;
+import me.shadorc.shadbot.core.game.GameCmd;
+import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -33,19 +33,19 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-public class TriviaManager extends AbstractGameManager implements MessageInterceptor {
+public class TriviaManager extends GameManager {
 
 	protected static final int MIN_GAINS = 100;
 	protected static final int MAX_BONUS = 100;
-	protected static final int LIMITED_TIME = 30;
+	protected static final Duration GAME_DURATION = Duration.ofSeconds(30);
 
 	private final TriviaResult trivia;
-	private final ConcurrentHashMap<Snowflake, Boolean> alreadyAnswered;
+	private final Map<Snowflake, Boolean> alreadyAnswered;
 
 	private long startTime;
 
-	public TriviaManager(Context context, Integer categoryId) {
-		super(context);
+	public TriviaManager(GameCmd<TriviaManager> gameCmd, Context context, Integer categoryId) {
+		super(gameCmd, context);
 		try {
 			final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, ""));
 			final TriviaResponse response = Utils.MAPPER.readValue(NetUtils.getJSON(url), TriviaResponse.class);
@@ -64,15 +64,8 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 				.then(this.getContext().getChannel())
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
 						this.trivia.getCorrectAnswer()), channel)),
-				LIMITED_TIME, ChronoUnit.SECONDS);
+				GAME_DURATION);
 		this.startTime = System.currentTimeMillis();
-	}
-
-	@Override
-	public void stop() {
-		this.cancelScheduledTask();
-		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-		TriviaCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
 	@Override
@@ -88,7 +81,7 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 						.addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
 						.addField("Type", String.format("`%s`", this.trivia.getType()), true)
 						.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
-						.setFooter(String.format("You have %d seconds to answer.", LIMITED_TIME), null));
+						.setFooter(String.format("You have %d seconds to answer.", GAME_DURATION.toSeconds()), null));
 
 		return this.getContext().getChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
@@ -96,9 +89,9 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 	}
 
 	private Mono<Message> win(Member member) {
-		final float coinsPerSec = (float) MAX_BONUS / LIMITED_TIME;
-		final long remainingSec = LIMITED_TIME - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(this.startTime));
-		final int gains = MIN_GAINS + (int) Math.ceil(remainingSec * coinsPerSec);
+		final float coinsPerSec = (float) MAX_BONUS / GAME_DURATION.toSeconds();
+		final Duration remainingDuration = GAME_DURATION.minusMillis(TimeUtils.getMillisUntil(this.startTime));
+		final int gains = MIN_GAINS + (int) Math.ceil(remainingDuration.toSeconds() * coinsPerSec);
 
 		Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
 		StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
@@ -123,29 +116,27 @@ public class TriviaManager extends AbstractGameManager implements MessageInterce
 					}
 
 					// If the user has already answered and has been warned, ignore him
-					if(this.alreadyAnswered.containsKey(member.getId()) && this.alreadyAnswered.get(member.getId())) {
+					if(this.alreadyAnswered.getOrDefault(member.getId(), false)) {
 						return Mono.just(false);
 					}
 
 					final String answer = choice == null ? content : this.trivia.getAnswers().get(choice - 1);
 
-					Mono<Message> monoMessage;
 					if(this.alreadyAnswered.containsKey(member.getId())) {
-						monoMessage = event.getMessage().getChannel()
-								.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
-										member.getUsername()), channel));
 						this.alreadyAnswered.put(member.getId(), true);
+						return event.getMessage().getChannel()
+								.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
+										member.getUsername()), channel))
+								.thenReturn(true);
 					} else if(answer.equalsIgnoreCase(this.trivia.getCorrectAnswer())) {
-						monoMessage = this.win(member);
-
+						return this.win(member).thenReturn(true);
 					} else {
-						monoMessage = event.getMessage().getChannel()
-								.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
-										member.getUsername()), channel));
 						this.alreadyAnswered.put(member.getId(), false);
+						return event.getMessage().getChannel()
+								.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
+										member.getUsername()), channel))
+								.thenReturn(true);
 					}
-
-					return monoMessage.thenReturn(true);
 				}));
 	}
 

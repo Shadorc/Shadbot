@@ -1,14 +1,11 @@
 package me.shadorc.shadbot.command.game.roulette;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.BaseCmd;
-import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -18,19 +15,16 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-public class RouletteCmd extends BaseCmd {
+public class RouletteCmd extends GameCmd<RouletteManager> {
 
 	public enum Place {
 		RED, BLACK, ODD, EVEN, LOW, HIGH;
 	}
 
-	protected static final ConcurrentHashMap<Snowflake, RouletteManager> MANAGERS = new ConcurrentHashMap<>();
-
 	private static final int MAX_BET = 250_000;
 
 	public RouletteCmd() {
-		super(CommandCategory.GAME, List.of("roulette"));
-		this.setGameRateLimiter();
+		super(List.of("roulette"));
 	}
 
 	@Override
@@ -47,11 +41,12 @@ public class RouletteCmd extends BaseCmd {
 					place, FormatUtils.format(Place.values(), value -> String.format("**%s**", StringUtils.toLowerCase(value)), ", ")));
 		}
 
-		RouletteManager rouletteManager = MANAGERS.putIfAbsent(context.getChannelId(), new RouletteManager(context));
-		if(rouletteManager == null) {
-			rouletteManager = MANAGERS.get(context.getChannelId());
-			rouletteManager.start();
-		}
+		final RouletteManager rouletteManager = this.getManagers().computeIfAbsent(context.getChannelId(),
+				channelId -> {
+					final RouletteManager manager = new RouletteManager(this, context);
+					manager.start();
+					return manager;
+				});
 
 		if(rouletteManager.addPlayer(context.getAuthorId(), bet, place)) {
 			return rouletteManager.show();

@@ -1,6 +1,6 @@
 package me.shadorc.shadbot.command.game.roulette;
 
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,10 +13,10 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.game.AbstractGameManager;
+import me.shadorc.shadbot.core.game.GameCmd;
+import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -31,11 +31,11 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-public class RouletteManager extends AbstractGameManager implements MessageInterceptor {
+public class RouletteManager extends GameManager {
 
 	protected static final List<Integer> RED_NUMS = List.of(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36);
 
-	private static final int GAME_DURATION = 30;
+	private static final Duration GAME_DURATION = Duration.ofSeconds(30);
 
 	// User ID, Tuple2<Bet, Place>
 	private final ConcurrentHashMap<Snowflake, Tuple2<Integer, String>> playersPlace;
@@ -43,23 +43,16 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 
 	private String results;
 
-	public RouletteManager(Context context) {
-		super(context);
+	public RouletteManager(GameCmd<RouletteManager> gameCmd, Context context) {
+		super(gameCmd, context);
 		this.playersPlace = new ConcurrentHashMap<>();
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 	}
 
 	@Override
 	public void start() {
-		this.schedule(this.spin(), GAME_DURATION, ChronoUnit.SECONDS);
+		this.schedule(this.spin(), GAME_DURATION);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-	}
-
-	@Override
-	public void stop() {
-		this.cancelScheduledTask();
-		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-		RouletteCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
 	@Override
@@ -86,7 +79,7 @@ public class RouletteManager extends AbstractGameManager implements MessageInter
 							if(this.isTaskDone()) {
 								embed.setFooter("Finished", null);
 							} else {
-								embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+								embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION.toSeconds()), null);
 							}
 						}))
 				.flatMap(this.updateableMessage::send)

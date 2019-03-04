@@ -1,12 +1,10 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -16,11 +14,11 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.game.AbstractGameManager;
+import me.shadorc.shadbot.core.game.GameCmd;
+import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -32,9 +30,9 @@ import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class BlackjackManager extends AbstractGameManager implements MessageInterceptor {
+public class BlackjackManager extends GameManager {
 
-	private static final int GAME_DURATION = 60;
+	private static final Duration GAME_DURATION = Duration.ofMinutes(1);
 	private static final float WIN_MULTIPLIER = 1.15f;
 
 	private final RateLimiter rateLimiter;
@@ -44,8 +42,8 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 
 	private long startTime;
 
-	public BlackjackManager(Context context) {
-		super(context);
+	public BlackjackManager(GameCmd<BlackjackManager> gameCmd, Context context) {
+		super(gameCmd, context);
 		this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(2));
 		this.players = new CopyOnWriteArrayList<>();
 		this.dealerCards = new ArrayList<>();
@@ -59,16 +57,9 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 			this.dealerCards.add(Card.pick());
 		}
 
-		this.schedule(this.computeResults(), GAME_DURATION, ChronoUnit.SECONDS);
+		this.schedule(this.computeResults(), GAME_DURATION);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
 		this.startTime = System.currentTimeMillis();
-	}
-
-	@Override
-	public void stop() {
-		this.cancelScheduledTask();
-		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-		BlackjackCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
 	@Override
@@ -97,8 +88,8 @@ public class BlackjackManager extends AbstractGameManager implements MessageInte
 							if(this.isTaskDone()) {
 								embed.setFooter("Finished", null);
 							} else {
-								final long remainingTime = GAME_DURATION - TimeUnit.MILLISECONDS.toSeconds(TimeUtils.getMillisUntil(this.startTime));
-								embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingTime), null);
+								final Duration remainingDuration = GAME_DURATION.minusMillis(TimeUtils.getMillisUntil(this.startTime));
+								embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingDuration.toSeconds()), null);
 							}
 
 							fields.stream().forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));

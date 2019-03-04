@@ -1,6 +1,6 @@
 package me.shadorc.shadbot.command.game.dice;
 
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -10,10 +10,10 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.game.AbstractGameManager;
+import me.shadorc.shadbot.core.game.GameCmd;
+import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -23,18 +23,18 @@ import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class DiceManager extends AbstractGameManager implements MessageInterceptor {
+public class DiceManager extends GameManager {
 
-	private static final int GAME_DURATION = 30;
+	private static final Duration GAME_DURATION = Duration.ofSeconds(30);
 
-	private final ConcurrentHashMap<Integer, Snowflake> numsPlayers;
 	private final int bet;
+	private final ConcurrentHashMap<Integer, Snowflake> numsPlayers;
 	private final UpdateableMessage updateableMessage;
 
 	private String results;
 
-	public DiceManager(Context context, int bet) {
-		super(context);
+	public DiceManager(GameCmd<DiceManager> gameCmd, Context context, int bet) {
+		super(gameCmd, context);
 		this.bet = bet;
 		this.numsPlayers = new ConcurrentHashMap<>();
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
@@ -42,15 +42,8 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 
 	@Override
 	public void start() {
-		this.schedule(this.rollTheDice(), GAME_DURATION, ChronoUnit.SECONDS);
+		this.schedule(this.rollTheDice(), GAME_DURATION);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-	}
-
-	@Override
-	public void stop() {
-		this.cancelScheduledTask();
-		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-		DiceCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
 	@Override
@@ -71,7 +64,7 @@ public class DiceManager extends AbstractGameManager implements MessageIntercept
 							if(this.isTaskDone()) {
 								embed.setFooter("Finished.", null);
 							} else {
-								embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION), null);
+								embed.setFooter(String.format("You have %d seconds to make your bets.", GAME_DURATION.toSeconds()), null);
 							}
 
 							if(this.results != null) {

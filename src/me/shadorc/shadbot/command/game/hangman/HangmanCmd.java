@@ -3,15 +3,12 @@ package me.shadorc.shadbot.command.game.hangman;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.core.command.BaseCmd;
-import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -25,7 +22,7 @@ import me.shadorc.shadbot.utils.object.message.LoadingMessage;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-public class HangmanCmd extends BaseCmd {
+public class HangmanCmd extends GameCmd<HangmanManager> {
 
 	protected enum Difficulty {
 		EASY, HARD;
@@ -37,13 +34,11 @@ public class HangmanCmd extends BaseCmd {
 	private static final int MIN_WORD_LENGTH = 5;
 	private static final int MAX_WORD_LENGTH = 10;
 
-	protected static final ConcurrentHashMap<Snowflake, HangmanManager> MANAGERS = new ConcurrentHashMap<>();
 	protected static final List<String> HARD_WORDS = new ArrayList<>();
 	protected static final List<String> EASY_WORDS = new ArrayList<>();
 
 	public HangmanCmd() {
-		super(CommandCategory.GAME, List.of("hangman"));
-		this.setGameRateLimiter();
+		super(List.of("hangman"));
 	}
 
 	@Override
@@ -66,9 +61,9 @@ public class HangmanCmd extends BaseCmd {
 			loadingMsg.stopTyping();
 		}
 
-		final HangmanManager hangmanManager = MANAGERS.putIfAbsent(context.getChannelId(), new HangmanManager(context, difficulty));
+		final HangmanManager hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanManager(this, context, difficulty));
 		if(hangmanManager == null) {
-			final HangmanManager newHangmanManager = MANAGERS.get(context.getChannelId());
+			final HangmanManager newHangmanManager = this.getManagers().get(context.getChannelId());
 			newHangmanManager.start();
 			return newHangmanManager.show();
 		} else {

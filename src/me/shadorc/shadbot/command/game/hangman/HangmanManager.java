@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.game.hangman;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -14,11 +13,11 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.game.AbstractGameManager;
+import me.shadorc.shadbot.core.game.GameCmd;
+import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -28,7 +27,7 @@ import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 import reactor.core.publisher.Mono;
 
-public class HangmanManager extends AbstractGameManager implements MessageInterceptor {
+public class HangmanManager extends GameManager {
 
 	private static final List<String> IMG_LIST = List.of(
 			"https://upload.wikimedia.org/wikipedia/commons/8/8b/Hangman-0.png",
@@ -41,7 +40,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	protected static final int MIN_GAINS = 200;
 	protected static final int MAX_BONUS = 200;
-	protected static final int IDLE_MIN = 1;
+	protected static final Duration IDLE_DURATION = Duration.ofMinutes(1);
 
 	private final RateLimiter rateLimiter;
 	private final UpdateableMessage updateableMessage;
@@ -50,8 +49,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	private int failCount;
 
-	public HangmanManager(Context context, Difficulty difficulty) {
-		super(context);
+	public HangmanManager(GameCmd<HangmanManager> gameCmd, Context context, Difficulty difficulty) {
+		super(gameCmd, context);
 		this.rateLimiter = new RateLimiter(3, Duration.ofSeconds(2));
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 		this.word = HangmanCmd.getWord(difficulty);
@@ -61,15 +60,8 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	@Override
 	public void start() {
-		this.schedule(Mono.fromRunnable(this::stop), IDLE_MIN, ChronoUnit.MINUTES);
+		this.schedule(Mono.fromRunnable(this::stop), IDLE_DURATION);
 		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-	}
-
-	@Override
-	public void stop() {
-		this.cancelScheduledTask();
-		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
-		HangmanCmd.MANAGERS.remove(this.getContext().getChannelId());
 	}
 
 	@Override
@@ -94,7 +86,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 						embed.setFooter("Finished.", null);
 					} else {
 						embed.setFooter(String.format("Use %scancel to cancel this game (Automatically cancelled in %d min in case of inactivity)",
-								this.getContext().getPrefix(), IDLE_MIN), null);
+								this.getContext().getPrefix(), IDLE_DURATION.toMinutes()), null);
 					}
 
 					if(this.failCount > 0) {
@@ -130,7 +122,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	private Mono<Void> checkLetter(String chr) {
 		// Reset IDLE timer
-		this.schedule(Mono.fromRunnable(this::stop), IDLE_MIN, ChronoUnit.MINUTES);
+		this.schedule(Mono.fromRunnable(this::stop), IDLE_DURATION);
 
 		if(this.lettersTested.contains(chr)) {
 			return Mono.empty();
@@ -155,7 +147,7 @@ public class HangmanManager extends AbstractGameManager implements MessageInterc
 
 	private Mono<Void> checkWord(String word) {
 		// Reset IDLE timer
-		this.schedule(Mono.fromRunnable(this::stop), IDLE_MIN, ChronoUnit.MINUTES);
+		this.schedule(Mono.fromRunnable(this::stop), IDLE_DURATION);
 
 		// If the word has been guessed
 		if(this.word.equalsIgnoreCase(word)) {
