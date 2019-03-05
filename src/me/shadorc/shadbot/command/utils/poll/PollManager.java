@@ -39,7 +39,7 @@ public class PollManager {
 		this.pollCmd = pollCmd;
 		this.context = context;
 		this.spec = spec;
-		this.voteMessage = new ReactionMessage(context.getClient(), context.getChannelId(), spec.getChoices().values());
+		this.voteMessage = new ReactionMessage(context.getClient(), context.getChannelId(), spec.getReactions());
 		this.scheduledTask = null;
 	}
 
@@ -61,10 +61,9 @@ public class PollManager {
 		}
 
 		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-				.andThen(embed -> embed.setAuthor(String.format("Poll by %s)", this.getContext().getUsername()),
+				.andThen(embed -> embed.setAuthor(String.format("Poll by %s", this.getContext().getUsername()),
 						null, this.getContext().getAvatarUrl())
-						.setDescription(String.format("Vote using: `%s%s <choice>`%n%n__**%s**__%s",
-								this.getContext().getPrefix(), this.getContext().getCommandName(),
+						.setDescription(String.format("Vote by clicking on the corresponding number.%n%n__**%s**__%s",
 								this.spec.getQuestion(), representation.toString()))
 						.setFooter(String.format("You have %s to vote.",
 								FormatUtils.shortDuration(this.spec.getDuration().toMillis())),

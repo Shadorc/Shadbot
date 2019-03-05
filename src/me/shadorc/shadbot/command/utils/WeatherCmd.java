@@ -84,12 +84,14 @@ public class WeatherCmd extends BaseCmd {
 							.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true));
 
 			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			if(err instanceof APIException && ((APIException) err).getCode() == HttpStatus.SC_NOT_FOUND) {
+		} catch (final APIException err) {
+			if(err.getCode() == HttpStatus.SC_NOT_FOUND) {
 				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
 						context.getUsername(), args.get(0))).then();
 			}
+			loadingMsg.stopTyping();
+			throw Exceptions.propagate(err);
+		} catch (final Exception err) {
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
 		}

@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.utils.poll;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Map;
 
 import discord4j.core.object.reaction.ReactionEmoji;
@@ -27,6 +28,10 @@ public class PollCreateSpec {
 
 	public Map<String, ReactionEmoji> getChoices() {
 		return this.choices;
+	}
+
+	public Collection<ReactionEmoji> getReactions() {
+		return this.getChoices().values();
 	}
 
 }

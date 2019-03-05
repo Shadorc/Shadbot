@@ -2,7 +2,7 @@ package me.shadorc.shadbot.command.utils.poll;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,9 +29,8 @@ import reactor.core.publisher.Mono;
 public class PollCmd extends BaseCmd {
 
 	private static final List<String> NUMBER_UNICODE = List.of(
-			"\u0030\u20E3", "\u0031\u20E3", "\u0032\u20E3", "\u0033\u20E3", "\u0034\u20E3",
-			"\u0035\u20E3", "\u0036\u20E3", "\u0037\u20E3", "\u0038\u20E3", "\u0039\u20E3",
-			"\u0040\u20E3");
+			"\u0031\u20E3", "\u0032\u20E3", "\u0033\u20E3", "\u0034\u20E3", "\u0035\u20E3",
+			"\u0036\u20E3", "\u0037\u20E3", "\u0038\u20E3", "\u0039\u20E3", "\u0040\u20E3");
 
 	private static final int MIN_CHOICES_NUM = 2;
 	private static final int MAX_CHOICES_NUM = 10;
@@ -118,9 +117,9 @@ public class PollCmd extends BaseCmd {
 					MIN_CHOICES_NUM, MAX_CHOICES_NUM));
 		}
 
-		final Map<String, ReactionEmoji> choicesReactions = new HashMap<>();
+		final Map<String, ReactionEmoji> choicesReactions = new LinkedHashMap<>();
 		for(int i = 0; i < choices.size(); i++) {
-			choicesReactions.put(choices.get(i), ReactionEmoji.unicode(NUMBER_UNICODE.get(i + 1)));
+			choicesReactions.put(choices.get(i), ReactionEmoji.unicode(NUMBER_UNICODE.get(i)));
 		}
 
 		return new PollManager(this, context, new PollCreateSpec(Duration.ofSeconds(seconds), substrings.get(0), choicesReactions));
@@ -135,9 +134,9 @@ public class PollCmd extends BaseCmd {
 				.addArg("\"choice1\"", false)
 				.addArg("\"choice2\"", false)
 				.addArg("\"choiceX\"", true)
-				.setExample(String.format("`%s%s 120 \"Where do we eat at noon?\" \"White\" \"53\" \"A dog\"`",
+				.setExample(String.format("`%s%s 2m30s \"Where do we eat at noon?\" \"White\" \"53\" \"A dog\"`",
 						context.getPrefix(), this.getName()))
-				.addField("Restrictions", String.format("%n**duration** - in seconds, must be between %ds and %ds (1 hour)"
+				.addField("Restrictions", String.format("%n**duration** - must be between %ds and %ds (1 hour)"
 						+ "%n**question** - must be in quotation marks"
 						+ "%n**choices** - must be in quotation marks, min: %d, max: %d",
 						MIN_DURATION, MAX_DURATION, MIN_CHOICES_NUM, MAX_CHOICES_NUM), false)

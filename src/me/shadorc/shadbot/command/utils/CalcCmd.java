@@ -46,7 +46,8 @@ public class CalcCmd extends BaseCmd {
 		return new HelpBuilder(this, context)
 				.setDescription("Calculate an expression.")
 				.addArg("expression", false)
-				.setExample(String.format("`%s%s 3+3*3+3`", context.getPrefix(), this.getName()))
+				.setExample(String.format("`%s%s 3+3*3+3`%n`%s%s 2*cos(pi)`",
+						context.getPrefix(), this.getName(), context.getPrefix(), this.getName()))
 				.build();
 	}
 

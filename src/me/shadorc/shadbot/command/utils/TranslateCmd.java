@@ -3,6 +3,7 @@ package me.shadorc.shadbot.command.utils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.json.JSONArray;
@@ -66,6 +67,10 @@ public class TranslateCmd extends BaseCmd {
 		final String langFrom = this.toISO(langs.get(0));
 		final String langTo = this.toISO(langs.get(1));
 
+		if(langTo != null && Objects.equals(langFrom, langTo)) {
+			throw new CommandException("The destination language must be different from the source one.");
+		}
+
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 		try {
 			final String url = String.format("https://translate.googleapis.com/translate_a/single?"
@@ -94,10 +99,9 @@ public class TranslateCmd extends BaseCmd {
 
 			if(translatedText.toString().equalsIgnoreCase(sourceText)) {
 				loadingMsg.stopTyping();
-				throw new CommandException(String.format("The text could not been translated. "
-						+ "Check that the specified languages are supported, that the text is in the specified language "
-						+ "and that the destination language is different from the source one. "
-						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
+				throw new CommandException(String.format("The text could not been translated."
+						+ "%nCheck that the specified languages are supported and that the text is in the specified language."
+						+ "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
 			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()

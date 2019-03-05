@@ -20,22 +20,20 @@ public class ReactionMessage {
 	private final Snowflake channelId;
 	private final Collection<ReactionEmoji> reactions;
 
-	public ReactionMessage(DiscordClient client, Snowflake channelId, Collection<ReactionEmoji> collection) {
+	public ReactionMessage(DiscordClient client, Snowflake channelId, Collection<ReactionEmoji> reactions) {
 		this.client = client;
 		this.channelId = channelId;
-		this.reactions = collection;
+		this.reactions = reactions;
 	}
 
 	/**
 	 * @param embed - the embed to send
-	 * @return A {@link Mono} containing a {@link Message} with {@link Reaction} added. If an error is received, it is emitted through the {@code Mono}.
-	 *         For example, if the message is deleted during the delay, a {@code 404 Forbidden} will be thrown.
+	 * @return A {@link Mono} containing a {@link Message} with {@link Reaction} added.
 	 */
 	public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
 				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
-				// Add the reactions to the message then wait
 				.flatMap(message -> Flux.fromIterable(this.reactions)
 						.flatMap(message::addReaction)
 						.then(Mono.just(message)));
