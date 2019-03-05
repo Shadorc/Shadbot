@@ -148,24 +148,6 @@ public class DiscordUtils {
 				.then();
 	}
 
-	public static Mono<Boolean> isUserHigher(Guild guild, Member user1, Member user2) {
-		if(guild.getOwnerId().equals(user1.getId())) {
-			return Mono.just(true);
-		}
-		if(guild.getOwnerId().equals(user2.getId())) {
-			return Mono.just(false);
-		}
-
-		return Mono.zip(user1.getRoles().collectList(), user2.getRoles().collectList())
-				.flatMap(tuple -> hasHigherRoles(tuple.getT1(), tuple.getT2()));
-	}
-
-	private static Mono<Boolean> hasHigherRoles(List<Role> roles1, List<Role> roles2) {
-		return Mono.zip(Flux.fromIterable(roles1).flatMap(Role::getPosition).sort().defaultIfEmpty(0).last(),
-				Flux.fromIterable(roles2).flatMap(Role::getPosition).sort().defaultIfEmpty(0).last())
-				.map(tuple -> tuple.getT1() > tuple.getT2());
-	}
-
 	/**
 	 * @param context - the context
 	 * @return The user voice channel ID if the user is in a voice channel and the bot is allowed to join or if the user is in a voice channel or if the

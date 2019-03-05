@@ -84,28 +84,28 @@ public abstract class RemoveMemberCmd extends BaseCmd {
 							}
 
 							return Flux.fromIterable(mentionedUsers)
-									.filter(user -> !user.isBot())
-									.flatMap(user -> user.asMember(context.getGuildId()))
-									.concatMap(member -> member.getPrivateChannel()
+									.filter(userToRemove -> !userToRemove.isBot())
+									.flatMap(userToRemove -> userToRemove.asMember(context.getGuildId()))
+									.concatMap(memberToRemove -> memberToRemove.getPrivateChannel()
 											.cast(MessageChannel.class)
-											.filterWhen(ignored -> DiscordUtils.isUserHigher(guild, self, member))
+											.filterWhen(ignored -> self.isHigher(memberToRemove))
 											.switchIfEmpty(DiscordUtils.sendMessage(
 													String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in the role hierarchy than me.",
-															context.getUsername(), this.getName(), member.getUsername()), channel)
+															context.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
 													.then(Mono.empty()))
-											.filterWhen(ignored -> DiscordUtils.isUserHigher(guild, context.getMember(), member))
+											.filterWhen(ignored -> context.getMember().isHigher(memberToRemove))
 											.switchIfEmpty(DiscordUtils.sendMessage(
 													String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher in the role hierarchy than you.",
-															context.getUsername(), this.getName(), member.getUsername()), channel)
+															context.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
 													.then(Mono.empty()))
 											.flatMap(privateChannel -> DiscordUtils.sendMessage(
 													String.format(Emoji.INFO + " You were %s from the server **%s** by **%s**. Reason: `%s`",
 															this.conjugatedVerb, guild.getName(), context.getUsername(), reason), privateChannel))
 											.switchIfEmpty(DiscordUtils.sendMessage(
 													String.format(Emoji.WARNING + " (**%s**) I could not send a message to **%s**.",
-															context.getUsername(), member.getUsername()), channel))
-											.then(this.action(member, reason.toString()))
-											.thenReturn(member));
+															context.getUsername(), memberToRemove.getUsername()), channel))
+											.then(this.action(memberToRemove, reason.toString()))
+											.thenReturn(memberToRemove));
 						})
 						.map(Member::getUsername)
 						.collectList()
