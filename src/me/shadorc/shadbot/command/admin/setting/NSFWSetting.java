@@ -36,7 +36,8 @@ public class NSFWSetting extends BaseSetting {
 			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
 		}
 
-		return context.getChannel().cast(TextChannel.class)
+		return context.getChannel()
+				.cast(TextChannel.class)
 				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_CHANNELS)
 						.then(Mono.fromSupplier(() -> {
 							switch (action) {
@@ -48,9 +49,9 @@ public class NSFWSetting extends BaseSetting {
 									return false;
 							}
 						}))
-						.flatMap(nsfw -> channel.edit(spec -> spec.setNsfw(nsfw)))
-						.then(DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) %s is now **%sSFW**.",
-								context.getUsername(), channel.getMention(), channel.isNsfw() ? "N" : ""), channel)))
+						.flatMap(nsfw -> channel.edit(spec -> spec.setNsfw(nsfw))))
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) %s is now **%sSFW**.",
+						context.getUsername(), channel.getMention(), channel.isNsfw() ? "N" : ""), channel))
 				.then();
 	}
 
