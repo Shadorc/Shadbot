@@ -12,7 +12,6 @@ import me.shadorc.shadbot.api.image.r34.R34Response;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -40,8 +39,11 @@ public class Rule34Cmd extends BaseCmd {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.isChannelNsfw()
-				.filter(Boolean.TRUE::equals)
 				.flatMap(isNsfw -> {
+					if(!isNsfw) {
+						return loadingMsg.send(TextUtils.mustBeNsfw(context.getPrefix()));
+					}
+
 					try {
 						final String url = String.format("https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=%s",
 								NetUtils.encode(arg.replace(" ", "_")));
@@ -87,8 +89,6 @@ public class Rule34Cmd extends BaseCmd {
 						throw Exceptions.propagate(err);
 					}
 				})
-				.switchIfEmpty(context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), channel)))
 				.then();
 	}
 
