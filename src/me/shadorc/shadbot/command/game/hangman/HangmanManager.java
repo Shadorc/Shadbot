@@ -3,11 +3,13 @@ package me.shadorc.shadbot.command.game.hangman;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
@@ -23,25 +25,24 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 import reactor.core.publisher.Mono;
 
 public class HangmanManager extends GameManager {
 
 	private static final List<String> IMG_LIST = List.of(
-			"https://upload.wikimedia.org/wikipedia/commons/8/8b/Hangman-0.png",
-			"https://upload.wikimedia.org/wikipedia/commons/3/30/Hangman-1.png",
-			"https://upload.wikimedia.org/wikipedia/commons/7/70/Hangman-2.png",
-			"https://upload.wikimedia.org/wikipedia/commons/9/97/Hangman-3.png",
-			"https://upload.wikimedia.org/wikipedia/commons/2/27/Hangman-4.png",
-			"https://upload.wikimedia.org/wikipedia/commons/6/6b/Hangman-5.png",
-			"https://upload.wikimedia.org/wikipedia/commons/d/d6/Hangman-6.png");
+			getImageUrl("8/8b", 0),
+			getImageUrl("3/30", 1),
+			getImageUrl("7/70", 2),
+			getImageUrl("9/97", 3),
+			getImageUrl("2/27", 4),
+			getImageUrl("6/6b", 5),
+			getImageUrl("d/d6", 6));
 
 	protected static final int MIN_GAINS = 200;
 	private static final int MAX_BONUS = 200;
 
 	private final RateLimiter rateLimiter;
-	private final UpdateableMessage updateableMessage;
+	private final AtomicLong messageId;
 	private final String word;
 	private final List<String> lettersTested;
 
@@ -49,8 +50,8 @@ public class HangmanManager extends GameManager {
 
 	public HangmanManager(HangmanCmd gameCmd, Context context, Difficulty difficulty) {
 		super(gameCmd, context, Duration.ofMinutes(1));
-		this.rateLimiter = new RateLimiter(3, Duration.ofSeconds(2));
-		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
+		this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(1));
+		this.messageId = new AtomicLong(-1);
 		this.word = gameCmd.getWord(difficulty);
 		this.lettersTested = new ArrayList<>();
 		this.failCount = 0;
@@ -92,7 +93,13 @@ public class HangmanManager extends GameManager {
 					}
 				});
 
-		return this.updateableMessage.send(embedConsumer).then();
+		return this.getContext().getClient()
+				.getMessageById(this.getContext().getChannelId(), Snowflake.of(this.messageId.get()))
+				.flatMap(message -> message.edit(spec -> spec.setEmbed(embedConsumer)))
+				.onErrorResume(err -> this.getContext().getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
+				.doOnNext(message -> this.messageId.set(message.getId().asLong()))
+				.then();
 	}
 
 	private Mono<Void> showResultAndStop(boolean win) {
@@ -195,6 +202,11 @@ public class HangmanManager extends GameManager {
 
 							return checkMono.thenReturn(false);
 						}));
+	}
+
+	private static String getImageUrl(String path, int num) {
+		return String.format("https://upload.wikimedia.org/wikipedia/commons/thumb/%s/Hangman-%d.png/60px-Hangman-%d.png",
+				path, num, num);
 	}
 
 }
