@@ -59,6 +59,12 @@ public class WikiCmd extends BaseCmd {
 						.then();
 			}
 
+			if(page.getExtract().endsWith("may refer to:")) {
+				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
+						+ "try with a more precise search.", context.getUsername()))
+						.then();
+			}
+
 			final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
 
 			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
