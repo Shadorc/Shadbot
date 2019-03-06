@@ -38,7 +38,7 @@ public class SendMessageCmd extends BaseCmd {
 		}
 
 		return context.getClient().getUserById(Snowflake.of(userId))
-				.onErrorMap(ExceptionUtils::isDiscordForbidden,
+				.onErrorMap(ExceptionUtils::isKnownDiscordError,
 						err -> new CommandException("User not found."))
 				.flatMap(user -> {
 					if(user.isBot()) {
