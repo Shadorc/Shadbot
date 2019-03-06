@@ -58,9 +58,9 @@ public abstract class GameManager implements MessageInterceptor {
 	 * Cancel the current task, if scheduled.
 	 */
 	private void cancelScheduledTask() {
-		this.isScheduled.set(false);
-		if(this.scheduledTask != null) {
+		if(this.isScheduled() && this.scheduledTask != null) {
 			this.scheduledTask.dispose();
+			this.isScheduled.set(false);
 		}
 	}
 
