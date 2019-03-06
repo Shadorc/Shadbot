@@ -201,7 +201,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 					final Set<Integer> choices = new HashSet<>();
 					for(final String choice : contentCleaned.split(",")) {
 						// If the choice is not valid, ignore the message
-						final Integer num = NumberUtils.asIntBetween(choice, 1, Math.min(Config.MUSIC_SEARCHES, this.resultsTracks.size()));
+						final Integer num = NumberUtils.asIntBetween(choice.trim(), 1, Math.min(Config.MUSIC_SEARCHES, this.resultsTracks.size()));
 						if(num == null) {
 							return Mono.just(false);
 						}
