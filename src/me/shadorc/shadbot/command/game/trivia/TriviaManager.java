@@ -2,6 +2,9 @@ package me.shadorc.shadbot.command.game.trivia;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,11 +43,13 @@ public class TriviaManager extends GameManager {
 
 	private final TriviaResult trivia;
 	private final Map<Snowflake, Boolean> alreadyAnswered;
+	private final List<String> answers;
 
 	private long startTime;
 
 	public TriviaManager(GameCmd<TriviaManager> gameCmd, Context context, Integer categoryId) {
 		super(gameCmd, context, Duration.ofSeconds(30));
+
 		try {
 			final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, ""));
 			final TriviaResponse response = Utils.MAPPER.readValue(NetUtils.getJSON(url), TriviaResponse.class);
@@ -52,6 +57,16 @@ public class TriviaManager extends GameManager {
 		} catch (final IOException err) {
 			throw Exceptions.propagate(err);
 		}
+
+		this.answers = new ArrayList<>();
+		if(this.trivia.getType().equals("multiple")) {
+			this.answers.addAll(this.trivia.getIncorrectAnswers());
+			this.answers.add(this.trivia.getCorrectAnswer());
+			Collections.shuffle(this.answers);
+		} else {
+			this.answers.addAll(List.of("True", "False"));
+		}
+
 		this.alreadyAnswered = new ConcurrentHashMap<>();
 	}
 
@@ -70,8 +85,8 @@ public class TriviaManager extends GameManager {
 	public Mono<Void> show() {
 		final String description = String.format("**%s**%n%s",
 				this.trivia.getQuestion(),
-				FormatUtils.numberedList(this.trivia.getAnswers().size(), this.trivia.getAnswers().size(),
-						count -> String.format("\t**%d**. %s", count, this.trivia.getAnswers().get(count - 1))));
+				FormatUtils.numberedList(this.answers.size(), this.answers.size(),
+						count -> String.format("\t**%d**. %s", count, this.answers.get(count - 1))));
 
 		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
 				.andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
@@ -103,13 +118,13 @@ public class TriviaManager extends GameManager {
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		final Member member = event.getMember().get();
-		return this.cancelOrDo(event.getMessage(), Mono.just(event.getMessage().getContent().get())
+		return this.cancelOrDo(event.getMessage(), Mono.justOrEmpty(event.getMessage().getContent())
 				.flatMap(content -> {
 					// It's a number or a text
-					final Integer choice = NumberUtils.asIntBetween(content, 1, this.trivia.getAnswers().size());
+					final Integer choice = NumberUtils.asIntBetween(content, 1, this.answers.size());
 
 					// Message is a text and doesn't match any answers, ignore it
-					if(choice == null && !this.trivia.getAnswers().stream().anyMatch(content::equalsIgnoreCase)) {
+					if(choice == null && !this.answers.stream().anyMatch(content::equalsIgnoreCase)) {
 						return Mono.just(false);
 					}
 
@@ -118,7 +133,7 @@ public class TriviaManager extends GameManager {
 						return Mono.just(false);
 					}
 
-					final String answer = choice == null ? content : this.trivia.getAnswers().get(choice - 1);
+					final String answer = choice == null ? content : this.answers.get(choice - 1);
 
 					if(this.alreadyAnswered.containsKey(member.getId())) {
 						this.alreadyAnswered.put(member.getId(), true);
