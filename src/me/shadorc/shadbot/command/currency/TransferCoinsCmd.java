@@ -69,11 +69,11 @@ public class TransferCoinsCmd extends BaseCmd {
 		dbSender.addCoins(-coins);
 		dbReceiver.addCoins(coins);
 
-		return context.getClient().getUserById(senderUserId)
-				.map(User::getMention)
-				.flatMap(senderMention -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.BANK + " %s has transfered **%s** to %s",
-								context.getAuthor().getMention(), FormatUtils.coins(coins), senderMention), channel)))
+		return context.getClient().getUserById(receiverUserId).map(User::getMention)
+				.flatMap(receiverMention -> context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(
+								String.format(Emoji.BANK + " %s has transfered **%s** to %s",
+										context.getAuthor().getMention(), FormatUtils.coins(coins), receiverMention), channel)))
 				.then();
 	}
 
