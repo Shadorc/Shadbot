@@ -80,7 +80,7 @@ public class CounterStrikeCmd extends BaseCmd {
 			final PlayerSummary player = players.get(0);
 			if(player.getCommunityVisibilityState() != 3) {
 				return loadingMsg.send(
-						String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private, more info here: %s",
+						String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private, more info here: <%s>",
 								context.getUsername(), PRIVACY_HELP_URL))
 						.then();
 			}
@@ -91,7 +91,7 @@ public class CounterStrikeCmd extends BaseCmd {
 			final String body = NetUtils.getBody(userStatsUrl);
 			if(body.contains("500 Internal Server Error")) {
 				return loadingMsg.send(
-						String.format(Emoji.ACCESS_DENIED + " (**%s**) The game details of this profile are not public, more info here: %s",
+						String.format(Emoji.ACCESS_DENIED + " (**%s**) The game details of this profile are not public, more info here: <%s>",
 								context.getUsername(), PRIVACY_HELP_URL))
 						.then();
 			}
