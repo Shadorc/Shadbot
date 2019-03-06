@@ -153,7 +153,7 @@ public class Utils {
 	public static int requireBet(Member member, String betStr, int maxValue) {
 		final Integer bet = NumberUtils.asPositiveInt(betStr);
 		if(bet == null) {
-			throw new CommandException(String.format("`%s` is not a valid amount for coins.", betStr));
+			throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
 		}
 
 		if(Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {

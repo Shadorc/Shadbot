@@ -47,7 +47,7 @@ public class TransferCoinsCmd extends BaseCmd {
 		final Integer coins = NumberUtils.asPositiveInt(args.get(0));
 		if(coins == null) {
 			throw new CommandException(
-					String.format("`%s` is not a valid amount for coins.", args.get(0)));
+					String.format("`%s` is not a valid amount of coins.", args.get(0)));
 		}
 
 		final DBMember dbSender = Shadbot.getDatabase().getDBMember(context.getGuildId(), senderUserId);

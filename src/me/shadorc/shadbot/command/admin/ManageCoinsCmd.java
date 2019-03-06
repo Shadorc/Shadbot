@@ -44,7 +44,7 @@ public class ManageCoinsCmd extends BaseCmd {
 
 		final Integer coins = NumberUtils.asInt(args.get(1));
 		if(coins == null && !Action.RESET.equals(action)) {
-			throw new CommandException(String.format("`%s` is not a valid amount for coins.", args.get(1)));
+			throw new CommandException(String.format("`%s` is not a valid amount of coins.", args.get(1)));
 		}
 
 		return DiscordUtils.getMembersFrom(context.getMessage())
