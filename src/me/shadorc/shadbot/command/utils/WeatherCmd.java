@@ -86,8 +86,13 @@ public class WeatherCmd extends BaseCmd {
 			return loadingMsg.send(embedConsumer).then();
 		} catch (final APIException err) {
 			if(err.getCode() == HttpStatus.SC_NOT_FOUND) {
-				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s` not found.",
-						context.getUsername(), args.get(0))).then();
+				final StringBuilder strBuilder = new StringBuilder(
+						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s`", context.getUsername(), args.get(0)));
+				if(args.size() == 2) {
+					strBuilder.append(String.format(" in country `%s`", args.get(1)));
+				}
+				strBuilder.append(" not found.");
+				return loadingMsg.send(strBuilder.toString()).then();
 			}
 			loadingMsg.stopTyping();
 			throw Exceptions.propagate(err);
