@@ -79,6 +79,7 @@ public class Shard {
 		this.getClient().getEventDispatcher()
 				.on(ReadyEvent.class)
 				.next()
+				.doOnNext(event -> this.logger.info("Presence update scheduled."))
 				.flatMapMany(event -> Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
 						.flatMap(ignored -> {
 							final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
