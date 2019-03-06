@@ -27,7 +27,7 @@ public class UpdateableMessage {
 	public UpdateableMessage(DiscordClient client, Snowflake channelId) {
 		this.client = client;
 		this.channelId = channelId;
-		this.messageId = new AtomicLong(0);
+		this.messageId = new AtomicLong(-1);
 	}
 
 	/**
@@ -36,7 +36,8 @@ public class UpdateableMessage {
 	 * @param embed - the embed to send
 	 */
 	public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
-		return Mono.justOrEmpty(this.messageId.get() == 0 ? null : Snowflake.of(this.messageId.get()))
+		return Mono.just(Snowflake.of(this.messageId.get()))
+				.filter(messageId -> messageId.asLong() != -1)
 				.flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
 				.flatMap(Message::delete)
 				.onErrorResume(ExceptionUtils::isKnownDiscordError, err -> Mono.empty())

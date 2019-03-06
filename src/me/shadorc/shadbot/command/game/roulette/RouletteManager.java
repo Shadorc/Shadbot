@@ -63,7 +63,7 @@ public class RouletteManager extends GameManager {
 							embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
 									.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
 									.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
-											+ "%n%n**Place** is a `number between 1 and 36`, %s",
+											+ "%n%n**place** is a `number between 1 and 36`, %s",
 											this.getContext().getPrefix(), this.getContext().getCommandName(),
 											FormatUtils.format(Place.values(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", ")))
 									.addField("Player (Bet)", FormatUtils.format(users,
