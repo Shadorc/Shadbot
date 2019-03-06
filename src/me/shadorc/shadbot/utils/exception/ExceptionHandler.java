@@ -32,11 +32,8 @@ public class ExceptionHandler {
 		if(err instanceof NoMusicException) {
 			return ExceptionHandler.onNoMusicException(context);
 		}
-		if(ExceptionUtils.isUnavailable(err) || ExceptionUtils.isInternalServerError(err)) {
-			return ExceptionHandler.onUnavailable(cmd, context);
-		}
-		if(ExceptionUtils.isUnreacheable(err)) {
-			return ExceptionHandler.onUnreacheable(cmd, context);
+		if(ExceptionUtils.isServerAccessError(err)) {
+			return ExceptionHandler.onServerAccessError(cmd, context);
 		}
 		return ExceptionHandler.onUnknown(err, cmd, context);
 	}
@@ -71,23 +68,14 @@ public class ExceptionHandler {
 				.then();
 	}
 
-	private static Mono<Void> onUnavailable(BaseCmd cmd, Context context) {
+	private static Mono<Void> onServerAccessError(BaseCmd cmd, Context context) {
 		return Mono.fromRunnable(() -> LogUtils.warn(context.getClient(),
-				String.format("{Guild ID: %d} [%s] Service unavailable.", context.getGuildId().asLong(), cmd.getClass().getSimpleName()),
+				String.format("{Guild ID: %d} [%s] Server access error.", context.getGuildId().asLong(), cmd.getClass().getSimpleName()),
 				context.getContent()))
 				.and(context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` is currently unavailable... "
-								+ "This is not my fault, I promise ! Try again later.",
-								context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
-	}
-
-	private static Mono<Void> onUnreacheable(BaseCmd cmd, Context context) {
-		return Mono.fromRunnable(() -> LogUtils.warn(context.getClient(),
-				String.format("{Guild ID: %d} [%s] Service unreachable.", context.getGuildId().asLong(), cmd.getClass().getSimpleName()),
-				context.getContent()))
-				.and(context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... `%s%s` takes too long to be executed... "
-								+ "This is not my fault, I promise ! Try again later.",
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(
+								Emoji.RED_FLAG + " (**%s**) Mmmh... The web service related to the `%s%s` command is not available right now... "
+										+ "This is not my fault, I promise ! Try again later.",
 								context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
 	}
 

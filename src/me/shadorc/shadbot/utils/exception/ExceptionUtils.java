@@ -3,8 +3,8 @@ package me.shadorc.shadbot.utils.exception;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
-import org.apache.http.HttpStatus;
 import org.jsoup.HttpStatusException;
 
 import discord4j.rest.http.client.ClientException;
@@ -12,24 +12,12 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class ExceptionUtils {
 
-	public static boolean isUnavailable(Throwable err) {
-		if(err instanceof HttpStatusException) {
-			HttpStatusException thr = (HttpStatusException) err;
-			return thr.getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE;
-		}
-		return err instanceof ConnectException;
-	}
-
-	public static boolean isInternalServerError(Throwable err) {
-		if(err instanceof HttpStatusException) {
-			HttpStatusException thr = (HttpStatusException) err;
-			return thr.getStatusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR;
-		}
-		return false;
-	}
-
-	public static boolean isUnreacheable(Throwable err) {
-		return err instanceof NoRouteToHostException || err instanceof SocketTimeoutException;
+	public static boolean isServerAccessError(Throwable err) {
+		return err instanceof HttpStatusException
+				|| err instanceof NoRouteToHostException
+				|| err instanceof SocketTimeoutException
+				|| err instanceof UnknownHostException
+				|| err instanceof ConnectException;
 	}
 
 	public static boolean isDiscordForbidden(Throwable err) {
