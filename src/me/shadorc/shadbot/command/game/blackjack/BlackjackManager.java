@@ -34,6 +34,7 @@ public class BlackjackManager extends GameManager {
 
 	private static final float WIN_MULTIPLIER = 1.15f;
 
+	private final Map<String, Consumer<BlackjackPlayer>> actionsMap;
 	private final RateLimiter rateLimiter;
 	private final List<BlackjackPlayer> players;
 	private final List<Card> dealerCards;
@@ -43,6 +44,7 @@ public class BlackjackManager extends GameManager {
 
 	public BlackjackManager(GameCmd<BlackjackManager> gameCmd, Context context) {
 		super(gameCmd, context, Duration.ofMinutes(1));
+		this.actionsMap = Map.of("hit", BlackjackPlayer::hit, "stand", BlackjackPlayer::stand, "double down", BlackjackPlayer::doubleDown);
 		this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(2));
 		this.players = new CopyOnWriteArrayList<>();
 		this.dealerCards = new ArrayList<>();
@@ -155,18 +157,13 @@ public class BlackjackManager extends GameManager {
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		final Member member = event.getMember().get();
 		return this.cancelOrDo(event.getMessage(),
-				Mono.just(this.players)
+				Flux.fromIterable(this.players)
 						// Check if the member is a current player
-						.filter(blackjackPlayers -> blackjackPlayers.stream()
-								.map(BlackjackPlayer::getUserId)
-								.anyMatch(member.getId()::equals))
-						.filter(blackjackPlayers -> !this.rateLimiter.isLimitedAndWarn(
+						.filter(player -> member.getId().equals(player.getUserId()))
+						.singleOrEmpty()
+						.filter(player -> actionsMap.containsKey(event.getMessage().getContent().orElse("")))
+						.filter(player -> !this.rateLimiter.isLimitedAndWarn(
 								event.getClient(), member.getGuildId(), event.getMessage().getChannelId(), member.getId()))
-						// Find the player associated with the user
-						.map(blackjackPlayers -> blackjackPlayers.stream()
-								.filter(player -> player.getUserId().equals(member.getId()))
-								.findFirst()
-								.get())
 						.flatMap(player -> {
 							if(player.isStanding()) {
 								return this.getContext().getChannel()
@@ -186,14 +183,12 @@ public class BlackjackManager extends GameManager {
 										.thenReturn(true);
 							}
 
-							final Map<String, Runnable> actionsMap = Map.of("hit", player::hit, "stand", player::stand, "double down", player::doubleDown);
-
-							final Runnable action = actionsMap.get(content);
+							final Consumer<BlackjackPlayer> action = actionsMap.get(content);
 							if(action == null) {
 								return Mono.just(false);
 							}
 
-							action.run();
+							action.accept(player);
 							return this.computeResultsOrShow()
 									.thenReturn(true);
 						}));
