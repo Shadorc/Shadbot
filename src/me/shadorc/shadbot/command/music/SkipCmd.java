@@ -39,18 +39,22 @@ public class SkipCmd extends BaseCmd {
 			if(num == null) {
 				throw new CommandException(String.format("Number must be between 1 and %d.", playlistSize));
 			}
-			guildMusic.getTrackScheduler().skipTo(num);
+			return messageMono
+					.doOnNext(ignored -> {
+						guildMusic.getTrackScheduler().skipTo(num);
+						// If the music has been started correctly, we resume it in case the previous music was paused
+						guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
+					})
+					.then();
 		} else {
-			if(guildMusic.getTrackScheduler().nextTrack()) {
-				// If the music has been started correctly, we resume it in case the previous music was on pause
-				guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
-			} else {
-				// There is no more music, this is the end
-				return messageMono.then(guildMusic.end());
-			}
+			return messageMono
+					.filter(ignored -> guildMusic.getTrackScheduler().nextTrack())
+					// If the music has been started correctly, we resume it in case the previous music was paused
+					.doOnNext(ignored -> guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false))
+					// There is no more music, this is the end
+					.switchIfEmpty(guildMusic.end().then(Mono.empty()))
+					.then();
 		}
-
-		return messageMono.then();
 	}
 
 	@Override
