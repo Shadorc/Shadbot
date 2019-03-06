@@ -33,11 +33,11 @@ public class DatabaseCmd extends BaseCmd {
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.onErrorMap(ExceptionUtils::isDiscordForbidden,
+				.onErrorMap(ExceptionUtils::isKnownDiscordError,
 						err -> new CommandException("Guild not found."))
-				.map(guild -> {
+				.flatMap(guild -> {
 					if(args.size() == 1) {
-						return Shadbot.getDatabase().getDBGuild(guild.getId()).toString();
+						return Mono.just(Shadbot.getDatabase().getDBGuild(guild.getId()).toString());
 					}
 
 					final Long memberId = NumberUtils.asPositiveLong(args.get(1));
@@ -45,7 +45,10 @@ public class DatabaseCmd extends BaseCmd {
 						throw new CommandException(String.format("`%s` is not a valid member ID.", args.get(1)));
 					}
 
-					return Shadbot.getDatabase().getDBMember(guild.getId(), Snowflake.of(memberId)).toString();
+					return context.getClient().getMemberById(Snowflake.of(guildId), Snowflake.of(memberId))
+							.onErrorMap(ExceptionUtils::isKnownDiscordError,
+									err -> new CommandException("Member not found."))
+							.map(member -> Shadbot.getDatabase().getDBMember(guild.getId(), member.getId()).toString());
 				})
 				.flatMap(text -> context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
