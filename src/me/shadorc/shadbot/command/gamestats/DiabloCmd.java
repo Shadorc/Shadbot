@@ -140,7 +140,7 @@ public class DiabloCmd extends BaseCmd {
 				.setDescription("Show player's stats for Diablo 3.")
 				.addArg("region", String.format("user's region (%s)", FormatUtils.format(Region.class, ", ")), false)
 				.addArg("battletag#0000", false)
-				.setExample(String.format("`%s%s eu Shadbot#1758`", context.getPrefix(), this.getName()))
+				.setExample(String.format("`%s%s eu Shadorc#2503`", context.getPrefix(), this.getName()))
 				.build();
 	}
 
