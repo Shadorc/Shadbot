@@ -34,11 +34,12 @@ public class LeaveCmd extends BaseCmd {
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.onErrorMap(ExceptionUtils::isDiscordForbidden,
+				.onErrorMap(ExceptionUtils::isKnownDiscordError,
 						err -> new CommandException("Guild not found."))
 				.flatMap(Guild::leave)
-				.and(context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " Guild left.", channel)));
+				.then(context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Guild left.", channel)))
+				.then();
 	}
 
 	@Override
