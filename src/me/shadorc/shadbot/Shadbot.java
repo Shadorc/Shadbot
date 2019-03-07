@@ -27,6 +27,7 @@ import me.shadorc.shadbot.data.lottery.Lottery;
 import me.shadorc.shadbot.data.lottery.LotteryManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
@@ -69,6 +70,17 @@ public class Shadbot {
 		LogUtils.info("Next lottery draw in: %s", LotteryCmd.getDelay().toString());
 		Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
 				.flatMap(ignored -> LotteryCmd.draw(Shadbot.getClient()))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+
+		// TODO: Remove
+		Flux.interval(Duration.ofHours(5), Duration.ofHours(5))
+				.doOnNext(ignored -> LogUtils.warn(Shadbot.getClient(), "Disconnecting all voice channels..."))
+				.flatMap(ignored -> Flux.fromIterable(GuildMusicManager.GUILD_MUSIC_MAP.entrySet()))
+				.doOnNext(entry -> {
+					LogUtils.info("{Guild ID: %d} Force leaving voice channel...", entry.getKey().asLong());
+					entry.getValue().leaveVoiceChannel();
+				})
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 
 		LogUtils.info("Connecting...");
