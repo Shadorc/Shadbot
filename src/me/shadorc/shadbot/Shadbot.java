@@ -70,6 +70,7 @@ public class Shadbot {
 		LogUtils.info("Next lottery draw in: %s", LotteryCmd.getDelay().toString());
 		Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
 				.flatMap(ignored -> LotteryCmd.draw(Shadbot.getClient()))
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 
 		// TODO: Remove
