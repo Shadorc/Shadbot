@@ -77,7 +77,7 @@ public class Shadbot {
 				.doOnNext(ignored -> LogUtils.warn(Shadbot.getClient(), "Disconnecting all voice channels..."))
 				.flatMap(ignored -> Flux.fromIterable(GuildMusicManager.GUILD_MUSIC_MAP.entrySet()))
 				.doOnNext(entry -> {
-					LogUtils.info("{Guild ID: %d} Force leaving voice channel (paused: %s)...", 
+					LogUtils.info("{Guild ID: %d} Force leaving voice channel (paused: %s)...",
 							entry.getKey().asLong(), entry.getValue().getTrackScheduler().getAudioPlayer().isPaused());
 					entry.getValue().leaveVoiceChannel();
 				})
