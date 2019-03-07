@@ -11,7 +11,6 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Jsoup;
 
 import discord4j.core.DiscordClient;
-import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.shard.Shard;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
@@ -23,11 +22,11 @@ import reactor.core.publisher.Mono;
 
 public class BotListStats {
 
-	private final Snowflake selfId;
+	private final long selfId;
 	private final Disposable task;
 
 	public BotListStats() {
-		this.selfId = Shadbot.getClient().getSelfId().get();
+		this.selfId = Shadbot.getClient().getSelfId().get().asLong();
 		this.task = Flux.interval(Duration.ofHours(2), Duration.ofHours(2))
 				.flatMap(ignored -> this.postStats())
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
