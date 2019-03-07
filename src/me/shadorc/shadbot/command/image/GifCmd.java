@@ -41,7 +41,7 @@ public class GifCmd extends BaseCmd {
 
 			if(giphy.getGifs() == null) {
 				loadingMsg.stopTyping();
-				throw new HttpStatusException("Giphy did not return valid JSON.", HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
+				throw new HttpStatusException("Giphy did not return valid JSON.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
 			}
 
 			if(giphy.getGifs().isEmpty()) {
