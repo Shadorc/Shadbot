@@ -17,6 +17,7 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -32,14 +33,18 @@ import reactor.core.publisher.Mono;
 public class DiscordUtils {
 
 	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
-		return DiscordUtils.sendMessage(content, null, channel);
+		return DiscordUtils.sendMessage(spec -> spec.setContent(content), channel, false);
 	}
 
 	public static Mono<Message> sendMessage(Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
-		return DiscordUtils.sendMessage(null, embed, channel);
+		return DiscordUtils.sendMessage(spec -> spec.setEmbed(embed), channel, true);
 	}
 
 	public static Mono<Message> sendMessage(String content, Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
+		return DiscordUtils.sendMessage(spec -> spec.setContent(content).setEmbed(embed), channel, true);
+	}
+
+	public static Mono<Message> sendMessage(Consumer<MessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
 		final Snowflake selfId = channel.getClient().getSelfId().get();
 		return Mono.zip(
 				DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
@@ -54,7 +59,7 @@ public class DiscordUtils {
 						return Mono.empty();
 					}
 
-					if(!canSendEmbed && embed != null) {
+					if(!canSendEmbed && hasEmbed) {
 						LogUtils.info("{Channel ID: %d} Missing permission: %s",
 								channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS));
 						return DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed links.%nPlease, check my permissions "
@@ -62,19 +67,12 @@ public class DiscordUtils {
 								StringUtils.capitalizeEnum(Permission.EMBED_LINKS)), channel);
 					}
 
-					return channel.createMessage(spec -> {
-						if(content != null) {
-							spec.setContent(content);
-						}
-						if(embed != null) {
-							spec.setEmbed(embed);
-						}
-					});
+					return channel.createMessage(spec);
 				})
 				// 403 Forbidden means that the bot is not in the guild
 				.onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.empty())
 				.doOnNext(message -> {
-					if(!message.getEmbeds().isEmpty()) {
+					if(hasEmbed) {
 						StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);
 					}
 					StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT);
