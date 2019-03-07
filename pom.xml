@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.shadorc.shadbot</groupId>
 	<artifactId>shadbot</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.0.0</version>
 	<name>Shadbot</name>
 	<url>https://github.com/Shadorc/Shadbot</url>
 	<description>Discord bot using Discord4J that plays musics, executes useful, admin and fun commands, play games and more.</description>
