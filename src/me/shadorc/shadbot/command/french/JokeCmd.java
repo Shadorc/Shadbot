@@ -17,7 +17,6 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class JokeCmd extends BaseCmd {
@@ -33,7 +32,7 @@ public class JokeCmd extends BaseCmd {
 	public Mono<Void> execute(Context context) {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		try {
+		return Mono.fromCallable(() -> {
 			final List<String> jokes = NetUtils.getDoc(HOME_URL)
 					.getElementsByClass("gag__content")
 					.stream()
@@ -44,16 +43,13 @@ public class JokeCmd extends BaseCmd {
 			final String joke = FormatUtils.format(Utils.randValue(jokes).split("<br>"),
 					line -> Jsoup.parse(line).text().trim(), "\n");
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Blague", "https://www.humour.com/blagues/", context.getAvatarUrl())
-							.setDescription(joke));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+							.setDescription(joke)));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	@Override

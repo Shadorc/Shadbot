@@ -25,7 +25,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class FortniteCmd extends BaseCmd {
@@ -52,8 +51,7 @@ public class FortniteCmd extends BaseCmd {
 		final String epicNickname = args.get(1);
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			final String encodedNickname = epicNickname.replace(" ", "%20");
 			final URL url = new URL(String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
 					StringUtils.toLowerCase(platform), encodedNickname));
@@ -65,7 +63,6 @@ public class FortniteCmd extends BaseCmd {
 					.execute();
 
 			if(response.statusCode() != 200) {
-				loadingMsg.stopTyping();
 				throw new HttpStatusException("Fortnite API did not return a valid status code.",
 						HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
 			}
@@ -73,10 +70,9 @@ public class FortniteCmd extends BaseCmd {
 			final FortniteResponse fortnite = Utils.MAPPER.readValue(response.parse().body().html(), FortniteResponse.class);
 
 			if(fortnite.getError().map("Player Not Found"::equals).orElse(false)) {
-				return loadingMsg.send(
+				return loadingMsg.setContent(
 						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Fortnite on this platform or doesn't exist.",
-								context.getUsername()))
-						.then();
+								context.getUsername()));
 			}
 
 			final int length = 8;
@@ -91,20 +87,17 @@ public class FortniteCmd extends BaseCmd {
 					+ String.format(format, "K/D lifetime", stats.getSoloStats().getRatio(), stats.getDuoStats().getRatio(), stats.getSquadStats().getRatio())
 					+ "```";
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Fortnite Stats",
 							String.format("https://fortnitetracker.com/profile/%s/%s",
 									StringUtils.toLowerCase(platform), encodedNickname),
 							context.getAvatarUrl())
 							.setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
-							.setDescription(description));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+							.setDescription(description)));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	@Override

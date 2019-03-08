@@ -54,7 +54,7 @@ public class ServerInfoCmd extends BaseCmd {
 					final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
 					final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
-					return EmbedUtils.getDefaultEmbed()
+					return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 							.andThen(embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, context.getAvatarUrl())
 									.setThumbnail(guild.getIconUrl(Format.JPEG).get())
 									.addField("Owner", owner.getUsername(), true)
@@ -62,9 +62,10 @@ public class ServerInfoCmd extends BaseCmd {
 									.addField("Creation date", creationDate, true)
 									.addField("Region", region.getName(), true)
 									.addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), true)
-									.addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true));
+									.addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true)));
 				})
-				.flatMap(loadingMsg::send)
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
 				.then();
 	}
 

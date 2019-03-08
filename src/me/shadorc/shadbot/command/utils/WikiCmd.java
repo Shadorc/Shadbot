@@ -19,7 +19,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class WikiCmd extends BaseCmd {
@@ -34,8 +33,7 @@ public class WikiCmd extends BaseCmd {
 		final String arg = context.requireArg();
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			// Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
 			final String url = String.format("https://en.wikipedia.org/w/api.php?"
 					+ "format=json"
@@ -54,32 +52,27 @@ public class WikiCmd extends BaseCmd {
 			final WikipediaPage page = pages.get(pageId);
 
 			if("-1".equals(pageId) || page.getExtract() == null) {
-				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
-						context.getUsername(), arg))
-						.then();
+				return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
+						context.getUsername(), arg));
 			}
 
 			if(page.getExtract().endsWith("may refer to:")) {
-				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
-						+ "try with a more precise search.", context.getUsername()))
-						.then();
+				return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
+						+ "try with a more precise search.", context.getUsername()));
 			}
 
 			final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
 							String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
 							context.getAvatarUrl())
 							.setThumbnail("https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png")
-							.setDescription(extract));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+							.setDescription(extract)));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	@Override

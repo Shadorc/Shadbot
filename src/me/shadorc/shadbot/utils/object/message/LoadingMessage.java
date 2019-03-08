@@ -14,10 +14,12 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 
 public class LoadingMessage implements Publisher<Void> {
 
@@ -26,6 +28,11 @@ public class LoadingMessage implements Publisher<Void> {
 	private final DiscordClient client;
 	private final Snowflake channelId;
 	private final List<Subscriber<? super Void>> subscribers;
+
+	@Nullable
+	private String content;
+	@Nullable
+	private Consumer<EmbedCreateSpec> embed;
 
 	/**
 	 * Start typing until a message is send or 30 seconds have passed
@@ -39,6 +46,35 @@ public class LoadingMessage implements Publisher<Void> {
 		this.subscribers = new ArrayList<>();
 
 		this.startTyping().subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+	}
+
+	public LoadingMessage setContent(String content) {
+		this.content = content;
+		return this;
+	}
+
+	public LoadingMessage setEmbed(Consumer<EmbedCreateSpec> embed) {
+		this.embed = embed;
+		return this;
+	}
+
+	/**
+	 * Send a message and stop typing when the message has been sent or an error occurred
+	 */
+	public Mono<Message> send() {
+		final Consumer<MessageCreateSpec> consumer = spec -> {
+			if(content != null) {
+				spec.setContent(content);
+			}
+			if(embed != null) {
+				spec.setEmbed(embed);
+			}
+		};
+		return this.client.getChannelById(this.channelId)
+				.cast(MessageChannel.class)
+				.flatMap(channel -> DiscordUtils.sendMessage(consumer, channel, embed != null))
+				.timeout(TYPING_TIMEOUT)
+				.doAfterTerminate(this::stopTyping);
 	}
 
 	/**
@@ -57,28 +93,6 @@ public class LoadingMessage implements Publisher<Void> {
 	 */
 	public void stopTyping() {
 		this.subscribers.forEach(Subscriber::onComplete);
-	}
-
-	/**
-	 * Send a message and stop typing when the message has been sent or an error occurred
-	 */
-	public Mono<Message> send(String content) {
-		return this.client.getChannelById(this.channelId)
-				.cast(MessageChannel.class)
-				.flatMap(channel -> DiscordUtils.sendMessage(content, channel))
-				.timeout(TYPING_TIMEOUT)
-				.doAfterTerminate(this::stopTyping);
-	}
-
-	/**
-	 * Send a message and stop typing when the message has been sent or an error occurred
-	 */
-	public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
-		return this.client.getChannelById(this.channelId)
-				.cast(MessageChannel.class)
-				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
-				.timeout(TYPING_TIMEOUT)
-				.doAfterTerminate(this::stopTyping);
 	}
 
 	@Override

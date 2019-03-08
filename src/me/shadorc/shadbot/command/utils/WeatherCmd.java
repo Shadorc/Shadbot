@@ -27,7 +27,6 @@ import net.aksingh.owmjapis.core.OWM.Unit;
 import net.aksingh.owmjapis.model.CurrentWeather;
 import net.aksingh.owmjapis.model.param.Main;
 import net.aksingh.owmjapis.model.param.Weather;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class WeatherCmd extends BaseCmd {
@@ -46,8 +45,7 @@ public class WeatherCmd extends BaseCmd {
 		final List<String> args = context.requireArgs(1, 2, ",");
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			final OWM owm = new OWM(Credentials.get(Credential.OPENWEATHERMAP_API_KEY));
 			owm.setUnit(Unit.METRIC);
 
@@ -55,8 +53,8 @@ public class WeatherCmd extends BaseCmd {
 			if(args.size() == 2) {
 				final Country country = Utils.getEnum(Country.class, args.get(1).replace(" ", "_"));
 				if(country == null) {
-					return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
-							context.getUsername(), args.get(1))).then();
+					return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
+							context.getUsername(), args.get(1)));
 				}
 				currentWeather = owm.currentWeatherByCityName(args.get(0), country);
 			} else {
@@ -71,7 +69,7 @@ public class WeatherCmd extends BaseCmd {
 			final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ? String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
 			final String countryCode = currentWeather.getSystemData().getCountryCode();
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
 							String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
 							context.getAvatarUrl())
@@ -81,25 +79,23 @@ public class WeatherCmd extends BaseCmd {
 							.addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
 							.addField(Emoji.RAIN + " Rain", rain, true)
 							.addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
-							.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true));
-
-			return loadingMsg.send(embedConsumer).then();
-		} catch (final APIException err) {
-			if(err.getCode() == HttpStatus.SC_NOT_FOUND) {
-				final StringBuilder strBuilder = new StringBuilder(
-						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s`", context.getUsername(), args.get(0)));
-				if(args.size() == 2) {
-					strBuilder.append(String.format(" in country `%s`", args.get(1)));
-				}
-				strBuilder.append(" not found.");
-				return loadingMsg.send(strBuilder.toString()).then();
-			}
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+							.addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true)));
+		})
+				.onErrorResume(APIException.class, err -> {
+					if(err.getCode() == HttpStatus.SC_NOT_FOUND) {
+						final StringBuilder strBuilder = new StringBuilder(
+								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s`", context.getUsername(), args.get(0)));
+						if(args.size() == 2) {
+							strBuilder.append(String.format(" in country `%s`", args.get(1)));
+						}
+						strBuilder.append(" not found.");
+						return Mono.just(loadingMsg.setContent(strBuilder.toString()));
+					}
+					return Mono.error(err);
+				})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	private String getWindDesc(double windSpeed) {

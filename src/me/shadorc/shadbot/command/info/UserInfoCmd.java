@@ -45,10 +45,10 @@ public class UserInfoCmd extends BaseCmd {
 		return Mono.zip(memberMono,
 				memberMono.flatMap(Member::getPresence),
 				memberMono.flatMapMany(Member::getRoles).collectList())
-				.map(tuple4 -> {
-					final Member member = tuple4.getT1();
-					final Presence presence = tuple4.getT2();
-					final List<Role> roles = tuple4.getT3();
+				.map(tuple -> {
+					final Member member = tuple.getT1();
+					final Presence presence = tuple.getT2();
+					final List<Role> roles = tuple.getT3();
 
 					final String creationDate = String.format("%s%n(%s)",
 							TimeUtils.toLocalDate(member.getId().getTimestamp()).format(dateFormatter),
@@ -58,7 +58,7 @@ public class UserInfoCmd extends BaseCmd {
 							TimeUtils.toLocalDate(member.getJoinTime()).format(dateFormatter),
 							FormatUtils.longDuration(member.getJoinTime()));
 
-					return EmbedUtils.getDefaultEmbed()
+					return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 							.andThen(embed -> {
 								embed.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, context.getAvatarUrl())
 										.setThumbnail(member.getAvatarUrl())
@@ -75,9 +75,10 @@ public class UserInfoCmd extends BaseCmd {
 								presence.getActivity()
 										.map(Activity::getName)
 										.ifPresent(details -> embed.addField("Playing text", details, true));
-							});
+							}));
 				})
-				.flatMap(loadingMsg::send)
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
 				.then();
 	}
 

@@ -10,7 +10,6 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -18,7 +17,6 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class SuicideGirlsCmd extends BaseCmd {
@@ -33,30 +31,25 @@ public class SuicideGirlsCmd extends BaseCmd {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.isChannelNsfw()
-				.filter(Boolean.TRUE::equals)
-				.flatMap(isNsfw -> {
-					try {
-						final Document doc = NetUtils.getDoc("https://www.suicidegirls.com/photos/sg/recent/all/");
-
-						final Element girl = Utils.randValue(doc.getElementsByTag("article"));
-						final String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();
-						final String imageUrl = girl.select("noscript").attr("data-retina");
-						final String url = girl.getElementsByClass("facebook-share").attr("href");
-
-						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-								.andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
-										.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
-										.setImage(imageUrl));
-
-						return loadingMsg.send(embedConsumer);
-
-					} catch (final Exception err) {
-						loadingMsg.stopTyping();
-						throw Exceptions.propagate(err);
+				.flatMap(isNsfw -> Mono.fromCallable(() -> {
+					if(!isNsfw) {
+						return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
 					}
-				})
-				.switchIfEmpty(context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(TextUtils.mustBeNsfw(context.getPrefix()), channel)))
+
+					final Document doc = NetUtils.getDoc("https://www.suicidegirls.com/photos/sg/recent/all/");
+
+					final Element girl = Utils.randValue(doc.getElementsByTag("article"));
+					final String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();
+					final String imageUrl = girl.select("noscript").attr("data-retina");
+					final String url = girl.getElementsByClass("facebook-share").attr("href");
+
+					return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+							.andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
+									.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
+									.setImage(imageUrl)));
+				}))
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
 				.then();
 	}
 

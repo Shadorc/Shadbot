@@ -87,14 +87,12 @@ public class SettingsCmd extends BaseCmd {
 					.then();
 		}
 
-		try {
-			return setting.execute(context);
-		} catch (MissingArgumentException err) {
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(
-							Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", this.getHelp(context, setting), channel))
-					.then();
-		}
+		return setting.execute(context)
+				.onErrorResume(MissingArgumentException.class,
+						err -> context.getChannel()
+								.flatMap(channel -> DiscordUtils.sendMessage(
+										Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", this.getHelp(context, setting), channel))
+								.then());
 	}
 
 	private Mono<Consumer<EmbedCreateSpec>> show(Context context) {

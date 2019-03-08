@@ -19,7 +19,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class UrbanCmd extends BaseCmd {
@@ -34,16 +33,14 @@ public class UrbanCmd extends BaseCmd {
 		final String arg = context.requireArg();
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			final String url = String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(arg));
 
 			final UrbanDictionaryResponse urbanDictionary = Utils.MAPPER.readValue(NetUtils.getJSON(url), UrbanDictionaryResponse.class);
 
 			if(urbanDictionary.getDefinitions().isEmpty()) {
-				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",
-						context.getUsername(), arg))
-						.then();
+				return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",
+						context.getUsername(), arg));
 			}
 
 			final UrbanDefinition urbanDefinition = urbanDictionary.getDefinitions().get(0);
@@ -51,7 +48,7 @@ public class UrbanCmd extends BaseCmd {
 			final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
 			final String example = StringUtils.abbreviate(urbanDefinition.getExample(), Field.MAX_VALUE_LENGTH);
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> {
 						embed.setAuthor(String.format("Urban Dictionary: %s", urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())
 								.setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
@@ -59,15 +56,11 @@ public class UrbanCmd extends BaseCmd {
 						if(!example.isBlank()) {
 							embed.addField("Example", example, false);
 						}
-					});
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
-
+					}));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	@Override

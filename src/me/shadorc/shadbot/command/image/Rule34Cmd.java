@@ -21,7 +21,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class Rule34Cmd extends BaseCmd {
@@ -39,56 +38,50 @@ public class Rule34Cmd extends BaseCmd {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
 		return context.isChannelNsfw()
-				.flatMap(isNsfw -> {
+				.flatMap(isNsfw -> Mono.fromCallable(() -> {
 					if(!isNsfw) {
-						return loadingMsg.send(TextUtils.mustBeNsfw(context.getPrefix()));
+						return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
 					}
 
-					try {
-						final String url = String.format("https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=%s",
-								NetUtils.encode(arg.replace(" ", "_")));
+					final String url = String.format("https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=%s",
+							NetUtils.encode(arg.replace(" ", "_")));
 
-						final R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
-						final R34Posts posts = r34.getPosts();
+					final R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
+					final R34Posts posts = r34.getPosts();
 
-						if(posts.getCount() == 0) {
-							return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
-									context.getUsername(), arg));
-						}
-
-						final R34Post post = Utils.randValue(posts.getPosts());
-
-						final List<String> tags = StringUtils.split(post.getTags(), " ");
-						if(post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
-							return loadingMsg.send(
-									String.format(Emoji.WARNING + " (**%s**) I don't display images containing children or tagged with `loli` or `shota`.",
-											context.getUsername()));
-						}
-
-						final String formattedtags = org.apache.commons.lang3.StringUtils.truncate(
-								FormatUtils.format(tags, tag -> String.format("`%s`", tag), " "), MAX_TAGS_LENGTH);
-
-						final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-								.andThen(embed -> {
-									embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
-											.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
-											.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
-											.addField("Tags", formattedtags, false)
-											.setImage(post.getFileUrl())
-											.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
-
-									if(!post.getSource().isEmpty()) {
-										embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
-									}
-								});
-
-						return loadingMsg.send(embedConsumer).then();
-
-					} catch (final Exception err) {
-						loadingMsg.stopTyping();
-						throw Exceptions.propagate(err);
+					if(posts.getCount() == 0) {
+						return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
+								context.getUsername(), arg));
 					}
-				})
+
+					final R34Post post = Utils.randValue(posts.getPosts());
+
+					final List<String> tags = StringUtils.split(post.getTags(), " ");
+					if(post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
+						return loadingMsg.setContent(
+								String.format(Emoji.WARNING + " (**%s**) I don't display images containing children or tagged with `loli` or `shota`.",
+										context.getUsername()));
+					}
+
+					final String formattedtags = org.apache.commons.lang3.StringUtils.truncate(
+							FormatUtils.format(tags, tag -> String.format("`%s`", tag), " "), MAX_TAGS_LENGTH);
+
+					return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+							.andThen(embed -> {
+								embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
+										.setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
+										.addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
+										.addField("Tags", formattedtags, false)
+										.setImage(post.getFileUrl())
+										.setFooter("If there is no preview, click on the title to see the media (probably a video)", null);
+
+								if(!post.getSource().isEmpty()) {
+									embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
+								}
+							}));
+				}))
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
 				.then();
 	}
 

@@ -38,7 +38,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class WallpaperCmd extends BaseCmd {
@@ -76,29 +75,30 @@ public class WallpaperCmd extends BaseCmd {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		CommandLine cmdLine;
-		try {
-			final List<String> args = StringUtils.split(context.getArg().orElse(""));
-			cmdLine = new DefaultParser().parse(options, args.toArray(new String[0]));
-		} catch (final UnrecognizedOptionException | org.apache.commons.cli.MissingArgumentException err) {
-			throw new CommandException(String.format("%s. Use `%shelp %s` for more information.",
-					err.getMessage(), context.getPrefix(), this.getName()));
-		} catch (final Exception err) {
-			throw Exceptions.propagate(err);
-		}
-
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		if(this.wallhaven == null) {
-			this.wallhaven = new Wallhaven(Credentials.get(Credential.WALLHAVEN_LOGIN),
-					Credentials.get(Credential.WALLHAVEN_PASSWORD));
-		}
+		return Mono.fromCallable(() -> {
+			final List<String> args = StringUtils.split(context.getArg().orElse(""));
+			return new DefaultParser().parse(options, args.toArray(new String[0]));
+		})
+				.onErrorMap(err -> err instanceof UnrecognizedOptionException || err instanceof org.apache.commons.cli.MissingArgumentException,
+						err -> new CommandException(String.format("%s. Use `%shelp %s` for more information.",
+								err.getMessage(), context.getPrefix(), this.getName())))
+				.map(cmdLine -> {
+					if(this.wallhaven == null) {
+						this.wallhaven = new Wallhaven(Credentials.get(Credential.WALLHAVEN_LOGIN),
+								Credentials.get(Credential.WALLHAVEN_PASSWORD));
+					}
+					return cmdLine;
+				})
+				.zipWith(context.isChannelNsfw())
+				.map(tuple -> {
+					final CommandLine cmdLine = tuple.getT1();
+					final boolean isNsfw = tuple.getT2();
 
-		return context.isChannelNsfw()
-				.flatMap(isNsfw -> {
 					final Purity purity = this.parseEnum(loadingMsg, context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
 					if((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !isNsfw) {
-						return loadingMsg.send(TextUtils.mustBeNsfw(context.getPrefix())).then();
+						return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
 					}
 
 					final SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
@@ -124,27 +124,26 @@ public class WallpaperCmd extends BaseCmd {
 
 					final List<Wallpaper> wallpapers = this.wallhaven.search(queryBuilder.pages(1).build());
 					if(wallpapers.isEmpty()) {
-						return loadingMsg.send(
+						return loadingMsg.setContent(
 								String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
-										context.getUsername(), context.getContent()))
-								.then();
+										context.getUsername(), context.getContent()));
 					}
 
 					final Wallpaper wallpaper = Utils.randValue(wallpapers);
 					final String tags = FormatUtils.format(wallpaper.getTags(),
 							tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
 
-					final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+					return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 							.andThen(embed -> embed.setAuthor("Wallpaper", wallpaper.getUrl(), context.getAvatarUrl())
 									.setImage(wallpaper.getImageUrl())
 									.addField("Resolution", wallpaper.getResolution().toString(), false)
-									.addField("Tags", tags, false));
-
-					return loadingMsg.send(embedConsumer).then();
+									.addField("Tags", tags, false)));
 				})
 				.onErrorMap(err -> err instanceof WallhavenException && err.getCause() != null && err.getCause() instanceof ConnectionException,
 						err -> new HttpStatusException("Wallhaven is unavailable.", HttpStatus.SC_SERVICE_UNAVAILABLE, "https://alpha.wallhaven.cc/"))
-				.doOnTerminate(() -> loadingMsg.stopTyping());
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) {

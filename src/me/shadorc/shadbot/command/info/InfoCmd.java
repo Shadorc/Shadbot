@@ -9,9 +9,9 @@ import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 
 import discord4j.common.GitProperties;
 import discord4j.core.object.VoiceState;
-import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -53,42 +53,43 @@ public class InfoCmd extends BaseCmd {
 				.count();
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-		return Mono.zip(context.getClient().getApplicationInfo().flatMap(ApplicationInfo::getOwner),
+
+		return Mono.zip(context.getClient().getUserById(Snowflake.of(Shadbot.OWNER_ID.get())),
 				context.getClient().getGuilds().count(),
 				context.getClient().getUsers().count(),
 				voiceChannelCountMono)
 				.flatMap(tuple -> {
-					final long start = System.currentTimeMillis();
-					return loadingMsg.send(String.format(Emoji.GEAR + " (**%s**) Testing ping...", context.getUsername()))
-							.flatMap(message -> {
-								final User owner = tuple.getT1();
-								final Long guildCount = tuple.getT2();
-								final Long memberCount = tuple.getT3();
-								final Long voiceChannelCount = tuple.getT4();
+					final User owner = tuple.getT1();
+					final Long guildCount = tuple.getT2();
+					final Long memberCount = tuple.getT3();
+					final Long voiceChannelCount = tuple.getT4();
 
-								return message.edit(spec -> spec.setContent("```prolog"
-										+ String.format("%n-= Versions =-")
-										+ String.format("%nJava: %s", System.getProperty("java.version"))
-										+ String.format("%nShadbot: %s", Config.VERSION)
-										+ String.format("%n%s: %s", D4J_NAME, D4J_VERSION)
-										+ String.format("%nLavaPlayer: %s", PlayerLibrary.VERSION)
-										+ String.format("%n%n-= Performance =-")
-										+ String.format("%nMemory: %s/%s MB", FormatUtils.number(usedMemory), FormatUtils.number(maxMemory))
-										+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
-										+ String.format("%nThreads: %s", FormatUtils.number(Thread.activeCount()))
-										+ String.format("%n%n-= Internet =-")
-										+ String.format("%nPing: %dms", TimeUtils.getMillisUntil(start))
-										+ String.format("%nGateway Latency: %dms", context.getClient().getResponseTime())
-										+ String.format("%n%n-= Shadbot =-")
-										+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true))
-										+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
-										+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
-										+ String.format("%nServers: %s", FormatUtils.number(guildCount))
-										+ String.format("%nVoice Channels: %s/%s", FormatUtils.number(voiceChannelCount), FormatUtils.number(GuildMusicManager.GUILD_MUSIC_MAP.size()))
-										+ String.format("%nUsers: %s", FormatUtils.number(memberCount))
-										+ "```"));
-							});
+					final long start = System.currentTimeMillis();
+					return loadingMsg.setContent(String.format(Emoji.GEAR + " (**%s**) Testing ping...", context.getUsername()))
+							.send()
+							.flatMap(message -> message.edit(spec -> spec.setContent("```prolog"
+									+ String.format("%n-= Versions =-")
+									+ String.format("%nJava: %s", System.getProperty("java.version"))
+									+ String.format("%nShadbot: %s", Config.VERSION)
+									+ String.format("%n%s: %s", D4J_NAME, D4J_VERSION)
+									+ String.format("%nLavaPlayer: %s", PlayerLibrary.VERSION)
+									+ String.format("%n%n-= Performance =-")
+									+ String.format("%nMemory: %s/%s MB", FormatUtils.number(usedMemory), FormatUtils.number(maxMemory))
+									+ String.format("%nCPU Usage: %.1f%%", Utils.getProcessCpuLoad())
+									+ String.format("%nThreads: %s", FormatUtils.number(Thread.activeCount()))
+									+ String.format("%n%n-= Internet =-")
+									+ String.format("%nPing: %dms", TimeUtils.getMillisUntil(start))
+									+ String.format("%nGateway Latency: %dms", context.getClient().getResponseTime())
+									+ String.format("%n%n-= Shadbot =-")
+									+ String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true))
+									+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
+									+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
+									+ String.format("%nServers: %s", FormatUtils.number(guildCount))
+									+ String.format("%nVoice Channels: %s/%s", FormatUtils.number(voiceChannelCount), FormatUtils.number(GuildMusicManager.GUILD_MUSIC_MAP.size()))
+									+ String.format("%nUsers: %s", FormatUtils.number(memberCount))
+									+ "```")));
 				})
+				.doOnTerminate(loadingMsg::stopTyping)
 				.then();
 	}
 

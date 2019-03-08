@@ -22,7 +22,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class TranslateCmd extends BaseCmd {
@@ -72,7 +71,8 @@ public class TranslateCmd extends BaseCmd {
 		}
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-		try {
+
+		return Mono.fromCallable(() -> {
 			final String url = String.format("https://translate.googleapis.com/translate_a/single?"
 					+ "client=gtx"
 					+ "&ie=UTF-8"
@@ -86,7 +86,6 @@ public class TranslateCmd extends BaseCmd {
 			final JSONArray result = new JSONArray(NetUtils.getJSON(url));
 
 			if(langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
-				loadingMsg.stopTyping();
 				throw new CommandException(String.format("One of the specified language isn't supported. "
 						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
@@ -98,24 +97,21 @@ public class TranslateCmd extends BaseCmd {
 			}
 
 			if(translatedText.toString().equalsIgnoreCase(sourceText)) {
-				loadingMsg.stopTyping();
 				throw new CommandException(String.format("The text could not been translated."
 						+ "%nCheck that the specified languages are supported and that the text is in the specified language."
 						+ "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
 							.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
 									StringUtils.capitalize(langIsoMap.inverse().get(langFrom)), sourceText,
-									StringUtils.capitalize(langIsoMap.inverse().get(langTo)), translatedText.toString())));
+									StringUtils.capitalize(langIsoMap.inverse().get(langTo)), translatedText.toString()))));
 
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	private String toISO(String lang) {

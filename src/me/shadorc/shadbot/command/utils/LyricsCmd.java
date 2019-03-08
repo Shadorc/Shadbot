@@ -29,7 +29,6 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class LyricsCmd extends BaseCmd {
@@ -49,15 +48,13 @@ public class LyricsCmd extends BaseCmd {
 		final Optional<String> arg = context.getArg();
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			String search;
 			if(arg.isPresent()) {
 				search = arg.get();
 			} else {
 				final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(context.getGuildId());
 				if(guildMusic == null) {
-					loadingMsg.stopTyping();
 					throw new MissingArgumentException();
 				}
 
@@ -68,28 +65,24 @@ public class LyricsCmd extends BaseCmd {
 
 			final String url = this.getCorrectedUrl(search);
 			if(url == null) {
-				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
-						context.getUsername(), search))
-						.then();
+				return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+						context.getUsername(), search));
 			}
 
 			final Document doc = this.getLyricsDocument(context.getClient(), url).outputSettings(PRESERVE_FORMAT);
 			final Musixmatch musixmatch = new Musixmatch(doc);
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
 							musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
 							.setThumbnail(musixmatch.getImageUrl())
 							.setDescription(musixmatch.getLyrics())
 							.setFooter("Click on the title to see the full version",
-									"https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png"));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+									"https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png")));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	private Document getLyricsDocument(DiscordClient client, String url) throws IOException {

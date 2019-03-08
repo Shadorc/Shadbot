@@ -88,8 +88,11 @@ public class PruneCmd extends BaseCmd {
 						.flatMap(messageIds -> ((TextChannel) channel).bulkDelete(Flux.fromIterable(messageIds))
 								.count()
 								.map(messagesNotDeleted -> (int) (messageIds.size() - messagesNotDeleted)))
-						.flatMap(deletedMessages -> loadingMsg.send(String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
-								context.getUsername(), StringUtils.pluralOf(deletedMessages, "message")))))
+						.map(deletedMessages -> String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
+								context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
+				.map(loadingMsg::setContent)
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
 				.then();
 	}
 

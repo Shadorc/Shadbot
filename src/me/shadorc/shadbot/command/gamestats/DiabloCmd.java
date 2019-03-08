@@ -29,7 +29,6 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class DiabloCmd extends BaseCmd {
@@ -62,9 +61,7 @@ public class DiabloCmd extends BaseCmd {
 		final String battletag = args.get(1).replaceAll("#", "-");
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
-
+		return Mono.fromCallable(() -> {
 			if(this.isTokenExpired()) {
 				this.generateAccessToken();
 			}
@@ -75,7 +72,6 @@ public class DiabloCmd extends BaseCmd {
 			final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(url), ProfileResponse.class);
 
 			if("NOTFOUND".equals(profile.getCode())) {
-				loadingMsg.stopTyping();
 				throw new FileNotFoundException();
 			}
 
@@ -94,7 +90,7 @@ public class DiabloCmd extends BaseCmd {
 			heroResponses.sort((hero1, hero2) -> Double.compare(hero1.getStats().getDamage(), hero2.getStats().getDamage()));
 			Collections.reverse(heroResponses);
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
 							.setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
 							.setDescription(String.format("Stats for **%s** (Guild: **%s**)"
@@ -106,18 +102,15 @@ public class DiabloCmd extends BaseCmd {
 							.addField("Heroes", FormatUtils.format(heroResponses,
 									hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
 							.addField("Damage", FormatUtils.format(heroResponses,
-									hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final FileNotFoundException err) {
-			return loadingMsg.send(
-					String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.", context.getUsername()))
-					.then();
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+									hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true)));
+		})
+				.onErrorResume(FileNotFoundException.class,
+						err -> Mono.just(loadingMsg.setContent(String.format(
+								Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
+								context.getUsername()))))
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	private boolean isTokenExpired() {

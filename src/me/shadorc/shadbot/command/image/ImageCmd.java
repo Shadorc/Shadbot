@@ -25,7 +25,6 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class ImageCmd extends BaseCmd {
@@ -46,29 +45,25 @@ public class ImageCmd extends BaseCmd {
 		final String arg = context.requireArg();
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			final Image image = this.getRandomPopularImage(NetUtils.encode(arg));
 			if(image == null) {
-				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
-						context.getUsername(), arg))
-						.then();
+				return loadingMsg.setContent(String.format(
+						Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
+						context.getUsername(), arg));
 			}
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
 							.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
 							.addField("Title", image.getTitle(), false)
 							.addField("Author", image.getAuthor().getUsername(), false)
 							.addField("Category", image.getCategoryPath(), false)
-							.setImage(image.getContent().getSource()));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+							.setImage(image.getContent().getSource())));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	private Image getRandomPopularImage(String encodedSearch) throws IOException {

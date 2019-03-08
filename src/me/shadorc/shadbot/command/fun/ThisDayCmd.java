@@ -19,7 +19,6 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class ThisDayCmd extends BaseCmd {
@@ -34,8 +33,7 @@ public class ThisDayCmd extends BaseCmd {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			final Document doc = NetUtils.getDoc(HOME_URL);
 
 			final String date = doc.getElementsByClass("date-large")
@@ -53,17 +51,14 @@ public class ThisDayCmd extends BaseCmd {
 					.map(Document::text)
 					.collect(Collectors.joining("\n\n"));
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor(String.format("On This Day: %s", date), HOME_URL, context.getAvatarUrl())
 							.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-							.setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH)));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+							.setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH))));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	@Override

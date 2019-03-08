@@ -18,7 +18,6 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class DtcCmd extends BaseCmd {
@@ -31,8 +30,7 @@ public class DtcCmd extends BaseCmd {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			final String url = String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
 					Credentials.get(Credential.DTC_API_KEY));
 
@@ -47,19 +45,16 @@ public class DtcCmd extends BaseCmd {
 			final String content = quote.getContent().replace("*", "\\*");
 			final String id = quote.getId();
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Quote DansTonChat",
 							String.format("https://danstonchat.com/%s.html", id),
 							context.getAvatarUrl())
 							.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-							.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n")));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+							.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"))));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	private String format(String line) {

@@ -24,7 +24,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class CounterStrikeCmd extends BaseCmd {
@@ -41,8 +40,7 @@ public class CounterStrikeCmd extends BaseCmd {
 		final String arg = context.requireArg();
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			String identificator = arg;
 
 			// The user provided an URL that can contains a pseudo or an ID
@@ -72,17 +70,16 @@ public class CounterStrikeCmd extends BaseCmd {
 			// Search users matching the steamId
 			final List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
 			if(players.isEmpty()) {
-				return loadingMsg.send(
-						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.", context.getUsername()))
-						.then();
+				return loadingMsg.setContent(
+						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.",
+								context.getUsername()));
 			}
 
 			final PlayerSummary player = players.get(0);
 			if(player.getCommunityVisibilityState() != 3) {
-				return loadingMsg.send(
+				return loadingMsg.setContent(
 						String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private, more info here: <%s>",
-								context.getUsername(), PRIVACY_HELP_URL))
-						.then();
+								context.getUsername(), PRIVACY_HELP_URL));
 			}
 
 			final String userStatsUrl = String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
@@ -90,19 +87,17 @@ public class CounterStrikeCmd extends BaseCmd {
 
 			final String body = NetUtils.getBody(userStatsUrl);
 			if(body.contains("500 Internal Server Error")) {
-				return loadingMsg.send(
+				return loadingMsg.setContent(
 						String.format(Emoji.ACCESS_DENIED + " (**%s**) The game details of this profile are not public, more info here: <%s>",
-								context.getUsername(), PRIVACY_HELP_URL))
-						.then();
+								context.getUsername(), PRIVACY_HELP_URL));
 			}
 
 			final UserStatsForGameResponse userStats = Utils.MAPPER.readValue(NetUtils.getJSON(userStatsUrl), UserStatsForGameResponse.class);
 
 			if(userStats.getPlayerStats() == null || userStats.getPlayerStats().getStats() == null) {
-				return loadingMsg.send(
+				return loadingMsg.setContent(
 						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Counter-Strike: Global Offensive.",
-								context.getUsername()))
-						.then();
+								context.getUsername()));
 			}
 
 			final List<Stats> stats = userStats.getPlayerStats().getStats();
@@ -110,7 +105,7 @@ public class CounterStrikeCmd extends BaseCmd {
 			final Map<String, Integer> statsMap = new HashMap<>();
 			stats.forEach(stat -> statsMap.put(stat.getName(), stat.getValue()));
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Counter-Strike: Global Offensive Stats",
 							"http://steamcommunity.com/profiles/" + steamId,
 							context.getAvatarUrl())
@@ -120,15 +115,11 @@ public class CounterStrikeCmd extends BaseCmd {
 							.addField("Deaths", statsMap.get("total_deaths").toString(), true)
 							.addField("Total wins", statsMap.get("total_wins").toString(), true)
 							.addField("Total MVP", statsMap.get("total_mvps").toString(), true)
-							.addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), false));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
-
+							.addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), false)));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	@Override

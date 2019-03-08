@@ -21,7 +21,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
@@ -42,15 +41,14 @@ public class OverwatchCmd extends BaseCmd {
 		final List<String> args = context.requireArgs(1, 2);
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			final Tuple3<Platform, ProfileResponse, StatsResponse> response =
 					args.size() == 1 ? this.getResponse(args.get(0)) : this.getResponse(args.get(0), args.get(1));
 
 			if(response == null) {
-				return loadingMsg.send(
-						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Overwatch player not found.", context.getUsername()))
-						.then();
+				return loadingMsg.setContent(
+						String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Overwatch player not found.",
+								context.getUsername()));
 			}
 
 			final Platform platform = response.getT1();
@@ -58,12 +56,12 @@ public class OverwatchCmd extends BaseCmd {
 			final Quickplay topHeroes = response.getT3().getStats().getTopHeroes().getQuickplay();
 
 			if(profile.isPrivate()) {
-				return loadingMsg.send(
-						String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private.", context.getUsername()))
-						.then();
+				return loadingMsg.setContent(
+						String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private.",
+								context.getUsername()));
 			}
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
 							StringUtils.toLowerCase(platform), profile.getUsername()), context.getAvatarUrl())
 							.setThumbnail(profile.getPortrait())
@@ -73,14 +71,11 @@ public class OverwatchCmd extends BaseCmd {
 							.addField("Games won", profile.getGames().getQuickplayWon(), true)
 							.addField("Time played", profile.getQuickplayPlaytime(), true)
 							.addField("Top hero (Time played)", topHeroes.getPlayed(), true)
-							.addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+							.addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true)));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	private Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String battletag) throws IOException {

@@ -3,9 +3,6 @@ package me.shadorc.shadbot.command.image;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.apache.http.HttpStatus;
-import org.jsoup.HttpStatusException;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.image.giphy.GiphyResponse;
 import me.shadorc.shadbot.core.command.BaseCmd;
@@ -19,7 +16,6 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.object.Emoji;
 import me.shadorc.shadbot.utils.object.message.LoadingMessage;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 public class GifCmd extends BaseCmd {
@@ -32,33 +28,22 @@ public class GifCmd extends BaseCmd {
 	@Override
 	public Mono<Void> execute(Context context) {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
-		try {
+		return Mono.fromCallable(() -> {
 			final String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
 					Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
 
 			final GiphyResponse giphy = Utils.MAPPER.readValue(NetUtils.getJSON(url), GiphyResponse.class);
-
-			if(giphy.getGifs() == null) {
-				loadingMsg.stopTyping();
-				throw new HttpStatusException("Giphy did not return valid JSON.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
-			}
-
 			if(giphy.getGifs().isEmpty()) {
-				return loadingMsg.send(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
-						context.getUsername(), context.getArg().orElse("random search")))
-						.then();
+				return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
+						context.getUsername(), context.getArg().orElse("random search")));
 			}
 
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-					.andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl()));
-
-			return loadingMsg.send(embedConsumer).then();
-
-		} catch (final Exception err) {
-			loadingMsg.stopTyping();
-			throw Exceptions.propagate(err);
-		}
+			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+					.andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl())));
+		})
+				.flatMap(LoadingMessage::send)
+				.doOnTerminate(loadingMsg::stopTyping)
+				.then();
 	}
 
 	@Override
