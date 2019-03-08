@@ -26,18 +26,16 @@ public class ActivateRelicCmd extends BaseCmd {
 		final String arg = context.requireArg();
 
 		return context.getChannel()
-				.flatMap(channel -> {
-					try {
-						Shadbot.getPremium().activateRelic(context.getGuildId(), context.getAuthorId(), arg);
-						return DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy !",
-								context.getUsername()), channel);
-					} catch (final RelicActivationException err) {
-						return DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
-								context.getUsername(), err.getMessage()), channel);
-					}
+				.flatMap(channel -> Mono.fromCallable(() -> {
+					Shadbot.getPremium().activateRelic(context.getGuildId(), context.getAuthorId(), arg);
+					return String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy !",
+							context.getUsername());
 				})
+						.onErrorResume(RelicActivationException.class,
+								err -> Mono.just(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
+										context.getUsername(), err.getMessage())))
+						.flatMap(text -> DiscordUtils.sendMessage(text, channel)))
 				.then();
-
 	}
 
 	@Override
