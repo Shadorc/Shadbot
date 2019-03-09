@@ -73,7 +73,7 @@ public class SettingsCmd extends BaseCmd {
 					.then();
 		}
 
-		final Setting settingEnum = Utils.getEnum(Setting.class, args.get(0));
+		final Setting settingEnum = Utils.parseEnum(Setting.class, args.get(0));
 		final BaseSetting setting = settingsMap.get(settingEnum);
 		if(setting == null) {
 			return Mono.error(new CommandException(String.format("Setting `%s` does not exist. Use `%shelp %s` to see all available settings.",

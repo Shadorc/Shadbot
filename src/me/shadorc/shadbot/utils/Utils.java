@@ -42,11 +42,11 @@ public class Utils {
 			.setSerializationInclusion(Include.NON_EMPTY);
 
 	/**
-	 * @param enumClass - the enumeration class
+	 * @param enumClass - the {@link Enum} class
 	 * @param value - the string representing the enumeration, case insensitive
-	 * @return The enumeration corresponding to the {@code value} from {@code enumClass} or null if it does not exist
+	 * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass} or null if it does not exist
 	 */
-	public static <T extends Enum<T>> T getEnum(Class<T> enumClass, String value) {
+	public static <T extends Enum<T>> T parseEnum(Class<T> enumClass, String value) {
 		for(final T enumeration : enumClass.getEnumConstants()) {
 			if(enumeration.toString().equalsIgnoreCase(value)) {
 				return enumeration;

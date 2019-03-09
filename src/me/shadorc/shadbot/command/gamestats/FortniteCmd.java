@@ -42,7 +42,7 @@ public class FortniteCmd extends BaseCmd {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(2);
 
-		final Platform platform = Utils.getEnum(Platform.class, args.get(0));
+		final Platform platform = Utils.parseEnum(Platform.class, args.get(0));
 		if(platform == null) {
 			return Mono.error(new CommandException(String.format("`%s` is not a valid Platform. %s",
 					args.get(0), FormatUtils.options(Platform.class))));

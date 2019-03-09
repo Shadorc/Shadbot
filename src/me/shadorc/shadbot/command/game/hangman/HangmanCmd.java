@@ -38,7 +38,7 @@ public class HangmanCmd extends GameCmd<HangmanManager> {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final Difficulty difficulty = Utils.getEnum(Difficulty.class, context.getArg().orElse("easy"));
+		final Difficulty difficulty = Utils.parseEnum(Difficulty.class, context.getArg().orElse("easy"));
 
 		if(difficulty == null) {
 			return Mono.error(new CommandException(String.format("`%s` is not a valid difficulty. %s",

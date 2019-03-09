@@ -50,7 +50,7 @@ public class ChatCmd extends BaseCmd {
 		final String arg = context.requireArg();
 
 		if(arg.length() > MAX_CHARACTERS) {
-			return Mono.error(new CommandException(String.format("The message must not exceed **%d characters**.", 
+			return Mono.error(new CommandException(String.format("The message must not exceed **%d characters**.",
 					MAX_CHARACTERS)));
 		}
 

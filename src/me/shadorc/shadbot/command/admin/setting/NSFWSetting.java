@@ -31,7 +31,7 @@ public class NSFWSetting extends BaseSetting {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(2);
 
-		final Action action = Utils.getEnum(Action.class, args.get(1));
+		final Action action = Utils.parseEnum(Action.class, args.get(1));
 		if(action == null) {
 			return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s",
 					args.get(1), FormatUtils.options(Action.class))));

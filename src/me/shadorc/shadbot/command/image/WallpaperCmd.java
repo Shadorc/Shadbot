@@ -160,7 +160,7 @@ public class WallpaperCmd extends BaseCmd {
 	}
 
 	private <T extends Enum<T>> T parseEnum(Context context, Class<T> enumClass, String name, String value) {
-		final T enumObj = Utils.getEnum(enumClass, value);
+		final T enumObj = Utils.parseEnum(enumClass, value);
 		if(enumObj == null) {
 			this.throwInvalidArg(context, name);
 		}

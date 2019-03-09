@@ -42,7 +42,7 @@ public class StatsCmd extends BaseCmd {
 					.then();
 		}
 
-		final StatisticEnum statEnum = Utils.getEnum(StatisticEnum.class, args.get(0));
+		final StatisticEnum statEnum = Utils.parseEnum(StatisticEnum.class, args.get(0));
 		if(statEnum == null) {
 			return Mono.error(new CommandException(String.format("`%s` is not a valid category. %s",
 					args.get(0), FormatUtils.options(StatisticEnum.class))));
@@ -57,7 +57,7 @@ public class StatsCmd extends BaseCmd {
 
 			map = ((MapStatistic<?>) statEnum.getStat()).getMap();
 		} else {
-			final Enum<?> subStatEnum = Utils.getEnum(statEnum.getStat().getEnumClass(), args.get(1));
+			final Enum<?> subStatEnum = Utils.parseEnum(statEnum.getStat().getEnumClass(), args.get(1));
 			if(subStatEnum == null) {
 				return Mono.error(new CommandException(String.format("`%s` is not a valid sub-category. %s",
 						args.get(1), FormatUtils.options(statEnum.getStat().getEnumClass()))));

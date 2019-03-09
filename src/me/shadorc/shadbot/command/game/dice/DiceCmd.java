@@ -34,7 +34,7 @@ public class DiceCmd extends GameCmd<DiceManager> {
 		final String numStr = args.get(isJoining ? 0 : 1);
 		final Integer num = NumberUtils.asIntBetween(numStr, 1, 6);
 		if(num == null) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid number, must be between 1 and 6.", 
+			return Mono.error(new CommandException(String.format("`%s` is not a valid number, must be between 1 and 6.",
 					numStr)));
 		}
 

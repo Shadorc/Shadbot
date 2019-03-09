@@ -27,7 +27,7 @@ public class PrefixSetting extends BaseSetting {
 		final List<String> args = context.requireArgs(2);
 
 		if(args.get(1).length() > MAX_PREFIX_LENGTH) {
-			return Mono.error(new CommandException(String.format("Prefix cannot contain more than %s characters.", 
+			return Mono.error(new CommandException(String.format("Prefix cannot contain more than %s characters.",
 					MAX_PREFIX_LENGTH)));
 		}
 

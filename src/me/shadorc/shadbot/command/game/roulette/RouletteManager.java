@@ -91,7 +91,7 @@ public class RouletteManager extends GameManager {
 				.map(user -> {
 					final int bet = this.playersPlace.get(user.getId()).getT1();
 					final String place = this.playersPlace.get(user.getId()).getT2();
-					final Place placeEnum = Utils.getEnum(Place.class, place);
+					final Place placeEnum = Utils.parseEnum(Place.class, place);
 
 					final Map<Place, Boolean> testsMap = Map.of(
 							Place.RED, RED_NUMS.contains(winningPlace),

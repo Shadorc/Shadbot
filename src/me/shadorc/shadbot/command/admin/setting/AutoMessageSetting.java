@@ -39,15 +39,15 @@ public class AutoMessageSetting extends BaseSetting {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(3, 4);
 
-		final Action action = Utils.getEnum(Action.class, args.get(1));
+		final Action action = Utils.parseEnum(Action.class, args.get(1));
 		if(action == null) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s", 
+			return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s",
 					args.get(1), FormatUtils.options(Action.class))));
 		}
 
-		final Type type = Utils.getEnum(Type.class, args.get(2));
+		final Type type = Utils.parseEnum(Type.class, args.get(2));
 		if(type == null) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid type. %s", 
+			return Mono.error(new CommandException(String.format("`%s` is not a valid type. %s",
 					args.get(2), FormatUtils.options(Type.class))));
 		}
 

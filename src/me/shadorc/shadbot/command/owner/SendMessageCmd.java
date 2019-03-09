@@ -30,7 +30,7 @@ public class SendMessageCmd extends BaseCmd {
 
 		final Long userId = NumberUtils.asPositiveLong(args.get(0));
 		if(userId == null) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid user ID.", 
+			return Mono.error(new CommandException(String.format("`%s` is not a valid user ID.",
 					args.get(0))));
 		}
 

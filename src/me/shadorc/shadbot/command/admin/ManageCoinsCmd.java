@@ -36,7 +36,7 @@ public class ManageCoinsCmd extends BaseCmd {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(2, 3);
 
-		final Action action = Utils.getEnum(Action.class, args.get(0));
+		final Action action = Utils.parseEnum(Action.class, args.get(0));
 		if(action == null) {
 			return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s",
 					args.get(0), FormatUtils.options(Action.class))));
@@ -44,7 +44,7 @@ public class ManageCoinsCmd extends BaseCmd {
 
 		final Integer coins = NumberUtils.asInt(args.get(1));
 		if(coins == null && !Action.RESET.equals(action)) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.", 
+			return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.",
 					args.get(1))));
 		}
 

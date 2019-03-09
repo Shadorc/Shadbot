@@ -51,7 +51,7 @@ public class WeatherCmd extends BaseCmd {
 
 			CurrentWeather currentWeather;
 			if(args.size() == 2) {
-				final Country country = Utils.getEnum(Country.class, args.get(1).replace(" ", "_"));
+				final Country country = Utils.parseEnum(Country.class, args.get(1).replace(" ", "_"));
 				if(country == null) {
 					return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
 							context.getUsername(), args.get(1)));
