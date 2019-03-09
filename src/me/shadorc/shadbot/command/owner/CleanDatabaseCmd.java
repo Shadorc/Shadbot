@@ -31,7 +31,8 @@ public class CleanDatabaseCmd extends BaseCmd {
 						.flatMap(dbGuild -> context.getClient().getGuildById(dbGuild.getId())
 								.doOnError(ClientException.class, err -> {
 									if(err.getStatus().code() == 404 || err.getStatus().code() == 403) {
-										LogUtils.info("Deleting guild ID: %d", dbGuild.getId().asLong());
+										LogUtils.info("Deleting guild ID: %d, reason: %d",
+												dbGuild.getId().asLong(), err.getStatus().code());
 										Shadbot.getDatabase().removeDBGuild(dbGuild.getId());
 									}
 								})
@@ -40,12 +41,15 @@ public class CleanDatabaseCmd extends BaseCmd {
 										.flatMap(dbMember -> guild.getMemberById(dbMember.getId())
 												.doOnNext(member -> {
 													if(dbMember.getCoins() == 0) {
+														LogUtils.info("Deleting member ID: %d, reason: coins",
+																dbGuild.getId().asLong());
 														dbGuild.removeMember(dbMember);
 													}
 												})
 												.doOnError(ClientException.class, err -> {
 													if(err.getStatus().code() == 404 || err.getStatus().code() == 403) {
-														LogUtils.info("Deleting member ID: %d", dbMember.getId().asLong());
+														LogUtils.info("Deleting member ID: %d, reason: %d",
+																dbMember.getId().asLong(), err.getStatus().code());
 														dbGuild.removeMember(dbMember);
 													}
 												})
