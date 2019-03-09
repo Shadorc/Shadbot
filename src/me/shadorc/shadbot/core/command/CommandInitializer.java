@@ -57,6 +57,7 @@ import me.shadorc.shadbot.command.music.ShuffleCmd;
 import me.shadorc.shadbot.command.music.SkipCmd;
 import me.shadorc.shadbot.command.music.StopCmd;
 import me.shadorc.shadbot.command.music.VolumeCmd;
+import me.shadorc.shadbot.command.owner.CleanDatabaseCmd;
 import me.shadorc.shadbot.command.owner.DatabaseCmd;
 import me.shadorc.shadbot.command.owner.GenerateRelicCmd;
 import me.shadorc.shadbot.command.owner.LeaveCmd;
@@ -111,6 +112,7 @@ public class CommandInitializer {
 				// Owner Commands
 				new LoggerCmd(), new StatsCmd(), new RestartCmd(), new LeaveCmd(),
 				new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(), new DatabaseCmd(),
+				new CleanDatabaseCmd(),
 				// Hidden Commands
 				new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd());
 	}
