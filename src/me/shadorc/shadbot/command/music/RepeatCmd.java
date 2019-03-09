@@ -32,10 +32,8 @@ public class RepeatCmd extends BaseCmd {
 				.map(voiceChannelId -> {
 					RepeatMode mode;
 					if(context.getArg().isPresent()) {
-						mode = Utils.parseEnum(RepeatMode.class, context.getArg().get());
-						if(mode == null) {
-							throw new CommandException(String.format("`%s` is not a valid mode.", context.getArg().get()));
-						}
+						mode = Utils.parseEnum(RepeatMode.class, context.getArg().get(),
+								new CommandException(String.format("`%s` is not a valid mode.", context.getArg().get())));
 					}
 					// By default, modifications are made on song repeat mode
 					else {

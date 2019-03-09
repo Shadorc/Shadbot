@@ -35,11 +35,9 @@ public class AllowedChannelsSetting extends BaseSetting {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(3);
 
-		final Action action = Utils.parseEnum(Action.class, args.get(1));
-		if(action == null) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s",
-					args.get(1), FormatUtils.options(Action.class))));
-		}
+		final Action action = Utils.parseEnum(Action.class, args.get(1),
+				new CommandException(String.format("`%s` is not a valid action. %s",
+						args.get(1), FormatUtils.options(Action.class))));
 
 		return context.getGuild()
 				.flatMapMany(guild -> DiscordUtils.extractChannels(guild, args.get(2)))

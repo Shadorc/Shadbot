@@ -30,11 +30,9 @@ public class GenerateRelicCmd extends BaseCmd {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		final RelicType type = Utils.parseEnum(RelicType.class, context.getArg().get());
-		if(type == null) {
-			return Mono.error(new CommandException(String.format("`%s` in not a valid type. %s",
-					arg, FormatUtils.options(RelicType.class))));
-		}
+		final RelicType type = Utils.parseEnum(RelicType.class, context.getArg().get(),
+				new CommandException(String.format("`%s` in not a valid type. %s",
+						arg, FormatUtils.options(RelicType.class))));
 
 		final Relic relic = Shadbot.getPremium().generateRelic(type);
 		return context.getChannel()

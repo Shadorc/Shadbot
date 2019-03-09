@@ -51,11 +51,9 @@ public class DiabloCmd extends BaseCmd {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(2);
 
-		final Region region = Utils.parseEnum(Region.class, args.get(0));
-		if(region == null) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid Region. %s",
-					args.get(0), FormatUtils.options(Region.class))));
-		}
+		final Region region = Utils.parseEnum(Region.class, args.get(0),
+				new CommandException(String.format("`%s` is not a valid Region. %s",
+						args.get(0), FormatUtils.options(Region.class))));
 
 		final String battletag = args.get(1).replaceAll("#", "-");
 

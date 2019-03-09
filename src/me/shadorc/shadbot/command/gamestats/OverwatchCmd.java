@@ -92,11 +92,9 @@ public class OverwatchCmd extends BaseCmd {
 
 	private Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String platformStr, String battletag) throws IOException {
 		final String username = battletag.replace("#", "-");
-		final Platform platform = Utils.parseEnum(Platform.class, platformStr);
-		if(platform == null) {
-			throw new CommandException(String.format("`%s` is not a valid Platform. %s",
-					platformStr, FormatUtils.options(Platform.class)));
-		}
+		final Platform platform = Utils.parseEnum(Platform.class, platformStr,
+				new CommandException(String.format("`%s` is not a valid Platform. %s",
+						platformStr, FormatUtils.options(Platform.class))));
 
 		final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("profile", platform, username)), ProfileResponse.class);
 		if(profile.getUsername() == null) {
