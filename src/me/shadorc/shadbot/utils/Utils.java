@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.management.Attribute;
@@ -53,6 +54,22 @@ public class Utils {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @param enumClass - the {@link Enum} class
+	 * @param value - the string representing the enumeration, case insensitive
+	 * @param exceptionSupplier - the supplying function that produces an exception to be thrown
+	 * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass}
+	 * @throws X if the value is null
+	 */
+	public static <T extends Enum<T>, X extends Throwable> T parseEnum(Class<T> enumClass, String value, Supplier<X> exceptionSupplier) throws X {
+		final T enumValue = Utils.parseEnum(enumClass, value);
+		if(enumValue != null) {
+			return enumValue;
+		} else {
+			throw exceptionSupplier.get();
+		}
 	}
 
 	/**
