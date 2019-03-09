@@ -2,6 +2,7 @@ package me.shadorc.shadbot.data.database;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,10 @@ public class DatabaseManager extends Data {
 				guildsMap.put(guild.getId(), guild);
 			}
 		}
+	}
+
+	public Collection<DBGuild> getDBGuilds() {
+		return this.guildsMap.values();
 	}
 
 	public DBGuild getDBGuild(Snowflake guildId) {
