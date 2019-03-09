@@ -35,7 +35,7 @@ public class RolelistCmd extends BaseCmd {
 				.collectList()
 				.flatMap(mentionedRoleIds -> {
 					if(mentionedRoleIds.isEmpty()) {
-						throw new CommandException(String.format("Role `%s` not found.", arg));
+						return Mono.error(new CommandException(String.format("Role `%s` not found.", arg)));
 					}
 
 					final Mono<List<Role>> mentionedRoles = Flux.fromIterable(mentionedRoleIds)

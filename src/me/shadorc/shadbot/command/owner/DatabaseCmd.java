@@ -29,7 +29,8 @@ public class DatabaseCmd extends BaseCmd {
 
 		final Long guildId = NumberUtils.asPositiveLong(args.get(0));
 		if(guildId == null) {
-			throw new CommandException(String.format("`%s` is not a valid guild ID.", args.get(0)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.", 
+					args.get(0))));
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))
@@ -42,7 +43,8 @@ public class DatabaseCmd extends BaseCmd {
 
 					final Long memberId = NumberUtils.asPositiveLong(args.get(1));
 					if(memberId == null) {
-						throw new CommandException(String.format("`%s` is not a valid member ID.", args.get(1)));
+						return Mono.error(new CommandException(String.format("`%s` is not a valid member ID.", 
+								args.get(1))));
 					}
 
 					return context.getClient().getMemberById(Snowflake.of(guildId), Snowflake.of(memberId))

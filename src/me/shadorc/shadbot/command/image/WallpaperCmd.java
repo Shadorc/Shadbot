@@ -96,7 +96,7 @@ public class WallpaperCmd extends BaseCmd {
 					final CommandLine cmdLine = tuple.getT1();
 					final boolean isNsfw = tuple.getT2();
 
-					final Purity purity = this.parseEnum(loadingMsg, context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
+					final Purity purity = this.parseEnum(context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
 					if((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !isNsfw) {
 						return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
 					}
@@ -105,16 +105,16 @@ public class WallpaperCmd extends BaseCmd {
 					queryBuilder.purity(purity);
 
 					if(cmdLine.hasOption(CATEGORY)) {
-						queryBuilder.categories(this.parseEnum(loadingMsg, context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
+						queryBuilder.categories(this.parseEnum(context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
 					}
 
 					if(cmdLine.hasOption(RATIO)) {
-						final Dimension dim = this.parseDim(loadingMsg, context, RATIO, cmdLine.getOptionValues(RATIO));
+						final Dimension dim = this.parseDim(context, RATIO, cmdLine.getOptionValues(RATIO));
 						queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
 					}
 
 					if(cmdLine.hasOption(RESOLUTION)) {
-						final Dimension dim = this.parseDim(loadingMsg, context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
+						final Dimension dim = this.parseDim(context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
 						queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
 					}
 
@@ -146,29 +146,28 @@ public class WallpaperCmd extends BaseCmd {
 				.then();
 	}
 
-	private Dimension parseDim(LoadingMessage msg, Context context, String name, String... values) {
+	private Dimension parseDim(Context context, String name, String... values) {
 		final List<String> sizeList = List.of(values);
 		if(sizeList.size() != 2) {
-			this.throwInvalidArg(msg, context, name);
+			this.throwInvalidArg(context, name);
 		}
 		final Integer width = NumberUtils.asPositiveInt(sizeList.get(0));
 		final Integer height = NumberUtils.asPositiveInt(sizeList.get(1));
 		if(width == null || height == null) {
-			this.throwInvalidArg(msg, context, name);
+			this.throwInvalidArg(context, name);
 		}
 		return new Dimension(width, height);
 	}
 
-	private <T extends Enum<T>> T parseEnum(LoadingMessage msg, Context context, Class<T> enumClass, String name, String value) {
+	private <T extends Enum<T>> T parseEnum(Context context, Class<T> enumClass, String name, String value) {
 		final T enumObj = Utils.getEnum(enumClass, value);
 		if(enumObj == null) {
-			this.throwInvalidArg(msg, context, name);
+			this.throwInvalidArg(context, name);
 		}
 		return enumObj;
 	}
 
-	private void throwInvalidArg(LoadingMessage loadingMsg, Context context, String name) {
-		loadingMsg.stopTyping();
+	private void throwInvalidArg(Context context, String name) {
 		throw new CommandException(String.format("`%s` value is not valid. Use `%shelp %s` for more information.",
 				name, context.getPrefix(), this.getName()));
 	}

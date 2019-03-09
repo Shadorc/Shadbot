@@ -39,7 +39,7 @@ public class VolumeCmd extends BaseCmd {
 					final String arg = context.getArg().get();
 					final Integer volume = NumberUtils.asPositiveInt(arg);
 					if(volume == null) {
-						throw new CommandException(String.format("`%s` is not a valid volume.", arg));
+						return Mono.error(new CommandException(String.format("`%s` is not a valid volume.", arg)));
 					}
 
 					scheduler.setVolume(volume);

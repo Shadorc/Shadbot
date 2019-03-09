@@ -27,11 +27,12 @@ public class PrefixSetting extends BaseSetting {
 		final List<String> args = context.requireArgs(2);
 
 		if(args.get(1).length() > MAX_PREFIX_LENGTH) {
-			throw new CommandException(String.format("Prefix cannot contain more than %s characters.", MAX_PREFIX_LENGTH));
+			return Mono.error(new CommandException(String.format("Prefix cannot contain more than %s characters.", 
+					MAX_PREFIX_LENGTH)));
 		}
 
 		if(args.get(1).contains(" ")) {
-			throw new CommandException("Prefix cannot contain spaces.");
+			return Mono.error(new CommandException("Prefix cannot contain spaces."));
 		}
 
 		Shadbot.getDatabase().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), args.get(1));

@@ -33,7 +33,8 @@ public class RpsCmd extends BaseCmd {
 
 		final Handsign userHandsign = Utils.getEnum(Handsign.class, arg);
 		if(userHandsign == null) {
-			throw new CommandException(String.format("`%s` is not a valid handsign. %s.", arg, FormatUtils.options(Handsign.class)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid handsign. %s.", 
+					arg, FormatUtils.options(Handsign.class))));
 		}
 
 		final Handsign botHandsign = Utils.randValue(Handsign.values());

@@ -36,7 +36,8 @@ public class AutoRolesSetting extends BaseSetting {
 
 		final Action action = Utils.getEnum(Action.class, args.get(1));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s",
+					args.get(1), FormatUtils.options(Action.class))));
 		}
 
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());

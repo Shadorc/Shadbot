@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.command.gamestats;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,8 +53,8 @@ public class DiabloCmd extends BaseCmd {
 
 		final Region region = Utils.getEnum(Region.class, args.get(0));
 		if(region == null) {
-			throw new CommandException(String.format("`%s` is not a valid Region. %s",
-					args.get(0), FormatUtils.options(Region.class)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid Region. %s",
+					args.get(0), FormatUtils.options(Region.class))));
 		}
 
 		final String battletag = args.get(1).replaceAll("#", "-");
@@ -72,7 +71,9 @@ public class DiabloCmd extends BaseCmd {
 			final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(url), ProfileResponse.class);
 
 			if("NOTFOUND".equals(profile.getCode())) {
-				throw new FileNotFoundException();
+				return loadingMsg.setContent(String.format(
+						Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
+						context.getUsername()));
 			}
 
 			final List<HeroResponse> heroResponses = new ArrayList<>();
@@ -104,10 +105,6 @@ public class DiabloCmd extends BaseCmd {
 							.addField("Damage", FormatUtils.format(heroResponses,
 									hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true)));
 		})
-				.onErrorResume(FileNotFoundException.class,
-						err -> Mono.just(loadingMsg.setContent(String.format(
-								Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
-								context.getUsername()))))
 				.flatMap(LoadingMessage::send)
 				.doOnTerminate(loadingMsg::stopTyping)
 				.then();

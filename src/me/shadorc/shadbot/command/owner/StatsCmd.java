@@ -44,23 +44,23 @@ public class StatsCmd extends BaseCmd {
 
 		final StatisticEnum statEnum = Utils.getEnum(StatisticEnum.class, args.get(0));
 		if(statEnum == null) {
-			throw new CommandException(String.format("`%s` is not a valid category. %s",
-					args.get(0), FormatUtils.options(StatisticEnum.class)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid category. %s",
+					args.get(0), FormatUtils.options(StatisticEnum.class))));
 		}
 
 		Map<String, AtomicLong> map;
 		if(args.size() == 1) {
 			if(statEnum.getStat() instanceof TableStatistic) {
-				throw new CommandException(String.format("You need to specify a valid sub-category.%n%s",
-						FormatUtils.options(statEnum.getStat().getEnumClass())));
+				return Mono.error(new CommandException(String.format("You need to specify a valid sub-category.%n%s",
+						FormatUtils.options(statEnum.getStat().getEnumClass()))));
 			}
 
 			map = ((MapStatistic<?>) statEnum.getStat()).getMap();
 		} else {
 			final Enum<?> subStatEnum = Utils.getEnum(statEnum.getStat().getEnumClass(), args.get(1));
 			if(subStatEnum == null) {
-				throw new CommandException(String.format("`%s` is not a valid sub-category. %s",
-						args.get(1), FormatUtils.options(statEnum.getStat().getEnumClass())));
+				return Mono.error(new CommandException(String.format("`%s` is not a valid sub-category. %s",
+						args.get(1), FormatUtils.options(statEnum.getStat().getEnumClass()))));
 			}
 
 			if(statEnum.getStat() instanceof MapStatistic) {

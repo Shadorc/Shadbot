@@ -30,11 +30,12 @@ public class SendMessageCmd extends BaseCmd {
 
 		final Long userId = NumberUtils.asPositiveLong(args.get(0));
 		if(userId == null) {
-			throw new CommandException(String.format("`%s` is not a valid user ID.", args.get(0)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid user ID.", 
+					args.get(0))));
 		}
 
 		if(Snowflake.of(userId).equals(context.getSelfId())) {
-			throw new CommandException("I can't send a private message to myself.");
+			return Mono.error(new CommandException("I can't send a private message to myself."));
 		}
 
 		return context.getClient().getUserById(Snowflake.of(userId))
@@ -42,7 +43,7 @@ public class SendMessageCmd extends BaseCmd {
 						err -> new CommandException("User not found."))
 				.flatMap(user -> {
 					if(user.isBot()) {
-						throw new CommandException("I can't send private message to other bots.");
+						return Mono.error(new CommandException("I can't send private message to other bots."));
 					}
 
 					return user.getPrivateChannel()

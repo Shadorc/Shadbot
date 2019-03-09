@@ -43,10 +43,10 @@ public class IamCmd extends BaseCmd {
 
 		final List<String> quotedElements = StringUtils.getQuotedElements(arg);
 		if(quotedElements.isEmpty() && arg.contains("\"")) {
-			throw new CommandException("One quotation mark is missing.");
+			return Mono.error(new CommandException("One quotation mark is missing."));
 		}
 		if(quotedElements.size() > 1) {
-			throw new CommandException("You should specify only one text in quotation marks.");
+			return Mono.error(new CommandException("You should specify only one text in quotation marks."));
 		}
 
 		final Mono<List<Role>> rolesMono = context.getGuild()
@@ -59,7 +59,7 @@ public class IamCmd extends BaseCmd {
 						.then(rolesMono)
 						.flatMap(roles -> {
 							if(roles.isEmpty()) {
-								throw new MissingArgumentException();
+								return Mono.error(new MissingArgumentException());
 							}
 
 							final StringBuilder description = new StringBuilder();

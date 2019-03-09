@@ -34,14 +34,15 @@ public class DiceCmd extends GameCmd<DiceManager> {
 		final String numStr = args.get(isJoining ? 0 : 1);
 		final Integer num = NumberUtils.asIntBetween(numStr, 1, 6);
 		if(num == null) {
-			throw new CommandException(String.format("`%s` is not a valid number, must be between 1 and 6.", numStr));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid number, must be between 1 and 6.", 
+					numStr)));
 		}
 
 		DiceManager diceManager = this.getManagers().get(context.getChannelId());
 
 		// The user tries to join a game and no game are currently playing
 		if(isJoining && diceManager == null) {
-			throw new MissingArgumentException();
+			return Mono.error(new MissingArgumentException());
 		}
 
 		final String betStr = isJoining ? Integer.toString(diceManager.getBet()) : args.get(0);

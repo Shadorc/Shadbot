@@ -30,7 +30,7 @@ public class LeaveCmd extends BaseCmd {
 
 		final Long guildId = NumberUtils.asPositiveLong(arg);
 		if(guildId == null) {
-			throw new CommandException(String.format("`%s` is not a valid guild ID.", arg));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.", arg)));
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))

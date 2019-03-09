@@ -37,8 +37,8 @@ public class RouletteCmd extends GameCmd<RouletteManager> {
 
 		// Match [1-36], red, black, odd, even, high or low
 		if(!place.matches("^([1-9]|1[0-9]|2[0-9]|3[0-6])$") && Utils.getEnum(Place.class, place) == null) {
-			throw new CommandException(String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
-					place, FormatUtils.format(Place.values(), value -> String.format("**%s**", StringUtils.toLowerCase(value)), ", ")));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
+					place, FormatUtils.format(Place.values(), value -> String.format("**%s**", StringUtils.toLowerCase(value)), ", "))));
 		}
 
 		final RouletteManager rouletteManager = this.getManagers().computeIfAbsent(context.getChannelId(),

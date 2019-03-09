@@ -36,15 +36,16 @@ public class BlacklistSettingCmd extends BaseSetting {
 
 		final Action action = Utils.getEnum(Action.class, args.get(1));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s", args.get(1), FormatUtils.options(Action.class)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s", 
+					args.get(1), FormatUtils.options(Action.class))));
 		}
 
 		final List<String> commands = StringUtils.split(args.get(2).toLowerCase());
 
 		final List<String> unknownCmds = commands.stream().filter(cmd -> CommandInitializer.getCommand(cmd) == null).collect(Collectors.toList());
 		if(!unknownCmds.isEmpty()) {
-			throw new CommandException(String.format("Command %s doesn't exist.",
-					FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", ")));
+			return Mono.error(new CommandException(String.format("Command %s doesn't exist.",
+					FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", "))));
 		}
 
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());

@@ -31,8 +31,8 @@ public class VolumeSetting extends BaseSetting {
 
 		final Integer volume = NumberUtils.asIntBetween(args.get(1), MIN_VOLUME, MAX_VOLUME);
 		if(volume == null) {
-			throw new CommandException(String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
-					args.get(1), MIN_VOLUME, MAX_VOLUME));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
+					args.get(1), MIN_VOLUME, MAX_VOLUME)));
 		}
 
 		Shadbot.getDatabase().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), volume);

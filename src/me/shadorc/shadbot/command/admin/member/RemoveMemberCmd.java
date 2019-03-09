@@ -47,15 +47,15 @@ public abstract class RemoveMemberCmd extends BaseCmd {
 
 		final Set<Snowflake> mentionedUserIds = context.getMessage().getUserMentionIds();
 		if(mentionedUserIds.isEmpty()) {
-			throw new MissingArgumentException();
+			return Mono.error(new MissingArgumentException());
 		}
 
 		if(mentionedUserIds.contains(context.getAuthorId())) {
-			throw new CommandException(String.format("You cannot %s yourself.", this.getName()));
+			return Mono.error(new CommandException(String.format("You cannot %s yourself.", this.getName())));
 		}
 
 		if(mentionedUserIds.contains(context.getSelfId())) {
-			throw new CommandException(String.format("You cannot %s me.", this.getName()));
+			return Mono.error(new CommandException(String.format("You cannot %s me.", this.getName())));
 		}
 
 		return context.getChannel()

@@ -39,7 +39,7 @@ public class SlotMachineCmd extends BaseCmd {
 		final DBMember dbMember = Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId());
 
 		if(dbMember.getCoins() < PAID_COST) {
-			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
+			return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
 		}
 
 		final List<SlotOptions> slots = List.of(Utils.randValue(SLOTS_ARRAY), Utils.randValue(SLOTS_ARRAY), Utils.randValue(SLOTS_ARRAY));

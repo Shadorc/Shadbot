@@ -35,24 +35,24 @@ public class TransferCoinsCmd extends BaseCmd {
 		final List<String> args = context.requireArgs(2);
 
 		if(context.getMessage().getUserMentionIds().isEmpty()) {
-			throw new MissingArgumentException();
+			return Mono.error(new MissingArgumentException());
 		}
 
 		final Snowflake senderUserId = context.getAuthorId();
 		final Snowflake receiverUserId = new ArrayList<>(context.getMessage().getUserMentionIds()).get(0);
 		if(receiverUserId.equals(senderUserId)) {
-			throw new CommandException("You cannot transfer coins to yourself.");
+			return Mono.error(new CommandException("You cannot transfer coins to yourself."));
 		}
 
 		final Integer coins = NumberUtils.asPositiveInt(args.get(0));
 		if(coins == null) {
-			throw new CommandException(
-					String.format("`%s` is not a valid amount of coins.", args.get(0)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.", 
+					args.get(0))));
 		}
 
 		final DBMember dbSender = Shadbot.getDatabase().getDBMember(context.getGuildId(), senderUserId);
 		if(dbSender.getCoins() < coins) {
-			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
+			return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
 		}
 
 		final DBMember dbReceiver = Shadbot.getDatabase().getDBMember(context.getGuildId(), receiverUserId);

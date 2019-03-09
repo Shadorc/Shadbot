@@ -38,13 +38,14 @@ public class ManageCoinsCmd extends BaseCmd {
 
 		final Action action = Utils.getEnum(Action.class, args.get(0));
 		if(action == null) {
-			throw new CommandException(String.format("`%s` is not a valid action. %s",
-					args.get(0), FormatUtils.options(Action.class)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s",
+					args.get(0), FormatUtils.options(Action.class))));
 		}
 
 		final Integer coins = NumberUtils.asInt(args.get(1));
 		if(coins == null && !Action.RESET.equals(action)) {
-			throw new CommandException(String.format("`%s` is not a valid amount of coins.", args.get(1)));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.", 
+					args.get(1))));
 		}
 
 		return DiscordUtils.getMembersFrom(context.getMessage())

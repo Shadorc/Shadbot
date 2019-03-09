@@ -47,16 +47,16 @@ public class TranslateCmd extends BaseCmd {
 
 		final List<String> quotedWords = StringUtils.getQuotedElements(arg);
 		if(quotedWords.size() != 1) {
-			throw new CommandException("The text to translate cannot be empty and must be enclosed in quotation marks.");
+			return Mono.error(new CommandException("The text to translate cannot be empty and must be enclosed in quotation marks."));
 		}
 		final String sourceText = quotedWords.get(0);
 		if(sourceText.length() > CHARACTERS_LIMIT) {
-			throw new CommandException(String.format("The text to translate cannot exceed %d characters.", CHARACTERS_LIMIT));
+			return Mono.error(new CommandException(String.format("The text to translate cannot exceed %d characters.", CHARACTERS_LIMIT)));
 		}
 
 		final List<String> langs = StringUtils.split(StringUtils.remove(arg, sourceText, "\""));
 		if(langs.isEmpty()) {
-			throw new MissingArgumentException();
+			return Mono.error(new MissingArgumentException());
 		}
 
 		if(langs.size() == 1) {
@@ -67,7 +67,7 @@ public class TranslateCmd extends BaseCmd {
 		final String langTo = this.toISO(langs.get(1));
 
 		if(langTo != null && Objects.equals(langFrom, langTo)) {
-			throw new CommandException("The destination language must be different from the source one.");
+			return Mono.error(new CommandException("The destination language must be different from the source one."));
 		}
 
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
@@ -86,8 +86,8 @@ public class TranslateCmd extends BaseCmd {
 			final JSONArray result = new JSONArray(NetUtils.getJSON(url));
 
 			if(langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
-				throw new CommandException(String.format("One of the specified language isn't supported. "
-						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
+				return Mono.error(new CommandException(String.format("One of the specified language isn't supported. "
+						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName())));
 			}
 
 			final StringBuilder translatedText = new StringBuilder();
@@ -97,9 +97,9 @@ public class TranslateCmd extends BaseCmd {
 			}
 
 			if(translatedText.toString().equalsIgnoreCase(sourceText)) {
-				throw new CommandException(String.format("The text could not been translated."
+				return Mono.error(new CommandException(String.format("The text could not been translated."
 						+ "%nCheck that the specified languages are supported and that the text is in the specified language."
-						+ "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
+						+ "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName())));
 			}
 
 			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
@@ -109,6 +109,7 @@ public class TranslateCmd extends BaseCmd {
 									StringUtils.capitalize(langIsoMap.inverse().get(langTo)), translatedText.toString()))));
 
 		})
+				.cast(LoadingMessage.class)
 				.flatMap(LoadingMessage::send)
 				.doOnTerminate(loadingMsg::stopTyping)
 				.then();

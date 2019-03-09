@@ -56,8 +56,8 @@ public class TriviaCmd extends GameCmd<TriviaManager> {
 		final Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
 
 		if(context.getArg().isPresent() && !this.categories.getIds().contains(categoryId)) {
-			throw new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list of categories.",
-					context.getArg().get(), context.getPrefix(), this.getName()));
+			return Mono.error(new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list of categories.",
+					context.getArg().get(), context.getPrefix(), this.getName())));
 		}
 
 		if(this.getManagers().containsKey(context.getChannelId())) {

@@ -31,7 +31,8 @@ public class LoggerCmd extends BaseCmd {
 		final String name = args.get(0);
 		final Level level = Level.toLevel(args.get(1).toUpperCase(), null);
 		if(level == null) {
-			throw new CommandException(String.format("`%s` in not a valid level.", args.get(1)));
+			return Mono.error(new CommandException(String.format("`%s` in not a valid level.", 
+					args.get(1))));
 		}
 
 		Logger logger;
