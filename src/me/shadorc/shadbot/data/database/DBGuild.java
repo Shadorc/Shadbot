@@ -147,6 +147,10 @@ public class DBGuild {
 		this.members.add(dbMember);
 	}
 
+	public void removeMember(DBMember dbMember) {
+		this.members.remove(dbMember);
+	}
+
 	@Override
 	public String toString() {
 		return String.format("DBGuild [guildId=%s, members=%s, settings=%s]",

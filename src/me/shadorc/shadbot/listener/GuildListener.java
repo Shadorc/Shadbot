@@ -19,6 +19,9 @@ public class GuildListener {
 	}
 
 	public static Mono<Void> onGuildDelete(GuildDeleteEvent event) {
-		return Mono.fromRunnable(() -> LogUtils.info("{Guild ID: %d} Disconnected.", event.getGuildId().asLong()));
+		return Mono.fromRunnable(() -> {
+			LogUtils.info("{Guild ID: %d} Disconnected.", event.getGuildId().asLong());
+			Shadbot.getDatabase().removeDBGuild(event.getGuildId());
+		});
 	}
 }

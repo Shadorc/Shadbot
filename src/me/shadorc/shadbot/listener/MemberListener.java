@@ -36,7 +36,10 @@ public class MemberListener {
 
 	public static Mono<Void> onMemberLeave(MemberLeaveEvent event) {
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId());
-		return MemberListener.sendAutoMsg(event.getClient(), event.getUser(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage()).then();
+		event.getMember()
+				.ifPresent(member -> dbGuild.removeMember(Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId())));
+		return MemberListener.sendAutoMsg(event.getClient(), event.getUser(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage())
+				.then();
 	}
 
 	private static Mono<Message> sendAutoMsg(DiscordClient client, User user, Optional<Long> channelId, Optional<String> message) {

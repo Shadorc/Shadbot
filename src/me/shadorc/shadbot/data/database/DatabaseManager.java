@@ -50,6 +50,10 @@ public class DatabaseManager extends Data {
 		return dbMember;
 	}
 
+	public void removeDBGuild(Snowflake guildId) {
+		this.guildsMap.remove(guildId);
+	}
+
 	@Override
 	public Object getData() {
 		return this.guildsMap.values();
