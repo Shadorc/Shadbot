@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -30,7 +31,7 @@ public class CleanDatabaseCmd extends BaseCmd {
 				.and(Flux.fromIterable(Shadbot.getDatabase().getDBGuilds())
 						.flatMap(dbGuild -> context.getClient().getGuildById(dbGuild.getId())
 								.doOnError(ClientException.class, err -> {
-									if(err.getStatus().code() == 404 || err.getStatus().code() == 403) {
+									if(err.getStatus().equals(HttpResponseStatus.NOT_FOUND) || err.getStatus().equals(HttpResponseStatus.FORBIDDEN)) {
 										LogUtils.info("Deleting guild ID: %d, reason: %d",
 												dbGuild.getId().asLong(), err.getStatus().code());
 										Shadbot.getDatabase().removeDBGuild(dbGuild.getId());
@@ -47,7 +48,7 @@ public class CleanDatabaseCmd extends BaseCmd {
 													}
 												})
 												.doOnError(ClientException.class, err -> {
-													if(err.getStatus().code() == 404 || err.getStatus().code() == 403) {
+													if(err.getStatus().equals(HttpResponseStatus.NOT_FOUND) || err.getStatus().equals(HttpResponseStatus.FORBIDDEN)) {
 														LogUtils.info("Deleting member ID: %d, reason: %d",
 																dbMember.getId().asLong(), err.getStatus().code());
 														dbGuild.removeMember(dbMember);
