@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.music;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -13,7 +14,7 @@ import discord4j.core.object.util.Snowflake;
 public class GuildMusicManager {
 
 	public static final AudioPlayerManager AUDIO_PLAYER_MANAGER = new DefaultAudioPlayerManager();
-	public static final ConcurrentHashMap<Snowflake, GuildMusic> GUILD_MUSIC_MAP = new ConcurrentHashMap<>();
+	public static final Map<Snowflake, GuildMusic> GUILD_MUSIC_MAP = new ConcurrentHashMap<>();
 
 	static {
 		AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
