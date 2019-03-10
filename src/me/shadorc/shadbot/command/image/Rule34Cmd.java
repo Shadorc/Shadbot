@@ -49,7 +49,7 @@ public class Rule34Cmd extends BaseCmd {
 					final R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
 					final R34Posts posts = r34.getPosts();
 
-					if(posts.getCount() == 0) {
+					if(posts == null || posts.getCount() == 0) {
 						return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
 								context.getUsername(), arg));
 					}
