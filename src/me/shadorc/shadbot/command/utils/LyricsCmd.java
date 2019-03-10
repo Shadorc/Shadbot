@@ -53,7 +53,7 @@ public class LyricsCmd extends BaseCmd {
 			if(arg.isPresent()) {
 				search = arg.get();
 			} else {
-				final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(context.getGuildId());
+				final GuildMusic guildMusic = GuildMusicManager.getGuildMusic(context.getGuildId());
 				if(guildMusic == null) {
 					return Mono.error(new MissingArgumentException());
 				}

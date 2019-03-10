@@ -29,7 +29,7 @@ public class VoiceStateUpdateListener {
 		return Mono.fromRunnable(() -> {
 			if(!event.getCurrent().getChannelId().isPresent()) {
 				final Snowflake guildId = event.getCurrent().getGuildId();
-				final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guildId);
+				final GuildMusic guildMusic = GuildMusicManager.getGuildMusic(guildId);
 				if(guildMusic != null) {
 					guildMusic.destroy();
 					LogUtils.info("{Guild ID: %d} Voice channel left.", guildId.asLong());
@@ -41,7 +41,7 @@ public class VoiceStateUpdateListener {
 	private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {
 		final Snowflake guildId = event.getCurrent().getGuildId();
 
-		final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guildId);
+		final GuildMusic guildMusic = GuildMusicManager.getGuildMusic(guildId);
 		// The bot is not playing music, ignore the event
 		if(guildMusic == null) {
 			return Mono.empty();

@@ -85,7 +85,7 @@ public class InfoCmd extends BaseCmd {
 									+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
 									+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
 									+ String.format("%nServers: %s", FormatUtils.number(guildCount))
-									+ String.format("%nVoice Channels: %s/%s", FormatUtils.number(voiceChannelCount), FormatUtils.number(GuildMusicManager.GUILD_MUSIC_MAP.size()))
+									+ String.format("%nVoice Channels: %s/%s", FormatUtils.number(voiceChannelCount), FormatUtils.number(GuildMusicManager.getGuildMusics().size()))
 									+ String.format("%nUsers: %s", FormatUtils.number(memberCount))
 									+ "```")));
 				})

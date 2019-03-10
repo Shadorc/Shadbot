@@ -95,7 +95,7 @@ public class GuildMusic {
 
 	public void destroy() {
 		this.cancelLeave();
-		GuildMusicManager.GUILD_MUSIC_MAP.remove(this.guildId);
+		GuildMusicManager.removeGuildMusic(this.guildId);
 		this.trackScheduler.destroy();
 	}
 

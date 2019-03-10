@@ -174,7 +174,7 @@ public class Context {
 	}
 
 	public GuildMusic requireGuildMusic() {
-		final GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(this.getGuildId());
+		final GuildMusic guildMusic = GuildMusicManager.getGuildMusic(this.getGuildId());
 		if(guildMusic == null || guildMusic.getTrackScheduler().isStopped()) {
 			throw new NoMusicException();
 		}

@@ -54,7 +54,7 @@ public class PlayCmd extends BaseCmd {
 								identifier = AudioLoadResultListener.YT_SEARCH + arg;
 							}
 
-							GuildMusic guildMusic = GuildMusicManager.GUILD_MUSIC_MAP.get(guildId);
+							GuildMusic guildMusic = GuildMusicManager.getGuildMusic(guildId);
 							if(guildMusic == null) {
 								guildMusic = GuildMusicManager.createGuildMusic(context.getClient(), guildId);
 							} else if(guildMusic.isWaitingForChoice()) {
@@ -83,7 +83,7 @@ public class PlayCmd extends BaseCmd {
 							final boolean putFirst = context.getCommandName().endsWith("first");
 							final AudioLoadResultListener resultListener = new AudioLoadResultListener(
 									guildMusic, context.getAuthorId(), voiceChannelId, identifier, putFirst);
-							GuildMusicManager.AUDIO_PLAYER_MANAGER.loadItemOrdered(guildMusic, identifier, resultListener);
+							GuildMusicManager.getAudioPlayerManager().loadItemOrdered(guildMusic, identifier, resultListener);
 
 							return Mono.empty();
 						}));
