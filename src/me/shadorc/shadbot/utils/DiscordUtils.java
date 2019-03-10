@@ -79,6 +79,29 @@ public class DiscordUtils {
 				});
 	}
 
+	// TODO: Remove when the PR is merged in Discord4J
+	public static Mono<Boolean> hasHigherRoles(Member member, List<Role> roles) {
+		for(Role role : roles) {
+			if(!role.getGuildId().equals(member.getGuildId())) {
+				return Mono.error(new IllegalArgumentException("The provided roles are from a different guild."));
+			}
+		}
+
+		// getRoles() emits items in order based off their natural position, the "highest" role, if present, will be
+		// emitted last
+		Mono<Integer> getThisHighestPosition = member.getRoles().flatMap(Role::getPosition).defaultIfEmpty(0).last();
+		Mono<Integer> getOtherHighestPosition = Flux.fromIterable(roles).flatMap(Role::getPosition)
+				.defaultIfEmpty(0).last();
+
+		return member.getGuild().map(Guild::getOwnerId)
+				.flatMap(ownerId -> {
+					if(ownerId.equals(member.getId())) {
+						return Mono.just(true);
+					}
+					return Mono.zip(getThisHighestPosition, getOtherHighestPosition, (p1, p2) -> p1 > p2);
+				});
+	}
+
 	/**
 	 * @param guild - a {@link Guild} containing the channels to extract
 	 * @param str - a string containing channels mentions / names
