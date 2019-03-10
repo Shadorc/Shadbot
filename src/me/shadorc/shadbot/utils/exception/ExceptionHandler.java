@@ -2,6 +2,7 @@ package me.shadorc.shadbot.utils.exception;
 
 import discord4j.core.DiscordClient;
 import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -95,8 +96,13 @@ public class ExceptionHandler {
 			LogUtils.info(err.toString());
 		} else if(ExceptionUtils.isKnownDiscordError(err)) {
 			final ClientException clientErr = (ClientException) err;
-			LogUtils.error(client, err, String.format("%s: %s (URL: %s)",
-					clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url()));
+			if(clientErr.getStatus().equals(HttpResponseStatus.INTERNAL_SERVER_ERROR)) {
+				LogUtils.info(String.format("%s: %s (URL: %s)",
+						clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url()));
+			} else {
+				LogUtils.error(client, err, String.format("%s: %s (URL: %s)",
+						clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url()));
+			}
 		} else {
 			LogUtils.error(client, err, "An unknown error occurred.");
 		}
