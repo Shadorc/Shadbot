@@ -8,7 +8,6 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
@@ -17,25 +16,11 @@ public class VoiceStateUpdateListener {
 	public static Mono<Void> onVoiceStateUpdateEvent(VoiceStateUpdateEvent event) {
 		return Mono.justOrEmpty(event.getClient().getSelfId())
 				.flatMap(selfId -> {
-					if(event.getCurrent().getUserId().equals(selfId)) {
-						return VoiceStateUpdateListener.onBotEvent(event);
+					if(!event.getCurrent().getUserId().equals(selfId)) {
+						return VoiceStateUpdateListener.onUserEvent(event);
 					}
-					return VoiceStateUpdateListener.onUserEvent(event);
+					return Mono.empty();
 				});
-	}
-
-	private static Mono<Void> onBotEvent(VoiceStateUpdateEvent event) {
-		// If the bot is no more in a voice channel and the guild music still exists, destroy it
-		return Mono.fromRunnable(() -> {
-			if(!event.getCurrent().getChannelId().isPresent()) {
-				final Snowflake guildId = event.getCurrent().getGuildId();
-				final GuildMusic guildMusic = GuildMusicManager.get(guildId);
-				if(guildMusic != null) {
-					guildMusic.destroy();
-					LogUtils.info("{Guild ID: %d} Voice channel left.", guildId.asLong());
-				}
-			}
-		});
 	}
 
 	private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {

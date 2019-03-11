@@ -64,8 +64,9 @@ public class GuildMusic {
 	public void leaveVoiceChannel() {
 		if(this.voiceConnection != null) {
 			this.voiceConnection.disconnect();
-			this.voiceConnection = null;
+			LogUtils.info("{Guild ID: %d} Voice channel left.", this.guildId.asLong());
 		}
+		this.destroy();
 	}
 
 	public void scheduleLeave() {
@@ -94,6 +95,7 @@ public class GuildMusic {
 	}
 
 	public void destroy() {
+		this.voiceConnection = null;
 		this.cancelLeave();
 		GuildMusicManager.remove(this.guildId);
 		this.trackScheduler.destroy();
