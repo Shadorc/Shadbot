@@ -36,9 +36,10 @@ import reactor.core.publisher.Mono;
 
 public class AudioLoadResultListener implements AudioLoadResultHandler, MessageInterceptor {
 
-	private static final int MAX_RESULTS = 5;
 	public static final String YT_SEARCH = "ytsearch: ";
 	public static final String SC_SEARCH = "scsearch: ";
+
+	private static final int MAX_RESULTS = 5;
 
 	private final GuildMusic guildMusic;
 	private final Snowflake djId;

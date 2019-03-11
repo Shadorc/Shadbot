@@ -13,7 +13,7 @@ import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.listener.music.AudioEventListener;
+import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
@@ -38,7 +38,7 @@ public class GuildMusic {
 	public GuildMusic(DiscordClient client, Snowflake guildId, AudioPlayer audioPlayer) {
 		this.client = client;
 		this.guildId = guildId;
-		audioPlayer.addListener(new AudioEventListener(this));
+		audioPlayer.addListener(new TrackEventListener(this));
 		this.audioProvider = new LavaplayerAudioProvider(audioPlayer);
 		this.trackScheduler = new TrackScheduler(audioPlayer, Shadbot.getDatabase().getDBGuild(guildId).getDefaultVol());
 		this.isWaitingForChoice = new AtomicBoolean(false);

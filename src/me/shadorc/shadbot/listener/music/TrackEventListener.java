@@ -17,12 +17,12 @@ import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
-public class AudioEventListener extends AudioEventAdapter {
+public class TrackEventListener extends AudioEventAdapter {
 
 	private final GuildMusic guildMusic;
 	private final AtomicInteger errorCount;
 
-	public AudioEventListener(GuildMusic guildMusic) {
+	public TrackEventListener(GuildMusic guildMusic) {
 		super();
 		this.guildMusic = guildMusic;
 		this.errorCount = new AtomicInteger(0);
