@@ -38,7 +38,7 @@ public class GuildMusic {
 	public GuildMusic(DiscordClient client, Snowflake guildId, AudioPlayer audioPlayer) {
 		this.client = client;
 		this.guildId = guildId;
-		audioPlayer.addListener(new TrackEventListener(this));
+		audioPlayer.addListener(new TrackEventListener(guildId));
 		this.audioProvider = new LavaplayerAudioProvider(audioPlayer);
 		this.trackScheduler = new TrackScheduler(audioPlayer, Shadbot.getDatabase().getDBGuild(guildId).getDefaultVol());
 		this.isWaitingForChoice = new AtomicBoolean(false);

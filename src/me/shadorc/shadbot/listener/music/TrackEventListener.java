@@ -8,7 +8,8 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
-import me.shadorc.shadbot.music.GuildMusic;
+import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TextUtils;
@@ -19,12 +20,12 @@ import reactor.core.publisher.Mono;
 
 public class TrackEventListener extends AudioEventAdapter {
 
-	private final GuildMusic guildMusic;
+	private final Snowflake guildId;
 	private final AtomicInteger errorCount;
 
-	public TrackEventListener(GuildMusic guildMusic) {
+	public TrackEventListener(Snowflake guildId) {
 		super();
-		this.guildMusic = guildMusic;
+		this.guildId = guildId;
 		this.errorCount = new AtomicInteger(0);
 	}
 
@@ -32,9 +33,9 @@ public class TrackEventListener extends AudioEventAdapter {
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
 		final String message = String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
 				FormatUtils.trackName(track.getInfo()));
-		this.guildMusic.getMessageChannel()
+		GuildMusicManager.getGuildMusic(this.guildId).getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(message, channel))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err));
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), err));
 	}
 
 	@Override
@@ -42,7 +43,7 @@ public class TrackEventListener extends AudioEventAdapter {
 		if(endReason.mayStartNext) {
 			this.errorCount.set(0); // Everything seems to be fine, reset error counter.
 			this.nextOrEnd()
-					.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err));
+					.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), err));
 		}
 	}
 
@@ -51,9 +52,8 @@ public class TrackEventListener extends AudioEventAdapter {
 		this.errorCount.incrementAndGet();
 
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
-		final long guildId = this.guildMusic.getGuildId().asLong();
 
-		LogUtils.info("{Guild ID: %d} %sTrack exception: %s", guildId, this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
+		LogUtils.info("{Guild ID: %d} %sTrack exception: %s", this.guildId.asLong(), this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
 
 		final StringBuilder strBuilder = new StringBuilder();
 		if(this.errorCount.get() <= 3) {
@@ -62,33 +62,33 @@ public class TrackEventListener extends AudioEventAdapter {
 		}
 
 		if(this.errorCount.get() == 3) {
-			LogUtils.info("{Guild ID: %d} Too many errors in a row. They will be ignored until a music can be played.", guildId);
+			LogUtils.info("{Guild ID: %d} Too many errors in a row. They will be ignored until a music can be played.", this.guildId.asLong());
 			strBuilder.append("\n" + Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until I find a music that can be played.");
 		}
 
-		this.guildMusic.getMessageChannel()
+		GuildMusicManager.getGuildMusic(this.guildId).getMessageChannel()
 				.filter(ignored -> strBuilder.length() > 0)
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then(this.nextOrEnd())
-				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), thr));
+				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), thr));
 	}
 
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-		LogUtils.info("{Guild ID: %d} Music stuck, skipping it.", this.guildMusic.getGuildId().asLong());
+		LogUtils.info("{Guild ID: %d} Music stuck, skipping it.", GuildMusicManager.getGuildMusic(this.guildId).getGuildId().asLong());
 
-		this.guildMusic.getMessageChannel()
+		GuildMusicManager.getGuildMusic(this.guildId).getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
 						channel))
 				.then(this.nextOrEnd())
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.guildMusic.getClient(), err));
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), err));
 	}
 
 	private Mono<Void> nextOrEnd() {
 		// If the next track could be started
-		if(this.guildMusic.getTrackScheduler().nextTrack()) {
+		if(GuildMusicManager.getGuildMusic(this.guildId).getTrackScheduler().nextTrack()) {
 			return Mono.empty();
 		}
-		return this.guildMusic.end();
+		return GuildMusicManager.getGuildMusic(this.guildId).end();
 	}
 }

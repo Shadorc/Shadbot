@@ -80,7 +80,7 @@ public class PlayCmd extends BaseCmd {
 
 							final boolean putFirst = context.getCommandName().endsWith("first");
 							final AudioLoadResultListener resultListener = new AudioLoadResultListener(
-									guildMusic, context.getAuthorId(), voiceChannelId, identifier, putFirst);
+									guildId, context.getAuthorId(), voiceChannelId, identifier, putFirst);
 							GuildMusicManager.getAudioPlayerManager()
 									.loadItemOrdered(guildMusic, identifier, resultListener);
 
