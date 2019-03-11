@@ -26,12 +26,12 @@ public class GuildMusicManager {
 		return AUDIO_PLAYER_MANAGER;
 	}
 
-	public static GuildMusic getOrCreate(DiscordClient client, Snowflake guildId) {
+	public static GuildMusic getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
 		return GUILD_MUSIC_MAP.computeIfAbsent(guildId,
-				id -> new GuildMusic(client, id, AUDIO_PLAYER_MANAGER.createPlayer()));
+				ignored -> new GuildMusic(client, guildId, voiceChannelId, AUDIO_PLAYER_MANAGER.createPlayer()));
 	}
 
-	//TODO: Remove
+	// TODO: Remove
 	public static Collection<GuildMusic> getGuildMusics() {
 		return GUILD_MUSIC_MAP.values();
 	}

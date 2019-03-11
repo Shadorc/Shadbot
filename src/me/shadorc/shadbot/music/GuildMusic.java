@@ -1,6 +1,10 @@
 package me.shadorc.shadbot.music;
 
 import java.time.Duration;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -13,6 +17,7 @@ import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -26,30 +31,32 @@ public class GuildMusic {
 
 	private final DiscordClient client;
 	private final Snowflake guildId;
+	private final Snowflake voiceChannelId;
 	private final AudioProvider audioProvider;
 	private final TrackScheduler trackScheduler;
 	private final AtomicBoolean isWaitingForChoice;
+	private final Map<AudioLoadResultListener, Future<Void>> listeners;
 
 	private volatile VoiceConnection voiceConnection;
-	private Disposable leaveTask;
-	private Snowflake messageChannelId;
-	private Snowflake djId;
+	private volatile Disposable leaveTask;
+	private volatile Snowflake messageChannelId;
+	private volatile Snowflake djId;
 
-	public GuildMusic(DiscordClient client, Snowflake guildId, AudioPlayer audioPlayer) {
+	public GuildMusic(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId, AudioPlayer audioPlayer) {
 		this.client = client;
 		this.guildId = guildId;
+		this.voiceChannelId = voiceChannelId;
 		audioPlayer.addListener(new TrackEventListener(guildId));
 		this.audioProvider = new LavaplayerAudioProvider(audioPlayer);
 		this.trackScheduler = new TrackScheduler(audioPlayer, Shadbot.getDatabase().getDBGuild(guildId).getDefaultVol());
 		this.isWaitingForChoice = new AtomicBoolean(false);
+		this.listeners = new ConcurrentHashMap<>();
 	}
 
 	/**
-	 * Join a voice channel only if the bot is not already in a voice channel
-	 *
-	 * @param voiceChannelId - the voice channel ID to join
+	 * Join the voice channel only if the bot is not already in a voice channel
 	 */
-	public void joinVoiceChannel(Snowflake voiceChannelId) {
+	public void joinVoiceChannel() {
 		this.client.getChannelById(voiceChannelId)
 				.cast(VoiceChannel.class)
 				.filter(ignored -> this.voiceConnection == null)
@@ -61,14 +68,21 @@ public class GuildMusic {
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
+	/**
+	 * Leave the voice channel if the bot is still in and destroy this {@link GuildMusic}
+	 */
 	public void leaveVoiceChannel() {
 		if(this.voiceConnection != null) {
 			this.voiceConnection.disconnect();
+			this.voiceConnection = null;
 			LogUtils.info("{Guild ID: %d} Voice channel left.", this.guildId.asLong());
 		}
 		this.destroy();
 	}
 
+	/**
+	 * Schedule to leave the voice channel in 1 minute
+	 */
 	public void scheduleLeave() {
 		this.leaveTask = Mono.delay(Duration.ofMinutes(1))
 				.doOnNext(ignored -> this.leaveVoiceChannel())
@@ -92,13 +106,6 @@ public class GuildMusic {
 				.then(this.getMessageChannel())
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then();
-	}
-
-	public void destroy() {
-		this.voiceConnection = null;
-		this.cancelLeave();
-		GuildMusicManager.remove(this.guildId);
-		this.trackScheduler.destroy();
 	}
 
 	public DiscordClient getClient() {
@@ -149,6 +156,26 @@ public class GuildMusic {
 
 	public void setWaitingForChoice(boolean isWaitingForChoice) {
 		this.isWaitingForChoice.set(isWaitingForChoice);
+	}
+
+	public void addAudioLoadResultListener(AudioLoadResultListener listener, String identifier) {
+		this.listeners.put(listener, GuildMusicManager.getAudioPlayerManager()
+				.loadItemOrdered(this.guildId, identifier, listener));
+	}
+
+	public void removeAudioLoadResultListener(AudioLoadResultListener listener) {
+		this.listeners.remove(listener);
+	}
+
+	private void destroy() {
+		for(final Entry<AudioLoadResultListener, Future<Void>> entry : this.listeners.entrySet()) {
+			entry.getValue().cancel(true);
+			entry.getKey().terminate();
+		}
+		this.listeners.clear();
+		this.cancelLeave();
+		GuildMusicManager.remove(this.guildId);
+		this.trackScheduler.destroy();
 	}
 
 }

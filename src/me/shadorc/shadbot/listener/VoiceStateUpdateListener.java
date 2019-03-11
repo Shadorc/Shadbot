@@ -15,12 +15,8 @@ public class VoiceStateUpdateListener {
 
 	public static Mono<Void> onVoiceStateUpdateEvent(VoiceStateUpdateEvent event) {
 		return Mono.justOrEmpty(event.getClient().getSelfId())
-				.flatMap(selfId -> {
-					if(!event.getCurrent().getUserId().equals(selfId)) {
-						return VoiceStateUpdateListener.onUserEvent(event);
-					}
-					return Mono.empty();
-				});
+				.filter(selfId -> !event.getCurrent().getUserId().equals(selfId))
+				.flatMap(selfId -> VoiceStateUpdateListener.onUserEvent(event));
 	}
 
 	private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {
