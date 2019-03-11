@@ -26,10 +26,9 @@ public class GuildMusicManager {
 		return AUDIO_PLAYER_MANAGER;
 	}
 
-	public static GuildMusic createGuildMusic(DiscordClient client, Snowflake guildId) {
-		final GuildMusic guildMusic = new GuildMusic(client, guildId, AUDIO_PLAYER_MANAGER.createPlayer());
-		GUILD_MUSIC_MAP.put(guildId, guildMusic);
-		return guildMusic;
+	public static GuildMusic getOrCreateGuildMusic(DiscordClient client, Snowflake guildId) {
+		return GUILD_MUSIC_MAP.computeIfAbsent(guildId,
+				id -> new GuildMusic(client, id, AUDIO_PLAYER_MANAGER.createPlayer()));
 	}
 
 	public static Collection<GuildMusic> getGuildMusics() {

@@ -54,10 +54,8 @@ public class PlayCmd extends BaseCmd {
 								identifier = AudioLoadResultListener.YT_SEARCH + arg;
 							}
 
-							GuildMusic guildMusic = GuildMusicManager.getGuildMusic(guildId);
-							if(guildMusic == null) {
-								guildMusic = GuildMusicManager.createGuildMusic(context.getClient(), guildId);
-							} else if(guildMusic.isWaitingForChoice()) {
+							final GuildMusic guildMusic = GuildMusicManager.getOrCreateGuildMusic(context.getClient(), guildId);
+							if(guildMusic.isWaitingForChoice()) {
 								if(guildMusic.getDjId().equals(context.getAuthorId())) {
 									return Mono.error(new CommandException(String.format("You're already selecting a music. "
 											+ "Enter a number or use `%scancel` to cancel the selection.", context.getPrefix())));
