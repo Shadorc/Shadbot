@@ -60,12 +60,12 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	@Override
 	public void trackLoaded(AudioTrack track) {
-		GuildMusicManager.getGuildMusic(this.guildId).joinVoiceChannel(this.voiceChannelId);
-		if(!GuildMusicManager.getGuildMusic(this.guildId).getTrackScheduler().startOrQueue(track, this.putFirst)) {
-			GuildMusicManager.getGuildMusic(this.guildId).getMessageChannel()
+		GuildMusicManager.get(this.guildId).joinVoiceChannel(this.voiceChannelId);
+		if(!GuildMusicManager.get(this.guildId).getTrackScheduler().startOrQueue(track, this.putFirst)) {
+			GuildMusicManager.get(this.guildId).getMessageChannel()
 					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
 							FormatUtils.trackName(track.getInfo())), channel))
-					.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), err));
+					.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.get(this.guildId).getClient(), err));
 		}
 	}
 
@@ -92,10 +92,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	@Override
 	public void loadFailed(FriendlyException err) {
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
-		LogUtils.info("{Guild ID: %d} Load failed: %s", GuildMusicManager.getGuildMusic(this.guildId).getGuildId().asLong(), errMessage);
-		GuildMusicManager.getGuildMusic(this.guildId).getMessageChannel()
+		LogUtils.info("{Guild ID: %d} Load failed: %s", GuildMusicManager.get(this.guildId).getGuildId().asLong(), errMessage);
+		GuildMusicManager.get(this.guildId).getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.RED_CROSS + " Sorry, %s", errMessage.toLowerCase()), channel))
-				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), thr));
+				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(GuildMusicManager.get(this.guildId).getClient(), thr));
 		this.leaveIfStopped();
 	}
 
@@ -105,8 +105,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	}
 
 	private void onSearchResult(AudioPlaylist playlist) {
-		GuildMusicManager.getGuildMusic(this.guildId).setDj(this.djId);
-		GuildMusicManager.getGuildMusic(this.guildId).setWaitingForChoice(true);
+		GuildMusicManager.get(this.guildId).setDj(this.djId);
+		GuildMusicManager.get(this.guildId).setWaitingForChoice(true);
 
 		final String choices = FormatUtils.numberedList(MAX_RESULTS, playlist.getTracks().size(),
 				count -> {
@@ -117,8 +117,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 		final String playlistName = playlist.getName();
 		final String name = playlistName == null || playlistName.isBlank() ? "Playlist" : playlistName;
 
-		GuildMusicManager.getGuildMusic(this.guildId).getClient()
-				.getUserById(GuildMusicManager.getGuildMusic(this.guildId).getDjId())
+		GuildMusicManager.get(this.guildId).getClient()
+				.getUserById(GuildMusicManager.get(this.guildId).getDjId())
 				.map(User::getAvatarUrl)
 				.map(avatarUrl -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> embed.setAuthor(name, null, avatarUrl)
@@ -128,68 +128,68 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 										+ "\nExample: 1,3,4"
 										+ "\n\n" + choices)
 								.setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-										Shadbot.getDatabase().getDBGuild(GuildMusicManager.getGuildMusic(this.guildId).getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null)))
-				.flatMap(embedConsumer -> GuildMusicManager.getGuildMusic(this.guildId).getMessageChannel()
+										Shadbot.getDatabase().getDBGuild(GuildMusicManager.get(this.guildId).getGuildId()).getPrefix(), Config.MUSIC_CHOICE_DURATION), null)))
+				.flatMap(embedConsumer -> GuildMusicManager.get(this.guildId).getMessageChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
 				.then(Mono.fromRunnable(() -> {
 					this.stopWaitingTask = Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
 							.doOnNext(ignored -> this.stopWaiting())
-							.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), err));
+							.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.get(this.guildId).getClient(), err));
 
 					this.resultsTracks = new ArrayList<>(playlist.getTracks().subList(0, Math.min(MAX_RESULTS, playlist.getTracks().size())));
-					MessageInterceptorManager.addInterceptor(GuildMusicManager.getGuildMusic(this.guildId).getMessageChannelId(), this);
+					MessageInterceptorManager.addInterceptor(GuildMusicManager.get(this.guildId).getMessageChannelId(), this);
 				}))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), err));
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.get(this.guildId).getClient(), err));
 	}
 
 	private void onPlaylistLoaded(AudioPlaylist playlist) {
-		GuildMusicManager.getGuildMusic(this.guildId).joinVoiceChannel(this.voiceChannelId);
+		GuildMusicManager.get(this.guildId).joinVoiceChannel(this.voiceChannelId);
 
 		final StringBuilder strBuilder = new StringBuilder();
 		int musicsAdded = 0;
 		for(final AudioTrack track : playlist.getTracks()) {
-			GuildMusicManager.getGuildMusic(this.guildId).getTrackScheduler().startOrQueue(track, this.putFirst);
+			GuildMusicManager.get(this.guildId).getTrackScheduler().startOrQueue(track, this.putFirst);
 			musicsAdded++;
 			// The playlist limit is reached and the user / guild is not premium
-			if(GuildMusicManager.getGuildMusic(this.guildId).getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE
-					&& !Shadbot.getPremium().isPremium(GuildMusicManager.getGuildMusic(this.guildId).getGuildId(), this.djId)) {
+			if(GuildMusicManager.get(this.guildId).getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE
+					&& !Shadbot.getPremium().isPremium(GuildMusicManager.get(this.guildId).getGuildId(), this.djId)) {
 				strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
 				break;
 			}
 		}
 
 		strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
-		GuildMusicManager.getGuildMusic(this.guildId).getMessageChannel()
+		GuildMusicManager.get(this.guildId).getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), err));
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.get(this.guildId).getClient(), err));
 	}
 
 	private void onNoMatches() {
-		GuildMusicManager.getGuildMusic(this.guildId).getMessageChannel()
+		GuildMusicManager.get(this.guildId).getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
 						StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.getGuildMusic(this.guildId).getClient(), err));
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.get(this.guildId).getClient(), err));
 		this.leaveIfStopped();
 	}
 
 	private void leaveIfStopped() {
-		if(GuildMusicManager.getGuildMusic(this.guildId).getTrackScheduler().isStopped()) {
-			GuildMusicManager.getGuildMusic(this.guildId).leaveVoiceChannel();
+		if(GuildMusicManager.get(this.guildId).getTrackScheduler().isStopped()) {
+			GuildMusicManager.get(this.guildId).leaveVoiceChannel();
 		}
 	}
 
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		return Mono.justOrEmpty(event.getMember())
-				.filter(member -> member.getId().equals(GuildMusicManager.getGuildMusic(this.guildId).getDjId()))
+				.filter(member -> member.getId().equals(GuildMusicManager.get(this.guildId).getDjId()))
 				.filter(member -> event.getMessage().getContent().isPresent())
 				.map(Member::getUsername)
 				.flatMap(username -> {
 					final String content = event.getMessage().getContent().get();
-					final String prefix = Shadbot.getDatabase().getDBGuild(GuildMusicManager.getGuildMusic(this.guildId).getGuildId()).getPrefix();
+					final String prefix = Shadbot.getDatabase().getDBGuild(GuildMusicManager.get(this.guildId).getGuildId()).getPrefix();
 					if(content.equals(String.format("%scancel", prefix))) {
 						this.stopWaiting();
-						return GuildMusicManager.getGuildMusic(this.guildId).getMessageChannel()
+						return GuildMusicManager.get(this.guildId).getMessageChannel()
 								.flatMap(channel -> DiscordUtils.sendMessage(
 										String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.", username), channel))
 								.thenReturn(true);
@@ -219,8 +219,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	private void stopWaiting() {
 		this.stopWaitingTask.dispose();
-		MessageInterceptorManager.removeInterceptor(GuildMusicManager.getGuildMusic(this.guildId).getMessageChannelId(), this);
-		GuildMusicManager.getGuildMusic(this.guildId).setWaitingForChoice(false);
+		MessageInterceptorManager.removeInterceptor(GuildMusicManager.get(this.guildId).getMessageChannelId(), this);
+		GuildMusicManager.get(this.guildId).setWaitingForChoice(false);
 		this.leaveIfStopped();
 	}
 
