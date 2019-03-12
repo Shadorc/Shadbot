@@ -55,7 +55,7 @@ public class LyricsCmd extends BaseCmd {
 			} else {
 				final GuildMusic guildMusic = GuildMusicManager.get(context.getGuildId());
 				if(guildMusic == null) {
-					return Mono.error(new MissingArgumentException());
+					throw new MissingArgumentException();
 				}
 
 				final AudioTrackInfo info = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack().getInfo();
@@ -80,7 +80,6 @@ public class LyricsCmd extends BaseCmd {
 							.setFooter("Click on the title to see the full version",
 									"https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png")));
 		})
-				.cast(LoadingMessage.class)
 				.flatMap(LoadingMessage::send)
 				.doOnTerminate(loadingMsg::stopTyping)
 				.then();

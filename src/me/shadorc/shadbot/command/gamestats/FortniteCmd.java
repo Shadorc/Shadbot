@@ -61,8 +61,8 @@ public class FortniteCmd extends BaseCmd {
 					.execute();
 
 			if(response.statusCode() != 200) {
-				return Mono.error(new HttpStatusException("Fortnite API did not return a valid status code.",
-						HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString()));
+				throw new HttpStatusException("Fortnite API did not return a valid status code.",
+						HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
 			}
 
 			final FortniteResponse fortnite = Utils.MAPPER.readValue(response.parse().body().html(), FortniteResponse.class);
@@ -93,7 +93,6 @@ public class FortniteCmd extends BaseCmd {
 							.setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
 							.setDescription(description)));
 		})
-				.cast(LoadingMessage.class)
 				.flatMap(LoadingMessage::send)
 				.doOnTerminate(loadingMsg::stopTyping)
 				.then();

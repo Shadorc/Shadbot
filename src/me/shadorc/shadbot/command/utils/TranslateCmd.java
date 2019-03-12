@@ -86,8 +86,8 @@ public class TranslateCmd extends BaseCmd {
 			final JSONArray result = new JSONArray(NetUtils.getJSON(url));
 
 			if(langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
-				return Mono.error(new CommandException(String.format("One of the specified language isn't supported. "
-						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName())));
+				throw new CommandException(String.format("One of the specified language isn't supported. "
+						+ "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
 			final StringBuilder translatedText = new StringBuilder();
@@ -97,9 +97,9 @@ public class TranslateCmd extends BaseCmd {
 			}
 
 			if(translatedText.toString().equalsIgnoreCase(sourceText)) {
-				return Mono.error(new CommandException(String.format("The text could not been translated."
+				throw new CommandException(String.format("The text could not been translated."
 						+ "%nCheck that the specified languages are supported and that the text is in the specified language."
-						+ "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName())));
+						+ "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
 			}
 
 			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
@@ -109,7 +109,6 @@ public class TranslateCmd extends BaseCmd {
 									StringUtils.capitalize(langIsoMap.inverse().get(langTo)), translatedText.toString()))));
 
 		})
-				.cast(LoadingMessage.class)
 				.flatMap(LoadingMessage::send)
 				.doOnTerminate(loadingMsg::stopTyping)
 				.then();
