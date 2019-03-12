@@ -62,6 +62,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	@Override
 	public void trackLoaded(AudioTrack track) {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		guildMusic.joinVoiceChannel();
 		if(!guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst)) {
 			guildMusic.getMessageChannel()
 					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
@@ -164,6 +165,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	private void onPlaylistLoaded(AudioPlaylist playlist) {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		guildMusic.joinVoiceChannel();
 
 		final StringBuilder strBuilder = new StringBuilder();
 		int musicsAdded = 0;

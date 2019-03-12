@@ -76,7 +76,6 @@ public class PlayCmd extends BaseCmd {
 								return DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel).then();
 							}
 
-							guildMusic.joinVoiceChannel();
 							guildMusic.setMessageChannel(context.getChannelId());
 
 							final boolean putFirst = context.getCommandName().endsWith("first");
