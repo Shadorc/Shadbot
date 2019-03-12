@@ -51,19 +51,20 @@ public class BotListStats {
 
 	private void post(String url, String authorization, JSONObject content) throws IOException {
 		Jsoup.connect(url)
+				.ignoreContentType(true)
 				.requestBody(content.toString())
 				.headers(Map.of("Content-Type", "application/json", "Authorization", authorization))
 				.post();
 	}
 
 	/**
-	 * WebSite: https://botlist.space/ <br>
-	 * Documentation: https://botlist.space/documentation
+	 * WebSite: https://botlist.space/bots <br>
+	 * Documentation: https://docs.botlist.space/bl-docs/bots
 	 */
 	private void postOnBotListDotSpace(Long guildCount) {
 		final JSONObject content = new JSONObject()
 				.put("server_count", guildCount);
-		final String url = String.format("https://botlist.space/bots/%d/stats", this.selfId);
+		final String url = String.format("https://api.botlist.space/v1/bots/%d", this.selfId);
 
 		try {
 			this.post(url, Credentials.get(Credential.BOT_LIST_DOT_SPACE), content);
@@ -121,7 +122,7 @@ public class BotListStats {
 					.put("shardId", client.getConfig().getShardIndex())
 					.put("shardCount", client.getConfig().getShardCount())
 					.put("guildCount", (int) (guildCount / client.getConfig().getShardCount()));
-			final String url = String.format("https://discord.bots.gg/api/bots/%d/stats", this.selfId);
+			final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", this.selfId);
 
 			try {
 				this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
