@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public class MessageUpdateListener {
 
 	public static Mono<Void> onMessageUpdateEvent(MessageUpdateEvent event) {
-		if(!event.isContentChanged() || !event.getOld().isPresent() || !event.getGuildId().isPresent()) {
+		if(!event.isContentChanged() || event.getOld().isEmpty() || event.getGuildId().isEmpty()) {
 			return Mono.empty();
 		}
 

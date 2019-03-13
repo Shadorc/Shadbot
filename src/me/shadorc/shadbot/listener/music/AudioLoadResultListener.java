@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.listener.music;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -143,7 +142,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 				.flatMap(avatarUrl -> guildMusic.getMessageChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(this.getPlaylistEmbed(playlist, avatarUrl), channel)))
 				.map(ignored -> {
-					this.resultsTracks = new ArrayList<>(playlist.getTracks().subList(0, Math.min(MAX_RESULTS, playlist.getTracks().size())));
+					this.resultsTracks = playlist.getTracks().subList(0, Math.min(MAX_RESULTS, playlist.getTracks().size()));
 					MessageInterceptorManager.addInterceptor(guildMusic.getMessageChannelId(), this);
 
 					return Mono.delay(Duration.ofSeconds(Config.MUSIC_CHOICE_DURATION))
