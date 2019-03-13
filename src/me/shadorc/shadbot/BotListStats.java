@@ -69,7 +69,7 @@ public class BotListStats {
 		try {
 			this.post(url, Credentials.get(Credential.BOT_LIST_DOT_SPACE), content);
 		} catch (final IOException err) {
-			LogUtils.error(err, "An error occurred while posting statistics on botlist.space");
+			LogUtils.warn("An error occurred while posting statistics on botlist.space: %d", err.getMessage());
 		}
 	}
 
@@ -87,7 +87,7 @@ public class BotListStats {
 		try {
 			this.post(url, Credentials.get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
 		} catch (final IOException err) {
-			LogUtils.error(err, "An error occurred while posting statistics on bots.ondiscord.xyz");
+			LogUtils.warn("An error occurred while posting statistics on bots.ondiscord.xyz: ", err.getMessage());
 		}
 	}
 
@@ -106,7 +106,7 @@ public class BotListStats {
 			try {
 				this.post(url, String.format("Bot %s", Credentials.get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
 			} catch (final IOException err) {
-				LogUtils.error(err, "An error occurred while posting statistics on discordbotlist.com");
+				LogUtils.warn("An error occurred while posting statistics on discordbotlist.com: ", err.getMessage());
 			}
 		}
 	}
@@ -127,7 +127,7 @@ public class BotListStats {
 			try {
 				this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
 			} catch (final IOException err) {
-				LogUtils.error(err, "An error occurred while posting statistics on discord.bots.gg");
+				LogUtils.warn("An error occurred while posting statistics on discord.bots.gg: ", err.getMessage());
 			}
 		}
 	}
@@ -148,7 +148,7 @@ public class BotListStats {
 			try {
 				this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
 			} catch (final IOException err) {
-				LogUtils.error(err, "An error occurred while posting statistics on discordbots.org");
+				LogUtils.warn("An error occurred while posting statistics on discordbots.org: ", err.getMessage());
 			}
 		}
 	}
@@ -165,7 +165,7 @@ public class BotListStats {
 		try {
 			this.post(url, Credentials.get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
 		} catch (final IOException err) {
-			LogUtils.error(err, "An error occurred while posting statistics on divinediscordbots.com");
+			LogUtils.warn("An error occurred while posting statistics on divinediscordbots.com: ", err.getMessage());
 		}
 	}
 
