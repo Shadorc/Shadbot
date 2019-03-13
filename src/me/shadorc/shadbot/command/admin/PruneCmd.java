@@ -51,7 +51,6 @@ public class PruneCmd extends BaseCmd {
 							final List<String> quotedElements = StringUtils.getQuotedElements(arg);
 
 							if(arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
-								loadingMsg.stopTyping();
 								return Flux.error(new CommandException("You have forgotten a quote or have specified several quotes in quotation marks."));
 							}
 
@@ -65,7 +64,6 @@ public class PruneCmd extends BaseCmd {
 
 							Integer count = NumberUtils.asPositiveInt(argCleaned);
 							if(!argCleaned.isEmpty() && count == null) {
-								loadingMsg.stopTyping();
 								return Flux.error(new CommandException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
 										+ "please include them in quotation marks. See `%shelp %s` for more information.",
 										argCleaned, context.getPrefix(), this.getName())));
@@ -99,6 +97,8 @@ public class PruneCmd extends BaseCmd {
 	private String getEmbedContent(Message message) {
 		final StringBuilder strBuilder = new StringBuilder();
 		for(final Embed embed : message.getEmbeds()) {
+			embed.getTitle().ifPresent(title -> strBuilder.append(title + "\n"));
+			embed.getDescription().ifPresent(desc -> strBuilder.append(desc + "\n"));
 			for(final Field field : embed.getFields()) {
 				strBuilder.append(field.getName() + "\n" + field.getValue() + "\n");
 			}
@@ -109,7 +109,7 @@ public class PruneCmd extends BaseCmd {
 	@Override
 	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
-				.setDescription("Delete messages.")
+				.setDescription("Delete messages (include embeds).")
 				.addArg("@user(s)", "from these users", true)
 				.addArg("\"words\"", "containing these words", true)
 				.addArg("number", String.format("number of messages to delete (max: %d)", MAX_MESSAGES), true)

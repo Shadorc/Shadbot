@@ -46,7 +46,7 @@ public class LogUtils {
 		LOGGER.warn(msg);
 		LogUtils.sendLog(client, new LogBuilder(LogType.WARN, msg));
 	}
-	
+
 	public static void warn(String format, Object... args) {
 		LOGGER.warn(String.format(format, args));
 	}
