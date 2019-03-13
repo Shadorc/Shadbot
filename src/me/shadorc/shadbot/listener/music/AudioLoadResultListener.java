@@ -62,6 +62,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	@Override
 	public void trackLoaded(AudioTrack track) {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
 		guildMusic.joinVoiceChannel();
 		if(!guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst)) {
 			guildMusic.getMessageChannel()
@@ -96,6 +99,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	@Override
 	public void loadFailed(FriendlyException err) {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
 		LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildId.asLong(), errMessage);
 		guildMusic.getMessageChannel()
@@ -112,6 +118,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	private void onNoMatches() {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
 		guildMusic.getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
 						StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
@@ -122,6 +131,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	private void onSearchResult(AudioPlaylist playlist) {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
 		guildMusic.setDj(this.djId);
 		guildMusic.setWaitingForChoice(true);
 
@@ -165,6 +177,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 
 	private void onPlaylistLoaded(AudioPlaylist playlist) {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
 		guildMusic.joinVoiceChannel();
 
 		final StringBuilder strBuilder = new StringBuilder();
@@ -191,6 +206,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler, MessageI
 	@Override
 	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return Mono.just(false);
+		}
 		return Mono.justOrEmpty(event.getMember())
 				.filter(member -> member.getId().equals(guildMusic.getDjId()))
 				.filter(member -> event.getMessage().getContent().isPresent())
