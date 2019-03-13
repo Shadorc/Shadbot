@@ -32,9 +32,13 @@ public class TrackEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
+		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
+
 		final String message = String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
 				FormatUtils.trackName(track.getInfo()));
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
 		guildMusic.getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(message, channel))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), err));
@@ -42,15 +46,25 @@ public class TrackEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
+
 		if(endReason.mayStartNext) {
 			this.errorCount.set(0); // Everything seems to be fine, reset error counter.
 			this.nextOrEnd()
-					.subscribe(null, err -> ExceptionHandler.handleUnknownError(GuildMusicManager.get(this.guildId).getClient(), err));
+					.subscribe(null, err -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), err));
 		}
 	}
 
 	@Override
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
+		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
+
 		this.errorCount.incrementAndGet();
 
 		final String errMessage = TextUtils.cleanLavaplayerErr(err);
@@ -68,7 +82,6 @@ public class TrackEventListener extends AudioEventAdapter {
 			strBuilder.append("\n" + Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until I find a music that can be played.");
 		}
 
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
 		guildMusic.getMessageChannel()
 				.filter(ignored -> strBuilder.length() > 0)
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
@@ -78,9 +91,13 @@ public class TrackEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
+		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
+
 		LogUtils.info("{Guild ID: %d} Music stuck, skipping it.", this.guildId.asLong());
 
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
 		guildMusic.getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
 						channel))
@@ -90,6 +107,10 @@ public class TrackEventListener extends AudioEventAdapter {
 
 	private Mono<Void> nextOrEnd() {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return Mono.empty();
+		}
+
 		// If the next track could be started
 		if(guildMusic.getTrackScheduler().nextTrack()) {
 			return Mono.empty();
