@@ -167,7 +167,7 @@ public class GuildMusic {
 		this.listeners.remove(listener);
 	}
 
-	private void destroy() {
+	public void destroy() {
 		for(final Entry<AudioLoadResultListener, Future<Void>> entry : this.listeners.entrySet()) {
 			entry.getValue().cancel(true);
 			entry.getKey().terminate();
