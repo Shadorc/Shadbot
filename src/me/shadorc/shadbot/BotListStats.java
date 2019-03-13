@@ -26,7 +26,7 @@ public class BotListStats {
 
 	public BotListStats() {
 		this.selfId = Shadbot.getClient().getSelfId().get().asLong();
-		this.task = Flux.interval(Duration.ofMinutes(30), Duration.ofHours(2))
+		this.task = Flux.interval(Duration.ofHours(3), Duration.ofHours(3))
 				.flatMap(ignored -> this.postStats())
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
