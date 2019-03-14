@@ -7,15 +7,13 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
+import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
-import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
-public abstract class GameManager implements MessageInterceptor {
+public abstract class GameManager {
 
 	private final GameCmd<?> gameCmd;
 	private final Context context;
@@ -34,7 +32,6 @@ public abstract class GameManager implements MessageInterceptor {
 
 	public final void stop() {
 		this.cancelScheduledTask();
-		MessageInterceptorManager.removeInterceptor(this.getContext().getChannelId(), this);
 		this.gameCmd.getManagers().remove(this.getContext().getChannelId());
 	}
 
@@ -58,7 +55,7 @@ public abstract class GameManager implements MessageInterceptor {
 	 * Cancel the current task, if scheduled.
 	 */
 	private void cancelScheduledTask() {
-		if(this.isScheduled() && this.scheduledTask != null) {
+		if(this.isScheduled()) {
 			this.scheduledTask.dispose();
 			this.isScheduled.set(false);
 		}
@@ -85,24 +82,31 @@ public abstract class GameManager implements MessageInterceptor {
 
 	/**
 	 * @param message - the {@link Message} to check
-	 * @return A {@link Mono} that returns true if the {@link Message} is a valid cancel command, false otherwise
+	 * @return A {@link Mono} that returns {@code true} if the {@link Message} is a valid
+	 *         cancel command, {@code false} otherwise.
 	 */
-	private Mono<Boolean> isCancelMessage(Message message) {
-		return Mono.just(message)
-				.filter(msg -> msg.getAuthor().isPresent() && msg.getContent().isPresent())
-				.filter(msg -> msg.getContent().get().equals(String.format("%scancel", this.context.getPrefix())))
-				.flatMap(msg -> msg.getChannel()
-						.flatMap(channel -> DiscordUtils.hasPermission(channel, message.getAuthor().get().getId(), Permission.ADMINISTRATOR))
-						// The author is the author of the game or he is an administrator
-						.map(isAdmin -> this.context.getAuthorId().equals(message.getAuthor().get().getId()) || isAdmin))
-				.defaultIfEmpty(false);
+	public Mono<Boolean> isCancelMessage(Message message) {
+		if(message.getContent().isEmpty() || message.getAuthor().isEmpty()) {
+			return Mono.just(false);
+		}
+
+		final String content = message.getContent().get();
+		final User author = message.getAuthor().get();
+		if(content.equals(String.format("%scancel", this.context.getPrefix()))) {
+			return message.getChannel()
+					.flatMap(channel -> DiscordUtils.hasPermission(channel, author.getId(), Permission.ADMINISTRATOR))
+					// The author is the author of the game or he is an administrator
+					.map(isAdmin -> this.context.getAuthorId().equals(author.getId()) || isAdmin);
+		}
+
+		return Mono.just(false);
 	}
 
 	/**
 	 * @return {@code true} if a task is currently scheduled, {@code false} otherwise.
 	 */
 	public boolean isScheduled() {
-		return this.isScheduled.get();
+		return this.scheduledTask != null && this.isScheduled.get();
 	}
 
 	public Context getContext() {
