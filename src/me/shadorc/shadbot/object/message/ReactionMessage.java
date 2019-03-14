@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils.object.message;
+package me.shadorc.shadbot.object.message;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -20,7 +20,8 @@ public class ReactionMessage {
 	private final Snowflake channelId;
 	private final Collection<ReactionEmoji> reactions;
 
-	public ReactionMessage(DiscordClient client, Snowflake channelId, Collection<ReactionEmoji> reactions) {
+	public ReactionMessage(DiscordClient client, Snowflake channelId,
+			Collection<ReactionEmoji> reactions) {
 		this.client = client;
 		this.channelId = channelId;
 		this.reactions = reactions;
