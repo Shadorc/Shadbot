@@ -196,6 +196,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
 	public void terminate() {
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
+		if(guildMusic == null) {
+			return;
+		}
+
 		guildMusic.removeAudioLoadResultListener(this);
 		if(guildMusic.getTrackScheduler().isStopped()) {
 			guildMusic.leaveVoiceChannel();
