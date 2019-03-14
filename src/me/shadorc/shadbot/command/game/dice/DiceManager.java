@@ -14,16 +14,17 @@ import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
+import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
 import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
+import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.message.UpdateableMessage;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class DiceManager extends GameManager {
+public class DiceManager extends GameManager implements MessageInterceptor {
 
 	private final int bet;
 	private final ConcurrentHashMap<Integer, Snowflake> numsPlayers;

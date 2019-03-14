@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils.object.message;
+package me.shadorc.shadbot.object.message;
 
 import java.time.Duration;
 import java.util.ArrayList;

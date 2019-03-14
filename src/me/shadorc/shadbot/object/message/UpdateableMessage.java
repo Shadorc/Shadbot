@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.utils.object.message;
+package me.shadorc.shadbot.object.message;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;

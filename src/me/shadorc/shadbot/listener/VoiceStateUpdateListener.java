@@ -7,8 +7,8 @@ import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
+import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 public class VoiceStateUpdateListener {

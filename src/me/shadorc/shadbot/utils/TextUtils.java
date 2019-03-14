@@ -8,7 +8,7 @@ import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.TextFile;
-import me.shadorc.shadbot.utils.object.Emoji;
+import me.shadorc.shadbot.object.Emoji;
 
 public class TextUtils {
 

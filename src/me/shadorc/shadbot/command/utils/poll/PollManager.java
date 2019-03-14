@@ -18,12 +18,12 @@ import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.object.message.ReactionMessage;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
-import me.shadorc.shadbot.utils.object.message.ReactionMessage;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
