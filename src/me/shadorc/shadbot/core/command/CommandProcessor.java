@@ -59,8 +59,7 @@ public class CommandProcessor {
 			return false;
 		}
 
-		if(rateLimiter.get().isLimitedAndWarn(context.getClient(),
-				context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
+		if(rateLimiter.get().isLimitedAndWarn(context.getChannelId(), context.getMember())) {
 			StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_LIMITED, cmd);
 			return true;
 		}

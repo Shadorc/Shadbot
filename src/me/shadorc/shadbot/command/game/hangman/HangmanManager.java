@@ -193,11 +193,11 @@ public class HangmanManager extends GameManager implements MessageInterceptor {
 							}
 
 							Mono<Void> checkMono = Mono.empty();
-							if(content.length() == 1 && !this.rateLimiter.isLimitedAndWarn(
-									context.getClient(), context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
+							if(content.length() == 1
+									&& !this.rateLimiter.isLimitedAndWarn(context.getChannelId(), context.getMember())) {
 								checkMono = this.checkLetter(content);
-							} else if(content.length() == this.word.length() && !this.rateLimiter.isLimitedAndWarn(
-									context.getClient(), context.getGuildId(), context.getChannelId(), context.getAuthorId())) {
+							} else if(content.length() == this.word.length()
+									&& !this.rateLimiter.isLimitedAndWarn(context.getChannelId(), context.getMember())) {
 								checkMono = this.checkWord(content);
 							}
 

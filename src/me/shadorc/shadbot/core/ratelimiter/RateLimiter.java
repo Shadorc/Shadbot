@@ -7,14 +7,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
+import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.message.TemporaryMessage;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
-import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.message.TemporaryMessage;
 
 public class RateLimiter {
 
@@ -30,15 +31,15 @@ public class RateLimiter {
 		this.bandwidth = Bandwidth.classic(this.max, Refill.intervally(this.max, this.duration));
 	}
 
-	public boolean isLimitedAndWarn(DiscordClient client, Snowflake guildId, Snowflake channelId, Snowflake userId) {
-		final LimitedUser limitedUser = this.guildsLimitedMap.computeIfAbsent(guildId, id -> new LimitedGuild(this.bandwidth))
-				.getUser(userId);
+	public boolean isLimitedAndWarn(Snowflake channelId, Member member) {
+		final LimitedUser limitedUser = this.guildsLimitedMap.computeIfAbsent(member.getGuildId(), ignored -> new LimitedGuild(this.bandwidth))
+				.getUser(member.getId());
 
 		// The token could not been consumed, the user is limited
 		if(!limitedUser.getBucket().tryConsume(1)) {
 			// The user has not yet been warned
 			if(!limitedUser.isWarned()) {
-				this.sendWarningMessage(client, channelId, userId);
+				this.sendWarningMessage(member.getClient(), channelId, member.getId());
 				limitedUser.warn();
 			}
 			return true;
