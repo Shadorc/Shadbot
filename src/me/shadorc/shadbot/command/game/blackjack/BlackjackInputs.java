@@ -46,46 +46,48 @@ public class BlackjackInputs extends Inputs {
 
 	@Override
 	public Mono<Void> processEvent(MessageCreateEvent event) {
-		final Member member = event.getMember().get();
-		// TODO
-		if(this.manager.isCancelMessage(event.getMessage()).block()) {
-			return event.getMessage().getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(
-							String.format(Emoji.CHECK_MARK + " Blackjack game cancelled by **%s**.", member.getUsername()), channel))
-					.then(Mono.fromRunnable(this.manager::stop));
-		}
+		return this.manager.isCancelMessage(event.getMessage())
+				.flatMap(isCancelMsg -> {
+					final Member member = event.getMember().get();
+					if(isCancelMsg) {
+						return event.getMessage().getChannel()
+								.flatMap(channel -> DiscordUtils.sendMessage(
+										String.format(Emoji.CHECK_MARK + " Blackjack game cancelled by **%s**.", member.getUsername()), channel))
+								.then(Mono.fromRunnable(this.manager::stop));
+					}
 
-		final BlackjackPlayer player = this.manager.getPlayers().get(member.getId());
+					final BlackjackPlayer player = this.manager.getPlayers().get(member.getId());
 
-		if(player.isStanding()) {
-			return this.manager.getContext().getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(
-							String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't play anymore.",
-									member.getUsername()), channel))
-					.then();
-		}
+					if(player.isStanding()) {
+						return this.manager.getContext().getChannel()
+								.flatMap(channel -> DiscordUtils.sendMessage(
+										String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't play anymore.",
+												member.getUsername()), channel))
+								.then();
+					}
 
-		final String prefix = Shadbot.getDatabase().getDBGuild(member.getGuildId()).getPrefix();
-		final String content = event.getMessage().getContent().orElse("").replace(prefix, "").toLowerCase().trim();
-		if("double down".equals(content) && player.getHand().count() != 2) {
-			return this.manager.getContext().getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(
-							String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a maximum of 2 cards to use `double down`.",
-									member.getUsername()), channel))
-					.then();
-		}
+					final String prefix = Shadbot.getDatabase().getDBGuild(member.getGuildId()).getPrefix();
+					final String content = event.getMessage().getContent().orElse("").replace(prefix, "").toLowerCase().trim();
+					if("double down".equals(content) && player.getHand().count() != 2) {
+						return this.manager.getContext().getChannel()
+								.flatMap(channel -> DiscordUtils.sendMessage(
+										String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a maximum of 2 cards to use `double down`.",
+												member.getUsername()), channel))
+								.then();
+					}
 
-		final Consumer<BlackjackPlayer> action = this.manager.getActions().get(content);
-		if(action == null) {
-			return Mono.empty();
-		}
+					final Consumer<BlackjackPlayer> action = this.manager.getActions().get(content);
+					if(action == null) {
+						return Mono.empty();
+					}
 
-		action.accept(player);
+					action.accept(player);
 
-		if(this.manager.allPlayersStanding()) {
-			return this.manager.end();
-		}
-		return this.manager.show();
+					if(this.manager.allPlayersStanding()) {
+						return this.manager.end();
+					}
+					return this.manager.show();
+				});
 	}
 
 }
