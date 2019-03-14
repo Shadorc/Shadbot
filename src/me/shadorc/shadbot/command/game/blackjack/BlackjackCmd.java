@@ -38,12 +38,12 @@ public class BlackjackCmd extends GameCmd<BlackjackManager> {
 				return blackjackManager.end();
 			}
 			return blackjackManager.show();
-		} else {
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-							context.getUsername()), channel))
-					.then();
 		}
+
+		return context.getChannel()
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+						context.getUsername()), channel))
+				.then();
 	}
 
 	@Override
