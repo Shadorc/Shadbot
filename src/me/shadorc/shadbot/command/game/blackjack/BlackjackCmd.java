@@ -6,10 +6,10 @@ import java.util.function.Consumer;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
+import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.object.Emoji;
 import reactor.core.publisher.Mono;
 
 public class BlackjackCmd extends GameCmd<BlackjackManager> {
@@ -34,7 +34,10 @@ public class BlackjackCmd extends GameCmd<BlackjackManager> {
 				});
 
 		if(blackjackManager.addPlayerIfAbsent(context.getAuthorId(), context.getUsername(), bet)) {
-			return blackjackManager.computeResultsOrShow();
+			if(blackjackManager.allPlayersStanding()) {
+				return blackjackManager.end();
+			}
+			return blackjackManager.show();
 		} else {
 			return context.getChannel()
 					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",

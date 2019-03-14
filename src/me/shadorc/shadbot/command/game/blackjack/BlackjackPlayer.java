@@ -1,18 +1,16 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.utils.object.Card;
+import me.shadorc.shadbot.object.casino.Card;
+import me.shadorc.shadbot.object.casino.Hand;
 
 public class BlackjackPlayer {
 
 	private final Snowflake userId;
 	private final String username;
 	private final int bet;
-	private final List<Card> cards;
+	private final Hand hand;
 
 	private boolean isDoubleDown;
 	private boolean isStanding;
@@ -21,40 +19,30 @@ public class BlackjackPlayer {
 		this.userId = userId;
 		this.username = username;
 		this.bet = bet;
-		this.cards = new ArrayList<>();
+		this.hand = new Hand();
 		this.isDoubleDown = false;
 		this.isStanding = false;
-
-		this.addCards(Card.pick(2));
 	}
 
-	public void hit() {
-		this.addCards(List.of(Card.pick()));
+	public void hit(Card card) {
+		this.hand.deal(card);
+
+		if(this.hand.getValue() >= 21) {
+			this.stand();
+		}
 	}
 
 	public void stand() {
 		this.isStanding = true;
 	}
 
-	public void doubleDown() {
+	public void doubleDown(Card card) {
 		this.isDoubleDown = true;
-		this.hit();
+		this.hit(card);
 		this.stand();
 	}
 
-	private void addCards(List<Card> cards) {
-		if(this.isStanding()) {
-			return;
-		}
-
-		this.cards.addAll(cards);
-
-		if(BlackjackUtils.getValue(this.cards) >= 21) {
-			this.stand();
-		}
-	}
-
-	public EmbedFieldEntity formatHand() {
+	public EmbedFieldEntity format() {
 		final StringBuilder name = new StringBuilder(String.format("%s's hand", this.getUsername()));
 		if(this.isStanding()) {
 			name.append(" (Stand)");
@@ -63,7 +51,7 @@ public class BlackjackPlayer {
 			name.append(" (Double down)");
 		}
 
-		return new EmbedFieldEntity(name.toString(), BlackjackUtils.formatCards(this.getCards()), true);
+		return new EmbedFieldEntity(name.toString(), this.hand.format(), true);
 	}
 
 	public Snowflake getUserId() {
@@ -78,8 +66,8 @@ public class BlackjackPlayer {
 		return this.bet * (this.isDoubleDown() ? 2 : 1);
 	}
 
-	public List<Card> getCards() {
-		return this.cards;
+	public Hand getHand() {
+		return this.hand;
 	}
 
 	public boolean isDoubleDown() {

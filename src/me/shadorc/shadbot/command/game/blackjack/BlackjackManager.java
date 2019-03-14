@@ -1,14 +1,10 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
@@ -19,14 +15,15 @@ import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
+import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.casino.Deck;
+import me.shadorc.shadbot.object.casino.Hand;
+import me.shadorc.shadbot.object.message.UpdateableMessage;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.object.Card;
-import me.shadorc.shadbot.utils.object.Emoji;
-import me.shadorc.shadbot.utils.object.message.UpdateableMessage;
+import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -34,45 +31,58 @@ public class BlackjackManager extends GameManager {
 
 	private static final float WIN_MULTIPLIER = 1.15f;
 
-	private final Map<String, Consumer<BlackjackPlayer>> actionsMap;
 	private final RateLimiter rateLimiter;
-	private final List<BlackjackPlayer> players;
-	private final List<Card> dealerCards;
 	private final UpdateableMessage updateableMessage;
+
+	private final Deck deck;
+	private final Hand dealerHand;
+	private final Map<Snowflake, BlackjackPlayer> players;
+	private final Map<String, Consumer<BlackjackPlayer>> actions;
 
 	private long startTime;
 
 	public BlackjackManager(GameCmd<BlackjackManager> gameCmd, Context context) {
 		super(gameCmd, context, Duration.ofMinutes(1));
-		this.actionsMap = Map.of("hit", BlackjackPlayer::hit, "stand", BlackjackPlayer::stand, "double down", BlackjackPlayer::doubleDown);
+
 		this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(2));
-		this.players = new CopyOnWriteArrayList<>();
-		this.dealerCards = new ArrayList<>();
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
+
+		this.deck = new Deck();
+		this.deck.shuffle();
+		this.dealerHand = new Hand();
+		this.players = new ConcurrentHashMap<>();
+
+		this.actions = Map.of("hit", player -> player.hit(this.deck.pick()),
+				"double down", player -> player.doubleDown(this.deck.pick()),
+				"stand", BlackjackPlayer::stand);
 	}
 
 	@Override
 	public void start() {
-		this.dealerCards.addAll(Card.pick(2));
-		while(BlackjackUtils.getValue(this.dealerCards) < 17) {
-			this.dealerCards.add(Card.pick());
+		this.dealerHand.deal(this.deck.pick(2));
+		while(this.dealerHand.getValue() < 17) {
+			this.dealerHand.deal(this.deck.pick());
 		}
 
-		this.schedule(this.computeResults());
-		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
+		this.schedule(this.end());
 		this.startTime = System.currentTimeMillis();
+		new BlackjackInputs(this.getContext().getClient(), this)
+				.waitForInputs()
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
 	}
 
 	@Override
 	public Mono<Void> show() {
 		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
 				.andThen(embed -> {
+					final Hand visibleDealerHand = this.isScheduled() ? new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
 					embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())
 							.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
 							.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
 									+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
 									this.getContext().getPrefix(), this.getContext().getCommandName()))
-							.addField("Dealer's hand", BlackjackUtils.formatCards(this.isScheduled() ? this.dealerCards.subList(0, 1) : this.dealerCards), true);
+							.addField("Dealer's hand", visibleDealerHand.format(), true);
 
 					if(this.isScheduled()) {
 						final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
@@ -81,26 +91,20 @@ public class BlackjackManager extends GameManager {
 						embed.setFooter("Finished", null);
 					}
 
-					this.players.stream()
-							.map(BlackjackPlayer::formatHand)
+					this.players.values()
+							.stream()
+							.map(BlackjackPlayer::format)
 							.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
 				});
 
 		return this.updateableMessage.send(embedConsumer).then();
 	}
 
-	public Mono<Void> computeResultsOrShow() {
-		if(this.isFinished()) {
-			return this.computeResults();
-		}
-		return this.show().then();
-	}
-
-	private Mono<Void> computeResults() {
-		final int dealerValue = BlackjackUtils.getValue(this.dealerCards);
-		return Flux.fromIterable(this.players)
+	public Mono<Void> end() {
+		return Flux.fromIterable(this.players.values())
 				.map(player -> {
-					final int playerValue = BlackjackUtils.getValue(player.getCards());
+					final int dealerValue = this.dealerHand.getValue();
+					final int playerValue = player.getHand().getValue();
 
 					// -1 = Lose | 0 = Draw | 1 = Win
 					int result;
@@ -143,55 +147,26 @@ public class BlackjackManager extends GameManager {
 	}
 
 	public boolean addPlayerIfAbsent(Snowflake userId, String username, int bet) {
-		if(this.players.stream().map(BlackjackPlayer::getUserId).anyMatch(userId::equals)) {
-			return false;
-		}
-		return this.players.add(new BlackjackPlayer(userId, username, bet));
+		final BlackjackPlayer player = new BlackjackPlayer(userId, username, bet);
+		player.hit(this.deck.pick());
+		player.hit(this.deck.pick());
+		return this.players.putIfAbsent(userId, player) == null;
 	}
 
-	public boolean isFinished() {
-		return this.players.stream().allMatch(BlackjackPlayer::isStanding);
+	public boolean allPlayersStanding() {
+		return this.players.values().stream().allMatch(BlackjackPlayer::isStanding);
 	}
 
-	@Override
-	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		final Member member = event.getMember().get();
-		return this.cancelOrDo(event.getMessage(),
-				Flux.fromIterable(this.players)
-						// Check if the member is a current player
-						.filter(player -> member.getId().equals(player.getUserId()))
-						.singleOrEmpty()
-						.filter(player -> actionsMap.containsKey(event.getMessage().getContent().orElse("")))
-						.filter(player -> !this.rateLimiter.isLimitedAndWarn(
-								event.getClient(), member.getGuildId(), event.getMessage().getChannelId(), member.getId()))
-						.flatMap(player -> {
-							if(player.isStanding()) {
-								return this.getContext().getChannel()
-										.flatMap(channel -> DiscordUtils.sendMessage(
-												String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't play anymore.",
-														member.getUsername()), channel))
-										.thenReturn(false);
-							}
+	public Map<Snowflake, BlackjackPlayer> getPlayers() {
+		return this.players;
+	}
 
-							final String prefix = Shadbot.getDatabase().getDBGuild(event.getGuildId().get()).getPrefix();
-							final String content = event.getMessage().getContent().orElse("").replace(prefix, "").toLowerCase().trim();
-							if("double down".equals(content) && player.getCards().size() != 2) {
-								return this.getContext().getChannel()
-										.flatMap(channel -> DiscordUtils.sendMessage(
-												String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a maximum of 2 cards to use `double down`.",
-														member.getUsername()), channel))
-										.thenReturn(true);
-							}
+	public RateLimiter getRateLimiter() {
+		return this.rateLimiter;
+	}
 
-							final Consumer<BlackjackPlayer> action = actionsMap.get(content);
-							if(action == null) {
-								return Mono.just(false);
-							}
-
-							action.accept(player);
-							return this.computeResultsOrShow()
-									.thenReturn(true);
-						}));
+	public Map<String, Consumer<BlackjackPlayer>> getActions() {
+		return this.actions;
 	}
 
 }
