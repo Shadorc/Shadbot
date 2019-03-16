@@ -13,7 +13,6 @@ import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
@@ -45,7 +44,8 @@ public class CommandProcessor {
 				.flatMap(ignored -> event.getMessage().getChannel())
 				.filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
 				// The message has not been intercepted
-				.filterWhen(ignored -> MessageInterceptorManager.isIntercepted(event).map(Boolean.FALSE::equals))
+				// TODO
+				// .filterWhen(ignored -> MessageInterceptorManager.isIntercepted(event).map(Boolean.FALSE::equals))
 				// The message starts with the correct prefix
 				.map(ignored -> dbGuild.getPrefix())
 				.filter(prefix -> content.startsWith(prefix))
