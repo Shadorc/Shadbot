@@ -7,8 +7,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
@@ -19,16 +17,15 @@ import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
 
-public class HangmanManager extends GameManager implements MessageInterceptor {
+public class HangmanManager extends GameManager {
 
 	private static final List<String> IMG_LIST = List.of(
 			getImageUrl("8/8b", 0),
@@ -47,6 +44,7 @@ public class HangmanManager extends GameManager implements MessageInterceptor {
 	private final String word;
 	private final List<String> lettersTested;
 
+	private long startTime;
 	private int failCount;
 
 	public HangmanManager(HangmanCmd gameCmd, Context context, Difficulty difficulty) {
@@ -61,7 +59,8 @@ public class HangmanManager extends GameManager implements MessageInterceptor {
 	@Override
 	public void start() {
 		this.schedule(Mono.fromRunnable(this::stop));
-		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
+		this.startTime = System.currentTimeMillis();
+		new HangmanInputs(this.getContext().getClient(), this).subscribe();
 	}
 
 	@Override
@@ -83,8 +82,9 @@ public class HangmanManager extends GameManager implements MessageInterceptor {
 					}
 
 					if(this.isScheduled()) {
-						embed.setFooter(String.format("Use %scancel to cancel this game (Automatically cancelled in %d min in case of inactivity)",
-								this.getContext().getPrefix(), this.getDuration().toMinutes()), null);
+						final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+						embed.setFooter(String.format("Will automatically stop in %s seconds in case of inactivity. Use %scancel to force the stop.",
+								remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
 					} else {
 						embed.setFooter("Finished.", null);
 					}
@@ -103,7 +103,7 @@ public class HangmanManager extends GameManager implements MessageInterceptor {
 				.then();
 	}
 
-	private Mono<Void> showResultAndStop(boolean win) {
+	private Mono<Void> end(boolean win) {
 		String text;
 		if(win) {
 			final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
@@ -126,7 +126,7 @@ public class HangmanManager extends GameManager implements MessageInterceptor {
 				.then(Mono.fromRunnable(this::stop));
 	}
 
-	private Mono<Void> checkLetter(String chr) {
+	public Mono<Void> checkLetter(String chr) {
 		// Reset IDLE timer
 		this.schedule(Mono.fromRunnable(this::stop));
 
@@ -137,7 +137,7 @@ public class HangmanManager extends GameManager implements MessageInterceptor {
 		if(!this.word.contains(chr)) {
 			this.failCount++;
 			if(this.failCount == IMG_LIST.size()) {
-				return this.showResultAndStop(false);
+				return this.end(false);
 			}
 		}
 
@@ -145,64 +145,41 @@ public class HangmanManager extends GameManager implements MessageInterceptor {
 
 		// The word has been entirely guessed
 		if(StringUtils.remove(this.getRepresentation(this.word), "\\", " ", "*").equalsIgnoreCase(this.word)) {
-			return this.showResultAndStop(true);
+			return this.end(true);
 		}
 
 		return this.show();
 	}
 
-	private Mono<Void> checkWord(String word) {
+	public Mono<Void> checkWord(String word) {
 		// Reset IDLE timer
 		this.schedule(Mono.fromRunnable(this::stop));
 
 		// If the word has been guessed
 		if(this.word.equalsIgnoreCase(word)) {
 			this.lettersTested.addAll(StringUtils.split(word, ""));
-			return this.showResultAndStop(true);
+			return this.end(true);
 		}
 
 		this.failCount++;
 		if(this.failCount == IMG_LIST.size()) {
-			return this.showResultAndStop(false);
+			return this.end(false);
 		}
 		return this.show();
+	}
+
+	public RateLimiter getRateLimiter() {
+		return this.rateLimiter;
+	}
+
+	public String getWord() {
+		return this.word;
 	}
 
 	private String getRepresentation(String word) {
 		return String.format("**%s**",
 				FormatUtils.format(StringUtils.split(word, ""),
 						letter -> this.lettersTested.contains(letter) ? letter.toUpperCase() : "\\_", " "));
-	}
-
-	@Override
-	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		return this.cancelOrDo(event.getMessage(),
-				Mono.justOrEmpty(event.getMessage().getAuthor().map(User::getId))
-						.flatMap(authorId -> {
-							final Context context = this.getContext();
-
-							if(!authorId.equals(context.getAuthorId())) {
-								return Mono.just(false);
-							}
-
-							final String content = event.getMessage().getContent().get().toLowerCase().trim();
-
-							// Check only if content is an unique word/letter
-							if(!content.matches("[a-z]+")) {
-								return Mono.just(false);
-							}
-
-							Mono<Void> checkMono = Mono.empty();
-							if(content.length() == 1
-									&& !this.rateLimiter.isLimitedAndWarn(context.getChannelId(), context.getMember())) {
-								checkMono = this.checkLetter(content);
-							} else if(content.length() == this.word.length()
-									&& !this.rateLimiter.isLimitedAndWarn(context.getChannelId(), context.getMember())) {
-								checkMono = this.checkWord(content);
-							}
-
-							return checkMono.thenReturn(false);
-						}));
 	}
 
 	private static String getImageUrl(String path, int num) {

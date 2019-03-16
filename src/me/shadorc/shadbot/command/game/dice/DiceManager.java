@@ -66,7 +66,7 @@ public class DiceManager extends GameManager {
 
 							if(this.isScheduled()) {
 								final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-								embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.", 
+								embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
 										remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
 							} else {
 								embed.setFooter("Finished.", null);

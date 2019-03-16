@@ -43,7 +43,7 @@ public class DiceInputs extends Inputs {
 				.filterWhen(ignored -> this.manager.isCancelMessage(event.getMessage()))
 				.flatMap(member -> event.getMessage().getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(
-								String.format(Emoji.CHECK_MARK + " Dice game cancelled by **%s**.", 
+								String.format(Emoji.CHECK_MARK + " Dice game cancelled by **%s**.",
 										member.getUsername()), channel))
 						.then(Mono.fromRunnable(this.manager::stop)));
 	}
