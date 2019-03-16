@@ -1,4 +1,4 @@
-package me.shadorc.shadbot.listener.interceptor;
+package me.shadorc.shadbot.object;
 
 import java.time.Duration;
 

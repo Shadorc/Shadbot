@@ -3,8 +3,8 @@ package me.shadorc.shadbot.command.game.trivia;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
-import me.shadorc.shadbot.listener.interceptor.Inputs;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.Inputs;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import reactor.core.publisher.Mono;
@@ -59,7 +59,7 @@ public class TriviaInputs extends Inputs {
 					}
 
 					// If the user has already answered and has been warned, ignore him
-					if(this.game.getPlayers().containsKey(member.getId()) 
+					if(this.game.getPlayers().containsKey(member.getId())
 							&& this.game.getPlayers().get(member.getId()).hasAnswered()) {
 						return Mono.empty();
 					}

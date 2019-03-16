@@ -43,9 +43,6 @@ public class CommandProcessor {
 				// The channel is allowed
 				.flatMap(ignored -> event.getMessage().getChannel())
 				.filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
-				// The message has not been intercepted
-				// TODO
-				// .filterWhen(ignored -> MessageInterceptorManager.isIntercepted(event).map(Boolean.FALSE::equals))
 				// The message starts with the correct prefix
 				.map(ignored -> dbGuild.getPrefix())
 				.filter(prefix -> content.startsWith(prefix))

@@ -6,8 +6,8 @@ import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.listener.interceptor.Inputs;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.Inputs;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Mono;
 

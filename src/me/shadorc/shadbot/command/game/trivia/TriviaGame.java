@@ -91,7 +91,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 						.addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
 						.addField("Type", String.format("`%s`", this.trivia.getType()), true)
 						.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
-						.setFooter(String.format("You have %d seconds to answer. Use %scancel to force the stop.", 
+						.setFooter(String.format("You have %d seconds to answer. Use %scancel to force the stop.",
 								this.getDuration().toSeconds(), this.getContext().getPrefix()), null));
 
 		return this.getContext().getChannel()
