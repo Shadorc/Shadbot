@@ -28,9 +28,7 @@ public class TriviaInputs extends Inputs {
 			return Mono.just(false);
 		}
 
-		final Member member = event.getMember().get();
-		return this.game.isCancelMessage(event.getMessage())
-				.map(isCancelCmd -> isCancelCmd || (this.game.getPlayers().containsKey(member.getId())));
+		return Mono.just(true);
 	}
 
 	@Override
@@ -61,7 +59,8 @@ public class TriviaInputs extends Inputs {
 					}
 
 					// If the user has already answered and has been warned, ignore him
-					if(this.game.getPlayers().get(member.getId()).hasAnswered()) {
+					if(this.game.getPlayers().containsKey(member.getId()) 
+							&& this.game.getPlayers().get(member.getId()).hasAnswered()) {
 						return Mono.empty();
 					}
 
