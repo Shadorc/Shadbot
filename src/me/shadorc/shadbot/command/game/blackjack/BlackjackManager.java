@@ -23,7 +23,6 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -66,10 +65,7 @@ public class BlackjackManager extends GameManager {
 
 		this.schedule(this.end());
 		this.startTime = System.currentTimeMillis();
-		new BlackjackInputs(this.getContext().getClient(), this)
-				.waitForInputs()
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
+		new BlackjackInputs(this.getContext().getClient(), this).subscribe();
 	}
 
 	@Override

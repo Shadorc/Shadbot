@@ -4,6 +4,8 @@ import java.time.Duration;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,6 +26,12 @@ public abstract class Inputs {
 				.filterWhen(this::isValidEvent)
 				.flatMap(this::processEvent)
 				.take(this.timeout);
+	}
+
+	public final Disposable subscribe() {
+		return this.waitForInputs()
+				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(this.client, err))
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
 	/**
