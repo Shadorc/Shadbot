@@ -34,30 +34,32 @@ public class TriviaCmd extends GameCmd<TriviaManager> {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		if(this.categories == null) {
-			try {
-				this.categories = Utils.MAPPER.readValue(NetUtils.getJSON(CATEGORY_URL), TriviaCategoriesResponse.class);
-			} catch (final IOException err) {
-				throw Exceptions.propagate(err);
-			}
-		}
-
-		if("categories".equalsIgnoreCase(context.getArg().orElse(null))) {
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-					.andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
-							.addField("ID", FormatUtils.format(this.categories.getIds(), id -> Integer.toString(id), "\n"), true)
-							.addField("Name", String.join("\n", this.categories.getNames()), true));
-
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-					.then();
-		}
-
 		final Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
 
-		if(context.getArg().isPresent() && !this.categories.getIds().contains(categoryId)) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list of categories.",
-					context.getArg().get(), context.getPrefix(), this.getName())));
+		if(context.getArg().isPresent()) {
+			if(this.categories == null) {
+				try {
+					this.categories = Utils.MAPPER.readValue(NetUtils.getJSON(CATEGORY_URL), TriviaCategoriesResponse.class);
+				} catch (final IOException err) {
+					throw Exceptions.propagate(err);
+				}
+			}
+
+			if("categories".equalsIgnoreCase(context.getArg().get())) {
+				final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+						.andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
+								.addField("ID", FormatUtils.format(this.categories.getIds(), Object::toString, "\n"), true)
+								.addField("Name", String.join("\n", this.categories.getNames()), true));
+
+				return context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+						.then();
+			}
+
+			if(!this.categories.getIds().contains(categoryId)) {
+				return Mono.error(new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list of categories.",
+						context.getArg().get(), context.getPrefix(), this.getName())));
+			}
 		}
 
 		if(this.getManagers().containsKey(context.getChannelId())) {
@@ -66,12 +68,13 @@ public class TriviaCmd extends GameCmd<TriviaManager> {
 							Emoji.INFO + " (**%s**) A Trivia game has already been started.",
 							context.getUsername()), channel))
 					.then();
+		} else {
+			final TriviaManager triviaManager = new TriviaManager(this, context, categoryId);
+			this.getManagers().put(context.getChannelId(), triviaManager);
+			triviaManager.start();
+			return triviaManager.show();
 		}
 
-		final TriviaManager triviaManager = new TriviaManager(this, context, categoryId);
-		this.getManagers().put(context.getChannelId(), triviaManager);
-		triviaManager.start();
-		return triviaManager.show();
 	}
 
 	@Override

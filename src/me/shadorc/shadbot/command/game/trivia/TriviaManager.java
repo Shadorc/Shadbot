@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
@@ -24,30 +23,28 @@ import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-public class TriviaManager extends GameManager implements MessageInterceptor {
+public class TriviaManager extends GameManager {
 
 	protected static final int MIN_GAINS = 100;
 	private static final int MAX_BONUS = 100;
 
 	private final TriviaResult trivia;
-	private final Map<Snowflake, Boolean> alreadyAnswered;
+	private final Map<Snowflake, TriviaPlayer> players;
 	private final List<String> answers;
 
 	private long startTime;
 
+	// Trivia API doc : https://opentdb.com/api_config.php
 	public TriviaManager(GameCmd<TriviaManager> gameCmd, Context context, Integer categoryId) {
 		super(gameCmd, context, Duration.ofSeconds(30));
 
@@ -68,18 +65,22 @@ public class TriviaManager extends GameManager implements MessageInterceptor {
 			this.answers.addAll(List.of("True", "False"));
 		}
 
-		this.alreadyAnswered = new ConcurrentHashMap<>();
+		this.players = new ConcurrentHashMap<>();
 	}
 
-	// Trivia API doc : https://opentdb.com/api_config.php
 	@Override
 	public void start() {
-		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
-		this.schedule(Mono.fromRunnable(this::stop)
-				.then(this.getContext().getChannel())
-				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
-						this.trivia.getCorrectAnswer()), channel)));
+		this.schedule(this.end());
 		this.startTime = System.currentTimeMillis();
+		new TriviaInputs(this.getContext().getClient(), this).subscribe();
+	}
+
+	@Override
+	public Mono<Void> end() {
+		return this.getContext().getChannel()
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
+						this.trivia.getCorrectAnswer()), channel))
+				.then(Mono.fromRunnable(this::stop));
 	}
 
 	@Override
@@ -102,7 +103,7 @@ public class TriviaManager extends GameManager implements MessageInterceptor {
 				.then();
 	}
 
-	private Mono<Message> win(Member member) {
+	protected Mono<Message> win(Member member) {
 		final float coinsPerSec = (float) MAX_BONUS / this.getDuration().toSeconds();
 		final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
 		final int gains = (int) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
@@ -116,42 +117,24 @@ public class TriviaManager extends GameManager implements MessageInterceptor {
 						member.getUsername(), gains), channel));
 	}
 
-	@Override
-	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		final Member member = event.getMember().get();
-		return this.cancelOrDo(event.getMessage(), Mono.justOrEmpty(event.getMessage().getContent())
-				.flatMap(content -> {
-					// It's a number or a text
-					final Integer choice = NumberUtils.asIntBetween(content, 1, this.answers.size());
+	public void hasAnswered(Snowflake userId) {
+		if(this.players.containsKey(userId)) {
+			this.players.get(userId).setAnswered(true);
+		} else {
+			this.players.put(userId, new TriviaPlayer(userId));
+		}
+	}
 
-					// Message is a text and doesn't match any answers, ignore it
-					if(choice == null && !this.answers.stream().anyMatch(content::equalsIgnoreCase)) {
-						return Mono.just(false);
-					}
+	public Map<Snowflake, TriviaPlayer> getPlayers() {
+		return Collections.unmodifiableMap(this.players);
+	}
 
-					// If the user has already answered and has been warned, ignore him
-					if(this.alreadyAnswered.getOrDefault(member.getId(), false)) {
-						return Mono.just(false);
-					}
+	public List<String> getAnswers() {
+		return Collections.unmodifiableList(this.answers);
+	}
 
-					final String answer = choice == null ? content : this.answers.get(choice - 1);
-
-					if(this.alreadyAnswered.containsKey(member.getId())) {
-						this.alreadyAnswered.put(member.getId(), true);
-						return event.getMessage().getChannel()
-								.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
-										member.getUsername()), channel))
-								.thenReturn(true);
-					} else if(answer.equalsIgnoreCase(this.trivia.getCorrectAnswer())) {
-						return this.win(member).thenReturn(true);
-					} else {
-						this.alreadyAnswered.put(member.getId(), false);
-						return event.getMessage().getChannel()
-								.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
-										member.getUsername()), channel))
-								.thenReturn(true);
-					}
-				}));
+	public String getCorrectAnswer() {
+		return this.trivia.getCorrectAnswer();
 	}
 
 }

@@ -26,13 +26,12 @@ public class BlackjackInputs extends Inputs {
 			return Mono.just(false);
 		}
 
-		final Member member = event.getMember().get();
-		final String content = event.getMessage().getContent().get();
-
 		if(!event.getMessage().getChannelId().equals(this.manager.getContext().getChannelId())) {
 			return Mono.just(false);
 		}
 
+		final Member member = event.getMember().get();
+		final String content = event.getMessage().getContent().get();
 		return this.manager.isCancelMessage(event.getMessage())
 				.map(isCancelCmd -> isCancelCmd || (this.manager.getPlayers().containsKey(member.getId())
 						&& this.manager.getActions().containsKey(content)
