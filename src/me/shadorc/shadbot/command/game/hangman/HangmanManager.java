@@ -48,7 +48,7 @@ public class HangmanManager extends GameManager {
 	private int failCount;
 
 	public HangmanManager(HangmanCmd gameCmd, Context context, Difficulty difficulty) {
-		super(gameCmd, context, Duration.ofMinutes(1));
+		super(gameCmd, context, Duration.ofMinutes(3));
 		this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(1));
 		this.messageId = new AtomicLong(-1);
 		this.word = gameCmd.getWord(difficulty);
@@ -83,7 +83,7 @@ public class HangmanManager extends GameManager {
 
 					if(this.isScheduled()) {
 						final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-						embed.setFooter(String.format("Will automatically stop in %s seconds in case of inactivity. Use %scancel to force the stop.",
+						embed.setFooter(String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
 								remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
 					} else {
 						embed.setFooter("Finished.", null);
