@@ -48,39 +48,7 @@ public class DiceManager extends GameManager {
 	}
 
 	@Override
-	public Mono<Void> show() {
-		return Flux.fromIterable(this.players.values())
-				.flatMap(player -> player.getUsername(this.getContext().getClient()))
-				.collectList()
-				.map(usernames -> EmbedUtils.getDefaultEmbed()
-						.andThen(embed -> {
-							embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
-									.setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
-									.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
-											this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
-									.addField("Player", String.join("\n", usernames), true)
-									.addField("Number", String.join("\n", this.players.values().stream()
-											.map(DicePlayer::getNumber)
-											.map(Object::toString)
-											.collect(Collectors.toList())), true);
-
-							if(this.isScheduled()) {
-								final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-								embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
-										remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
-							} else {
-								embed.setFooter("Finished.", null);
-							}
-
-							if(this.results != null) {
-								embed.addField("Results", this.results, false);
-							}
-						}))
-				.flatMap(this.updateableMessage::send)
-				.then();
-	}
-
-	private Mono<Void> end() {
+	public Mono<Void> end() {
 		final int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
 		return Flux.fromIterable(this.players.values())
 				.flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
@@ -103,6 +71,39 @@ public class DiceManager extends GameManager {
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
 				.then(this.show())
 				.then(Mono.fromRunnable(this::stop));
+	}
+
+	@Override
+	public Mono<Void> show() {
+		return Flux.fromIterable(this.players.values())
+				.flatMap(player -> player.getUsername(this.getContext().getClient()))
+				.collectList()
+				.map(usernames -> EmbedUtils.getDefaultEmbed()
+						.andThen(embed -> {
+							embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
+									.setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
+									.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
+											this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
+									.addField("Player", String.join("\n", usernames), true)
+									.addField("Number", String.join("\n", this.players.values().stream()
+											.map(DicePlayer::getNumber)
+											.map(Object::toString)
+											.collect(Collectors.toList())), true);
+
+							if(this.results != null) {
+								embed.addField("Results", this.results, false);
+							}
+
+							if(this.isScheduled()) {
+								final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+								embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
+										remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
+							} else {
+								embed.setFooter("Finished.", null);
+							}
+						}))
+				.flatMap(this.updateableMessage::send)
+				.then();
 	}
 
 	public void addPlayerIfAbsent(Snowflake userId, int number) {

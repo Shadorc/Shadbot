@@ -61,40 +61,7 @@ public class RouletteManager extends GameManager {
 	}
 
 	@Override
-	public Mono<Void> show() {
-		return Flux.fromIterable(this.players.values())
-				.flatMap(player -> Mono.zip(Mono.just(player),
-						player.getUsername(this.getContext().getClient())))
-				.collectList()
-				.map(list -> EmbedUtils.getDefaultEmbed()
-						.andThen(embed -> {
-							embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
-									.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
-									.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
-											+ "%n%n**place** is a `number between 1 and 36`, %s",
-											this.getContext().getPrefix(), this.getContext().getCommandName(),
-											FormatUtils.format(Place.values(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", ")))
-									.addField("Player (Bet)", FormatUtils.format(list,
-											tuple -> String.format("**%s** (%s)", tuple.getT2(), FormatUtils.coins(tuple.getT1().getBet())), "\n"), true)
-									.addField("Place", String.join("\n", this.players.values().stream().map(RoulettePlayer::getPlace).collect(Collectors.toList())), true);
-
-							if(this.results != null) {
-								embed.addField("Results", this.results, false);
-							}
-
-							if(this.isScheduled()) {
-								final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-								embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
-										remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
-							} else {
-								embed.setFooter("Finished.", null);
-							}
-						}))
-				.flatMap(this.updateableMessage::send)
-				.then();
-	}
-
-	private Mono<Void> end() {
+	public Mono<Void> end() {
 		final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
 		return Flux.fromIterable(this.players.values())
 				.flatMap(player -> Mono.zip(Mono.just(player),
@@ -132,6 +99,40 @@ public class RouletteManager extends GameManager {
 						winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"), channel))
 				.then(this.show())
 				.then(Mono.fromRunnable(this::stop));
+	}
+
+	@Override
+	public Mono<Void> show() {
+		return Flux.fromIterable(this.players.values())
+				.flatMap(player -> Mono.zip(Mono.just(player),
+						player.getUsername(this.getContext().getClient())))
+				.collectList()
+				.map(list -> EmbedUtils.getDefaultEmbed()
+						.andThen(embed -> {
+							embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
+									.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
+									.setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
+											+ "%n%n**place** is a `number between 1 and 36`, %s",
+											this.getContext().getPrefix(), this.getContext().getCommandName(),
+											FormatUtils.format(Place.values(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", ")))
+									.addField("Player (Bet)", FormatUtils.format(list,
+											tuple -> String.format("**%s** (%s)", tuple.getT2(), FormatUtils.coins(tuple.getT1().getBet())), "\n"), true)
+									.addField("Place", String.join("\n", this.players.values().stream().map(RoulettePlayer::getPlace).collect(Collectors.toList())), true);
+
+							if(this.results != null) {
+								embed.addField("Results", this.results, false);
+							}
+
+							if(this.isScheduled()) {
+								final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+								embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
+										remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
+							} else {
+								embed.setFooter("Finished.", null);
+							}
+						}))
+				.flatMap(this.updateableMessage::send)
+				.then();
 	}
 
 	protected boolean addPlayerIfAbsent(Snowflake userId, Integer bet, String place) {

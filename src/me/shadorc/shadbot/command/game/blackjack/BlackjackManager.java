@@ -70,34 +70,6 @@ public class BlackjackManager extends GameManager {
 	}
 
 	@Override
-	public Mono<Void> show() {
-		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-				.andThen(embed -> {
-					final Hand visibleDealerHand = this.isScheduled() ? new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
-					embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())
-							.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
-							.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
-									+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
-									this.getContext().getPrefix(), this.getContext().getCommandName()))
-							.addField("Dealer's hand", visibleDealerHand.format(), true);
-
-					if(this.isScheduled()) {
-						final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-						embed.setFooter(String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
-								remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
-					} else {
-						embed.setFooter("Finished", null);
-					}
-
-					this.players.values()
-							.stream()
-							.map(BlackjackPlayer::format)
-							.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
-				});
-
-		return this.updateableMessage.send(embedConsumer).then();
-	}
-
 	public Mono<Void> end() {
 		return Flux.fromIterable(this.players.values())
 				.map(player -> {
@@ -142,6 +114,35 @@ public class BlackjackManager extends GameManager {
 								String.format(Emoji.DICE + " __Results:__ %s", String.join(", ", results)), channel)))
 				.then(Mono.fromRunnable(this::stop))
 				.then(this.show());
+	}
+
+	@Override
+	public Mono<Void> show() {
+		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+				.andThen(embed -> {
+					final Hand visibleDealerHand = this.isScheduled() ? new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
+					embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())
+							.setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
+							.setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
+									+ "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
+									this.getContext().getPrefix(), this.getContext().getCommandName()))
+							.addField("Dealer's hand", visibleDealerHand.format(), true);
+
+					if(this.isScheduled()) {
+						final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+						embed.setFooter(String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
+								remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
+					} else {
+						embed.setFooter("Finished", null);
+					}
+
+					this.players.values()
+							.stream()
+							.map(BlackjackPlayer::format)
+							.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
+				});
+
+		return this.updateableMessage.send(embedConsumer).then();
 	}
 
 	public boolean addPlayerIfAbsent(Snowflake userId, String username, int bet) {

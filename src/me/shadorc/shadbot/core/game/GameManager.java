@@ -30,6 +30,8 @@ public abstract class GameManager {
 
 	public abstract void start();
 
+	public abstract Mono<Void> end();
+
 	public final void stop() {
 		this.cancelScheduledTask();
 		this.gameCmd.getManagers().remove(this.getContext().getChannelId());

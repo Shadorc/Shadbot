@@ -64,6 +64,30 @@ public class HangmanManager extends GameManager {
 	}
 
 	@Override
+	public Mono<Void> end() {
+		final StringBuilder strBuilder = new StringBuilder();
+		if(this.failCount == IMG_LIST.size()) {
+			strBuilder.append(String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
+					this.getContext().getUsername(), this.word));
+		} else {
+			final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
+			final float imagesRemaining = IMG_LIST.size() - this.failCount;
+			final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
+
+			Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
+			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
+
+			strBuilder.append(String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
+					this.getContext().getUsername(), FormatUtils.coins(gains)));
+		}
+
+		return this.show()
+				.then(this.getContext().getChannel())
+				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
+				.then(Mono.fromRunnable(this::stop));
+	}
+
+	@Override
 	public Mono<Void> show() {
 		final List<String> missedLetters = this.lettersTested.stream()
 				.filter(letter -> !this.word.contains(letter))
@@ -103,29 +127,6 @@ public class HangmanManager extends GameManager {
 				.then();
 	}
 
-	private Mono<Void> end(boolean win) {
-		String text;
-		if(win) {
-			final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
-			final float imagesRemaining = IMG_LIST.size() - this.failCount;
-			final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
-
-			Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
-			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
-
-			text = String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
-					this.getContext().getUsername(), FormatUtils.coins(gains));
-		} else {
-			text = String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
-					this.getContext().getUsername(), this.word);
-		}
-
-		return this.show()
-				.then(this.getContext().getChannel())
-				.flatMap(channel -> DiscordUtils.sendMessage(text, channel))
-				.then(Mono.fromRunnable(this::stop));
-	}
-
 	public Mono<Void> checkLetter(String chr) {
 		// Reset IDLE timer
 		this.schedule(Mono.fromRunnable(this::stop));
@@ -137,7 +138,7 @@ public class HangmanManager extends GameManager {
 		if(!this.word.contains(chr)) {
 			this.failCount++;
 			if(this.failCount == IMG_LIST.size()) {
-				return this.end(false);
+				return this.end();
 			}
 		}
 
@@ -145,7 +146,7 @@ public class HangmanManager extends GameManager {
 
 		// The word has been entirely guessed
 		if(StringUtils.remove(this.getRepresentation(this.word), "\\", " ", "*").equalsIgnoreCase(this.word)) {
-			return this.end(true);
+			return this.end();
 		}
 
 		return this.show();
@@ -158,12 +159,12 @@ public class HangmanManager extends GameManager {
 		// If the word has been guessed
 		if(this.word.equalsIgnoreCase(word)) {
 			this.lettersTested.addAll(StringUtils.split(word, ""));
-			return this.end(true);
+			return this.end();
 		}
 
 		this.failCount++;
 		if(this.failCount == IMG_LIST.size()) {
-			return this.end(false);
+			return this.end();
 		}
 		return this.show();
 	}
