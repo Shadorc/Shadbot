@@ -11,11 +11,11 @@ import reactor.core.publisher.Mono;
 
 public class TriviaInputs extends Inputs {
 
-	private final TriviaManager manager;
+	private final TriviaGame game;
 
-	public TriviaInputs(DiscordClient client, TriviaManager manager) {
-		super(client, manager.getDuration());
-		this.manager = manager;
+	public TriviaInputs(DiscordClient client, TriviaGame game) {
+		super(client, game.getDuration());
+		this.game = game;
 	}
 
 	@Override
@@ -24,23 +24,23 @@ public class TriviaInputs extends Inputs {
 			return Mono.just(false);
 		}
 
-		if(!event.getMessage().getChannelId().equals(this.manager.getContext().getChannelId())) {
+		if(!event.getMessage().getChannelId().equals(this.game.getContext().getChannelId())) {
 			return Mono.just(false);
 		}
 
 		final Member member = event.getMember().get();
-		return this.manager.isCancelMessage(event.getMessage())
-				.map(isCancelCmd -> isCancelCmd || (this.manager.getPlayers().containsKey(member.getId())));
+		return this.game.isCancelMessage(event.getMessage())
+				.map(isCancelCmd -> isCancelCmd || (this.game.getPlayers().containsKey(member.getId())));
 	}
 
 	@Override
 	public boolean takeEventWile(MessageCreateEvent ignored) {
-		return this.manager.isScheduled();
+		return this.game.isScheduled();
 	}
 
 	@Override
 	public Mono<Void> processEvent(MessageCreateEvent event) {
-		return this.manager.isCancelMessage(event.getMessage())
+		return this.game.isCancelMessage(event.getMessage())
 				.flatMap(isCancelMsg -> {
 					final Member member = event.getMember().get();
 					if(isCancelMsg) {
@@ -48,36 +48,36 @@ public class TriviaInputs extends Inputs {
 								.flatMap(channel -> DiscordUtils.sendMessage(
 										String.format(Emoji.CHECK_MARK + " Trivia game cancelled by **%s**.",
 												member.getUsername()), channel))
-								.then(Mono.fromRunnable(this.manager::stop));
+								.then(Mono.fromRunnable(this.game::stop));
 					}
 
 					// It's a number or a text
 					final String content = event.getMessage().getContent().get();
-					final Integer choice = NumberUtils.asIntBetween(content, 1, this.manager.getAnswers().size());
+					final Integer choice = NumberUtils.asIntBetween(content, 1, this.game.getAnswers().size());
 
 					// Message is a text and doesn't match any answers, ignore it
-					if(choice == null && !this.manager.getAnswers().stream().anyMatch(content::equalsIgnoreCase)) {
+					if(choice == null && !this.game.getAnswers().stream().anyMatch(content::equalsIgnoreCase)) {
 						return Mono.empty();
 					}
 
 					// If the user has already answered and has been warned, ignore him
-					if(this.manager.getPlayers().get(member.getId()).hasAnswered()) {
+					if(this.game.getPlayers().get(member.getId()).hasAnswered()) {
 						return Mono.empty();
 					}
 
-					final String answer = choice == null ? content : this.manager.getAnswers().get(choice - 1);
+					final String answer = choice == null ? content : this.game.getAnswers().get(choice - 1);
 
-					if(this.manager.getPlayers().containsKey(member.getId())) {
-						this.manager.hasAnswered(member.getId());
+					if(this.game.getPlayers().containsKey(member.getId())) {
+						this.game.hasAnswered(member.getId());
 						return event.getMessage().getChannel()
 								.flatMap(channel -> DiscordUtils.sendMessage(
 										String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
 												member.getUsername()), channel))
 								.then();
-					} else if(answer.equalsIgnoreCase(this.manager.getCorrectAnswer())) {
-						return this.manager.win(member).then();
+					} else if(answer.equalsIgnoreCase(this.game.getCorrectAnswer())) {
+						return this.game.win(member).then();
 					} else {
-						this.manager.hasAnswered(member.getId());
+						this.game.hasAnswered(member.getId());
 						return event.getMessage().getChannel()
 								.flatMap(channel -> DiscordUtils.sendMessage(
 										String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",

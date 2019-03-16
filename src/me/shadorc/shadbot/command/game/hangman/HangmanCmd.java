@@ -17,7 +17,7 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-public class HangmanCmd extends GameCmd<HangmanManager> {
+public class HangmanCmd extends GameCmd<HangmanGame> {
 
 	protected enum Difficulty {
 		EASY, HARD;
@@ -52,9 +52,9 @@ public class HangmanCmd extends GameCmd<HangmanManager> {
 			throw Exceptions.propagate(err);
 		}
 
-		final HangmanManager hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanManager(this, context, difficulty));
+		final HangmanGame hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
 		if(hangmanManager == null) {
-			final HangmanManager newHangmanManager = this.getManagers().get(context.getChannelId());
+			final HangmanGame newHangmanManager = this.getManagers().get(context.getChannelId());
 			newHangmanManager.start();
 			return newHangmanManager.show();
 		} else {
@@ -82,7 +82,7 @@ public class HangmanCmd extends GameCmd<HangmanManager> {
 		return new HelpBuilder(this, context)
 				.setDescription("Start a Hangman game.")
 				.addArg("difficulty", String.format("%s. The difficulty of the word to find", FormatUtils.format(Difficulty.class, "/")), true)
-				.setGains("The winner gets **%d coins** plus a bonus depending on the number of errors.", HangmanManager.MIN_GAINS)
+				.setGains("The winner gets **%d coins** plus a bonus depending on the number of errors.", HangmanGame.MIN_GAINS)
 				.build();
 	}
 }

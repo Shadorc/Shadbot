@@ -1,24 +1,17 @@
 package me.shadorc.shadbot.command.game.roulette;
 
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
-import reactor.core.publisher.Mono;
+import me.shadorc.shadbot.core.game.Player;
 
-public class RoulettePlayer {
+public class RoulettePlayer extends Player {
 
-	private final Snowflake userId;
 	private final int bet;
 	private final String place;
 
 	public RoulettePlayer(Snowflake userId, int bet, String place) {
-		this.userId = userId;
+		super(userId);
 		this.bet = bet;
 		this.place = place;
-	}
-
-	public Snowflake getUserId() {
-		return userId;
 	}
 
 	public int getBet() {
@@ -27,11 +20,6 @@ public class RoulettePlayer {
 
 	public String getPlace() {
 		return place;
-	}
-
-	public Mono<String> getUsername(DiscordClient client) {
-		return client.getUserById(this.userId)
-				.map(User::getUsername);
 	}
 
 }

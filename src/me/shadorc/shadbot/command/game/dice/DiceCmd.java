@@ -15,7 +15,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
-public class DiceCmd extends GameCmd<DiceManager> {
+public class DiceCmd extends GameCmd<DiceGame> {
 
 	protected static final float MULTIPLIER = 4.5f;
 	private static final int MAX_BET = 250_000;
@@ -49,7 +49,7 @@ public class DiceCmd extends GameCmd<DiceManager> {
 						.then();
 			}
 
-			final DiceManager diceManager = this.getManagers().get(context.getChannelId());
+			final DiceGame diceManager = this.getManagers().get(context.getChannelId());
 
 			if(diceManager.getPlayers().containsKey(context.getAuthorId())) {
 				return context.getChannel()
@@ -76,7 +76,7 @@ public class DiceCmd extends GameCmd<DiceManager> {
 			}
 
 			Utils.requireBet(context.getMember(), Integer.toString(diceManager.getBet()), MAX_BET);
-			diceManager.addPlayerIfAbsent(context.getAuthorId(), number);
+			diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));
 			return diceManager.show();
 		}
 		// A game is not already started...
@@ -87,9 +87,9 @@ public class DiceCmd extends GameCmd<DiceManager> {
 			}
 
 			final Integer bet = Utils.requireBet(context.getMember(), args.get(1), MAX_BET);
-			final DiceManager diceManager = this.getManagers().computeIfAbsent(context.getChannelId(),
-					ignored -> new DiceManager(this, context, bet));
-			diceManager.addPlayerIfAbsent(context.getAuthorId(), number);
+			final DiceGame diceManager = this.getManagers().computeIfAbsent(context.getChannelId(),
+					ignored -> new DiceGame(this, context, bet));
+			diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));
 			diceManager.start();
 			return diceManager.show();
 		}

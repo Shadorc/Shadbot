@@ -8,7 +8,7 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 
-public abstract class GameCmd<T extends GameManager> extends BaseCmd {
+public abstract class GameCmd<T extends Game> extends BaseCmd {
 
 	private final Map<Snowflake, T> managers;
 

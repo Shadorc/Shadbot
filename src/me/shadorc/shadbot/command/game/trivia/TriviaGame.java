@@ -5,9 +5,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Member;
@@ -20,7 +18,7 @@ import me.shadorc.shadbot.api.trivia.TriviaResult;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
-import me.shadorc.shadbot.core.game.GameManager;
+import me.shadorc.shadbot.core.game.MultiplayerGame;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.object.Emoji;
@@ -33,19 +31,18 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-public class TriviaManager extends GameManager {
+public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
 	protected static final int MIN_GAINS = 100;
 	private static final int MAX_BONUS = 100;
 
 	private final TriviaResult trivia;
-	private final Map<Snowflake, TriviaPlayer> players;
 	private final List<String> answers;
 
 	private long startTime;
 
 	// Trivia API doc : https://opentdb.com/api_config.php
-	public TriviaManager(GameCmd<TriviaManager> gameCmd, Context context, Integer categoryId) {
+	public TriviaGame(GameCmd<TriviaGame> gameCmd, Context context, Integer categoryId) {
 		super(gameCmd, context, Duration.ofSeconds(30));
 
 		try {
@@ -64,8 +61,6 @@ public class TriviaManager extends GameManager {
 		} else {
 			this.answers.addAll(List.of("True", "False"));
 		}
-
-		this.players = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -118,15 +113,11 @@ public class TriviaManager extends GameManager {
 	}
 
 	public void hasAnswered(Snowflake userId) {
-		if(this.players.containsKey(userId)) {
-			this.players.get(userId).setAnswered(true);
+		if(this.getPlayers().containsKey(userId)) {
+			this.getPlayers().get(userId).setAnswered(true);
 		} else {
-			this.players.put(userId, new TriviaPlayer(userId));
+			this.addPlayerIfAbsent(new TriviaPlayer(userId));
 		}
-	}
-
-	public Map<Snowflake, TriviaPlayer> getPlayers() {
-		return Collections.unmodifiableMap(this.players);
 	}
 
 	public List<String> getAnswers() {

@@ -10,11 +10,11 @@ import reactor.core.publisher.Mono;
 
 public class HangmanInputs extends Inputs {
 
-	private final HangmanManager manager;
+	private final HangmanGame game;
 
-	public HangmanInputs(DiscordClient client, HangmanManager manager) {
-		super(client, manager.getDuration());
-		this.manager = manager;
+	public HangmanInputs(DiscordClient client, HangmanGame game) {
+		super(client, game.getDuration());
+		this.game = game;
 	}
 
 	@Override
@@ -23,23 +23,23 @@ public class HangmanInputs extends Inputs {
 			return Mono.just(false);
 		}
 
-		if(!event.getMessage().getChannelId().equals(this.manager.getContext().getChannelId())) {
+		if(!event.getMessage().getChannelId().equals(this.game.getContext().getChannelId())) {
 			return Mono.just(false);
 		}
 
 		final Member member = event.getMember().get();
-		return this.manager.isCancelMessage(event.getMessage())
-				.map(isCancelCmd -> isCancelCmd || this.manager.getContext().getAuthorId().equals(member.getId()));
+		return this.game.isCancelMessage(event.getMessage())
+				.map(isCancelCmd -> isCancelCmd || this.game.getContext().getAuthorId().equals(member.getId()));
 	}
 
 	@Override
 	public boolean takeEventWile(MessageCreateEvent ignored) {
-		return this.manager.isScheduled();
+		return this.game.isScheduled();
 	}
 
 	@Override
 	public Mono<Void> processEvent(MessageCreateEvent event) {
-		return this.manager.isCancelMessage(event.getMessage())
+		return this.game.isCancelMessage(event.getMessage())
 				.flatMap(isCancelMsg -> {
 					final Member member = event.getMember().get();
 					if(isCancelMsg) {
@@ -47,7 +47,7 @@ public class HangmanInputs extends Inputs {
 								.flatMap(channel -> DiscordUtils.sendMessage(
 										String.format(Emoji.CHECK_MARK + " Hangman game cancelled by **%s**.",
 												member.getUsername()), channel))
-								.then(Mono.fromRunnable(this.manager::stop));
+								.then(Mono.fromRunnable(this.game::stop));
 					}
 
 					final String content = event.getMessage().getContent().get().toLowerCase().trim();
@@ -58,11 +58,11 @@ public class HangmanInputs extends Inputs {
 					}
 
 					if(content.length() == 1
-							&& !this.manager.getRateLimiter().isLimitedAndWarn(this.manager.getContext().getChannelId(), this.manager.getContext().getMember())) {
-						return this.manager.checkLetter(content);
-					} else if(content.length() == this.manager.getWord().length()
-							&& !this.manager.getRateLimiter().isLimitedAndWarn(this.manager.getContext().getChannelId(), this.manager.getContext().getMember())) {
-						return this.manager.checkWord(content);
+							&& !this.game.getRateLimiter().isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
+						return this.game.checkLetter(content);
+					} else if(content.length() == this.game.getWord().length()
+							&& !this.game.getRateLimiter().isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
+						return this.game.checkWord(content);
 					}
 
 					return Mono.empty();

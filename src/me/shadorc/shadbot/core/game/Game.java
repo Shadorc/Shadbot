@@ -13,7 +13,7 @@ import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
-public abstract class GameManager {
+public abstract class Game {
 
 	private final GameCmd<?> gameCmd;
 	private final Context context;
@@ -21,7 +21,7 @@ public abstract class GameManager {
 	private final AtomicBoolean isScheduled;
 	private Disposable scheduledTask;
 
-	public GameManager(GameCmd<?> gameCmd, Context context, Duration duration) {
+	public Game(GameCmd<?> gameCmd, Context context, Duration duration) {
 		this.gameCmd = gameCmd;
 		this.context = context;
 		this.duration = duration;

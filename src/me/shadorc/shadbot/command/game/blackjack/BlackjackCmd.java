@@ -12,7 +12,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
-public class BlackjackCmd extends GameCmd<BlackjackManager> {
+public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
 	private static final int MAX_BET = 250_000;
 
@@ -26,14 +26,14 @@ public class BlackjackCmd extends GameCmd<BlackjackManager> {
 
 		final Integer bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
 
-		final BlackjackManager blackjackManager = this.getManagers().computeIfAbsent(context.getChannelId(),
+		final BlackjackGame blackjackManager = this.getManagers().computeIfAbsent(context.getChannelId(),
 				channelId -> {
-					final BlackjackManager manager = new BlackjackManager(this, context);
-					manager.start();
-					return manager;
+					final BlackjackGame game = new BlackjackGame(this, context);
+					game.start();
+					return game;
 				});
 
-		if(blackjackManager.addPlayerIfAbsent(context.getAuthorId(), context.getUsername(), bet)) {
+		if(blackjackManager.addPlayerIfAbsent(new BlackjackPlayer(context.getAuthorId(), bet))) {
 			if(blackjackManager.allPlayersStanding()) {
 				return blackjackManager.end();
 			}

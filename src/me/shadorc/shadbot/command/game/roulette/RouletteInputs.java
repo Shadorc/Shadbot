@@ -10,11 +10,11 @@ import reactor.core.publisher.Mono;
 
 public class RouletteInputs extends Inputs {
 
-	private final RouletteManager manager;
+	private final RouletteGame game;
 
-	public RouletteInputs(DiscordClient client, RouletteManager manager) {
-		super(client, manager.getDuration());
-		this.manager = manager;
+	public RouletteInputs(DiscordClient client, RouletteGame game) {
+		super(client, game.getDuration());
+		this.game = game;
 	}
 
 	@Override
@@ -23,29 +23,29 @@ public class RouletteInputs extends Inputs {
 			return Mono.just(false);
 		}
 
-		if(!event.getMessage().getChannelId().equals(this.manager.getContext().getChannelId())) {
+		if(!event.getMessage().getChannelId().equals(this.game.getContext().getChannelId())) {
 			return Mono.just(false);
 		}
 
 		final Member member = event.getMember().get();
-		return this.manager.isCancelMessage(event.getMessage())
-				.map(isCancelCmd -> isCancelCmd || this.manager.getPlayers().containsKey(member.getId()));
+		return this.game.isCancelMessage(event.getMessage())
+				.map(isCancelCmd -> isCancelCmd || this.game.getPlayers().containsKey(member.getId()));
 	}
 
 	@Override
 	public boolean takeEventWile(MessageCreateEvent ignored) {
-		return this.manager.isScheduled();
+		return this.game.isScheduled();
 	}
 
 	@Override
 	public Mono<Void> processEvent(MessageCreateEvent event) {
 		return Mono.justOrEmpty(event.getMember())
-				.filterWhen(ignored -> this.manager.isCancelMessage(event.getMessage()))
+				.filterWhen(ignored -> this.game.isCancelMessage(event.getMessage()))
 				.flatMap(member -> event.getMessage().getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(
 								String.format(Emoji.CHECK_MARK + " Roulette game cancelled by **%s**.",
 										member.getUsername()), channel))
-						.then(Mono.fromRunnable(this.manager::stop)));
+						.then(Mono.fromRunnable(this.game::stop)));
 	}
 
 }

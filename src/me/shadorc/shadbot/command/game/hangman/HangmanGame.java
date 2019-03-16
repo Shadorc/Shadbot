@@ -13,7 +13,7 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.core.game.GameManager;
+import me.shadorc.shadbot.core.game.Game;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
@@ -25,7 +25,7 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
 
-public class HangmanManager extends GameManager {
+public class HangmanGame extends Game {
 
 	private static final List<String> IMG_LIST = List.of(
 			getImageUrl("8/8b", 0),
@@ -47,7 +47,7 @@ public class HangmanManager extends GameManager {
 	private long startTime;
 	private int failCount;
 
-	public HangmanManager(HangmanCmd gameCmd, Context context, Difficulty difficulty) {
+	public HangmanGame(HangmanCmd gameCmd, Context context, Difficulty difficulty) {
 		super(gameCmd, context, Duration.ofMinutes(3));
 		this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(1));
 		this.messageId = new AtomicLong(-1);

@@ -1,23 +1,23 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
 import discord4j.common.json.EmbedFieldEntity;
+import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.core.game.Player;
 import me.shadorc.shadbot.object.casino.Card;
 import me.shadorc.shadbot.object.casino.Hand;
+import reactor.core.publisher.Mono;
 
-public class BlackjackPlayer {
+public class BlackjackPlayer extends Player {
 
-	private final Snowflake userId;
-	private final String username;
 	private final int bet;
 	private final Hand hand;
 
 	private boolean isDoubleDown;
 	private boolean isStanding;
 
-	public BlackjackPlayer(Snowflake userId, String username, int bet) {
-		this.userId = userId;
-		this.username = username;
+	public BlackjackPlayer(Snowflake userId, int bet) {
+		super(userId);
 		this.bet = bet;
 		this.hand = new Hand();
 		this.isDoubleDown = false;
@@ -42,24 +42,19 @@ public class BlackjackPlayer {
 		this.stand();
 	}
 
-	public EmbedFieldEntity format() {
-		final StringBuilder name = new StringBuilder(String.format("%s's hand", this.getUsername()));
-		if(this.isStanding()) {
-			name.append(" (Stand)");
-		}
-		if(this.isDoubleDown()) {
-			name.append(" (Double down)");
-		}
+	public Mono<EmbedFieldEntity> format(DiscordClient client) {
+		return this.getUsername(client)
+				.map(username -> {
+					final StringBuilder name = new StringBuilder(String.format("%s's hand", username));
+					if(this.isStanding()) {
+						name.append(" (Stand)");
+					}
+					if(this.isDoubleDown()) {
+						name.append(" (Double down)");
+					}
 
-		return new EmbedFieldEntity(name.toString(), this.hand.format(), true);
-	}
-
-	public Snowflake getUserId() {
-		return this.userId;
-	}
-
-	public String getUsername() {
-		return this.username;
+					return new EmbedFieldEntity(name.toString(), this.hand.format(), true);
+				});
 	}
 
 	public int getBet() {

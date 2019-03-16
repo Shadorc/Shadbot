@@ -15,7 +15,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
-public class RouletteCmd extends GameCmd<RouletteManager> {
+public class RouletteCmd extends GameCmd<RouletteGame> {
 
 	public enum Place {
 		RED, BLACK, ODD, EVEN, LOW, HIGH;
@@ -40,14 +40,14 @@ public class RouletteCmd extends GameCmd<RouletteManager> {
 					place, FormatUtils.format(Place.values(), value -> String.format("**%s**", StringUtils.toLowerCase(value)), ", "))));
 		}
 
-		final RouletteManager rouletteManager = this.getManagers().computeIfAbsent(context.getChannelId(),
+		final RouletteGame rouletteManager = this.getManagers().computeIfAbsent(context.getChannelId(),
 				channelId -> {
-					final RouletteManager manager = new RouletteManager(this, context);
-					manager.start();
-					return manager;
+					final RouletteGame game = new RouletteGame(this, context);
+					game.start();
+					return game;
 				});
 
-		if(rouletteManager.addPlayerIfAbsent(context.getAuthorId(), bet, place)) {
+		if(rouletteManager.addPlayerIfAbsent(new RoulettePlayer(context.getAuthorId(), bet, place))) {
 			return rouletteManager.show();
 		} else {
 			return context.getChannel()

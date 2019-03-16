@@ -56,9 +56,9 @@ public class PollCmd extends BaseCmd {
 				.doOnNext(permission -> {
 					final PollManager pollManager = this.managers.computeIfAbsent(context.getChannelId(),
 							channelId -> {
-								final PollManager manager = this.createPoll(context);
-								manager.start();
-								return manager;
+								final PollManager game = this.createPoll(context);
+								game.start();
+								return game;
 							});
 
 					if(this.isCancelMsg(context, permission, pollManager)) {

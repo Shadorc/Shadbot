@@ -20,7 +20,7 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-public class TriviaCmd extends GameCmd<TriviaManager> {
+public class TriviaCmd extends GameCmd<TriviaGame> {
 
 	private static final String CATEGORY_URL = "https://opentdb.com/api_category.php";
 
@@ -69,7 +69,7 @@ public class TriviaCmd extends GameCmd<TriviaManager> {
 							context.getUsername()), channel))
 					.then();
 		} else {
-			final TriviaManager triviaManager = new TriviaManager(this, context, categoryId);
+			final TriviaGame triviaManager = new TriviaGame(this, context, categoryId);
 			this.getManagers().put(context.getChannelId(), triviaManager);
 			triviaManager.start();
 			return triviaManager.show();
@@ -85,7 +85,7 @@ public class TriviaCmd extends GameCmd<TriviaManager> {
 				.addField("Category", String.format("Use `%s%s categories` to see the list of categories",
 						context.getPrefix(), this.getName()), false)
 				.setGains("The winner gets **%d coins** plus a bonus depending on his speed to answer.",
-						TriviaManager.MIN_GAINS)
+						TriviaGame.MIN_GAINS)
 				.build();
 	}
 }
