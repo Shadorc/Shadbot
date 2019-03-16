@@ -32,7 +32,6 @@ public class RouletteCmd extends GameCmd<RouletteManager> {
 		final List<String> args = context.requireArgs(2);
 
 		final int bet = Utils.requireBet(context.getMember(), args.get(0), MAX_BET);
-
 		final String place = args.get(1).toLowerCase();
 
 		// Match [1-36], red, black, odd, even, high or low
@@ -48,7 +47,7 @@ public class RouletteCmd extends GameCmd<RouletteManager> {
 					return manager;
 				});
 
-		if(rouletteManager.addPlayer(context.getAuthorId(), bet, place)) {
+		if(rouletteManager.addPlayerIfAbsent(context.getAuthorId(), bet, place)) {
 			return rouletteManager.show();
 		} else {
 			return context.getChannel()

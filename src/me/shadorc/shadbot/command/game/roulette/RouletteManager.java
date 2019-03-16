@@ -1,13 +1,14 @@
 package me.shadorc.shadbot.command.game.roulette;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
@@ -17,49 +18,55 @@ import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.core.game.GameManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptor;
-import me.shadorc.shadbot.listener.interceptor.MessageInterceptorManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.UpdateableMessage;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
-public class RouletteManager extends GameManager implements MessageInterceptor {
+public class RouletteManager extends GameManager {
 
 	private static final List<Integer> RED_NUMS = List.of(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36);
+	private static final Map<Place, Predicate<Integer>> TESTS = Map.of(
+			Place.RED, RED_NUMS::contains,
+			Place.BLACK, Predicate.not(RED_NUMS::contains),
+			Place.LOW, num -> NumberUtils.isInRange(num, 1, 19),
+			Place.HIGH, num -> NumberUtils.isInRange(num, 19, 37),
+			Place.EVEN, num -> num % 2 == 0,
+			Place.ODD, num -> num % 2 != 0);
 
-	// User ID, Tuple2<Bet, Place>
-	private final ConcurrentHashMap<Snowflake, Tuple2<Integer, String>> playersPlace;
+	private final Map<Snowflake, RoulettePlayer> players;
 	private final UpdateableMessage updateableMessage;
 
+	private long startTime;
 	private String results;
 
 	public RouletteManager(GameCmd<RouletteManager> gameCmd, Context context) {
 		super(gameCmd, context, Duration.ofSeconds(30));
-		this.playersPlace = new ConcurrentHashMap<>();
+		this.players = new ConcurrentHashMap<>();
 		this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
 	}
 
 	@Override
 	public void start() {
-		this.schedule(this.spin());
-		MessageInterceptorManager.addInterceptor(this.getContext().getChannelId(), this);
+		this.schedule(this.end());
+		this.startTime = System.currentTimeMillis();
+		new RouletteInputs(this.getContext().getClient(), this).subscribe();
 	}
 
 	@Override
 	public Mono<Void> show() {
-		return Flux.fromIterable(this.playersPlace.keySet())
-				.flatMap(userId -> this.getContext().getClient().getUserById(userId))
+		return Flux.fromIterable(this.players.values())
+				.flatMap(player -> Mono.zip(Mono.just(player),
+						player.getUsername(this.getContext().getClient())))
 				.collectList()
-				.map(users -> EmbedUtils.getDefaultEmbed()
+				.map(list -> EmbedUtils.getDefaultEmbed()
 						.andThen(embed -> {
 							embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
 									.setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
@@ -67,60 +74,55 @@ public class RouletteManager extends GameManager implements MessageInterceptor {
 											+ "%n%n**place** is a `number between 1 and 36`, %s",
 											this.getContext().getPrefix(), this.getContext().getCommandName(),
 											FormatUtils.format(Place.values(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", ")))
-									.addField("Player (Bet)", FormatUtils.format(users,
-											user -> String.format("**%s** (%s)", user.getUsername(), FormatUtils.coins(this.playersPlace.get(user.getId()).getT1())), "\n"), true)
-									.addField("Place", this.playersPlace.values().stream().map(Tuple2::getT2).collect(Collectors.joining("\n")), true);
+									.addField("Player (Bet)", FormatUtils.format(list,
+											tuple -> String.format("**%s** (%s)", tuple.getT2(), FormatUtils.coins(tuple.getT1().getBet())), "\n"), true)
+									.addField("Place", String.join("\n", this.players.values().stream().map(RoulettePlayer::getPlace).collect(Collectors.toList())), true);
 
 							if(this.results != null) {
 								embed.addField("Results", this.results, false);
 							}
 
 							if(this.isScheduled()) {
-								embed.setFooter(String.format("You have %d seconds to make your bets.", this.getDuration().toSeconds()), null);
+								final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+								embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
+										remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
 							} else {
-								embed.setFooter("Finished", null);
+								embed.setFooter("Finished.", null);
 							}
 						}))
 				.flatMap(this.updateableMessage::send)
 				.then();
 	}
 
-	private Mono<Void> spin() {
+	private Mono<Void> end() {
 		final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
-		return Flux.fromIterable(this.playersPlace.keySet())
-				.flatMap(this.getContext().getClient()::getUserById)
-				.map(user -> {
-					final int bet = this.playersPlace.get(user.getId()).getT1();
-					final String place = this.playersPlace.get(user.getId()).getT2();
-					final Place placeEnum = Utils.parseEnum(Place.class, place);
-
-					final Map<Place, Boolean> testsMap = Map.of(
-							Place.RED, RED_NUMS.contains(winningPlace),
-							Place.BLACK, !RED_NUMS.contains(winningPlace),
-							Place.LOW, NumberUtils.isInRange(winningPlace, 1, 19),
-							Place.HIGH, NumberUtils.isInRange(winningPlace, 19, 37),
-							Place.EVEN, winningPlace % 2 == 0,
-							Place.ODD, winningPlace % 2 != 0);
+		return Flux.fromIterable(this.players.values())
+				.flatMap(player -> Mono.zip(Mono.just(player),
+						player.getUsername(this.getContext().getClient())))
+				.map(tuple -> {
+					final RoulettePlayer player = tuple.getT1();
+					final String username = tuple.getT2();
+					final Place placeEnum = Utils.parseEnum(Place.class, player.getPlace());
 
 					int multiplier = 0;
-					if(place.equals(Integer.toString(winningPlace))) {
+					if(player.getPlace().equals(Integer.toString(winningPlace))) {
 						multiplier = 36;
-					} else if(placeEnum != null && testsMap.get(placeEnum)) {
+					} else if(placeEnum != null && TESTS.get(placeEnum).test(winningPlace)) {
 						multiplier = 2;
 					} else {
 						multiplier = -1;
 					}
 
-					final int gains = bet * multiplier;
-					Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), user.getId()).addCoins(gains);
+					final int gains = player.getBet() * multiplier;
+					Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), player.getUserId()).addCoins(gains);
 
 					if(gains > 0) {
 						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
-						return String.format("**%s** (Gains: **%s**)", user.getUsername(), FormatUtils.coins(gains));
+						return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains));
 					} else {
 						StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), Math.abs(gains));
 						Shadbot.getLottery().addToJackpot(Math.abs(gains));
-						return String.format("**%s** (Losses: **%s**)", user.getUsername(), FormatUtils.coins(Math.abs(gains)));
+						return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(Math.abs(gains)));
 					}
 				})
 				.collectSortedList()
@@ -132,16 +134,12 @@ public class RouletteManager extends GameManager implements MessageInterceptor {
 				.then(Mono.fromRunnable(this::stop));
 	}
 
-	/**
-	 * @return true if the user was not participating, false otherwise
-	 */
-	protected boolean addPlayer(Snowflake userId, Integer bet, String place) {
-		return this.playersPlace.putIfAbsent(userId, Tuples.of(bet, place)) == null;
+	protected boolean addPlayerIfAbsent(Snowflake userId, Integer bet, String place) {
+		return this.players.putIfAbsent(userId, new RoulettePlayer(userId, bet, place)) == null;
 	}
 
-	@Override
-	public Mono<Boolean> isIntercepted(MessageCreateEvent event) {
-		return this.cancelOrDo(event.getMessage(), Mono.empty());
+	protected Map<Snowflake, RoulettePlayer> getPlayers() {
+		return Collections.unmodifiableMap(this.players);
 	}
 
 }
