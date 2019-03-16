@@ -7,7 +7,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.Disposable;
@@ -61,25 +60,6 @@ public abstract class Game {
 			this.scheduledTask.dispose();
 			this.isScheduled.set(false);
 		}
-	}
-
-	/**
-	 * @param message - the {@link Message} to check
-	 * @param mono - the {@link Mono} to execute if the {@link Message} is not a cancel command
-	 * @return A {@link Mono} that returns true if the message is intercepted, false otherwise
-	 */
-	public Mono<Boolean> cancelOrDo(Message message, Mono<Boolean> mono) {
-		return Mono.just(message)
-				.filterWhen(this::isCancelMessage)
-				.map(Message::getAuthor)
-				.flatMap(Mono::justOrEmpty)
-				.map(User::getUsername)
-				.flatMap(username -> this.context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Game cancelled by **%s**.", username), channel)))
-				.flatMap(ignored -> Mono.fromRunnable(this::stop))
-				// The message is intercepted, return true
-				.map(ignored -> Boolean.TRUE)
-				.switchIfEmpty(mono);
 	}
 
 	/**
