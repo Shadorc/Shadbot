@@ -28,65 +28,70 @@ public class DiceCmd extends GameCmd<DiceManager> {
 	public Mono<Void> execute(Context context) {
 		final List<String> args = context.requireArgs(1, 2);
 
-		// This value indicates if the user is trying to join or create a game
+		// This boolean indicates if the user is trying to join or to create a game
 		final boolean isJoining = args.size() == 1;
 
-		final String numStr = args.get(isJoining ? 0 : 1);
-		final Integer num = NumberUtils.asIntBetween(numStr, 1, 6);
-		if(num == null) {
+		final Integer number = NumberUtils.asIntBetween(args.get(0), 1, 6);
+		if(number == null) {
 			return Mono.error(new CommandException(String.format("`%s` is not a valid number, must be between 1 and 6.",
-					numStr)));
+					args.get(0))));
 		}
 
-		DiceManager diceManager = this.getManagers().get(context.getChannelId());
-
-		// The user tries to join a game and no game are currently playing
-		if(isJoining && diceManager == null) {
-			return Mono.error(new MissingArgumentException());
-		}
-
-		final String betStr = isJoining ? Integer.toString(diceManager.getBet()) : args.get(0);
-		final Integer bet = Utils.requireBet(context.getMember(), betStr, MAX_BET);
-
-		if(!isJoining) {
-			// The user tries to start a game and it has already been started
-			if(diceManager != null) {
+		// A game is already started...
+		if(this.getManagers().containsKey(context.getChannelId())) {
+			// ... and the user is trying to create a game
+			if(!isJoining) {
 				return context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A **Dice Game** has already been started. "
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO
+								+ " (**%s**) A **Dice Game** has already been started. "
 								+ "Use `%s%s <num>` to join it.",
 								context.getUsername(), context.getPrefix(), this.getName()), channel))
 						.then();
 			}
 
-			diceManager = new DiceManager(this, context, bet);
-		}
+			final DiceManager diceManager = this.getManagers().get(context.getChannelId());
 
-		if(diceManager.getPlayerCount() == 6) {
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) Sorry, there are already 6 players.",
-							context.getUsername()), channel))
-					.then();
-		}
+			if(diceManager.getPlayers().containsKey(context.getAuthorId())) {
+				return context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO
+								+ " (**%s**) You're already participating.",
+								context.getUsername()), channel))
+						.then();
+			}
 
-		if(diceManager.isNumBet(num)) {
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(
-							String.format(Emoji.GREY_EXCLAMATION + " (**%s**) This number has already been bet, please try with another one.",
-									context.getUsername()), channel))
-					.then();
-		}
+			if(diceManager.getPlayers().size() == 6) {
+				return context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION
+								+ " (**%s**) Sorry, there are already 6 players.",
+								context.getUsername()), channel))
+						.then();
+			}
 
-		if(this.getManagers().putIfAbsent(context.getChannelId(), diceManager) == null) {
-			diceManager.start();
-		}
+			if(diceManager.getPlayers().values().stream().anyMatch(player -> player.getNumber() == number)) {
+				return context.getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION
+								+ " (**%s**) This number has already been bet, please try with another one.",
+								context.getUsername()), channel))
+						.then();
+			}
 
-		if(diceManager.addPlayerIfAbsent(context.getAuthorId(), num)) {
+			Utils.requireBet(context.getMember(), Integer.toString(diceManager.getBet()), MAX_BET);
+			diceManager.addPlayerIfAbsent(context.getAuthorId(), number);
 			return diceManager.show();
-		} else {
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-							context.getUsername()), channel))
-					.then();
+		}
+		// A game is not already started...
+		else {
+			// ... and the user tries to join a game
+			if(isJoining) {
+				return Mono.error(new MissingArgumentException());
+			}
+
+			final Integer bet = Utils.requireBet(context.getMember(), args.get(1), MAX_BET);
+			final DiceManager diceManager = this.getManagers().computeIfAbsent(context.getChannelId(),
+					ignored -> new DiceManager(this, context, bet));
+			diceManager.addPlayerIfAbsent(context.getAuthorId(), number);
+			diceManager.start();
+			return diceManager.show();
 		}
 	}
 
@@ -94,8 +99,8 @@ public class DiceCmd extends GameCmd<DiceManager> {
 	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Start a dice game with a common bet.")
-				.addArg("bet", false)
 				.addArg("num", "number between 1 and 6\nYou can't bet on a number that has already been chosen by another player.", false)
+				.addArg("bet", false)
 				.setGains("The winner gets the prize pool plus %.1f times his bet", MULTIPLIER)
 				.build();
 	}
