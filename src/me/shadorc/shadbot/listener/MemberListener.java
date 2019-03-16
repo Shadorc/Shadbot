@@ -1,11 +1,11 @@
 package me.shadorc.shadbot.listener;
 
+import java.util.List;
 import java.util.Optional;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
@@ -23,14 +23,15 @@ public class MemberListener {
 		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId());
 		return MemberListener.sendAutoMsg(event.getClient(), event.getMember(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage())
 				// Add auto-role(s) to the new member
-				.and(event.getGuild()
-						.flatMap(guild -> Mono.justOrEmpty(event.getClient().getSelfId())
-								.flatMap(selfId -> guild.getMemberById(selfId)))
-						.flatMap(Member::getBasePermissions)
-						.filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
-						.flatMapMany(ignored -> Flux.fromIterable(dbGuild.getAutoRoles()))
-						.map(Snowflake::of)
-						.flatMap(roleId -> event.getMember().addRole(roleId)));
+				.and(Mono.zip(event.getGuild(), Mono.justOrEmpty(event.getClient().getSelfId()))
+						.flatMap(tuple -> tuple.getT1().getMemberById(tuple.getT2()))
+						.flatMapMany(self -> self.getBasePermissions()
+								.filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
+								.flatMapMany(ignored -> Flux.fromIterable(dbGuild.getAutoRoles())
+										.map(Snowflake::of)
+										.flatMap(roleId -> event.getClient().getRoleById(event.getGuildId(), roleId))
+										.filterWhen(role -> DiscordUtils.hasHigherRoles(self, List.of(role)))
+										.flatMap(role -> event.getMember().addRole(role.getId())))));
 
 	}
 
