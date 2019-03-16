@@ -4,6 +4,8 @@ import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import me.shadorc.shadbot.listener.interceptor.Inputs;
+import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Mono;
 
 public class DiceInputs extends Inputs {
@@ -37,7 +39,13 @@ public class DiceInputs extends Inputs {
 
 	@Override
 	public Mono<Void> processEvent(MessageCreateEvent event) {
-		return Mono.empty();
+		return Mono.justOrEmpty(event.getMember())
+				.filterWhen(ignored -> this.manager.isCancelMessage(event.getMessage()))
+				.flatMap(member -> event.getMessage().getChannel()
+						.flatMap(channel -> DiscordUtils.sendMessage(
+								String.format(Emoji.CHECK_MARK + " Dice game cancelled by **%s**.", 
+										member.getUsername()), channel))
+						.then(Mono.fromRunnable(this.manager::stop)));
 	}
 
 }
