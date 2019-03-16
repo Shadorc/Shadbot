@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -82,7 +83,8 @@ public class BlackjackManager extends GameManager {
 
 					if(this.isScheduled()) {
 						final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-						embed.setFooter(String.format("This game will end automatically in %d seconds.", remainingDuration.toSeconds()), null);
+						embed.setFooter(String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
+								remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
 					} else {
 						embed.setFooter("Finished", null);
 					}
@@ -154,7 +156,7 @@ public class BlackjackManager extends GameManager {
 	}
 
 	public Map<Snowflake, BlackjackPlayer> getPlayers() {
-		return this.players;
+		return Collections.unmodifiableMap(this.players);
 	}
 
 	public RateLimiter getRateLimiter() {
@@ -162,7 +164,7 @@ public class BlackjackManager extends GameManager {
 	}
 
 	public Map<String, Consumer<BlackjackPlayer>> getActions() {
-		return this.actions;
+		return Collections.unmodifiableMap(this.actions);
 	}
 
 }

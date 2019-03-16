@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.game.dice;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -65,7 +66,8 @@ public class DiceManager extends GameManager {
 
 							if(this.isScheduled()) {
 								final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-								embed.setFooter(String.format("You have %d seconds to make your bets.", remainingDuration.toSeconds()), null);
+								embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.", 
+										remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
 							} else {
 								embed.setFooter("Finished.", null);
 							}
@@ -112,7 +114,7 @@ public class DiceManager extends GameManager {
 	}
 
 	public Map<Snowflake, DicePlayer> getPlayers() {
-		return this.players;
+		return Collections.unmodifiableMap(this.players);
 	}
 
 }

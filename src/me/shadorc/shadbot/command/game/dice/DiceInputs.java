@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 public class DiceInputs extends Inputs {
 
-	final DiceManager manager;
+	private final DiceManager manager;
 
 	public DiceInputs(DiscordClient client, DiceManager manager) {
 		super(client, manager.getDuration());
@@ -27,7 +27,7 @@ public class DiceInputs extends Inputs {
 
 		final Member member = event.getMember().get();
 		return this.manager.isCancelMessage(event.getMessage())
-				.map(isCancelCmd -> isCancelCmd || (this.manager.getPlayers().containsKey(member.getId())));
+				.map(isCancelCmd -> isCancelCmd || this.manager.getPlayers().containsKey(member.getId()));
 	}
 
 	@Override
