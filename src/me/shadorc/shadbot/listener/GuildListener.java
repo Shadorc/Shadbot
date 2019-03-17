@@ -5,6 +5,7 @@ import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
+import me.shadorc.shadbot.music.GuildVoiceManager;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
@@ -27,6 +28,7 @@ public class GuildListener {
 			if(guildMusic != null) {
 				guildMusic.destroy();
 			}
+			GuildVoiceManager.remove(event.getGuildId());
 			Shadbot.getDatabase().removeDBGuild(event.getGuildId());
 		});
 	}
