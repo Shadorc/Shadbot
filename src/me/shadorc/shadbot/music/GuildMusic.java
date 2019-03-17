@@ -37,7 +37,6 @@ public class GuildMusic {
 	private final AtomicBoolean isWaitingForChoice;
 	private final Map<AudioLoadResultListener, Future<Void>> listeners;
 
-	private volatile VoiceConnection voiceConnection;
 	private volatile Disposable leaveTask;
 	private volatile Snowflake messageChannelId;
 	private volatile Snowflake djId;
@@ -59,10 +58,10 @@ public class GuildMusic {
 	public void joinVoiceChannel() {
 		this.client.getChannelById(voiceChannelId)
 				.cast(VoiceChannel.class)
-				.filter(ignored -> this.voiceConnection == null)
+				.filter(ignored -> !GuildVoiceManager.contains(this.guildId))
 				.flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(this.audioProvider)))
 				.doOnNext(voiceConnection -> {
-					this.voiceConnection = voiceConnection;
+					GuildVoiceManager.put(this.guildId, voiceConnection);
 					LogUtils.info("{Guild ID: %d} Voice channel joined.", this.getGuildId().asLong());
 				})
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
@@ -72,9 +71,9 @@ public class GuildMusic {
 	 * Leave the voice channel if the bot is still in and destroy this {@link GuildMusic}
 	 */
 	public void leaveVoiceChannel() {
-		if(this.voiceConnection != null) {
-			this.voiceConnection.disconnect();
-			this.voiceConnection = null;
+		final VoiceConnection connection = GuildVoiceManager.remove(this.guildId);
+		if(connection != null) {
+			connection.disconnect();
 			LogUtils.info("{Guild ID: %d} Voice channel left.", this.guildId.asLong());
 		}
 		this.destroy();
@@ -176,6 +175,14 @@ public class GuildMusic {
 		this.cancelLeave();
 		GuildMusicManager.remove(this.guildId);
 		this.trackScheduler.destroy();
+
+		// TODO: Remove
+		final VoiceConnection connection = GuildVoiceManager.remove(this.guildId);
+		if(connection != null) {
+			LogUtils.warn(this.getClient(), "Voice connection was not disconnected on GuildMusic#destroy");
+			Thread.dumpStack();
+			connection.disconnect();
+		}
 	}
 
 }
