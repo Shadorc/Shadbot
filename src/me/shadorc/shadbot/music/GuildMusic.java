@@ -167,22 +167,14 @@ public class GuildMusic {
 	}
 
 	public void destroy() {
+		this.cancelLeave();
+		GuildMusicManager.remove(this.guildId);
 		for(final Entry<AudioLoadResultListener, Future<Void>> entry : this.listeners.entrySet()) {
 			entry.getValue().cancel(true);
 			entry.getKey().terminate();
 		}
 		this.listeners.clear();
-		this.cancelLeave();
-		GuildMusicManager.remove(this.guildId);
 		this.trackScheduler.destroy();
-
-		// TODO: Remove
-		final VoiceConnection connection = GuildVoiceManager.remove(this.guildId);
-		if(connection != null) {
-			LogUtils.warn(this.getClient(), "Voice connection was not disconnected on GuildMusic#destroy");
-			Thread.dumpStack();
-			connection.disconnect();
-		}
 	}
 
 }
