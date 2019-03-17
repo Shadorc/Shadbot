@@ -10,7 +10,7 @@ public class Games {
 	private Map<String, Integer> quickplay;
 
 	public String getQuickplayWon() {
-		return this.quickplay.get("won").toString();
+		return this.quickplay.getOrDefault("won", 0).toString();
 	}
 
 }
