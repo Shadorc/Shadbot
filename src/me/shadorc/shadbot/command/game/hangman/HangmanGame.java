@@ -128,9 +128,6 @@ public class HangmanGame extends Game {
 	}
 
 	public Mono<Void> checkLetter(String chr) {
-		// Reset IDLE timer
-		this.schedule(Mono.fromRunnable(this::stop));
-
 		if(this.lettersTested.contains(chr)) {
 			return Mono.empty();
 		}
@@ -153,9 +150,6 @@ public class HangmanGame extends Game {
 	}
 
 	public Mono<Void> checkWord(String word) {
-		// Reset IDLE timer
-		this.schedule(Mono.fromRunnable(this::stop));
-
 		// If the word has been guessed
 		if(this.word.equalsIgnoreCase(word)) {
 			this.lettersTested.addAll(StringUtils.split(word, ""));
