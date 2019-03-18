@@ -1,15 +1,15 @@
 package me.shadorc.shadbot.command.admin.member;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import discord4j.core.object.audit.AuditLogEntry;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.BaseCmd;
@@ -21,9 +21,7 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public abstract class RemoveMemberCmd extends BaseCmd {
@@ -50,72 +48,66 @@ public abstract class RemoveMemberCmd extends BaseCmd {
 			return Mono.error(new MissingArgumentException());
 		}
 
-		if(mentionedUserIds.contains(context.getAuthorId())) {
+		final Snowflake mentionUserId = new ArrayList<>(mentionedUserIds).get(0);
+		if(mentionUserId.equals(context.getAuthorId())) {
 			return Mono.error(new CommandException(String.format("You cannot %s yourself.", this.getName())));
 		}
 
-		if(mentionedUserIds.contains(context.getSelfId())) {
+		if(mentionUserId.equals(context.getSelfId())) {
 			return Mono.error(new CommandException(String.format("You cannot %s me.", this.getName())));
 		}
 
-		return context.getChannel()
-				.flatMapMany(channel -> DiscordUtils.requirePermissions(channel, this.permission)
-						.then(Mono.zip(context.getMessage().getUserMentions().collectList(),
-								context.getGuild(),
-								context.getSelfAsMember()))
-						.flatMapMany(tuple -> {
-							final List<User> mentionedUsers = tuple.getT1();
-							final Guild guild = tuple.getT2();
-							final Member self = tuple.getT3();
+		final StringBuilder reason = new StringBuilder(
+				StringUtils.remove(arg, String.format("<@%d>", mentionUserId.asLong())));
+		if(reason.length() == 0) {
+			reason.append("Reason not specified.");
+		}
 
-							final StringBuilder reason = new StringBuilder();
-							final List<String> mentions = mentionedUsers.stream()
-									.map(User::getMention)
-									.collect(Collectors.toList());
-							reason.append(StringUtils.remove(arg, mentions).trim());
+		if(reason.length() > AuditLogEntry.MAX_REASON_LENGTH) {
+			return Mono.error(new CommandException(
+					String.format("Reason cannot exceed **%d characters**.", AuditLogEntry.MAX_REASON_LENGTH)));
+		}
 
-							if(reason.length() == 0) {
-								reason.append("Reason not specified.");
-							}
-
-							if(reason.length() > AuditLogEntry.MAX_REASON_LENGTH) {
-								return Flux.error(new CommandException(
-										String.format("Reason cannot exceed **%d characters**.", AuditLogEntry.MAX_REASON_LENGTH)));
-							}
-
-							return Flux.fromIterable(mentionedUsers)
-									.filter(userToRemove -> !userToRemove.isBot())
-									.flatMap(userToRemove -> userToRemove.asMember(context.getGuildId()))
-									.concatMap(memberToRemove -> memberToRemove.getPrivateChannel()
-											.cast(MessageChannel.class)
-											.filterWhen(ignored -> self.isHigher(memberToRemove))
-											.switchIfEmpty(DiscordUtils.sendMessage(
-													String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in the role hierarchy than me.",
-															context.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
-													.then(Mono.empty()))
-											.filterWhen(ignored -> context.getMember().isHigher(memberToRemove))
-											.switchIfEmpty(DiscordUtils.sendMessage(
-													String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher in the role hierarchy than you.",
-															context.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
-													.then(Mono.empty()))
-											.flatMap(privateChannel -> DiscordUtils.sendMessage(
-													String.format(Emoji.INFO + " You were %s from the server **%s** by **%s**. Reason: `%s`",
-															this.conjugatedVerb, guild.getName(), context.getUsername(), reason), privateChannel))
-											.switchIfEmpty(DiscordUtils.sendMessage(
-													String.format(Emoji.WARNING + " (**%s**) I could not send a message to **%s**.",
-															context.getUsername(), memberToRemove.getUsername()), channel))
-											.then(this.action(memberToRemove, reason.toString()))
-											.thenReturn(memberToRemove));
-						})
-						.map(Member::getUsername)
-						.collectList()
-						.flatMap(memberUsernames -> DiscordUtils.sendMessage(
-								String.format(Emoji.INFO + " **%s** %s %s.",
-										context.getUsername(),
-										this.conjugatedVerb,
-										FormatUtils.format(memberUsernames, username -> String.format("**%s**", username), ", ")),
-								channel)))
+		return Mono.zip(context.getGuild(), context.getChannel(), context.getSelfAsMember(),
+				context.getClient().getMemberById(context.getGuildId(), mentionUserId))
+				.filterWhen(tuple -> DiscordUtils.requirePermissions(tuple.getT2(), this.permission).thenReturn(true))
+				.filterWhen(tuple -> this.canInteract(tuple.getT2(), tuple.getT3(), context.getMember(), tuple.getT4()))
+				.flatMap(tuple -> this.sendMessage(context, tuple.getT1(), tuple.getT2(), tuple.getT4(), reason.toString())
+						.then(this.action(tuple.getT4(), reason.toString()))
+						.then(DiscordUtils.sendMessage(String.format(Emoji.INFO + " **%s** %s %s.",
+								context.getUsername(), this.conjugatedVerb,
+								String.format("**%s**", tuple.getT4().getUsername())),
+								tuple.getT2())))
 				.then();
+	}
+
+	private Mono<Boolean> canInteract(MessageChannel channel, Member self, Member author, Member member) {
+		return Mono.zip(self.isHigher(member), author.isHigher(member))
+				.flatMap(tuple -> {
+					if(!tuple.getT1()) {
+						return DiscordUtils.sendMessage(
+								String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in the role hierarchy than me.",
+										author.getUsername(), this.getName(), member.getUsername()), channel)
+								.thenReturn(false);
+					}
+					if(!tuple.getT2()) {
+						return DiscordUtils.sendMessage(
+								String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher in the role hierarchy than you.",
+										author.getUsername(), this.getName(), member.getUsername()), channel)
+								.thenReturn(false);
+					}
+					return Mono.just(true);
+				});
+	}
+
+	private Mono<Message> sendMessage(Context context, Guild guild, MessageChannel channel, Member member, String reason) {
+		return member.getPrivateChannel()
+				.flatMap(privateChannel -> DiscordUtils.sendMessage(
+						String.format(Emoji.INFO + " You were %s from the server **%s** by **%s**. Reason: `%s`",
+								this.conjugatedVerb, guild.getName(), context.getUsername(), reason), privateChannel)
+						.switchIfEmpty(DiscordUtils.sendMessage(
+								String.format(Emoji.WARNING + " (**%s**) I could not send a message to **%s**.",
+										context.getUsername(), member.getUsername()), channel)));
 	}
 
 }

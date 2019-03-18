@@ -24,9 +24,9 @@ public class SoftBanCmd extends RemoveMemberCmd {
 	@Override
 	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
-				.setDescription("Ban and instantly unban user(s).\nIt's like kicking him/them but it also deletes his/their messages "
-						+ "from the last 7 days.")
-				.addArg("@user(s)", false)
+				.setDescription("Ban and instantly unban user.\nIt's like kicking him but it "
+						+ "also deletes his messages from the last 7 days.")
+				.addArg("@user", false)
 				.addArg("reason", true)
 				.build();
 	}

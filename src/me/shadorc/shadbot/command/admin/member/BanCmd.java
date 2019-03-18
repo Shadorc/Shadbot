@@ -23,8 +23,8 @@ public class BanCmd extends RemoveMemberCmd {
 	@Override
 	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
-				.setDescription("Ban user(s) and delete his/their messages from the last 7 days.")
-				.addArg("@user(s)", false)
+				.setDescription("Ban user and delete his messages from the last 7 days.")
+				.addArg("@user", false)
 				.addArg("reason", true)
 				.build();
 	}
