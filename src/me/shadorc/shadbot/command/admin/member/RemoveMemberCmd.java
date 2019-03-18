@@ -72,7 +72,7 @@ public abstract class RemoveMemberCmd extends BaseCmd {
 				context.getClient().getMemberById(context.getGuildId(), mentionUserId))
 				.filterWhen(tuple -> DiscordUtils.requirePermissions(tuple.getT2(), this.permission).thenReturn(true))
 				.filterWhen(tuple -> this.canInteract(tuple.getT2(), tuple.getT3(), context.getMember(), tuple.getT4()))
-				.flatMap(tuple -> this.sendMessage(context, tuple.getT1(), tuple.getT2(), tuple.getT4(), reason.toString())
+				.flatMap(tuple -> this.sendMessage(tuple.getT1(), tuple.getT2(), context.getMember(), tuple.getT4(), reason.toString())
 						.then(this.action(tuple.getT4(), reason.toString()))
 						.then(DiscordUtils.sendMessage(String.format(Emoji.INFO + " **%s** %s %s.",
 								context.getUsername(), this.conjugatedVerb,
@@ -81,33 +81,33 @@ public abstract class RemoveMemberCmd extends BaseCmd {
 				.then();
 	}
 
-	private Mono<Boolean> canInteract(MessageChannel channel, Member self, Member author, Member member) {
-		return Mono.zip(self.isHigher(member), author.isHigher(member))
+	private Mono<Boolean> canInteract(MessageChannel channel, Member self, Member author, Member memberToRemove) {
+		return Mono.zip(self.isHigher(memberToRemove), author.isHigher(memberToRemove))
 				.flatMap(tuple -> {
 					if(!tuple.getT1()) {
 						return DiscordUtils.sendMessage(
 								String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in the role hierarchy than me.",
-										author.getUsername(), this.getName(), member.getUsername()), channel)
+										author.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
 								.thenReturn(false);
 					}
 					if(!tuple.getT2()) {
 						return DiscordUtils.sendMessage(
 								String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher in the role hierarchy than you.",
-										author.getUsername(), this.getName(), member.getUsername()), channel)
+										author.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
 								.thenReturn(false);
 					}
 					return Mono.just(true);
 				});
 	}
 
-	private Mono<Message> sendMessage(Context context, Guild guild, MessageChannel channel, Member member, String reason) {
-		return member.getPrivateChannel()
+	private Mono<Message> sendMessage(Guild guild, MessageChannel channel, Member author, Member memberToRemove, String reason) {
+		return memberToRemove.getPrivateChannel()
 				.flatMap(privateChannel -> DiscordUtils.sendMessage(
-						String.format(Emoji.INFO + " You were %s from the server **%s** by **%s**. Reason: `%s`",
-								this.conjugatedVerb, guild.getName(), context.getUsername(), reason), privateChannel)
+						String.format(Emoji.WARNING + " You were %s from the server **%s** by **%s**. Reason: `%s`",
+								this.conjugatedVerb, guild.getName(), author.getUsername(), reason), privateChannel)
 						.switchIfEmpty(DiscordUtils.sendMessage(
 								String.format(Emoji.WARNING + " (**%s**) I could not send a message to **%s**.",
-										context.getUsername(), member.getUsername()), channel)));
+										author.getUsername(), memberToRemove.getUsername()), channel)));
 	}
 
 }
