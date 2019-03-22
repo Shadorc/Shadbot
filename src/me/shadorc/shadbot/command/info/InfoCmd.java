@@ -46,7 +46,7 @@ public class InfoCmd extends BaseCmd {
 		final long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / MB_UNIT;
 		final long maxMemory = runtime.maxMemory() / MB_UNIT;
 
-		final Mono<Long> voiceChannelCountMono = context.getClient().getGuilds()
+		final Mono<Long> getVoiceChannelCount = context.getClient().getGuilds()
 				.flatMap(guild -> guild.getMemberById(context.getSelfId()))
 				.flatMap(Member::getVoiceState)
 				.flatMap(VoiceState::getChannel)
@@ -57,7 +57,7 @@ public class InfoCmd extends BaseCmd {
 		return Mono.zip(context.getClient().getUserById(Snowflake.of(Shadbot.OWNER_ID.get())),
 				context.getClient().getGuilds().count(),
 				context.getClient().getUsers().count(),
-				voiceChannelCountMono)
+				getVoiceChannelCount)
 				.flatMap(tuple -> {
 					final User owner = tuple.getT1();
 					final Long guildCount = tuple.getT2();
@@ -85,7 +85,7 @@ public class InfoCmd extends BaseCmd {
 									+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
 									+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
 									+ String.format("%nServers: %s", FormatUtils.number(guildCount))
-									+ String.format("%nVoice Channels: %s/%s", FormatUtils.number(voiceChannelCount), FormatUtils.number(GuildMusicManager.getGuildMusics().size()))
+									+ String.format("%nVoice Channels: %d (GM: %d)", voiceChannelCount, GuildMusicManager.get().size())
 									+ String.format("%nUsers: %s", FormatUtils.number(memberCount))
 									+ "```")));
 				})
