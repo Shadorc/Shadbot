@@ -16,7 +16,6 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.admin.IamCmd;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.TemporaryMessage;
-import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Mono;
@@ -48,7 +47,7 @@ public class ReactionListener {
 					final Role role = tuple.getT2();
 
 					return Mono.zip(selfMember.getBasePermissions().map(set -> set.contains(Permission.MANAGE_ROLES)),
-							DiscordUtils.hasHigherRoles(selfMember, List.of(role)))
+							selfMember.hasHigherRoles(List.of(role)))
 							.flatMap(tuple2 -> {
 								final boolean canManageRoles = tuple2.getT1();
 								final boolean hasHigherRoles = tuple2.getT2();

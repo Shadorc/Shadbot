@@ -30,7 +30,7 @@ public class MemberListener {
 								.flatMapMany(ignored -> Flux.fromIterable(dbGuild.getAutoRoles())
 										.map(Snowflake::of)
 										.flatMap(roleId -> event.getClient().getRoleById(event.getGuildId(), roleId))
-										.filterWhen(role -> DiscordUtils.hasHigherRoles(self, List.of(role)))
+										.filterWhen(role -> self.hasHigherRoles(List.of(role)))
 										.flatMap(role -> event.getMember().addRole(role.getId())))));
 
 	}
