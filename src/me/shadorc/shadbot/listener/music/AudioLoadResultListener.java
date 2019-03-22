@@ -32,38 +32,30 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 	public static final String YT_SEARCH = "ytsearch: ";
 	public static final String SC_SEARCH = "scsearch: ";
 
-	private static final int MAX_RESULTS = 5;
-
 	private final Snowflake guildId;
 	private final Snowflake djId;
 	private final String identifier;
-	private final boolean putFirst;
+	private final boolean insertFirst;
 
 	private List<AudioTrack> resultTracks;
 
-	public AudioLoadResultListener(Snowflake guildId, Snowflake djId, String identifier, boolean putFirst) {
+	public AudioLoadResultListener(Snowflake guildId, Snowflake djId, String identifier, boolean insertFirst) {
 		this.guildId = guildId;
 		this.djId = djId;
 		this.identifier = identifier;
-		this.putFirst = putFirst;
+		this.insertFirst = insertFirst;
 	}
 
 	@Override
 	public void trackLoaded(AudioTrack track) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
-
-		guildMusic.joinVoiceChannel();
-		if(!guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst)) {
-			guildMusic.getMessageChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-							FormatUtils.trackName(track.getInfo())), channel))
-					.subscribe(null, err -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), err));
-		}
-
-		this.terminate();
+		Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				.filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(track, this.insertFirst))
+				.flatMap(GuildMusic::getMessageChannel)
+				.flatMap(channel -> DiscordUtils.sendMessage(String.format(
+						Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
+						FormatUtils.trackName(track.getInfo())), channel))
+				.doOnTerminate(this::terminate)
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 	}
 
 	@Override
@@ -87,62 +79,55 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 	}
 
 	private void onSearchResult(AudioPlaylist playlist) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
+		Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				.flatMapMany(guildMusic -> {
+					this.resultTracks = playlist.getTracks()
+							.subList(0, Math.min(Config.MUSIC_SEARCHES, playlist.getTracks().size()));
 
-		this.resultTracks = playlist.getTracks()
-				.subList(0, Math.min(MAX_RESULTS, playlist.getTracks().size()));
+					guildMusic.setDj(this.djId);
+					guildMusic.setWaitingForChoice(true);
 
-		guildMusic.setDj(this.djId);
-		guildMusic.setWaitingForChoice(true);
-
-		guildMusic.getClient()
-				.getUserById(guildMusic.getDjId())
-				.map(User::getAvatarUrl)
-				.flatMap(avatarUrl -> guildMusic.getMessageChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(this.getPlaylistEmbed(playlist, avatarUrl), channel)))
-				.flatMapMany(ignored -> new AudioLoadResultInputs(guildMusic.getClient(), Duration.ofSeconds(30), this)
-						.waitForInputs())
-				.then(Mono.fromRunnable(this::terminate))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), err));
+					return guildMusic.getClient().getUserById(guildMusic.getDjId())
+							.map(User::getAvatarUrl)
+							.flatMap(avatarUrl -> guildMusic.getMessageChannel()
+									.flatMap(channel -> DiscordUtils.sendMessage(this.getPlaylistEmbed(playlist, avatarUrl), channel)))
+							.flatMapMany(ignored -> new AudioLoadResultInputs(guildMusic.getClient(), Duration.ofSeconds(30), this)
+									.waitForInputs());
+				})
+				.doOnTerminate(this::terminate)
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 	}
 
 	private void onPlaylistLoaded(AudioPlaylist playlist) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
+		Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				.flatMap(guildMusic -> {
+					final StringBuilder strBuilder = new StringBuilder();
 
-		guildMusic.joinVoiceChannel();
+					int musicsAdded = 0;
+					for(final AudioTrack track : playlist.getTracks()) {
+						guildMusic.getTrackScheduler().startOrQueue(track, this.insertFirst);
+						musicsAdded++;
+						// The playlist limit is reached and the user / guild is not premium
+						if(guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE
+								&& !Shadbot.getPremium().isPremium(this.guildId, this.djId)) {
+							strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
+							break;
+						}
+					}
 
-		final StringBuilder strBuilder = new StringBuilder();
-		int musicsAdded = 0;
-		for(final AudioTrack track : playlist.getTracks()) {
-			guildMusic.getTrackScheduler().startOrQueue(track, this.putFirst);
-			musicsAdded++;
-			// The playlist limit is reached and the user / guild is not premium
-			if(guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE
-					&& !Shadbot.getPremium().isPremium(this.guildId, this.djId)) {
-				strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
-				break;
-			}
-		}
-
-		strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
-		guildMusic.getMessageChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), err));
-
-		this.terminate();
+					strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
+					return guildMusic.getMessageChannel()
+							.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
+				})
+				.doOnTerminate(this::terminate)
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 	}
 
 	private Consumer<EmbedCreateSpec> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
 		final String playlistName = playlist.getName();
 		final String name = playlistName == null || playlistName.isBlank() ? "Playlist" : playlistName;
 
-		final String choices = FormatUtils.numberedList(MAX_RESULTS, playlist.getTracks().size(),
+		final String choices = FormatUtils.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
 				count -> {
 					final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
 					return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
@@ -161,18 +146,16 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
 	@Override
 	public void loadFailed(FriendlyException err) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
-
-		final String errMessage = TextUtils.cleanLavaplayerErr(err);
-		LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildId.asLong(), errMessage);
-		guildMusic.getMessageChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.RED_CROSS + " Sorry, %s", errMessage.toLowerCase()), channel))
-				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), thr));
-
-		this.terminate();
+		Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				.flatMap(guildMusic -> {
+					final String errMessage = TextUtils.cleanLavaplayerErr(err);
+					LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildId.asLong(), errMessage);
+					return guildMusic.getMessageChannel()
+							.flatMap(channel -> DiscordUtils.sendMessage(
+									String.format(Emoji.RED_CROSS + " Sorry, %s", errMessage.toLowerCase()), channel));
+				})
+				.doOnTerminate(this::terminate)
+				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), thr));
 	}
 
 	@Override
@@ -181,28 +164,21 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 	}
 
 	private void onNoMatches() {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
-
-		guildMusic.getMessageChannel()
+		Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				.flatMap(GuildMusic::getMessageChannel)
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
 						StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), err));
-
-		this.terminate();
+				.doOnTerminate(this::terminate)
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 	}
 
-	public void terminate() {
+	private void terminate() {
+		LogUtils.info("{Guild ID: %d} Terminating audio load result listener.", guildId.asLong());
 		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
-
-		guildMusic.removeAudioLoadResultListener(this);
-		if(guildMusic.getTrackScheduler().isStopped()) {
-			guildMusic.leaveVoiceChannel();
+		if(guildMusic != null) {
+			guildMusic.removeAudioLoadResultListener(this);
+		} else {
+			LogUtils.info("{Guild ID: %d} Terminating audio load result listener: null", guildId.asLong());
 		}
 	}
 

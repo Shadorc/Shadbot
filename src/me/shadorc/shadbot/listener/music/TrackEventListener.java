@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.GuildMusicManager;
 import me.shadorc.shadbot.object.Emoji;
@@ -32,89 +33,78 @@ public class TrackEventListener extends AudioEventAdapter {
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
-
-		final String message = String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
-				FormatUtils.trackName(track.getInfo()));
-		guildMusic.getMessageChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(message, channel))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), err));
+		Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				.flatMap(guildMusic -> {
+					final String message = String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
+							FormatUtils.trackName(track.getInfo()));
+					return guildMusic.getMessageChannel()
+							.flatMap(channel -> DiscordUtils.sendMessage(message, channel));
+				})
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 	}
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
-
-		if(endReason.mayStartNext) {
-			this.errorCount.set(0); // Everything seems to be fine, reset error counter.
-			this.nextOrEnd()
-					.subscribe(null, err -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), err));
-		}
+		Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				.filter(ignored -> endReason.mayStartNext)
+				// Everything seems fine, reset error counter.
+				.doOnNext(ignored -> this.errorCount.set(0))
+				.flatMap(ignored -> this.nextOrEnd())
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 	}
 
 	@Override
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
+		Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				.flatMap(guildMusic -> {
+					this.errorCount.incrementAndGet();
 
-		this.errorCount.incrementAndGet();
+					final String errMessage = TextUtils.cleanLavaplayerErr(err);
+					LogUtils.info("{Guild ID: %d} %sTrack exception: %s", this.guildId.asLong(),
+							this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
 
-		final String errMessage = TextUtils.cleanLavaplayerErr(err);
+					final StringBuilder strBuilder = new StringBuilder();
+					if(this.errorCount.get() <= 3) {
+						strBuilder.append(String.format(Emoji.RED_CROSS + " Sorry, %s. I'll try to play "
+								+ "the next available song.", errMessage.toLowerCase()));
+					}
 
-		LogUtils.info("{Guild ID: %d} %sTrack exception: %s", this.guildId.asLong(), this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
+					if(this.errorCount.get() == 3) {
+						LogUtils.info("{Guild ID: %d} Too many errors in a row. They will be ignored until"
+								+ " a music can be played.", this.guildId.asLong());
+						strBuilder.append("\n" + Emoji.RED_FLAG + " Too many errors in a row, I will ignore"
+								+ " them until I find a music that can be played.");
+					}
 
-		final StringBuilder strBuilder = new StringBuilder();
-		if(this.errorCount.get() <= 3) {
-			strBuilder.append(String.format(Emoji.RED_CROSS + " Sorry, %s. I'll try to play the next available song.",
-					errMessage.toLowerCase()));
-		}
-
-		if(this.errorCount.get() == 3) {
-			LogUtils.info("{Guild ID: %d} Too many errors in a row. They will be ignored until a music can be played.", this.guildId.asLong());
-			strBuilder.append("\n" + Emoji.RED_FLAG + " Too many errors in a row, I will ignore them until I find a music that can be played.");
-		}
-
-		guildMusic.getMessageChannel()
-				.filter(ignored -> strBuilder.length() > 0)
-				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
-				.then(this.nextOrEnd())
-				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), thr));
+					return guildMusic.getMessageChannel()
+							.filter(ignored -> strBuilder.length() > 0)
+							.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
+							.then(this.nextOrEnd());
+				})
+				.subscribe(null, thr -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), thr));
 	}
 
 	@Override
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return;
-		}
-
 		LogUtils.info("{Guild ID: %d} Music stuck, skipping it.", this.guildId.asLong());
-
-		guildMusic.getMessageChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll try to play the next available song.",
-						channel))
+		Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				.flatMap(GuildMusic::getMessageChannel)
+				.flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "
+						+ "try to play the next available song.", channel))
 				.then(this.nextOrEnd())
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(guildMusic.getClient(), err));
+				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 	}
 
+	/**
+	 * Start the next track or end the guild music if this is the end of the playlist
+	 * 
+	 * @return A {@link Mono} that completes when a new track has been started or when the guild music ended
+	 */
 	private Mono<Void> nextOrEnd() {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.guildId);
-		if(guildMusic == null) {
-			return Mono.empty();
-		}
-
-		// If the next track could be started
-		if(guildMusic.getTrackScheduler().nextTrack()) {
-			return Mono.empty();
-		}
-		return guildMusic.end();
+		LogUtils.info("{Guild ID: %d} Next or end.", guildId.asLong());
+		return Mono.justOrEmpty(GuildMusicManager.get(this.guildId))
+				// If the next track could not be started
+				.filter(guildMusic -> !guildMusic.getTrackScheduler().nextTrack())
+				.flatMap(GuildMusic::end);
 	}
 }

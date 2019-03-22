@@ -21,6 +21,7 @@ public class VoiceStateUpdateListener {
 
 	private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {
 		final Snowflake guildId = event.getCurrent().getGuildId();
+		final Snowflake selfId = event.getClient().getSelfId().get();
 
 		final GuildMusic guildMusic = GuildMusicManager.get(guildId);
 		// The bot is not playing music, ignore the event
@@ -28,9 +29,7 @@ public class VoiceStateUpdateListener {
 			return Mono.empty();
 		}
 
-		return event.getClient()
-				.getSelf()
-				.flatMap(self -> self.asMember(guildId))
+		return event.getClient().getMemberById(guildId, selfId)
 				.flatMap(Member::getVoiceState)
 				.flatMap(VoiceState::getChannel)
 				.flatMapMany(VoiceChannel::getVoiceStates)

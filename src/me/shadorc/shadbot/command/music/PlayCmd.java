@@ -78,9 +78,9 @@ public class PlayCmd extends BaseCmd {
 
 							guildMusic.setMessageChannel(context.getChannelId());
 
-							final boolean putFirst = context.getCommandName().endsWith("first");
+							final boolean insertFirst = context.getCommandName().endsWith("first");
 							final AudioLoadResultListener resultListener = new AudioLoadResultListener(
-									guildId, context.getAuthorId(), identifier, putFirst);
+									guildId, context.getAuthorId(), identifier, insertFirst);
 
 							guildMusic.addAudioLoadResultListener(resultListener, identifier);
 

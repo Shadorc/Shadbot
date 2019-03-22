@@ -2,12 +2,9 @@ package me.shadorc.shadbot.music;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.MessageChannel;
@@ -18,62 +15,68 @@ import discord4j.voice.VoiceConnection;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
-import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import me.shadorc.shadbot.utils.exception.ExceptionUtils;
-import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
 public class GuildMusic {
 
 	private final DiscordClient client;
 	private final Snowflake guildId;
-	private final Snowflake voiceChannelId;
-	private final AudioProvider audioProvider;
 	private final TrackScheduler trackScheduler;
-	private final AtomicBoolean isWaitingForChoice;
-	private final Map<AudioLoadResultListener, Future<Void>> listeners;
 
-	private volatile Disposable leaveTask;
+	private final Map<AudioLoadResultListener, Future<Void>> listeners;
+	private final AtomicBoolean isJoiningVoiceChannel;
+	private final AtomicBoolean isWaitingForChoice;
+	private final AtomicBoolean isLeavingScheduled;
+
+	private volatile VoiceConnection voiceConnection;
 	private volatile Snowflake messageChannelId;
 	private volatile Snowflake djId;
 
-	public GuildMusic(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId, AudioPlayer audioPlayer) {
+	public GuildMusic(DiscordClient client, Snowflake guildId, TrackScheduler trackScheduler) {
 		this.client = client;
 		this.guildId = guildId;
-		this.voiceChannelId = voiceChannelId;
-		audioPlayer.addListener(new TrackEventListener(guildId));
-		this.audioProvider = new LavaplayerAudioProvider(audioPlayer);
-		this.trackScheduler = new TrackScheduler(audioPlayer, Shadbot.getDatabase().getDBGuild(guildId).getDefaultVol());
-		this.isWaitingForChoice = new AtomicBoolean(false);
+		this.trackScheduler = trackScheduler;
+
 		this.listeners = new ConcurrentHashMap<>();
+		this.isJoiningVoiceChannel = new AtomicBoolean(false);
+		this.isWaitingForChoice = new AtomicBoolean(false);
+		this.isLeavingScheduled = new AtomicBoolean(false);
 	}
 
 	/**
-	 * Join the voice channel only if the bot is not already in a voice channel
+	 * Requests to join a voice channel.
+	 * This function does nothing if the bot is already joining a voice channel or is already in a
+	 * voice channel.
 	 */
-	public void joinVoiceChannel() {
-		this.client.getChannelById(voiceChannelId)
+	public Mono<Void> joinVoiceChannel(Snowflake voiceChannelId, AudioProvider audioProvider) {
+		return this.client.getChannelById(voiceChannelId)
 				.cast(VoiceChannel.class)
-				.filter(ignored -> !GuildVoiceManager.contains(this.guildId))
-				.flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(this.audioProvider)))
+				.filter(ignored -> !this.isJoiningVoiceChannel.get() && voiceConnection == null)
+				.doOnNext(ignored -> this.isJoiningVoiceChannel.set(true))
+				.doOnNext(ignored -> LogUtils.info("{Guild ID: %d} Joining voice channel...", guildId.asLong()))
+				.flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
 				.doOnNext(voiceConnection -> {
-					GuildVoiceManager.put(this.guildId, voiceConnection);
-					LogUtils.info("{Guild ID: %d} Voice channel joined.", this.getGuildId().asLong());
+					LogUtils.info("{Guild ID: %d} Voice channel joined.", guildId.asLong());
+					this.voiceConnection = voiceConnection;
 				})
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
+				.doOnTerminate(() -> this.isJoiningVoiceChannel.set(false))
+				.then();
 	}
 
 	/**
-	 * Leave the voice channel if the bot is still in and destroy this {@link GuildMusic}
+	 * Leave the voice channel and destroy this {@link GuildMusic}
 	 */
 	public void leaveVoiceChannel() {
-		final VoiceConnection connection = GuildVoiceManager.remove(this.guildId);
-		if(connection != null) {
-			connection.disconnect();
+		LogUtils.info("{Guild ID: %d} Leaving voice channel...", guildId.asLong());
+		if(this.voiceConnection != null) {
+			LogUtils.info("{Guild ID: %d} Actually leaving voice channel.", guildId.asLong());
+			this.voiceConnection.disconnect();
+			this.voiceConnection = null;
 			LogUtils.info("{Guild ID: %d} Voice channel left.", this.guildId.asLong());
 		}
 		this.destroy();
@@ -83,40 +86,35 @@ public class GuildMusic {
 	 * Schedule to leave the voice channel in 1 minute
 	 */
 	public void scheduleLeave() {
-		this.leaveTask = Mono.delay(Duration.ofMinutes(1))
+		LogUtils.info("{Guild ID: %d} Scheduling leave.", guildId.asLong());
+		Mono.delay(Duration.ofMinutes(1))
+				.filter(ignored -> this.isLeavingScheduled())
 				.doOnNext(ignored -> this.leaveVoiceChannel())
+				.doOnSubscribe(ignored -> this.isLeavingScheduled.set(true))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}
 
 	public void cancelLeave() {
-		if(this.isLeavingScheduled()) {
-			this.leaveTask.dispose();
-		}
+		LogUtils.info("{Guild ID: %d} Cancelling leave.", guildId.asLong());
+		this.isLeavingScheduled.set(false);
 	}
 
 	public Mono<Void> end() {
+		LogUtils.info("{Guild ID: %d} Ending guild music.", guildId.asLong());
 		final StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
 		if(!Shadbot.getPremium().isGuildPremium(this.guildId)) {
 			strBuilder.append(String.format(" If you like me, you can make a donation on **%s**, "
 					+ "it will help my creator keeping me alive :heart:",
 					Config.PATREON_URL));
 		}
-		return Mono.fromRunnable(this::leaveVoiceChannel)
-				.then(this.getMessageChannel())
+		this.leaveVoiceChannel();
+		return this.getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then();
 	}
 
 	public DiscordClient getClient() {
 		return this.client;
-	}
-
-	public Snowflake getGuildId() {
-		return this.guildId;
-	}
-
-	public AudioProvider getAudioProvider() {
-		return this.audioProvider;
 	}
 
 	public TrackScheduler getTrackScheduler() {
@@ -142,7 +140,7 @@ public class GuildMusic {
 	}
 
 	public boolean isLeavingScheduled() {
-		return this.leaveTask != null && !this.leaveTask.isDisposed();
+		return this.isLeavingScheduled.get();
 	}
 
 	public void setMessageChannel(Snowflake messageChannelId) {
@@ -158,21 +156,23 @@ public class GuildMusic {
 	}
 
 	public void addAudioLoadResultListener(AudioLoadResultListener listener, String identifier) {
-		this.listeners.put(listener, GuildMusicManager.getAudioPlayerManager()
-				.loadItemOrdered(this.guildId, identifier, listener));
+		LogUtils.info("{Guild ID: %d} Adding audio load result listener.", guildId.asLong());
+		this.listeners.put(listener, GuildMusicManager.loadItemOrdered(this.guildId, identifier, listener));
 	}
 
 	public void removeAudioLoadResultListener(AudioLoadResultListener listener) {
+		LogUtils.info("{Guild ID: %d} Removing audio load result listener.", guildId.asLong());
 		this.listeners.remove(listener);
+		if(this.getTrackScheduler().isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
+			this.leaveVoiceChannel();
+		}
 	}
 
-	public void destroy() {
+	private void destroy() {
+		LogUtils.info("{Guild ID: %d} Destroying guild music.", guildId.asLong());
 		this.cancelLeave();
 		GuildMusicManager.remove(this.guildId);
-		for(final Entry<AudioLoadResultListener, Future<Void>> entry : this.listeners.entrySet()) {
-			entry.getValue().cancel(true);
-			entry.getKey().terminate();
-		}
+		this.listeners.values().forEach(task -> task.cancel(true));
 		this.listeners.clear();
 		this.trackScheduler.destroy();
 	}
