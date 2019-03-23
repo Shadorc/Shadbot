@@ -56,15 +56,24 @@ public class GuildMusic {
 	public Mono<Void> joinVoiceChannel(Snowflake voiceChannelId, AudioProvider audioProvider) {
 		return this.client.getChannelById(voiceChannelId)
 				.cast(VoiceChannel.class)
-				.filter(ignored -> !this.isJoiningVoiceChannel.get() && voiceConnection == null)
+				.filter(ignored -> !this.isJoiningVoiceChannel.get() && this.voiceConnection == null)
 				.doOnNext(ignored -> this.isJoiningVoiceChannel.set(true))
-				.doOnNext(ignored -> LogUtils.info("{Guild ID: %d} Joining voice channel...", guildId.asLong()))
+				.doOnNext(ignored -> LogUtils.info("{Guild ID: %d} Joining voice channel...", this.guildId.asLong()))
 				.flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
 				.doOnNext(voiceConnection -> {
-					LogUtils.info("{Guild ID: %d} Voice channel joined.", guildId.asLong());
+					LogUtils.info("{Guild ID: %d} Voice channel joined.", this.guildId.asLong());
 					this.voiceConnection = voiceConnection;
 				})
 				.doOnTerminate(() -> this.isJoiningVoiceChannel.set(false))
+				// If a music fails to load directly after creating a guild music, it will be instantly deleted.
+				// In this case, it is possible that the voice connection is established after the guild music destruction.
+				// To avoid this, if the guild music does not exist when a voice connection is established,
+				// disconnect the bot from this voice channel after 5 seconds. This delay is used to avoid UnhandledTransitionException.
+				.then(Mono.just(GuildMusicManager.get(this.guildId) == null
+						&& !this.isJoiningVoiceChannel.get() && this.voiceConnection != null)
+						.filter(Boolean.TRUE::equals)
+						.flatMap(ignored -> Mono.delay(Duration.ofSeconds(5)))
+						.doOnNext(ignored -> this.voiceConnection.disconnect()))
 				.then();
 	}
 
@@ -163,6 +172,7 @@ public class GuildMusic {
 	public void removeAudioLoadResultListener(AudioLoadResultListener listener) {
 		LogUtils.info("{Guild ID: %d} Removing audio load result listener.", guildId.asLong());
 		this.listeners.remove(listener);
+		// If there is no music playing and nothing is loading, leave the voice channel
 		if(this.getTrackScheduler().isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
 			this.leaveVoiceChannel();
 		}
