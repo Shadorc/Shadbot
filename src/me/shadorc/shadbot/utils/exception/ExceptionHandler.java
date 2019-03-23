@@ -34,7 +34,7 @@ public class ExceptionHandler {
 			return ExceptionHandler.onNoMusicException(context);
 		}
 		if(ExceptionUtils.isServerAccessError(err)) {
-			return ExceptionHandler.onServerAccessError(cmd, context);
+			return ExceptionHandler.onServerAccessError(err, cmd, context);
 		}
 		return ExceptionHandler.onUnknown(err, cmd, context);
 	}
@@ -69,9 +69,12 @@ public class ExceptionHandler {
 				.then();
 	}
 
-	private static Mono<Void> onServerAccessError(BaseCmd cmd, Context context) {
+	private static Mono<Void> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {
+		final Throwable cause = err.getCause() != null ? err.getCause() : err;
 		return Mono.fromRunnable(() -> LogUtils.warn(context.getClient(),
-				String.format("{Guild ID: %d} [%s] Server access error.", context.getGuildId().asLong(), cmd.getClass().getSimpleName()),
+				String.format("{Guild ID: %d} [%s] Server access error. %s: %s",
+						context.getGuildId().asLong(), cmd.getClass().getSimpleName(),
+						cause.getClass().getName(), cause.getMessage()),
 				context.getContent()))
 				.and(context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(String.format(
