@@ -49,12 +49,18 @@ public class SkipCmd extends BaseCmd {
 					.then();
 		} else {
 			return messageMono
-					.filter(ignored -> guildMusic.getTrackScheduler().nextTrack())
-					// If the music has been started correctly, we resume it in case the previous music was paused
-					.doOnNext(ignored -> guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false))
-					// There is no more music, this is the end
-					.switchIfEmpty(guildMusic.end().then(Mono.empty()))
-					.then();
+					.flatMap(ignored -> {
+						// If the music has been started correctly
+						if(guildMusic.getTrackScheduler().nextTrack()) {
+							// we resume it in case the previous music was paused.
+							return Mono.fromRunnable(() -> guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false));
+						}
+						// else
+						else {
+							// there is no more music, this is the end.
+							return guildMusic.end();
+						}
+					});
 		}
 	}
 
