@@ -173,7 +173,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 	}
 
 	private void terminate() {
-		LogUtils.info("{Guild ID: %d} Terminating audio load result listener.", guildId.asLong());
 		final GuildMusic guildMusic = GuildMusicStateManager.getMusic(this.guildId);
 		if(guildMusic != null) {
 			guildMusic.removeAudioLoadResultListener(this);

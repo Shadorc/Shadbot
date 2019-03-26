@@ -101,7 +101,6 @@ public class TrackEventListener extends AudioEventAdapter {
 	 * @return A {@link Mono} that completes when a new track has been started or when the guild music ended
 	 */
 	private Mono<Void> nextOrEnd() {
-		LogUtils.info("{Guild ID: %d} Next or end.", guildId.asLong());
 		return Mono.justOrEmpty(GuildMusicStateManager.getMusic(this.guildId))
 				// If the next track could not be started
 				.filter(guildMusic -> !guildMusic.getTrackScheduler().nextTrack())
