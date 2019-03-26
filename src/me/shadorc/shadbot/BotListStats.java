@@ -160,7 +160,7 @@ public class BotListStats {
 	private void postOnDivineDiscordBotsDotCom(Long guildCount) {
 		final JSONObject content = new JSONObject()
 				.put("server_count", guildCount);
-		final String url = String.format("https://divinediscordbots.com/bots/%d/stats", this.selfId);
+		final String url = String.format("https://divinediscordbots.com/bot/%d/stats", this.selfId);
 
 		try {
 			this.post(url, Credentials.get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
