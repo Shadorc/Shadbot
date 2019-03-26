@@ -22,7 +22,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
-import me.shadorc.shadbot.music.GuildMusicManager;
+import me.shadorc.shadbot.music.GuildMusicStateManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.LoadingMessage;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -53,7 +53,7 @@ public class LyricsCmd extends BaseCmd {
 			if(arg.isPresent()) {
 				search = arg.get();
 			} else {
-				final GuildMusic guildMusic = GuildMusicManager.get(context.getGuildId());
+				final GuildMusic guildMusic = GuildMusicStateManager.getMusic(context.getGuildId());
 				if(guildMusic == null) {
 					throw new MissingArgumentException();
 				}

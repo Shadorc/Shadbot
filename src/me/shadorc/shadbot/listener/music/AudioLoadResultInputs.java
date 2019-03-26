@@ -11,7 +11,7 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.music.GuildMusic;
-import me.shadorc.shadbot.music.GuildMusicManager;
+import me.shadorc.shadbot.music.GuildMusicStateManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.Inputs;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -30,7 +30,7 @@ public class AudioLoadResultInputs extends Inputs {
 
 	@Override
 	public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.listener.getGuildId());
+		final GuildMusic guildMusic = GuildMusicStateManager.getMusic(this.listener.getGuildId());
 		return Mono.just(guildMusic != null
 				&& event.getMessage().getContent().isPresent()
 				&& event.getMessage().getChannelId().equals(guildMusic.getMessageChannelId())
@@ -39,7 +39,7 @@ public class AudioLoadResultInputs extends Inputs {
 
 	@Override
 	public Mono<Void> processEvent(MessageCreateEvent event) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.listener.getGuildId());
+		final GuildMusic guildMusic = GuildMusicStateManager.getMusic(this.listener.getGuildId());
 
 		final String content = event.getMessage().getContent().get();
 		final String prefix = Shadbot.getDatabase().getDBGuild(this.listener.getGuildId()).getPrefix();
@@ -76,7 +76,7 @@ public class AudioLoadResultInputs extends Inputs {
 
 	@Override
 	public boolean takeEventWile(MessageCreateEvent ignored) {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.listener.getGuildId());
+		final GuildMusic guildMusic = GuildMusicStateManager.getMusic(this.listener.getGuildId());
 		return guildMusic != null && guildMusic.isWaitingForChoice();
 	}
 

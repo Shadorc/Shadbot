@@ -20,7 +20,7 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.music.GuildMusic;
-import me.shadorc.shadbot.music.GuildMusicManager;
+import me.shadorc.shadbot.music.GuildMusicStateManager;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -174,7 +174,7 @@ public class Context {
 	}
 
 	public GuildMusic requireGuildMusic() {
-		final GuildMusic guildMusic = GuildMusicManager.get(this.getGuildId());
+		final GuildMusic guildMusic = GuildMusicStateManager.getMusic(this.getGuildId());
 		if(guildMusic == null || guildMusic.getTrackScheduler().isStopped()) {
 			throw new NoMusicException();
 		}

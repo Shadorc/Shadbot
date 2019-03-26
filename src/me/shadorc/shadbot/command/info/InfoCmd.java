@@ -18,7 +18,7 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.music.GuildMusicManager;
+import me.shadorc.shadbot.music.GuildMusicStateManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.LoadingMessage;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -85,7 +85,7 @@ public class InfoCmd extends BaseCmd {
 									+ String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
 									+ String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
 									+ String.format("%nServers: %s", FormatUtils.number(guildCount))
-									+ String.format("%nVoice Channels: %d (GM: %d)", voiceChannelCount, GuildMusicManager.get().size())
+									+ String.format("%nVoice Channels: %d (GM: %d)", voiceChannelCount, GuildMusicStateManager.count())
 									+ String.format("%nUsers: %s", FormatUtils.number(memberCount))
 									+ "```")));
 				})
