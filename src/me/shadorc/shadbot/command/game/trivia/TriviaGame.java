@@ -34,7 +34,7 @@ import reactor.core.publisher.Mono;
 public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
 	protected static final int MIN_GAINS = 100;
-	private static final int MAX_BONUS = 100;
+	protected static final int MAX_BONUS = 150;
 
 	private final TriviaResult trivia;
 	private final List<String> answers;
