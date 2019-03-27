@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 
 public class RpsCmd extends BaseCmd {
 
-	private static final int GAINS = 170;
+	private static final int GAINS = 200;
 
 	public RpsCmd() {
 		super(CommandCategory.GAME, List.of("rps"));
@@ -47,7 +47,7 @@ public class RpsCmd extends BaseCmd {
 			Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(GAINS);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
 		} else {
-			strBuilder.append("I win !");
+			strBuilder.append("I won !");
 		}
 
 		return context.getChannel()
