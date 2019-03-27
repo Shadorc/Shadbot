@@ -159,14 +159,13 @@ public class Utils {
 	}
 
 	/**
-	 * @param member - the member who bet
+	 * @param member - the member who bets
 	 * @param betStr - the string representing the bet
-	 * @param maxValue - the maximum bet value
-	 * @return An Integer representing {@code betStr} converted as an integer
-	 * @throws CommandException - thrown if {@code betStr} cannot be casted to integer, if the {@code user} does not have enough coins or if the bet value
-	 *             is superior to {code maxValue}
+	 * @return An int representing {@code betStr} converted as an int
+	 * @throws CommandException - thrown if {@code betStr} cannot be casted to an int
+	 *             or if the {@code user} does not have enough coins.
 	 */
-	public static int requireBet(Member member, String betStr, int maxValue) {
+	public static int requireValidBet(Member member, String betStr) {
 		final Integer bet = NumberUtils.asPositiveInt(betStr);
 		if(bet == null) {
 			throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
@@ -174,11 +173,6 @@ public class Utils {
 
 		if(Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
 			throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
-		}
-
-		if(bet > maxValue) {
-			throw new CommandException(String.format("Sorry, you can't bet more than **%s**.",
-					FormatUtils.coins(maxValue)));
 		}
 
 		return bet;

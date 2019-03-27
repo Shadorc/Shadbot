@@ -14,8 +14,6 @@ import reactor.core.publisher.Mono;
 
 public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
-	private static final int MAX_BET = 250_000;
-
 	public BlackjackCmd() {
 		super(List.of("blackjack"), "bj");
 	}
@@ -24,7 +22,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		final Integer bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
+		final Integer bet = Utils.requireValidBet(context.getMember(), arg);
 
 		final BlackjackGame blackjackManager = this.getManagers().computeIfAbsent(context.getChannelId(),
 				channelId -> {

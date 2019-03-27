@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono;
 public class DiceCmd extends GameCmd<DiceGame> {
 
 	protected static final float MULTIPLIER = 4.5f;
-	private static final int MAX_BET = 250_000;
 
 	public DiceCmd() {
 		super(List.of("dice"));
@@ -75,7 +74,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
 						.then();
 			}
 
-			Utils.requireBet(context.getMember(), Integer.toString(diceManager.getBet()), MAX_BET);
+			Utils.requireValidBet(context.getMember(), Integer.toString(diceManager.getBet()));
 			diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));
 			return diceManager.show();
 		}
@@ -86,7 +85,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
 				return Mono.error(new MissingArgumentException());
 			}
 
-			final Integer bet = Utils.requireBet(context.getMember(), args.get(1), MAX_BET);
+			final Integer bet = Utils.requireValidBet(context.getMember(), args.get(1));
 			final DiceGame diceManager = this.getManagers().computeIfAbsent(context.getChannelId(),
 					ignored -> new DiceGame(this, context, bet));
 			diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));
