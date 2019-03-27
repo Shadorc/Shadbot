@@ -20,9 +20,10 @@ import reactor.core.publisher.Mono;
 
 public class RussianRouletteCmd extends BaseCmd {
 
-	private static final int MAX_BET = 250_000;
-	private static final float WIN_MULTIPLIER = 2.03f;
-	private static final float LOSE_MULTIPLIER = 10f;
+	private static final int PAID_COST = 250;
+
+	private static final float WIN_MULTIPLIER = 4f;
+	private static final float LOSE_MULTIPLIER = 14f;
 
 	public RussianRouletteCmd() {
 		super(CommandCategory.GAME, List.of("russian_roulette", "russian-roulette", "russianroulette"), "rr");
@@ -31,20 +32,19 @@ public class RussianRouletteCmd extends BaseCmd {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final String arg = context.requireArg();
-		final int bet = Utils.requireBet(context.getMember(), arg, MAX_BET);
+		Utils.requireValidBet(context.getMember(), Integer.toString(PAID_COST));
 
 		final StringBuilder strBuilder = new StringBuilder(
 				String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", context.getUsername()));
 
 		int gains;
 		if(ThreadLocalRandom.current().nextInt(6) == 0) {
-			gains = (int) -Math.ceil(bet * LOSE_MULTIPLIER);
+			gains = (int) -Math.ceil(PAID_COST * LOSE_MULTIPLIER);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
 			Shadbot.getLottery().addToJackpot(Math.abs(gains));
 			strBuilder.append(String.format("**PAN** ... Sorry, you died. You lose **%s**.", FormatUtils.coins(Math.abs(gains))));
 		} else {
-			gains = (int) Math.ceil(bet * WIN_MULTIPLIER);
+			gains = (int) Math.ceil(PAID_COST * WIN_MULTIPLIER);
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
 			strBuilder.append(String.format("**click** ... Phew, you are still alive ! You get **%s**.", FormatUtils.coins(gains)));
 		}
@@ -60,9 +60,7 @@ public class RussianRouletteCmd extends BaseCmd {
 	public Consumer<EmbedCreateSpec> getHelp(Context context) {
 		return new HelpBuilder(this, context)
 				.setDescription("Play Russian roulette.")
-				.addArg("bet", String.format("You can't bet more than **%s**.", FormatUtils.coins(MAX_BET)), false)
-				.setGains("You have a **5-in-6** chance to win **%.1f times** your bet and a **1-in-6** chance to lose **%.1f times** your bet.",
-						WIN_MULTIPLIER, LOSE_MULTIPLIER)
+				.addField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)
 				.build();
 	}
 }
