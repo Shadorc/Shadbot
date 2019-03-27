@@ -8,21 +8,18 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 public class SlotMachineCmd extends BaseCmd {
 
-	private static final int PAID_COST = 10;
+	private static final int PAID_COST = 50;
 
 	private static final SlotOptions[] SLOTS_ARRAY = new SlotOptions[] {
 			SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES, // Winning chance : 12.5%
@@ -36,16 +33,12 @@ public class SlotMachineCmd extends BaseCmd {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		final DBMember dbMember = Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId());
-
-		if(dbMember.getCoins() < PAID_COST) {
-			return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
-		}
+		Utils.requireValidBet(context.getMember(), Integer.toString(PAID_COST));
 
 		final List<SlotOptions> slots = List.of(Utils.randValue(SLOTS_ARRAY), Utils.randValue(SLOTS_ARRAY), Utils.randValue(SLOTS_ARRAY));
 		final int gains = slots.stream().distinct().count() == 1 ? slots.get(0).getGain() : -PAID_COST;
 
-		dbMember.addCoins(gains);
+		Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains);
 		if(gains > 0) {
 			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
 		} else {

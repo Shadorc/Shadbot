@@ -4,9 +4,9 @@ import me.shadorc.shadbot.utils.StringUtils;
 
 public enum SlotOptions {
 
-	CHERRIES(70),
-	BELL(700),
-	GIFT(10000);
+	CHERRIES(250),
+	BELL(3000),
+	GIFT(100_000);
 
 	private final int gain;
 
