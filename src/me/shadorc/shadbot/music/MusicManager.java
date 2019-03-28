@@ -26,7 +26,6 @@ public class MusicManager {
 
 	static {
 		AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
-		AUDIO_PLAYER_MANAGER.getConfiguration().setFilterHotSwapEnabled(true);
 		AudioSourceManagers.registerRemoteSources(AUDIO_PLAYER_MANAGER);
 	}
 
