@@ -19,13 +19,14 @@ import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 
-public class GuildMusicStateManager {
+public class MusicManager {
 
 	private static final AudioPlayerManager AUDIO_PLAYER_MANAGER = new DefaultAudioPlayerManager();
-	private static final Map<Snowflake, GuildMusicState> GUILD_MUSIC_STATES = new ConcurrentHashMap<>();
+	private static final Map<Snowflake, GuildMusicConnection> GUILD_MUSIC_CONNECTIONS = new ConcurrentHashMap<>();
 
 	static {
 		AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
+		AUDIO_PLAYER_MANAGER.getConfiguration().setFilterHotSwapEnabled(true);
 		AudioSourceManagers.registerRemoteSources(AUDIO_PLAYER_MANAGER);
 	}
 
@@ -45,51 +46,51 @@ public class GuildMusicStateManager {
 	 * {@code voiceChannelId} is sent.
 	 */
 	public static GuildMusic getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
-		final GuildMusicState guildMusicState = GUILD_MUSIC_STATES.computeIfAbsent(guildId,
+		final GuildMusicConnection guildMusicConnection = GUILD_MUSIC_CONNECTIONS.computeIfAbsent(guildId,
 				ignored -> {
-					LogUtils.debug("{Guild ID: %d} Creating guild music state.", guildId.asLong());
-					return new GuildMusicState(client, guildId);
+					LogUtils.debug("{Guild ID: %d} Creating guild music connection.", guildId.asLong());
+					return new GuildMusicConnection(client, guildId);
 				});
 
-		if(guildMusicState.getGuildMusic() == null) {
+		if(guildMusicConnection.getGuildMusic() == null) {
 			LogUtils.debug("{Guild ID: %d} Creating guild music.", guildId.asLong());
 			final AudioPlayer audioPlayer = AUDIO_PLAYER_MANAGER.createPlayer();
 			audioPlayer.addListener(new TrackEventListener(guildId));
 
 			final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, Shadbot.getDatabase().getDBGuild(guildId).getDefaultVol());
 			final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
-			guildMusicState.setGuildMusic(guildMusic);
+			guildMusicConnection.setGuildMusic(guildMusic);
 
 			final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
-			guildMusicState.joinVoiceChannel(voiceChannelId, audioProvider)
+			guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
 					.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 		}
 
-		return guildMusicState.getGuildMusic();
+		return guildMusicConnection.getGuildMusic();
 	}
 
-	public static GuildMusicState getState(Snowflake guildId) {
-		return GUILD_MUSIC_STATES.get(guildId);
+	public static GuildMusicConnection getConnection(Snowflake guildId) {
+		return GUILD_MUSIC_CONNECTIONS.get(guildId);
 	}
 
 	public static GuildMusic getMusic(Snowflake guildId) {
-		final GuildMusicState guildMusicState = GuildMusicStateManager.getState(guildId);
-		if(guildMusicState == null) {
+		final GuildMusicConnection guildMusicConnection = MusicManager.getConnection(guildId);
+		if(guildMusicConnection == null) {
 			return null;
 		}
-		return guildMusicState.getGuildMusic();
+		return guildMusicConnection.getGuildMusic();
 	}
 
-	public static void removeState(Snowflake guildId) {
-		final GuildMusicState guildMusicState = GUILD_MUSIC_STATES.remove(guildId);
-		if(guildMusicState != null) {
-			guildMusicState.leaveVoiceChannel();
+	public static void removeConnection(Snowflake guildId) {
+		final GuildMusicConnection guildMusicConnection = GUILD_MUSIC_CONNECTIONS.remove(guildId);
+		if(guildMusicConnection != null) {
+			guildMusicConnection.leaveVoiceChannel();
 		}
 	}
 
 	// TODO: Remove, for debug purpose
 	public static long count() {
-		return GUILD_MUSIC_STATES.values().stream()
+		return GUILD_MUSIC_CONNECTIONS.values().stream()
 				.filter(state -> state.getGuildMusic() != null)
 				.count();
 	}

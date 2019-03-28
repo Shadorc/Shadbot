@@ -47,7 +47,7 @@ public class GuildMusic {
 		LogUtils.debug("{Guild ID: %d} Scheduling auto-leave.", this.guildId.asLong());
 		Mono.delay(Duration.ofMinutes(1))
 				.filter(ignored -> this.isLeavingScheduled())
-				.doOnNext(ignored -> GuildMusicStateManager.getState(this.guildId).leaveVoiceChannel())
+				.doOnNext(ignored -> MusicManager.getConnection(this.guildId).leaveVoiceChannel())
 				.doOnSubscribe(ignored -> this.isLeavingScheduled.set(true))
 				.doOnTerminate(() -> this.isLeavingScheduled.set(false))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
@@ -67,7 +67,7 @@ public class GuildMusic {
 					Config.PATREON_URL));
 		}
 
-		GuildMusicStateManager.getState(this.guildId).leaveVoiceChannel();
+		MusicManager.getConnection(this.guildId).leaveVoiceChannel();
 		return this.getMessageChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then();
@@ -117,7 +117,7 @@ public class GuildMusic {
 
 	public void addAudioLoadResultListener(AudioLoadResultListener listener, String identifier) {
 		LogUtils.debug("{Guild ID: %d} Adding audio load result listener.", this.guildId.asLong());
-		this.listeners.put(listener, GuildMusicStateManager.loadItemOrdered(this.guildId, identifier, listener));
+		this.listeners.put(listener, MusicManager.loadItemOrdered(this.guildId, identifier, listener));
 	}
 
 	public void removeAudioLoadResultListener(AudioLoadResultListener listener) {
@@ -125,17 +125,15 @@ public class GuildMusic {
 		this.listeners.remove(listener);
 		// If there is no music playing and nothing is loading, leave the voice channel
 		if(this.getTrackScheduler().isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
-			GuildMusicStateManager.getState(this.guildId).leaveVoiceChannel();
+			MusicManager.getConnection(this.guildId).leaveVoiceChannel();
 		}
 	}
 
 	protected void destroy() {
-		LogUtils.debug("{Guild ID: %d} Destroying guild music.", this.guildId.asLong());
 		this.cancelLeave();
 		this.listeners.values().forEach(task -> task.cancel(true));
 		this.listeners.clear();
 		this.trackScheduler.destroy();
-		LogUtils.debug("{Guild ID: %d} Guild music destroyed.", this.guildId.asLong());
 	}
 
 }

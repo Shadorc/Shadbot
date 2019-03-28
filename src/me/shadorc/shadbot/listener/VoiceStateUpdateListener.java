@@ -6,7 +6,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.music.GuildMusic;
-import me.shadorc.shadbot.music.GuildMusicStateManager;
+import me.shadorc.shadbot.music.MusicManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Mono;
@@ -23,7 +23,7 @@ public class VoiceStateUpdateListener {
 		final Snowflake guildId = event.getCurrent().getGuildId();
 		final Snowflake selfId = event.getClient().getSelfId().get();
 
-		final GuildMusic guildMusic = GuildMusicStateManager.getMusic(guildId);
+		final GuildMusic guildMusic = MusicManager.getMusic(guildId);
 		// The bot is not playing music, ignore the event
 		if(guildMusic == null) {
 			return Mono.empty();

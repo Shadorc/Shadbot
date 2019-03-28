@@ -15,7 +15,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.music.GuildMusic;
-import me.shadorc.shadbot.music.GuildMusicStateManager;
+import me.shadorc.shadbot.music.MusicManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
@@ -54,7 +54,7 @@ public class PlayCmd extends BaseCmd {
 								identifier = AudioLoadResultListener.YT_SEARCH + arg;
 							}
 
-							final GuildMusic guildMusic = GuildMusicStateManager.getOrCreate(context.getClient(), guildId, voiceChannelId);
+							final GuildMusic guildMusic = MusicManager.getOrCreate(context.getClient(), guildId, voiceChannelId);
 							if(guildMusic.isWaitingForChoice()) {
 								if(guildMusic.getDjId().equals(context.getAuthorId())) {
 									return Mono.error(new CommandException(String.format("You're already selecting a music. "

@@ -44,10 +44,11 @@ public class TrackScheduler {
 			return true;
 		} else if(first) {
 			this.queue.offerFirst(track);
+			return false;
 		} else {
 			this.queue.offerLast(track);
+			return false;
 		}
-		return false;
 	}
 
 	/**
