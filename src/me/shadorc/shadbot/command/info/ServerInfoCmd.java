@@ -56,7 +56,7 @@ public class ServerInfoCmd extends BaseCmd {
 
 					return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 							.andThen(embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, context.getAvatarUrl())
-									.setThumbnail(guild.getIconUrl(Format.JPEG).get())
+									.setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
 									.addField("Owner", owner.getUsername(), true)
 									.addField("Server ID", guild.getId().asString(), true)
 									.addField("Creation date", creationDate, true)
