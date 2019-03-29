@@ -4,18 +4,19 @@ import me.shadorc.shadbot.utils.StringUtils;
 
 public enum SlotOptions {
 
-	CHERRIES(250),
-	BELL(3000),
-	GIFT(100_000);
+	APPLE(100),
+	CHERRIES(300),
+	BELL(2500),
+	GIFT(30000);
 
-	private final int gain;
+	private final int gains;
 
-	SlotOptions(int gain) {
-		this.gain = gain;
+	SlotOptions(int gains) {
+		this.gains = gains;
 	}
 
-	public int getGain() {
-		return this.gain;
+	public int getGains() {
+		return this.gains;
 	}
 
 	public String getEmoji() {
