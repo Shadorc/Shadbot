@@ -1,8 +1,12 @@
 package me.shadorc.shadbot.command.game.rps;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
@@ -17,14 +21,19 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 public class RpsCmd extends BaseCmd {
 
 	private static final int GAINS = 500;
 
+	private final Map<Tuple2<Snowflake, Snowflake>, AtomicInteger> winStreaks;
+
 	public RpsCmd() {
 		super(CommandCategory.GAME, List.of("rps"));
 		this.setGameRateLimiter();
+		this.winStreaks = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -41,19 +50,31 @@ public class RpsCmd extends BaseCmd {
 				context.getUsername(), userHandsign.getHandsign(), userHandsign.getEmoji(),
 				botHandsign.getEmoji(), botHandsign.getHandsign()));
 
-		if(userHandsign.equals(botHandsign)) {
-			strBuilder.append("It's a draw !");
-		} else if(userHandsign.isSuperior(botHandsign)) {
-			strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you won **%d coins**.", context.getUsername(), GAINS));
-			Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(GAINS);
-			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), GAINS);
+		final AtomicInteger userCombo = this.getCombo(context);
+		if(userHandsign.isSuperior(botHandsign)) {
+			userCombo.incrementAndGet();
+			final int gains = GAINS * userCombo.get();
+			strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you won **%d coins** (Win Streak x%d)!",
+					context.getUsername(), gains, userCombo.get()));
+			Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains);
+			StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
+		} else if(userHandsign.equals(botHandsign)) {
+			userCombo.set(0);
+			strBuilder.append("It's a draw.");
 		} else {
+			userCombo.set(0);
 			strBuilder.append("I won !");
 		}
+		this.getCombo(context).set(userCombo.get());
 
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
 				.then();
+	}
+
+	private AtomicInteger getCombo(Context context) {
+		return this.winStreaks.computeIfAbsent(Tuples.of(context.getGuildId(), context.getAuthorId()),
+				ignored -> new AtomicInteger(0));
 	}
 
 	@Override
