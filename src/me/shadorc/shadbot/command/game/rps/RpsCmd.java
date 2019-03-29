@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 
 public class RpsCmd extends BaseCmd {
 
-	private static final int GAINS = 200;
+	private static final int GAINS = 500;
 
 	public RpsCmd() {
 		super(CommandCategory.GAME, List.of("rps"));
