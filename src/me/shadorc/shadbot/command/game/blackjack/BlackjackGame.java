@@ -27,8 +27,6 @@ import reactor.core.publisher.Mono;
 
 public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
 
-	private static final float WIN_MULTIPLIER = 1.15f;
-
 	private final RateLimiter rateLimiter;
 	private final UpdateableMessage updateableMessage;
 
@@ -90,7 +88,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
 					final StringBuilder text = new StringBuilder();
 					switch (result) {
 						case 1:
-							gains += (int) Math.ceil(player.getBet() * WIN_MULTIPLIER);
+							gains += player.getBet() * 2;
 							StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
 							text.append(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));
 							break;
