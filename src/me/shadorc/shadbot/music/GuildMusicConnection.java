@@ -91,7 +91,9 @@ public class GuildMusicConnection {
 			LogUtils.debug("{Guild ID: %d} Guild music destroyed.", this.guildId.asLong());
 		}
 
-		this.changeState(State.DISCONNECTED);
+		if(this.state.equals(State.CONNECTED)) {
+			this.changeState(State.DISCONNECTED);
+		}
 	}
 
 	public GuildMusic getGuildMusic() {
