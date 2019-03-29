@@ -37,8 +37,9 @@ public class RpsCmd extends BaseCmd {
 
 		final Handsign botHandsign = Utils.randValue(Handsign.values());
 
-		final StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s.%n**Shadbot**: %s.%n",
-				context.getUsername(), userHandsign.getRepresentation(), botHandsign.getRepresentation()));
+		final StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s %s **VS** %s %s :**Shadbot**%n",
+				context.getUsername(), userHandsign.getHandsign(), userHandsign.getEmoji(),
+				botHandsign.getEmoji(), botHandsign.getHandsign()));
 
 		if(userHandsign.equals(botHandsign)) {
 			strBuilder.append("It's a draw !");
