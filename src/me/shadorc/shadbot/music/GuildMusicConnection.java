@@ -54,6 +54,7 @@ public class GuildMusicConnection {
 						.timeout(Duration.ofSeconds(Config.DEFAULT_TIMEOUT)))
 				.onErrorResume(TimeoutException.class, err -> {
 					LogUtils.info("{Guild ID: %d} Voice connection timed out.", this.guildId.asLong());
+					this.changeState(State.DISCONNECTED);
 					return Mono.justOrEmpty(this.guildMusic)
 							.flatMap(GuildMusic::getMessageChannel)
 							.flatMap(channel -> DiscordUtils.sendMessage(
@@ -82,6 +83,7 @@ public class GuildMusicConnection {
 		if(this.voiceConnection != null) {
 			this.voiceConnection.disconnect();
 			this.voiceConnection = null;
+			this.changeState(State.DISCONNECTED);
 			LogUtils.info("{Guild ID: %d} Voice channel left.", this.guildId.asLong());
 		}
 
@@ -89,10 +91,6 @@ public class GuildMusicConnection {
 			this.guildMusic.destroy();
 			this.guildMusic = null;
 			LogUtils.debug("{Guild ID: %d} Guild music destroyed.", this.guildId.asLong());
-		}
-
-		if(this.state.equals(State.CONNECTED)) {
-			this.changeState(State.DISCONNECTED);
 		}
 	}
 
