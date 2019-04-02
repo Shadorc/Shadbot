@@ -119,7 +119,7 @@
 		<dependency>
 			<groupId>com.sedmelluq</groupId>
 			<artifactId>lavaplayer</artifactId>
-			<version>1.3.14</version>
+			<version>1.3.16</version>
 		</dependency>
 		<dependency>
 			<groupId>net.aksingh</groupId>
