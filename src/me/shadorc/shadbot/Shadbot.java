@@ -11,12 +11,18 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
+import discord4j.core.object.data.stored.MessageBean;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.shard.ShardingClientBuilder;
+import discord4j.core.shard.ShardingJdkStoreRegistry;
+import discord4j.core.shard.ShardingJdkStoreService;
+import discord4j.core.shard.ShardingStoreRegistry;
 import discord4j.gateway.retry.RetryOptions;
+import discord4j.store.api.mapping.MappingStoreService;
+import discord4j.store.caffeine.CaffeineStoreService;
 import me.shadorc.shadbot.command.game.LotteryCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.shard.Shard;
@@ -73,9 +79,13 @@ public class Shadbot {
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 
 		LogUtils.info("Connecting...");
+		final ShardingStoreRegistry registry = new ShardingJdkStoreRegistry();
 		new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
 				.build()
 				.map(builder -> builder
+						.setStoreService(MappingStoreService.create()
+								.setMapping(MessageBean.class, new CaffeineStoreService(caffeine -> caffeine.expireAfterAccess(Duration.ofHours(6))))
+								.setFallback(new ShardingJdkStoreService(registry)))
 						.setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
 								Integer.MAX_VALUE, Schedulers.elastic()))
 						.setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
