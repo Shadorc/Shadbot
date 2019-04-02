@@ -11,8 +11,8 @@ public class Deck {
 
 	public Deck() {
 		this.cards = new Stack<>();
-		for(Suit suit : Suit.values()) {
-			for(Value value : Value.values()) {
+		for(final Suit suit : Suit.values()) {
+			for(final Value value : Value.values()) {
 				this.cards.add(new Card(suit, value));
 			}
 		}

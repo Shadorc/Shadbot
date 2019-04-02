@@ -57,7 +57,7 @@ public class ChatCmd extends BaseCmd {
 		for(final Entry<String, String> bot : BOTS.entrySet()) {
 			try {
 				final String response = this.talk(context.getChannelId(), bot.getValue(), arg);
-				errorCount.set(0);
+				this.errorCount.set(0);
 				return context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SPEECH + " **%s**: %s", bot.getKey(), response), channel))
 						.then();
@@ -66,10 +66,10 @@ public class ChatCmd extends BaseCmd {
 			}
 		}
 
-		if(errorCount.incrementAndGet() >= MAX_ERROR_COUNT) {
+		if(this.errorCount.incrementAndGet() >= MAX_ERROR_COUNT) {
 			LogUtils.error(context.getClient(),
 					String.format("{%s} No artificial intelligence responds (Error count: %d).",
-							this.getClass().getSimpleName(), errorCount.get()));
+							this.getClass().getSimpleName(), this.errorCount.get()));
 		}
 
 		return context.getChannel()
@@ -81,10 +81,10 @@ public class ChatCmd extends BaseCmd {
 
 	private String talk(Snowflake channelId, String botId, String input) throws UnsupportedEncodingException, IOException {
 		final String url = String.format("https://www.pandorabots.com/pandora/talk-xml?botid=%s&input=%s&custid=%s",
-				botId, NetUtils.encode(input), channelsCustid.getOrDefault(channelId, ""));
+				botId, NetUtils.encode(input), this.channelsCustid.getOrDefault(channelId, ""));
 		final JSONObject resultObj = XML.toJSONObject(NetUtils.getDoc(url).html()).getJSONObject("result");
 		final ChatBotResponse chat = Utils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class);
-		channelsCustid.put(channelId, chat.getCustId());
+		this.channelsCustid.put(channelId, chat.getCustId());
 		return chat.getResponse();
 	}
 

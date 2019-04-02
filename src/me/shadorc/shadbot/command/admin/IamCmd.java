@@ -49,14 +49,14 @@ public class IamCmd extends BaseCmd {
 			return Mono.error(new CommandException("You should specify only one text in quotation marks."));
 		}
 
-		final Mono<List<Role>> rolesMono = context.getGuild()
+		final Mono<List<Role>> getRoles = context.getGuild()
 				.flatMapMany(guild -> DiscordUtils.extractRoles(guild, StringUtils.remove(arg, quotedElements)))
 				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
 				.collectList();
 
 		return context.getChannel()
 				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
-						.then(rolesMono)
+						.then(getRoles)
 						.flatMap(roles -> {
 							if(roles.isEmpty()) {
 								return Mono.error(new MissingArgumentException());

@@ -105,8 +105,8 @@ public class TranslateCmd extends BaseCmd {
 			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
 					.andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
 							.setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
-									StringUtils.capitalize(langIsoMap.inverse().get(langFrom)), sourceText,
-									StringUtils.capitalize(langIsoMap.inverse().get(langTo)), translatedText.toString()))));
+									StringUtils.capitalize(this.langIsoMap.inverse().get(langFrom)), sourceText,
+									StringUtils.capitalize(this.langIsoMap.inverse().get(langTo)), translatedText.toString()))));
 
 		})
 				.flatMap(LoadingMessage::send)
@@ -115,7 +115,7 @@ public class TranslateCmd extends BaseCmd {
 	}
 
 	private String toISO(String lang) {
-		return langIsoMap.containsValue(lang) ? lang : langIsoMap.get(lang);
+		return this.langIsoMap.containsValue(lang) ? lang : this.langIsoMap.get(lang);
 	}
 
 	@Override

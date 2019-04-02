@@ -36,26 +36,26 @@ public class UserInfoCmd extends BaseCmd {
 	public Mono<Void> execute(Context context) {
 		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		final Mono<Member> memberMono = context.getMessage()
+		final Mono<Member> getMember = context.getMessage()
 				.getUserMentions()
 				.switchIfEmpty(Mono.just(context.getAuthor()))
 				.next()
 				.flatMap(user -> user.asMember(context.getGuildId()));
 
-		return Mono.zip(memberMono,
-				memberMono.flatMap(Member::getPresence),
-				memberMono.flatMapMany(Member::getRoles).collectList())
+		return Mono.zip(getMember,
+				getMember.flatMap(Member::getPresence),
+				getMember.flatMapMany(Member::getRoles).collectList())
 				.map(tuple -> {
 					final Member member = tuple.getT1();
 					final Presence presence = tuple.getT2();
 					final List<Role> roles = tuple.getT3();
 
 					final String creationDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(member.getId().getTimestamp()).format(dateFormatter),
+							TimeUtils.toLocalDate(member.getId().getTimestamp()).format(this.dateFormatter),
 							FormatUtils.longDuration(member.getId().getTimestamp()));
 
 					final String joinDate = String.format("%s%n(%s)",
-							TimeUtils.toLocalDate(member.getJoinTime()).format(dateFormatter),
+							TimeUtils.toLocalDate(member.getJoinTime()).format(this.dateFormatter),
 							FormatUtils.longDuration(member.getJoinTime()));
 
 					return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()

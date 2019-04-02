@@ -57,20 +57,20 @@ public class WallpaperCmd extends BaseCmd {
 
 		this.options = new Options();
 
-		options.addOption("p", PURITY, true, FormatUtils.format(Purity.class, ", "));
-		options.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
+		this.options.addOption("p", PURITY, true, FormatUtils.format(Purity.class, ", "));
+		this.options.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
 
 		final Option ratioOption = new Option("rat", RATIO, true, "image ratio");
 		ratioOption.setValueSeparator('x');
-		options.addOption(ratioOption);
+		this.options.addOption(ratioOption);
 
 		final Option resOption = new Option("res", RESOLUTION, true, "image resolution");
 		resOption.setValueSeparator('x');
-		options.addOption(resOption);
+		this.options.addOption(resOption);
 
 		final Option keyOption = new Option("k", KEYWORD, true, KEYWORD);
 		keyOption.setValueSeparator(',');
-		options.addOption(keyOption);
+		this.options.addOption(keyOption);
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class WallpaperCmd extends BaseCmd {
 
 		return Mono.fromCallable(() -> {
 			final List<String> args = StringUtils.split(context.getArg().orElse(""));
-			return new DefaultParser().parse(options, args.toArray(new String[0]));
+			return new DefaultParser().parse(this.options, args.toArray(new String[0]));
 		})
 				.onErrorMap(err -> err instanceof UnrecognizedOptionException || err instanceof org.apache.commons.cli.MissingArgumentException,
 						err -> new CommandException(String.format("%s. Use `%shelp %s` for more information.",

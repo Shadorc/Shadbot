@@ -54,10 +54,10 @@ public class SettingsCmd extends BaseCmd {
 	}
 
 	private void add(BaseSetting... settings) {
-		for(BaseSetting setting : settings) {
-			if(settingsMap.putIfAbsent(setting.getSetting(), setting) != null) {
+		for(final BaseSetting setting : settings) {
+			if(this.settingsMap.putIfAbsent(setting.getSetting(), setting) != null) {
 				LogUtils.error(String.format("Command name collision between %s and %s",
-						setting.getName(), settingsMap.get(setting.getSetting()).getClass().getSimpleName()));
+						setting.getName(), this.settingsMap.get(setting.getSetting()).getClass().getSimpleName()));
 			}
 		}
 	}
@@ -74,7 +74,7 @@ public class SettingsCmd extends BaseCmd {
 		}
 
 		final Setting settingEnum = Utils.parseEnum(Setting.class, args.get(0));
-		final BaseSetting setting = settingsMap.get(settingEnum);
+		final BaseSetting setting = this.settingsMap.get(settingEnum);
 		if(setting == null) {
 			return Mono.error(new CommandException(String.format("Setting `%s` does not exist. Use `%shelp %s` to see all available settings.",
 					args.get(0), context.getPrefix(), this.getName())));
@@ -179,7 +179,7 @@ public class SettingsCmd extends BaseCmd {
 				.addField("Current settings", String.format("`%s%s show`",
 						context.getPrefix(), this.getName()), false);
 
-		settingsMap.values().stream()
+		this.settingsMap.values().stream()
 				.forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()),
 						setting.getDescription(),
 						false));

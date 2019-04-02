@@ -51,5 +51,5 @@ public class MemberListener {
 								.replace("{username}", user.getUsername())
 								.replace("{userId}", user.getId().asString())
 								.replace("{mention}", user.getMention()), channel)));
-	};
+	}
 }

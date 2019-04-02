@@ -39,7 +39,7 @@ public class Hand {
 		int aceCount = 0;
 
 		int value = 0;
-		for(final Card card : cards) {
+		for(final Card card : this.cards) {
 			if(card.getValue().equals(Value.ACE)) {
 				aceCount++;
 			} else {

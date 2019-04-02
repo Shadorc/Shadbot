@@ -26,7 +26,7 @@ public class DatabaseManager extends Data {
 			final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, DBGuild.class);
 			final List<DBGuild> guilds = Utils.MAPPER.readValue(this.getFile(), valueType);
 			for(final DBGuild guild : guilds) {
-				guildsMap.put(guild.getId(), guild);
+				this.guildsMap.put(guild.getId(), guild);
 			}
 		}
 	}

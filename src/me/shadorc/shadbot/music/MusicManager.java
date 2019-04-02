@@ -32,7 +32,7 @@ public class MusicManager {
 	/**
 	 * Schedules loading a track or playlist with the specified identifier. Items loaded with the same
 	 * guild ID are handled sequentially in the order of calls to this method.
-	 * 
+	 *
 	 * @return A future for this operation
 	 */
 	public static Future<Void> loadItemOrdered(Snowflake guildId, String identifier, AudioLoadResultListener listener) {

@@ -97,7 +97,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
 	/**
 	 * Start the next track or end the guild music if this is the end of the playlist
-	 * 
+	 *
 	 * @return A {@link Mono} that completes when a new track has been started or when the guild music ended
 	 */
 	private Mono<Void> nextOrEnd() {

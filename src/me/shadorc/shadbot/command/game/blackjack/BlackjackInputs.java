@@ -33,9 +33,9 @@ public class BlackjackInputs extends Inputs {
 		final Member member = event.getMember().get();
 		final String content = event.getMessage().getContent().get();
 		return this.game.isCancelMessage(event.getMessage())
-				.map(isCancelCmd -> isCancelCmd || (this.game.getPlayers().containsKey(member.getId())
+				.map(isCancelCmd -> isCancelCmd || this.game.getPlayers().containsKey(member.getId())
 						&& this.game.getActions().containsKey(content)
-						&& !this.game.getRateLimiter().isLimitedAndWarn(event.getMessage().getChannelId(), member)));
+						&& !this.game.getRateLimiter().isLimitedAndWarn(event.getMessage().getChannelId(), member));
 	}
 
 	@Override

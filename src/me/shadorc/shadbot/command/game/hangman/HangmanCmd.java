@@ -48,7 +48,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
 			} else if(difficulty.equals(Difficulty.HARD) && !this.hardWords.isLoaded()) {
 				this.hardWords.load();
 			}
-		} catch (IOException err) {
+		} catch (final IOException err) {
 			throw Exceptions.propagate(err);
 		}
 

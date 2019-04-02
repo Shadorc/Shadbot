@@ -28,13 +28,13 @@ import reactor.core.publisher.Mono;
 public class HangmanGame extends Game {
 
 	private static final List<String> IMG_LIST = List.of(
-			getImageUrl("8/8b", 0),
-			getImageUrl("3/30", 1),
-			getImageUrl("7/70", 2),
-			getImageUrl("9/97", 3),
-			getImageUrl("2/27", 4),
-			getImageUrl("6/6b", 5),
-			getImageUrl("d/d6", 6));
+			HangmanGame.getImageUrl("8/8b", 0),
+			HangmanGame.getImageUrl("3/30", 1),
+			HangmanGame.getImageUrl("7/70", 2),
+			HangmanGame.getImageUrl("9/97", 3),
+			HangmanGame.getImageUrl("2/27", 4),
+			HangmanGame.getImageUrl("6/6b", 5),
+			HangmanGame.getImageUrl("d/d6", 6));
 
 	protected static final int MIN_GAINS = 200;
 	private static final int MAX_BONUS = 200;

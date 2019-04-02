@@ -37,7 +37,7 @@ public class LoggerCmd extends BaseCmd {
 
 		Logger logger;
 		if(name.equalsIgnoreCase("root")) {
-			logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+			logger = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
 		} else {
 			logger = (Logger) LoggerFactory.getLogger(name);
 		}

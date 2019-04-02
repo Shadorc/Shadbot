@@ -137,7 +137,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
 								embed.setFooter("Finished", null);
 							}
 
-							for(EmbedFieldEntity field : hands) {
+							for(final EmbedFieldEntity field : hands) {
 								embed.addField(field.getName(), field.getValue(), field.isInline());
 							}
 						}))

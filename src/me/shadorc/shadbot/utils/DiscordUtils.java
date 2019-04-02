@@ -152,17 +152,17 @@ public class DiscordUtils {
 	 *         user and the bot are in the same voice channel
 	 */
 	public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
-		final Mono<Optional<Snowflake>> botVoiceChannelIdMono = context.getSelfAsMember()
+		final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getSelfAsMember()
 				.flatMap(Member::getVoiceState)
 				.map(VoiceState::getChannelId)
 				.defaultIfEmpty(Optional.empty());
 
-		final Mono<Optional<Snowflake>> userVoiceChannelIdMono = context.getMember()
+		final Mono<Optional<Snowflake>> getUserVoiceChannelId = context.getMember()
 				.getVoiceState()
 				.map(VoiceState::getChannelId)
 				.defaultIfEmpty(Optional.empty());
 
-		return Mono.zip(botVoiceChannelIdMono, userVoiceChannelIdMono)
+		return Mono.zip(getBotVoiceChannelId, getUserVoiceChannelId)
 				.map(tuple -> {
 					final Optional<Snowflake> botVoiceChannelId = tuple.getT1();
 					final Optional<Snowflake> userVoiceChannelId = tuple.getT2();

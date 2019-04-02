@@ -15,11 +15,11 @@ public class RoulettePlayer extends Player {
 	}
 
 	public int getBet() {
-		return bet;
+		return this.bet;
 	}
 
 	public String getPlace() {
-		return place;
+		return this.place;
 	}
 
 }

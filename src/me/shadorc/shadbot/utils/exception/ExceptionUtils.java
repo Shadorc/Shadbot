@@ -22,7 +22,7 @@ public class ExceptionUtils {
 
 	public static boolean isDiscordForbidden(Throwable err) {
 		if(err instanceof ClientException) {
-			ClientException thr = (ClientException) err;
+			final ClientException thr = (ClientException) err;
 			return thr.getStatus().equals(HttpResponseStatus.FORBIDDEN);
 		}
 		return false;

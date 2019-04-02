@@ -37,7 +37,7 @@ public abstract class Inputs {
 	/**
 	 * Evaluate each event against this predicate. If the predicate test succeeds, the event is
 	 * emitted. If the predicate test fails, the event is ignored.
-	 * 
+	 *
 	 * @param event - the event
 	 * @return {@code true} if the event is valid and has to be processed, {code false} otherwise.
 	 */
@@ -46,7 +46,7 @@ public abstract class Inputs {
 	/**
 	 * {@code waitForInput} will relay events while this predicate returns {@code true} for
 	 * the event (checked before each event is delivered). This only includes the matching data.
-	 * 
+	 *
 	 * @param event - the event
 	 * @return {@code true} if the event has to be relayed, {@code false} if the {@link Flux}
 	 *         has to stop emitting.
@@ -55,7 +55,7 @@ public abstract class Inputs {
 
 	/**
 	 * Process valid events.
-	 * 
+	 *
 	 * @param event - the event
 	 * @return A {@link Mono} which emits when the event has been processed.
 	 */

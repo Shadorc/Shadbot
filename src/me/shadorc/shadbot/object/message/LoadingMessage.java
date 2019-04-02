@@ -63,16 +63,16 @@ public class LoadingMessage implements Publisher<Void> {
 	 */
 	public Mono<Message> send() {
 		final Consumer<MessageCreateSpec> consumer = spec -> {
-			if(content != null) {
-				spec.setContent(content);
+			if(this.content != null) {
+				spec.setContent(this.content);
 			}
-			if(embed != null) {
-				spec.setEmbed(embed);
+			if(this.embed != null) {
+				spec.setEmbed(this.embed);
 			}
 		};
 		return this.client.getChannelById(this.channelId)
 				.cast(MessageChannel.class)
-				.flatMap(channel -> DiscordUtils.sendMessage(consumer, channel, embed != null))
+				.flatMap(channel -> DiscordUtils.sendMessage(consumer, channel, this.embed != null))
 				.timeout(TYPING_TIMEOUT)
 				.doAfterTerminate(this::stopTyping);
 	}

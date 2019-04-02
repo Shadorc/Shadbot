@@ -29,7 +29,7 @@ public class SkipCmd extends BaseCmd {
 	public Mono<Void> execute(Context context) {
 		final GuildMusic guildMusic = context.requireGuildMusic();
 
-		final Mono<Message> messageMono = context.getChannel()
+		final Mono<Message> sendMessage = context.getChannel()
 				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.",
 						context.getUsername()), channel));
 
@@ -40,7 +40,7 @@ public class SkipCmd extends BaseCmd {
 				return Mono.error(new CommandException(String.format("Number must be between 1 and %d.",
 						playlistSize)));
 			}
-			return messageMono
+			return sendMessage
 					.doOnNext(ignored -> {
 						guildMusic.getTrackScheduler().skipTo(num);
 						// If the music has been started correctly, we resume it in case the previous music was paused
@@ -48,7 +48,7 @@ public class SkipCmd extends BaseCmd {
 					})
 					.then();
 		} else {
-			return messageMono
+			return sendMessage
 					.flatMap(ignored -> {
 						// If the music has been started correctly
 						if(guildMusic.getTrackScheduler().nextTrack()) {

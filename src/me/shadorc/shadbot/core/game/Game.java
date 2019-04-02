@@ -40,7 +40,7 @@ public abstract class Game {
 
 	/**
 	 * Schedule a {@link Mono} that will be triggered when the game duration is elapsed.
-	 * 
+	 *
 	 * @param mono - The {@link Mono} to trigger after the game duration has elapsed.
 	 */
 	public <T> void schedule(Mono<T> mono) {
