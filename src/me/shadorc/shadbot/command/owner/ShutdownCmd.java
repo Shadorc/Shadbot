@@ -9,6 +9,7 @@ import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +21,7 @@ public class ShutdownCmd extends BaseCmd {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		return Mono.fromRunnable(Shadbot::quit);
+		return Shadbot.quit(ExitCode.NORMAL);
 	}
 
 	@Override
