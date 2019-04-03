@@ -51,7 +51,7 @@ public class GuildMusicConnection {
 		return this.client.getChannelById(voiceChannelId)
 				.cast(VoiceChannel.class)
 				.flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider))
-						.timeout(Duration.ofSeconds(Config.DEFAULT_TIMEOUT)))
+						.timeout(Duration.ofMillis(Config.DEFAULT_TIMEOUT)))
 				.onErrorResume(TimeoutException.class, err -> {
 					LogUtils.info("{Guild ID: %d} Voice connection timed out.", this.guildId.asLong());
 					this.changeState(State.DISCONNECTED);
