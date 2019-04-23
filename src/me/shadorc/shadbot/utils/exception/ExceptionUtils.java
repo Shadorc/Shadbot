@@ -5,6 +5,8 @@ import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
+import javax.net.ssl.SSLException;
+
 import org.jsoup.HttpStatusException;
 
 import discord4j.rest.http.client.ClientException;
@@ -17,7 +19,8 @@ public class ExceptionUtils {
 				|| err instanceof NoRouteToHostException
 				|| err instanceof SocketTimeoutException
 				|| err instanceof UnknownHostException
-				|| err instanceof ConnectException;
+				|| err instanceof ConnectException
+				|| err instanceof SSLException;
 	}
 
 	public static boolean isDiscordForbidden(Throwable err) {
