@@ -84,7 +84,7 @@ public class Shadbot {
 				.build()
 				.map(builder -> builder
 						.setStoreService(MappingStoreService.create()
-								.setMapping(MessageBean.class, new CaffeineStoreService(caffeine -> caffeine.expireAfterAccess(Duration.ofHours(6))))
+								.setMapping(new CaffeineStoreService(caffeine -> caffeine.expireAfterAccess(Duration.ofHours(6))), MessageBean.class)
 								.setFallback(new ShardingJdkStoreService(registry)))
 						.setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
 								Integer.MAX_VALUE, Schedulers.elastic()))
