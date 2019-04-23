@@ -15,7 +15,6 @@ import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Mono;
 
 public class LeaveCmd extends BaseCmd {
@@ -34,8 +33,7 @@ public class LeaveCmd extends BaseCmd {
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.onErrorMap(ExceptionUtils::isKnownDiscordError,
-						err -> new CommandException("Guild not found."))
+				.switchIfEmpty(Mono.error(new CommandException("Guild not found.")))
 				.flatMap(Guild::leave)
 				.then(context.getChannel()
 						.flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Guild left.", channel)))

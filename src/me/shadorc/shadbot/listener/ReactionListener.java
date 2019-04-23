@@ -17,7 +17,6 @@ import me.shadorc.shadbot.command.admin.IamCmd;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.TemporaryMessage;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Mono;
 
 public class ReactionListener {
@@ -28,13 +27,11 @@ public class ReactionListener {
 
 	public static Mono<Void> onReactionAddEvent(ReactionAddEvent event) {
 		return event.getMessage()
-				.onErrorResume(ExceptionUtils::isKnownDiscordError, err -> Mono.empty())
 				.flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.ADD));
 	}
 
 	public static Mono<Void> onReactionRemoveEvent(ReactionRemoveEvent event) {
 		return event.getMessage()
-				.onErrorResume(ExceptionUtils::isKnownDiscordError, err -> Mono.empty())
 				.flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.REMOVE));
 	}
 

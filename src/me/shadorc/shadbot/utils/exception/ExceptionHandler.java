@@ -1,8 +1,6 @@
 package me.shadorc.shadbot.utils.exception;
 
 import discord4j.core.DiscordClient;
-import discord4j.rest.http.client.ClientException;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -93,22 +91,8 @@ public class ExceptionHandler {
 										context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
 	}
 
-	// Warning: If an error occurred in this method while processing an error, the error will not be logged
 	public static void handleUnknownError(DiscordClient client, Throwable err) {
-		if(err.getMessage() != null && err.getMessage().equals("syscall:read(..) failed: Connection reset by peer")) {
-			LogUtils.info(err.toString());
-		} else if(ExceptionUtils.isKnownDiscordError(err)) {
-			final ClientException clientErr = (ClientException) err;
-			if(clientErr.getStatus().equals(HttpResponseStatus.INTERNAL_SERVER_ERROR)) {
-				LogUtils.info(String.format("%s: %s (URL: %s)",
-						clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url()));
-			} else {
-				LogUtils.error(client, err, String.format("%s: %s (URL: %s)",
-						clientErr.getStatus(), clientErr.getErrorResponse().getFields().get("message").toString(), clientErr.getRequest().url()));
-			}
-		} else {
-			LogUtils.error(client, err, "An unknown error occurred.");
-		}
+		LogUtils.error(client, err, "An unknown error occurred.");
 	}
 
 }

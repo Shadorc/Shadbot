@@ -14,7 +14,6 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Mono;
 
 public class DatabaseCmd extends BaseCmd {
@@ -34,8 +33,7 @@ public class DatabaseCmd extends BaseCmd {
 		}
 
 		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.onErrorMap(ExceptionUtils::isKnownDiscordError,
-						err -> new CommandException("Guild not found."))
+				.switchIfEmpty(Mono.error(new CommandException("Guild not found.")))
 				.flatMap(guild -> {
 					if(args.size() == 1) {
 						return Mono.just(Shadbot.getDatabase().getDBGuild(guild.getId()).toString());
@@ -48,8 +46,7 @@ public class DatabaseCmd extends BaseCmd {
 					}
 
 					return context.getClient().getMemberById(Snowflake.of(guildId), Snowflake.of(memberId))
-							.onErrorMap(ExceptionUtils::isKnownDiscordError,
-									err -> new CommandException("Member not found."))
+							.switchIfEmpty(Mono.error(new CommandException("Member not found.")))
 							.map(member -> Shadbot.getDatabase().getDBMember(guild.getId(), member.getId()).toString());
 				})
 				.flatMap(text -> context.getChannel()

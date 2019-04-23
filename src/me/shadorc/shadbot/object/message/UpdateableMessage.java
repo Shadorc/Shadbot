@@ -9,7 +9,6 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Mono;
 
 public class UpdateableMessage {
@@ -40,7 +39,6 @@ public class UpdateableMessage {
 				.filter(messageId -> messageId.asLong() != -1)
 				.flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
 				.flatMap(Message::delete)
-				.onErrorResume(ExceptionUtils::isKnownDiscordError, err -> Mono.empty())
 				.then(this.client.getChannelById(this.channelId))
 				.cast(MessageChannel.class)
 				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))

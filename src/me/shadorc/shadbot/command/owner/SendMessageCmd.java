@@ -39,8 +39,7 @@ public class SendMessageCmd extends BaseCmd {
 		}
 
 		return context.getClient().getUserById(Snowflake.of(userId))
-				.onErrorMap(ExceptionUtils::isKnownDiscordError,
-						err -> new CommandException("User not found."))
+				.switchIfEmpty(Mono.error(new CommandException("User not found.")))
 				.flatMap(user -> {
 					if(user.isBot()) {
 						return Mono.error(new CommandException("I can't send private message to other bots."));

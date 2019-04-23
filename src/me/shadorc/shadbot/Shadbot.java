@@ -21,6 +21,10 @@ import discord4j.core.shard.ShardingJdkStoreRegistry;
 import discord4j.core.shard.ShardingJdkStoreService;
 import discord4j.core.shard.ShardingStoreRegistry;
 import discord4j.gateway.retry.RetryOptions;
+import discord4j.rest.http.client.ClientException;
+import discord4j.rest.request.RouteMatcher;
+import discord4j.rest.request.RouterOptions;
+import discord4j.rest.response.ResponseFunction;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.caffeine.CaffeineStoreService;
 import me.shadorc.shadbot.command.game.LotteryCmd;
@@ -39,6 +43,7 @@ import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.retry.Retry;
 
 public class Shadbot {
 
@@ -86,6 +91,13 @@ public class Shadbot {
 						.setStoreService(MappingStoreService.create()
 								.setMapping(new CaffeineStoreService(caffeine -> caffeine.expireAfterAccess(Duration.ofHours(6))), MessageBean.class)
 								.setFallback(new ShardingJdkStoreService(registry)))
+						.setRouterOptions(RouterOptions.builder()
+								.onClientResponse(ResponseFunction.emptyIfNotFound())
+								.onClientResponse(ResponseFunction.retryWhen(RouteMatcher.any(),
+										Retry.onlyIf(ClientException.isRetryContextStatusCode(500))
+												.exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofSeconds(5))
+												.retryMax(3)))
+								.build())
 						.setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
 								Integer.MAX_VALUE, Schedulers.elastic()))
 						.setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))

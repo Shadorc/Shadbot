@@ -28,14 +28,4 @@ public class ExceptionUtils {
 		return false;
 	}
 
-	public static boolean isKnownDiscordError(Throwable err) {
-		if(err instanceof ClientException) {
-			final HttpResponseStatus status = ((ClientException) err).getStatus();
-			return status.equals(HttpResponseStatus.INTERNAL_SERVER_ERROR)
-					|| status.equals(HttpResponseStatus.FORBIDDEN)
-					|| status.equals(HttpResponseStatus.NOT_FOUND);
-		}
-		return false;
-	}
-
 }
