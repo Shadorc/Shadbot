@@ -6,11 +6,11 @@ import java.util.List;
 
 public class PlayerSummaries {
 
-	@JsonProperty("players")
-	private List<PlayerSummary> players;
+    @JsonProperty("players")
+    private List<PlayerSummary> players;
 
-	public List<PlayerSummary> getPlayers() {
-		return this.players;
-	}
+    public List<PlayerSummary> getPlayers() {
+        return this.players;
+    }
 
 }

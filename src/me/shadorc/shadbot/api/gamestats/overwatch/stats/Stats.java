@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Stats {
 
-	@JsonProperty("top_heroes")
-	private TopHeroes topHeroes;
+    @JsonProperty("top_heroes")
+    private TopHeroes topHeroes;
 
-	public TopHeroes getTopHeroes() {
-		return this.topHeroes;
-	}
+    public TopHeroes getTopHeroes() {
+        return this.topHeroes;
+    }
 
 }

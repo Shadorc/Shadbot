@@ -11,37 +11,37 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
 
-	private final Map<String, AtomicLong> map;
+    private final Map<String, AtomicLong> map;
 
-	public MapStatistic(String fileName, Class<E> enumClass) {
-		super(fileName, enumClass);
-		this.map = new HashMap<>();
+    public MapStatistic(String fileName, Class<E> enumClass) {
+        super(fileName, enumClass);
+        this.map = new HashMap<>();
 
-		try {
-			if(this.getFile().exists()) {
-				final JavaType type = Utils.MAPPER.getTypeFactory().constructMapLikeType(Map.class, String.class, AtomicLong.class);
-				this.map.putAll(Utils.MAPPER.readValue(this.getFile(), type));
-			}
-		} catch (final IOException err) {
-			LogUtils.error(err, String.format("An error occurred while initializing statistic: %s", this.getFile()));
-		}
-	}
+        try {
+            if (this.getFile().exists()) {
+                final JavaType type = Utils.MAPPER.getTypeFactory().constructMapLikeType(Map.class, String.class, AtomicLong.class);
+                this.map.putAll(Utils.MAPPER.readValue(this.getFile(), type));
+            }
+        } catch (final IOException err) {
+            LogUtils.error(err, String.format("An error occurred while initializing statistic: %s", this.getFile()));
+        }
+    }
 
-	public void log(E key) {
-		this.map.computeIfAbsent(key.toString(), ignored -> new AtomicLong(0)).incrementAndGet();
-	}
+    public void log(E key) {
+        this.map.computeIfAbsent(key.toString(), ignored -> new AtomicLong(0)).incrementAndGet();
+    }
 
-	public Map<String, AtomicLong> getMap() {
-		return this.map;
-	}
+    public Map<String, AtomicLong> getMap() {
+        return this.map;
+    }
 
-	public AtomicLong getValue(String key) {
-		return this.map.getOrDefault(key, new AtomicLong(0));
-	}
+    public AtomicLong getValue(String key) {
+        return this.map.getOrDefault(key, new AtomicLong(0));
+    }
 
-	@Override
-	public Object getData() {
-		return this.map;
-	}
+    @Override
+    public Object getData() {
+        return this.map;
+    }
 
 }

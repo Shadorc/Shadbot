@@ -16,33 +16,33 @@ import java.util.function.Consumer;
 
 public class ActivateRelicCmd extends BaseCmd {
 
-	public ActivateRelicCmd() {
-		super(CommandCategory.HIDDEN, List.of("activate_relic", "activate-relic", "activaterelic"));
-		this.setDefaultRateLimiter();
-	}
+    public ActivateRelicCmd() {
+        super(CommandCategory.HIDDEN, List.of("activate_relic", "activate-relic", "activaterelic"));
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final String arg = context.requireArg();
+    @Override
+    public Mono<Void> execute(Context context) {
+        final String arg = context.requireArg();
 
-		return context.getChannel()
-				.flatMap(channel -> Mono.fromCallable(() -> {
-					Shadbot.getPremium().activateRelic(context.getGuildId(), context.getAuthorId(), arg);
-					return String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy !",
-							context.getUsername());
-				})
-						.onErrorResume(RelicActivationException.class,
-								err -> Mono.just(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
-										context.getUsername(), err.getMessage())))
-						.flatMap(text -> DiscordUtils.sendMessage(text, channel)))
-				.then();
-	}
+        return context.getChannel()
+                .flatMap(channel -> Mono.fromCallable(() -> {
+                    Shadbot.getPremium().activateRelic(context.getGuildId(), context.getAuthorId(), arg);
+                    return String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy !",
+                            context.getUsername());
+                })
+                        .onErrorResume(RelicActivationException.class,
+                                err -> Mono.just(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
+                                        context.getUsername(), err.getMessage())))
+                        .flatMap(text -> DiscordUtils.sendMessage(text, channel)))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Activate a relic.")
-				.addArg("key", false)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Activate a relic.")
+                .addArg("key", false)
+                .build();
+    }
 }

@@ -15,20 +15,20 @@ import java.util.function.Consumer;
 
 public class ShutdownCmd extends BaseCmd {
 
-	public ShutdownCmd() {
-		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("shutdown"));
-	}
+    public ShutdownCmd() {
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("shutdown"));
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		return Shadbot.quit(ExitCode.NORMAL);
-	}
+    @Override
+    public Mono<Void> execute(Context context) {
+        return Shadbot.quit(ExitCode.NORMAL);
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Shutdown the bot.")
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Shutdown the bot.")
+                .build();
+    }
 
 }

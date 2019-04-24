@@ -19,48 +19,48 @@ import java.util.function.Consumer;
 
 public class NSFWSetting extends BaseSetting {
 
-	private enum Action {
-		TOGGLE, ENABLE, DISABLE;
-	}
+    private enum Action {
+        TOGGLE, ENABLE, DISABLE;
+    }
 
-	public NSFWSetting() {
-		super(Setting.NSFW, "Manage current channel's NSFW state.");
-	}
+    public NSFWSetting() {
+        super(Setting.NSFW, "Manage current channel's NSFW state.");
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final List<String> args = context.requireArgs(2);
+    @Override
+    public Mono<Void> execute(Context context) {
+        final List<String> args = context.requireArgs(2);
 
-		final Action action = Utils.parseEnum(Action.class, args.get(1),
-				new CommandException(String.format("`%s` is not a valid action. %s",
-						args.get(1), FormatUtils.options(Action.class))));
+        final Action action = Utils.parseEnum(Action.class, args.get(1),
+                new CommandException(String.format("`%s` is not a valid action. %s",
+                        args.get(1), FormatUtils.options(Action.class))));
 
-		return context.getChannel()
-				.cast(TextChannel.class)
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_CHANNELS)
-						.then(Mono.fromSupplier(() -> {
-							switch (action) {
-								case TOGGLE:
-									return !channel.isNsfw();
-								case ENABLE:
-									return true;
-								default:
-									return false;
-							}
-						}))
-						.flatMap(nsfw -> channel.edit(spec -> spec.setNsfw(nsfw))))
-				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) %s is now **%sSFW**.",
-						context.getUsername(), channel.getMention(), channel.isNsfw() ? "N" : ""), channel))
-				.then();
-	}
+        return context.getChannel()
+                .cast(TextChannel.class)
+                .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_CHANNELS)
+                        .then(Mono.fromSupplier(() -> {
+                            switch (action) {
+                                case TOGGLE:
+                                    return !channel.isNsfw();
+                                case ENABLE:
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }))
+                        .flatMap(nsfw -> channel.edit(spec -> spec.setNsfw(nsfw))))
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) %s is now **%sSFW**.",
+                        context.getUsername(), channel.getMention(), channel.isNsfw() ? "N" : ""), channel))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return EmbedUtils.getDefaultEmbed()
-				.andThen(embed -> embed.addField("Usage", String.format("`%s%s <action>`", context.getPrefix(), this.getCommandName()), false)
-						.addField("Argument", String.format("**action** - %s",
-								FormatUtils.format(Action.class, "/")), false)
-						.addField("Example", String.format("`%s%s toggle`", context.getPrefix(), this.getCommandName()), false));
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return EmbedUtils.getDefaultEmbed()
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action>`", context.getPrefix(), this.getCommandName()), false)
+                        .addField("Argument", String.format("**action** - %s",
+                                FormatUtils.format(Action.class, "/")), false)
+                        .addField("Example", String.format("`%s%s toggle`", context.getPrefix(), this.getCommandName()), false));
+    }
 
 }

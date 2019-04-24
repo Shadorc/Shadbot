@@ -25,75 +25,75 @@ import java.util.function.Consumer;
 
 public class StatsCmd extends BaseCmd {
 
-	public StatsCmd() {
-		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("stats"));
-	}
+    public StatsCmd() {
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("stats"));
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final List<String> args = context.requireArgs(1, 2);
+    @Override
+    public Mono<Void> execute(Context context) {
+        final List<String> args = context.requireArgs(1, 2);
 
-		if(args.get(0).equalsIgnoreCase("average")) {
-			final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getAverageEmbed()
-					.andThen(embed -> embed.setAuthor("Stats: average", null, context.getAvatarUrl()));
+        if (args.get(0).equalsIgnoreCase("average")) {
+            final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getAverageEmbed()
+                    .andThen(embed -> embed.setAuthor("Stats: average", null, context.getAvatarUrl()));
 
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-					.then();
-		}
+            return context.getChannel()
+                    .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+                    .then();
+        }
 
-		final StatisticEnum statEnum = Utils.parseEnum(StatisticEnum.class, args.get(0),
-				new CommandException(String.format("`%s` is not a valid category. %s",
-						args.get(0), FormatUtils.options(StatisticEnum.class))));
+        final StatisticEnum statEnum = Utils.parseEnum(StatisticEnum.class, args.get(0),
+                new CommandException(String.format("`%s` is not a valid category. %s",
+                        args.get(0), FormatUtils.options(StatisticEnum.class))));
 
-		Map<String, AtomicLong> map;
-		if(args.size() == 1) {
-			if(statEnum.getStat() instanceof TableStatistic) {
-				return Mono.error(new CommandException(String.format("You need to specify a valid sub-category.%n%s",
-						FormatUtils.options(statEnum.getStat().getEnumClass()))));
-			}
+        Map<String, AtomicLong> map;
+        if (args.size() == 1) {
+            if (statEnum.getStat() instanceof TableStatistic) {
+                return Mono.error(new CommandException(String.format("You need to specify a valid sub-category.%n%s",
+                        FormatUtils.options(statEnum.getStat().getEnumClass()))));
+            }
 
-			map = ((MapStatistic<?>) statEnum.getStat()).getMap();
-		} else {
-			final Enum<?> subStatEnum = Utils.parseEnum(statEnum.getStat().getEnumClass(), args.get(1),
-					new CommandException(String.format("`%s` is not a valid sub-category. %s",
-							args.get(1), FormatUtils.options(statEnum.getStat().getEnumClass()))));
+            map = ((MapStatistic<?>) statEnum.getStat()).getMap();
+        } else {
+            final Enum<?> subStatEnum = Utils.parseEnum(statEnum.getStat().getEnumClass(), args.get(1),
+                    new CommandException(String.format("`%s` is not a valid sub-category. %s",
+                            args.get(1), FormatUtils.options(statEnum.getStat().getEnumClass()))));
 
-			if(statEnum.getStat() instanceof MapStatistic) {
-				map = Map.of(subStatEnum.toString(), ((MapStatistic<?>) statEnum.getStat()).getValue(subStatEnum.toString()));
-			} else {
-				map = ((TableStatistic<?>) statEnum.getStat()).getMap(subStatEnum.toString());
-			}
-		}
+            if (statEnum.getStat() instanceof MapStatistic) {
+                map = Map.of(subStatEnum.toString(), ((MapStatistic<?>) statEnum.getStat()).getValue(subStatEnum.toString()));
+            } else {
+                map = ((TableStatistic<?>) statEnum.getStat()).getMap(subStatEnum.toString());
+            }
+        }
 
-		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-				.andThen(embed -> {
-					embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, context.getAvatarUrl());
+        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+                .andThen(embed -> {
+                    embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, context.getAvatarUrl());
 
-					if(map == null || map.isEmpty()) {
-						embed.setDescription("No statistics yet.");
-					} else {
-						final Comparator<? super Map.Entry<String, AtomicLong>> comparator =
-								Map.Entry.comparingByValue(Comparator.comparingLong(AtomicLong::get));
-						final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
+                    if (map == null || map.isEmpty()) {
+                        embed.setDescription("No statistics yet.");
+                    } else {
+                        final Comparator<? super Map.Entry<String, AtomicLong>> comparator =
+                                Map.Entry.comparingByValue(Comparator.comparingLong(AtomicLong::get));
+                        final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
 
-						embed.addField("Name", FormatUtils.format(sortedMap.keySet(), StringUtils::toLowerCase, "\n"), true)
-								.addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.number(Long.parseLong(value.toString())), "\n"), true);
-					}
-				});
+                        embed.addField("Name", FormatUtils.format(sortedMap.keySet(), StringUtils::toLowerCase, "\n"), true)
+                                .addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.number(Long.parseLong(value.toString())), "\n"), true);
+                    }
+                });
 
-		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-				.then();
-	}
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Show statistics for the specified category.")
-				.addArg("category", FormatUtils.options(StatisticEnum.class), false)
-				.addArg("sub-category", "Needed when checking table statistics or to see a specific statistic", true)
-				.addField("Info", "You can also use `average` as a *category* to get average winnings per game", false)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Show statistics for the specified category.")
+                .addArg("category", FormatUtils.options(StatisticEnum.class), false)
+                .addArg("sub-category", "Needed when checking table statistics or to see a specific statistic", true)
+                .addField("Info", "You can also use `average` as a *category* to get average winnings per game", false)
+                .build();
+    }
 }

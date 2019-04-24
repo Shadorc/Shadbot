@@ -7,54 +7,54 @@ import java.util.List;
 
 public class ProfileResponse {
 
-	@Nullable
-	@JsonProperty("code")
-	private String code;
-	@JsonProperty("battleTag")
-	private String battleTag;
-	@JsonProperty("paragonLevel")
-	private int paragonLevel;
-	@JsonProperty("paragonLevelHardcore")
-	private int paragonLevelHardcore;
-	@JsonProperty("paragonLevelSeason")
-	private int paragonLevelSeason;
-	@JsonProperty("paragonLevelSeasonHardcore")
-	private int paragonLevelSeasonHardcore;
-	@JsonProperty("guildName")
-	private String guildName;
-	@JsonProperty("heroes")
-	private List<HeroId> heroeIds;
+    @Nullable
+    @JsonProperty("code")
+    private String code;
+    @JsonProperty("battleTag")
+    private String battleTag;
+    @JsonProperty("paragonLevel")
+    private int paragonLevel;
+    @JsonProperty("paragonLevelHardcore")
+    private int paragonLevelHardcore;
+    @JsonProperty("paragonLevelSeason")
+    private int paragonLevelSeason;
+    @JsonProperty("paragonLevelSeasonHardcore")
+    private int paragonLevelSeasonHardcore;
+    @JsonProperty("guildName")
+    private String guildName;
+    @JsonProperty("heroes")
+    private List<HeroId> heroeIds;
 
-	public String getCode() {
-		return this.code;
-	}
+    public String getCode() {
+        return this.code;
+    }
 
-	public String getBattleTag() {
-		return this.battleTag;
-	}
+    public String getBattleTag() {
+        return this.battleTag;
+    }
 
-	public int getParagonLevel() {
-		return this.paragonLevel;
-	}
+    public int getParagonLevel() {
+        return this.paragonLevel;
+    }
 
-	public int getParagonLevelHardcore() {
-		return this.paragonLevelHardcore;
-	}
+    public int getParagonLevelHardcore() {
+        return this.paragonLevelHardcore;
+    }
 
-	public int getParagonLevelSeason() {
-		return this.paragonLevelSeason;
-	}
+    public int getParagonLevelSeason() {
+        return this.paragonLevelSeason;
+    }
 
-	public int getParagonLevelSeasonHardcore() {
-		return this.paragonLevelSeasonHardcore;
-	}
+    public int getParagonLevelSeasonHardcore() {
+        return this.paragonLevelSeasonHardcore;
+    }
 
-	public String getGuildName() {
-		return this.guildName;
-	}
+    public String getGuildName() {
+        return this.guildName;
+    }
 
-	public List<HeroId> getHeroeIds() {
-		return this.heroeIds;
-	}
+    public List<HeroId> getHeroeIds() {
+        return this.heroeIds;
+    }
 
 }

@@ -45,63 +45,63 @@ import java.util.Map;
 
 public class CommandInitializer {
 
-	private final static Map<String, BaseCmd> COMMANDS_MAP = new LinkedHashMap<>();
+    private final static Map<String, BaseCmd> COMMANDS_MAP = new LinkedHashMap<>();
 
-	public static void initialize() {
-		CommandInitializer.add(
-				// Utility Commands
-				new WeatherCmd(), new CalcCmd(), new TranslateCmd(), new WikiCmd(), new PollCmd(),
-				new UrbanCmd(), new LyricsCmd(),
-				// Fun Commands
-				new ChatCmd(), new ThisDayCmd(), new LeetCmd(),
-				// Image Commands
-				new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(),
-				new Rule34Cmd(),
-				// Game Commands
-				new RpsCmd(), new HangmanCmd(), new TriviaCmd(), new RussianRouletteCmd(),
-				new SlotMachineCmd(), new RouletteCmd(), new BlackjackCmd(), new DiceCmd(),
-				new LotteryCmd(),
-				// Currency Commands
-				new CoinsCmd(), new LeaderboardCmd(), new TransferCoinsCmd(),
-				// Music Commands
-				new PlayCmd(), new PauseCmd(), new StopCmd(), new SkipCmd(), new RepeatCmd(),
-				new BackwardCmd(), new ForwardCmd(), new VolumeCmd(), new NameCmd(),
-				new PlaylistCmd(), new ShuffleCmd(), new ClearCmd(),
-				// Game Stats Commands
-				new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
-				// Info Commands
-				new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
-				new RolelistCmd(),
-				// French Commands
-				new JokeCmd(), new DtcCmd(),
-				// Admin Commands
-				new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
-				new IamCmd(), new SettingsCmd(),
-				// Owner Commands
-				new LoggerCmd(), new StatsCmd(), new RestartCmd(), new LeaveCmd(),
-				new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(), new DatabaseCmd(),
-				new CleanDatabaseCmd(),
-				// Hidden Commands
-				new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd());
-	}
+    public static void initialize() {
+        CommandInitializer.add(
+                // Utility Commands
+                new WeatherCmd(), new CalcCmd(), new TranslateCmd(), new WikiCmd(), new PollCmd(),
+                new UrbanCmd(), new LyricsCmd(),
+                // Fun Commands
+                new ChatCmd(), new ThisDayCmd(), new LeetCmd(),
+                // Image Commands
+                new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(),
+                new Rule34Cmd(),
+                // Game Commands
+                new RpsCmd(), new HangmanCmd(), new TriviaCmd(), new RussianRouletteCmd(),
+                new SlotMachineCmd(), new RouletteCmd(), new BlackjackCmd(), new DiceCmd(),
+                new LotteryCmd(),
+                // Currency Commands
+                new CoinsCmd(), new LeaderboardCmd(), new TransferCoinsCmd(),
+                // Music Commands
+                new PlayCmd(), new PauseCmd(), new StopCmd(), new SkipCmd(), new RepeatCmd(),
+                new BackwardCmd(), new ForwardCmd(), new VolumeCmd(), new NameCmd(),
+                new PlaylistCmd(), new ShuffleCmd(), new ClearCmd(),
+                // Game Stats Commands
+                new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
+                // Info Commands
+                new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
+                new RolelistCmd(),
+                // French Commands
+                new JokeCmd(), new DtcCmd(),
+                // Admin Commands
+                new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
+                new IamCmd(), new SettingsCmd(),
+                // Owner Commands
+                new LoggerCmd(), new StatsCmd(), new RestartCmd(), new LeaveCmd(),
+                new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(), new DatabaseCmd(),
+                new CleanDatabaseCmd(),
+                // Hidden Commands
+                new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd());
+    }
 
-	private static void add(BaseCmd... cmds) {
-		for(final BaseCmd cmd : cmds) {
-			for(final String name : cmd.getNames()) {
-				if(COMMANDS_MAP.putIfAbsent(name, cmd) != null) {
-					LogUtils.error(String.format("Command name collision between %s and %s.",
-							name, COMMANDS_MAP.get(name).getClass().getSimpleName()));
-				}
-			}
-		}
-		LogUtils.info("%d commands initialized.", cmds.length);
-	}
+    private static void add(BaseCmd... cmds) {
+        for (final BaseCmd cmd : cmds) {
+            for (final String name : cmd.getNames()) {
+                if (COMMANDS_MAP.putIfAbsent(name, cmd) != null) {
+                    LogUtils.error(String.format("Command name collision between %s and %s.",
+                            name, COMMANDS_MAP.get(name).getClass().getSimpleName()));
+                }
+            }
+        }
+        LogUtils.info("%d commands initialized.", cmds.length);
+    }
 
-	public static Map<String, BaseCmd> getCommands() {
-		return COMMANDS_MAP;
-	}
+    public static Map<String, BaseCmd> getCommands() {
+        return COMMANDS_MAP;
+    }
 
-	public static BaseCmd getCommand(String name) {
-		return COMMANDS_MAP.get(name);
-	}
+    public static BaseCmd getCommand(String name) {
+        return COMMANDS_MAP.get(name);
+    }
 }

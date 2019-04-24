@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PlayerSummariesResponse {
 
-	@JsonProperty("response")
-	private PlayerSummaries response;
+    @JsonProperty("response")
+    private PlayerSummaries response;
 
-	public PlayerSummaries getResponse() {
-		return this.response;
-	}
+    public PlayerSummaries getResponse() {
+        return this.response;
+    }
 
 }

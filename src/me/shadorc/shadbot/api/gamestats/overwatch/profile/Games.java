@@ -6,11 +6,11 @@ import java.util.Map;
 
 public class Games {
 
-	@JsonProperty("quickplay")
-	private Map<String, Integer> quickplay;
+    @JsonProperty("quickplay")
+    private Map<String, Integer> quickplay;
 
-	public String getQuickplayWon() {
-		return this.quickplay.getOrDefault("won", 0).toString();
-	}
+    public String getQuickplayWon() {
+        return this.quickplay.getOrDefault("won", 0).toString();
+    }
 
 }

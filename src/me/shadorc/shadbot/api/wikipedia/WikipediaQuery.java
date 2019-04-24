@@ -6,11 +6,11 @@ import java.util.Map;
 
 public class WikipediaQuery {
 
-	@JsonProperty("pages")
-	private Map<String, WikipediaPage> pages;
+    @JsonProperty("pages")
+    private Map<String, WikipediaPage> pages;
 
-	public Map<String, WikipediaPage> getPages() {
-		return this.pages;
-	}
+    public Map<String, WikipediaPage> getPages() {
+        return this.pages;
+    }
 
 }

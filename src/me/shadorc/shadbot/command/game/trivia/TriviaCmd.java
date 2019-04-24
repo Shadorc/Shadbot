@@ -18,70 +18,70 @@ import java.util.function.Consumer;
 
 public class TriviaCmd extends GameCmd<TriviaGame> {
 
-	private static final String CATEGORY_URL = "https://opentdb.com/api_category.php";
+    private static final String CATEGORY_URL = "https://opentdb.com/api_category.php";
 
-	private TriviaCategoriesResponse categories;
+    private TriviaCategoriesResponse categories;
 
-	public TriviaCmd() {
-		super(List.of("trivia"));
+    public TriviaCmd() {
+        super(List.of("trivia"));
 
-		this.categories = null;
-	}
+        this.categories = null;
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
+    @Override
+    public Mono<Void> execute(Context context) {
+        final Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
 
-		if(context.getArg().isPresent()) {
-			if(this.categories == null) {
-				try {
-					this.categories = Utils.MAPPER.readValue(NetUtils.getJSON(CATEGORY_URL), TriviaCategoriesResponse.class);
-				} catch (final IOException err) {
-					throw Exceptions.propagate(err);
-				}
-			}
+        if (context.getArg().isPresent()) {
+            if (this.categories == null) {
+                try {
+                    this.categories = Utils.MAPPER.readValue(NetUtils.getJSON(CATEGORY_URL), TriviaCategoriesResponse.class);
+                } catch (final IOException err) {
+                    throw Exceptions.propagate(err);
+                }
+            }
 
-			if("categories".equalsIgnoreCase(context.getArg().get())) {
-				final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-						.andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
-								.addField("ID", FormatUtils.format(this.categories.getIds(), Object::toString, "\n"), true)
-								.addField("Name", String.join("\n", this.categories.getNames()), true));
+            if ("categories".equalsIgnoreCase(context.getArg().get())) {
+                final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+                        .andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
+                                .addField("ID", FormatUtils.format(this.categories.getIds(), Object::toString, "\n"), true)
+                                .addField("Name", String.join("\n", this.categories.getNames()), true));
 
-				return context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-						.then();
-			}
+                return context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+                        .then();
+            }
 
-			if(!this.categories.getIds().contains(categoryId)) {
-				return Mono.error(new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list of categories.",
-						context.getArg().get(), context.getPrefix(), this.getName())));
-			}
-		}
+            if (!this.categories.getIds().contains(categoryId)) {
+                return Mono.error(new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list of categories.",
+                        context.getArg().get(), context.getPrefix(), this.getName())));
+            }
+        }
 
-		if(this.getManagers().containsKey(context.getChannelId())) {
-			return context.getChannel()
-					.flatMap(channel -> DiscordUtils.sendMessage(String.format(
-							Emoji.INFO + " (**%s**) A Trivia game has already been started.",
-							context.getUsername()), channel))
-					.then();
-		} else {
-			final TriviaGame triviaManager = new TriviaGame(this, context, categoryId);
-			this.getManagers().put(context.getChannelId(), triviaManager);
-			triviaManager.start();
-			return triviaManager.show();
-		}
+        if (this.getManagers().containsKey(context.getChannelId())) {
+            return context.getChannel()
+                    .flatMap(channel -> DiscordUtils.sendMessage(String.format(
+                            Emoji.INFO + " (**%s**) A Trivia game has already been started.",
+                            context.getUsername()), channel))
+                    .then();
+        } else {
+            final TriviaGame triviaManager = new TriviaGame(this, context, categoryId);
+            this.getManagers().put(context.getChannelId(), triviaManager);
+            triviaManager.start();
+            return triviaManager.show();
+        }
 
-	}
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Start a Trivia game in which everyone can participate.")
-				.addArg("categoryID", "the category ID of the question", true)
-				.addField("Category", String.format("Use `%s%s categories` to see the list of categories",
-						context.getPrefix(), this.getName()), false)
-				.setGains("The winner gets **%d coins** plus a bonus depending on his speed to answer.",
-						TriviaGame.MIN_GAINS)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Start a Trivia game in which everyone can participate.")
+                .addArg("categoryID", "the category ID of the question", true)
+                .addField("Category", String.format("Use `%s%s categories` to see the list of categories",
+                        context.getPrefix(), this.getName()), false)
+                .setGains("The winner gets **%d coins** plus a bonus depending on his speed to answer.",
+                        TriviaGame.MIN_GAINS)
+                .build();
+    }
 }

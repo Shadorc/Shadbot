@@ -8,9 +8,9 @@ import reactor.core.publisher.Mono;
 
 public class MessageCreateListener {
 
-	public static Mono<Void> onMessageCreate(MessageCreateEvent event) {
-		return Mono.fromRunnable(() -> StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_RECEIVED))
-				.and(CommandProcessor.processMessageEvent(event));
-	}
+    public static Mono<Void> onMessageCreate(MessageCreateEvent event) {
+        return Mono.fromRunnable(() -> StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_RECEIVED))
+                .and(CommandProcessor.processMessageEvent(event));
+    }
 
 }

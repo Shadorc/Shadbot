@@ -5,15 +5,15 @@ import me.shadorc.shadbot.core.game.Player;
 
 public class DicePlayer extends Player {
 
-	private final int number;
+    private final int number;
 
-	public DicePlayer(Snowflake userId, int number) {
-		super(userId);
-		this.number = number;
-	}
+    public DicePlayer(Snowflake userId, int number) {
+        super(userId);
+        this.number = number;
+    }
 
-	public int getNumber() {
-		return this.number;
-	}
+    public int getNumber() {
+        return this.number;
+    }
 
 }

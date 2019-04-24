@@ -31,98 +31,98 @@ import java.util.function.Consumer;
 
 public class LyricsCmd extends BaseCmd {
 
-	// Make html() preserve linebreaks and spacing
-	private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
-	private static final String HOME_URL = "https://www.musixmatch.com";
-	private static final int MAX_RETRY = 5;
+    // Make html() preserve linebreaks and spacing
+    private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
+    private static final String HOME_URL = "https://www.musixmatch.com";
+    private static final int MAX_RETRY = 5;
 
-	public LyricsCmd() {
-		super(CommandCategory.UTILS, List.of("lyrics"));
-		this.setDefaultRateLimiter();
-	}
+    public LyricsCmd() {
+        super(CommandCategory.UTILS, List.of("lyrics"));
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final Optional<String> arg = context.getArg();
+    @Override
+    public Mono<Void> execute(Context context) {
+        final Optional<String> arg = context.getArg();
 
-		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-		return Mono.fromCallable(() -> {
-			String search;
-			if(arg.isPresent()) {
-				search = arg.get();
-			} else {
-				final GuildMusic guildMusic = MusicManager.getMusic(context.getGuildId());
-				if(guildMusic == null) {
-					throw new MissingArgumentException();
-				}
+        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        return Mono.fromCallable(() -> {
+            String search;
+            if (arg.isPresent()) {
+                search = arg.get();
+            } else {
+                final GuildMusic guildMusic = MusicManager.getMusic(context.getGuildId());
+                if (guildMusic == null) {
+                    throw new MissingArgumentException();
+                }
 
-				final AudioTrackInfo info = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack().getInfo();
-				// Remove from title (case insensitive): official, video, music, [, ], (, )
-				search = info.title.replaceAll("(?i)official|video|music|\\[|]|\\(|\\)", "");
-			}
+                final AudioTrackInfo info = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack().getInfo();
+                // Remove from title (case insensitive): official, video, music, [, ], (, )
+                search = info.title.replaceAll("(?i)official|video|music|\\[|]|\\(|\\)", "");
+            }
 
-			final String url = this.getCorrectedUrl(search);
-			if(url == null) {
-				return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
-						context.getUsername(), search));
-			}
+            final String url = this.getCorrectedUrl(search);
+            if (url == null) {
+                return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+                        context.getUsername(), search));
+            }
 
-			final Document doc = this.getLyricsDocument(context.getClient(), url).outputSettings(PRESERVE_FORMAT);
-			final Musixmatch musixmatch = new Musixmatch(doc);
+            final Document doc = this.getLyricsDocument(context.getClient(), url).outputSettings(PRESERVE_FORMAT);
+            final Musixmatch musixmatch = new Musixmatch(doc);
 
-			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-					.andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
-							musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
-							.setThumbnail(musixmatch.getImageUrl())
-							.setDescription(musixmatch.getLyrics())
-							.setFooter("Click on the title to see the full version",
-									"https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png")));
-		})
-				.flatMap(LoadingMessage::send)
-				.doOnTerminate(loadingMsg::stopTyping)
-				.then();
-	}
+            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
+                            musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
+                            .setThumbnail(musixmatch.getImageUrl())
+                            .setDescription(musixmatch.getLyrics())
+                            .setFooter("Click on the title to see the full version",
+                                    "https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png")));
+        })
+                .flatMap(LoadingMessage::send)
+                .doOnTerminate(loadingMsg::stopTyping)
+                .then();
+    }
 
-	private Document getLyricsDocument(DiscordClient client, String url) throws IOException {
-		// Sometimes Musixmatch redirects to a wrong page
-		// If the response URL and the requested URL are different, retry
-		int retryCount = 0;
-		Response response;
-		do {
-			if(retryCount == MAX_RETRY) {
-				LogUtils.warn(client, String.format("[%s] Too many retries, abort attempt to reload page.",
-						this.getClass().getSimpleName()));
-				throw new HttpStatusException("Musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
-			}
+    private Document getLyricsDocument(DiscordClient client, String url) throws IOException {
+        // Sometimes Musixmatch redirects to a wrong page
+        // If the response URL and the requested URL are different, retry
+        int retryCount = 0;
+        Response response;
+        do {
+            if (retryCount == MAX_RETRY) {
+                LogUtils.warn(client, String.format("[%s] Too many retries, abort attempt to reload page.",
+                        this.getClass().getSimpleName()));
+                throw new HttpStatusException("Musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
+            }
 
-			response = NetUtils.getResponse(url);
-			retryCount++;
-		} while(!response.url().toString().equalsIgnoreCase(url));
+            response = NetUtils.getResponse(url);
+            retryCount++;
+        } while (!response.url().toString().equalsIgnoreCase(url));
 
-		return response.parse();
-	}
+        return response.parse();
+    }
 
-	private String getCorrectedUrl(String search) throws IOException {
-		final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
+    private String getCorrectedUrl(String search) throws IOException {
+        final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
 
-		// Make a search request on the site
-		final Document doc = NetUtils.getDoc(url);
-		final Element trackList = doc.getElementsByClass("media-card-title").first();
-		if(trackList == null) {
-			return null;
-		}
+        // Make a search request on the site
+        final Document doc = NetUtils.getDoc(url);
+        final Element trackList = doc.getElementsByClass("media-card-title").first();
+        if (trackList == null) {
+            return null;
+        }
 
-		// Find the first element containing "title" (generally the best result) and get its URL
-		return HOME_URL + trackList.getElementsByClass("title").attr("href");
-	}
+        // Find the first element containing "title" (generally the best result) and get its URL
+        return HOME_URL + trackList.getElementsByClass("title").attr("href");
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Show lyrics for a song."
-						+ "\nCan also be used without argument when a music is being played to find corresponding lyrics.")
-				.addArg("search", true)
-				.setSource(HOME_URL)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Show lyrics for a song."
+                        + "\nCan also be used without argument when a music is being played to find corresponding lyrics.")
+                .addArg("search", true)
+                .setSource(HOME_URL)
+                .build();
+    }
 }

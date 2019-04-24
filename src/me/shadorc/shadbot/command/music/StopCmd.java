@@ -15,25 +15,25 @@ import java.util.function.Consumer;
 
 public class StopCmd extends BaseCmd {
 
-	public StopCmd() {
-		super(CommandCategory.MUSIC, List.of("stop"));
-		this.setDefaultRateLimiter();
-	}
+    public StopCmd() {
+        super(CommandCategory.MUSIC, List.of("stop"));
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		context.requireGuildMusic();
-		MusicManager.getConnection(context.getGuildId()).leaveVoiceChannel();
-		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.",
-						context.getUsername()), channel))
-				.then();
-	}
+    @Override
+    public Mono<Void> execute(Context context) {
+        context.requireGuildMusic();
+        MusicManager.getConnection(context.getGuildId()).leaveVoiceChannel();
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.",
+                        context.getUsername()), channel))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Stop music.")
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Stop music.")
+                .build();
+    }
 }

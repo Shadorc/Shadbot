@@ -5,28 +5,28 @@ import me.shadorc.shadbot.object.Emoji;
 import java.awt.*;
 
 public enum Suit {
-	HEART(Color.RED, Emoji.HEARTS),
-	DIAMOND(Color.RED, Emoji.DIAMONDS),
-	CLUB(Color.BLACK, Emoji.CLUBS),
-	SPADE(Color.BLACK, Emoji.SPADES);
+    HEART(Color.RED, Emoji.HEARTS),
+    DIAMOND(Color.RED, Emoji.DIAMONDS),
+    CLUB(Color.BLACK, Emoji.CLUBS),
+    SPADE(Color.BLACK, Emoji.SPADES);
 
-	private final Color color;
-	private final Emoji emoji;
+    private final Color color;
+    private final Emoji emoji;
 
-	Suit(Color color, Emoji emoji) {
-		this.color = color;
-		this.emoji = emoji;
-	}
+    Suit(Color color, Emoji emoji) {
+        this.color = color;
+        this.emoji = emoji;
+    }
 
-	public boolean isRed() {
-		return this.color.equals(Color.RED);
-	}
+    public boolean isRed() {
+        return this.color.equals(Color.RED);
+    }
 
-	public boolean isBlack() {
-		return !this.isRed();
-	}
+    public boolean isBlack() {
+        return !this.isRed();
+    }
 
-	public Emoji getEmoji() {
-		return this.emoji;
-	}
+    public Emoji getEmoji() {
+        return this.emoji;
+    }
 }

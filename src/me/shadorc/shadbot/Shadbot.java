@@ -47,137 +47,137 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Shadbot {
 
-	public static final AtomicLong OWNER_ID = new AtomicLong(0L);
+    public static final AtomicLong OWNER_ID = new AtomicLong(0L);
 
-	private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
-	private static final Instant LAUNCH_TIME = Instant.now();
-	private static final Map<Integer, Shard> SHARDS = new ConcurrentHashMap<>();
+    private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
+    private static final Instant LAUNCH_TIME = Instant.now();
+    private static final Map<Integer, Shard> SHARDS = new ConcurrentHashMap<>();
 
-	private static DatabaseManager databaseManager;
-	private static PremiumManager premiumManager;
-	private static LotteryManager lotteryManager;
-	private static StatsManager statsManager;
-	private static BotListStats botListStats;
+    private static DatabaseManager databaseManager;
+    private static PremiumManager premiumManager;
+    private static LotteryManager lotteryManager;
+    private static StatsManager statsManager;
+    private static BotListStats botListStats;
 
-	public static void main(String[] args) {
-		// Set default to Locale US
-		Locale.setDefault(Locale.US);
+    public static void main(String[] args) {
+        // Set default to Locale US
+        Locale.setDefault(Locale.US);
 
-		try {
-			Shadbot.databaseManager = new DatabaseManager();
-			Shadbot.premiumManager = new PremiumManager();
-			Shadbot.lotteryManager = new LotteryManager();
-			Shadbot.statsManager = new StatsManager();
-		} catch (final IOException err) {
-			LogUtils.error(err, "A fatal error occurred while initializing managers.");
-			System.exit(ExitCode.FATAL_ERROR.value());
-		}
+        try {
+            Shadbot.databaseManager = new DatabaseManager();
+            Shadbot.premiumManager = new PremiumManager();
+            Shadbot.lotteryManager = new LotteryManager();
+            Shadbot.statsManager = new StatsManager();
+        } catch (final IOException err) {
+            LogUtils.error(err, "A fatal error occurred while initializing managers.");
+            System.exit(ExitCode.FATAL_ERROR.value());
+        }
 
-		CommandInitializer.initialize();
+        CommandInitializer.initialize();
 
-		Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
+        Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 
-		LogUtils.info("Next lottery draw in: %s", LotteryCmd.getDelay().toString());
-		Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
-				.flatMap(ignored -> LotteryCmd.draw(Shadbot.getClient()))
-				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+        LogUtils.info("Next lottery draw in: %s", LotteryCmd.getDelay().toString());
+        Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
+                .flatMap(ignored -> LotteryCmd.draw(Shadbot.getClient()))
+                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 
-		LogUtils.info("Connecting...");
-		final ShardingStoreRegistry registry = new ShardingJdkStoreRegistry();
-		new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
-				.build()
-				.map(builder -> builder
-						.setStoreService(MappingStoreService.create()
-								.setMapping(new CaffeineStoreService(caffeine -> caffeine.expireAfterAccess(Duration.ofHours(6))), MessageBean.class)
-								.setFallback(new ShardingJdkStoreService(registry)))
-						.setRouterOptions(RouterOptions.builder()
-								.onClientResponse(ResponseFunction.emptyIfNotFound())
-								.onClientResponse(ResponseFunction.retryWhen(RouteMatcher.any(),
-										Retry.onlyIf(ClientException.isRetryContextStatusCode(500))
-												.exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofSeconds(5))
-												.retryMax(3)))
-								.build())
-						.setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
-								Integer.MAX_VALUE, Schedulers.elastic()))
-						.setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
-				.map(DiscordClientBuilder::build)
-				.doOnNext(client -> {
-					final int shardIndex = client.getConfig().getShardIndex();
-					SHARDS.put(shardIndex, new Shard(client));
+        LogUtils.info("Connecting...");
+        final ShardingStoreRegistry registry = new ShardingJdkStoreRegistry();
+        new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
+                .build()
+                .map(builder -> builder
+                        .setStoreService(MappingStoreService.create()
+                                .setMapping(new CaffeineStoreService(caffeine -> caffeine.expireAfterAccess(Duration.ofHours(6))), MessageBean.class)
+                                .setFallback(new ShardingJdkStoreService(registry)))
+                        .setRouterOptions(RouterOptions.builder()
+                                .onClientResponse(ResponseFunction.emptyIfNotFound())
+                                .onClientResponse(ResponseFunction.retryWhen(RouteMatcher.any(),
+                                        Retry.onlyIf(ClientException.isRetryContextStatusCode(500))
+                                                .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofSeconds(5))
+                                                .retryMax(3)))
+                                .build())
+                        .setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
+                                Integer.MAX_VALUE, Schedulers.elastic()))
+                        .setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
+                .map(DiscordClientBuilder::build)
+                .doOnNext(client -> {
+                    final int shardIndex = client.getConfig().getShardIndex();
+                    SHARDS.put(shardIndex, new Shard(client));
 
-					// Store owner's ID
-					if(shardIndex == 0) {
-						client.getApplicationInfo()
-								.map(ApplicationInfo::getOwnerId)
-								.map(Snowflake::asLong)
-								.doOnNext(OWNER_ID::set)
-								.subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
-					}
-				})
-				.flatMap(DiscordClient::login)
-				.blockLast();
-	}
+                    // Store owner's ID
+                    if (shardIndex == 0) {
+                        client.getApplicationInfo()
+                                .map(ApplicationInfo::getOwnerId)
+                                .map(Snowflake::asLong)
+                                .doOnNext(OWNER_ID::set)
+                                .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+                    }
+                })
+                .flatMap(DiscordClient::login)
+                .blockLast();
+    }
 
-	/**
-	 * Triggered when all the guilds have been received from a client
-	 */
-	public static void onFullyReadyEvent(DiscordClient client) {
-		if(CONNECTED_SHARDS.incrementAndGet() == client.getConfig().getShardCount()) {
-			LogUtils.info("Shadbot is connected to all guilds.");
-			if(!Config.IS_SNAPSHOT) {
-				Shadbot.botListStats = new BotListStats();
-				LogUtils.info("Bot list stats scheduler started.");
-			}
-		}
-	}
+    /**
+     * Triggered when all the guilds have been received from a client
+     */
+    public static void onFullyReadyEvent(DiscordClient client) {
+        if (CONNECTED_SHARDS.incrementAndGet() == client.getConfig().getShardCount()) {
+            LogUtils.info("Shadbot is connected to all guilds.");
+            if (!Config.IS_SNAPSHOT) {
+                Shadbot.botListStats = new BotListStats();
+                LogUtils.info("Bot list stats scheduler started.");
+            }
+        }
+    }
 
-	/**
-	 * @return The time when this class was loaded
-	 */
-	public static Instant getLaunchTime() {
-		return LAUNCH_TIME;
-	}
+    /**
+     * @return The time when this class was loaded
+     */
+    public static Instant getLaunchTime() {
+        return LAUNCH_TIME;
+    }
 
-	/**
-	 * @return All the shards the bot is connected to
-	 */
-	public static Map<Integer, Shard> getShards() {
-		return SHARDS;
-	}
+    /**
+     * @return All the shards the bot is connected to
+     */
+    public static Map<Integer, Shard> getShards() {
+        return SHARDS;
+    }
 
-	public static DiscordClient getClient() {
-		return SHARDS.values().stream().findAny().orElseThrow().getClient();
-	}
+    public static DiscordClient getClient() {
+        return SHARDS.values().stream().findAny().orElseThrow().getClient();
+    }
 
-	public static DatabaseManager getDatabase() {
-		return databaseManager;
-	}
+    public static DatabaseManager getDatabase() {
+        return databaseManager;
+    }
 
-	public static PremiumManager getPremium() {
-		return premiumManager;
-	}
+    public static PremiumManager getPremium() {
+        return premiumManager;
+    }
 
-	public static Lottery getLottery() {
-		return lotteryManager.getLottery();
-	}
+    public static Lottery getLottery() {
+        return lotteryManager.getLottery();
+    }
 
-	private static void save() {
-		databaseManager.save();
-		premiumManager.save();
-		lotteryManager.save();
-		statsManager.save();
-	}
+    private static void save() {
+        databaseManager.save();
+        premiumManager.save();
+        lotteryManager.save();
+        statsManager.save();
+    }
 
-	public static Mono<Void> quit(ExitCode exitCode) {
-		if(botListStats != null) {
-			botListStats.stop();
-		}
+    public static Mono<Void> quit(ExitCode exitCode) {
+        if (botListStats != null) {
+            botListStats.stop();
+        }
 
-		return Flux.fromIterable(SHARDS.values())
-				.map(Shard::getClient)
-				.flatMap(DiscordClient::logout)
-				.then(Mono.fromRunnable(() -> System.exit(exitCode.value())));
-	}
+        return Flux.fromIterable(SHARDS.values())
+                .map(Shard::getClient)
+                .flatMap(DiscordClient::logout)
+                .then(Mono.fromRunnable(() -> System.exit(exitCode.value())));
+    }
 
 }

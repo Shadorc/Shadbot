@@ -8,17 +8,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LimitedGuild {
 
-	private final ConcurrentHashMap<Snowflake, LimitedUser> limitedUsersMap;
-	private final Bandwidth bandwidth;
+    private final ConcurrentHashMap<Snowflake, LimitedUser> limitedUsersMap;
+    private final Bandwidth bandwidth;
 
-	public LimitedGuild(Bandwidth bandwidth) {
-		this.limitedUsersMap = new ConcurrentHashMap<>();
-		this.bandwidth = bandwidth;
-	}
+    public LimitedGuild(Bandwidth bandwidth) {
+        this.limitedUsersMap = new ConcurrentHashMap<>();
+        this.bandwidth = bandwidth;
+    }
 
-	public LimitedUser getUser(Snowflake userId) {
-		return this.limitedUsersMap.computeIfAbsent(userId,
-				id -> new LimitedUser(Bucket4j.builder().addLimit(this.bandwidth).build()));
-	}
+    public LimitedUser getUser(Snowflake userId) {
+        return this.limitedUsersMap.computeIfAbsent(userId,
+                id -> new LimitedUser(Bucket4j.builder().addLimit(this.bandwidth).build()));
+    }
 
 }

@@ -13,26 +13,26 @@ import java.time.Duration;
 
 public class StatsManager extends Data {
 
-	public static final File STATS_DIR = new File("./stats");
+    public static final File STATS_DIR = new File("./stats");
 
-	public static final MapStatistic<VariousEnum> VARIOUS_STATS = new MapStatistic<>("various.json", VariousEnum.class);
-	public static final TableStatistic<CommandEnum> COMMAND_STATS = new TableStatistic<>("command.json", CommandEnum.class);
-	public static final TableStatistic<MoneyEnum> MONEY_STATS = new TableStatistic<>("money.json", MoneyEnum.class);
+    public static final MapStatistic<VariousEnum> VARIOUS_STATS = new MapStatistic<>("various.json", VariousEnum.class);
+    public static final TableStatistic<CommandEnum> COMMAND_STATS = new TableStatistic<>("command.json", CommandEnum.class);
+    public static final TableStatistic<MoneyEnum> MONEY_STATS = new TableStatistic<>("money.json", MoneyEnum.class);
 
-	public StatsManager() {
-		super("statistics", Duration.ofMinutes(10), Duration.ofMinutes(10));
-	}
+    public StatsManager() {
+        super("statistics", Duration.ofMinutes(10), Duration.ofMinutes(10));
+    }
 
-	@Override
-	public void write() throws IOException {
-		for(final StatisticEnum statistic : StatisticEnum.values()) {
-			statistic.getStat().save();
-		}
-	}
+    @Override
+    public void write() throws IOException {
+        for (final StatisticEnum statistic : StatisticEnum.values()) {
+            statistic.getStat().save();
+        }
+    }
 
-	@Override
-	public Object getData() {
-		return null;
-	}
+    @Override
+    public Object getData() {
+        return null;
+    }
 
 }

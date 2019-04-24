@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ResolveVanityUrlResponse {
 
-	@JsonProperty("response")
-	private SteamId response;
+    @JsonProperty("response")
+    private SteamId response;
 
-	public SteamId getResponse() {
-		return this.response;
-	}
+    public SteamId getResponse() {
+        return this.response;
+    }
 
 }

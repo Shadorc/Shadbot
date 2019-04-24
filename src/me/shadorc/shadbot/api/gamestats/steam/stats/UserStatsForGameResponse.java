@@ -5,12 +5,12 @@ import reactor.util.annotation.Nullable;
 
 public class UserStatsForGameResponse {
 
-	@Nullable
-	@JsonProperty("playerstats")
-	private PlayerStats playerStats;
+    @Nullable
+    @JsonProperty("playerstats")
+    private PlayerStats playerStats;
 
-	public PlayerStats getPlayerStats() {
-		return this.playerStats;
-	}
+    public PlayerStats getPlayerStats() {
+        return this.playerStats;
+    }
 
 }

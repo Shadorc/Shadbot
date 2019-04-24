@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GiphyGif {
 
-	@JsonProperty("image_url")
-	private String imageUrl;
+    @JsonProperty("image_url")
+    private String imageUrl;
 
-	public String getImageUrl() {
-		return this.imageUrl;
-	}
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
 
 }

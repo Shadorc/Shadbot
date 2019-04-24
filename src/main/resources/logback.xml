@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 <configuration scan="true">
-	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} %level [%thread/%logger]: %msg%n</pattern>
-		</encoder>
-	</appender>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %level [%thread/%logger]: %msg%n</pattern>
+        </encoder>
+    </appender>
 
-	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>logs/shadbot.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>25MB</maxFileSize>
             <maxHistory>100</maxHistory>
         </rollingPolicy>
-		<encoder>
-			<charset>UTF-8</charset>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread/%logger]: %msg%n</pattern>
-		</encoder>
-		<prudent>true</prudent>
-	</appender>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread/%logger]: %msg%n</pattern>
+        </encoder>
+        <prudent>true</prudent>
+    </appender>
 
-	<appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-		<queueSize>512</queueSize>
-		<appender-ref ref="FILE" />
-	</appender>
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <appender-ref ref="FILE"/>
+    </appender>
 
-	<root level="INFO">
-		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="ASYNC" />
-	</root>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC"/>
+    </root>
 </configuration>

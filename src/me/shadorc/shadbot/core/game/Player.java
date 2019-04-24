@@ -7,18 +7,18 @@ import reactor.core.publisher.Mono;
 
 public class Player {
 
-	private final Snowflake userId;
+    private final Snowflake userId;
 
-	public Player(Snowflake userId) {
-		this.userId = userId;
-	}
+    public Player(Snowflake userId) {
+        this.userId = userId;
+    }
 
-	public Snowflake getUserId() {
-		return this.userId;
-	}
+    public Snowflake getUserId() {
+        return this.userId;
+    }
 
-	public Mono<String> getUsername(DiscordClient client) {
-		return client.getUserById(this.getUserId()).map(User::getUsername);
-	}
+    public Mono<String> getUsername(DiscordClient client) {
+        return client.getUserById(this.getUserId()).map(User::getUsername);
+    }
 
 }

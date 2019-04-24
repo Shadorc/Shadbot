@@ -7,12 +7,12 @@ import java.util.List;
 
 public class GiphyResponse {
 
-	@Nullable
-	@JsonProperty("data")
-	private List<GiphyGif> gifs;
+    @Nullable
+    @JsonProperty("data")
+    private List<GiphyGif> gifs;
 
-	public List<GiphyGif> getGifs() {
-		return this.gifs;
-	}
+    public List<GiphyGif> getGifs() {
+        return this.gifs;
+    }
 
 }

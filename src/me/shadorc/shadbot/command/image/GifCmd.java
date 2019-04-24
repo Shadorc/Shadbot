@@ -20,39 +20,39 @@ import java.util.function.Consumer;
 
 public class GifCmd extends BaseCmd {
 
-	public GifCmd() {
-		super(CommandCategory.IMAGE, List.of("gif"));
-		this.setDefaultRateLimiter();
-	}
+    public GifCmd() {
+        super(CommandCategory.IMAGE, List.of("gif"));
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-		return Mono.fromCallable(() -> {
-			final String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
-					Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
+    @Override
+    public Mono<Void> execute(Context context) {
+        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        return Mono.fromCallable(() -> {
+            final String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
+                    Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
 
-			final GiphyResponse giphy = Utils.MAPPER.readValue(NetUtils.getJSON(url), GiphyResponse.class);
-			if(giphy.getGifs().isEmpty()) {
-				return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
-						context.getUsername(), context.getArg().orElse("random search")));
-			}
+            final GiphyResponse giphy = Utils.MAPPER.readValue(NetUtils.getJSON(url), GiphyResponse.class);
+            if (giphy.getGifs().isEmpty()) {
+                return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
+                        context.getUsername(), context.getArg().orElse("random search")));
+            }
 
-			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-					.andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl())));
-		})
-				.flatMap(LoadingMessage::send)
-				.doOnTerminate(loadingMsg::stopTyping)
-				.then();
-	}
+            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    .andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl())));
+        })
+                .flatMap(LoadingMessage::send)
+                .doOnTerminate(loadingMsg::stopTyping)
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Show a random gif")
-				.addArg("tag", "the tag to search", true)
-				.setSource("https://www.giphy.com/")
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Show a random gif")
+                .addArg("tag", "the tag to search", true)
+                .setSource("https://www.giphy.com/")
+                .build();
+    }
 
 }

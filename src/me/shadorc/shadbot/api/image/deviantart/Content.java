@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Content {
 
-	@JsonProperty("src")
-	private String source;
+    @JsonProperty("src")
+    private String source;
 
-	public String getSource() {
-		return this.source;
-	}
+    public String getSource() {
+        return this.source;
+    }
 
 }

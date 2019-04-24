@@ -15,30 +15,30 @@ import java.util.function.Consumer;
 
 public class ShuffleCmd extends BaseCmd {
 
-	public ShuffleCmd() {
-		super(CommandCategory.MUSIC, List.of("shuffle"));
-		this.setDefaultRateLimiter();
-	}
+    public ShuffleCmd() {
+        super(CommandCategory.MUSIC, List.of("shuffle"));
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final GuildMusic guildMusic = context.requireGuildMusic();
+    @Override
+    public Mono<Void> execute(Context context) {
+        final GuildMusic guildMusic = context.requireGuildMusic();
 
-		return DiscordUtils.requireSameVoiceChannel(context)
-				.map(voiceChannelId -> {
-					guildMusic.getTrackScheduler().shufflePlaylist();
-					return String.format(Emoji.CHECK_MARK + " Playlist shuffled by **%s**.", context.getUsername());
-				})
-				.flatMap(message -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(message, channel)))
-				.then();
-	}
+        return DiscordUtils.requireSameVoiceChannel(context)
+                .map(voiceChannelId -> {
+                    guildMusic.getTrackScheduler().shufflePlaylist();
+                    return String.format(Emoji.CHECK_MARK + " Playlist shuffled by **%s**.", context.getUsername());
+                })
+                .flatMap(message -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(message, channel)))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Shuffle current playlist.")
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Shuffle current playlist.")
+                .build();
+    }
 
 }

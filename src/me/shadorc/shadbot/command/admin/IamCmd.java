@@ -30,71 +30,71 @@ import java.util.function.Consumer;
 
 public class IamCmd extends BaseCmd {
 
-	public static final Unicode REACTION = ReactionEmoji.unicode("✅");
+    public static final Unicode REACTION = ReactionEmoji.unicode("✅");
 
-	public IamCmd() {
-		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("iam"));
-		this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
-	}
+    public IamCmd() {
+        super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("iam"));
+        this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final String arg = context.requireArg();
+    @Override
+    public Mono<Void> execute(Context context) {
+        final String arg = context.requireArg();
 
-		final List<String> quotedElements = StringUtils.getQuotedElements(arg);
-		if(quotedElements.isEmpty() && arg.contains("\"")) {
-			return Mono.error(new CommandException("One quotation mark is missing."));
-		}
-		if(quotedElements.size() > 1) {
-			return Mono.error(new CommandException("You should specify only one text in quotation marks."));
-		}
+        final List<String> quotedElements = StringUtils.getQuotedElements(arg);
+        if (quotedElements.isEmpty() && arg.contains("\"")) {
+            return Mono.error(new CommandException("One quotation mark is missing."));
+        }
+        if (quotedElements.size() > 1) {
+            return Mono.error(new CommandException("You should specify only one text in quotation marks."));
+        }
 
-		final Mono<List<Role>> getRoles = context.getGuild()
-				.flatMapMany(guild -> DiscordUtils.extractRoles(guild, StringUtils.remove(arg, quotedElements)))
-				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-				.collectList();
+        final Mono<List<Role>> getRoles = context.getGuild()
+                .flatMapMany(guild -> DiscordUtils.extractRoles(guild, StringUtils.remove(arg, quotedElements)))
+                .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
+                .collectList();
 
-		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
-						.then(getRoles)
-						.flatMap(roles -> {
-							if(roles.isEmpty()) {
-								return Mono.error(new MissingArgumentException());
-							}
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
+                        .then(getRoles)
+                        .flatMap(roles -> {
+                            if (roles.isEmpty()) {
+                                return Mono.error(new MissingArgumentException());
+                            }
 
-							final StringBuilder description = new StringBuilder();
-							if(quotedElements.isEmpty()) {
-								description.append(String.format("Click on %s to get role(s): %s", REACTION.getRaw(),
-										FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
-							} else {
-								description.append(quotedElements.get(0));
-							}
+                            final StringBuilder description = new StringBuilder();
+                            if (quotedElements.isEmpty()) {
+                                description.append(String.format("Click on %s to get role(s): %s", REACTION.getRaw(),
+                                        FormatUtils.format(roles, role -> String.format("`@%s`", role.getName()), "\n")));
+                            } else {
+                                description.append(quotedElements.get(0));
+                            }
 
-							final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-									.andThen(embed -> embed.setAuthor(String.format("Iam: %s",
-											FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
-											null, context.getAvatarUrl())
-											.setDescription(description.toString()));
+                            final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+                                    .andThen(embed -> embed.setAuthor(String.format("Iam: %s",
+                                            FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
+                                            null, context.getAvatarUrl())
+                                            .setDescription(description.toString()));
 
-							return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
-									.send(embedConsumer)
-									.doOnNext(message -> {
-										final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
-										final Map<String, Long> setting = dbGuild.getIamMessages();
-										roles.stream().map(Role::getId)
-												.forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));
-										dbGuild.setSetting(Setting.IAM_MESSAGES, setting);
-									});
-						}))
-				.then();
-	}
+                            return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
+                                    .send(embedConsumer)
+                                    .doOnNext(message -> {
+                                        final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+                                        final Map<String, Long> setting = dbGuild.getIamMessages();
+                                        roles.stream().map(Role::getId)
+                                                .forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));
+                                        dbGuild.setSetting(Setting.IAM_MESSAGES, setting);
+                                    });
+                        }))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription(String.format("Send a message with a reaction, users will be able to get the role(s) "
-						+ "associated with the message by clicking on %s", REACTION.getRaw()))
-				.addArg("@role(s)", false).addArg("\"text\"", "Replace the default text", true).build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription(String.format("Send a message with a reaction, users will be able to get the role(s) "
+                        + "associated with the message by clicking on %s", REACTION.getRaw()))
+                .addArg("@role(s)", false).addArg("\"text\"", "Replace the default text", true).build();
+    }
 
 }

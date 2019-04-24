@@ -21,41 +21,41 @@ import java.util.function.Consumer;
 
 public class LeaderboardCmd extends BaseCmd {
 
-	public LeaderboardCmd() {
-		super(CommandCategory.CURRENCY, List.of("leaderboard"));
-		this.setDefaultRateLimiter();
-	}
+    public LeaderboardCmd() {
+        super(CommandCategory.CURRENCY, List.of("leaderboard"));
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		return Flux.fromIterable(Shadbot.getDatabase().getDBGuild(context.getGuildId()).getMembers())
-				.filter(dbMember -> dbMember.getCoins() > 0)
-				.sort(Comparator.comparingInt(DBMember::getCoins).reversed())
-				.take(10)
-				.flatMap(dbMember -> Mono.zip(context.getClient().getUserById(dbMember.getId()).map(User::getUsername), Mono.just(dbMember.getCoins())))
-				.collectList()
-				.map(list -> {
-					if(list.isEmpty()) {
-						return "\nEveryone is poor here.";
-					}
-					return FormatUtils.numberedList(10, list.size(),
-							count -> {
-								final Tuple2<String, Integer> tuple = list.get(count - 1);
-								return String.format("%d. **%s** - %s", count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
-							});
-				})
-				.map(description -> EmbedUtils.getDefaultEmbed()
-						.andThen(embed -> embed.setAuthor("Leaderboard", null, context.getAvatarUrl())
-								.setDescription(description)))
-				.flatMap(embed -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
-				.then();
-	}
+    @Override
+    public Mono<Void> execute(Context context) {
+        return Flux.fromIterable(Shadbot.getDatabase().getDBGuild(context.getGuildId()).getMembers())
+                .filter(dbMember -> dbMember.getCoins() > 0)
+                .sort(Comparator.comparingInt(DBMember::getCoins).reversed())
+                .take(10)
+                .flatMap(dbMember -> Mono.zip(context.getClient().getUserById(dbMember.getId()).map(User::getUsername), Mono.just(dbMember.getCoins())))
+                .collectList()
+                .map(list -> {
+                    if (list.isEmpty()) {
+                        return "\nEveryone is poor here.";
+                    }
+                    return FormatUtils.numberedList(10, list.size(),
+                            count -> {
+                                final Tuple2<String, Integer> tuple = list.get(count - 1);
+                                return String.format("%d. **%s** - %s", count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
+                            });
+                })
+                .map(description -> EmbedUtils.getDefaultEmbed()
+                        .andThen(embed -> embed.setAuthor("Leaderboard", null, context.getAvatarUrl())
+                                .setDescription(description)))
+                .flatMap(embed -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Show coins leaderboard for this server.")
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Show coins leaderboard for this server.")
+                .build();
+    }
 }

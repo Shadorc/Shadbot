@@ -22,30 +22,30 @@ import java.util.function.Consumer;
 
 public class GenerateRelicCmd extends BaseCmd {
 
-	public GenerateRelicCmd() {
-		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("generate_relic", "generate-relic", "generaterelic"));
-	}
+    public GenerateRelicCmd() {
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("generate_relic", "generate-relic", "generaterelic"));
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final String arg = context.requireArg();
+    @Override
+    public Mono<Void> execute(Context context) {
+        final String arg = context.requireArg();
 
-		final RelicType type = Utils.parseEnum(RelicType.class, context.getArg().get(),
-				new CommandException(String.format("`%s` in not a valid type. %s",
-						arg, FormatUtils.options(RelicType.class))));
+        final RelicType type = Utils.parseEnum(RelicType.class, context.getArg().get(),
+                new CommandException(String.format("`%s` in not a valid type. %s",
+                        arg, FormatUtils.options(RelicType.class))));
 
-		final Relic relic = Shadbot.getPremium().generateRelic(type);
-		return context.getChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-						StringUtils.capitalize(type.toString()), relic.getId()), channel))
-				.then();
-	}
+        final Relic relic = Shadbot.getPremium().generateRelic(type);
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
+                        StringUtils.capitalize(type.toString()), relic.getId()), channel))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Generate a relic.")
-				.addArg(RelicType.values(), false)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Generate a relic.")
+                .addArg(RelicType.values(), false)
+                .build();
+    }
 }

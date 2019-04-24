@@ -12,27 +12,27 @@ import java.util.List;
 
 public class TextFile {
 
-	private final List<String> texts;
+    private final List<String> texts;
 
-	public TextFile(String path) {
-		this.texts = new ArrayList<>();
+    public TextFile(String path) {
+        this.texts = new ArrayList<>();
 
-		final File file = new File(path);
-		if(file.exists()) {
-			try {
-				this.texts.addAll(Arrays.asList(Files.readString(file.toPath()).split("\n")));
-			} catch (final IOException err) {
-				LogUtils.error(err, String.format("An error occurred while reading text file: %s", file.getPath()));
-			}
-		}
-	}
+        final File file = new File(path);
+        if (file.exists()) {
+            try {
+                this.texts.addAll(Arrays.asList(Files.readString(file.toPath()).split("\n")));
+            } catch (final IOException err) {
+                LogUtils.error(err, String.format("An error occurred while reading text file: %s", file.getPath()));
+            }
+        }
+    }
 
-	public List<String> getTexts() {
-		return this.texts;
-	}
+    public List<String> getTexts() {
+        return this.texts;
+    }
 
-	public String getText() {
-		return Utils.randValue(this.getTexts());
-	}
+    public String getText() {
+        return Utils.randValue(this.getTexts());
+    }
 
 }

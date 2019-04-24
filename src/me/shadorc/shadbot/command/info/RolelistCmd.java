@@ -21,61 +21,61 @@ import java.util.function.Consumer;
 
 public class RolelistCmd extends BaseCmd {
 
-	public RolelistCmd() {
-		super(CommandCategory.INFO, List.of("rolelist"));
-		this.setDefaultRateLimiter();
-	}
+    public RolelistCmd() {
+        super(CommandCategory.INFO, List.of("rolelist"));
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final String arg = context.requireArg();
+    @Override
+    public Mono<Void> execute(Context context) {
+        final String arg = context.requireArg();
 
-		return context.getGuild()
-				.flatMapMany(guild -> DiscordUtils.extractRoles(guild, arg))
-				.collectList()
-				.flatMap(mentionedRoleIds -> {
-					if(mentionedRoleIds.isEmpty()) {
-						return Mono.error(new CommandException(String.format("Role `%s` not found.", arg)));
-					}
+        return context.getGuild()
+                .flatMapMany(guild -> DiscordUtils.extractRoles(guild, arg))
+                .collectList()
+                .flatMap(mentionedRoleIds -> {
+                    if (mentionedRoleIds.isEmpty()) {
+                        return Mono.error(new CommandException(String.format("Role `%s` not found.", arg)));
+                    }
 
-					final Mono<List<Role>> mentionedRoles = Flux.fromIterable(mentionedRoleIds)
-							.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-							.collectList();
+                    final Mono<List<Role>> mentionedRoles = Flux.fromIterable(mentionedRoleIds)
+                            .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
+                            .collectList();
 
-					final Mono<List<String>> usernames = context.getGuild()
-							.flatMapMany(Guild::getMembers)
-							.filter(member -> !Collections.disjoint(member.getRoleIds(), mentionedRoleIds))
-							.map(Member::getUsername)
-							.distinct()
-							.collectList();
+                    final Mono<List<String>> usernames = context.getGuild()
+                            .flatMapMany(Guild::getMembers)
+                            .filter(member -> !Collections.disjoint(member.getRoleIds(), mentionedRoleIds))
+                            .map(Member::getUsername)
+                            .distinct()
+                            .collectList();
 
-					return Mono.zip(mentionedRoles, usernames);
-				})
-				.map(tuple -> EmbedUtils.getDefaultEmbed()
-						.andThen(embed -> {
-							embed.setAuthor(String.format("Rolelist: %s", FormatUtils.format(tuple.getT1(), Role::getName, ", ")),
-									null, context.getAvatarUrl());
+                    return Mono.zip(mentionedRoles, usernames);
+                })
+                .map(tuple -> EmbedUtils.getDefaultEmbed()
+                        .andThen(embed -> {
+                            embed.setAuthor(String.format("Rolelist: %s", FormatUtils.format(tuple.getT1(), Role::getName, ", ")),
+                                    null, context.getAvatarUrl());
 
-							if(tuple.getT2().isEmpty()) {
-								embed.setDescription(
-										String.format("There is nobody with %s.", tuple.getT1().size() == 1 ? "this role" : "these roles"));
-								return;
-							}
+                            if (tuple.getT2().isEmpty()) {
+                                embed.setDescription(
+                                        String.format("There is nobody with %s.", tuple.getT1().size() == 1 ? "this role" : "these roles"));
+                                return;
+                            }
 
-							FormatUtils.createColumns(tuple.getT2(), 25)
-									.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
-						}))
-				.flatMap(embedConsumer -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
-				.then();
-	}
+                            FormatUtils.createColumns(tuple.getT2(), 25)
+                                    .forEach(field -> embed.addField(field.getName(), field.getValue(), true));
+                        }))
+                .flatMap(embedConsumer -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Show a list of members with specific role(s).")
-				.addArg("@role(s)", false)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Show a list of members with specific role(s).")
+                .addArg("@role(s)", false)
+                .build();
+    }
 
 }

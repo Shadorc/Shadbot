@@ -20,43 +20,43 @@ import java.util.function.Consumer;
 
 public class BackwardCmd extends BaseCmd {
 
-	public BackwardCmd() {
-		super(CommandCategory.MUSIC, List.of("backward"));
-		this.setDefaultRateLimiter();
-	}
+    public BackwardCmd() {
+        super(CommandCategory.MUSIC, List.of("backward"));
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final GuildMusic guildMusic = context.requireGuildMusic();
-		final String arg = context.requireArg();
+    @Override
+    public Mono<Void> execute(Context context) {
+        final GuildMusic guildMusic = context.requireGuildMusic();
+        final String arg = context.requireArg();
 
-		return DiscordUtils.requireSameVoiceChannel(context)
-				.map(voiceChannelId -> {
-					// If the argument is a number of seconds...
-					Long num = NumberUtils.asPositiveLong(arg);
-					if(num == null) {
-						try {
-							// ... else, try to parse it
-							num = TimeUtils.parseTime(arg);
-						} catch (final IllegalArgumentException err) {
-							throw new CommandException(String.format("`%s` is not a valid number / time.", arg));
-						}
-					}
+        return DiscordUtils.requireSameVoiceChannel(context)
+                .map(voiceChannelId -> {
+                    // If the argument is a number of seconds...
+                    Long num = NumberUtils.asPositiveLong(arg);
+                    if (num == null) {
+                        try {
+                            // ... else, try to parse it
+                            num = TimeUtils.parseTime(arg);
+                        } catch (final IllegalArgumentException err) {
+                            throw new CommandException(String.format("`%s` is not a valid number / time.", arg));
+                        }
+                    }
 
-					final long newPosition = guildMusic.getTrackScheduler().changePosition(-TimeUnit.SECONDS.toMillis(num));
-					return String.format(Emoji.CHECK_MARK + " New position set to **%s** by **%s**.",
-							FormatUtils.shortDuration(newPosition), context.getUsername());
-				})
-				.flatMap(message -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(message, channel)))
-				.then();
-	}
+                    final long newPosition = guildMusic.getTrackScheduler().changePosition(-TimeUnit.SECONDS.toMillis(num));
+                    return String.format(Emoji.CHECK_MARK + " New position set to **%s** by **%s**.",
+                            FormatUtils.shortDuration(newPosition), context.getUsername());
+                })
+                .flatMap(message -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(message, channel)))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Fast backward current song a specified amount of time.")
-				.addArg("time", "can be seconds or time (e.g. 72 or 1m12s)", false)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Fast backward current song a specified amount of time.")
+                .addArg("time", "can be seconds or time (e.g. 72 or 1m12s)", false)
+                .build();
+    }
 }

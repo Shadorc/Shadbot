@@ -10,16 +10,16 @@ import java.util.List;
 
 public class ChannelListener {
 
-	public static Mono<Void> onTextChannelDelete(TextChannelDeleteEvent event) {
-		return Mono.fromRunnable(() -> {
-			final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getChannel().getGuildId());
-			final List<Long> allowedTextChannelIds = dbGuild.getAllowedTextChannels();
-			// If the channel was an allowed channel...
-			if(allowedTextChannelIds.remove(event.getChannel().getId().asLong())) {
-				// ...update settings to remove the deleted one
-				dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
-			}
-		});
-	}
+    public static Mono<Void> onTextChannelDelete(TextChannelDeleteEvent event) {
+        return Mono.fromRunnable(() -> {
+            final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getChannel().getGuildId());
+            final List<Long> allowedTextChannelIds = dbGuild.getAllowedTextChannels();
+            // If the channel was an allowed channel...
+            if (allowedTextChannelIds.remove(event.getChannel().getId().asLong())) {
+                // ...update settings to remove the deleted one
+                dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
+            }
+        });
+    }
 
 }

@@ -10,19 +10,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class GameCmd<T extends Game> extends BaseCmd {
 
-	private final Map<Snowflake, T> managers;
+    private final Map<Snowflake, T> managers;
 
-	public GameCmd(List<String> names, String alias) {
-		super(CommandCategory.GAME, names, alias);
-		this.setGameRateLimiter();
-		this.managers = new ConcurrentHashMap<>();
-	}
+    public GameCmd(List<String> names, String alias) {
+        super(CommandCategory.GAME, names, alias);
+        this.setGameRateLimiter();
+        this.managers = new ConcurrentHashMap<>();
+    }
 
-	public GameCmd(List<String> names) {
-		this(names, null);
-	}
+    public GameCmd(List<String> names) {
+        this(names, null);
+    }
 
-	public Map<Snowflake, T> getManagers() {
-		return this.managers;
-	}
+    public Map<Snowflake, T> getManagers() {
+        return this.managers;
+    }
 }

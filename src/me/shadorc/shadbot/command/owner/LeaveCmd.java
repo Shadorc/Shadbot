@@ -19,33 +19,33 @@ import java.util.function.Consumer;
 
 public class LeaveCmd extends BaseCmd {
 
-	public LeaveCmd() {
-		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("leave"));
-	}
+    public LeaveCmd() {
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("leave"));
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final String arg = context.requireArg();
+    @Override
+    public Mono<Void> execute(Context context) {
+        final String arg = context.requireArg();
 
-		final Long guildId = NumberUtils.asPositiveLong(arg);
-		if(guildId == null) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.", arg)));
-		}
+        final Long guildId = NumberUtils.asPositiveLong(arg);
+        if (guildId == null) {
+            return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.", arg)));
+        }
 
-		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.switchIfEmpty(Mono.error(new CommandException("Guild not found.")))
-				.flatMap(Guild::leave)
-				.then(context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Guild left.", channel)))
-				.then();
-	}
+        return context.getClient().getGuildById(Snowflake.of(guildId))
+                .switchIfEmpty(Mono.error(new CommandException("Guild not found.")))
+                .flatMap(Guild::leave)
+                .then(context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Guild left.", channel)))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Leave a guild.")
-				.addArg("guildID", false)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Leave a guild.")
+                .addArg("guildID", false)
+                .build();
+    }
 
 }

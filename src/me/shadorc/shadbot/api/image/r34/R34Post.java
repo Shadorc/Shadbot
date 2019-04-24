@@ -4,41 +4,41 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class R34Post {
 
-	@JsonProperty("tags")
-	private String tags;
-	@JsonProperty("file_url")
-	private String fileUrl;
-	@JsonProperty("source")
-	private String source;
-	@JsonProperty("width")
-	private int width;
-	@JsonProperty("height")
-	private int height;
-	@JsonProperty("has_children")
-	private boolean hasChildren;
+    @JsonProperty("tags")
+    private String tags;
+    @JsonProperty("file_url")
+    private String fileUrl;
+    @JsonProperty("source")
+    private String source;
+    @JsonProperty("width")
+    private int width;
+    @JsonProperty("height")
+    private int height;
+    @JsonProperty("has_children")
+    private boolean hasChildren;
 
-	public String getTags() {
-		return this.tags;
-	}
+    public String getTags() {
+        return this.tags;
+    }
 
-	public String getFileUrl() {
-		return this.fileUrl;
-	}
+    public String getFileUrl() {
+        return this.fileUrl;
+    }
 
-	public String getSource() {
-		return this.source;
-	}
+    public String getSource() {
+        return this.source;
+    }
 
-	public int getWidth() {
-		return this.width;
-	}
+    public int getWidth() {
+        return this.width;
+    }
 
-	public int getHeight() {
-		return this.height;
-	}
+    public int getHeight() {
+        return this.height;
+    }
 
-	public boolean hasChildren() {
-		return this.hasChildren;
-	}
+    public boolean hasChildren() {
+        return this.hasChildren;
+    }
 
 }

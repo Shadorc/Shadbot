@@ -21,55 +21,55 @@ import java.util.function.Consumer;
 
 public class DtcCmd extends BaseCmd {
 
-	public DtcCmd() {
-		super(CommandCategory.FRENCH, List.of("dtc"));
-		this.setDefaultRateLimiter();
-	}
+    public DtcCmd() {
+        super(CommandCategory.FRENCH, List.of("dtc"));
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-		return Mono.fromCallable(() -> {
-			final String url = String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
-					Credentials.get(Credential.DTC_API_KEY));
+    @Override
+    public Mono<Void> execute(Context context) {
+        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        return Mono.fromCallable(() -> {
+            final String url = String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
+                    Credentials.get(Credential.DTC_API_KEY));
 
-			final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
-			final List<Quote> quotes = Utils.MAPPER.readValue(NetUtils.getJSON(url), valueType);
+            final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
+            final List<Quote> quotes = Utils.MAPPER.readValue(NetUtils.getJSON(url), valueType);
 
-			Quote quote;
-			do {
-				quote = Utils.randValue(quotes);
-			} while(quote.getContent().length() > 1000);
+            Quote quote;
+            do {
+                quote = Utils.randValue(quotes);
+            } while (quote.getContent().length() > 1000);
 
-			final String content = quote.getContent().replace("*", "\\*");
-			final String id = quote.getId();
+            final String content = quote.getContent().replace("*", "\\*");
+            final String id = quote.getId();
 
-			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-					.andThen(embed -> embed.setAuthor("Quote DansTonChat",
-							String.format("https://danstonchat.com/%s.html", id),
-							context.getAvatarUrl())
-							.setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-							.setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"))));
-		})
-				.flatMap(LoadingMessage::send)
-				.doOnTerminate(loadingMsg::stopTyping)
-				.then();
-	}
+            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    .andThen(embed -> embed.setAuthor("Quote DansTonChat",
+                            String.format("https://danstonchat.com/%s.html", id),
+                            context.getAvatarUrl())
+                            .setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+                            .setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"))));
+        })
+                .flatMap(LoadingMessage::send)
+                .doOnTerminate(loadingMsg::stopTyping)
+                .then();
+    }
 
-	private String format(String line) {
-		// Set the user name as bold
-		if(line.contains(" ")) {
-			final int index = line.indexOf(' ');
-			return String.format("**%s** %s", line.substring(0, index), line.substring(index + 1));
-		}
-		return line;
-	}
+    private String format(String line) {
+        // Set the user name as bold
+        if (line.contains(" ")) {
+            final int index = line.indexOf(' ');
+            return String.format("**%s** %s", line.substring(0, index), line.substring(index + 1));
+        }
+        return line;
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Show a random quote from DansTonChat.com")
-				.setSource("https://www.danstonchat.com/")
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Show a random quote from DansTonChat.com")
+                .setSource("https://www.danstonchat.com/")
+                .build();
+    }
 }

@@ -23,65 +23,65 @@ import java.util.function.Consumer;
 
 public class ManageCoinsCmd extends BaseCmd {
 
-	private enum Action {
-		ADD, REMOVE, RESET;
-	}
+    private enum Action {
+        ADD, REMOVE, RESET;
+    }
 
-	public ManageCoinsCmd() {
-		super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("manage_coins", "manage-coins", "managecoins"));
-		this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
-	}
+    public ManageCoinsCmd() {
+        super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("manage_coins", "manage-coins", "managecoins"));
+        this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final List<String> args = context.requireArgs(2, 3);
+    @Override
+    public Mono<Void> execute(Context context) {
+        final List<String> args = context.requireArgs(2, 3);
 
-		final Action action = Utils.parseEnum(Action.class, args.get(0),
-				new CommandException(String.format("`%s` is not a valid action. %s",
-						args.get(0), FormatUtils.options(Action.class))));
+        final Action action = Utils.parseEnum(Action.class, args.get(0),
+                new CommandException(String.format("`%s` is not a valid action. %s",
+                        args.get(0), FormatUtils.options(Action.class))));
 
-		final Integer coins = NumberUtils.asInt(args.get(1));
-		if(coins == null && !Action.RESET.equals(action)) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.",
-					args.get(1))));
-		}
+        final Integer coins = NumberUtils.asInt(args.get(1));
+        if (coins == null && !Action.RESET.equals(action)) {
+            return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.",
+                    args.get(1))));
+        }
 
-		return DiscordUtils.getMembersFrom(context.getMessage())
-				.collectList()
-				.map(members -> {
-					if(members.isEmpty()) {
-						throw new CommandException("You must specify at least one user / role.");
-					}
+        return DiscordUtils.getMembersFrom(context.getMessage())
+                .collectList()
+                .map(members -> {
+                    if (members.isEmpty()) {
+                        throw new CommandException("You must specify at least one user / role.");
+                    }
 
-					final String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(members, User::getUsername, ", ");
-					switch (action) {
-						case ADD:
-							members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
-							return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.coins(coins));
-						case REMOVE:
-							members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
-							return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.coins(coins));
-						case RESET:
-							members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).resetCoins());
-							return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, members.size() == 1 ? "his" : "their");
-						default:
-							return null;
-					}
-				})
-				.flatMap(text -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
-				.then();
-	}
+                    final String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(members, User::getUsername, ", ");
+                    switch (action) {
+                        case ADD:
+                            members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
+                            return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.coins(coins));
+                        case REMOVE:
+                            members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
+                            return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.coins(coins));
+                        case RESET:
+                            members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).resetCoins());
+                            return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, members.size() == 1 ? "his" : "their");
+                        default:
+                            return null;
+                    }
+                })
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Manage user(s) coins.")
-				.addArg("action", FormatUtils.format(Action.class, " / "), false)
-				.addArg("coins", "can be positive or negative", true)
-				.addArg("@user(s)/@role(s)", false)
-				.setExample(String.format("`%s%s add 150 @Shadbot`%n`%s%s reset @Shadbot`",
-						context.getPrefix(), this.getName(), context.getPrefix(), this.getName()))
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Manage user(s) coins.")
+                .addArg("action", FormatUtils.format(Action.class, " / "), false)
+                .addArg("coins", "can be positive or negative", true)
+                .addArg("@user(s)/@role(s)", false)
+                .setExample(String.format("`%s%s add 150 @Shadbot`%n`%s%s reset @Shadbot`",
+                        context.getPrefix(), this.getName(), context.getPrefix(), this.getName()))
+                .build();
+    }
 }

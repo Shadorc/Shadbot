@@ -8,30 +8,30 @@ import java.util.Map;
 
 public class PollCreateSpec {
 
-	private final Duration duration;
-	private final String question;
-	private final Map<String, ReactionEmoji> choices;
+    private final Duration duration;
+    private final String question;
+    private final Map<String, ReactionEmoji> choices;
 
-	public PollCreateSpec(Duration duration, String question, Map<String, ReactionEmoji> choices) {
-		this.duration = duration;
-		this.question = question;
-		this.choices = choices;
-	}
+    public PollCreateSpec(Duration duration, String question, Map<String, ReactionEmoji> choices) {
+        this.duration = duration;
+        this.question = question;
+        this.choices = choices;
+    }
 
-	public Duration getDuration() {
-		return this.duration;
-	}
+    public Duration getDuration() {
+        return this.duration;
+    }
 
-	public String getQuestion() {
-		return this.question;
-	}
+    public String getQuestion() {
+        return this.question;
+    }
 
-	public Map<String, ReactionEmoji> getChoices() {
-		return this.choices;
-	}
+    public Map<String, ReactionEmoji> getChoices() {
+        return this.choices;
+    }
 
-	public Collection<ReactionEmoji> getReactions() {
-		return this.getChoices().values();
-	}
+    public Collection<ReactionEmoji> getReactions() {
+        return this.getChoices().values();
+    }
 
 }

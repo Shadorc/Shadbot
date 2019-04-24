@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SteamId {
 
-	@JsonProperty("steamid")
-	private String steamId;
+    @JsonProperty("steamid")
+    private String steamId;
 
-	public String getSteamId() {
-		return this.steamId;
-	}
+    public String getSteamId() {
+        return this.steamId;
+    }
 
 }

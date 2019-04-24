@@ -16,28 +16,28 @@ import java.util.function.Consumer;
 
 public class ReactionMessage {
 
-	private final DiscordClient client;
-	private final Snowflake channelId;
-	private final Collection<ReactionEmoji> reactions;
+    private final DiscordClient client;
+    private final Snowflake channelId;
+    private final Collection<ReactionEmoji> reactions;
 
-	public ReactionMessage(DiscordClient client, Snowflake channelId,
-			Collection<ReactionEmoji> reactions) {
-		this.client = client;
-		this.channelId = channelId;
-		this.reactions = reactions;
-	}
+    public ReactionMessage(DiscordClient client, Snowflake channelId,
+                           Collection<ReactionEmoji> reactions) {
+        this.client = client;
+        this.channelId = channelId;
+        this.reactions = reactions;
+    }
 
-	/**
-	 * @param embed - the embed to send
-	 * @return A {@link Mono} containing a {@link Message} with {@link Reaction} added.
-	 */
-	public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
-		return this.client.getChannelById(this.channelId)
-				.cast(MessageChannel.class)
-				.flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
-				.flatMap(message -> Flux.fromIterable(this.reactions)
-						.flatMap(message::addReaction)
-						.then(Mono.just(message)));
-	}
+    /**
+     * @param embed - the embed to send
+     * @return A {@link Mono} containing a {@link Message} with {@link Reaction} added.
+     */
+    public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
+        return this.client.getChannelById(this.channelId)
+                .cast(MessageChannel.class)
+                .flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
+                .flatMap(message -> Flux.fromIterable(this.reactions)
+                        .flatMap(message::addReaction)
+                        .then(Mono.just(message)));
+    }
 
 }

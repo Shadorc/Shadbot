@@ -22,49 +22,49 @@ import java.util.stream.Collectors;
 
 public class ThisDayCmd extends BaseCmd {
 
-	private static final String HOME_URL = "http://www.onthisday.com/";
+    private static final String HOME_URL = "http://www.onthisday.com/";
 
-	public ThisDayCmd() {
-		super(CommandCategory.FUN, List.of("this_day", "this-day", "thisday"), "td");
-		this.setDefaultRateLimiter();
-	}
+    public ThisDayCmd() {
+        super(CommandCategory.FUN, List.of("this_day", "this-day", "thisday"), "td");
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-		return Mono.fromCallable(() -> {
-			final Document doc = NetUtils.getDoc(HOME_URL);
+    @Override
+    public Mono<Void> execute(Context context) {
+        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        return Mono.fromCallable(() -> {
+            final Document doc = NetUtils.getDoc(HOME_URL);
 
-			final String date = doc.getElementsByClass("date-large")
-					.first()
-					.attr("datetime");
+            final String date = doc.getElementsByClass("date-large")
+                    .first()
+                    .attr("datetime");
 
-			final Elements eventsElmt = doc.getElementsByClass("event-list event-list--with-advert")
-					.first()
-					.getElementsByClass("event-list__item");
+            final Elements eventsElmt = doc.getElementsByClass("event-list event-list--with-advert")
+                    .first()
+                    .getElementsByClass("event-list__item");
 
-			final String events = eventsElmt.stream()
-					.map(Element::html)
-					.map(html -> html.replaceAll("<b>|</b>", "**"))
-					.map(Jsoup::parse)
-					.map(Document::text)
-					.collect(Collectors.joining("\n\n"));
+            final String events = eventsElmt.stream()
+                    .map(Element::html)
+                    .map(html -> html.replaceAll("<b>|</b>", "**"))
+                    .map(Jsoup::parse)
+                    .map(Document::text)
+                    .collect(Collectors.joining("\n\n"));
 
-			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-					.andThen(embed -> embed.setAuthor(String.format("On This Day: %s", date), HOME_URL, context.getAvatarUrl())
-							.setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
-							.setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH))));
-		})
-				.flatMap(LoadingMessage::send)
-				.doOnTerminate(loadingMsg::stopTyping)
-				.then();
-	}
+            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    .andThen(embed -> embed.setAuthor(String.format("On This Day: %s", date), HOME_URL, context.getAvatarUrl())
+                            .setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
+                            .setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH))));
+        })
+                .flatMap(LoadingMessage::send)
+                .doOnTerminate(loadingMsg::stopTyping)
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Show significant events of the day.")
-				.setSource(HOME_URL)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Show significant events of the day.")
+                .setSource(HOME_URL)
+                .build();
+    }
 }

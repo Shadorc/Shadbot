@@ -12,30 +12,30 @@ import java.util.stream.Collectors;
 
 public class WordsList {
 
-	private final String url;
-	private final List<String> words;
+    private final String url;
+    private final List<String> words;
 
-	public WordsList(String url) {
-		this.url = url;
-		this.words = new ArrayList<>();
-	}
+    public WordsList(String url) {
+        this.url = url;
+        this.words = new ArrayList<>();
+    }
 
-	public void load() throws IOException {
-		if(this.words.isEmpty()) {
-			this.words.addAll(
-					StringUtils.split(NetUtils.getBody(this.url), "\n").stream()
-							.filter(word -> NumberUtils.isInRange(word.length(), HangmanCmd.MIN_WORD_LENGTH, HangmanCmd.MAX_WORD_LENGTH))
-							.limit(500)
-							.collect(Collectors.toList()));
-		}
-	}
+    public void load() throws IOException {
+        if (this.words.isEmpty()) {
+            this.words.addAll(
+                    StringUtils.split(NetUtils.getBody(this.url), "\n").stream()
+                            .filter(word -> NumberUtils.isInRange(word.length(), HangmanCmd.MIN_WORD_LENGTH, HangmanCmd.MAX_WORD_LENGTH))
+                            .limit(500)
+                            .collect(Collectors.toList()));
+        }
+    }
 
-	public String getRandomWord() {
-		return Utils.randValue(this.words);
-	}
+    public String getRandomWord() {
+        return Utils.randValue(this.words);
+    }
 
-	public boolean isLoaded() {
-		return !this.words.isEmpty();
-	}
+    public boolean isLoaded() {
+        return !this.words.isEmpty();
+    }
 
 }

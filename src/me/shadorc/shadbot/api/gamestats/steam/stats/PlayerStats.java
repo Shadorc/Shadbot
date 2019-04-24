@@ -7,12 +7,12 @@ import java.util.List;
 
 public class PlayerStats {
 
-	@Nullable
-	@JsonProperty("stats")
-	private List<Stats> stats;
+    @Nullable
+    @JsonProperty("stats")
+    private List<Stats> stats;
 
-	public List<Stats> getStats() {
-		return this.stats;
-	}
+    public List<Stats> getStats() {
+        return this.stats;
+    }
 
 }

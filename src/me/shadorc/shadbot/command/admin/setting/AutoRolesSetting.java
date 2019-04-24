@@ -22,65 +22,65 @@ import java.util.stream.Collectors;
 
 public class AutoRolesSetting extends BaseSetting {
 
-	private enum Action {
-		ADD, REMOVE;
-	}
+    private enum Action {
+        ADD, REMOVE;
+    }
 
-	public AutoRolesSetting() {
-		super(Setting.AUTO_ROLES, "Manage auto assigned role(s).");
-	}
+    public AutoRolesSetting() {
+        super(Setting.AUTO_ROLES, "Manage auto assigned role(s).");
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final List<String> args = context.requireArgs(3);
+    @Override
+    public Mono<Void> execute(Context context) {
+        final List<String> args = context.requireArgs(3);
 
-		final Action action = Utils.parseEnum(Action.class, args.get(1),
-				new CommandException(String.format("`%s` is not a valid action. %s",
-						args.get(1), FormatUtils.options(Action.class))));
+        final Action action = Utils.parseEnum(Action.class, args.get(1),
+                new CommandException(String.format("`%s` is not a valid action. %s",
+                        args.get(1), FormatUtils.options(Action.class))));
 
-		final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
-		final List<Long> autoRoles = dbGuild.getAutoRoles();
+        final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+        final List<Long> autoRoles = dbGuild.getAutoRoles();
 
-		return context.getGuild()
-				.flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(2)))
-				.flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-				.collectList()
-				.map(mentionedRoles -> {
-					if(mentionedRoles.isEmpty()) {
-						throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
-					}
+        return context.getGuild()
+                .flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(2)))
+                .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
+                .collectList()
+                .map(mentionedRoles -> {
+                    if (mentionedRoles.isEmpty()) {
+                        throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
+                    }
 
-					final List<Long> mentionedRoleIds = mentionedRoles.stream()
-							.map(Role::getId)
-							.map(Snowflake::asLong)
-							.collect(Collectors.toList());
+                    final List<Long> mentionedRoleIds = mentionedRoles.stream()
+                            .map(Role::getId)
+                            .map(Snowflake::asLong)
+                            .collect(Collectors.toList());
 
-					final StringBuilder strBuilder = new StringBuilder();
-					if(Action.ADD.equals(action)) {
-						autoRoles.addAll(mentionedRoleIds);
-						strBuilder.append(String.format(Emoji.CHECK_MARK + " %s added to auto-assigned roles.",
-								FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getMention()), ", ")));
-					} else {
-						autoRoles.removeAll(mentionedRoleIds);
-						strBuilder.append(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
-								FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getMention()), ", ")));
-					}
+                    final StringBuilder strBuilder = new StringBuilder();
+                    if (Action.ADD.equals(action)) {
+                        autoRoles.addAll(mentionedRoleIds);
+                        strBuilder.append(String.format(Emoji.CHECK_MARK + " %s added to auto-assigned roles.",
+                                FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getMention()), ", ")));
+                    } else {
+                        autoRoles.removeAll(mentionedRoleIds);
+                        strBuilder.append(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
+                                FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getMention()), ", ")));
+                    }
 
-					dbGuild.setSetting(this.getSetting(), autoRoles);
-					return strBuilder.toString();
-				})
-				.flatMap(text -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
-				.then();
-	}
+                    dbGuild.setSetting(this.getSetting(), autoRoles);
+                    return strBuilder.toString();
+                })
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return EmbedUtils.getDefaultEmbed()
-				.andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <@role(s)>`", context.getPrefix(), this.getCommandName()), false)
-						.addField("Argument", String.format("**action** - %s",
-								FormatUtils.format(Action.class, "/")), false)
-						.addField("Example", String.format("`%s%s add @newbie`", context.getPrefix(), this.getCommandName()), false));
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return EmbedUtils.getDefaultEmbed()
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <@role(s)>`", context.getPrefix(), this.getCommandName()), false)
+                        .addField("Argument", String.format("**action** - %s",
+                                FormatUtils.format(Action.class, "/")), false)
+                        .addField("Example", String.format("`%s%s add @newbie`", context.getPrefix(), this.getCommandName()), false));
+    }
 
 }

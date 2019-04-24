@@ -15,41 +15,41 @@ import java.time.Duration;
 
 public abstract class Data {
 
-	private static final File SAVE_DIR = new File("./saves");
+    private static final File SAVE_DIR = new File("./saves");
 
-	private final File file;
+    private final File file;
 
-	public Data(String fileName, Duration initialDelay, Duration period) {
-		this.file = new File(SAVE_DIR, fileName);
+    public Data(String fileName, Duration initialDelay, Duration period) {
+        this.file = new File(SAVE_DIR, fileName);
 
-		if(!SAVE_DIR.exists() && !SAVE_DIR.mkdir()) {
-			throw new RuntimeException(String.format("%s could not be created.", SAVE_DIR.getName()));
-		}
+        if (!SAVE_DIR.exists() && !SAVE_DIR.mkdir()) {
+            throw new RuntimeException(String.format("%s could not be created.", SAVE_DIR.getName()));
+        }
 
-		Flux.interval(initialDelay, period)
-				.doOnNext(ignored -> Mono.fromRunnable(this::save))
-				.subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
-	}
+        Flux.interval(initialDelay, period)
+                .doOnNext(ignored -> Mono.fromRunnable(this::save))
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+    }
 
-	public abstract Object getData();
+    public abstract Object getData();
 
-	public void write() throws IOException {
-		try (BufferedWriter writer = Files.newBufferedWriter(this.getFile().toPath())) {
-			writer.write(Utils.MAPPER.writeValueAsString(this.getData()));
-		}
-	}
+    public void write() throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(this.getFile().toPath())) {
+            writer.write(Utils.MAPPER.writeValueAsString(this.getData()));
+        }
+    }
 
-	public void save() {
-		try {
-			this.write();
-			LogUtils.info("%s saved.", this.getFile().getName());
-		} catch (final IOException err) {
-			LogUtils.error(err, String.format("An error occurred while saving %s.", this.getFile().getName()));
-		}
-	}
+    public void save() {
+        try {
+            this.write();
+            LogUtils.info("%s saved.", this.getFile().getName());
+        } catch (final IOException err) {
+            LogUtils.error(err, String.format("An error occurred while saving %s.", this.getFile().getName()));
+        }
+    }
 
-	public File getFile() {
-		return this.file;
-	}
+    public File getFile() {
+        return this.file;
+    }
 
 }

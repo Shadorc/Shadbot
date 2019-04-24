@@ -29,100 +29,100 @@ import java.util.function.Consumer;
 
 public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
-	protected static final int MIN_GAINS = 100;
-	protected static final int MAX_BONUS = 150;
+    protected static final int MIN_GAINS = 100;
+    protected static final int MAX_BONUS = 150;
 
-	private final TriviaResult trivia;
-	private final List<String> answers;
+    private final TriviaResult trivia;
+    private final List<String> answers;
 
-	private long startTime;
+    private long startTime;
 
-	// Trivia API doc : https://opentdb.com/api_config.php
-	public TriviaGame(GameCmd<TriviaGame> gameCmd, Context context, Integer categoryId) {
-		super(gameCmd, context, Duration.ofSeconds(30));
+    // Trivia API doc : https://opentdb.com/api_config.php
+    public TriviaGame(GameCmd<TriviaGame> gameCmd, Context context, Integer categoryId) {
+        super(gameCmd, context, Duration.ofSeconds(30));
 
-		try {
-			final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, ""));
-			final TriviaResponse response = Utils.MAPPER.readValue(NetUtils.getJSON(url), TriviaResponse.class);
-			this.trivia = response.getResults().get(0);
-		} catch (final IOException err) {
-			throw Exceptions.propagate(err);
-		}
+        try {
+            final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, ""));
+            final TriviaResponse response = Utils.MAPPER.readValue(NetUtils.getJSON(url), TriviaResponse.class);
+            this.trivia = response.getResults().get(0);
+        } catch (final IOException err) {
+            throw Exceptions.propagate(err);
+        }
 
-		this.answers = new ArrayList<>();
-		if(this.trivia.getType().equals("multiple")) {
-			this.answers.addAll(this.trivia.getIncorrectAnswers());
-			this.answers.add(this.trivia.getCorrectAnswer());
-			Collections.shuffle(this.answers);
-		} else {
-			this.answers.addAll(List.of("True", "False"));
-		}
-	}
+        this.answers = new ArrayList<>();
+        if (this.trivia.getType().equals("multiple")) {
+            this.answers.addAll(this.trivia.getIncorrectAnswers());
+            this.answers.add(this.trivia.getCorrectAnswer());
+            Collections.shuffle(this.answers);
+        } else {
+            this.answers.addAll(List.of("True", "False"));
+        }
+    }
 
-	@Override
-	public void start() {
-		this.schedule(this.end());
-		this.startTime = System.currentTimeMillis();
-		new TriviaInputs(this.getContext().getClient(), this).subscribe();
-	}
+    @Override
+    public void start() {
+        this.schedule(this.end());
+        this.startTime = System.currentTimeMillis();
+        new TriviaInputs(this.getContext().getClient(), this).subscribe();
+    }
 
-	@Override
-	public Mono<Void> end() {
-		return this.getContext().getChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
-						this.trivia.getCorrectAnswer()), channel))
-				.then(Mono.fromRunnable(this::stop));
-	}
+    @Override
+    public Mono<Void> end() {
+        return this.getContext().getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
+                        this.trivia.getCorrectAnswer()), channel))
+                .then(Mono.fromRunnable(this::stop));
+    }
 
-	@Override
-	public Mono<Void> show() {
-		final String description = String.format("**%s**%n%s",
-				this.trivia.getQuestion(),
-				FormatUtils.numberedList(this.answers.size(), this.answers.size(),
-						count -> String.format("\t**%d**. %s", count, this.answers.get(count - 1))));
+    @Override
+    public Mono<Void> show() {
+        final String description = String.format("**%s**%n%s",
+                this.trivia.getQuestion(),
+                FormatUtils.numberedList(this.answers.size(), this.answers.size(),
+                        count -> String.format("\t**%d**. %s", count, this.answers.get(count - 1))));
 
-		final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-				.andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
-						.setDescription(description)
-						.addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
-						.addField("Type", String.format("`%s`", this.trivia.getType()), true)
-						.addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
-						.setFooter(String.format("You have %d seconds to answer. Use %scancel to force the stop.",
-								this.getDuration().toSeconds(), this.getContext().getPrefix()), null));
+        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+                .andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
+                        .setDescription(description)
+                        .addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
+                        .addField("Type", String.format("`%s`", this.trivia.getType()), true)
+                        .addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
+                        .setFooter(String.format("You have %d seconds to answer. Use %scancel to force the stop.",
+                                this.getDuration().toSeconds(), this.getContext().getPrefix()), null));
 
-		return this.getContext().getChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-				.then();
-	}
+        return this.getContext().getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+                .then();
+    }
 
-	protected Mono<Message> win(Member member) {
-		final float coinsPerSec = (float) MAX_BONUS / this.getDuration().toSeconds();
-		final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-		final int gains = (int) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
+    protected Mono<Message> win(Member member) {
+        final float coinsPerSec = (float) MAX_BONUS / this.getDuration().toSeconds();
+        final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+        final int gains = (int) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
 
-		Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
-		StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
+        Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
+        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
 
-		this.stop();
-		return this.getContext().getChannel()
-				.flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won **%d coins**.",
-						member.getUsername(), gains), channel));
-	}
+        this.stop();
+        return this.getContext().getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won **%d coins**.",
+                        member.getUsername(), gains), channel));
+    }
 
-	public void hasAnswered(Snowflake userId) {
-		if(this.getPlayers().containsKey(userId)) {
-			this.getPlayers().get(userId).setAnswered(true);
-		} else {
-			this.addPlayerIfAbsent(new TriviaPlayer(userId));
-		}
-	}
+    public void hasAnswered(Snowflake userId) {
+        if (this.getPlayers().containsKey(userId)) {
+            this.getPlayers().get(userId).setAnswered(true);
+        } else {
+            this.addPlayerIfAbsent(new TriviaPlayer(userId));
+        }
+    }
 
-	public List<String> getAnswers() {
-		return Collections.unmodifiableList(this.answers);
-	}
+    public List<String> getAnswers() {
+        return Collections.unmodifiableList(this.answers);
+    }
 
-	public String getCorrectAnswer() {
-		return this.trivia.getCorrectAnswer();
-	}
+    public String getCorrectAnswer() {
+        return this.trivia.getCorrectAnswer();
+    }
 
 }

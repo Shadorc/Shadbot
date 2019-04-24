@@ -29,84 +29,84 @@ import java.util.stream.Collectors;
 
 public class ImageCmd extends BaseCmd {
 
-	private final AtomicLong lastTokenGeneration;
-	private TokenResponse token;
+    private final AtomicLong lastTokenGeneration;
+    private TokenResponse token;
 
-	public ImageCmd() {
-		super(CommandCategory.IMAGE, List.of("image"));
-		this.setDefaultRateLimiter();
+    public ImageCmd() {
+        super(CommandCategory.IMAGE, List.of("image"));
+        this.setDefaultRateLimiter();
 
-		this.lastTokenGeneration = new AtomicLong(0);
-		this.token = null;
-	}
+        this.lastTokenGeneration = new AtomicLong(0);
+        this.token = null;
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final String arg = context.requireArg();
+    @Override
+    public Mono<Void> execute(Context context) {
+        final String arg = context.requireArg();
 
-		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-		return Mono.fromCallable(() -> {
-			final Image image = this.getRandomPopularImage(NetUtils.encode(arg));
-			if(image == null) {
-				return loadingMsg.setContent(String.format(
-						Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
-						context.getUsername(), arg));
-			}
+        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        return Mono.fromCallable(() -> {
+            final Image image = this.getRandomPopularImage(NetUtils.encode(arg));
+            if (image == null) {
+                return loadingMsg.setContent(String.format(
+                        Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
+                        context.getUsername(), arg));
+            }
 
-			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-					.andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
-							.setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
-							.addField("Title", image.getTitle(), false)
-							.addField("Author", image.getAuthor().getUsername(), false)
-							.addField("Category", image.getCategoryPath(), false)
-							.setImage(image.getContent().getSource())));
-		})
-				.flatMap(LoadingMessage::send)
-				.doOnTerminate(loadingMsg::stopTyping)
-				.then();
-	}
+            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    .andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
+                            .setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
+                            .addField("Title", image.getTitle(), false)
+                            .addField("Author", image.getAuthor().getUsername(), false)
+                            .addField("Category", image.getCategoryPath(), false)
+                            .setImage(image.getContent().getSource())));
+        })
+                .flatMap(LoadingMessage::send)
+                .doOnTerminate(loadingMsg::stopTyping)
+                .then();
+    }
 
-	private Image getRandomPopularImage(String encodedSearch) throws IOException {
-		if(this.isTokenExpired()) {
-			this.generateAccessToken();
-		}
+    private Image getRandomPopularImage(String encodedSearch) throws IOException {
+        if (this.isTokenExpired()) {
+            this.generateAccessToken();
+        }
 
-		final String url = String.format("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
-				+ "q=%s"
-				+ "&timerange=alltime"
-				+ "&limit=25" // The pagination limit (min: 1 max: 50)
-				+ "&offset=%d" // The pagination offset (min: 0 max: 50000)
-				+ "&access_token=%s",
-				encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken());
+        final String url = String.format("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
+                        + "q=%s"
+                        + "&timerange=alltime"
+                        + "&limit=25" // The pagination limit (min: 1 max: 50)
+                        + "&offset=%d" // The pagination offset (min: 0 max: 50000)
+                        + "&access_token=%s",
+                encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken());
 
-		final DeviantArtResponse deviantArt = Utils.MAPPER.readValue(NetUtils.getJSON(url), DeviantArtResponse.class);
-		final List<Image> images = deviantArt.getResults().stream()
-				.filter(image -> image.getContent() != null)
-				.collect(Collectors.toList());
+        final DeviantArtResponse deviantArt = Utils.MAPPER.readValue(NetUtils.getJSON(url), DeviantArtResponse.class);
+        final List<Image> images = deviantArt.getResults().stream()
+                .filter(image -> image.getContent() != null)
+                .collect(Collectors.toList());
 
-		return images.isEmpty() ? null : Utils.randValue(images);
-	}
+        return images.isEmpty() ? null : Utils.randValue(images);
+    }
 
-	private boolean isTokenExpired() {
-		return this.token == null
-				|| TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
-	}
+    private boolean isTokenExpired() {
+        return this.token == null
+                || TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
+    }
 
-	private void generateAccessToken() throws IOException {
-		final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
-				Credentials.get(Credential.DEVIANTART_CLIENT_ID),
-				Credentials.get(Credential.DEVIANTART_API_SECRET));
-		this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
-		this.lastTokenGeneration.set(System.currentTimeMillis());
-		LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
-	}
+    private void generateAccessToken() throws IOException {
+        final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
+                Credentials.get(Credential.DEVIANTART_CLIENT_ID),
+                Credentials.get(Credential.DEVIANTART_API_SECRET));
+        this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
+        this.lastTokenGeneration.set(System.currentTimeMillis());
+        LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Search for a random image on DeviantArt.")
-				.addArg("search", false)
-				.setSource("https://www.deviantart.com/")
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Search for a random image on DeviantArt.")
+                .addArg("search", false)
+                .setSource("https://www.deviantart.com/")
+                .build();
+    }
 }

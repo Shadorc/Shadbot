@@ -20,44 +20,44 @@ import java.util.function.Consumer;
 
 public class SuicideGirlsCmd extends BaseCmd {
 
-	public SuicideGirlsCmd() {
-		super(CommandCategory.IMAGE, List.of("suicide_girls", "suicide-girls", "suicidegirls"), "sg");
-		this.setDefaultRateLimiter();
-	}
+    public SuicideGirlsCmd() {
+        super(CommandCategory.IMAGE, List.of("suicide_girls", "suicide-girls", "suicidegirls"), "sg");
+        this.setDefaultRateLimiter();
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+    @Override
+    public Mono<Void> execute(Context context) {
+        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
-		return context.isChannelNsfw()
-				.flatMap(isNsfw -> Mono.fromCallable(() -> {
-					if(!isNsfw) {
-						return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
-					}
+        return context.isChannelNsfw()
+                .flatMap(isNsfw -> Mono.fromCallable(() -> {
+                    if (!isNsfw) {
+                        return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
+                    }
 
-					final Document doc = NetUtils.getDoc("https://www.suicidegirls.com/photos/sg/recent/all/");
+                    final Document doc = NetUtils.getDoc("https://www.suicidegirls.com/photos/sg/recent/all/");
 
-					final Element girl = Utils.randValue(doc.getElementsByTag("article"));
-					final String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();
-					final String imageUrl = girl.select("noscript").attr("data-retina");
-					final String url = girl.getElementsByClass("facebook-share").attr("href");
+                    final Element girl = Utils.randValue(doc.getElementsByTag("article"));
+                    final String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();
+                    final String imageUrl = girl.select("noscript").attr("data-retina");
+                    final String url = girl.getElementsByClass("facebook-share").attr("href");
 
-					return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-							.andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
-									.setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
-									.setImage(imageUrl)));
-				}))
-				.flatMap(LoadingMessage::send)
-				.doOnTerminate(loadingMsg::stopTyping)
-				.then();
-	}
+                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                            .andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
+                                    .setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
+                                    .setImage(imageUrl)));
+                }))
+                .flatMap(LoadingMessage::send)
+                .doOnTerminate(loadingMsg::stopTyping)
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Show a random Suicide Girl image.")
-				.setSource("https://www.suicidegirls.com/")
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Show a random Suicide Girl image.")
+                .setSource("https://www.suicidegirls.com/")
+                .build();
+    }
 
 }

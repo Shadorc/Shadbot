@@ -6,11 +6,11 @@ import java.util.List;
 
 public class UrbanDictionaryResponse {
 
-	@JsonProperty("list")
-	private List<UrbanDefinition> definitions;
+    @JsonProperty("list")
+    private List<UrbanDefinition> definitions;
 
-	public List<UrbanDefinition> getDefinitions() {
-		return this.definitions;
-	}
+    public List<UrbanDefinition> getDefinitions() {
+        return this.definitions;
+    }
 
 }

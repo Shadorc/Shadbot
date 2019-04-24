@@ -18,49 +18,49 @@ import java.util.function.Consumer;
 
 public class DatabaseCmd extends BaseCmd {
 
-	public DatabaseCmd() {
-		super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("database"));
-	}
+    public DatabaseCmd() {
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("database"));
+    }
 
-	@Override
-	public Mono<Void> execute(Context context) {
-		final List<String> args = context.requireArgs(1, 2);
+    @Override
+    public Mono<Void> execute(Context context) {
+        final List<String> args = context.requireArgs(1, 2);
 
-		final Long guildId = NumberUtils.asPositiveLong(args.get(0));
-		if(guildId == null) {
-			return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.",
-					args.get(0))));
-		}
+        final Long guildId = NumberUtils.asPositiveLong(args.get(0));
+        if (guildId == null) {
+            return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.",
+                    args.get(0))));
+        }
 
-		return context.getClient().getGuildById(Snowflake.of(guildId))
-				.switchIfEmpty(Mono.error(new CommandException("Guild not found.")))
-				.flatMap(guild -> {
-					if(args.size() == 1) {
-						return Mono.just(Shadbot.getDatabase().getDBGuild(guild.getId()).toString());
-					}
+        return context.getClient().getGuildById(Snowflake.of(guildId))
+                .switchIfEmpty(Mono.error(new CommandException("Guild not found.")))
+                .flatMap(guild -> {
+                    if (args.size() == 1) {
+                        return Mono.just(Shadbot.getDatabase().getDBGuild(guild.getId()).toString());
+                    }
 
-					final Long memberId = NumberUtils.asPositiveLong(args.get(1));
-					if(memberId == null) {
-						return Mono.error(new CommandException(String.format("`%s` is not a valid member ID.",
-								args.get(1))));
-					}
+                    final Long memberId = NumberUtils.asPositiveLong(args.get(1));
+                    if (memberId == null) {
+                        return Mono.error(new CommandException(String.format("`%s` is not a valid member ID.",
+                                args.get(1))));
+                    }
 
-					return context.getClient().getMemberById(Snowflake.of(guildId), Snowflake.of(memberId))
-							.switchIfEmpty(Mono.error(new CommandException("Member not found.")))
-							.map(member -> Shadbot.getDatabase().getDBMember(guild.getId(), member.getId()).toString());
-				})
-				.flatMap(text -> context.getChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
-				.then();
-	}
+                    return context.getClient().getMemberById(Snowflake.of(guildId), Snowflake.of(memberId))
+                            .switchIfEmpty(Mono.error(new CommandException("Member not found.")))
+                            .map(member -> Shadbot.getDatabase().getDBMember(guild.getId(), member.getId()).toString());
+                })
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
+                .then();
+    }
 
-	@Override
-	public Consumer<EmbedCreateSpec> getHelp(Context context) {
-		return new HelpBuilder(this, context)
-				.setDescription("Return data about a member / guild.")
-				.addArg("guildID", false)
-				.addArg("memberID", true)
-				.build();
-	}
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription("Return data about a member / guild.")
+                .addArg("guildID", false)
+                .addArg("memberID", true)
+                .build();
+    }
 
 }

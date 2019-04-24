@@ -5,13 +5,13 @@ import reactor.util.annotation.Nullable;
 
 public class R34Response {
 
-	@Nullable
-	@JsonProperty("posts")
-	private R34Posts posts;
+    @Nullable
+    @JsonProperty("posts")
+    private R34Posts posts;
 
-	@Nullable
-	public R34Posts getPosts() {
-		return this.posts;
-	}
+    @Nullable
+    public R34Posts getPosts() {
+        return this.posts;
+    }
 
 }

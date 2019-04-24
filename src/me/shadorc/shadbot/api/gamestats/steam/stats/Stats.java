@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Stats {
 
-	@JsonProperty("name")
-	private String name;
-	@JsonProperty("value")
-	private int value;
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("value")
+    private int value;
 
-	public String getName() {
-		return this.name;
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	public int getValue() {
-		return this.value;
-	}
+    public int getValue() {
+        return this.value;
+    }
 
 }

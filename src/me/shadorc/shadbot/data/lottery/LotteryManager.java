@@ -8,21 +8,21 @@ import java.time.Duration;
 
 public class LotteryManager extends Data {
 
-	private final Lottery lottery;
+    private final Lottery lottery;
 
-	public LotteryManager() throws IOException {
-		super("lotto_data.json", Duration.ofMinutes(30), Duration.ofMinutes(30));
+    public LotteryManager() throws IOException {
+        super("lotto_data.json", Duration.ofMinutes(30), Duration.ofMinutes(30));
 
-		this.lottery = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), Lottery.class) : new Lottery();
-	}
+        this.lottery = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), Lottery.class) : new Lottery();
+    }
 
-	public Lottery getLottery() {
-		return this.lottery;
-	}
+    public Lottery getLottery() {
+        return this.lottery;
+    }
 
-	@Override
-	public Object getData() {
-		return this.getLottery();
-	}
+    @Override
+    public Object getData() {
+        return this.getLottery();
+    }
 
 }

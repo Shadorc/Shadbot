@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TopHeroes {
 
-	@JsonProperty("quickplay")
-	private Quickplay quickplay;
+    @JsonProperty("quickplay")
+    private Quickplay quickplay;
 
-	public Quickplay getQuickplay() {
-		return this.quickplay;
-	}
+    public Quickplay getQuickplay() {
+        return this.quickplay;
+    }
 
 }

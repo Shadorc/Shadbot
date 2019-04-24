@@ -2,21 +2,21 @@ package me.shadorc.shadbot.core.command;
 
 public enum CommandPermission {
 
-	USER(0),
-	ADMIN(1),
-	OWNER(2);
+    USER(0),
+    ADMIN(1),
+    OWNER(2);
 
-	private final int hierarchy;
+    private final int hierarchy;
 
-	CommandPermission(int hierarchy) {
-		this.hierarchy = hierarchy;
-	}
+    CommandPermission(int hierarchy) {
+        this.hierarchy = hierarchy;
+    }
 
-	public int getHierarchy() {
-		return this.hierarchy;
-	}
+    public int getHierarchy() {
+        return this.hierarchy;
+    }
 
-	public boolean isHigher(CommandPermission perm) {
-		return this.getHierarchy() > perm.getHierarchy();
-	}
+    public boolean isHigher(CommandPermission perm) {
+        return this.getHierarchy() > perm.getHierarchy();
+    }
 }
