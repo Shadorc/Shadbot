@@ -10,6 +10,9 @@ gen/
 .project
 .settings
 
+# IntelliJ project files
+.idea
+
 # Maven build files
 target/
 dependency-reduced-pom.xml
