@@ -4,9 +4,13 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import reactor.util.annotation.Nullable;
 
 public class ProfileResponse {
 
+	@Nullable
+	@JsonProperty("message")
+	private String message;
 	@JsonProperty("username")
 	private String username;
 	@JsonProperty("level")
@@ -21,6 +25,11 @@ public class ProfileResponse {
 	private Map<String, String> playtime;
 	@JsonProperty("competitive")
 	private Map<String, String> competitive;
+
+	@Nullable
+	public String getMessage() {
+		return this.message;
+	}
 
 	public String getUsername() {
 		return this.username;

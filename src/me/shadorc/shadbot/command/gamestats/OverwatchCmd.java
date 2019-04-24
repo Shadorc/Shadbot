@@ -97,13 +97,10 @@ public class OverwatchCmd extends BaseCmd {
 						platformStr, FormatUtils.options(Platform.class))));
 
 		final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("profile", platform, username)), ProfileResponse.class);
-		if(profile.getUsername() == null) {
+		if("Error: Profile not found".equals(profile.getMessage())) {
 			return null;
 		}
 		final StatsResponse stats = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("stats", platform, username)), StatsResponse.class);
-		if(stats.getStats() == null) {
-			return null;
-		}
 		return Tuples.of(platform, profile, stats);
 	}
 
