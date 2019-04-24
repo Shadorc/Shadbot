@@ -1,17 +1,5 @@
 package me.shadorc.shadbot.command.image;
 
-import java.awt.Dimension;
-import java.util.List;
-import java.util.function.Consumer;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.UnrecognizedOptionException;
-import org.apache.http.HttpStatus;
-import org.jsoup.HttpStatusException;
-
 import com.ivkos.wallhaven4j.Wallhaven;
 import com.ivkos.wallhaven4j.models.misc.Ratio;
 import com.ivkos.wallhaven4j.models.misc.Resolution;
@@ -21,7 +9,6 @@ import com.ivkos.wallhaven4j.models.wallpaper.Wallpaper;
 import com.ivkos.wallhaven4j.util.exceptions.ConnectionException;
 import com.ivkos.wallhaven4j.util.exceptions.WallhavenException;
 import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -31,14 +18,17 @@ import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.LoadingMessage;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.*;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.apache.commons.cli.*;
+import org.apache.http.HttpStatus;
+import org.jsoup.HttpStatusException;
 import reactor.core.publisher.Mono;
+
+import java.awt.*;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class WallpaperCmd extends BaseCmd {
 

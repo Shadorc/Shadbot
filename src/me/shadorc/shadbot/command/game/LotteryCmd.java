@@ -1,13 +1,5 @@
 package me.shadorc.shadbot.command.game;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
@@ -21,17 +13,21 @@ import me.shadorc.shadbot.data.lottery.LotteryGambler;
 import me.shadorc.shadbot.data.lottery.LotteryHistoric;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
-import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.TimeUtils;
+import me.shadorc.shadbot.utils.*;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class LotteryCmd extends BaseCmd {
 
@@ -46,7 +42,7 @@ public class LotteryCmd extends BaseCmd {
 
 	@Override
 	public Mono<Void> execute(Context context) {
-		if(!context.getArg().isPresent()) {
+		if(context.getArg().isEmpty()) {
 			return this.show(context).then();
 		}
 
@@ -96,17 +92,12 @@ public class LotteryCmd extends BaseCmd {
 							.addField("Number of participants", Integer.toString(gamblers.size()), false)
 							.addField("Prize pool", FormatUtils.coins(Shadbot.getLottery().getJackpot()), false);
 
-					final LotteryGambler gambler = gamblers.stream()
-							.filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
-							.findAny()
-							.orElse(null);
+                    gamblers.stream()
+                            .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
+                            .findAny().ifPresent(gambler -> embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
+                            "https://images.emojiterra.com/twitter/512px/1f39f.png"));
 
-					if(gambler != null) {
-						embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
-								"https://images.emojiterra.com/twitter/512px/1f39f.png");
-					}
-
-					final LotteryHistoric historic = Shadbot.getLottery().getHistoric();
+                    final LotteryHistoric historic = Shadbot.getLottery().getHistoric();
 					if(historic != null) {
 						String people;
 						switch (historic.getWinnerCount()) {

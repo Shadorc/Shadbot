@@ -1,10 +1,5 @@
 package me.shadorc.shadbot.command.image;
 
-import java.util.List;
-import java.util.function.Consumer;
-
-import org.json.XML;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.image.r34.R34Post;
 import me.shadorc.shadbot.api.image.r34.R34Posts;
@@ -14,14 +9,14 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.LoadingMessage;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.*;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.json.XML;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class Rule34Cmd extends BaseCmd {
 

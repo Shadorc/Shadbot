@@ -1,12 +1,6 @@
 package me.shadorc.shadbot.command.info;
 
-import java.util.List;
-import java.util.function.Consumer;
-
-import org.apache.commons.lang3.time.DurationFormatUtils;
-
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
-
 import discord4j.common.GitProperties;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
@@ -25,7 +19,11 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class InfoCmd extends BaseCmd {
 

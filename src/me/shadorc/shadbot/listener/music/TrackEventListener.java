@@ -1,13 +1,10 @@
 package me.shadorc.shadbot.listener.music;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.music.GuildMusic;
@@ -19,6 +16,8 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TrackEventListener extends AudioEventAdapter {
 

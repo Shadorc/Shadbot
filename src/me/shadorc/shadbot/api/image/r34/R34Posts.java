@@ -1,8 +1,8 @@
 package me.shadorc.shadbot.api.image.r34;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 public class R34Posts {
 

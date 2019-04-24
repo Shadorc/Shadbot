@@ -1,9 +1,5 @@
 package me.shadorc.shadbot.listener.music;
 
-import java.time.Duration;
-import java.util.HashSet;
-import java.util.Set;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
@@ -18,6 +14,10 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AudioLoadResultInputs extends Inputs {
 
@@ -67,7 +67,7 @@ public class AudioLoadResultInputs extends Inputs {
 			choices.add(num);
 		}
 
-		choices.stream()
+		choices
 				.forEach(choice -> this.listener.trackLoaded(this.listener.getResultTracks().get(choice - 1)));
 
 		guildMusic.setWaitingForChoice(false);

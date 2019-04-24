@@ -30,7 +30,7 @@ public class NumberUtils {
 		}
 
 		try {
-			final Integer nbr = Integer.parseInt(str);
+			final int nbr = Integer.parseInt(str);
 			if(!NumberUtils.isInRange(nbr, min, max)) {
 				return null;
 			}
@@ -50,7 +50,7 @@ public class NumberUtils {
 		}
 
 		try {
-			final Integer nbr = Integer.parseInt(str);
+			final int nbr = Integer.parseInt(str);
 			return nbr > 0 ? nbr : null;
 		} catch (final NumberFormatException err) {
 			return null;
@@ -67,7 +67,7 @@ public class NumberUtils {
 		}
 
 		try {
-			final Long nbr = Long.parseLong(str);
+			final long nbr = Long.parseLong(str);
 			return nbr > 0 ? nbr : null;
 		} catch (final NumberFormatException err) {
 			return null;

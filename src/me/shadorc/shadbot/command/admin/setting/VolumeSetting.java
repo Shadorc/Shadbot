@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.command.admin.setting;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -15,6 +12,9 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class VolumeSetting extends BaseSetting {
 

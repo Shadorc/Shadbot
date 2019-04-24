@@ -1,9 +1,5 @@
 package me.shadorc.shadbot.command.game.dice;
 
-import java.time.Duration;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
@@ -19,6 +15,10 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class DiceGame extends MultiplayerGame<DicePlayer> {
 
@@ -79,10 +79,10 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
 									.setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
 											this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
 									.addField("Player", String.join("\n", usernames), true)
-									.addField("Number", String.join("\n", this.getPlayers().values().stream()
+									.addField("Number", this.getPlayers().values().stream()
 											.map(DicePlayer::getNumber)
 											.map(Object::toString)
-											.collect(Collectors.toList())), true);
+											.collect(Collectors.joining("\n")), true);
 
 							if(this.results != null) {
 								embed.addField("Results", this.results, false);

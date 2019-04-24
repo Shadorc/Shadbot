@@ -1,12 +1,12 @@
 package me.shadorc.shadbot.utils.embed.log;
 
-import java.awt.Color;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
+
+import java.awt.*;
+import java.util.function.Consumer;
 
 public class LogBuilder {
 

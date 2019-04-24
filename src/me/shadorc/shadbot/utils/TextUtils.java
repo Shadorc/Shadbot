@@ -1,14 +1,12 @@
 package me.shadorc.shadbot.utils;
 
-import org.jsoup.Jsoup;
-
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.TextFile;
 import me.shadorc.shadbot.object.Emoji;
+import org.jsoup.Jsoup;
 
 public class TextUtils {
 

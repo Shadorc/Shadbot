@@ -1,8 +1,8 @@
 package me.shadorc.shadbot.core.ratelimiter;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import io.github.bucket4j.Bucket;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LimitedUser {
 

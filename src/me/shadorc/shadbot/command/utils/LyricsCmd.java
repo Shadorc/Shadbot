@@ -1,19 +1,6 @@
 package me.shadorc.shadbot.command.utils;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-
-import org.apache.http.HttpStatus;
-import org.jsoup.Connection.Response;
-import org.jsoup.HttpStatusException;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Document.OutputSettings;
-import org.jsoup.nodes.Element;
-
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.musixmatch.Musixmatch;
@@ -29,7 +16,18 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import org.apache.http.HttpStatus;
+import org.jsoup.Connection.Response;
+import org.jsoup.HttpStatusException;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.jsoup.nodes.Element;
 import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class LyricsCmd extends BaseCmd {
 
@@ -60,7 +58,7 @@ public class LyricsCmd extends BaseCmd {
 
 				final AudioTrackInfo info = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack().getInfo();
 				// Remove from title (case insensitive): official, video, music, [, ], (, )
-				search = info.title.replaceAll("(?i)official|video|music|\\[|\\]|\\(|\\)", "");
+				search = info.title.replaceAll("(?i)official|video|music|\\[|]|\\(|\\)", "");
 			}
 
 			final String url = this.getCorrectedUrl(search);
@@ -89,7 +87,7 @@ public class LyricsCmd extends BaseCmd {
 		// Sometimes Musixmatch redirects to a wrong page
 		// If the response URL and the requested URL are different, retry
 		int retryCount = 0;
-		Response response = null;
+		Response response;
 		do {
 			if(retryCount == MAX_RETRY) {
 				LogUtils.warn(client, String.format("[%s] Too many retries, abort attempt to reload page.",

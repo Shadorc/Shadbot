@@ -1,5 +1,10 @@
 package me.shadorc.shadbot.utils;
 
+import com.google.common.collect.Lists;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import discord4j.common.json.EmbedFieldEntity;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -13,13 +18,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.time.DurationFormatUtils;
-
-import com.google.common.collect.Lists;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-
-import discord4j.common.json.EmbedFieldEntity;
 
 public class FormatUtils {
 

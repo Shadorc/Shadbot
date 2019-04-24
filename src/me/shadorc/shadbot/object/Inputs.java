@@ -1,13 +1,12 @@
 package me.shadorc.shadbot.object;
 
-import java.time.Duration;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 public abstract class Inputs {
 
@@ -28,8 +27,8 @@ public abstract class Inputs {
 				.take(this.timeout);
 	}
 
-	public final Disposable subscribe() {
-		return this.waitForInputs()
+	public final void subscribe() {
+		this.waitForInputs()
 				.onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(this.client, err))
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
 	}

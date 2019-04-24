@@ -1,12 +1,12 @@
 package me.shadorc.shadbot.core.game;
 
+import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.core.command.Context;
+
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.core.command.Context;
 
 public abstract class MultiplayerGame<P extends Player> extends Game {
 

@@ -1,12 +1,12 @@
 package me.shadorc.shadbot.listener;
 
-import java.util.List;
-
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public class ChannelListener {
 

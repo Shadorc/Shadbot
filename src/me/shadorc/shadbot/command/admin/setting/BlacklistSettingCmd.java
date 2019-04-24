@@ -1,9 +1,5 @@
 package me.shadorc.shadbot.command.admin.setting;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
@@ -19,6 +15,10 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class BlacklistSettingCmd extends BaseSetting {
 

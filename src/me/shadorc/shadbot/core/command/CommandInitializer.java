@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.core.command;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import me.shadorc.shadbot.command.admin.IamCmd;
 import me.shadorc.shadbot.command.admin.ManageCoinsCmd;
 import me.shadorc.shadbot.command.admin.PruneCmd;
@@ -35,45 +32,16 @@ import me.shadorc.shadbot.command.hidden.ActivateRelicCmd;
 import me.shadorc.shadbot.command.hidden.BaguetteCmd;
 import me.shadorc.shadbot.command.hidden.HelpCmd;
 import me.shadorc.shadbot.command.hidden.RelicStatusCmd;
-import me.shadorc.shadbot.command.image.GifCmd;
-import me.shadorc.shadbot.command.image.ImageCmd;
-import me.shadorc.shadbot.command.image.Rule34Cmd;
-import me.shadorc.shadbot.command.image.SuicideGirlsCmd;
-import me.shadorc.shadbot.command.image.WallpaperCmd;
-import me.shadorc.shadbot.command.info.InfoCmd;
-import me.shadorc.shadbot.command.info.PingCmd;
-import me.shadorc.shadbot.command.info.RolelistCmd;
-import me.shadorc.shadbot.command.info.ServerInfoCmd;
-import me.shadorc.shadbot.command.info.UserInfoCmd;
-import me.shadorc.shadbot.command.music.BackwardCmd;
-import me.shadorc.shadbot.command.music.ClearCmd;
-import me.shadorc.shadbot.command.music.ForwardCmd;
-import me.shadorc.shadbot.command.music.NameCmd;
-import me.shadorc.shadbot.command.music.PauseCmd;
-import me.shadorc.shadbot.command.music.PlayCmd;
-import me.shadorc.shadbot.command.music.PlaylistCmd;
-import me.shadorc.shadbot.command.music.RepeatCmd;
-import me.shadorc.shadbot.command.music.ShuffleCmd;
-import me.shadorc.shadbot.command.music.SkipCmd;
-import me.shadorc.shadbot.command.music.StopCmd;
-import me.shadorc.shadbot.command.music.VolumeCmd;
-import me.shadorc.shadbot.command.owner.CleanDatabaseCmd;
-import me.shadorc.shadbot.command.owner.DatabaseCmd;
-import me.shadorc.shadbot.command.owner.GenerateRelicCmd;
-import me.shadorc.shadbot.command.owner.LeaveCmd;
-import me.shadorc.shadbot.command.owner.LoggerCmd;
-import me.shadorc.shadbot.command.owner.RestartCmd;
-import me.shadorc.shadbot.command.owner.SendMessageCmd;
-import me.shadorc.shadbot.command.owner.ShutdownCmd;
-import me.shadorc.shadbot.command.owner.StatsCmd;
-import me.shadorc.shadbot.command.utils.CalcCmd;
-import me.shadorc.shadbot.command.utils.LyricsCmd;
-import me.shadorc.shadbot.command.utils.TranslateCmd;
-import me.shadorc.shadbot.command.utils.UrbanCmd;
-import me.shadorc.shadbot.command.utils.WeatherCmd;
-import me.shadorc.shadbot.command.utils.WikiCmd;
+import me.shadorc.shadbot.command.image.*;
+import me.shadorc.shadbot.command.info.*;
+import me.shadorc.shadbot.command.music.*;
+import me.shadorc.shadbot.command.owner.*;
+import me.shadorc.shadbot.command.utils.*;
 import me.shadorc.shadbot.command.utils.poll.PollCmd;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class CommandInitializer {
 

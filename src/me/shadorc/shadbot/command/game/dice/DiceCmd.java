@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.command.game.dice;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
@@ -14,6 +11,9 @@ import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class DiceCmd extends GameCmd<DiceGame> {
 
@@ -85,7 +85,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
 				return Mono.error(new MissingArgumentException());
 			}
 
-			final Integer bet = Utils.requireValidBet(context.getMember(), args.get(1));
+			final int bet = Utils.requireValidBet(context.getMember(), args.get(1));
 			final DiceGame diceManager = this.getManagers().computeIfAbsent(context.getChannelId(),
 					ignored -> new DiceGame(this, context, bet));
 			diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));

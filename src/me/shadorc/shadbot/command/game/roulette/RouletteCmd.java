@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.command.game.roulette;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
@@ -14,6 +11,9 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class RouletteCmd extends GameCmd<RouletteGame> {
 

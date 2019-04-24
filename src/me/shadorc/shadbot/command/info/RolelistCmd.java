@@ -1,9 +1,5 @@
 package me.shadorc.shadbot.command.info;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
@@ -18,6 +14,10 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class RolelistCmd extends BaseCmd {
 
@@ -62,7 +62,7 @@ public class RolelistCmd extends BaseCmd {
 								return;
 							}
 
-							FormatUtils.createColumns(tuple.getT2(), 25).stream()
+							FormatUtils.createColumns(tuple.getT2(), 25)
 									.forEach(field -> embed.addField(field.getName(), field.getValue(), true));
 						}))
 				.flatMap(embedConsumer -> context.getChannel()

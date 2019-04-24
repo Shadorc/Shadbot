@@ -1,13 +1,5 @@
 package me.shadorc.shadbot.object.message;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
@@ -17,9 +9,16 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class LoadingMessage implements Publisher<Void> {
 

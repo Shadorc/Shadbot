@@ -1,9 +1,5 @@
 package me.shadorc.shadbot.command.currency;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
@@ -19,10 +15,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
-public class LeaderboardCmd extends BaseCmd {
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Consumer;
 
-	private static final Comparator<DBMember> COMPARATOR =
-			(user1, user2) -> Integer.compare(user1.getCoins(), user2.getCoins());
+public class LeaderboardCmd extends BaseCmd {
 
 	public LeaderboardCmd() {
 		super(CommandCategory.CURRENCY, List.of("leaderboard"));
@@ -33,7 +30,7 @@ public class LeaderboardCmd extends BaseCmd {
 	public Mono<Void> execute(Context context) {
 		return Flux.fromIterable(Shadbot.getDatabase().getDBGuild(context.getGuildId()).getMembers())
 				.filter(dbMember -> dbMember.getCoins() > 0)
-				.sort(COMPARATOR.reversed())
+				.sort(Comparator.comparingInt(DBMember::getCoins).reversed())
 				.take(10)
 				.flatMap(dbMember -> Mono.zip(context.getClient().getUserById(dbMember.getId()).map(User::getUsername), Mono.just(dbMember.getCoins())))
 				.collectList()

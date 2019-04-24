@@ -1,12 +1,12 @@
 package me.shadorc.shadbot.data.stats.core;
 
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.utils.Utils;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.utils.Utils;
 
 public abstract class Statistic<E extends Enum<E>> {
 

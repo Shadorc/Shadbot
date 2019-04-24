@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.object.casino;
 
+import me.shadorc.shadbot.utils.FormatUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import me.shadorc.shadbot.utils.FormatUtils;
 
 public class Hand {
 

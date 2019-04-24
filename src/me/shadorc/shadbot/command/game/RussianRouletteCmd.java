@@ -1,9 +1,5 @@
 package me.shadorc.shadbot.command.game;
 
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
@@ -17,6 +13,10 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 public class RussianRouletteCmd extends BaseCmd {
 

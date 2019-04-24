@@ -1,36 +1,20 @@
 package me.shadorc.shadbot.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.HashBasedTable;
-
 import discord4j.core.object.entity.Member;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.exception.CommandException;
+
+import javax.management.*;
+import java.lang.management.ManagementFactory;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -60,7 +44,7 @@ public class Utils {
 	 * @param value - the string representing the enumeration, case insensitive
 	 * @param exception - the exception to be thrown
 	 * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass}
-	 * @throws exception if the value is null
+	 * @throws X - if the value is null
 	 */
 	public static <T extends Enum<T>, X extends Throwable> T parseEnum(Class<T> enumClass, String value, X exception) throws X {
 		final T enumValue = Utils.parseEnum(enumClass, value);
@@ -72,7 +56,7 @@ public class Utils {
 	}
 
 	/**
-	 * @return The percentage of CPU used or {@link Double.NaN} if the value could not be found
+	 * @return The percentage of CPU used or {@link Double#NaN} if the value could not be found
 	 */
 	public static double getProcessCpuLoad() {
 		double cpuLoad;
@@ -117,15 +101,6 @@ public class Utils {
 	 */
 	public static <T> T randValue(T[] array) {
 		return Utils.randValue(Arrays.asList(array));
-	}
-
-	/**
-	 * @param file - The {@link File} to read
-	 * @return a String containing the content of the
-	 * @throws IOException if an I/O error occurs reading from the stream
-	 */
-	public static String read(File file) throws IOException {
-		return new String(Files.readAllBytes(file.toPath()), Charset.forName("UTF-8"));
 	}
 
 	/**

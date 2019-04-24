@@ -1,10 +1,10 @@
 
 package me.shadorc.shadbot.api.trivia.category;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TriviaCategoriesResponse {
 

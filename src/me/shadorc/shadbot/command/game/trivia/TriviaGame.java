@@ -1,13 +1,5 @@
 package me.shadorc.shadbot.command.game.trivia;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
@@ -22,14 +14,18 @@ import me.shadorc.shadbot.core.game.MultiplayerGame;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.object.Emoji;
-import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.*;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 

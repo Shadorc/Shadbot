@@ -1,13 +1,5 @@
 package me.shadorc.shadbot.command.gamestats;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.TokenResponse;
 import me.shadorc.shadbot.api.gamestats.diablo.hero.HeroResponse;
@@ -29,6 +21,15 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 public class DiabloCmd extends BaseCmd {
 
@@ -86,7 +87,7 @@ public class DiabloCmd extends BaseCmd {
 			}
 
 			// Sort heroes by ascending damage
-			heroResponses.sort((hero1, hero2) -> Double.compare(hero1.getStats().getDamage(), hero2.getStats().getDamage()));
+			heroResponses.sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()));
 			Collections.reverse(heroResponses);
 
 			return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()

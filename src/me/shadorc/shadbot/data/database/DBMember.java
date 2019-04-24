@@ -1,14 +1,13 @@
 package me.shadorc.shadbot.data.database;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.NumberUtils;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class DBMember {

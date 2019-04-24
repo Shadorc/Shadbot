@@ -1,19 +1,7 @@
 package me.shadorc.shadbot.utils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import discord4j.core.object.VoiceState;
-import discord4j.core.object.entity.Channel;
-import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.GuildChannel;
-import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.entity.PrivateChannel;
-import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.*;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -29,6 +17,11 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class DiscordUtils {
 
@@ -134,7 +127,7 @@ public class DiscordUtils {
 		if(channel instanceof PrivateChannel) {
 			return Mono.just(true);
 		}
-		return GuildChannel.class.cast(channel).getEffectivePermissions(userId)
+		return ((GuildChannel) channel).getEffectivePermissions(userId)
 				.map(permissions -> permissions.contains(permission));
 	}
 
@@ -173,7 +166,7 @@ public class DiscordUtils {
 					}
 
 					// If the user and the bot are not in a voice channel
-					if(!botVoiceChannelId.isPresent() && !userVoiceChannelId.isPresent()) {
+					if(botVoiceChannelId.isEmpty() && userVoiceChannelId.isEmpty()) {
 						throw new CommandException("Join a voice channel before using this command.");
 					}
 

@@ -1,18 +1,9 @@
 package me.shadorc.shadbot.core.command;
 
-import java.util.List;
-import java.util.Optional;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.*;
 import discord4j.core.object.entity.Channel.Type;
-import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.entity.TextChannel;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
@@ -25,10 +16,15 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
+
+import java.util.List;
+import java.util.Optional;
 
 public class Context {
 
-	private final Optional<String> arg;
+	@Nullable
+	private final String arg;
 	private final String cmdName;
 	private final MessageCreateEvent event;
 	private final String prefix;
@@ -39,11 +35,11 @@ public class Context {
 
 		final List<String> splittedMsg = StringUtils.split(this.getContent(), 2);
 		this.cmdName = splittedMsg.get(0).substring(prefix.length()).toLowerCase();
-		this.arg = Optional.ofNullable(splittedMsg.size() > 1 ? splittedMsg.get(1).trim() : null);
+		this.arg = splittedMsg.size() > 1 ? splittedMsg.get(1).trim() : null;
 	}
 
 	public Optional<String> getArg() {
-		return this.arg;
+		return Optional.ofNullable(this.arg);
 	}
 
 	public User getAuthor() {

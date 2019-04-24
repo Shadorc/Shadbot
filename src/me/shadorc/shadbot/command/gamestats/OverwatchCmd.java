@@ -1,10 +1,5 @@
 package me.shadorc.shadbot.command.gamestats;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.gamestats.overwatch.profile.ProfileResponse;
 import me.shadorc.shadbot.api.gamestats.overwatch.stats.Quickplay;
@@ -24,6 +19,10 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class OverwatchCmd extends BaseCmd {
 
@@ -104,7 +103,7 @@ public class OverwatchCmd extends BaseCmd {
 		return Tuples.of(platform, profile, stats);
 	}
 
-	private String getUrl(String endpoint, Platform platform, String username) throws MalformedURLException {
+	private String getUrl(String endpoint, Platform platform, String username) {
 		return String.format("http://overwatchy.com/%s/%s/global/%s",
 				endpoint, StringUtils.toLowerCase(platform), username);
 	}

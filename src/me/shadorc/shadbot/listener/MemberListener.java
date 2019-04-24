@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.listener;
 
-import java.util.List;
-import java.util.Optional;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
@@ -16,6 +13,9 @@ import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Optional;
 
 public class MemberListener {
 

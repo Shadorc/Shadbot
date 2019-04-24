@@ -51,7 +51,7 @@ public class VoiceStateUpdateListener {
 					return Mono.empty();
 				})
 				.flatMap(content -> guildMusic.getMessageChannel()
-						.flatMap(channel -> DiscordUtils.sendMessage(content.toString(), channel)))
+						.flatMap(channel -> DiscordUtils.sendMessage(content, channel)))
 				.then();
 	}
 

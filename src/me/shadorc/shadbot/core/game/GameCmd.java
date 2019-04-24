@@ -1,12 +1,12 @@
 package me.shadorc.shadbot.core.game;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class GameCmd<T extends Game> extends BaseCmd {
 

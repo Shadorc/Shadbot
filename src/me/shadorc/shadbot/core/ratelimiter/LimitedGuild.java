@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.core.ratelimiter;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import discord4j.core.object.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket4j;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 public class LimitedGuild {
 

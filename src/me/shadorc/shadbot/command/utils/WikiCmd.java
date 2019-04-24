@@ -1,11 +1,5 @@
 package me.shadorc.shadbot.command.utils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import org.apache.commons.lang3.StringUtils;
-
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.wikipedia.WikipediaPage;
@@ -19,7 +13,12 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class WikiCmd extends BaseCmd {
 

@@ -1,16 +1,14 @@
 package me.shadorc.shadbot.utils.exception;
 
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.jsoup.HttpStatusException;
+
+import javax.net.ssl.SSLException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
-import javax.net.ssl.SSLException;
-
-import org.jsoup.HttpStatusException;
-
-import discord4j.rest.http.client.ClientException;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class ExceptionUtils {
 

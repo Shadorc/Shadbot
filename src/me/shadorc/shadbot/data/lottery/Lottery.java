@@ -1,17 +1,16 @@
 package me.shadorc.shadbot.data.lottery;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.NumberUtils;
 import reactor.util.annotation.Nullable;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class Lottery {

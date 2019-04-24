@@ -1,14 +1,13 @@
 package me.shadorc.shadbot.data.stats.core;
 
+import com.fasterxml.jackson.databind.JavaType;
+import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-
-import com.fasterxml.jackson.databind.JavaType;
-
-import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
 

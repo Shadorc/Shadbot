@@ -1,15 +1,14 @@
 package me.shadorc.shadbot.data.stats.core;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.collect.HashBasedTable;
-
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class TableStatistic<E extends Enum<E>> extends Statistic<E> {
 

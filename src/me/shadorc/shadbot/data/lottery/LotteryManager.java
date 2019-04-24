@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.data.lottery;
 
-import java.io.IOException;
-import java.time.Duration;
-
 import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.utils.Utils;
+
+import java.io.IOException;
+import java.time.Duration;
 
 public class LotteryManager extends Data {
 

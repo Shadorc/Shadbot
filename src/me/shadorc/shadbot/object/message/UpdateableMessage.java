@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.object.message;
 
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
@@ -10,6 +7,9 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 public class UpdateableMessage {
 

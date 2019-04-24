@@ -1,10 +1,5 @@
 package me.shadorc.shadbot.command.info;
 
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Consumer;
-
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.presence.Activity;
@@ -20,6 +15,11 @@ import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
 
 public class UserInfoCmd extends BaseCmd {
 

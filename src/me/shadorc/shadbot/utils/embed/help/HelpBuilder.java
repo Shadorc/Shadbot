@@ -1,11 +1,5 @@
 package me.shadorc.shadbot.utils.embed.help;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
@@ -13,6 +7,12 @@ import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class HelpBuilder {
 

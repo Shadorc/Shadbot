@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class TimeUtils {
 
@@ -39,7 +38,7 @@ public class TimeUtils {
 	public static long parseTime(String str) {
 		final String normalizedText = str.replaceAll(" ", "").toLowerCase();
 
-		final Pattern pattern = Pattern.compile("[0-9]+[a-z]{1}");
+		final Pattern pattern = Pattern.compile("[0-9]+[a-z]");
 		final Matcher matcher = pattern.matcher(normalizedText);
 
 		final List<String> matches = new ArrayList<>();
@@ -47,7 +46,7 @@ public class TimeUtils {
 			matches.add(matcher.group());
 		}
 
-		if(!matches.stream().collect(Collectors.joining()).equals(normalizedText)) {
+		if(!String.join("", matches).equals(normalizedText)) {
 			throw new IllegalArgumentException(str + " is not a valid time format.");
 		}
 

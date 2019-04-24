@@ -44,7 +44,7 @@ public class StringUtils {
 	}
 
 	/**
-	 * The function returns the argument string with whitespace normalized by using {@link #trim(String)} to remove leading and trailing whitespace and
+	 * The function returns the argument string with whitespace normalized by using {@link String#trim()} to remove leading and trailing whitespace and
 	 * then replacing sequences of whitespace characters by a single space.
 	 *
 	 * @param str - the source String to normalize whitespaces from, may be null
@@ -101,7 +101,6 @@ public class StringUtils {
 	/**
 	 * @param str - the string to split
 	 * @param limit - the result threshold
-	 * @param delimiter - the delimiting regular expression
 	 * @return A endless list containing all the elements resulting of {@code str} splitted using space excluding empty results
 	 */
 	public static List<String> split(String str, int limit) {

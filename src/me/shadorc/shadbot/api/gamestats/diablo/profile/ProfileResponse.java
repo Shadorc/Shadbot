@@ -1,10 +1,9 @@
 package me.shadorc.shadbot.api.gamestats.diablo.profile;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import reactor.util.annotation.Nullable;
+
+import java.util.List;
 
 public class ProfileResponse {
 

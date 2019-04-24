@@ -1,10 +1,5 @@
 package me.shadorc.shadbot.command.gamestats;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.gamestats.steam.player.PlayerSummariesResponse;
 import me.shadorc.shadbot.api.gamestats.steam.player.PlayerSummary;
@@ -25,6 +20,11 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class CounterStrikeCmd extends BaseCmd {
 

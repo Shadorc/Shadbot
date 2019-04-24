@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.command.admin.setting;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -16,6 +13,9 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class NSFWSetting extends BaseSetting {
 

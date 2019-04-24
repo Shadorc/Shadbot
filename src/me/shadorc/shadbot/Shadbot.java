@@ -1,14 +1,5 @@
 package me.shadorc.shadbot;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.object.data.stored.MessageBean;
@@ -44,6 +35,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.retry.Retry;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Shadbot {
 

@@ -1,12 +1,5 @@
 package me.shadorc.shadbot.command.game.roulette;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
 import me.shadorc.shadbot.core.command.CommandInitializer;
@@ -17,15 +10,17 @@ import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.UpdateableMessage;
-import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.*;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
 
@@ -66,7 +61,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
 					final String username = tuple.getT2();
 					final Place placeEnum = Utils.parseEnum(Place.class, player.getPlace());
 
-					int multiplier = 0;
+					int multiplier;
 					if(player.getPlace().equals(Integer.toString(winningPlace))) {
 						multiplier = 36;
 					} else if(placeEnum != null && TESTS.get(placeEnum).test(winningPlace)) {
@@ -112,7 +107,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
 											FormatUtils.format(Place.values(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", ")))
 									.addField("Player (Bet)", FormatUtils.format(list,
 											tuple -> String.format("**%s** (%s)", tuple.getT2(), FormatUtils.coins(tuple.getT1().getBet())), "\n"), true)
-									.addField("Place", String.join("\n", this.getPlayers().values().stream().map(RoulettePlayer::getPlace).collect(Collectors.toList())), true);
+									.addField("Place", this.getPlayers().values().stream().map(RoulettePlayer::getPlace).collect(Collectors.joining("\n")), true);
 
 							if(this.results != null) {
 								embed.addField("Results", this.results, false);

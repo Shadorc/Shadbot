@@ -1,10 +1,9 @@
 package me.shadorc.shadbot.api.musixmatch;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.nodes.Document;
-
 import discord4j.core.object.Embed;
 import me.shadorc.shadbot.utils.NetUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.nodes.Document;
 
 public class Musixmatch {
 

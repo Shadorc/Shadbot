@@ -1,14 +1,5 @@
 package me.shadorc.shadbot.utils.embed;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -18,6 +9,12 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class EmbedUtils {
 
@@ -51,12 +48,12 @@ public class EmbedUtils {
 				averageMap.put(gameName, Tuples.of(average, usages));
 			}
 
-			final Comparator<Entry<String, Tuple2<Float, Long>>> comparator = (v1, v2) -> Long.compare(v1.getValue().getT2(), v2.getValue().getT2());
+			final Comparator<Entry<String, Tuple2<Float, Long>>> comparator = Comparator.comparingLong(v -> v.getValue().getT2());
 			final Map<String, Tuple2<Float, Long>> sortedMap = Utils.sortByValue(averageMap, comparator.reversed());
 
 			embed.addField("Name", String.join("\n", sortedMap.keySet()), true);
 			embed.addField("Average", FormatUtils.format(sortedMap.values().stream().map(Tuple2::getT1), num -> FormatUtils.number(num.intValue()), "\n"), true);
-			embed.addField("Count", FormatUtils.format(sortedMap.values().stream().map(Tuple2::getT2), num -> FormatUtils.number(num), "\n"), true);
+			embed.addField("Count", FormatUtils.format(sortedMap.values().stream().map(Tuple2::getT2), (Function<Long, String>) FormatUtils::number, "\n"), true);
 		};
 	}
 

@@ -1,15 +1,5 @@
 package me.shadorc.shadbot.command.fun;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
@@ -19,7 +9,16 @@ import me.shadorc.shadbot.object.message.LoadingMessage;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ThisDayCmd extends BaseCmd {
 

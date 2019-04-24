@@ -1,10 +1,6 @@
 package me.shadorc.shadbot.command.music;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -14,6 +10,9 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class NameCmd extends BaseCmd {
 

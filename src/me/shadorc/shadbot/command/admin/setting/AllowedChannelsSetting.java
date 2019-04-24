@@ -1,9 +1,5 @@
 package me.shadorc.shadbot.command.admin.setting;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.util.Snowflake;
@@ -20,6 +16,10 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class AllowedChannelsSetting extends BaseSetting {
 

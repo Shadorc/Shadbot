@@ -1,11 +1,5 @@
 package me.shadorc.shadbot.command.owner;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -22,6 +16,12 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 public class StatsCmd extends BaseCmd {
 
@@ -74,7 +74,7 @@ public class StatsCmd extends BaseCmd {
 						embed.setDescription("No statistics yet.");
 					} else {
 						final Comparator<? super Map.Entry<String, AtomicLong>> comparator =
-								Map.Entry.comparingByValue((v1, v2) -> Long.compare(v1.get(), v2.get()));
+								Map.Entry.comparingByValue(Comparator.comparingLong(AtomicLong::get));
 						final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
 
 						embed.addField("Name", FormatUtils.format(sortedMap.keySet(), StringUtils::toLowerCase, "\n"), true)

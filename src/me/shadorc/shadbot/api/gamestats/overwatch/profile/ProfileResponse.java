@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.api.gamestats.overwatch.profile;
 
-import java.util.Map;
-import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import reactor.util.annotation.Nullable;
+
+import java.util.Map;
+import java.util.Objects;
 
 public class ProfileResponse {
 

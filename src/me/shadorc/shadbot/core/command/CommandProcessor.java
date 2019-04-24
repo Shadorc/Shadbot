@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.core.command;
 
-import java.time.Instant;
-import java.util.Optional;
-
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
@@ -18,16 +15,19 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
+import java.util.Optional;
+
 public class CommandProcessor {
 
 	public static Mono<Void> processMessageEvent(MessageCreateEvent event) {
 		// This is not a private channel
-		if(!event.getGuildId().isPresent()) {
+		if(event.getGuildId().isEmpty()) {
 			return CommandProcessor.onPrivateMessage(event);
 		}
 
 		// The content is not a Webhook
-		if(!event.getMessage().getContent().isPresent()) {
+		if(event.getMessage().getContent().isEmpty()) {
 			return Mono.empty();
 		}
 
@@ -39,20 +39,20 @@ public class CommandProcessor {
 				.filter(member -> !member.isBot())
 				// The role is allowed
 				.flatMap(member -> member.getRoles().collectList())
-				.filter(roles -> dbGuild.hasAllowedRole(roles))
+				.filter(dbGuild::hasAllowedRole)
 				// The channel is allowed
 				.flatMap(ignored -> event.getMessage().getChannel())
 				.filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
 				// The message starts with the correct prefix
 				.map(ignored -> dbGuild.getPrefix())
-				.filter(prefix -> content.startsWith(prefix))
+				.filter(content::startsWith)
 				// Execute the command
 				.flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)));
 	}
 
 	private static boolean isRateLimited(Context context, BaseCmd cmd) {
 		final Optional<RateLimiter> rateLimiter = cmd.getRateLimiter();
-		if(!rateLimiter.isPresent()) {
+		if(rateLimiter.isEmpty()) {
 			return false;
 		}
 
@@ -111,7 +111,7 @@ public class CommandProcessor {
 					.flatMap(Mono::justOrEmpty)
 					.take(50)
 					.collectList()
-					.filter(list -> !list.stream().anyMatch(text::equalsIgnoreCase))
+					.filter(list -> list.stream().noneMatch(text::equalsIgnoreCase))
 					.flatMap(ignored -> event.getMessage().getChannel())
 					.flatMap(channel -> DiscordUtils.sendMessage(text, channel))
 					.then();

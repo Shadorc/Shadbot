@@ -1,11 +1,6 @@
 package me.shadorc.shadbot.utils;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-
+import me.shadorc.shadbot.Config;
 import org.apache.http.HttpStatus;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Response;
@@ -14,7 +9,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
 
-import me.shadorc.shadbot.Config;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class NetUtils {
 
@@ -37,13 +36,12 @@ public class NetUtils {
 	/**
 	 * @param str - the string to encode as UTF-8
 	 * @return The string encoded as UTF-8
-	 * @throws UnsupportedEncodingException If the named encoding is not supported
 	 */
-	public static String encode(String str) throws UnsupportedEncodingException {
+	public static String encode(String str) {
 		if(str == null || str.isEmpty()) {
 			return str;
 		}
-		return URLEncoder.encode(str, "UTF-8");
+		return URLEncoder.encode(str, StandardCharsets.UTF_8);
 	}
 
 	/**
@@ -59,7 +57,7 @@ public class NetUtils {
 	/**
 	 * @param url - URL to connect to. The protocol must be http or https
 	 * @return The {@link Document} corresponding to {@code url} with default user-agent and default timeout
-	 * @throws IOException
+	 * @throws IOException - on error
 	 */
 	public static Document getDoc(String url) throws IOException {
 		return NetUtils.getDefaultConnection(url).get();

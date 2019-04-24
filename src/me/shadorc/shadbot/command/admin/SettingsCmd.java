@@ -1,25 +1,12 @@
 package me.shadorc.shadbot.command.admin;
 
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.command.admin.setting.AllowedChannelsSetting;
-import me.shadorc.shadbot.command.admin.setting.AllowedRolesSetting;
-import me.shadorc.shadbot.command.admin.setting.AutoMessageSetting;
-import me.shadorc.shadbot.command.admin.setting.AutoRolesSetting;
-import me.shadorc.shadbot.command.admin.setting.BlacklistSettingCmd;
-import me.shadorc.shadbot.command.admin.setting.NSFWSetting;
-import me.shadorc.shadbot.command.admin.setting.PrefixSetting;
-import me.shadorc.shadbot.command.admin.setting.VolumeSetting;
+import me.shadorc.shadbot.command.admin.setting.*;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -38,6 +25,12 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class SettingsCmd extends BaseCmd {
 
@@ -103,7 +96,7 @@ public class SettingsCmd extends BaseCmd {
 			settingsStr.append(String.format("**Prefix:** %s", context.getPrefix()));
 		}
 
-		if(dbGuild.getDefaultVol().intValue() != Config.DEFAULT_VOLUME) {
+		if(dbGuild.getDefaultVol() != Config.DEFAULT_VOLUME) {
 			settingsStr.append(String.format("%n**Default volume:** %d%%", dbGuild.getDefaultVol()));
 		}
 
@@ -179,7 +172,7 @@ public class SettingsCmd extends BaseCmd {
 				.addField("Current settings", String.format("`%s%s show`",
 						context.getPrefix(), this.getName()), false);
 
-		this.settingsMap.values().stream()
+		this.settingsMap.values()
 				.forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()),
 						setting.getDescription(),
 						false));

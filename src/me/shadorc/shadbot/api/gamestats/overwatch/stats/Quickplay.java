@@ -1,10 +1,9 @@
 package me.shadorc.shadbot.api.gamestats.overwatch.stats;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import me.shadorc.shadbot.utils.FormatUtils;
+
+import java.util.List;
 
 public class Quickplay {
 

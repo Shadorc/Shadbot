@@ -1,9 +1,5 @@
 package me.shadorc.shadbot.command.admin;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Shadbot;
@@ -20,6 +16,10 @@ import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ManageCoinsCmd extends BaseCmd {
 
@@ -56,13 +56,13 @@ public class ManageCoinsCmd extends BaseCmd {
 					final String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(members, User::getUsername, ", ");
 					switch (action) {
 						case ADD:
-							members.stream().forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
+							members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
 							return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.coins(coins));
 						case REMOVE:
-							members.stream().forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
+							members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
 							return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.coins(coins));
 						case RESET:
-							members.stream().forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).resetCoins());
+							members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).resetCoins());
 							return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, members.size() == 1 ? "his" : "their");
 						default:
 							return null;

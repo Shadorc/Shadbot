@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
@@ -11,6 +8,9 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
@@ -22,7 +22,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
 	public Mono<Void> execute(Context context) {
 		final String arg = context.requireArg();
 
-		final Integer bet = Utils.requireValidBet(context.getMember(), arg);
+		final int bet = Utils.requireValidBet(context.getMember(), arg);
 
 		final BlackjackGame blackjackManager = this.getManagers().computeIfAbsent(context.getChannelId(),
 				channelId -> {

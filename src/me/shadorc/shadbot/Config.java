@@ -1,15 +1,14 @@
 package me.shadorc.shadbot;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
+import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.utils.ExitCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.utils.ExitCode;
+import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class Config {
 

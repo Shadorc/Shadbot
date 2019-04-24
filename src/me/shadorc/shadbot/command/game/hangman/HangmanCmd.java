@@ -1,10 +1,6 @@
 
 package me.shadorc.shadbot.command.game.hangman;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
@@ -16,6 +12,10 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class HangmanCmd extends GameCmd<HangmanGame> {
 

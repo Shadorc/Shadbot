@@ -1,8 +1,8 @@
 package me.shadorc.shadbot.api.gamestats.overwatch.profile;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Map;
 
 public class Games {
 

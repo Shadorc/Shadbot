@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.api.image.r34;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import reactor.util.annotation.Nullable;
 
 public class R34Response {

@@ -1,18 +1,17 @@
 package me.shadorc.shadbot.music;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.data.stats.enums.VariousEnum;
+import me.shadorc.shadbot.utils.NumberUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.data.stats.enums.VariousEnum;
-import me.shadorc.shadbot.utils.NumberUtils;
 
 public class TrackScheduler {
 

@@ -1,16 +1,7 @@
 package me.shadorc.shadbot.command.utils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.function.Consumer;
-
-import org.json.JSONArray;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -22,7 +13,14 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.json.JSONArray;
 import reactor.core.publisher.Mono;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class TranslateCmd extends BaseCmd {
 

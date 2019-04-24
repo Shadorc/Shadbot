@@ -1,18 +1,7 @@
 package me.shadorc.shadbot.command.utils.poll;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
@@ -26,6 +15,14 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class PollManager {
 
@@ -44,7 +41,7 @@ public class PollManager {
 	}
 
 	public void start() {
-		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration().toMillis(), ChronoUnit.MILLIS);
+		this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration());
 		this.show()
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
 	}
@@ -78,9 +75,9 @@ public class PollManager {
 				.then();
 	}
 
-	private <T> void schedule(Mono<T> mono, long delay, TemporalUnit unit) {
+	private <T> void schedule(Mono<T> mono, Duration duration) {
 		this.cancelScheduledTask();
-		this.scheduledTask = Mono.delay(Duration.of(delay, unit))
+		this.scheduledTask = Mono.delay(duration)
 				.then(mono)
 				.subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
 	}

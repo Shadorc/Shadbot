@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.command.admin.setting;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -20,6 +17,9 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class AutoMessageSetting extends BaseSetting {
 
@@ -95,7 +95,7 @@ public class AutoMessageSetting extends BaseSetting {
 			final String message = args.get(3);
 			dbGuild.setSetting(setting, message);
 
-			if(!dbGuild.getMessageChannelId().isPresent()) {
+			if(dbGuild.getMessageChannelId().isEmpty()) {
 				strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
 						+ "in which send the auto-messages. Use `%s%s %s %s <#channel>`%n",
 						context.getPrefix(), this.getCommandName(), StringUtils.toLowerCase(Action.ENABLE), StringUtils.toLowerCase(Type.CHANNEL)));

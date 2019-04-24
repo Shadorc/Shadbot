@@ -1,9 +1,5 @@
 package me.shadorc.shadbot.command.hidden;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
@@ -20,6 +16,10 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class RelicStatusCmd extends BaseCmd {
 
@@ -66,7 +66,7 @@ public class RelicStatusCmd extends BaseCmd {
 							embed.setAuthor("Contributor Status", null, context.getAvatarUrl())
 									.setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");
 
-							fields.stream()
+							fields
 									.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
 						}))
 				.flatMap(embed -> context.getChannel()

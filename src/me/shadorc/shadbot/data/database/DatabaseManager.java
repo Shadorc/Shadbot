@@ -1,5 +1,10 @@
 package me.shadorc.shadbot.data.database;
 
+import com.fasterxml.jackson.databind.JavaType;
+import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.data.Data;
+import me.shadorc.shadbot.utils.Utils;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collection;
@@ -7,12 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.fasterxml.jackson.databind.JavaType;
-
-import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.data.Data;
-import me.shadorc.shadbot.utils.Utils;
 
 public class DatabaseManager extends Data {
 

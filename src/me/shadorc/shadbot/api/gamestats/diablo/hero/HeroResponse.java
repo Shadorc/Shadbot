@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.api.gamestats.diablo.hero;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.util.annotation.Nullable;
 

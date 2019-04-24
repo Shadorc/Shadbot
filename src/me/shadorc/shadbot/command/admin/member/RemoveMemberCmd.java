@@ -1,10 +1,5 @@
 package me.shadorc.shadbot.command.admin.member;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import discord4j.core.object.audit.AuditLogEntry;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
@@ -23,6 +18,11 @@ import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public abstract class RemoveMemberCmd extends BaseCmd {
 

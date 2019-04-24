@@ -1,15 +1,15 @@
 package me.shadorc.shadbot.data.stats;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.Duration;
-
 import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.data.stats.core.MapStatistic;
 import me.shadorc.shadbot.data.stats.core.TableStatistic;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
 
 public class StatsManager extends Data {
 

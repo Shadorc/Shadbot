@@ -1,12 +1,11 @@
 package me.shadorc.shadbot.api.trivia;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TriviaResult {
 

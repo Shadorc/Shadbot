@@ -1,16 +1,5 @@
 package me.shadorc.shadbot.command.utils.poll;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
@@ -24,7 +13,17 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class PollCmd extends BaseCmd {
 
@@ -92,7 +91,7 @@ public class PollCmd extends BaseCmd {
 			}
 		} else {
 			try {
-				seconds = Integer.valueOf((int) TimeUtils.parseTime(args.get(0)));
+				seconds = (int) TimeUtils.parseTime(args.get(0));
 			} catch (final IllegalArgumentException err) {
 				throw new CommandException(err.getMessage());
 			}

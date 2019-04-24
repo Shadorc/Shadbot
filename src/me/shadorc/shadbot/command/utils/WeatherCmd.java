@@ -1,12 +1,5 @@
 package me.shadorc.shadbot.command.utils;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Consumer;
-
-import org.apache.http.HttpStatus;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -27,7 +20,13 @@ import net.aksingh.owmjapis.core.OWM.Unit;
 import net.aksingh.owmjapis.model.CurrentWeather;
 import net.aksingh.owmjapis.model.param.Main;
 import net.aksingh.owmjapis.model.param.Weather;
+import org.apache.http.HttpStatus;
 import reactor.core.publisher.Mono;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
 
 public class WeatherCmd extends BaseCmd {
 

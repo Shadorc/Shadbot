@@ -54,7 +54,7 @@ public class TriviaInputs extends Inputs {
 					final Integer choice = NumberUtils.asIntBetween(content, 1, this.game.getAnswers().size());
 
 					// Message is a text and doesn't match any answers, ignore it
-					if(choice == null && !this.game.getAnswers().stream().anyMatch(content::equalsIgnoreCase)) {
+					if(choice == null && this.game.getAnswers().stream().noneMatch(content::equalsIgnoreCase)) {
 						return Mono.empty();
 					}
 

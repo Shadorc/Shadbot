@@ -1,13 +1,5 @@
 package me.shadorc.shadbot.command.gamestats;
 
-import java.net.URL;
-import java.util.List;
-import java.util.function.Consumer;
-
-import org.apache.http.HttpStatus;
-import org.jsoup.Connection.Response;
-import org.jsoup.HttpStatusException;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.gamestats.fortnite.FortniteResponse;
 import me.shadorc.shadbot.api.gamestats.fortnite.Stats;
@@ -25,7 +17,14 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.apache.http.HttpStatus;
+import org.jsoup.Connection.Response;
+import org.jsoup.HttpStatusException;
 import reactor.core.publisher.Mono;
+
+import java.net.URL;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class FortniteCmd extends BaseCmd {
 

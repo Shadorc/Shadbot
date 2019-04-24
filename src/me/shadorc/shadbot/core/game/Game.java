@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.core.game;
 
-import java.time.Duration;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
@@ -11,6 +8,9 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Game {
 

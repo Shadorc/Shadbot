@@ -1,8 +1,5 @@
 package me.shadorc.shadbot.command.owner;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -17,6 +14,9 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class CleanDatabaseCmd extends BaseCmd {
 

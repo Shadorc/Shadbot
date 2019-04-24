@@ -1,17 +1,5 @@
 package me.shadorc.shadbot.command.fun;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-
-import org.json.JSONObject;
-import org.json.XML;
-
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.pandorabots.ChatBotResponse;
@@ -25,7 +13,17 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import org.json.JSONObject;
+import org.json.XML;
 import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 public class ChatCmd extends BaseCmd {
 
@@ -79,7 +77,7 @@ public class ChatCmd extends BaseCmd {
 				.then();
 	}
 
-	private String talk(Snowflake channelId, String botId, String input) throws UnsupportedEncodingException, IOException {
+	private String talk(Snowflake channelId, String botId, String input) throws IOException {
 		final String url = String.format("https://www.pandorabots.com/pandora/talk-xml?botid=%s&input=%s&custid=%s",
 				botId, NetUtils.encode(input), this.channelsCustid.getOrDefault(channelId, ""));
 		final JSONObject resultObj = XML.toJSONObject(NetUtils.getDoc(url).html()).getJSONObject("result");

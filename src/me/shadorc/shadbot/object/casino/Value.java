@@ -19,12 +19,12 @@ public enum Value {
 	private final int numeric;
 	private final String ident;
 
-	private Value(int numeric, String ident) {
+	Value(int numeric, String ident) {
 		this.numeric = numeric;
 		this.ident = ident;
 	}
 
-	private Value(int numeric) {
+	Value(int numeric) {
 		this(numeric, Integer.toString(numeric));
 	}
 

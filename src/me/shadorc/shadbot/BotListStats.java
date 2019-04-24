@@ -1,23 +1,22 @@
 package me.shadorc.shadbot;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-
 import discord4j.core.DiscordClient;
 import me.shadorc.shadbot.core.shard.Shard;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BotListStats {
 
@@ -76,8 +75,6 @@ public class BotListStats {
 	/**
 	 * WebSite: https://bots.ondiscord.xyz/ <br>
 	 * Documentation: https://bots.ondiscord.xyz/info/api
-	 *
-	 * @param guildCount
 	 */
 	private void postOnBotsOndiscordXyz(Long guildCount) {
 		final JSONObject content = new JSONObject()

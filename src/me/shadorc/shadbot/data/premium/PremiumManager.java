@@ -1,5 +1,13 @@
 package me.shadorc.shadbot.data.premium;
 
+import com.fasterxml.jackson.databind.JavaType;
+import discord4j.core.object.util.Snowflake;
+import me.shadorc.shadbot.data.Data;
+import me.shadorc.shadbot.data.premium.Relic.RelicType;
+import me.shadorc.shadbot.exception.RelicActivationException;
+import me.shadorc.shadbot.utils.Utils;
+import reactor.util.annotation.Nullable;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
@@ -8,15 +16,6 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.JavaType;
-
-import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.data.Data;
-import me.shadorc.shadbot.data.premium.Relic.RelicType;
-import me.shadorc.shadbot.exception.RelicActivationException;
-import me.shadorc.shadbot.utils.Utils;
-import reactor.util.annotation.Nullable;
 
 public class PremiumManager extends Data {
 
@@ -43,7 +42,7 @@ public class PremiumManager extends Data {
 				.filter(relicItr -> relicItr.getId().equals(relicId))
 				.findFirst();
 
-		if(!relicOpt.isPresent()) {
+		if(relicOpt.isEmpty()) {
 			throw new RelicActivationException("This key is already activated or doesn't exist.");
 		}
 

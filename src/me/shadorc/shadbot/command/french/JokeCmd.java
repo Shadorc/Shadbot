@@ -1,12 +1,5 @@
 package me.shadorc.shadbot.command.french;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Element;
-
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -17,7 +10,13 @@ import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class JokeCmd extends BaseCmd {
 

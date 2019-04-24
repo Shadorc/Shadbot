@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.api.urbandictionary;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import me.shadorc.shadbot.utils.StringUtils;
 
 public class UrbanDefinition {

@@ -1,15 +1,10 @@
 package me.shadorc.shadbot.music;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
-
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
@@ -18,6 +13,10 @@ import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 public class MusicManager {
 

@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.command.utils.poll;
 
+import discord4j.core.object.reaction.ReactionEmoji;
+
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
-
-import discord4j.core.object.reaction.ReactionEmoji;
 
 public class PollCreateSpec {
 

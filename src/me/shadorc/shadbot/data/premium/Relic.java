@@ -1,15 +1,14 @@
 package me.shadorc.shadbot.data.premium;
 
-import java.util.Optional;
-import java.util.OptionalLong;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.utils.TimeUtils;
 import reactor.util.annotation.Nullable;
+
+import java.util.Optional;
+import java.util.OptionalLong;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class Relic {
@@ -88,7 +87,7 @@ public class Relic {
 	}
 
 	public boolean isExpired() {
-		if(!this.getActivationTime().isPresent()) {
+		if(this.getActivationTime().isEmpty()) {
 			return false;
 		}
 		return TimeUtils.getMillisUntil(this.getActivationTime().getAsLong()) >= this.getDuration();

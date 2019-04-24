@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.core.setting;
 
-import java.util.List;
-
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
+
+import java.util.List;
 
 public abstract class BaseSetting extends BaseCmd {
 
