@@ -124,9 +124,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 	}
 
 	private Consumer<EmbedCreateSpec> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
-		final String playlistName = playlist.getName();
-		final String name = playlistName == null || playlistName.isBlank() ? "Playlist" : playlistName;
-
 		final String choices = FormatUtils.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
 				count -> {
 					final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
@@ -134,7 +131,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 				});
 
 		return EmbedUtils.getDefaultEmbed()
-				.andThen(embed -> embed.setAuthor(name, null, avatarUrl)
+				.andThen(embed -> embed.setAuthor(String.format("Playlist: %s", playlist.getName()), null, avatarUrl)
 						.setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
 						.setDescription("**Select a music by typing the corresponding number.**"
 								+ "\nYou can choose several musics by separating them with a comma."
