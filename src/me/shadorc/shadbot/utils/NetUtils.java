@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.utils;
 
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import org.apache.http.HttpStatus;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Response;
@@ -8,14 +9,21 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
+import reactor.core.publisher.Mono;
+import reactor.retry.Retry;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 public class NetUtils {
+
+    private static final Retry<?> RETRY = Retry.onlyIf(err -> ExceptionUtils.isServerAccessError(err.exception()))
+            .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofSeconds(5))
+            .retryMax(3);
 
     /**
      * @param html - The HTML to convert to text
@@ -57,22 +65,24 @@ public class NetUtils {
     /**
      * @param url - URL to connect to. The protocol must be http or https
      * @return The {@link Document} corresponding to {@code url} with default user-agent and default timeout
-     * @throws IOException - on error
      */
-    public static Document getDoc(String url) throws IOException {
-        return NetUtils.getDefaultConnection(url).get();
+    public static Document getDoc(String url) {
+        return Mono.fromCallable(() -> NetUtils.getDefaultConnection(url).get())
+                .retryWhen(RETRY)
+                .block(); // TODO: Do not block
     }
 
     /**
      * @param url - URL to connect to. The protocol must be http or https
      * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type and HTTP errors
-     * @throws IOException - on error
      */
-    public static Response getResponse(String url) throws IOException {
-        return NetUtils.getDefaultConnection(url)
+    public static Response getResponse(String url) {
+        return Mono.fromCallable(() -> NetUtils.getDefaultConnection(url)
                 .ignoreContentType(true)
                 .ignoreHttpErrors(true)
-                .execute();
+                .execute())
+                .retryWhen(RETRY)
+                .block(); // TODO: Do not block
     }
 
     /**
