@@ -111,14 +111,14 @@ public class Shadbot {
         LogUtils.info("Connecting...");
         final ShardingStoreRegistry registry = new ShardingJdkStoreRegistry();
         new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
+                .setRouterOptions(RouterOptions.builder()
+                        .onClientResponse(ResponseFunction.emptyIfNotFound())
+                        .build())
                 .build()
                 .map(builder -> builder
                         .setStoreService(MappingStoreService.create()
                                 .setMapping(new CaffeineStoreService(caffeine -> caffeine.expireAfterAccess(Duration.ofHours(6))), MessageBean.class)
                                 .setFallback(new ShardingJdkStoreService(registry)))
-                        .setRouterOptions(RouterOptions.builder()
-                                .onClientResponse(ResponseFunction.emptyIfNotFound())
-                                .build())
                         .setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
                                 Integer.MAX_VALUE, Schedulers.elastic()))
                         .setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
