@@ -102,7 +102,7 @@ public class LyricsCmd extends BaseCmd {
         return response.parse();
     }
 
-    private String getCorrectedUrl(String search) throws IOException {
+    private String getCorrectedUrl(String search) {
         final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
 
         // Make a search request on the site

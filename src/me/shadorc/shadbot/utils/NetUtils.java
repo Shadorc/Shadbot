@@ -88,9 +88,8 @@ public class NetUtils {
     /**
      * @param url - URL to connect to. The protocol must be http or https
      * @return The {@code body} corresponding to the {@code url} with default user-agent and default timeout
-     * @throws IOException - on error
      */
-    public static String getBody(String url) throws IOException {
+    public static String getBody(String url) {
         return NetUtils.getResponse(url).body();
     }
 
