@@ -2,8 +2,11 @@ package me.shadorc.shadbot;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
+import discord4j.core.object.VoiceState;
 import discord4j.core.object.data.stored.MessageBean;
 import discord4j.core.object.entity.ApplicationInfo;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
@@ -12,8 +15,6 @@ import discord4j.core.shard.ShardingJdkStoreRegistry;
 import discord4j.core.shard.ShardingJdkStoreService;
 import discord4j.core.shard.ShardingStoreRegistry;
 import discord4j.gateway.retry.RetryOptions;
-import discord4j.rest.http.client.ClientException;
-import discord4j.rest.request.RouteMatcher;
 import discord4j.rest.request.RouterOptions;
 import discord4j.rest.response.ResponseFunction;
 import discord4j.store.api.mapping.MappingStoreService;
@@ -28,13 +29,13 @@ import me.shadorc.shadbot.data.lottery.Lottery;
 import me.shadorc.shadbot.data.lottery.LotteryManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
+import me.shadorc.shadbot.music.MusicManager;
 import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.retry.Retry;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -44,6 +45,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class Shadbot {
 
@@ -81,6 +83,29 @@ public class Shadbot {
         Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
                 .flatMap(ignored -> LotteryCmd.draw(Shadbot.getClient()))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+
+        // TODO: Remove
+        Flux.interval(Duration.ofMinutes(30), Duration.ofMinutes(30))
+                .flatMap(ignored -> Shadbot.getClient().getGuilds()
+                        .flatMap(guild -> guild.getMemberById(Shadbot.getClient().getSelfId().get()))
+                        .flatMap(Member::getVoiceState)
+                        .flatMap(VoiceState::getChannel)
+                        .collectList())
+                .doOnNext(voiceChannels -> {
+                    if (voiceChannels.size() > MusicManager.count()) {
+                        final String musicManagers = MusicManager.GUILD_MUSIC_CONNECTIONS.keySet().stream()
+                                .filter(key -> MusicManager.getConnection(key).getGuildMusic() != null)
+                                .map(Snowflake::asString)
+                                .collect(Collectors.joining(", "));
+                        final String voiceChannelsStr = voiceChannels.stream()
+                                .map(VoiceChannel::getId)
+                                .map(Snowflake::asString)
+                                .collect(Collectors.joining(", "));
+                        LogUtils.warn(Shadbot.getClient(), String.format("Desynchronization detected:%n%s%n%s",
+                                musicManagers, voiceChannelsStr));
+                    }
+                })
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 
         LogUtils.info("Connecting...");
