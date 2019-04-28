@@ -22,7 +22,7 @@ import java.time.Duration;
 public class NetUtils {
 
     private static final Retry<?> RETRY = Retry.onlyIf(err -> ExceptionUtils.isServerAccessError(err.exception()))
-            .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofSeconds(5))
+            .exponentialBackoffWithJitter(Duration.ofSeconds(2), Duration.ofSeconds(30))
             .retryMax(3);
 
     /**
