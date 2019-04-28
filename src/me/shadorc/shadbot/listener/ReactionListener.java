@@ -9,6 +9,8 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.admin.IamCmd;
 import me.shadorc.shadbot.object.Emoji;
@@ -27,11 +29,13 @@ public class ReactionListener {
 
     public static Mono<Void> onReactionAddEvent(ReactionAddEvent event) {
         return event.getMessage()
+                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                 .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.ADD));
     }
 
     public static Mono<Void> onReactionRemoveEvent(ReactionRemoveEvent event) {
         return event.getMessage()
+                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                 .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.REMOVE));
     }
 
