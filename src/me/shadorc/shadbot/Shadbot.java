@@ -118,10 +118,6 @@ public class Shadbot {
                                 .setFallback(new ShardingJdkStoreService(registry)))
                         .setRouterOptions(RouterOptions.builder()
                                 .onClientResponse(ResponseFunction.emptyIfNotFound())
-                                .onClientResponse(ResponseFunction.retryWhen(RouteMatcher.any(),
-                                        Retry.onlyIf(ClientException.isRetryContextStatusCode(500))
-                                                .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofSeconds(5))
-                                                .retryMax(3)))
                                 .build())
                         .setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
                                 Integer.MAX_VALUE, Schedulers.elastic()))
