@@ -99,7 +99,7 @@ public class Shard {
                         .thenReturn(event.toString())
                         .elapsed()
                         .doOnNext(tuple -> {
-                            this.logger.debug("{} took {}ms to be processed.", tuple.getT2(), tuple.getT1());
+                            this.logger.trace("{} took {}ms to be processed.", tuple.getT2(), tuple.getT1());
                             if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
                                 LogUtils.warn(this.getClient(),
                                         String.format("%s took a long time to be processed (%dms).",
