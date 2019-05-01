@@ -91,6 +91,8 @@ public class Shadbot {
                         .flatMap(guild -> guild.getMemberById(Shadbot.getClient().getSelfId().get()))
                         .flatMap(Member::getVoiceState)
                         .flatMap(VoiceState::getChannel)
+                        .map(VoiceChannel::getGuildId)
+                        .map(Snowflake::asString)
                         .collectList())
                 .doOnNext(voiceChannels -> {
                     if (voiceChannels.size() > MusicManager.count()) {
@@ -98,12 +100,8 @@ public class Shadbot {
                                 .filter(key -> MusicManager.getConnection(key).getGuildMusic() != null)
                                 .map(Snowflake::asString)
                                 .collect(Collectors.joining(", "));
-                        final String voiceChannelsStr = voiceChannels.stream()
-                                .map(VoiceChannel::getId)
-                                .map(Snowflake::asString)
-                                .collect(Collectors.joining(", "));
                         LogUtils.warn(Shadbot.getClient(), String.format("Desynchronization detected:%n%s%n%s",
-                                musicManagers, voiceChannelsStr));
+                                musicManagers, String.join(", ", voiceChannels)));
                     }
                 })
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
