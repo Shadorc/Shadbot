@@ -59,4 +59,17 @@ public class ProfileResponse {
         return this.playtime.get("quickplay");
     }
 
+    @Override
+    public String toString() {
+        return "ProfileResponse{" +
+                "message='" + message + '\'' +
+                ", username='" + username + '\'' +
+                ", level=" + level +
+                ", portrait='" + portrait + '\'' +
+                ", isPrivate=" + isPrivate +
+                ", games=" + games +
+                ", playtime=" + playtime +
+                ", competitive=" + competitive +
+                '}';
+    }
 }
