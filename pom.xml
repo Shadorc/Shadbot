@@ -104,9 +104,9 @@
     </repositories>
     <dependencies>
         <dependency>
-            <groupId>com.discord4j.discord4j</groupId>
+            <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>716af84</version>
+            <version>3.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>
