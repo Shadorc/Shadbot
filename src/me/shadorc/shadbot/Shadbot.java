@@ -2,11 +2,8 @@ package me.shadorc.shadbot;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
-import discord4j.core.object.VoiceState;
 import discord4j.core.object.data.stored.MessageBean;
 import discord4j.core.object.entity.ApplicationInfo;
-import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
@@ -29,7 +26,6 @@ import me.shadorc.shadbot.data.lottery.Lottery;
 import me.shadorc.shadbot.data.lottery.LotteryManager;
 import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.music.MusicManager;
 import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
@@ -45,7 +41,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 public class Shadbot {
 

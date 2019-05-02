@@ -2,8 +2,6 @@ package me.shadorc.shadbot.command.info;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import discord4j.common.GitProperties;
-import discord4j.core.object.VoiceState;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
