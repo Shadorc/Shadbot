@@ -53,7 +53,7 @@ public class GuildMusicConnection {
                     final VoiceConnection voiceConnection = tuple.getT2();
 
                     LogUtils.info("{Guild ID: %d} Voice channel joined in %dms.", this.guildId.asLong(), elapsedTime);
-                    if(elapsedTime > Duration.ofSeconds(10).toMillis()) {
+                    if (elapsedTime > Duration.ofSeconds(10).toMillis()) {
                         LogUtils.warn(Shadbot.getClient(), String.format("{Guild ID: %d} Joining a voice channel took %dms",
                                 this.guildId.asLong(), elapsedTime));
                     }
