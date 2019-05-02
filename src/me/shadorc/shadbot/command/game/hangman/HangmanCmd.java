@@ -9,10 +9,8 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -41,14 +39,10 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                 new CommandException(String.format("`%s` is not a valid difficulty. %s",
                         context.getArg().orElse(""), FormatUtils.options(Difficulty.class))));
 
-        try {
-            if (difficulty.equals(Difficulty.EASY) && !this.easyWords.isLoaded()) {
-                this.easyWords.load();
-            } else if (difficulty.equals(Difficulty.HARD) && !this.hardWords.isLoaded()) {
-                this.hardWords.load();
-            }
-        } catch (final IOException err) {
-            throw Exceptions.propagate(err);
+        if (difficulty.equals(Difficulty.EASY) && !this.easyWords.isLoaded()) {
+            this.easyWords.load();
+        } else if (difficulty.equals(Difficulty.HARD) && !this.hardWords.isLoaded()) {
+            this.hardWords.load();
         }
 
         final HangmanGame hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
