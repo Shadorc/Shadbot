@@ -21,16 +21,12 @@ import java.time.Duration;
 
 public class NetUtils {
 
-    private static final Retry<?> RETRY = Retry.onlyIf(err -> ExceptionUtils.isServerAccessError(err.exception()))
-            .exponentialBackoffWithJitter(Duration.ofSeconds(2), Duration.ofSeconds(30))
-            .retryMax(3);
-
     /**
      * @param html - The HTML to convert to text
      * @return html converted to text with new lines preserved
      */
     public static String br2nl(String html) {
-        if (html == null) {
+        if (html == null || html.isBlank()) {
             return html;
         }
         final Document document = Jsoup.parse(html);
@@ -64,16 +60,6 @@ public class NetUtils {
 
     /**
      * @param url - URL to connect to. The protocol must be http or https
-     * @return The {@link Document} corresponding to {@code url} with default user-agent and default timeout
-     */
-    public static Document getDoc(String url) {
-        return Mono.fromCallable(() -> NetUtils.getDefaultConnection(url).get())
-                .retryWhen(RETRY)
-                .block(); // TODO: Do not block
-    }
-
-    /**
-     * @param url - URL to connect to. The protocol must be http or https
      * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type and HTTP errors
      */
     public static Response getResponse(String url) {
@@ -81,8 +67,18 @@ public class NetUtils {
                 .ignoreContentType(true)
                 .ignoreHttpErrors(true)
                 .execute())
-                .retryWhen(RETRY)
+                .retryWhen(Retry.onlyIf(err -> ExceptionUtils.isServerAccessError(err.exception()))
+                        .exponentialBackoffWithJitter(Duration.ofSeconds(2), Duration.ofSeconds(5))
+                        .retryMax(3))
                 .block(); // TODO: Do not block
+    }
+
+    /**
+     * @param url - URL to connect to. The protocol must be http or https
+     * @return The {@link Document} corresponding to {@code url} with default user-agent and default timeout
+     */
+    public static Document getDoc(String url) throws IOException {
+        return NetUtils.getResponse(url).parse();
     }
 
     /**
