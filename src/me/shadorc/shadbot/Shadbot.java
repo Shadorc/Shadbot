@@ -85,27 +85,6 @@ public class Shadbot {
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 
-        // TODO: Remove
-        Flux.interval(Duration.ofMinutes(30), Duration.ofMinutes(30))
-                .flatMap(ignored -> Shadbot.getClient().getGuilds()
-                        .flatMap(guild -> guild.getMemberById(Shadbot.getClient().getSelfId().get()))
-                        .flatMap(Member::getVoiceState)
-                        .flatMap(VoiceState::getChannel)
-                        .map(VoiceChannel::getGuildId)
-                        .map(Snowflake::asString)
-                        .collectList())
-                .doOnNext(voiceChannels -> {
-                    if (voiceChannels.size() > MusicManager.count()) {
-                        final String musicManagers = MusicManager.GUILD_MUSIC_CONNECTIONS.keySet().stream()
-                                .filter(key -> MusicManager.getConnection(key).getGuildMusic() != null)
-                                .map(Snowflake::asString)
-                                .collect(Collectors.joining(", "));
-                        LogUtils.warn(Shadbot.getClient(), String.format("Desynchronization detected:%n%s%n%s",
-                                musicManagers, String.join(", ", voiceChannels)));
-                    }
-                })
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
-
         LogUtils.info("Connecting...");
         final ShardingStoreRegistry registry = new ShardingJdkStoreRegistry();
         new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))

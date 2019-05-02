@@ -6,6 +6,8 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
 import discord4j.core.DiscordClient;
+import discord4j.core.object.VoiceState;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
@@ -13,10 +15,17 @@ import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import org.jetbrains.annotations.Nullable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 public class MusicManager {
 
@@ -26,6 +35,7 @@ public class MusicManager {
     static {
         AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         AudioSourceManagers.registerRemoteSources(AUDIO_PLAYER_MANAGER);
+        MusicManager.startWatcher();
     }
 
     /**
@@ -86,11 +96,32 @@ public class MusicManager {
         }
     }
 
-    // TODO: Remove, for debug purpose
-    public static long count() {
-        return GUILD_MUSIC_CONNECTIONS.values().stream()
-                .filter(state -> state.getGuildMusic() != null)
-                .count();
+    private static void startWatcher() {
+        Flux.interval(Duration.ofMinutes(5), Duration.ofMinutes(5))
+                .flatMap(ignored -> MusicManager.getGuildIdsWithVoice())
+                .doOnNext(guildIdsWithVoice -> {
+                    List<Snowflake> diffList = new ArrayList<>(guildIdsWithVoice);
+                    diffList.removeAll(MusicManager.getGuildIdsWithGuildMusics());
+                    if (!diffList.isEmpty()) {
+                        LogUtils.warn(Shadbot.getClient(), String.format("Desynchronization detected: %s", diffList.toString()));
+                    }
+                })
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+    }
+
+    public static List<Snowflake> getGuildIdsWithGuildMusics() {
+        return GUILD_MUSIC_CONNECTIONS.keySet().stream()
+                .filter(guildId -> MusicManager.getConnection(guildId).getGuildMusic() != null)
+                .collect(Collectors.toList());
+    }
+
+    public static Mono<List<Snowflake>> getGuildIdsWithVoice() {
+        return Shadbot.getClient().getGuilds()
+                .flatMap(guild -> guild.getMemberById(guild.getClient().getSelfId().get()))
+                .flatMap(Member::getVoiceState)
+                .flatMap(VoiceState::getChannel)
+                .map(VoiceChannel::getGuildId)
+                .collectList();
     }
 
 }

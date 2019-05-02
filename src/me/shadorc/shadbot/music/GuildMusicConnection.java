@@ -6,6 +6,7 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
@@ -50,20 +51,17 @@ public class GuildMusicConnection {
 
         return this.client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
-                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider))
-                        .timeout(Duration.ofMillis(Config.DEFAULT_TIMEOUT)))
-                .onErrorResume(TimeoutException.class, err -> {
-                    LogUtils.info("{Guild ID: %d} Voice connection timed out.", this.guildId.asLong());
-                    this.changeState(State.DISCONNECTED);
-                    return Mono.justOrEmpty(this.guildMusic)
-                            .flatMap(GuildMusic::getMessageChannel)
-                            .flatMap(channel -> DiscordUtils.sendMessage(
-                                    Emoji.WARNING + " Sorry, I can't join this voice channel right now. "
-                                            + "Please retry in a few minutes or with another voice channel.", channel))
-                            .then(Mono.fromRunnable(this::leaveVoiceChannel));
-                })
-                .flatMap(voiceConnection -> {
-                    LogUtils.info("{Guild ID: %d} Voice channel joined.", this.guildId.asLong());
+                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)).elapsed())
+                .flatMap(tuple -> {
+                    final Long elapsedTime = tuple.getT1();
+                    final VoiceConnection voiceConnection = tuple.getT2();
+
+                    LogUtils.info("{Guild ID: %d} Voice channel joined in %dms.", this.guildId.asLong(), elapsedTime);
+                    if(elapsedTime > Duration.ofSeconds(10).toMillis()) {
+                        LogUtils.warn(Shadbot.getClient(), String.format("{Guild ID: %d} Joining a voice channel took %dms",
+                                this.guildId.asLong(), elapsedTime));
+                    }
+
                     this.voiceConnection = voiceConnection;
                     this.changeState(State.CONNECTED);
 
