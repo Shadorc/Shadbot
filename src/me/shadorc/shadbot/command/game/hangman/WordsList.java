@@ -5,7 +5,6 @@ import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +19,7 @@ public class WordsList {
         this.words = new ArrayList<>();
     }
 
-    public void load() throws IOException {
+    public void load() {
         if (this.words.isEmpty()) {
             this.words.addAll(
                     StringUtils.split(NetUtils.getBody(this.url), "\n").stream()

@@ -30,7 +30,7 @@ public class NetUtils {
             return html;
         }
         final Document document = Jsoup.parse(html);
-        document.outputSettings(new Document.OutputSettings().prettyPrint(false));// makes html() preserve linebreaks and spacing
+        document.outputSettings(new Document.OutputSettings().prettyPrint(false));// makes html() preserve linebreak and spacing
         document.select("br").append("\\n");
         document.select("p").prepend("\\n\\n");
         final String str = document.html().replaceAll("\\\\n", "\n");

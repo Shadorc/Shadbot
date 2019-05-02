@@ -13,15 +13,16 @@ import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 public class MemberListener {
 
     public static Mono<Void> onMemberJoin(MemberJoinEvent event) {
         final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId());
-        return MemberListener.sendAutoMsg(event.getClient(), event.getMember(), dbGuild.getMessageChannelId(), dbGuild.getJoinMessage())
+        return MemberListener.sendAutoMsg(event.getClient(), event.getMember(),
+                dbGuild.getMessageChannelId().orElse(null), dbGuild.getJoinMessage().orElse(null))
                 // Add auto-role(s) to the new member
                 .and(Mono.zip(event.getGuild(), Mono.justOrEmpty(event.getClient().getSelfId()))
                         .flatMap(tuple -> tuple.getT1().getMemberById(tuple.getT2()))
@@ -39,11 +40,12 @@ public class MemberListener {
         final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getGuildId());
         event.getMember()
                 .ifPresent(member -> dbGuild.removeMember(Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId())));
-        return MemberListener.sendAutoMsg(event.getClient(), event.getUser(), dbGuild.getMessageChannelId(), dbGuild.getLeaveMessage())
+        return MemberListener.sendAutoMsg(event.getClient(), event.getUser(),
+                dbGuild.getMessageChannelId().orElse(null), dbGuild.getLeaveMessage().orElse(null))
                 .then();
     }
 
-    private static Mono<Message> sendAutoMsg(DiscordClient client, User user, Optional<Long> channelId, Optional<String> message) {
+    private static Mono<Message> sendAutoMsg(DiscordClient client, User user, @Nullable Long channelId, @Nullable String message) {
         return Mono.zip(Mono.justOrEmpty(channelId).map(Snowflake::of), Mono.justOrEmpty(message))
                 .flatMap(tuple -> client.getChannelById(tuple.getT1())
                         .cast(MessageChannel.class)

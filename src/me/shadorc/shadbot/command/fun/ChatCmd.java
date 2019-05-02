@@ -32,7 +32,7 @@ public class ChatCmd extends BaseCmd {
     private static final int MAX_ERROR_COUNT = 10;
     private static final int MAX_CHARACTERS = 250;
 
-    private final ConcurrentHashMap<Snowflake, String> channelsCustid;
+    private final Map<Snowflake, String> channelsCustid;
     private final AtomicInteger errorCount;
 
     public ChatCmd() {

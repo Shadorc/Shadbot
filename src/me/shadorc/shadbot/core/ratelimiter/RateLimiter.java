@@ -14,11 +14,12 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RateLimiter {
 
-    private final ConcurrentHashMap<Snowflake, LimitedGuild> guildsLimitedMap;
+    private final Map<Snowflake, LimitedGuild> guildsLimitedMap;
     private final int max;
     private final Duration duration;
     private final Bandwidth bandwidth;
