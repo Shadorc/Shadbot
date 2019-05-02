@@ -4,6 +4,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.gamestats.steam.player.PlayerSummariesResponse;
 import me.shadorc.shadbot.api.gamestats.steam.player.PlayerSummary;
 import me.shadorc.shadbot.api.gamestats.steam.resolver.ResolveVanityUrlResponse;
+import me.shadorc.shadbot.api.gamestats.steam.stats.PlayerStats;
 import me.shadorc.shadbot.api.gamestats.steam.stats.Stats;
 import me.shadorc.shadbot.api.gamestats.steam.stats.UserStatsForGameResponse;
 import me.shadorc.shadbot.core.command.BaseCmd;
@@ -94,13 +95,13 @@ public class CounterStrikeCmd extends BaseCmd {
 
             final UserStatsForGameResponse userStats = Utils.MAPPER.readValue(NetUtils.getJSON(userStatsUrl), UserStatsForGameResponse.class);
 
-            if (userStats.getPlayerStats() == null || userStats.getPlayerStats().getStats() == null) {
+            if (userStats.getPlayerStats().flatMap(PlayerStats::getStats).isEmpty()) {
                 return loadingMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Counter-Strike: Global Offensive.",
                                 context.getUsername()));
             }
 
-            final List<Stats> stats = userStats.getPlayerStats().getStats();
+            final List<Stats> stats = userStats.getPlayerStats().flatMap(PlayerStats::getStats).get();
 
             final Map<String, Integer> statsMap = new HashMap<>();
             stats.forEach(stat -> statsMap.put(stat.getName(), stat.getValue()));

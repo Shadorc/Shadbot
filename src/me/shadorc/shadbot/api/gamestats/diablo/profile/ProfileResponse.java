@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import reactor.util.annotation.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ProfileResponse {
 
@@ -25,8 +26,8 @@ public class ProfileResponse {
     @JsonProperty("heroes")
     private List<HeroId> heroeIds;
 
-    public String getCode() {
-        return this.code;
+    public Optional<String> getCode() {
+        return Optional.ofNullable(this.code);
     }
 
     public String getBattleTag() {

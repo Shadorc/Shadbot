@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.util.annotation.Nullable;
 
+import java.util.Optional;
+
 public class HeroResponse {
 
     @Nullable
@@ -18,8 +20,8 @@ public class HeroResponse {
     @JsonProperty("stats")
     private HeroStats stats;
 
-    public String getCode() {
-        return this.code;
+    public Optional<String> getCode() {
+        return Optional.ofNullable(this.code);
     }
 
     public String getName() {

@@ -69,7 +69,7 @@ public class DiabloCmd extends BaseCmd {
 
             final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(url), ProfileResponse.class);
 
-            if ("NOTFOUND".equals(profile.getCode())) {
+            if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
                 return loadingMsg.setContent(String.format(
                         Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
                         context.getUsername()));
@@ -81,7 +81,7 @@ public class DiabloCmd extends BaseCmd {
                         region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken());
 
                 final HeroResponse hero = Utils.MAPPER.readValue(NetUtils.getJSON(heroUrl), HeroResponse.class);
-                if (hero.getCode() == null) {
+                if (hero.getCode().isEmpty()) {
                     heroResponses.add(hero);
                 }
             }

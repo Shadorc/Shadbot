@@ -98,10 +98,10 @@ public class OverwatchCmd extends BaseCmd {
                         platformStr, FormatUtils.options(Platform.class))));
 
         final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("profile", platform, username)), ProfileResponse.class);
-        if (profile.getGames().getQuickplay() == null) {
+        if (profile.getGames().getQuickplay().isEmpty()) {
             LogUtils.warn(Shadbot.getClient(), "Overwatch debug: " + profile.toString());
         }
-        if ("Error: Profile not found".equals(profile.getMessage())) {
+        if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
             return null;
         }
         final StatsResponse stats = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("stats", platform, username)), StatsResponse.class);

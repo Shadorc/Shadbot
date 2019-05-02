@@ -3,6 +3,8 @@ package me.shadorc.shadbot.api.image.deviantart;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import reactor.util.annotation.Nullable;
 
+import java.util.Optional;
+
 public class Image {
 
     @Nullable
@@ -17,8 +19,8 @@ public class Image {
     @JsonProperty("category_path")
     private String categoryPath;
 
-    public Content getContent() {
-        return this.content;
+    public Optional<Content> getContent() {
+        return Optional.ofNullable(this.content);
     }
 
     public Author getAuthor() {

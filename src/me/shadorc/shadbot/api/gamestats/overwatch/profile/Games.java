@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import reactor.util.annotation.Nullable;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class Games {
 
@@ -11,9 +12,8 @@ public class Games {
     @JsonProperty("quickplay")
     private Map<String, Integer> quickplay;
 
-    @Nullable
-    public Map<String, Integer> getQuickplay() {
-        return this.quickplay;
+    public Optional<Map<String, Integer>> getQuickplay() {
+        return Optional.ofNullable(this.quickplay);
     }
 
     public String getQuickplayWon() {

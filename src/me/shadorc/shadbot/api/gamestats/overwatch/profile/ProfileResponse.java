@@ -5,6 +5,7 @@ import reactor.util.annotation.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ProfileResponse {
 
@@ -26,9 +27,8 @@ public class ProfileResponse {
     @JsonProperty("competitive")
     private Map<String, String> competitive;
 
-    @Nullable
-    public String getMessage() {
-        return this.message;
+    public Optional<String> getMessage() {
+        return Optional.ofNullable(this.message);
     }
 
     public String getUsername() {

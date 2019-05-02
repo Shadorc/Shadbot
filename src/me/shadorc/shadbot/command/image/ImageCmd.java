@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.image;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.api.TokenResponse;
+import me.shadorc.shadbot.api.image.deviantart.Content;
 import me.shadorc.shadbot.api.image.deviantart.DeviantArtResponse;
 import me.shadorc.shadbot.api.image.deviantart.Image;
 import me.shadorc.shadbot.core.command.BaseCmd;
@@ -59,7 +60,7 @@ public class ImageCmd extends BaseCmd {
                             .addField("Title", image.getTitle(), false)
                             .addField("Author", image.getAuthor().getUsername(), false)
                             .addField("Category", image.getCategoryPath(), false)
-                            .setImage(image.getContent().getSource())));
+                            .setImage(image.getContent().map(Content::getSource).get())));
         })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
@@ -81,7 +82,7 @@ public class ImageCmd extends BaseCmd {
 
         final DeviantArtResponse deviantArt = Utils.MAPPER.readValue(NetUtils.getJSON(url), DeviantArtResponse.class);
         final List<Image> images = deviantArt.getResults().stream()
-                .filter(image -> image.getContent() != null)
+                .filter(image -> image.getContent().isPresent())
                 .collect(Collectors.toList());
 
         return images.isEmpty() ? null : Utils.randValue(images);

@@ -42,14 +42,12 @@ public class Rule34Cmd extends BaseCmd {
                             NetUtils.encode(arg.replace(" ", "_")));
 
                     final R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
-                    final R34Posts posts = r34.getPosts();
-
-                    if (posts == null || posts.getCount() == 0) {
+                    if (!r34.getPosts().map(R34Posts::getCount).map(count -> count != 0).orElse(false)) {
                         return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
                                 context.getUsername(), arg));
                     }
 
-                    final R34Post post = Utils.randValue(posts.getPosts());
+                    final R34Post post = Utils.randValue(r34.getPosts().map(R34Posts::getPosts).get());
 
                     final List<String> tags = StringUtils.split(post.getTags(), " ");
                     if (post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
