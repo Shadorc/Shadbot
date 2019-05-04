@@ -30,6 +30,8 @@
         <li><a href="http://javaluator.sourceforge.net/en/home/">javaluator</a>
     </ul>
     <hr>
+    <h2>Build</h2>
+    You can find some help to build your own version of Shadbot by looking at the <a href="https://github.com/Shadorc/Shadbot/wiki/Build-Shadbot">Wiki</a>.
     <h2>Licence</h2>
     <p>Copyright (C) 2019 <b>Shadorc</b>
         <pre>
