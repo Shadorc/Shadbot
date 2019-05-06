@@ -6,8 +6,6 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
 import discord4j.core.DiscordClient;
-import discord4j.core.object.VoiceState;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
@@ -16,7 +14,6 @@ import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -97,12 +94,16 @@ public class MusicManager {
 
     private static void startWatcher() {
         Flux.interval(Duration.ofMinutes(5), Duration.ofMinutes(5))
-                .flatMap(ignored -> MusicManager.getGuildIdsWithVoice())
-                .doOnNext(guildIdsWithVoice -> {
-                    List<Snowflake> diffList = new ArrayList<>(guildIdsWithVoice);
+                .doOnNext(ignored -> {
+                    List<Snowflake> diffList = new ArrayList<>(MusicManager.getGuildIdsWithVoice());
                     diffList.removeAll(MusicManager.getGuildIdsWithGuildMusics());
                     if (!diffList.isEmpty()) {
-                        LogUtils.warn(Shadbot.getClient(), String.format("Desynchronization detected: %s", diffList.toString()));
+                        LogUtils.warn(Shadbot.getClient(), String.format("Voice desynchronization detected: %s", diffList.toString()));
+                    }
+                    diffList = new ArrayList<>(MusicManager.getGuildIdsWithGuildMusics());
+                    diffList.removeAll(MusicManager.getGuildIdsWithVoice());
+                    if (!diffList.isEmpty()) {
+                        LogUtils.warn(Shadbot.getClient(), String.format("Guild music desynchronization detected: %s", diffList.toString()));
                     }
                 })
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
