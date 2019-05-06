@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 public class LoadingMessage implements Publisher<Void> {
 
-    private final static Duration TYPING_TIMEOUT = Duration.ofSeconds(30);
+    private final static Duration TYPING_TIMEOUT = Duration.ofMinutes(1);
 
     private final DiscordClient client;
     private final Snowflake channelId;
