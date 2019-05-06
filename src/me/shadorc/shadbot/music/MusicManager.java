@@ -13,6 +13,7 @@ import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
@@ -26,7 +27,8 @@ import java.util.stream.Collectors;
 public class MusicManager {
 
     private static final AudioPlayerManager AUDIO_PLAYER_MANAGER = new DefaultAudioPlayerManager();
-    public static final Map<Snowflake, GuildMusicConnection> GUILD_MUSIC_CONNECTIONS = new ConcurrentHashMap<>();
+    private static final Map<Snowflake, GuildMusicConnection> GUILD_MUSIC_CONNECTIONS = new ConcurrentHashMap<>();
+    private static final Map<Snowflake, Disposable> GUILD_DISPOSABLES = new ConcurrentHashMap<>();
 
     static {
         AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
@@ -66,8 +68,9 @@ public class MusicManager {
             guildMusicConnection.setGuildMusic(guildMusic);
 
             final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
-            guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
+            final Disposable voiceDisposable = guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
                     .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+            GUILD_DISPOSABLES.put(guildId, voiceDisposable);
         }
 
         return guildMusicConnection.getGuildMusic();
@@ -93,12 +96,15 @@ public class MusicManager {
     }
 
     private static void startWatcher() {
-        Flux.interval(Duration.ofMinutes(5), Duration.ofMinutes(5))
+        Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15))
                 .doOnNext(ignored -> {
                     List<Snowflake> diffList = new ArrayList<>(MusicManager.getGuildIdsWithVoice());
                     diffList.removeAll(MusicManager.getGuildIdsWithGuildMusics());
                     if (!diffList.isEmpty()) {
                         LogUtils.warn(Shadbot.getClient(), String.format("Voice desynchronization detected: %s", diffList.toString()));
+                        for (Snowflake guildId : diffList) {
+                            GUILD_DISPOSABLES.get(guildId).dispose();
+                        }
                     }
                     diffList = new ArrayList<>(MusicManager.getGuildIdsWithGuildMusics());
                     diffList.removeAll(MusicManager.getGuildIdsWithVoice());
