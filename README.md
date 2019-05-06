@@ -14,15 +14,10 @@
     <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=271674390">link</a> !</b></p>
     <hr>
     <h2>Support</h2>
-    <p><b><a href="https://discord.gg/CKnV4ff">Join</a> the support server if you have any questions, suggestions or just want to discuss.</b></p>
+    <p><b><a href="https://discord.gg/CKnV4ff">Join</a> the support server if you have any questions, suggestions or if you just want to talk.</b></p>
     <hr>
     <h2>Privacy</h2>
-    When you interact with Shadbot, I may collect information from you, as further described below:
-    <ul>
-        <li>User ID is used to store coins.
-        <li>Server ID is used to store settings.
-        <li>When an error occurred, I may log the message that triggers the command for debugging purpose.
-    </ul>
+    When you interact with Shadbot and an error occurs, I may log the message that triggers the command for debugging purpose.
     If you have any questions, do not hesitate to <a href="https://discord.gg/CKnV4ff">join</a> the support server.
     <hr>
     <h2>Libraries used</h2>
@@ -35,6 +30,8 @@
         <li><a href="http://javaluator.sourceforge.net/en/home/">javaluator</a>
     </ul>
     <hr>
+    <h2>Build</h2>
+    You can find some help to build your own version of Shadbot by looking at the <a href="https://github.com/Shadorc/Shadbot/wiki/Build-Shadbot">Wiki</a>.
     <h2>Licence</h2>
     <p>Copyright (C) 2019 <b>Shadorc</b>
         <pre>
