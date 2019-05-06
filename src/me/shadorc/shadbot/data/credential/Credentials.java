@@ -1,5 +1,9 @@
 package me.shadorc.shadbot.data.credential;
 
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +12,7 @@ import java.util.Properties;
 
 public class Credentials {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Credentials.class);
     private static final Properties CREDENTIALS_PROPERTIES = new Properties();
     private static final File CREDENTIALS_FILE = new File("credentials.properties");
 
@@ -25,7 +30,7 @@ public class Credentials {
         // Check if all API keys are present
         for (final Credential key : Credential.values()) {
             if (Credentials.get(key) == null) {
-                throw new RuntimeException(String.format("%s not found.", key.toString()));
+                LOGGER.warn("Property {} not found, the associated command / service may not work properly.", key.toString());
             }
         }
     }
