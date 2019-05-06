@@ -114,13 +114,10 @@ public class MusicManager {
                 .collect(Collectors.toList());
     }
 
-    public static Mono<List<Snowflake>> getGuildIdsWithVoice() {
-        return Shadbot.getClient().getGuilds()
-                .flatMap(guild -> guild.getMemberById(guild.getClient().getSelfId().get()))
-                .flatMap(Member::getVoiceState)
-                .flatMap(VoiceState::getChannel)
-                .map(VoiceChannel::getGuildId)
-                .collectList();
+    public static List<Snowflake> getGuildIdsWithVoice() {
+        return GUILD_MUSIC_CONNECTIONS.keySet().stream()
+                .filter(guildId -> MusicManager.getConnection(guildId).getVoiceConnection() != null)
+                .collect(Collectors.toList());
     }
 
 }

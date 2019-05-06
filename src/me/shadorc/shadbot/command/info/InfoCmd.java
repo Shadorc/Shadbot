@@ -46,13 +46,11 @@ public class InfoCmd extends BaseCmd {
 
         return Mono.zip(context.getClient().getUserById(Snowflake.of(Shadbot.OWNER_ID.get())),
                 context.getClient().getGuilds().count(),
-                context.getClient().getUsers().count(),
-                MusicManager.getGuildIdsWithVoice())
+                context.getClient().getUsers().count())
                 .flatMap(tuple -> {
                     final User owner = tuple.getT1();
                     final Long guildCount = tuple.getT2();
                     final Long memberCount = tuple.getT3();
-                    final int voiceChannelCount = tuple.getT4().size();
 
                     final long start = System.currentTimeMillis();
                     return loadingMsg.setContent(String.format(Emoji.GEAR + " (**%s**) Testing ping...", context.getUsername()))
@@ -75,7 +73,7 @@ public class InfoCmd extends BaseCmd {
                                     + String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
                                     + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
                                     + String.format("%nServers: %s", FormatUtils.number(guildCount))
-                                    + String.format("%nVoice Channels: %d (GM: %d)", voiceChannelCount, MusicManager.getGuildIdsWithGuildMusics().size())
+                                    + String.format("%nVoice Channels: %d (GM: %d)", MusicManager.getGuildIdsWithVoice().size(), MusicManager.getGuildIdsWithGuildMusics().size())
                                     + String.format("%nUsers: %s", FormatUtils.number(memberCount))
                                     + "```")));
                 })
