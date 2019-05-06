@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <configuration scan="true">
 
-    <logger name="shadbot" level="DEBUG" />
+    <logger name="shadbot" level="DEBUG"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

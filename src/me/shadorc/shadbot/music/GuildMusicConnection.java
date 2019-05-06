@@ -5,11 +5,15 @@ import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
-import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 public class GuildMusicConnection {
 
@@ -47,16 +51,10 @@ public class GuildMusicConnection {
 
         return this.client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
-                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)).elapsed())
-                .flatMap(tuple -> {
-                    final Long elapsedTime = tuple.getT1();
-                    final VoiceConnection voiceConnection = tuple.getT2();
-
-                    LogUtils.info("{Guild ID: %d} Voice channel joined in %dms.", this.guildId.asLong(), elapsedTime);
-                    if (elapsedTime > Duration.ofSeconds(10).toMillis()) {
-                        LogUtils.warn(Shadbot.getClient(), String.format("{Guild ID: %d} Joining a voice channel took %dms",
-                                this.guildId.asLong(), elapsedTime));
-                    }
+                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
+                .timeout(Duration.ofMillis(Config.DEFAULT_TIMEOUT))
+                .flatMap(voiceConnection -> {
+                    LogUtils.info("{Guild ID: %d} Voice channel joined.", this.guildId.asLong());
 
                     this.voiceConnection = voiceConnection;
                     this.changeState(State.CONNECTED);
@@ -67,7 +65,21 @@ public class GuildMusicConnection {
                             .switchIfEmpty(Mono.delay(Duration.ofSeconds(2))
                                     .then(Mono.fromRunnable(this::leaveVoiceChannel)));
                 })
+                .onErrorResume(TimeoutException.class, err -> this.onVoiceConnectionTimeout())
+                .doOnCancel(() -> this.onVoiceConnectionTimeout()
+                        .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err)))
                 .then();
+    }
+
+    private <T> Mono<T> onVoiceConnectionTimeout() {
+        LogUtils.info("{Guild ID: %d} Voice connection timed out.", this.guildId.asLong());
+        this.changeState(State.DISCONNECTED);
+        return Mono.justOrEmpty(this.guildMusic)
+                .flatMap(GuildMusic::getMessageChannel)
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        Emoji.WARNING + " Sorry, I can't join this voice channel right now. "
+                                + "Please, try again in a few seconds or with another voice channel.", channel))
+                .then(Mono.fromRunnable(this::leaveVoiceChannel));
     }
 
     /**
@@ -86,6 +98,10 @@ public class GuildMusicConnection {
             this.guildMusic = null;
             LogUtils.debug("{Guild ID: %d} Guild music destroyed.", this.guildId.asLong());
         }
+    }
+
+    public VoiceConnection getVoiceConnection() {
+        return this.voiceConnection;
     }
 
     public GuildMusic getGuildMusic() {
