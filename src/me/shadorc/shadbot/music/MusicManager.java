@@ -33,7 +33,7 @@ public class MusicManager {
     static {
         AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         AudioSourceManagers.registerRemoteSources(AUDIO_PLAYER_MANAGER);
-        MusicManager.startWatcher();
+        //MusicManager.startWatcher();
     }
 
     /**
