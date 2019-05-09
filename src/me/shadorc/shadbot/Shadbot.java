@@ -62,13 +62,6 @@ public class Shadbot {
     private static BotListStats botListStats;
 
     public static void main(String[] args) {
-        //TODO: Remove
-        BlockHound.Builder bhBuilder = BlockHound.builder();
-        ServiceLoader<BlockHoundIntegration> serviceLoader = ServiceLoader.load(BlockHoundIntegration.class);
-        StreamSupport.stream(serviceLoader.spliterator(), false).sorted().forEach(bhBuilder::with);
-        bhBuilder.blockingMethodCallback(it -> LogUtils.error(new Error(it.toString()), "Blocking Method"));
-        bhBuilder.install();
-
         // Set default to Locale US
         Locale.setDefault(Locale.US);
 
@@ -129,6 +122,15 @@ public class Shadbot {
      */
     public static void onFullyReadyEvent(DiscordClient client) {
         if (CONNECTED_SHARDS.incrementAndGet() == client.getConfig().getShardCount()) {
+
+            //TODO: Remove
+            BlockHound.Builder bhBuilder = BlockHound.builder();
+            ServiceLoader<BlockHoundIntegration> serviceLoader = ServiceLoader.load(BlockHoundIntegration.class);
+            StreamSupport.stream(serviceLoader.spliterator(), false).sorted().forEach(bhBuilder::with);
+            bhBuilder.blockingMethodCallback(it ->
+                    LogUtils.error(Shadbot.getClient(), new Exception(it.toString()), "Blocking Method: " + it.toString()));
+            bhBuilder.install();
+
             LogUtils.info("Shadbot is connected to all guilds.");
             if (!Config.IS_SNAPSHOT) {
                 Shadbot.botListStats = new BotListStats();
