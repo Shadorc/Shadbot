@@ -30,6 +30,7 @@ import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.blockhound.BlockHound;
+import reactor.blockhound.integration.BlockHoundIntegration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -39,9 +40,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class Shadbot {
 
@@ -58,7 +62,12 @@ public class Shadbot {
     private static BotListStats botListStats;
 
     public static void main(String[] args) {
-        BlockHound.install();
+        //TODO: Remove
+        BlockHound.Builder bhBuilder = BlockHound.builder();
+        ServiceLoader<BlockHoundIntegration> serviceLoader = ServiceLoader.load(BlockHoundIntegration.class);
+        StreamSupport.stream(serviceLoader.spliterator(), false).sorted().forEach(bhBuilder::with);
+        bhBuilder.blockingMethodCallback(it -> LogUtils.error(new Error(it.toString()), "Blocking Method"));
+        bhBuilder.install();
 
         // Set default to Locale US
         Locale.setDefault(Locale.US);
