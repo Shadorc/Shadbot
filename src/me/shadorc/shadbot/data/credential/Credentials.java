@@ -1,6 +1,5 @@
 package me.shadorc.shadbot.data.credential;
 
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
