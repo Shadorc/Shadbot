@@ -101,8 +101,18 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <!-- BlockHound repository -->
+        <repository>
+            <id>spring.repo</id>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
     </repositories>
     <dependencies>
+        <dependency>
+            <groupId>io.projectreactor.tools</groupId>
+            <artifactId>blockhound</artifactId>
+            <version>1.0.0.M3</version>
+        </dependency>
         <dependency>
             <groupId>com.discord4j.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
