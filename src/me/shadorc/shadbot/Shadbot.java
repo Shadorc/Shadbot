@@ -44,7 +44,6 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class Shadbot {

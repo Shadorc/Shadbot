@@ -13,7 +13,6 @@ import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,7 +58,7 @@ public class RateLimiter {
                     return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
                             username, message, maxNum, durationStr);
                 })
-                .flatMap(new TemporaryMessage(client, channelId, 10, ChronoUnit.SECONDS)::send)
+                .flatMap(new TemporaryMessage(client, channelId, Duration.ofSeconds(10))::send)
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
     }
 

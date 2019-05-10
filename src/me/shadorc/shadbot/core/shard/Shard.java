@@ -25,7 +25,6 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
 import reactor.util.Loggers;
