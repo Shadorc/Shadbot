@@ -80,7 +80,7 @@ public class Shadbot {
         Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 
         LogUtils.info("Next lottery draw in: %s", LotteryCmd.getDelay().toString());
-        Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7))
+        Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.elastic())
                 .flatMap(ignored -> LotteryCmd.draw(Shadbot.getClient()))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));

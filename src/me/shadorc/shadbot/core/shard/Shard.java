@@ -25,6 +25,8 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -67,7 +69,7 @@ public class Shard {
                 .on(ReadyEvent.class)
                 .next()
                 .doOnNext(event -> this.logger.info("Presence update scheduled."))
-                .flatMapMany(event -> Flux.interval(Duration.ZERO, Duration.ofMinutes(30))
+                .flatMapMany(event -> Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.elastic())
                         .flatMap(ignored -> {
                             final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX, Utils.randValue(TextUtils.TIP_MESSAGES));
                             return event.getClient().updatePresence(Presence.online(Activity.playing(presence)));

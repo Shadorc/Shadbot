@@ -11,6 +11,7 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class GuildMusic {
      */
     public void scheduleLeave() {
         LogUtils.debug("{Guild ID: %d} Scheduling auto-leave.", this.guildId.asLong());
-        Mono.delay(Duration.ofMinutes(1))
+        Mono.delay(Duration.ofMinutes(1), Schedulers.elastic())
                 .filter(ignored -> this.isLeavingScheduled())
                 .doOnNext(ignored -> MusicManager.getConnection(this.guildId).leaveVoiceChannel())
                 .doOnSubscribe(ignored -> this.isLeavingScheduled.set(true))

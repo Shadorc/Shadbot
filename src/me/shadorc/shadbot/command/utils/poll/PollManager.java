@@ -15,6 +15,7 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -67,7 +68,7 @@ public class PollManager {
                                 "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png"));
 
         return this.voteMessage.send(embedConsumer)
-                .flatMap(message -> Mono.delay(this.spec.getDuration())
+                .flatMap(message -> Mono.delay(this.spec.getDuration(), Schedulers.elastic())
                         .thenReturn(message.getId()))
                 .flatMap(messageId -> this.getContext().getClient().getMessageById(this.getContext().getChannelId(), messageId))
                 .map(Message::getReactions)
@@ -77,7 +78,7 @@ public class PollManager {
 
     private <T> void schedule(Mono<T> mono, Duration duration) {
         this.cancelScheduledTask();
-        this.scheduledTask = Mono.delay(duration)
+        this.scheduledTask = Mono.delay(duration, Schedulers.elastic())
                 .then(mono)
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
     }

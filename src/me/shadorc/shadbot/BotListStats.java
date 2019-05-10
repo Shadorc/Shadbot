@@ -11,6 +11,7 @@ import org.jsoup.Jsoup;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -25,7 +26,7 @@ public class BotListStats {
 
     public BotListStats() {
         this.selfId = Shadbot.getClient().getSelfId().get().asLong();
-        this.task = Flux.interval(Duration.ofHours(3), Duration.ofHours(3))
+        this.task = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), Schedulers.elastic())
                 .flatMap(ignored -> this.postStats())
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
@@ -48,6 +49,7 @@ public class BotListStats {
                 .then();
     }
 
+    // TODO: Return Mono.fromCallable
     private void post(String url, String authorization, JSONObject content) throws IOException {
         Jsoup.connect(url)
                 .ignoreContentType(true)

@@ -6,6 +6,7 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,7 +27,7 @@ public abstract class Data {
             throw new RuntimeException(String.format("%s could not be created.", SAVE_DIR.getName()));
         }
 
-        Flux.interval(initialDelay, period)
+        Flux.interval(initialDelay, period, Schedulers.elastic())
                 .doOnNext(ignored -> Mono.fromRunnable(this::save))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }

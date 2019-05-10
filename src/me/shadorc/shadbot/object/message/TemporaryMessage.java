@@ -5,6 +5,7 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
@@ -22,6 +23,7 @@ public class TemporaryMessage {
      * @param delay     - the delay to wait
      * @param unit      - the delay unit
      */
+    // TODO: Change to Duration
     public TemporaryMessage(DiscordClient client, Snowflake channelId, long delay, TemporalUnit unit) {
         this.client = client;
         this.channelId = channelId;
@@ -39,7 +41,7 @@ public class TemporaryMessage {
         return this.client.getChannelById(this.channelId)
                 .cast(MessageChannel.class)
                 .flatMap(channel -> DiscordUtils.sendMessage(content, channel))
-                .flatMap(message -> Mono.delay(Duration.of(this.delay, this.unit))
+                .flatMap(message -> Mono.delay(Duration.of(this.delay, this.unit), Schedulers.elastic())
                         .then(message.delete()));
     }
 

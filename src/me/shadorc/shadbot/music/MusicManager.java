@@ -15,6 +15,7 @@ import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class MusicManager {
     }
 
     private static void startWatcher() {
-        Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15))
+        Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), Schedulers.elastic())
                 .doOnNext(ignored -> {
                     List<Snowflake> diffList = new ArrayList<>(MusicManager.getGuildIdsWithVoice());
                     diffList.removeAll(MusicManager.getGuildIdsWithGuildMusics());

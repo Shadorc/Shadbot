@@ -8,6 +8,7 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,7 +47,7 @@ public abstract class Game {
     public <T> void schedule(Mono<T> mono) {
         this.cancelScheduledTask();
         this.isScheduled.set(true);
-        this.scheduledTask = Mono.delay(this.getDuration())
+        this.scheduledTask = Mono.delay(this.getDuration(), Schedulers.elastic())
                 .doOnNext(ignored -> this.isScheduled.set(false))
                 .then(mono)
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));

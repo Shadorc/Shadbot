@@ -11,6 +11,7 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -62,7 +63,7 @@ public class GuildMusicConnection {
                     // If an error occurred while loading a track, the voice channel can be joined after
                     // the guild music is destroyed. The delay is needed to avoid transition error.
                     return Mono.justOrEmpty(this.guildMusic)
-                            .switchIfEmpty(Mono.delay(Duration.ofSeconds(2))
+                            .switchIfEmpty(Mono.delay(Duration.ofSeconds(2), Schedulers.elastic())
                                     .then(Mono.fromRunnable(this::leaveVoiceChannel)));
                 })
                 .onErrorResume(TimeoutException.class, err -> this.onVoiceConnectionTimeout())
