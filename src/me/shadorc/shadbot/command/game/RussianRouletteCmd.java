@@ -35,16 +35,6 @@ public class RussianRouletteCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        // TODO: Remove this in the next update
-        if (context.getArg().isPresent()) {
-            return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO +
-                            " To avoid making a lot of coins very easily and quickly, **the Russian "
-                            + "roulette now has a constant bet of %d coins.** Retry without "
-                            + "specyfying a bet.", PAID_COST), channel))
-                    .then();
-        }
-
         Utils.requireValidBet(context.getMember(), Integer.toString(PAID_COST));
 
         final StringBuilder strBuilder = new StringBuilder(
