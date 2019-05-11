@@ -82,7 +82,7 @@ public class RpsCmd extends BaseCmd {
         return new HelpBuilder(this, context)
                 .setDescription("Play a Rock–paper–scissors game.")
                 .addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)
-                .setGains("The winner gets **%d coins**.", GAINS)
+                .addField("Gains", String.format("The winner gets **%d coins** multiplied by his win-streak.", GAINS), false)
                 .build();
     }
 

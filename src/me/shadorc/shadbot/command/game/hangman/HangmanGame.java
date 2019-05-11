@@ -37,7 +37,7 @@ public class HangmanGame extends Game {
             HangmanGame.getImageUrl("d/d6", 6));
 
     protected static final int MIN_GAINS = 200;
-    private static final int MAX_BONUS = 200;
+    protected static final int MAX_BONUS = 200;
 
     private final RateLimiter rateLimiter;
     private final AtomicLong messageId;

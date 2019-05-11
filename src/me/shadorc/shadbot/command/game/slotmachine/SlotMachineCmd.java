@@ -10,6 +10,7 @@ import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
@@ -89,6 +90,12 @@ public class SlotMachineCmd extends BaseCmd {
         return new HelpBuilder(this, context)
                 .setDescription("Play slot machine.")
                 .addField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)
+                .addField("Gains", String.format("%s: **%d coins**, %s: **%d coins**, %s: **%d coins**, %s: **%d coins**. " +
+                                "You also gain a small random bonus.",
+                        StringUtils.capitalizeEnum(SlotOptions.APPLE), SlotOptions.APPLE.getGains(),
+                        StringUtils.capitalizeEnum(SlotOptions.CHERRIES), SlotOptions.CHERRIES.getGains(),
+                        StringUtils.capitalizeEnum(SlotOptions.BELL), SlotOptions.BELL.getGains(),
+                        StringUtils.capitalizeEnum(SlotOptions.GIFT), SlotOptions.GIFT.getGains()), false)
                 .build();
     }
 

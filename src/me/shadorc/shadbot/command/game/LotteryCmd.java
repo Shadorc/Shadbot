@@ -175,7 +175,8 @@ public class LotteryCmd extends BaseCmd {
                 .addField("Info", "One winner is randomly drawn every Sunday at noon (English time)."
                         + "\nIf no one wins, the prize pool is put back into play, "
                         + "if there are multiple winners, the prize pool is splitted between them.", false)
-                .setGains("The prize pool contains all coins lost at games during the week plus the purchase price of the lottery tickets.")
+                .addField("Cost", String.format("A ticket costs **%d coins.**", PAID_COST), false)
+                .addField("Gains", "The prize pool contains all coins lost at games during the week plus the purchase price of the lottery tickets.", false)
                 .build();
     }
 }

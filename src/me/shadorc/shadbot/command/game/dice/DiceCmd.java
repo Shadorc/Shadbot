@@ -100,7 +100,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
                 .setDescription("Start a dice game with a common bet.")
                 .addArg("num", "number between 1 and 6\nYou can't bet on a number that has already been chosen by another player.", false)
                 .addArg("bet", false)
-                .setGains("The winner gets the prize pool plus %.1f times his bet", MULTIPLIER)
+                .addField("Gains", String.format("The winner gets the prize pool plus **%.1f times** his bet.", MULTIPLIER), false)
                 .build();
     }
 }

@@ -51,6 +51,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
                 .addArg("bet", false)
                 .addField("Info", "**double down** - increase the initial bet by 100% in exchange for committing to stand"
                         + " after receiving exactly one more card", false)
+                .addField("Gains", "This game follows the same rules and winnings as real Blackjack.", false)
                 .build();
     }
 }

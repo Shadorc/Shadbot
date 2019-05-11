@@ -75,7 +75,8 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
         return new HelpBuilder(this, context)
                 .setDescription("Start a Hangman game.")
                 .addArg("difficulty", String.format("%s. The difficulty of the word to find", FormatUtils.format(Difficulty.class, "/")), true)
-                .setGains("The winner gets **%d coins** plus a bonus depending on the number of errors.", HangmanGame.MIN_GAINS)
+                .addField("Gains", String.format("The winner gets **%d coins** plus a bonus (**%d coins max.**) depending on his number of errors.",
+                        HangmanGame.MIN_GAINS, HangmanGame.MAX_BONUS), false)
                 .build();
     }
 }

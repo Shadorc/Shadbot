@@ -63,6 +63,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                 .addArg("place", String.format("number between 1 and 36, %s", FormatUtils.format(Place.class, ", ")), false)
                 .addField("Info", "**low** - numbers between 1 and 18"
                         + "\n**high** - numbers between 19 and 36", false)
+                .addField("Gains", "The game follows the same rules and winnings as real Roulette.", false)
                 .build();
     }
 }

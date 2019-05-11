@@ -25,7 +25,6 @@ public class HelpBuilder {
     private String description;
     private String usage;
     private String example;
-    private String gains;
     private String source;
     private String delimiter;
 
@@ -58,11 +57,6 @@ public class HelpBuilder {
 
     public HelpBuilder setExample(String example) {
         this.example = example;
-        return this;
-    }
-
-    public HelpBuilder setGains(String format, Object... args) {
-        this.gains = String.format(format, args);
         return this;
     }
 
@@ -115,10 +109,6 @@ public class HelpBuilder {
 
                     if (this.example != null) {
                         embed.addField("Example", this.example, false);
-                    }
-
-                    if (this.gains != null) {
-                        embed.addField("Gains", this.gains, false);
                     }
 
                     if (this.source != null) {
