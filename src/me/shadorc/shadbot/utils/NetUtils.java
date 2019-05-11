@@ -10,6 +10,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.retry.Retry;
 
 import java.io.IOException;
@@ -70,7 +71,8 @@ public class NetUtils {
                 .retryWhen(Retry.onlyIf(err -> ExceptionUtils.isServerAccessError(err.exception()))
                         .exponentialBackoffWithJitter(Duration.ofSeconds(2), Duration.ofSeconds(5))
                         .retryMax(3))
-                .block(); // TODO: Do not block
+                .publishOn(Schedulers.elastic())
+                .block();
     }
 
     /**
