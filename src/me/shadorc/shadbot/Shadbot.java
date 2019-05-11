@@ -29,6 +29,8 @@ import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import reactor.blockhound.BlockHound;
+import reactor.blockhound.integration.BlockHoundIntegration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -38,9 +40,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.StreamSupport;
 
 public class Shadbot {
 
@@ -117,18 +121,8 @@ public class Shadbot {
      */
     public static void onFullyReadyEvent(DiscordClient client) {
         if (CONNECTED_SHARDS.incrementAndGet() == client.getConfig().getShardCount()) {
-
-            //TODO: Remove
-            /*
-            BlockHound.Builder bhBuilder = BlockHound.builder();
-            ServiceLoader<BlockHoundIntegration> serviceLoader = ServiceLoader.load(BlockHoundIntegration.class);
-            StreamSupport.stream(serviceLoader.spliterator(), false).sorted().forEach(bhBuilder::with);
-            bhBuilder.blockingMethodCallback(it ->
-                    LogUtils.error(Shadbot.getClient(), new Exception(it.toString()), "Blocking Method: " + it.toString()));
-            bhBuilder.install();
-            */
-
             LogUtils.info("Shadbot is connected to all guilds.");
+            Shadbot.installBlockHound();
             if (!Config.IS_SNAPSHOT) {
                 Shadbot.botListStats = new BotListStats();
                 LogUtils.info("Bot list stats scheduler started.");
@@ -182,6 +176,17 @@ public class Shadbot {
                 .map(Shard::getClient)
                 .flatMap(DiscordClient::logout)
                 .then(Mono.fromRunnable(() -> System.exit(exitCode.value())));
+    }
+
+    private static void installBlockHound() {
+        BlockHound.Builder builder = BlockHound.builder();
+        ServiceLoader<BlockHoundIntegration> serviceLoader = ServiceLoader.load(BlockHoundIntegration.class);
+        StreamSupport.stream(serviceLoader.spliterator(), false)
+                .sorted()
+                .forEach(builder::with);
+        builder.blockingMethodCallback(method ->
+                LogUtils.error(Shadbot.getClient(), new Exception(method.toString()), String.format("Blocking Method: %s", method.toString())));
+        builder.install();
     }
 
 }

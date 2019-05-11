@@ -98,6 +98,7 @@ public class OverwatchCmd extends BaseCmd {
                         platformStr, FormatUtils.options(Platform.class))));
 
         final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("profile", platform, username)), ProfileResponse.class);
+        // TODO: Remove
         if (profile.getGames().getQuickplay().isEmpty()) {
             LogUtils.warn(Shadbot.getClient(), "Overwatch debug: " + profile.toString());
         }
