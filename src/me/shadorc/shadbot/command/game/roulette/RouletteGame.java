@@ -67,19 +67,18 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                     } else if (placeEnum != null && TESTS.get(placeEnum).test(winningPlace)) {
                         multiplier = 2;
                     } else {
-                        multiplier = -1;
+                        multiplier = 0;
                     }
 
-                    final int gains = player.getBet() * multiplier;
-                    Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), player.getUserId()).addCoins(gains);
-
-                    if (gains > 0) {
+                    if (multiplier > 0) {
+                        final int gains = player.getBet() * multiplier;
                         StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
+                        Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), player.getUserId()).addCoins(gains);
                         return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains));
                     } else {
-                        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), Math.abs(gains));
-                        Shadbot.getLottery().addToJackpot(Math.abs(gains));
-                        return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(Math.abs(gains)));
+                        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), player.getBet());
+                        Shadbot.getLottery().addToJackpot(player.getBet());
+                        return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet()));
                     }
                 })
                 .collectSortedList()

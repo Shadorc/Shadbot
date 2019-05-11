@@ -93,12 +93,12 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                             text.append(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));
                             break;
                         case -1:
-                            gains -= player.getBet();
-                            StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), Math.abs(gains));
-                            Shadbot.getLottery().addToJackpot(Math.abs(gains));
-                            text.append(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(Math.abs(gains))));
+                            StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), player.getBet());
+                            Shadbot.getLottery().addToJackpot(player.getBet());
+                            text.append(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet())));
                             break;
                         default:
+                            gains += player.getBet();
                             text.append(String.format("**%s** (Draw)", username));
                             break;
                     }

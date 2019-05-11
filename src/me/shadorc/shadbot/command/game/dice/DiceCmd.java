@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.game.dice;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.exception.CommandException;
@@ -74,7 +75,8 @@ public class DiceCmd extends GameCmd<DiceGame> {
                         .then();
             }
 
-            Utils.requireValidBet(context.getMember(), Integer.toString(diceManager.getBet()));
+            final int bet = Utils.requireValidBet(context.getMember(), Integer.toString(diceManager.getBet()));
+            Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(-bet);
             diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));
             return diceManager.show();
         }

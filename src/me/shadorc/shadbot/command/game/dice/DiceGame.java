@@ -47,17 +47,17 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
                 .map(tuple -> {
-                    int gains = this.bet;
                     if (tuple.getT1().getNumber() == winningNum) {
-                        gains *= this.getPlayers().size() + DiceCmd.MULTIPLIER;
+                        int gains = (int) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER));
                         StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
+                        Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), tuple.getT1().getUserId()).addCoins(gains);
+                        return String.format("**%s** (Gains: **%s**)", tuple.getT2(), FormatUtils.coins(gains));
                     } else {
-                        gains *= -1;
-                        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), Math.abs(gains));
-                        Shadbot.getLottery().addToJackpot(Math.abs(gains));
+                        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), this.bet);
+                        Shadbot.getLottery().addToJackpot(this.bet);
+                        return String.format("**%s** (Losses: **%s**)", tuple.getT2(), this.bet);
                     }
-                    Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), tuple.getT1().getUserId()).addCoins(gains);
-                    return String.format("%s (**%s**)", tuple.getT2(), FormatUtils.coins(gains));
+
                 })
                 .collectList()
                 .map(list -> this.results = String.join("\n", list))
