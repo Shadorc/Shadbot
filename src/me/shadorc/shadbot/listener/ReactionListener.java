@@ -18,7 +18,7 @@ import me.shadorc.shadbot.object.message.TemporaryMessage;
 import me.shadorc.shadbot.utils.StringUtils;
 import reactor.core.publisher.Mono;
 
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
 import java.util.List;
 
 public class ReactionListener {
@@ -54,7 +54,7 @@ public class ReactionListener {
                                 final boolean hasHigherRoles = tuple2.getT2();
 
                                 if (!canManageRoles) {
-                                    return new TemporaryMessage(message.getClient(), message.getChannelId(), 15, ChronoUnit.SECONDS)
+                                    return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
                                             .send(String.format(Emoji.ACCESS_DENIED
                                                             + " I can't add/remove a role due to a lack of permission."
                                                             + "%nPlease, check my permissions to verify that %s is checked.",
@@ -63,7 +63,7 @@ public class ReactionListener {
                                 }
 
                                 if (!hasHigherRoles) {
-                                    return new TemporaryMessage(message.getClient(), message.getChannelId(), 15, ChronoUnit.SECONDS)
+                                    return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
                                             .send(String.format(Emoji.ACCESS_DENIED +
                                                             " I can't add/remove role `%s` because I'm lower in the role hierarchy than this role.",
                                                     role.getName()))
