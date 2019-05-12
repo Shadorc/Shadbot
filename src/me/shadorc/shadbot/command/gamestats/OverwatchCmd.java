@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.gamestats;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.gamestats.overwatch.profile.ProfileResponse;
 import me.shadorc.shadbot.api.gamestats.overwatch.stats.Quickplay;
 import me.shadorc.shadbot.api.gamestats.overwatch.stats.StatsResponse;
@@ -17,7 +16,6 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
@@ -98,10 +96,6 @@ public class OverwatchCmd extends BaseCmd {
                         platformStr, FormatUtils.options(Platform.class))));
 
         final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(OverwatchCmd.getUrl("profile", platform, username)), ProfileResponse.class);
-        // TODO: Remove
-        if (profile.getGames().getQuickplay().isEmpty()) {
-            LogUtils.warn(Shadbot.getClient(), "Overwatch debug: " + profile);
-        }
         if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
             return null;
         }
