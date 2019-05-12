@@ -71,7 +71,7 @@ public class NetUtils {
                 .retryWhen(Retry.onlyIf(err -> ExceptionUtils.isServerAccessError(err.exception()))
                         .exponentialBackoffWithJitter(Duration.ofSeconds(2), Duration.ofSeconds(5))
                         .retryMax(3))
-                .publishOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.elastic())
                 .block();
     }
 
