@@ -116,7 +116,7 @@
         <dependency>
             <groupId>com.discord4j.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>7a94bd5db234ea7ac0a9eae85be0ea6080fbfd6a</version>
+            <version>2dbf4e5661170443b53cb73a39175c1eb5c665fd</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>
