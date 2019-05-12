@@ -76,7 +76,7 @@ public class LotteryCmd extends BaseCmd {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
                                 + "The next draw will take place in **%s**.",
-                        context.getUsername(), num, FormatUtils.customDate(LotteryCmd.getDelay().toMillis())), channel))
+                        context.getUsername(), num, FormatUtils.customDate(LotteryCmd.getDelay())), channel))
                 .then();
     }
 
@@ -88,7 +88,7 @@ public class LotteryCmd extends BaseCmd {
                     embed.setAuthor("Lottery", null, context.getAvatarUrl())
                             .setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
                             .setDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
-                                    FormatUtils.customDate(LotteryCmd.getDelay().toMillis()),
+                                    FormatUtils.customDate(LotteryCmd.getDelay()),
                                     context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
                             .addField("Number of participants", Integer.toString(gamblers.size()), false)
                             .addField("Prize pool", FormatUtils.coins(Shadbot.getLottery().getJackpot()), false);

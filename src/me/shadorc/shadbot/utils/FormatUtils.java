@@ -6,6 +6,7 @@ import discord4j.common.json.EmbedFieldEntity;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
@@ -33,17 +34,17 @@ public class FormatUtils {
     }
 
     /**
-     * @param durationMillis - the duration to format in milliseconds
-     * @return The formatted duration, not null, as X days and Y hours and Z minutes
+     * @param duration - the duration to format
+     * @return The formatted duration, not null, as D days and H hours and S minutes
      */
-    public static String customDate(long durationMillis) {
-        final long minutes = durationMillis / 1000 / 60;
-        final long hours = minutes / 60;
-        final long days = hours / 24;
+    public static String customDate(Duration duration) {
+        final long minutes = duration.toMinutesPart();
+        final long hours = duration.toHoursPart();
+        final long days = duration.toDaysPart();
         return String.format("%s%s%s",
                 days > 0 ? StringUtils.pluralOf(days, "day") + " " : "",
-                hours > 0 ? StringUtils.pluralOf(hours % 24, "hour") + " and " : "",
-                StringUtils.pluralOf(minutes % 60, "minute"));
+                hours > 0 ? StringUtils.pluralOf(hours, "hour") + " and " : "",
+                StringUtils.pluralOf(minutes, "minute"));
     }
 
     public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
