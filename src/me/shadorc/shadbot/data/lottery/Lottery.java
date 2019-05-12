@@ -10,7 +10,7 @@ import reactor.util.annotation.Nullable;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class Lottery {
@@ -18,13 +18,13 @@ public class Lottery {
     @JsonProperty("historic")
     private LotteryHistoric historic;
     @JsonProperty("jackpot")
-    private final AtomicInteger jackpot;
+    private final AtomicLong jackpot;
     @JsonProperty("gamblers")
     private final List<LotteryGambler> gamblers;
 
     public Lottery() {
         this.historic = null;
-        this.jackpot = new AtomicInteger(0);
+        this.jackpot = new AtomicLong(0);
         this.gamblers = new CopyOnWriteArrayList<>();
     }
 
@@ -33,7 +33,7 @@ public class Lottery {
         return this.historic;
     }
 
-    public int getJackpot() {
+    public long getJackpot() {
         return this.jackpot.get();
     }
 
@@ -45,8 +45,8 @@ public class Lottery {
         this.historic = historic;
     }
 
-    public void addToJackpot(int coins) {
-        final int newPool = this.jackpot.get() + (int) Math.ceil(coins / 100f);
+    public void addToJackpot(long coins) {
+        final long newPool = this.jackpot.get() + (int) Math.ceil(coins / 100f);
         this.jackpot.set(NumberUtils.between(newPool, 0, Config.MAX_COINS));
     }
 

@@ -30,7 +30,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(2);
 
-        final int bet = Utils.requireValidBet(context.getMember(), args.get(0));
+        final long bet = Utils.requireValidBet(context.getMember(), args.get(0));
         final String place = args.get(1).toLowerCase();
 
         // Match [1-36], red, black, odd, even, high or low

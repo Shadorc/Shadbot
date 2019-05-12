@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.game.roulette;
 
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
 import me.shadorc.shadbot.core.command.CommandInitializer;
@@ -71,7 +72,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                     }
 
                     if (multiplier > 0) {
-                        final int gains = player.getBet() * multiplier;
+                        final long gains = Math.min(player.getBet() * multiplier, Config.MAX_COINS);
                         StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
                         Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), player.getUserId()).addCoins(gains);
                         return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains));

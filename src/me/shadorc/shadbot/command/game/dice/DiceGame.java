@@ -1,5 +1,6 @@
 package me.shadorc.shadbot.command.game.dice;
 
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
@@ -22,13 +23,13 @@ import java.util.stream.Collectors;
 
 public class DiceGame extends MultiplayerGame<DicePlayer> {
 
-    private final int bet;
+    private final long bet;
     private final UpdateableMessage updateableMessage;
 
     private long startTime;
     private String results;
 
-    public DiceGame(GameCmd<DiceGame> gameCmd, Context context, int bet) {
+    public DiceGame(GameCmd<DiceGame> gameCmd, Context context, long bet) {
         super(gameCmd, context, Duration.ofSeconds(30));
         this.bet = bet;
         this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
@@ -48,7 +49,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
                 .map(tuple -> {
                     if (tuple.getT1().getNumber() == winningNum) {
-                        int gains = (int) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER));
+                        long gains = Math.min((long) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER)), Config.MAX_COINS);
                         StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
                         Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), tuple.getT1().getUserId()).addCoins(gains);
                         return String.format("**%s** (Gains: **%s**)", tuple.getT2(), FormatUtils.coins(gains));
@@ -100,7 +101,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                 .then();
     }
 
-    public int getBet() {
+    public long getBet() {
         return this.bet;
     }
 

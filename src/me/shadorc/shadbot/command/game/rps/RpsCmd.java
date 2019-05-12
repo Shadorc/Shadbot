@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.game.rps;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -53,7 +54,7 @@ public class RpsCmd extends BaseCmd {
         final AtomicInteger userCombo = this.getCombo(context);
         if (userHandsign.isSuperior(botHandsign)) {
             userCombo.incrementAndGet();
-            final int gains = GAINS * userCombo.get();
+            final long gains = Math.min((long) GAINS * userCombo.get(), Config.MAX_COINS);
             strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you won **%d coins** (Win Streak x%d)!",
                     context.getUsername(), gains, userCombo.get()));
             Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains);

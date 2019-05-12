@@ -75,7 +75,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
                         .then();
             }
 
-            final int bet = Utils.requireValidBet(context.getMember(), Integer.toString(diceManager.getBet()));
+            final long bet = Utils.requireValidBet(context.getMember(), Long.toString(diceManager.getBet()));
             Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(-bet);
             diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));
             return diceManager.show();
@@ -87,7 +87,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
                 return Mono.error(new MissingArgumentException());
             }
 
-            final int bet = Utils.requireValidBet(context.getMember(), args.get(1));
+            final long bet = Utils.requireValidBet(context.getMember(), args.get(1));
             final DiceGame diceManager = this.getManagers().computeIfAbsent(context.getChannelId(),
                     ignored -> new DiceGame(this, context, bet));
             diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));

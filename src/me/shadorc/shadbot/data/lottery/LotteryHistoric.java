@@ -8,13 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class LotteryHistoric {
 
     @JsonProperty("jackpot")
-    private final int jackpot;
+    private final long jackpot;
     @JsonProperty("winners_count")
     private final int winnerCount;
     @JsonProperty("number")
     private final int number;
 
-    public LotteryHistoric(int jackpot, int winnerCount, int number) {
+    public LotteryHistoric(long jackpot, int winnerCount, int number) {
         this.jackpot = jackpot;
         this.winnerCount = winnerCount;
         this.number = number;
@@ -24,7 +24,7 @@ public class LotteryHistoric {
         this(0, 0, 0);
     }
 
-    public int getJackpot() {
+    public long getJackpot() {
         return this.jackpot;
     }
 

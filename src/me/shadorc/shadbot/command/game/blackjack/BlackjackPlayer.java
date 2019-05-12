@@ -10,13 +10,13 @@ import reactor.core.publisher.Mono;
 
 public class BlackjackPlayer extends Player {
 
-    private final int bet;
+    private final long bet;
     private final Hand hand;
 
     private boolean isDoubleDown;
     private boolean isStanding;
 
-    public BlackjackPlayer(Snowflake userId, int bet) {
+    public BlackjackPlayer(Snowflake userId, long bet) {
         super(userId);
         this.bet = bet;
         this.hand = new Hand();
@@ -57,7 +57,7 @@ public class BlackjackPlayer extends Player {
                 });
     }
 
-    public int getBet() {
+    public long getBet() {
         return this.bet * (this.isDoubleDown() ? 2 : 1);
     }
 

@@ -4,6 +4,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -150,7 +151,7 @@ public class LotteryCmd extends BaseCmd {
         return Flux.fromIterable(winners)
                 .flatMap(winner -> client.getMemberById(winner.getGuildId(), winner.getUserId()))
                 .flatMap(member -> {
-                    final int coins = (int) Math.ceil((double) Shadbot.getLottery().getJackpot() / winners.size());
+                    final long coins = Math.min(Shadbot.getLottery().getJackpot() / winners.size(), Config.MAX_COINS);
                     Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
                     return member.getPrivateChannel()
                             .cast(MessageChannel.class)

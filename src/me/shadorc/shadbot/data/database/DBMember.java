@@ -40,7 +40,7 @@ public class DBMember {
         return this.coins.get();
     }
 
-    public void addCoins(int gains) {
+    public void addCoins(long gains) {
         this.coins.set(NumberUtils.between(this.getCoins() + gains, 0, Config.MAX_COINS));
     }
 

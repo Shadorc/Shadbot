@@ -23,7 +23,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final int bet = Utils.requireValidBet(context.getMember(), arg);
+        final long bet = Utils.requireValidBet(context.getMember(), arg);
 
         final BlackjackGame blackjackManager = this.getManagers().computeIfAbsent(context.getChannelId(),
                 channelId -> {

@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 public class FormatUtils {
 
-    public static String coins(int coins) {
+    public static String coins(long coins) {
         return String.format("%s coin%s", FormatUtils.number(coins), Math.abs(coins) > 1 ? "s" : "");
     }
 

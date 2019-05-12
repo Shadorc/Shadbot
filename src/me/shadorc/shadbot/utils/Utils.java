@@ -136,12 +136,12 @@ public class Utils {
     /**
      * @param member - the member who bets
      * @param betStr - the string representing the bet
-     * @return An int representing {@code betStr} converted as an int
-     * @throws CommandException - thrown if {@code betStr} cannot be casted to an int
+     * @return A long representing {@code betStr} converted as an int
+     * @throws CommandException - thrown if {@code betStr} cannot be casted to an long
      *                          or if the {@code user} does not have enough coins.
      */
-    public static int requireValidBet(Member member, String betStr) {
-        final Integer bet = NumberUtils.asPositiveInt(betStr);
+    public static long requireValidBet(Member member, String betStr) {
+        final Long bet = NumberUtils.asPositiveLong(betStr);
         if (bet == null) {
             throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
         }

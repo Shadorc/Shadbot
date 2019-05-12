@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
 import discord4j.common.json.EmbedFieldEntity;
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
@@ -84,11 +85,11 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                         result = 1;
                     }
 
-                    int gains = 0;
+                    long gains = 0;
                     final StringBuilder text = new StringBuilder();
                     switch (result) {
                         case 1:
-                            gains += player.getBet() * 2;
+                            gains = Math.min(player.getBet() * 2, Config.MAX_COINS);
                             StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
                             text.append(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));
                             break;
@@ -98,7 +99,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                             text.append(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet())));
                             break;
                         default:
-                            gains += player.getBet();
+                            gains = player.getBet();
                             text.append(String.format("**%s** (Draw)", username));
                             break;
                     }

@@ -5,16 +5,16 @@ import me.shadorc.shadbot.core.game.Player;
 
 public class RoulettePlayer extends Player {
 
-    private final int bet;
+    private final long bet;
     private final String place;
 
-    public RoulettePlayer(Snowflake userId, int bet, String place) {
+    public RoulettePlayer(Snowflake userId, long bet, String place) {
         super(userId);
         this.bet = bet;
         this.place = place;
     }
 
-    public int getBet() {
+    public long getBet() {
         return this.bet;
     }
 
