@@ -50,7 +50,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
         }
 
         this.answers = new ArrayList<>();
-        if (this.trivia.getType().equals("multiple")) {
+        if ("multiple".equals(this.trivia.getType())) {
             this.answers.addAll(this.trivia.getIncorrectAnswers());
             this.answers.add(this.trivia.getCorrectAnswer());
             Collections.shuffle(this.answers);

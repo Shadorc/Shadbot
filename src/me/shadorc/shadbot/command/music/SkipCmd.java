@@ -22,7 +22,7 @@ public class SkipCmd extends BaseCmd {
 
     public SkipCmd() {
         super(CommandCategory.MUSIC, List.of("skip", "next"));
-        this.setRateLimite(new RateLimiter(1, Duration.ofSeconds(1)));
+        this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(1)));
     }
 
     @Override

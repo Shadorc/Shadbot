@@ -11,7 +11,7 @@ public abstract class BaseSetting extends BaseCmd {
     private final Setting setting;
     private final String description;
 
-    public BaseSetting(Setting setting, String description) {
+    protected BaseSetting(Setting setting, String description) {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of(setting.toString()), null);
         this.setting = setting;
         this.description = description;

@@ -33,7 +33,7 @@ public class StatsCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(1, 2);
 
-        if (args.get(0).equalsIgnoreCase("average")) {
+        if ("average".equalsIgnoreCase(args.get(0))) {
             final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getAverageEmbed()
                     .andThen(embed -> embed.setAuthor("Stats: average", null, context.getAvatarUrl()));
 
@@ -46,7 +46,7 @@ public class StatsCmd extends BaseCmd {
                 new CommandException(String.format("`%s` is not a valid category. %s",
                         args.get(0), FormatUtils.options(StatisticEnum.class))));
 
-        Map<String, AtomicLong> map;
+        final Map<String, AtomicLong> map;
         if (args.size() == 1) {
             if (statEnum.getStat() instanceof TableStatistic) {
                 return Mono.error(new CommandException(String.format("You need to specify a valid sub-category.%n%s",

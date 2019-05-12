@@ -13,8 +13,8 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 
 public class PlaylistCmd extends BaseCmd {
@@ -31,14 +31,14 @@ public class PlaylistCmd extends BaseCmd {
         final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor("Playlist", null, context.getAvatarUrl())
                         .setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
-                        .setDescription(this.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist())));
+                        .setDescription(PlaylistCmd.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist())));
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
                 .then();
     }
 
-    private String formatPlaylist(BlockingQueue<AudioTrack> queue) {
+    private static String formatPlaylist(Collection<AudioTrack> queue) {
         if (queue.isEmpty()) {
             return "**The playlist is empty.**";
         }

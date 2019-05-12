@@ -29,7 +29,7 @@ public class ManageCoinsCmd extends BaseCmd {
 
     public ManageCoinsCmd() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("manage_coins", "manage-coins", "managecoins"));
-        this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+        this.setRateLimiter(new RateLimiter(2, Duration.ofSeconds(3)));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ManageCoinsCmd extends BaseCmd {
                         args.get(0), FormatUtils.options(Action.class))));
 
         final Integer coins = NumberUtils.asInt(args.get(1));
-        if (coins == null && !Action.RESET.equals(action)) {
+        if (coins == null && action != Action.RESET) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.",
                     args.get(1))));
         }

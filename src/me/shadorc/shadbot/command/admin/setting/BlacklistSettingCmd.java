@@ -49,8 +49,8 @@ public class BlacklistSettingCmd extends BaseSetting {
         final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
         final List<String> blacklist = dbGuild.getBlacklistedCmd();
 
-        String actionVerbose;
-        if (Action.ADD.equals(action)) {
+        final String actionVerbose;
+        if (action == Action.ADD) {
             blacklist.addAll(commands);
             actionVerbose = "added";
         } else {

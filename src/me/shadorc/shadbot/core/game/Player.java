@@ -18,7 +18,7 @@ public class Player {
     }
 
     public Mono<String> getUsername(DiscordClient client) {
-        return client.getUserById(this.getUserId()).map(User::getUsername);
+        return client.getUserById(this.userId).map(User::getUsername);
     }
 
 }

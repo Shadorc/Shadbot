@@ -12,7 +12,7 @@ public abstract class MultiplayerGame<P extends Player> extends Game {
 
     private final Map<Snowflake, P> players;
 
-    public MultiplayerGame(GameCmd<?> gameCmd, Context context, Duration duration) {
+    protected MultiplayerGame(GameCmd<?> gameCmd, Context context, Duration duration) {
         super(gameCmd, context, duration);
         this.players = new ConcurrentHashMap<>();
     }

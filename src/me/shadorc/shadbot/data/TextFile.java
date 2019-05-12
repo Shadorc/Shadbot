@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class TextFile {
@@ -28,11 +29,11 @@ public class TextFile {
     }
 
     public List<String> getTexts() {
-        return this.texts;
+        return Collections.unmodifiableList(this.texts);
     }
 
     public String getText() {
-        return Utils.randValue(this.getTexts());
+        return Utils.randValue(this.texts);
     }
 
 }

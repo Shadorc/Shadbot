@@ -49,14 +49,14 @@ public class DtcCmd extends BaseCmd {
                             String.format("https://danstonchat.com/%s.html", id),
                             context.getAvatarUrl())
                             .setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-                            .setDescription(FormatUtils.format(content.split("\n"), this::format, "\n"))));
+                            .setDescription(FormatUtils.format(content.split("\n"), DtcCmd::format, "\n"))));
         })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
                 .then();
     }
 
-    private String format(String line) {
+    private static String format(String line) {
         // Set the user name as bold
         if (line.contains(" ")) {
             final int index = line.indexOf(' ');

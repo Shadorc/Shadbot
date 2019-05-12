@@ -46,10 +46,10 @@ public class BlackjackPlayer extends Player {
         return this.getUsername(client)
                 .map(username -> {
                     final StringBuilder name = new StringBuilder(String.format("%s's hand", username));
-                    if (this.isStanding()) {
+                    if (this.isStanding) {
                         name.append(" (Stand)");
                     }
-                    if (this.isDoubleDown()) {
+                    if (this.isDoubleDown) {
                         name.append(" (Double down)");
                     }
 
@@ -58,7 +58,7 @@ public class BlackjackPlayer extends Player {
     }
 
     public long getBet() {
-        return this.bet * (this.isDoubleDown() ? 2 : 1);
+        return this.bet * (this.isDoubleDown ? 2 : 1);
     }
 
     public Hand getHand() {

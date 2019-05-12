@@ -87,7 +87,7 @@ public class WallpaperCmd extends BaseCmd {
                     final boolean isNsfw = tuple.getT2();
 
                     final Purity purity = this.parseEnum(context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
-                    if ((purity.equals(Purity.NSFW) || purity.equals(Purity.SKETCHY)) && !isNsfw) {
+                    if ((purity == Purity.NSFW || purity == Purity.SKETCHY) && !isNsfw) {
                         return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
                     }
 

@@ -40,7 +40,7 @@ public class PlayCmd extends BaseCmd {
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK)
                         .then(DiscordUtils.requireSameVoiceChannel(context))
                         .flatMap(voiceChannelId -> {
-                            String identifier;
+                            final String identifier;
                             // If this is a SoundCloud search...
                             if (arg.startsWith("soundcloud ")) {
                                 identifier = AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");

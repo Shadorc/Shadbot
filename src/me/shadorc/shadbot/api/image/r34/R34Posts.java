@@ -2,6 +2,7 @@ package me.shadorc.shadbot.api.image.r34;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 public class R34Posts {
@@ -12,7 +13,7 @@ public class R34Posts {
     private int count;
 
     public List<R34Post> getPosts() {
-        return this.posts;
+        return Collections.unmodifiableList(this.posts);
     }
 
     public int getCount() {

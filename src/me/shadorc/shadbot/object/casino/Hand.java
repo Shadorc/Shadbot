@@ -40,7 +40,7 @@ public class Hand {
 
         int value = 0;
         for (final Card card : this.cards) {
-            if (card.getValue().equals(Value.ACE)) {
+            if (card.getValue() == Value.ACE) {
                 aceCount++;
             } else {
                 // King, Queen and Jack have a number superior to 10 but their value is 10

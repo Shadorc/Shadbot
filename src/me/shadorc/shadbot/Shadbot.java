@@ -38,6 +38,7 @@ import reactor.core.scheduler.Schedulers;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -141,7 +142,7 @@ public class Shadbot {
      * @return All the shards the bot is connected to
      */
     public static Map<Integer, Shard> getShards() {
-        return SHARDS;
+        return Collections.unmodifiableMap(SHARDS);
     }
 
     public static DiscordClient getClient() {
@@ -179,8 +180,8 @@ public class Shadbot {
     }
 
     private static void installBlockHound() {
-        BlockHound.Builder builder = BlockHound.builder();
-        ServiceLoader<BlockHoundIntegration> serviceLoader = ServiceLoader.load(BlockHoundIntegration.class);
+        final BlockHound.Builder builder = BlockHound.builder();
+        final ServiceLoader<BlockHoundIntegration> serviceLoader = ServiceLoader.load(BlockHoundIntegration.class);
         StreamSupport.stream(serviceLoader.spliterator(), false)
                 .sorted()
                 .forEach(builder::with);

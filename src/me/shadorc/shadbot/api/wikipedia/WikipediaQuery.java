@@ -2,6 +2,7 @@ package me.shadorc.shadbot.api.wikipedia;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class WikipediaQuery {
@@ -10,7 +11,7 @@ public class WikipediaQuery {
     private Map<String, WikipediaPage> pages;
 
     public Map<String, WikipediaPage> getPages() {
-        return this.pages;
+        return Collections.unmodifiableMap(this.pages);
     }
 
 }

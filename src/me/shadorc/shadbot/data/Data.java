@@ -20,7 +20,7 @@ public abstract class Data {
 
     private final File file;
 
-    public Data(String fileName, Duration initialDelay, Duration period) {
+    protected Data(String fileName, Duration initialDelay, Duration period) {
         this.file = new File(SAVE_DIR, fileName);
 
         if (!SAVE_DIR.exists() && !SAVE_DIR.mkdir()) {
@@ -35,7 +35,7 @@ public abstract class Data {
     public abstract Object getData();
 
     public void write() throws IOException {
-        try (BufferedWriter writer = Files.newBufferedWriter(this.getFile().toPath())) {
+        try (final BufferedWriter writer = Files.newBufferedWriter(this.file.toPath())) {
             writer.write(Utils.MAPPER.writeValueAsString(this.getData()));
         }
     }
@@ -43,9 +43,9 @@ public abstract class Data {
     public void save() {
         try {
             this.write();
-            LogUtils.info("%s saved.", this.getFile().getName());
+            LogUtils.info("%s saved.", this.file.getName());
         } catch (final IOException err) {
-            LogUtils.error(err, String.format("An error occurred while saving %s.", this.getFile().getName()));
+            LogUtils.error(err, String.format("An error occurred while saving %s.", this.file.getName()));
         }
     }
 

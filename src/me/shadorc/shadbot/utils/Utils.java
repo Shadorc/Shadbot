@@ -72,12 +72,12 @@ public class Utils {
             final Attribute att = (Attribute) list.get(0);
             final Double value = (Double) att.getValue();
 
-            if (value == -1.0) {
+            if (value < 0) {
                 return Double.NaN;
             }
 
-            cpuLoad = value * 100d;
-        } catch (InstanceNotFoundException | ReflectionException | MalformedObjectNameException err) {
+            cpuLoad = value * 100.0d;
+        } catch (final InstanceNotFoundException | ReflectionException | MalformedObjectNameException err) {
             cpuLoad = Double.NaN;
         }
 

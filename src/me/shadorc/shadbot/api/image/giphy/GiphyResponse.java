@@ -2,6 +2,7 @@ package me.shadorc.shadbot.api.image.giphy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 public class GiphyResponse {
@@ -10,7 +11,7 @@ public class GiphyResponse {
     private List<GiphyGif> gifs;
 
     public List<GiphyGif> getGifs() {
-        return this.gifs;
+        return Collections.unmodifiableList(this.gifs);
     }
 
 }

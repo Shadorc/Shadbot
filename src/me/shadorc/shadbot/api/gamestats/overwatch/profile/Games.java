@@ -23,7 +23,7 @@ public class Games {
     @Override
     public String toString() {
         return "Games{" +
-                "quickplay=" + quickplay +
+                "quickplay=" + this.quickplay +
                 '}';
     }
 }

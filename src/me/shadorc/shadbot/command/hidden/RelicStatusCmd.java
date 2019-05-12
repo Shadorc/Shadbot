@@ -17,8 +17,8 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class RelicStatusCmd extends BaseCmd {
@@ -46,10 +46,10 @@ public class RelicStatusCmd extends BaseCmd {
 
                     relic.getGuildId().ifPresent(guildId -> contentBld.append(String.format("%n**Guild ID:** %d", guildId.asLong())));
 
-                    contentBld.append(String.format("%n**Duration:** %d days", TimeUnit.MILLISECONDS.toDays(relic.getDuration())));
-                    if (!relic.isExpired() && relic.getActivationTime().isPresent()) {
-                        final long millisLeft = relic.getDuration() - TimeUtils.getMillisUntil(relic.getActivationTime().getAsLong());
-                        contentBld.append(String.format("%n**Expires in:** %d days", TimeUnit.MILLISECONDS.toDays(millisLeft)));
+                    contentBld.append(String.format("%n**Duration:** %d days", relic.getDuration().toDays()));
+                    if (!relic.isExpired() && relic.getActivationInstant().isPresent()) {
+                        final Duration durationLeft = relic.getDuration().minusMillis(TimeUtils.getMillisUntil(relic.getActivationInstant().get().toEpochMilli()));
+                        contentBld.append(String.format("%n**Expires in:** %d days", durationLeft.toDays()));
                     }
 
                     final StringBuilder titleBld = new StringBuilder();

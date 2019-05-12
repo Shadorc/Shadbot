@@ -25,7 +25,6 @@ public class TrackEventListener extends AudioEventAdapter {
     private final AtomicInteger errorCount;
 
     public TrackEventListener(Snowflake guildId) {
-        super();
         this.guildId = guildId;
         this.errorCount = new AtomicInteger(0);
     }

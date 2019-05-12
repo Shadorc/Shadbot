@@ -49,7 +49,7 @@ public class AutoMessageSetting extends BaseSetting {
 
         switch (type) {
             case CHANNEL:
-                return this.channel(context, action).then();
+                return AutoMessageSetting.channel(context, action).then();
             case JOIN_MESSAGE:
                 return this.updateMessage(context, Setting.JOIN_MESSAGE, action, args).then();
             case LEAVE_MESSAGE:
@@ -59,7 +59,7 @@ public class AutoMessageSetting extends BaseSetting {
         }
     }
 
-    private Mono<Message> channel(Context context, Action action) {
+    private static Mono<Message> channel(Context context, Action action) {
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractChannels(guild, context.getContent()))
                 .flatMap(channelId -> context.getClient().getChannelById(channelId))
@@ -71,7 +71,7 @@ public class AutoMessageSetting extends BaseSetting {
 
                     final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
                     final Channel channel = mentionedChannels.get(0);
-                    if (Action.ENABLE.equals(action)) {
+                    if (action == Action.ENABLE) {
                         dbGuild.setSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong());
                         return String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
                                 channel.getMention());
@@ -88,7 +88,7 @@ public class AutoMessageSetting extends BaseSetting {
     private Mono<Message> updateMessage(Context context, Setting setting, Action action, List<String> args) {
         final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
         final StringBuilder strBuilder = new StringBuilder();
-        if (Action.ENABLE.equals(action)) {
+        if (action == Action.ENABLE) {
             if (args.size() < 4) {
                 return Mono.error(new MissingArgumentException());
             }

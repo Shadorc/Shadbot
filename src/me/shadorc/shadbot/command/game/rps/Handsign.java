@@ -24,9 +24,9 @@ public enum Handsign {
     }
 
     public boolean isSuperior(Handsign other) {
-        return this.equals(Handsign.ROCK) && other.equals(Handsign.SCISSORS)
-                || this.equals(Handsign.PAPER) && other.equals(Handsign.ROCK)
-                || this.equals(Handsign.SCISSORS) && other.equals(Handsign.PAPER);
+        return this == Handsign.ROCK && other == Handsign.SCISSORS
+                || this == Handsign.PAPER && other == Handsign.ROCK
+                || this == Handsign.SCISSORS && other == Handsign.PAPER;
     }
 
 }

@@ -13,7 +13,7 @@ public abstract class Statistic<E extends Enum<E>> {
     private final String fileName;
     private final Class<E> enumClass;
 
-    public Statistic(String fileName, Class<E> enumClass) {
+    protected Statistic(String fileName, Class<E> enumClass) {
         this.fileName = fileName;
         this.enumClass = enumClass;
     }
@@ -25,7 +25,7 @@ public abstract class Statistic<E extends Enum<E>> {
                 || !this.getFile().exists() && !this.getFile().createNewFile()) {
             throw new IOException("The folder or the file could not be created.");
         }
-        try (BufferedWriter writer = Files.newBufferedWriter(this.getFile().toPath())) {
+        try (final BufferedWriter writer = Files.newBufferedWriter(this.getFile().toPath())) {
             writer.write(Utils.MAPPER.writeValueAsString(this.getData()));
         }
     }

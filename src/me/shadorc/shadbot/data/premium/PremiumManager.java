@@ -10,6 +10,7 @@ import reactor.util.annotation.Nullable;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -82,7 +83,7 @@ public class PremiumManager extends Data {
 
     @Override
     public Object getData() {
-        return this.relics;
+        return Collections.unmodifiableList(this.relics);
     }
 
 }

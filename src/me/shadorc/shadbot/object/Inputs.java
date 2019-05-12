@@ -13,12 +13,12 @@ public abstract class Inputs {
     private final DiscordClient client;
     private final Duration timeout;
 
-    public Inputs(DiscordClient client, Duration timeout) {
+    protected Inputs(DiscordClient client, Duration timeout) {
         this.client = client;
         this.timeout = timeout;
     }
 
-    public final Flux<Void> waitForInputs() {
+    public Flux<Void> waitForInputs() {
         return this.client.getEventDispatcher()
                 .on(MessageCreateEvent.class)
                 .takeWhile(this::takeEventWile)
@@ -27,7 +27,7 @@ public abstract class Inputs {
                 .take(this.timeout);
     }
 
-    public final void subscribe() {
+    public void subscribe() {
         this.waitForInputs()
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(this.client, err))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));

@@ -27,7 +27,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -38,9 +38,9 @@ public class SettingsCmd extends BaseCmd {
 
     public SettingsCmd() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("setting", "settings"));
-        this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+        this.setRateLimiter(new RateLimiter(2, Duration.ofSeconds(3)));
 
-        this.settingsMap = new HashMap<>();
+        this.settingsMap = new EnumMap<>(Setting.class);
         this.add(new AllowedChannelsSetting(), new AllowedRolesSetting(), new AutoMessageSetting(),
                 new AutoRolesSetting(), new BlacklistSettingCmd(), new NSFWSetting(), new PrefixSetting(),
                 new VolumeSetting());
@@ -60,7 +60,7 @@ public class SettingsCmd extends BaseCmd {
         final List<String> args = context.requireArgs(1, Integer.MAX_VALUE);
 
         if ("show".equals(args.get(0))) {
-            return this.show(context)
+            return SettingsCmd.show(context)
                     .flatMap(embed -> context.getChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                     .then();
@@ -76,7 +76,7 @@ public class SettingsCmd extends BaseCmd {
         final String arg = args.size() == 2 ? args.get(1) : null;
         if ("help".equals(arg)) {
             return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(this.getHelp(context, setting), channel))
+                    .flatMap(channel -> DiscordUtils.sendMessage(SettingsCmd.getHelp(context, setting), channel))
                     .then();
         }
 
@@ -84,11 +84,11 @@ public class SettingsCmd extends BaseCmd {
                 .onErrorResume(MissingArgumentException.class,
                         err -> context.getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
-                                        Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", this.getHelp(context, setting), channel))
+                                        Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", SettingsCmd.getHelp(context, setting), channel))
                                 .then());
     }
 
-    private Mono<Consumer<EmbedCreateSpec>> show(Context context) {
+    private static Mono<Consumer<EmbedCreateSpec>> show(Context context) {
         final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
         final StringBuilder settingsStr = new StringBuilder();
 
@@ -154,7 +154,7 @@ public class SettingsCmd extends BaseCmd {
                                         settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString())));
     }
 
-    private Consumer<EmbedCreateSpec> getHelp(Context context, BaseSetting setting) {
+    private static Consumer<EmbedCreateSpec> getHelp(Context context, BaseSetting setting) {
         return setting.getHelp(context)
                 .andThen(embed -> embed.setAuthor(String.format("Help for setting: %s", setting.getName()), null, context.getAvatarUrl())
                         .setDescription(String.format("**%s**", setting.getDescription())));

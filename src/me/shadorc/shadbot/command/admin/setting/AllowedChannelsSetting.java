@@ -57,7 +57,7 @@ public class AllowedChannelsSetting extends BaseSetting {
                             .collect(Collectors.toList());
 
                     final StringBuilder strBuilder = new StringBuilder();
-                    if (Action.ADD.equals(action)) {
+                    if (action == Action.ADD) {
                         if (allowedTextChannels.isEmpty()
                                 && mentionedChannelIds.stream().noneMatch(channelId -> channelId.equals(context.getChannelId().asLong()))) {
                             strBuilder.append(Emoji.WARNING + " You did not mentioned this channel. "
@@ -66,9 +66,9 @@ public class AllowedChannelsSetting extends BaseSetting {
 
                         for (final Channel channel : mentionedChannels) {
                             final long channelId = channel.getId().asLong();
-                            if (channel.getType().equals(Type.GUILD_TEXT) && !allowedTextChannels.contains(channelId)) {
+                            if (channel.getType() == Type.GUILD_TEXT && !allowedTextChannels.contains(channelId)) {
                                 allowedTextChannels.add(channelId);
-                            } else if (channel.getType().equals(Type.GUILD_VOICE) && !allowedVoiceChannels.contains(channelId)) {
+                            } else if (channel.getType() == Type.GUILD_VOICE && !allowedVoiceChannels.contains(channelId)) {
                                 allowedVoiceChannels.add(channelId);
                             }
                         }

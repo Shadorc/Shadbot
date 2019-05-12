@@ -41,11 +41,11 @@ public class RepeatCmd extends BaseCmd {
                     }
 
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
-                    scheduler.setRepeatMode(scheduler.getRepeatMode().equals(mode) ? RepeatMode.NONE : mode);
+                    scheduler.setRepeatMode(scheduler.getRepeatMode() == mode ? RepeatMode.NONE : mode);
 
-                    final Emoji emoji = scheduler.getRepeatMode().equals(RepeatMode.NONE) ? Emoji.PLAY : Emoji.REPEAT;
-                    final String playlistRepetition = RepeatMode.PLAYLIST.equals(mode) ? "Playlist " : "";
-                    final String modeStr = scheduler.getRepeatMode().equals(RepeatMode.NONE) ? "disabled" : "enabled";
+                    final Emoji emoji = scheduler.getRepeatMode() == RepeatMode.NONE ? Emoji.PLAY : Emoji.REPEAT;
+                    final String playlistRepetition = mode == RepeatMode.PLAYLIST ? "Playlist " : "";
+                    final String modeStr = scheduler.getRepeatMode() == RepeatMode.NONE ? "disabled" : "enabled";
 
                     return String.format("%s %sRepetition %s by **%s**.", emoji, playlistRepetition, modeStr, context.getUsername());
                 })

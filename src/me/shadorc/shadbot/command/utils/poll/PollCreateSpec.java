@@ -4,6 +4,7 @@ import discord4j.core.object.reaction.ReactionEmoji;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 public class PollCreateSpec {
@@ -27,11 +28,11 @@ public class PollCreateSpec {
     }
 
     public Map<String, ReactionEmoji> getChoices() {
-        return this.choices;
+        return Collections.unmodifiableMap(this.choices);
     }
 
     public Collection<ReactionEmoji> getReactions() {
-        return this.getChoices().values();
+        return this.choices.values();
     }
 
 }

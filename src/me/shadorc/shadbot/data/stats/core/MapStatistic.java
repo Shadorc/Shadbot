@@ -5,6 +5,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -32,7 +33,7 @@ public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
     }
 
     public Map<String, AtomicLong> getMap() {
-        return this.map;
+        return Collections.unmodifiableMap(this.map);
     }
 
     public AtomicLong getValue(String key) {
@@ -41,7 +42,7 @@ public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
 
     @Override
     public Object getData() {
-        return this.map;
+        return Collections.unmodifiableMap(this.map);
     }
 
 }

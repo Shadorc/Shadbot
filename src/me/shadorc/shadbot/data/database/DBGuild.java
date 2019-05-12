@@ -40,7 +40,7 @@ public class DBGuild {
     }
 
     public List<DBMember> getMembers() {
-        return this.members;
+        return Collections.unmodifiableList(this.members);
     }
 
     public List<Long> getAllowedTextChannels() {

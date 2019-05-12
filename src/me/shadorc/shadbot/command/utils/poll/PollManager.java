@@ -44,12 +44,12 @@ public class PollManager {
     public void start() {
         this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration());
         this.show()
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.context.getClient(), err));
     }
 
     public void stop() {
         this.cancelScheduledTask();
-        this.pollCmd.getManagers().remove(this.getContext().getChannelId());
+        this.pollCmd.getManagers().remove(this.context.getChannelId());
     }
 
     private Mono<Void> show() {
@@ -59,8 +59,8 @@ public class PollManager {
         }
 
         final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor(String.format("Poll by %s", this.getContext().getUsername()),
-                        null, this.getContext().getAvatarUrl())
+                .andThen(embed -> embed.setAuthor(String.format("Poll by %s", this.context.getUsername()),
+                        null, this.context.getAvatarUrl())
                         .setDescription(String.format("Vote by clicking on the corresponding number.%n%n__**%s**__%s",
                                 this.spec.getQuestion(), representation.toString()))
                         .setFooter(String.format("You have %s to vote.",
@@ -70,7 +70,7 @@ public class PollManager {
         return this.voteMessage.send(embedConsumer)
                 .flatMap(message -> Mono.delay(this.spec.getDuration(), Schedulers.elastic())
                         .thenReturn(message.getId()))
-                .flatMap(messageId -> this.getContext().getClient().getMessageById(this.getContext().getChannelId(), messageId))
+                .flatMap(messageId -> this.context.getClient().getMessageById(this.context.getChannelId(), messageId))
                 .map(Message::getReactions)
                 .flatMap(this::sendResults)
                 .then();
@@ -80,7 +80,7 @@ public class PollManager {
         this.cancelScheduledTask();
         this.scheduledTask = Mono.delay(duration, Schedulers.elastic())
                 .then(mono)
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.context.getClient(), err));
     }
 
     private void cancelScheduledTask() {
@@ -111,11 +111,11 @@ public class PollManager {
         }
 
         final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor(String.format("Poll results (Author: %s)", this.getContext().getUsername()),
-                        null, this.getContext().getAvatarUrl())
+                .andThen(embed -> embed.setAuthor(String.format("Poll results (Author: %s)", this.context.getUsername()),
+                        null, this.context.getAvatarUrl())
                         .setDescription(String.format("__**%s**__%s", this.spec.getQuestion(), representation.toString())));
 
-        return this.getContext().getChannel()
+        return this.context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel));
     }
 

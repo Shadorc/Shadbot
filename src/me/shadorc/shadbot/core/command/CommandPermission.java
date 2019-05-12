@@ -17,6 +17,6 @@ public enum CommandPermission {
     }
 
     public boolean isHigher(CommandPermission perm) {
-        return this.getHierarchy() > perm.getHierarchy();
+        return this.hierarchy > perm.getHierarchy();
     }
 }

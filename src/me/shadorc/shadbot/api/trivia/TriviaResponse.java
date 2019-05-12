@@ -2,6 +2,7 @@ package me.shadorc.shadbot.api.trivia;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 public class TriviaResponse {
@@ -16,7 +17,7 @@ public class TriviaResponse {
     }
 
     public List<TriviaResult> getResults() {
-        return this.results;
+        return Collections.unmodifiableList(this.results);
     }
 
 }

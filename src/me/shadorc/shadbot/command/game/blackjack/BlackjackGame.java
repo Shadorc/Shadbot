@@ -153,7 +153,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
         return super.addPlayerIfAbsent(player);
     }
 
-    public boolean allPlayersStanding() {
+    public boolean areAllPlayersStanding() {
         return this.getPlayers().values().stream().allMatch(BlackjackPlayer::isStanding);
     }
 

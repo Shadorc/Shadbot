@@ -61,7 +61,7 @@ public class LyricsCmd extends BaseCmd {
                 search = info.title.replaceAll("(?i)official|video|music|\\[|]|\\(|\\)", "");
             }
 
-            final String url = this.getCorrectedUrl(search);
+            final String url = LyricsCmd.getCorrectedUrl(search);
             if (url == null) {
                 return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
                         context.getUsername(), search));
@@ -102,7 +102,7 @@ public class LyricsCmd extends BaseCmd {
         return response.parse();
     }
 
-    private String getCorrectedUrl(String search) throws IOException {
+    private static String getCorrectedUrl(String search) throws IOException {
         final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
 
         // Make a search request on the site

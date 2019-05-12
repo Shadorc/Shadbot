@@ -20,7 +20,7 @@ public class Credentials {
             throw new RuntimeException(String.format("%s file is missing.", CREDENTIALS_FILE.getName()));
         }
 
-        try (BufferedReader reader = Files.newBufferedReader(CREDENTIALS_FILE.toPath())) {
+        try (final BufferedReader reader = Files.newBufferedReader(CREDENTIALS_FILE.toPath())) {
             CREDENTIALS_PROPERTIES.load(reader);
         } catch (final IOException e) {
             throw new RuntimeException(String.format("An error occurred while loading %s file.", CREDENTIALS_FILE.getName()));
@@ -29,7 +29,7 @@ public class Credentials {
         // Check if all API keys are present
         for (final Credential key : Credential.values()) {
             if (Credentials.get(key) == null) {
-                LOGGER.warn("Property {} not found, the associated command / service may not work properly.", key.toString());
+                LOGGER.warn("Property {} not found, the associated command / service may not work properly.", key);
             }
         }
     }

@@ -46,7 +46,7 @@ public class HelpCmd extends BaseCmd {
                         .distinct()
                         .filter(cmd -> !cmd.getPermission().isHigher(authorPerm))
                         .filterWhen(cmd -> context.getChannel().map(Channel::getType)
-                                .map(type -> type.equals(Type.DM) || Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd)))
+                                .map(type -> type == Type.DM || Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd)))
                         .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
                 .map(map -> EmbedUtils.getDefaultEmbed()
                         .andThen(embed -> {
@@ -57,7 +57,7 @@ public class HelpCmd extends BaseCmd {
                                             Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
 
                             for (final CommandCategory category : CommandCategory.values()) {
-                                if (map.get(category) != null && !map.get(category).isEmpty() && !category.equals(CommandCategory.HIDDEN)) {
+                                if (map.get(category) != null && !map.get(category).isEmpty() && category != CommandCategory.HIDDEN) {
                                     embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
                                 }
                             }

@@ -40,12 +40,13 @@ import me.shadorc.shadbot.command.utils.*;
 import me.shadorc.shadbot.command.utils.poll.PollCmd;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class CommandInitializer {
 
-    private final static Map<String, BaseCmd> COMMANDS_MAP = new LinkedHashMap<>();
+    private static final Map<String, BaseCmd> COMMANDS_MAP = new LinkedHashMap<>();
 
     public static void initialize() {
         CommandInitializer.add(
@@ -98,7 +99,7 @@ public class CommandInitializer {
     }
 
     public static Map<String, BaseCmd> getCommands() {
-        return COMMANDS_MAP;
+        return Collections.unmodifiableMap(COMMANDS_MAP);
     }
 
     public static BaseCmd getCommand(String name) {

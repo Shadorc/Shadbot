@@ -62,14 +62,14 @@ public class ProfileResponse {
     @Override
     public String toString() {
         return "ProfileResponse{" +
-                "message='" + message + '\'' +
-                ", username='" + username + '\'' +
-                ", level=" + level +
-                ", portrait='" + portrait + '\'' +
-                ", isPrivate=" + isPrivate +
-                ", games=" + games +
-                ", playtime=" + playtime +
-                ", competitive=" + competitive +
+                "message='" + this.message + '\'' +
+                ", username='" + this.username + '\'' +
+                ", level=" + this.level +
+                ", portrait='" + this.portrait + '\'' +
+                ", isPrivate=" + this.isPrivate +
+                ", games=" + this.games +
+                ", playtime=" + this.playtime +
+                ", competitive=" + this.competitive +
                 '}';
     }
 }

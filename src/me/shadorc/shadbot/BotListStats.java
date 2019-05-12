@@ -42,7 +42,7 @@ public class BotListStats {
                 .then(Mono.fromRunnable(() -> LogUtils.info("Statistics posted.")));
     }
 
-    private Mono<Document> post(String url, String authorization, JSONObject content) {
+    private static Mono<Document> post(String url, String authorization, JSONObject content) {
         return Mono.fromCallable(() -> Jsoup.connect(url)
                 .ignoreContentType(true)
                 .requestBody(content.toString())
@@ -60,7 +60,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://api.botlist.space/v1/bots/%d", this.selfId);
-        return this.post(url, Credentials.get(Credential.BOT_LIST_DOT_SPACE), content);
+        return BotListStats.post(url, Credentials.get(Credential.BOT_LIST_DOT_SPACE), content);
     }
 
     /**
@@ -71,7 +71,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
         final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", this.selfId);
-        return this.post(url, Credentials.get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
+        return BotListStats.post(url, Credentials.get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
     }
 
     /**
@@ -82,7 +82,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://divinediscordbots.com/bot/%d/stats", this.selfId);
-        return this.post(url, Credentials.get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
+        return BotListStats.post(url, Credentials.get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
     }
 
     /**
@@ -97,7 +97,7 @@ public class BotListStats {
                             .put("shard_id", client.getConfig().getShardIndex())
                             .put("guilds ", guildCount);
                     final String url = String.format("https://discordbotlist.com/api/bots/%d/stats", this.selfId);
-                    return this.post(url, String.format("Bot %s", Credentials.get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
+                    return BotListStats.post(url, String.format("Bot %s", Credentials.get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
                 })
                 .then();
     }
@@ -115,7 +115,7 @@ public class BotListStats {
                             .put("shardCount", client.getConfig().getShardCount())
                             .put("guildCount", (int) (guildCount / client.getConfig().getShardCount()));
                     final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", this.selfId);
-                    return this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
+                    return BotListStats.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
                 })
                 .then();
     }
@@ -133,7 +133,7 @@ public class BotListStats {
                             .put("shard_count", client.getConfig().getShardCount())
                             .put("server_count", (int) (guildCount / client.getConfig().getShardCount()));
                     final String url = String.format("https://discordbots.org/api/bots/%d/stats", this.selfId);
-                    return this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
+                    return BotListStats.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
                 })
                 .then();
     }

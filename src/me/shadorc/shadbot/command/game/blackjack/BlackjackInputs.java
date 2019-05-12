@@ -83,7 +83,7 @@ public class BlackjackInputs extends Inputs {
 
                     action.accept(player);
 
-                    if (this.game.allPlayersStanding()) {
+                    if (this.game.areAllPlayersStanding()) {
                         return this.game.end();
                     }
                     return this.game.show();

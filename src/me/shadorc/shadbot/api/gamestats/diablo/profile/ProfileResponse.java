@@ -3,6 +3,7 @@ package me.shadorc.shadbot.api.gamestats.diablo.profile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import reactor.util.annotation.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,7 +56,7 @@ public class ProfileResponse {
     }
 
     public List<HeroId> getHeroeIds() {
-        return this.heroeIds;
+        return Collections.unmodifiableList(this.heroeIds);
     }
 
 }

@@ -43,7 +43,7 @@ public class GuildMusicConnection {
      * Requests to join a voice channel.
      */
     public Mono<Void> joinVoiceChannel(Snowflake voiceChannelId, AudioProvider audioProvider) {
-        if (!this.state.equals(State.DISCONNECTED)) {
+        if (this.state != State.DISCONNECTED) {
             return Mono.empty();
         }
 

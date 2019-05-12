@@ -39,9 +39,9 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                 new CommandException(String.format("`%s` is not a valid difficulty. %s",
                         context.getArg().orElse(""), FormatUtils.options(Difficulty.class))));
 
-        if (difficulty.equals(Difficulty.EASY) && !this.easyWords.isLoaded()) {
+        if (difficulty == Difficulty.EASY && !this.easyWords.isLoaded()) {
             this.easyWords.load();
-        } else if (difficulty.equals(Difficulty.HARD) && !this.hardWords.isLoaded()) {
+        } else if (difficulty == Difficulty.HARD && !this.hardWords.isLoaded()) {
             this.hardWords.load();
         }
 

@@ -2,6 +2,7 @@ package me.shadorc.shadbot.api.urbandictionary;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 public class UrbanDictionaryResponse {
@@ -10,7 +11,7 @@ public class UrbanDictionaryResponse {
     private List<UrbanDefinition> definitions;
 
     public List<UrbanDefinition> getDefinitions() {
-        return this.definitions;
+        return Collections.unmodifiableList(this.definitions);
     }
 
 }

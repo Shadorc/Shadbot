@@ -2,6 +2,7 @@ package me.shadorc.shadbot.api.gamestats.steam.player;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 public class PlayerSummaries {
@@ -10,7 +11,7 @@ public class PlayerSummaries {
     private List<PlayerSummary> players;
 
     public List<PlayerSummary> getPlayers() {
-        return this.players;
+        return Collections.unmodifiableList(this.players);
     }
 
 }

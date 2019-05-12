@@ -64,7 +64,7 @@ public class WeatherCmd extends BaseCmd {
             final Main main = currentWeather.getMainData();
 
             final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
-            final String windDesc = this.getWindDesc(windSpeed);
+            final String windDesc = WeatherCmd.getWindDesc(windSpeed);
             final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ? String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
             final String countryCode = currentWeather.getSystemData().getCountryCode();
 
@@ -97,7 +97,7 @@ public class WeatherCmd extends BaseCmd {
                 .then();
     }
 
-    private String getWindDesc(double windSpeed) {
+    private static String getWindDesc(double windSpeed) {
         if (windSpeed < 1) {
             return "Calm";
         } else if (NumberUtils.isInRange(windSpeed, 1, 6)) {

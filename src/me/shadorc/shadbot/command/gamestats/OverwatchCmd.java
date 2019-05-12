@@ -44,7 +44,7 @@ public class OverwatchCmd extends BaseCmd {
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
         return Mono.fromCallable(() -> {
             final Tuple3<Platform, ProfileResponse, StatsResponse> response =
-                    args.size() == 1 ? this.getResponse(args.get(0)) : this.getResponse(args.get(0), args.get(1));
+                    args.size() == 1 ? OverwatchCmd.getResponse(args.get(0)) : OverwatchCmd.getResponse(args.get(0), args.get(1));
 
             if (response == null) {
                 return loadingMsg.setContent(
@@ -79,9 +79,9 @@ public class OverwatchCmd extends BaseCmd {
                 .then();
     }
 
-    private Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String battletag) throws IOException {
+    private static Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String battletag) throws IOException {
         for (final Platform platform : Platform.values()) {
-            final Tuple3<Platform, ProfileResponse, StatsResponse> response = this.getResponse(platform.toString(), battletag);
+            final Tuple3<Platform, ProfileResponse, StatsResponse> response = OverwatchCmd.getResponse(platform.toString(), battletag);
             if (response != null) {
                 return response;
             }
@@ -91,25 +91,25 @@ public class OverwatchCmd extends BaseCmd {
                 FormatUtils.options(Platform.class)));
     }
 
-    private Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String platformStr, String battletag) throws IOException {
+    private static Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String platformStr, String battletag) throws IOException {
         final String username = battletag.replace("#", "-");
         final Platform platform = Utils.parseEnum(Platform.class, platformStr,
                 new CommandException(String.format("`%s` is not a valid Platform. %s",
                         platformStr, FormatUtils.options(Platform.class))));
 
-        final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("profile", platform, username)), ProfileResponse.class);
+        final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(OverwatchCmd.getUrl("profile", platform, username)), ProfileResponse.class);
         // TODO: Remove
         if (profile.getGames().getQuickplay().isEmpty()) {
-            LogUtils.warn(Shadbot.getClient(), "Overwatch debug: " + profile.toString());
+            LogUtils.warn(Shadbot.getClient(), "Overwatch debug: " + profile);
         }
         if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
             return null;
         }
-        final StatsResponse stats = Utils.MAPPER.readValue(NetUtils.getJSON(this.getUrl("stats", platform, username)), StatsResponse.class);
+        final StatsResponse stats = Utils.MAPPER.readValue(NetUtils.getJSON(OverwatchCmd.getUrl("stats", platform, username)), StatsResponse.class);
         return Tuples.of(platform, profile, stats);
     }
 
-    private String getUrl(String endpoint, Platform platform, String username) {
+    private static String getUrl(String endpoint, Platform platform, String username) {
         return String.format("http://overwatchy.com/%s/%s/global/%s",
                 endpoint, StringUtils.toLowerCase(platform), username);
     }

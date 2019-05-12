@@ -8,6 +8,8 @@ import me.shadorc.shadbot.data.TextFile;
 import me.shadorc.shadbot.object.Emoji;
 import org.jsoup.Jsoup;
 
+import java.util.List;
+
 public class TextUtils {
 
     public static final String NOT_ENOUGH_COINS =
@@ -19,10 +21,10 @@ public class TextUtils {
 
     public static final TextFile SPAMS = new TextFile("texts/spam.txt");
 
-    public static final String[] TIP_MESSAGES = {String.format("Check %slottery", Config.DEFAULT_PREFIX),
+    public static final List<String> TIP_MESSAGES = List.of(String.format("Check %slottery", Config.DEFAULT_PREFIX),
             String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
             String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
-            String.format("Support server: %s", Config.SUPPORT_SERVER_URL)};
+            String.format("Support server: %s", Config.SUPPORT_SERVER_URL));
 
     /**
      * @param err - the exception containing the error message to clean

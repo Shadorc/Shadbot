@@ -100,7 +100,7 @@ public class LotteryCmd extends BaseCmd {
 
                     final LotteryHistoric historic = Shadbot.getLottery().getHistoric();
                     if (historic != null) {
-                        String people;
+                        final String people;
                         switch (historic.getWinnerCount()) {
                             case 0:
                                 people = "nobody";

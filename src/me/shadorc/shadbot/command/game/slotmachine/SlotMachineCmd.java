@@ -31,7 +31,7 @@ public class SlotMachineCmd extends BaseCmd {
         this.setGameRateLimiter();
     }
 
-    private List<SlotOptions> randSlots() {
+    private static List<SlotOptions> randSlots() {
         // Pseudo-random number between 0 and 100 inclusive
         final int rand = ThreadLocalRandom.current().nextInt(100 + 1);
         if (rand == 0) {
@@ -63,7 +63,7 @@ public class SlotMachineCmd extends BaseCmd {
 
         final AtomicInteger gains = new AtomicInteger(-PAID_COST);
 
-        final List<SlotOptions> slots = this.randSlots();
+        final List<SlotOptions> slots = SlotMachineCmd.randSlots();
         if (slots.stream().distinct().count() == 1) {
             final int slotGains = slots.get(0).getGains();
             gains.set(ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),

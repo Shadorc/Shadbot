@@ -14,11 +14,7 @@ import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +30,6 @@ public class MusicManager {
     static {
         AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         AudioSourceManagers.registerRemoteSources(AUDIO_PLAYER_MANAGER);
-        //MusicManager.startWatcher();
     }
 
     /**
@@ -94,26 +89,6 @@ public class MusicManager {
         if (guildMusicConnection != null) {
             guildMusicConnection.leaveVoiceChannel();
         }
-    }
-
-    private static void startWatcher() {
-        Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), Schedulers.elastic())
-                .doOnNext(ignored -> {
-                    List<Snowflake> diffList = new ArrayList<>(MusicManager.getGuildIdsWithVoice());
-                    diffList.removeAll(MusicManager.getGuildIdsWithGuildMusics());
-                    if (!diffList.isEmpty()) {
-                        LogUtils.warn(Shadbot.getClient(), String.format("Voice desynchronization detected: %s", diffList.toString()));
-                        for (Snowflake guildId : diffList) {
-                            GUILD_DISPOSABLES.get(guildId).dispose();
-                        }
-                    }
-                    diffList = new ArrayList<>(MusicManager.getGuildIdsWithGuildMusics());
-                    diffList.removeAll(MusicManager.getGuildIdsWithVoice());
-                    if (!diffList.isEmpty()) {
-                        LogUtils.warn(Shadbot.getClient(), String.format("Guild music desynchronization detected: %s", diffList.toString()));
-                    }
-                })
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
     public static List<Snowflake> getGuildIdsWithGuildMusics() {

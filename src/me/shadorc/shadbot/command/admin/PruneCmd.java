@@ -2,8 +2,8 @@ package me.shadorc.shadbot.command.admin;
 
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
+import discord4j.core.object.entity.GuildMessageChannel;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
@@ -36,7 +36,7 @@ public class PruneCmd extends BaseCmd {
 
     public PruneCmd() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("prune"));
-        this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+        this.setRateLimiter(new RateLimiter(2, Duration.ofSeconds(3)));
     }
 
     @Override
@@ -83,7 +83,7 @@ public class PruneCmd extends BaseCmd {
                         })
                         .map(Message::getId)
                         .collectList()
-                        .flatMap(messageIds -> ((TextChannel) channel).bulkDelete(Flux.fromIterable(messageIds))
+                        .flatMap(messageIds -> ((GuildMessageChannel) channel).bulkDelete(Flux.fromIterable(messageIds))
                                 .count()
                                 .map(messagesNotDeleted -> (int) (messageIds.size() - messagesNotDeleted)))
                         .map(deletedMessages -> String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",

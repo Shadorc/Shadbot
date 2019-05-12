@@ -123,7 +123,7 @@ public class GuildMusic {
         LogUtils.debug("{Guild ID: %d} Removing audio load result listener.", this.guildId.asLong());
         this.listeners.remove(listener);
         // If there is no music playing and nothing is loading, leave the voice channel
-        if (this.getTrackScheduler().isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
+        if (this.trackScheduler.isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
             MusicManager.getConnection(this.guildId).leaveVoiceChannel();
         }
     }

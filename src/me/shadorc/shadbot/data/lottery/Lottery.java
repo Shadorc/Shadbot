@@ -8,6 +8,7 @@ import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.utils.NumberUtils;
 import reactor.util.annotation.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -38,7 +39,7 @@ public class Lottery {
     }
 
     public List<LotteryGambler> getGamblers() {
-        return this.gamblers;
+        return Collections.unmodifiableList(this.gamblers);
     }
 
     public void setHistoric(LotteryHistoric historic) {
@@ -46,7 +47,7 @@ public class Lottery {
     }
 
     public void addToJackpot(long coins) {
-        final long newPool = this.jackpot.get() + (int) Math.ceil(coins / 100f);
+        final long newPool = this.jackpot.get() + (int) Math.ceil(coins / 100.0f);
         this.jackpot.set(NumberUtils.between(newPool, 0, Config.MAX_COINS));
     }
 

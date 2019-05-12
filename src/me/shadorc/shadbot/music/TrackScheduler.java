@@ -7,10 +7,10 @@ import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.utils.NumberUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class TrackScheduler {
@@ -103,8 +103,8 @@ public class TrackScheduler {
         return this.audioPlayer;
     }
 
-    public BlockingQueue<AudioTrack> getPlaylist() {
-        return this.queue;
+    public Collection<AudioTrack> getPlaylist() {
+        return Collections.unmodifiableCollection(this.queue);
     }
 
     public RepeatMode getRepeatMode() {

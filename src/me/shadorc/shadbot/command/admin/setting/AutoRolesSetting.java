@@ -56,7 +56,7 @@ public class AutoRolesSetting extends BaseSetting {
                             .collect(Collectors.toList());
 
                     final StringBuilder strBuilder = new StringBuilder();
-                    if (Action.ADD.equals(action)) {
+                    if (action == Action.ADD) {
                         autoRoles.addAll(mentionedRoleIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s added to auto-assigned roles.",
                                 FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getMention()), ", ")));

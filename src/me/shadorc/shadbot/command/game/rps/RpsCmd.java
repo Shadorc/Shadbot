@@ -59,7 +59,7 @@ public class RpsCmd extends BaseCmd {
                     context.getUsername(), gains, userCombo.get()));
             Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains);
             StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
-        } else if (userHandsign.equals(botHandsign)) {
+        } else if (userHandsign == botHandsign) {
             userCombo.set(0);
             strBuilder.append("It's a draw.");
         } else {

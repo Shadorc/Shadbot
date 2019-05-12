@@ -44,7 +44,7 @@ public class BaguetteCmd extends BaseCmd {
         final String sugar = "100g sucre";
         final String butter = "100g beurre";
         return "Mélanger " + meal + " " + sugar + " " + eggs + " dans un saladier." +
-                "\nFaire fondre au bain-marie " + chocolate + butter +
+                "\nFaire fondre au bain-marie " + chocolate + " " + butter +
                 "\nRajouter le chocolat et le beurre dans le saladier.\nVerser le mélange dans un moule et enfourner pendant 25min à 180°C.";
     }
 

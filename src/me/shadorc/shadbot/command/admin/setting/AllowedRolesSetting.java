@@ -55,7 +55,7 @@ public class AllowedRolesSetting extends BaseSetting {
                             .collect(Collectors.toList());
 
                     final StringBuilder strBuilder = new StringBuilder();
-                    if (Action.ADD.equals(action)) {
+                    if (action == Action.ADD) {
                         allowedRoles.addAll(mentionedRoleIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s will now be able to interact with me.",
                                 FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));

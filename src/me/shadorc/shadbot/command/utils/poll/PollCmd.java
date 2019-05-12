@@ -17,10 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -60,16 +57,16 @@ public class PollCmd extends BaseCmd {
                                 return game;
                             });
 
-                    if (this.isCancelMsg(context, permission, pollManager)) {
+                    if (PollCmd.isCancelMsg(context, permission, pollManager)) {
                         pollManager.stop();
                     }
                 })
                 .then();
     }
 
-    private boolean isCancelMsg(Context context, CommandPermission perm, PollManager pollManager) {
+    private static boolean isCancelMsg(Context context, CommandPermission perm, PollManager pollManager) {
         final boolean isAuthor = context.getAuthorId().equals(pollManager.getContext().getAuthorId());
-        final boolean isAdmin = perm.equals(CommandPermission.ADMIN);
+        final boolean isAdmin = perm == CommandPermission.ADMIN;
         final boolean isCancelMsg = context.getArg().map(arg -> arg.matches("stop|cancel")).orElse(false);
         return isCancelMsg && (isAuthor || isAdmin);
     }
@@ -82,7 +79,7 @@ public class PollCmd extends BaseCmd {
             throw new CommandException("Question and choices must be enclosed in quotation marks.");
         }
 
-        Integer seconds;
+        final Integer seconds;
         if (NumberUtils.isPositiveLong(args.get(0))) {
             seconds = NumberUtils.asIntBetween(args.get(0), MIN_DURATION, MAX_DURATION);
             if (seconds == null) {
@@ -143,6 +140,6 @@ public class PollCmd extends BaseCmd {
     }
 
     public Map<Snowflake, PollManager> getManagers() {
-        return this.managers;
+        return Collections.unmodifiableMap(this.managers);
     }
 }

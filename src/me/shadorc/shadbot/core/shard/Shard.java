@@ -45,7 +45,7 @@ public class Shard {
         this.client = client;
         this.isFullyReady = new AtomicBoolean(false);
         this.logger = Loggers.getLogger(String.format("shadbot.shard.%d",
-                this.getClient().getConfig().getShardIndex()));
+                this.client.getConfig().getShardIndex()));
 
         this.registerReadyEvent();
         this.registerFullyReadyEvent();
@@ -64,7 +64,7 @@ public class Shard {
     }
 
     private void registerReadyEvent() {
-        this.getClient().getEventDispatcher()
+        this.client.getEventDispatcher()
                 .on(ReadyEvent.class)
                 .next()
                 .doOnNext(event -> this.logger.info("Presence update scheduled."))
@@ -74,27 +74,27 @@ public class Shard {
                             return event.getClient().updatePresence(Presence.online(Activity.playing(presence)));
                         })
                         .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(event.getClient(), err)))
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getClient(), err));
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
     }
 
     private void registerFullyReadyEvent() {
-        this.getClient().getEventDispatcher()
+        this.client.getEventDispatcher()
                 .on(ReadyEvent.class)
                 .map(event -> event.getGuilds().size())
-                .flatMap(size -> this.getClient().getEventDispatcher()
+                .flatMap(size -> this.client.getEventDispatcher()
                         .on(GuildCreateEvent.class)
                         .take(size)
                         .collectList())
                 .doOnNext(guilds -> {
                     this.logger.info("Fully ready.");
                     this.isFullyReady.set(true);
-                    Shadbot.onFullyReadyEvent(this.getClient());
+                    Shadbot.onFullyReadyEvent(this.client);
                 })
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
     }
 
     private <T extends Event> void register(Class<T> eventClass, Function<T, Mono<Void>> mapper) {
-        this.getClient().getEventDispatcher()
+        this.client.getEventDispatcher()
                 .on(eventClass)
                 .flatMap(event -> mapper.apply(event)
                         .thenReturn(event.toString())
@@ -102,7 +102,7 @@ public class Shard {
                         .doOnNext(tuple -> {
                             this.logger.trace("{} took {}ms to be processed.", tuple.getT2(), tuple.getT1());
                             if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
-                                LogUtils.warn(this.getClient(),
+                                LogUtils.warn(this.client,
                                         String.format("%s took a long time to be processed (%dms).",
                                                 tuple.getT2(), tuple.getT1()));
                             }
@@ -129,7 +129,7 @@ public class Shard {
                 this.state = State.RETRY_SUCCEEDED;
             }
 
-            this.isFullyReady.set(this.state.equals(State.RETRY_SUCCEEDED));
+            this.isFullyReady.set(this.state == State.RETRY_SUCCEEDED);
 
             this.logger.info("New event: {} / fully ready: {}.",
                     event.getClass().getSimpleName(), this.isFullyReady());

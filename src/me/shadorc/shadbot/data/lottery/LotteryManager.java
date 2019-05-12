@@ -22,7 +22,7 @@ public class LotteryManager extends Data {
 
     @Override
     public Object getData() {
-        return this.getLottery();
+        return this.lottery;
     }
 
 }

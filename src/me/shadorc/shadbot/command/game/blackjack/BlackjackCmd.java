@@ -34,7 +34,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
         if (blackjackManager.addPlayerIfAbsent(new BlackjackPlayer(context.getAuthorId(), bet))) {
             Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(-bet);
-            if (blackjackManager.allPlayersStanding()) {
+            if (blackjackManager.areAllPlayersStanding()) {
                 return blackjackManager.end();
             }
             return blackjackManager.show();

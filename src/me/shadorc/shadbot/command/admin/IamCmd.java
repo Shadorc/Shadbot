@@ -34,7 +34,7 @@ public class IamCmd extends BaseCmd {
 
     public IamCmd() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("iam"));
-        this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+        this.setRateLimiter(new RateLimiter(2, Duration.ofSeconds(3)));
     }
 
     @Override

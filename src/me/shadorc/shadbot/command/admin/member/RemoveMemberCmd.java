@@ -29,9 +29,9 @@ public abstract class RemoveMemberCmd extends BaseCmd {
     private final String conjugatedVerb;
     private final Permission permission;
 
-    public RemoveMemberCmd(String name, String conjugatedVerb, Permission permission) {
+    protected RemoveMemberCmd(String name, String conjugatedVerb, Permission permission) {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of(name));
-        this.setRateLimite(new RateLimiter(2, Duration.ofSeconds(3)));
+        this.setRateLimiter(new RateLimiter(2, Duration.ofSeconds(3)));
 
         this.conjugatedVerb = conjugatedVerb;
         this.permission = permission;

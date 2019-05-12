@@ -23,6 +23,7 @@ import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -180,7 +181,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     public List<AudioTrack> getResultTracks() {
-        return this.resultTracks;
+        return Collections.unmodifiableList(this.resultTracks);
     }
 
 }

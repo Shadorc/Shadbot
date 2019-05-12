@@ -21,7 +21,7 @@ public abstract class Game {
     private final AtomicBoolean isScheduled;
     private Disposable scheduledTask;
 
-    public Game(GameCmd<?> gameCmd, Context context, Duration duration) {
+    protected Game(GameCmd<?> gameCmd, Context context, Duration duration) {
         this.gameCmd = gameCmd;
         this.context = context;
         this.duration = duration;
@@ -32,9 +32,9 @@ public abstract class Game {
 
     public abstract Mono<Void> end();
 
-    public final void stop() {
+    public void stop() {
         this.cancelScheduledTask();
-        this.gameCmd.getManagers().remove(this.getContext().getChannelId());
+        this.gameCmd.getManagers().remove(this.context.getChannelId());
     }
 
     public abstract Mono<Void> show();
@@ -47,10 +47,10 @@ public abstract class Game {
     public <T> void schedule(Mono<T> mono) {
         this.cancelScheduledTask();
         this.isScheduled.set(true);
-        this.scheduledTask = Mono.delay(this.getDuration(), Schedulers.elastic())
+        this.scheduledTask = Mono.delay(this.duration, Schedulers.elastic())
                 .doOnNext(ignored -> this.isScheduled.set(false))
                 .then(mono)
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.getContext().getClient(), err));
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.context.getClient(), err));
     }
 
     /**

@@ -7,8 +7,9 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.utils.TimeUtils;
 import reactor.util.annotation.Nullable;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
-import java.util.OptionalLong;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class Relic {
@@ -55,14 +56,14 @@ public class Relic {
     }
 
     /**
-     * @return The guild ID of this {@link Relic}, if present
+     * @return The guild ID of this relic, if present
      */
     public Optional<Snowflake> getGuildId() {
         return Optional.ofNullable(this.guildId).map(Snowflake::of);
     }
 
     /**
-     * @return The user ID of this {@link Relic}, if present
+     * @return The user ID of this relic, if present
      */
     public Optional<Snowflake> getUserId() {
         return Optional.ofNullable(this.userId).map(Snowflake::of);
@@ -73,24 +74,23 @@ public class Relic {
     }
 
     /**
-     * @return The duration of this {@link Relic} in milliseconds
+     * @return The duration of this relic
      */
-    public long getDuration() {
-        return this.duration;
+    public Duration getDuration() {
+        return Duration.ofMillis(this.duration);
     }
 
     /**
-     * @return The activation time of this {@link Relic} in milliseconds if activated
+     * @return The activation time of this relic in milliseconds if activated
      */
-    public OptionalLong getActivationTime() {
-        return OptionalLong.of(this.activationTime);
+    public Optional<Instant> getActivationInstant() {
+        return Optional.ofNullable(this.activationTime).map(Instant::ofEpochMilli);
     }
 
     public boolean isExpired() {
-        if (this.getActivationTime().isEmpty()) {
-            return false;
-        }
-        return TimeUtils.getMillisUntil(this.getActivationTime().getAsLong()) >= this.getDuration();
+        return this.getActivationInstant()
+                .map(instant -> TimeUtils.getMillisUntil(instant) >= this.getDuration().toMillis())
+                .orElse(false);
     }
 
     public void setGuildId(Snowflake guildId) {
