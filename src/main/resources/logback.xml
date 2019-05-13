@@ -2,9 +2,8 @@
 <!DOCTYPE xml>
 <configuration scan="true">
 
-    <loger name="shadbot" level="DEBUG"/>
-    *
-    <loger name="shadbot.shard" level="INFO"/>
+    <logger name="shadbot" level="DEBUG"/>
+    <logger name="shadbot.shard" level="INFO"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
