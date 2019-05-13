@@ -35,7 +35,7 @@ public class SuicideGirlsCmd extends BaseCmd {
                         return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
                     }
 
-                    final Document doc = NetUtils.getDoc("https://www.suicidegirls.com/photos/sg/recent/all/");
+                    final Document doc = NetUtils.getDocument("https://www.suicidegirls.com/photos/sg/recent/all/");
 
                     final Element girl = Utils.randValue(doc.getElementsByTag("article"));
                     final String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();

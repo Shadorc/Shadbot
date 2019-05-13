@@ -17,12 +17,8 @@ import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import org.apache.http.HttpStatus;
-import org.jsoup.Connection.Response;
-import org.jsoup.HttpStatusException;
 import reactor.core.publisher.Mono;
 
-import java.net.URL;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -50,21 +46,14 @@ public class FortniteCmd extends BaseCmd {
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
         return Mono.fromCallable(() -> {
             final String encodedNickname = epicNickname.replace(" ", "%20");
-            final URL url = new URL(String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
-                    StringUtils.toLowerCase(platform), encodedNickname));
+            final String url = String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
+                    StringUtils.toLowerCase(platform), encodedNickname);
 
-            final Response response = NetUtils.getDefaultConnection(url.toString())
-                    .ignoreContentType(true)
-                    .ignoreHttpErrors(true)
-                    .header("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY))
-                    .execute();
+            final String body = NetUtils.getResponseSingle(url,
+                    header -> header.add("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY)))
+                    .getT2();
 
-            if (response.statusCode() != 200) {
-                throw new HttpStatusException("Fortnite API did not return a valid status code.",
-                        HttpStatus.SC_SERVICE_UNAVAILABLE, url.toString());
-            }
-
-            final FortniteResponse fortnite = Utils.MAPPER.readValue(response.parse().body().html(), FortniteResponse.class);
+            final FortniteResponse fortnite = Utils.MAPPER.readValue(body, FortniteResponse.class);
 
             if (fortnite.getError().map("Player Not Found"::equals).orElse(false)) {
                 return loadingMsg.setContent(

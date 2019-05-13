@@ -17,7 +17,6 @@ import me.shadorc.shadbot.object.message.LoadingMessage;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
@@ -59,14 +58,14 @@ public class CounterStrikeCmd extends BaseCmd {
             else {
                 final String resolveVanityUrl = String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
                         Credentials.get(Credential.STEAM_API_KEY), NetUtils.encode(identificator));
-                final ResolveVanityUrlResponse response = Utils.MAPPER.readValue(NetUtils.getJSON(resolveVanityUrl), ResolveVanityUrlResponse.class);
+                final ResolveVanityUrlResponse response = NetUtils.readValue(resolveVanityUrl, ResolveVanityUrlResponse.class);
                 steamId = response.getResponse().getSteamId();
             }
 
             final String playerSummariesUrl = String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
                     Credentials.get(Credential.STEAM_API_KEY), steamId);
 
-            final PlayerSummariesResponse playerSummary = Utils.MAPPER.readValue(NetUtils.getJSON(playerSummariesUrl), PlayerSummariesResponse.class);
+            final PlayerSummariesResponse playerSummary = NetUtils.readValue(playerSummariesUrl, PlayerSummariesResponse.class);
 
             // Search users matching the steamId
             final List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
@@ -93,7 +92,7 @@ public class CounterStrikeCmd extends BaseCmd {
                                 context.getUsername(), PRIVACY_HELP_URL));
             }
 
-            final UserStatsForGameResponse userStats = Utils.MAPPER.readValue(NetUtils.getJSON(userStatsUrl), UserStatsForGameResponse.class);
+            final UserStatsForGameResponse userStats = NetUtils.readValue(userStatsUrl, UserStatsForGameResponse.class);
 
             if (userStats.getPlayerStats().flatMap(PlayerStats::getStats).isEmpty()) {
                 return loadingMsg.setContent(

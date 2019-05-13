@@ -10,7 +10,6 @@ import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.LoadingMessage;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
@@ -32,7 +31,7 @@ public class GifCmd extends BaseCmd {
             final String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
                     Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
 
-            final GiphyResponse giphy = Utils.MAPPER.readValue(NetUtils.getJSON(url), GiphyResponse.class);
+            final GiphyResponse giphy = NetUtils.readValue(url, GiphyResponse.class);
             if (giphy.getGifs().isEmpty()) {
                 return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
                         context.getUsername(), context.getArg().orElse("random search")));

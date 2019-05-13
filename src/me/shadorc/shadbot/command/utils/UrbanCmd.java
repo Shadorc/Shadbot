@@ -11,7 +11,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.LoadingMessage;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +34,7 @@ public class UrbanCmd extends BaseCmd {
         return Mono.fromCallable(() -> {
             final String url = String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(arg));
 
-            final UrbanDictionaryResponse urbanDictionary = Utils.MAPPER.readValue(NetUtils.getJSON(url), UrbanDictionaryResponse.class);
+            final UrbanDictionaryResponse urbanDictionary = NetUtils.readValue(url, UrbanDictionaryResponse.class);
 
             if (urbanDictionary.getDefinitions().isEmpty()) {
                 return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",

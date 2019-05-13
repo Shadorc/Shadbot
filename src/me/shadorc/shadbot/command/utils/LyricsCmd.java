@@ -17,12 +17,14 @@ import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import org.apache.http.HttpStatus;
-import org.jsoup.Connection.Response;
 import org.jsoup.HttpStatusException;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.nodes.Element;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClientResponse;
+import reactor.util.function.Tuple2;
 
 import java.io.IOException;
 import java.util.List;
@@ -86,27 +88,22 @@ public class LyricsCmd extends BaseCmd {
     private Document getLyricsDocument(DiscordClient client, String url) throws IOException {
         // Sometimes Musixmatch redirects to a wrong page
         // If the response URL and the requested URL are different, retry
-        int retryCount = 0;
-        Response response;
-        do {
-            if (retryCount == MAX_RETRY) {
-                LogUtils.warn(client, String.format("[%s] Too many retries, abort attempt to reload page.",
-                        this.getClass().getSimpleName()));
-                throw new HttpStatusException("Musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
+        for(int i = 0; i < MAX_RETRY; i++) {
+            final Tuple2<HttpClientResponse, String> responseSingle = NetUtils.getResponseSingle(url);
+            if(url.endsWith(responseSingle.getT1().uri())) {
+                return Jsoup.parse(responseSingle.getT2());
             }
-
-            response = NetUtils.getResponse(url);
-            retryCount++;
-        } while (!response.url().toString().equalsIgnoreCase(url));
-
-        return response.parse();
+        }
+        LogUtils.warn(client, String.format("[%s] Too many retries, abort attempt to reload page.",
+                this.getClass().getSimpleName()));
+        throw new HttpStatusException("Musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
     }
 
-    private static String getCorrectedUrl(String search) throws IOException {
+    private static String getCorrectedUrl(String search) {
         final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
 
         // Make a search request on the site
-        final Document doc = NetUtils.getDoc(url);
+        final Document doc = NetUtils.getDocument(url);
         final Element trackList = doc.getElementsByClass("media-card-title").first();
         if (trackList == null) {
             return null;

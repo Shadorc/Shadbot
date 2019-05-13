@@ -6,13 +6,14 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
-import me.shadorc.shadbot.utils.*;
+import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -34,11 +35,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
 
         if (context.getArg().isPresent()) {
             if (this.categories == null) {
-                try {
-                    this.categories = Utils.MAPPER.readValue(NetUtils.getJSON(CATEGORY_URL), TriviaCategoriesResponse.class);
-                } catch (final IOException err) {
-                    throw Exceptions.propagate(err);
-                }
+                this.categories = NetUtils.readValue(CATEGORY_URL, TriviaCategoriesResponse.class);
             }
 
             if ("categories".equalsIgnoreCase(context.getArg().get())) {

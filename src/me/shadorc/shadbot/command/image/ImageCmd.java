@@ -20,7 +20,6 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -67,7 +66,7 @@ public class ImageCmd extends BaseCmd {
                 .then();
     }
 
-    private Image getRandomPopularImage(String encodedSearch) throws IOException {
+    private Image getRandomPopularImage(String encodedSearch) {
         if (this.isTokenExpired()) {
             this.generateAccessToken();
         }
@@ -80,7 +79,7 @@ public class ImageCmd extends BaseCmd {
                         + "&access_token=%s",
                 encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken());
 
-        final DeviantArtResponse deviantArt = Utils.MAPPER.readValue(NetUtils.getJSON(url), DeviantArtResponse.class);
+        final DeviantArtResponse deviantArt = NetUtils.readValue(url, DeviantArtResponse.class);
         final List<Image> images = deviantArt.getResults().stream()
                 .filter(image -> image.getContent().isPresent())
                 .collect(Collectors.toList());
@@ -93,11 +92,11 @@ public class ImageCmd extends BaseCmd {
                 || TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
     }
 
-    private void generateAccessToken() throws IOException {
+    private void generateAccessToken() {
         final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
                 Credentials.get(Credential.DEVIANTART_CLIENT_ID),
                 Credentials.get(Credential.DEVIANTART_API_SECRET));
-        this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
+        this.token = NetUtils.readValue(url, TokenResponse.class);
         this.lastTokenGeneration.set(System.currentTimeMillis());
         LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
     }

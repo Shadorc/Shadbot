@@ -14,12 +14,13 @@ import me.shadorc.shadbot.core.game.MultiplayerGame;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.object.Emoji;
-import me.shadorc.shadbot.utils.*;
+import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.FormatUtils;
+import me.shadorc.shadbot.utils.NetUtils;
+import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,13 +42,9 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
     public TriviaGame(GameCmd<TriviaGame> gameCmd, Context context, Integer categoryId) {
         super(gameCmd, context, Duration.ofSeconds(30));
 
-        try {
-            final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, ""));
-            final TriviaResponse response = Utils.MAPPER.readValue(NetUtils.getJSON(url), TriviaResponse.class);
-            this.trivia = response.getResults().get(0);
-        } catch (final IOException err) {
-            throw Exceptions.propagate(err);
-        }
+        final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, ""));
+        final TriviaResponse response = NetUtils.readValue(url, TriviaResponse.class);
+        this.trivia = response.getResults().get(0);
 
         this.answers = new ArrayList<>();
         if ("multiple".equals(this.trivia.getType())) {

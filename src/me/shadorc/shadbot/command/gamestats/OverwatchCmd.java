@@ -20,7 +20,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -77,7 +76,7 @@ public class OverwatchCmd extends BaseCmd {
                 .then();
     }
 
-    private static Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String battletag) throws IOException {
+    private static Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String battletag) {
         for (final Platform platform : Platform.values()) {
             final Tuple3<Platform, ProfileResponse, StatsResponse> response = OverwatchCmd.getResponse(platform.toString(), battletag);
             if (response != null) {
@@ -89,17 +88,17 @@ public class OverwatchCmd extends BaseCmd {
                 FormatUtils.options(Platform.class)));
     }
 
-    private static Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String platformStr, String battletag) throws IOException {
+    private static Tuple3<Platform, ProfileResponse, StatsResponse> getResponse(String platformStr, String battletag) {
         final String username = battletag.replace("#", "-");
         final Platform platform = Utils.parseEnum(Platform.class, platformStr,
                 new CommandException(String.format("`%s` is not a valid Platform. %s",
                         platformStr, FormatUtils.options(Platform.class))));
 
-        final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(OverwatchCmd.getUrl("profile", platform, username)), ProfileResponse.class);
+        final ProfileResponse profile = NetUtils.readValue(OverwatchCmd.getUrl("profile", platform, username), ProfileResponse.class);
         if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
             return null;
         }
-        final StatsResponse stats = Utils.MAPPER.readValue(NetUtils.getJSON(OverwatchCmd.getUrl("stats", platform, username)), StatsResponse.class);
+        final StatsResponse stats = NetUtils.readValue(OverwatchCmd.getUrl("stats", platform, username), StatsResponse.class);
         return Tuples.of(platform, profile, stats);
     }
 

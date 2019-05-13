@@ -22,7 +22,6 @@ import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,7 +66,7 @@ public class DiabloCmd extends BaseCmd {
             final String url = String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
                     region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken());
 
-            final ProfileResponse profile = Utils.MAPPER.readValue(NetUtils.getJSON(url), ProfileResponse.class);
+            final ProfileResponse profile = NetUtils.readValue(url, ProfileResponse.class);
 
             if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
                 return loadingMsg.setContent(String.format(
@@ -80,7 +79,7 @@ public class DiabloCmd extends BaseCmd {
                 final String heroUrl = String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
                         region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken());
 
-                final HeroResponse hero = Utils.MAPPER.readValue(NetUtils.getJSON(heroUrl), HeroResponse.class);
+                final HeroResponse hero = NetUtils.readValue(heroUrl, HeroResponse.class);
                 if (hero.getCode().isEmpty()) {
                     heroResponses.add(hero);
                 }
@@ -114,11 +113,11 @@ public class DiabloCmd extends BaseCmd {
                 || TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
     }
 
-    private void generateAccessToken() throws IOException {
+    private void generateAccessToken() {
         final String url = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
                 Credentials.get(Credential.BLIZZARD_CLIENT_ID),
                 Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
-        this.token = Utils.MAPPER.readValue(NetUtils.getJSON(url), TokenResponse.class);
+        this.token = NetUtils.readValue(url, TokenResponse.class);
         this.lastTokenGeneration.set(System.currentTimeMillis());
         LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
     }

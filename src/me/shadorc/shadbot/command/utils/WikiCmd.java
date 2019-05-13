@@ -10,7 +10,6 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.LoadingMessage;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +44,7 @@ public class WikiCmd extends BaseCmd {
                             + "&exsentences=5",
                     NetUtils.encode(arg));
 
-            final WikipediaResponse wikipedia = Utils.MAPPER.readValue(NetUtils.getJSON(url), WikipediaResponse.class);
+            final WikipediaResponse wikipedia = NetUtils.readValue(url, WikipediaResponse.class);
             final Map<String, WikipediaPage> pages = wikipedia.getQuery().getPages();
             final String pageId = pages.keySet().toArray()[0].toString();
             final WikipediaPage page = pages.get(pageId);

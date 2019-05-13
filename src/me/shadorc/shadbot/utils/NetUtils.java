@@ -1,17 +1,21 @@
 package me.shadorc.shadbot.utils;
 
+import com.fasterxml.jackson.databind.JavaType;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import org.apache.http.HttpStatus;
-import org.jsoup.Connection;
-import org.jsoup.Connection.Response;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.retry.Retry;
+import reactor.core.Exceptions;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.http.client.HttpClientResponse;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -19,8 +23,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.function.Consumer;
 
 public class NetUtils {
+
+    private static final HttpClient HTTP_CLIENT = HttpClient.create();
 
     /**
      * @param html - The HTML to convert to text
@@ -50,65 +57,6 @@ public class NetUtils {
     }
 
     /**
-     * @param url - URL to connect to. The protocol must be http or https
-     * @return The {@link Connection} corresponding to {@code url} with default user-agent and default timeout
-     */
-    public static Connection getDefaultConnection(String url) {
-        return Jsoup.connect(url)
-                .userAgent(Config.USER_AGENT)
-                .timeout(Config.DEFAULT_TIMEOUT);
-    }
-
-    /**
-     * @param url - URL to connect to. The protocol must be http or https
-     * @return The {@link Response} corresponding to {@code url} with default user-agent, default timeout, ignoring content type and HTTP errors
-     */
-    public static Response getResponse(String url) {
-        return Mono.fromCallable(() -> NetUtils.getDefaultConnection(url)
-                .ignoreContentType(true)
-                .ignoreHttpErrors(true)
-                .execute())
-                .retryWhen(Retry.onlyIf(err -> ExceptionUtils.isServerAccessError(err.exception()))
-                        .exponentialBackoffWithJitter(Duration.ofSeconds(2), Duration.ofSeconds(5))
-                        .retryMax(3))
-                .subscribeOn(Schedulers.elastic())
-                .block();
-    }
-
-    /**
-     * @param url - URL to connect to. The protocol must be http or https
-     * @return The {@link Document} corresponding to {@code url} with default user-agent and default timeout
-     */
-    public static Document getDoc(String url) throws IOException {
-        return NetUtils.getResponse(url).parse();
-    }
-
-    /**
-     * @param url - URL to connect to. The protocol must be http or https
-     * @return The {@code body} corresponding to the {@code url} with default user-agent and default timeout
-     */
-    public static String getBody(String url) {
-        return NetUtils.getResponse(url).body();
-    }
-
-    /**
-     * @param url - URL to connect to. The protocol must be http or https
-     * @return A string representing JSON
-     * @throws HttpStatusException if the URL returns an invalid JSON
-     */
-    public static String getJSON(String url) throws IOException {
-        final String json = NetUtils.getBody(url);
-        if (json.isEmpty() || json.charAt(0) != '{' && json.charAt(0) != '[') {
-            final String errorMessage = Jsoup.parse(json).text();
-            throw new HttpStatusException(
-                    String.format("%s did not return valid JSON: %s", url, errorMessage.isEmpty() ? "Empty" : errorMessage),
-                    HttpStatus.SC_SERVICE_UNAVAILABLE,
-                    url);
-        }
-        return json;
-    }
-
-    /**
      * @param url - a string representing an URL to check
      * @return true if the string is a valid and reachable URL, false otherwise
      */
@@ -133,4 +81,61 @@ public class NetUtils {
         return isValid;
     }
 
+    public static Tuple2<HttpClientResponse, String> getResponseSingle(String url, Consumer<HttpHeaders> headerBuilder) {
+        return HTTP_CLIENT
+                .headers(headerBuilder
+                        .andThen(header -> header.add(HttpHeaderNames.USER_AGENT, Config.USER_AGENT)))
+                .get()
+                .uri(url)
+                .responseSingle((response, content) -> content.asString(StandardCharsets.UTF_8)
+                        .map(body -> Tuples.of(response, body)))
+                .timeout(Duration.ofMillis(Config.DEFAULT_TIMEOUT))
+                .block();
+    }
+
+    public static Tuple2<HttpClientResponse, String> getResponseSingle(String url) {
+        return NetUtils.getResponseSingle(url, header -> {
+        });
+    }
+
+    public static HttpClientResponse getResponse(String url) {
+        return NetUtils.getResponseSingle(url).getT1();
+    }
+
+    public static String getBody(String url) {
+        return NetUtils.getResponseSingle(url).getT2();
+    }
+
+    public static Document getDocument(String url) {
+        return Jsoup.parse(NetUtils.getBody(url));
+    }
+
+    public static <T> T readValue(String url, Class<T> type) {
+        try {
+            return Utils.MAPPER.readValue(NetUtils.getJSON(url), type);
+        } catch (final IOException err) {
+            throw Exceptions.propagate(err);
+        }
+    }
+
+    public static <T> T readValue(String url, JavaType type) {
+        try {
+            return Utils.MAPPER.readValue(NetUtils.getJSON(url), type);
+        } catch (final IOException err) {
+            throw Exceptions.propagate(err);
+        }
+    }
+
+    public static String getJSON(String url) throws HttpStatusException {
+        final Tuple2<HttpClientResponse, String> responseSingle = NetUtils.getResponseSingle(url);
+        final HttpClientResponse response = responseSingle.getT1();
+        final String content = responseSingle.getT2();
+        if (!response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE).startsWith(HttpHeaderValues.APPLICATION_JSON.toString())
+                || !response.status().equals(HttpResponseStatus.OK)) {
+            throw new HttpStatusException(String.format("Invalid JSON:%nURL: %s%nStatus: %s%nHeaders: %s%nContent: %s",
+                    url, response.status(), response.responseHeaders(), content),
+                    HttpStatus.SC_SERVICE_UNAVAILABLE, url);
+        }
+        return content;
+    }
 }
