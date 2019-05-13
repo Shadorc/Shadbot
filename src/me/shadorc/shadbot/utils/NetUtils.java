@@ -18,11 +18,8 @@ import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.function.Consumer;
 
 public class NetUtils {
@@ -61,24 +58,16 @@ public class NetUtils {
      * @return true if the string is a valid and reachable URL, false otherwise
      */
     public static boolean isValidUrl(String url) {
-        boolean isValid;
-
-        HttpURLConnection conn = null;
         try {
-            conn = (HttpURLConnection) new URL(url).openConnection();
-            conn.setConnectTimeout(Config.DEFAULT_TIMEOUT);
-            conn.setReadTimeout(Config.DEFAULT_TIMEOUT);
-            conn.connect();
-            isValid = true;
+            HTTP_CLIENT.get()
+                    .uri(url)
+                    .response()
+                    .timeout(Config.DEFAULT_TIMEOUT)
+                    .block();
+            return true;
         } catch (final Exception err) {
-            isValid = false;
+            return false;
         }
-
-        if (conn != null) {
-            conn.disconnect();
-        }
-
-        return isValid;
     }
 
     public static Tuple2<HttpClientResponse, String> getResponseSingle(String url, Consumer<HttpHeaders> headerBuilder) {
@@ -89,7 +78,7 @@ public class NetUtils {
                 .uri(url)
                 .responseSingle((response, content) -> content.asString(StandardCharsets.UTF_8)
                         .map(body -> Tuples.of(response, body)))
-                .timeout(Duration.ofMillis(Config.DEFAULT_TIMEOUT))
+                .timeout(Config.DEFAULT_TIMEOUT)
                 .block();
     }
 

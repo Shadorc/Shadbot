@@ -42,6 +42,7 @@ public class BotListStats {
                 .then(Mono.fromRunnable(() -> LogUtils.info("Statistics posted.")));
     }
 
+    // TODO: Use reactor.netty
     private static Mono<Document> post(String url, String authorization, JSONObject content) {
         return Mono.fromCallable(() -> Jsoup.connect(url)
                 .ignoreContentType(true)
