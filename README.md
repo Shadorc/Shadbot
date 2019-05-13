@@ -17,7 +17,7 @@
     <p><b><a href="https://discord.gg/CKnV4ff">Join</a> the support server if you have any questions, suggestions or if you just want to talk.</b></p>
     <hr>
     <h2>Privacy</h2>
-    When you interact with Shadbot and an error occurs, I may log the message that triggers the command for debugging purpose.
+    If an error occurred while you're interacting with Shadbot, I may log the message that triggers the command for debugging purpose.
     If you have any questions, do not hesitate to <a href="https://discord.gg/CKnV4ff">join</a> the support server.
     <hr>
     <h2>Libraries used</h2>
@@ -33,11 +33,12 @@
     <h2>Getting Started</h2>
     <br>1. Make sure Java 11 is installed.
     <br>2. Fork the Shadbot repository: https://github.com/Shadorc/Shadbot/fork
-    <br>3. Clone your forked repository, ie. `git clone http://github.com/<YOUR-USERNAME>/shadbot.git`
-    <br>4. Run `mvn build`.
-    <br>5. Locate the `shadbot-<VERSION>.jar`.  
-    <br>6. Open command prompt and run `java -jar shadbot-<VERSION>.jar`.
-    <br>7. You're done!
+    <br>3. Clone your forked repository, ie. <code>git clone http://github.com/&lt;YOUR-USERNAME&gt;/shadbot.git</code>
+    <br>4. Read this: https://github.com/Shadorc/Shadbot/wiki/Build-Shadbot
+    <br>5. Run <code>mvn build</code>.
+    <br>6. Locate the <code>shadbot-&lt;VERSION&gt;.jar</code>.  
+    <br>7. Open command prompt and run <code>java -jar shadbot-&lt;VERSION&gt;.jar</code>.
+    <br>8. You're done!
     <h2>Licence</h2>
     <p>Copyright (C) 2019 <b>Shadorc</b>
         <pre>
