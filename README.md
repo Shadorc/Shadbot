@@ -33,10 +33,10 @@
     <h2>Getting Started</h2>
     <br>1. Make sure Java 11 is installed.
     <br>2. Fork the Shadbot repository: https://github.com/Shadorc/Shadbot/fork
-    <br>3. Clone your forked repository, ie. `git clone http://github.com/<YOUR-USERNAME>/shadbot.git`
-    <br>4. Run `mvn build`.
-    <br>5. Locate the `shadbot-<VERSION>.jar`.  
-    <br>6. Open command prompt and run `java -jar shadbot-<VERSION>.jar`.
+    <br>3. Clone your forked repository, ie. <code>git clone http://github.com/<YOUR-USERNAME>/shadbot.git</code>
+    <br>4. Run <code>mvn build</code>.
+    <br>5. Locate the <code>shadbot-<VERSION>.jar</code>.  
+    <br>6. Open command prompt and run <code>java -jar shadbot-<VERSION>.jar</code>.
     <br>7. You're done!
     <h2>Licence</h2>
     <p>Copyright (C) 2019 <b>Shadorc</b>
