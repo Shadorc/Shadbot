@@ -13,7 +13,6 @@ import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
-import reactor.core.Disposable;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ public class MusicManager {
 
     private static final AudioPlayerManager AUDIO_PLAYER_MANAGER = new DefaultAudioPlayerManager();
     private static final Map<Snowflake, GuildMusicConnection> GUILD_MUSIC_CONNECTIONS = new ConcurrentHashMap<>();
-    private static final Map<Snowflake, Disposable> GUILD_DISPOSABLES = new ConcurrentHashMap<>();
 
     static {
         AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
@@ -64,9 +62,8 @@ public class MusicManager {
             guildMusicConnection.setGuildMusic(guildMusic);
 
             final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
-            final Disposable voiceDisposable = guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
+            guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
                     .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
-            GUILD_DISPOSABLES.put(guildId, voiceDisposable);
         }
 
         return guildMusicConnection.getGuildMusic();
