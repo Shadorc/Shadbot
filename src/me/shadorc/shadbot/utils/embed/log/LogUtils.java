@@ -3,15 +3,16 @@ package me.shadorc.shadbot.utils.embed.log;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.MessageChannel;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.embed.log.LogBuilder.LogType;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 public class LogUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("shadbot");
+    private static final Logger LOGGER = Loggers.getLogger(Shadbot.class);
 
     public static void error(DiscordClient client, Throwable err, String msg, String input) {
         LOGGER.error(String.format("%s (Input: %s)", msg, input), err);
@@ -52,10 +53,6 @@ public class LogUtils {
 
     public static void info(String format, Object... args) {
         LOGGER.info(String.format(format, args));
-    }
-
-    public static void debug(String format, Object... args) {
-        LOGGER.debug(String.format(format, args));
     }
 
     private static void sendLog(DiscordClient client, LogBuilder embed) {

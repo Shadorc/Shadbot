@@ -11,6 +11,8 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 
+import static me.shadorc.shadbot.music.MusicManager.LOGGER;
+
 public class GuildMusicConnection {
 
     public enum State {
@@ -43,7 +45,7 @@ public class GuildMusicConnection {
         }
 
         this.changeState(State.CONNECTING);
-        LogUtils.debug("{Guild ID: %d} Joining voice channel...", this.guildId.asLong());
+        LOGGER.debug("{Guild ID: {}} Joining voice channel...", this.guildId.asLong());
 
         return this.client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
@@ -71,13 +73,13 @@ public class GuildMusicConnection {
             this.voiceConnection.disconnect();
             this.voiceConnection = null;
             this.changeState(State.DISCONNECTED);
-            LogUtils.info("{Guild ID: %d} Voice channel left.", this.guildId.asLong());
+            LOGGER.info("{Guild ID: {}} Voice channel left.", this.guildId.asLong());
         }
 
         if (this.guildMusic != null) {
             this.guildMusic.destroy();
             this.guildMusic = null;
-            LogUtils.debug("{Guild ID: %d} Guild music destroyed.", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Guild music destroyed.", this.guildId.asLong());
         }
     }
 
@@ -94,7 +96,7 @@ public class GuildMusicConnection {
     }
 
     public void changeState(State state) {
-        LogUtils.debug("{Guild ID: %d} Changing music state to %s.", this.guildId.asLong(), state.toString());
+        LOGGER.debug("{Guild ID: {}} Changing music state to {}.", this.guildId.asLong(), state.toString());
         this.state = state;
     }
 

@@ -2,8 +2,8 @@ package me.shadorc.shadbot;
 
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.utils.ExitCode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 import java.awt.*;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.Properties;
 
 public class Config {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
+    private static final Logger LOGGER = Loggers.getLogger(Config.class);
 
     private static final Properties PROPERTIES = Config.getProperties();
 

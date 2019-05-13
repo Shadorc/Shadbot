@@ -1,7 +1,7 @@
 package me.shadorc.shadbot.data.credential;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class Credentials {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Credentials.class);
+    private static final Logger LOGGER = Loggers.getLogger(Credentials.class);
     private static final Properties CREDENTIALS_PROPERTIES = new Properties();
     private static final File CREDENTIALS_FILE = new File("credentials.properties");
 

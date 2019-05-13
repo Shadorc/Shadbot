@@ -11,8 +11,9 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.listener.music.TrackEventListener;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 public class MusicManager {
 
+    public static final Logger LOGGER = Loggers.getLogger(MusicManager.class);
     private static final AudioPlayerManager AUDIO_PLAYER_MANAGER = new DefaultAudioPlayerManager();
     private static final Map<Snowflake, GuildMusicConnection> GUILD_MUSIC_CONNECTIONS = new ConcurrentHashMap<>();
 
@@ -48,12 +50,12 @@ public class MusicManager {
     public static GuildMusic getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
         final GuildMusicConnection guildMusicConnection = GUILD_MUSIC_CONNECTIONS.computeIfAbsent(guildId,
                 ignored -> {
-                    LogUtils.debug("{Guild ID: %d} Creating guild music connection.", guildId.asLong());
+                    LOGGER.debug("{Guild ID: {}} Creating guild music connection.", guildId.asLong());
                     return new GuildMusicConnection(client, guildId);
                 });
 
         if (guildMusicConnection.getGuildMusic() == null) {
-            LogUtils.debug("{Guild ID: %d} Creating guild music.", guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Creating guild music.", guildId.asLong());
             final AudioPlayer audioPlayer = AUDIO_PLAYER_MANAGER.createPlayer();
             audioPlayer.addListener(new TrackEventListener(guildId));
 

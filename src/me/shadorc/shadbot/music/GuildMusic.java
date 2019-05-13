@@ -8,7 +8,6 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -18,6 +17,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static me.shadorc.shadbot.music.MusicManager.LOGGER;
 
 public class GuildMusic {
 
@@ -44,7 +45,7 @@ public class GuildMusic {
      * Schedule to leave the voice channel in 1 minute
      */
     public void scheduleLeave() {
-        LogUtils.debug("{Guild ID: %d} Scheduling auto-leave.", this.guildId.asLong());
+        LOGGER.debug("{Guild ID: {}} Scheduling auto-leave.", this.guildId.asLong());
         Mono.delay(Duration.ofMinutes(1), Schedulers.elastic())
                 .filter(ignored -> this.isLeavingScheduled())
                 .doOnNext(ignored -> MusicManager.getConnection(this.guildId).leaveVoiceChannel())
@@ -54,12 +55,12 @@ public class GuildMusic {
     }
 
     public void cancelLeave() {
-        LogUtils.debug("{Guild ID: %d} Cancelling auto-leave.", this.guildId.asLong());
+        LOGGER.debug("{Guild ID: {}} Cancelling auto-leave.", this.guildId.asLong());
         this.isLeavingScheduled.set(false);
     }
 
     public Mono<Void> end() {
-        LogUtils.debug("{Guild ID: %d} Ending guild music.", this.guildId.asLong());
+        LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId.asLong());
         final StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
         if (!Shadbot.getPremium().isGuildPremium(this.guildId)) {
             strBuilder.append(String.format(" If you like me, you can make a donation on **%s**, "
@@ -115,12 +116,12 @@ public class GuildMusic {
     }
 
     public void addAudioLoadResultListener(AudioLoadResultListener listener, String identifier) {
-        LogUtils.debug("{Guild ID: %d} Adding audio load result listener.", this.guildId.asLong());
+        LOGGER.debug("{Guild ID: {}} Adding audio load result listener.", this.guildId.asLong());
         this.listeners.put(listener, MusicManager.loadItemOrdered(this.guildId, identifier, listener));
     }
 
     public void removeAudioLoadResultListener(AudioLoadResultListener listener) {
-        LogUtils.debug("{Guild ID: %d} Removing audio load result listener.", this.guildId.asLong());
+        LOGGER.debug("{Guild ID: {}} Removing audio load result listener.", this.guildId.asLong());
         this.listeners.remove(listener);
         // If there is no music playing and nothing is loading, leave the voice channel
         if (this.trackScheduler.isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
