@@ -114,14 +114,14 @@
             <version>1.0.0.M3</version>
         </dependency>
         <dependency>
-            <groupId>com.discord4j.discord4j</groupId>
+            <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>2dbf4e5661170443b53cb73a39175c1eb5c665fd</version>
+            <version>3.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>stores-caffeine</artifactId>
-            <version>3.0.3</version>
+            <version>3.0.4</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
