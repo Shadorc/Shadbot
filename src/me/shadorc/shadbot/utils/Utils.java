@@ -59,7 +59,6 @@ public class Utils {
      * @return The percentage of CPU used or {@link Double#NaN} if the value could not be found
      */
     public static double getProcessCpuLoad() {
-        double cpuLoad;
         try {
             final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             final ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
@@ -76,12 +75,10 @@ public class Utils {
                 return Double.NaN;
             }
 
-            cpuLoad = value * 100.0d;
+            return value * 100.0d;
         } catch (final InstanceNotFoundException | ReflectionException | MalformedObjectNameException err) {
-            cpuLoad = Double.NaN;
+            return Double.NaN;
         }
-
-        return cpuLoad;
     }
 
     /**

@@ -88,9 +88,9 @@ public class LyricsCmd extends BaseCmd {
     private Document getLyricsDocument(DiscordClient client, String url) throws IOException {
         // Sometimes Musixmatch redirects to a wrong page
         // If the response URL and the requested URL are different, retry
-        for(int i = 0; i < MAX_RETRY; i++) {
+        for (int i = 0; i < MAX_RETRY; i++) {
             final Tuple2<HttpClientResponse, String> responseSingle = NetUtils.getResponseSingle(url);
-            if(url.endsWith(responseSingle.getT1().uri())) {
+            if (url.endsWith(responseSingle.getT1().uri())) {
                 return Jsoup.parse(responseSingle.getT2());
             }
         }
