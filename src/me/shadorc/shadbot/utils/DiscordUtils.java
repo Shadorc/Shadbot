@@ -6,6 +6,8 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -14,10 +16,12 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.PrematureCloseException;
+import reactor.retry.Retry;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +67,7 @@ public class DiscordUtils {
                     return channel.createMessage(spec);
                 })
                 // 403 Forbidden means that the bot is not in the guild
-                .onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.empty())
+                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                 .doOnNext(message -> {
                     if (hasEmbed) {
                         StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);

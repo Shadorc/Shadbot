@@ -11,7 +11,7 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.listener.music.TrackEventListener;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import me.shadorc.shadbot.utils.ExceptionHandler;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 

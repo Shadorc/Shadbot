@@ -7,9 +7,9 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.TemporaryMessage;
+import me.shadorc.shadbot.utils.ExceptionHandler;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.time.Duration;

@@ -3,6 +3,8 @@ package me.shadorc.shadbot.command.owner;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -12,7 +14,6 @@ import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -48,7 +49,8 @@ public class SendMessageCmd extends BaseCmd {
                     return user.getPrivateChannel()
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtils.sendMessage(args.get(1), privateChannel))
-                            .onErrorMap(ExceptionUtils::isDiscordForbidden, err -> new CommandException("I'm not allowed to send a private message to this user."));
+                            .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
+                                    err -> new CommandException("I'm not allowed to send a private message to this user."));
                 })
                 .then(context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", channel)))

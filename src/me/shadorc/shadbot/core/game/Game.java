@@ -5,7 +5,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import me.shadorc.shadbot.utils.ExceptionHandler;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;

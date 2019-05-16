@@ -4,6 +4,8 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
@@ -18,7 +20,6 @@ import me.shadorc.shadbot.utils.*;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -157,7 +158,7 @@ public class LotteryCmd extends BaseCmd {
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn **%s**.",
                                     FormatUtils.coins(coins)), privateChannel))
-                            .onErrorResume(ExceptionUtils::isDiscordForbidden, err -> Mono.empty());
+                            .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty());
                 })
                 .then(Mono.fromRunnable(() -> {
                     Shadbot.getLottery().setHistoric(new LotteryHistoric(Shadbot.getLottery().getJackpot(), winners.size(), winningNum));

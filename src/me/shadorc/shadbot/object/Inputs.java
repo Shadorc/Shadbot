@@ -2,7 +2,7 @@ package me.shadorc.shadbot.object;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import me.shadorc.shadbot.utils.ExceptionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

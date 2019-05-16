@@ -12,7 +12,7 @@ import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import me.shadorc.shadbot.utils.ExceptionHandler;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;

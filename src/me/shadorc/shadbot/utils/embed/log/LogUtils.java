@@ -5,8 +5,8 @@ import discord4j.core.object.entity.MessageChannel;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.ExceptionHandler;
 import me.shadorc.shadbot.utils.embed.log.LogBuilder.LogType;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 

@@ -8,7 +8,7 @@ import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.exception.ExceptionHandler;
+import me.shadorc.shadbot.utils.ExceptionHandler;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
