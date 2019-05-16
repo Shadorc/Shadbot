@@ -68,6 +68,9 @@ public class DiscordUtils {
                 })
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
+                .retryWhen(Retry.onlyIf(err -> err.exception() instanceof PrematureCloseException)
+                        .exponentialBackoff(Duration.ofSeconds(1), Duration.ofSeconds(5))
+                        .retryMax(3))
                 .doOnNext(message -> {
                     if (hasEmbed) {
                         StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);
