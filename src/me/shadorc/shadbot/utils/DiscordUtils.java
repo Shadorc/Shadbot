@@ -7,6 +7,7 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.rest.http.client.ClientException;
+import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
@@ -68,7 +69,7 @@ public class DiscordUtils {
                 })
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
-                .retryWhen(Retry.onlyIf(err -> err.exception() instanceof PrematureCloseException)
+                .retryWhen(Retry.onlyIf(err -> err.exception() instanceof PrematureCloseException || err.exception() instanceof Errors.NativeIoException)
                         .exponentialBackoff(Duration.ofSeconds(1), Duration.ofSeconds(5))
                         .retryMax(3))
                 .doOnNext(message -> {
