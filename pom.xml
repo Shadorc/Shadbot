@@ -114,9 +114,9 @@
             <version>1.0.0.M3</version>
         </dependency>
         <dependency>
-            <groupId>com.discord4j.discord4j</groupId>
+            <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>dea6d327e8b86ebb483d306148dcdcbaac2d0a07</version>
+            <version>3.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>
