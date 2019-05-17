@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class ThisDayCmd extends BaseCmd {
 
-    private static final String HOME_URL = "http://www.onthisday.com/";
+    private static final String HOME_URL = "https://www.onthisday.com/";
 
     public ThisDayCmd() {
         super(CommandCategory.FUN, List.of("this_day", "this-day", "thisday"), "td");
