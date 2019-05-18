@@ -16,7 +16,7 @@ public class GamblerPlayer extends Player {
     }
 
     public void bet() {
-        this.lose(-this.bet);
+        this.lose(this.bet);
     }
 
     public void cancelBet() {
