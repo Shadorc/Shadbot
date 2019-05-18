@@ -19,6 +19,7 @@ import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeoutException;
 
 public class ExceptionHandler {
 
@@ -47,7 +48,8 @@ public class ExceptionHandler {
                 || err instanceof SocketTimeoutException
                 || err instanceof UnknownHostException
                 || err instanceof ConnectException
-                || err instanceof SSLException;
+                || err instanceof SSLException
+                || err instanceof TimeoutException;
     }
 
     private static Mono<Void> onCommandException(CommandException err, BaseCmd cmd, Context context) {
