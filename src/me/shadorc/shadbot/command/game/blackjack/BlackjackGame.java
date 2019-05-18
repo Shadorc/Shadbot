@@ -74,8 +74,9 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                     final StringBuilder text = new StringBuilder();
                     switch (BlackjackGame.getResult(playerValue, dealerValue)) {
                         case 1:
-                            final long coins = Math.min(player.getBet() * 2, Config.MAX_COINS);
-                            player.win(Math.min(player.getBet() * 2, Config.MAX_COINS));
+                            player.cancelBet();
+                            final long coins = Math.min(player.getBet(), Config.MAX_COINS);
+                            player.win(coins);
                             return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(coins));
                         case 0:
                             player.draw();
