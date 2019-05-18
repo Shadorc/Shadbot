@@ -4,15 +4,12 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.api.trivia.TriviaResponse;
 import me.shadorc.shadbot.api.trivia.TriviaResult;
-import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.core.game.MultiplayerGame;
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
+import me.shadorc.shadbot.core.game.player.Player;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -97,8 +94,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
         final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
         final int gains = (int) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
 
-        Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(gains);
-        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
+        new Player(this.getContext().getGuildId(), member.getId()).win(gains);
 
         this.stop();
         return this.getContext().getChannel()
@@ -107,10 +103,9 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
     }
 
     public void hasAnswered(Snowflake userId) {
-        if (this.getPlayers().containsKey(userId)) {
+        final TriviaPlayer player = new TriviaPlayer(this.getContext().getGuildId(), userId);
+        if (!this.addPlayerIfAbsent(player)) {
             this.getPlayers().get(userId).setAnswered(true);
-        } else {
-            this.addPlayerIfAbsent(new TriviaPlayer(userId));
         }
     }
 

@@ -1,12 +1,10 @@
 package me.shadorc.shadbot.command.game;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
+import me.shadorc.shadbot.core.game.player.GamblerPlayer;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -40,19 +38,18 @@ public class RussianRouletteCmd extends BaseCmd {
         final StringBuilder strBuilder = new StringBuilder(
                 String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", context.getUsername()));
 
-        int gains = -PAID_COST;
-        if (ThreadLocalRandom.current().nextInt(6) == 0) {
-            gains -= ThreadLocalRandom.current().nextInt(MIN_LOSE, MAX_LOSE + 1);
-            StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains));
-            Shadbot.getLottery().addToJackpot(Math.abs(gains));
-            strBuilder.append(String.format("**PAN** ... Sorry, you died.%nYou lose **%s**.", FormatUtils.coins(Math.abs(gains))));
-        } else {
-            gains += ThreadLocalRandom.current().nextInt(MIN_GAINS, MAX_GAINS + 1);
-            StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
-            strBuilder.append(String.format("**click** ... Phew, you are still alive !%nYou get **%s**.", FormatUtils.coins(gains)));
-        }
+        final GamblerPlayer player = new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST);
+        player.bet();
 
-        Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains);
+        if (ThreadLocalRandom.current().nextInt(6) == 0) {
+            final long coins = ThreadLocalRandom.current().nextInt(MIN_LOSE, MAX_LOSE + 1);
+            player.lose(coins);
+            strBuilder.append(String.format("**PAN** ... Sorry, you died.%nYou lose **%s**.", FormatUtils.coins(coins)));
+        } else {
+            final long coins = ThreadLocalRandom.current().nextInt(MIN_GAINS, MAX_GAINS + 1);
+            player.win(coins);
+            strBuilder.append(String.format("**click** ... Phew, you are still alive !%nYou get **%s**.", FormatUtils.coins(coins)));
+        }
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))

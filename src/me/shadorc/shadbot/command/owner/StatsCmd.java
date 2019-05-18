@@ -33,6 +33,7 @@ public class StatsCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(1, 2);
 
+        /*
         if ("average".equalsIgnoreCase(args.get(0))) {
             final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getAverageEmbed()
                     .andThen(embed -> embed.setAuthor("Stats: average", null, context.getAvatarUrl()));
@@ -41,6 +42,7 @@ public class StatsCmd extends BaseCmd {
                     .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
                     .then();
         }
+         */
 
         final StatisticEnum statEnum = Utils.parseEnum(StatisticEnum.class, args.get(0),
                 new CommandException(String.format("`%s` is not a valid category. %s",

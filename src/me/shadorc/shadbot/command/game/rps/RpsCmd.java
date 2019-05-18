@@ -3,12 +3,9 @@ package me.shadorc.shadbot.command.game.rps;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -22,19 +19,18 @@ import reactor.util.function.Tuples;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class RpsCmd extends BaseCmd {
 
     private static final int GAINS = 500;
 
-    private final Map<Tuple2<Snowflake, Snowflake>, AtomicInteger> winStreaks;
+    private final Map<Tuple2<Snowflake, Snowflake>, RpsPlayer> players;
 
     public RpsCmd() {
         super(CommandCategory.GAME, List.of("rps"));
         this.setGameRateLimiter();
-        this.winStreaks = new ConcurrentHashMap<>();
+        this.players = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -51,31 +47,29 @@ public class RpsCmd extends BaseCmd {
                 context.getUsername(), userHandsign.getHandsign(), userHandsign.getEmoji(),
                 botHandsign.getEmoji(), botHandsign.getHandsign()));
 
-        final AtomicInteger userCombo = this.getCombo(context);
+        final RpsPlayer player = this.getOrCreatePlayer(context);
         if (userHandsign.isSuperior(botHandsign)) {
-            userCombo.incrementAndGet();
-            final long gains = Math.min((long) GAINS * userCombo.get(), Config.MAX_COINS);
-            strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you won **%d coins** (Win Streak x%d)!",
-                    context.getUsername(), gains, userCombo.get()));
-            Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains);
-            StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains);
+            final int winStreak = player.getWinStreak().incrementAndGet();
+            final long gains = Math.min((long) GAINS * winStreak, Config.MAX_COINS);
+            player.win(gains);
+            strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you win **%d coins** (Win Streak x%d)!",
+                    context.getUsername(), gains, player.getWinStreak().get()));
         } else if (userHandsign == botHandsign) {
-            userCombo.set(0);
+            player.getWinStreak().set(0);
             strBuilder.append("It's a draw.");
         } else {
-            userCombo.set(0);
-            strBuilder.append("I won !");
+            player.getWinStreak().set(0);
+            strBuilder.append("I win !");
         }
-        this.getCombo(context).set(userCombo.get());
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
                 .then();
     }
 
-    private AtomicInteger getCombo(Context context) {
-        return this.winStreaks.computeIfAbsent(Tuples.of(context.getGuildId(), context.getAuthorId()),
-                ignored -> new AtomicInteger(0));
+    private RpsPlayer getOrCreatePlayer(Context context) {
+        return this.players.computeIfAbsent(Tuples.of(context.getGuildId(), context.getAuthorId()),
+                ignored -> new RpsPlayer(context.getGuildId(), context.getAuthorId()));
     }
 
     @Override

@@ -3,22 +3,20 @@ package me.shadorc.shadbot.command.game.blackjack;
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.core.game.Player;
+import me.shadorc.shadbot.core.game.player.GamblerPlayer;
 import me.shadorc.shadbot.object.casino.Card;
 import me.shadorc.shadbot.object.casino.Hand;
 import reactor.core.publisher.Mono;
 
-public class BlackjackPlayer extends Player {
+public class BlackjackPlayer extends GamblerPlayer {
 
-    private final long bet;
     private final Hand hand;
 
     private boolean isDoubleDown;
     private boolean isStanding;
 
-    public BlackjackPlayer(Snowflake userId, long bet) {
-        super(userId);
-        this.bet = bet;
+    public BlackjackPlayer(Snowflake guildId, Snowflake userId, long bet) {
+        super(guildId, userId, bet);
         this.hand = new Hand();
         this.isDoubleDown = false;
         this.isStanding = false;
@@ -57,8 +55,9 @@ public class BlackjackPlayer extends Player {
                 });
     }
 
+    @Override
     public long getBet() {
-        return this.bet * (this.isDoubleDown ? 2 : 1);
+        return super.getBet() * (this.isDoubleDown ? 2 : 1);
     }
 
     public Hand getHand() {

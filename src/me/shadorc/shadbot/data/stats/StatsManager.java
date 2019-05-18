@@ -4,7 +4,6 @@ import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.data.stats.core.MapStatistic;
 import me.shadorc.shadbot.data.stats.core.TableStatistic;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
-import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 
 import java.io.File;
@@ -17,7 +16,6 @@ public class StatsManager extends Data {
 
     public static final MapStatistic<VariousEnum> VARIOUS_STATS = new MapStatistic<>("various.json", VariousEnum.class);
     public static final TableStatistic<CommandEnum> COMMAND_STATS = new TableStatistic<>("command.json", CommandEnum.class);
-    public static final TableStatistic<MoneyEnum> MONEY_STATS = new TableStatistic<>("money.json", MoneyEnum.class);
 
     public StatsManager() {
         super("statistics", Duration.ofMinutes(10), Duration.ofMinutes(10));

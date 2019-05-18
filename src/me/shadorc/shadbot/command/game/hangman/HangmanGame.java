@@ -2,14 +2,11 @@ package me.shadorc.shadbot.command.game.hangman;
 
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.hangman.HangmanCmd.Difficulty;
-import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.Game;
+import me.shadorc.shadbot.core.game.player.Player;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -74,8 +71,7 @@ public class HangmanGame extends Game {
             final float imagesRemaining = IMG_LIST.size() - this.failCount;
             final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
 
-            Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), this.getContext().getAuthorId()).addCoins(gains);
-            StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
+            new Player(this.getContext().getGuildId(), this.getContext().getAuthorId()).win(gains);
 
             strBuilder.append(String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
                     this.getContext().getUsername(), FormatUtils.coins(gains)));

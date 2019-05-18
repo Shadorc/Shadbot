@@ -1,14 +1,10 @@
 package me.shadorc.shadbot.command.game.roulette;
 
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
-import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.core.game.MultiplayerGame;
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.UpdateableMessage;
 import me.shadorc.shadbot.utils.*;
@@ -55,30 +51,18 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     public Mono<Void> end() {
         final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
         return Flux.fromIterable(this.getPlayers().values())
-                .flatMap(player -> Mono.zip(Mono.just(player),
-                        player.getUsername(this.getContext().getClient())))
+                .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
                 .map(tuple -> {
                     final RoulettePlayer player = tuple.getT1();
                     final String username = tuple.getT2();
-                    final Place placeEnum = Utils.parseEnum(Place.class, player.getPlace());
+                    final Place place = Utils.parseEnum(Place.class, player.getPlace());
 
-                    int multiplier;
-                    if (player.getPlace().equals(Integer.toString(winningPlace))) {
-                        multiplier = 36;
-                    } else if (placeEnum != null && TESTS.get(placeEnum).test(winningPlace)) {
-                        multiplier = 2;
-                    } else {
-                        multiplier = 0;
-                    }
-
+                    final int multiplier = RouletteGame.getMultiplier(player, place, winningPlace);
                     if (multiplier > 0) {
                         final long gains = Math.min(player.getBet() * multiplier, Config.MAX_COINS);
-                        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
-                        Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), player.getUserId()).addCoins(gains);
+                        player.win(gains);
                         return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains));
                     } else {
-                        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), player.getBet());
-                        Shadbot.getLottery().addToJackpot(player.getBet());
                         return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet()));
                     }
                 })
@@ -91,11 +75,20 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                 .then(Mono.fromRunnable(this::stop));
     }
 
+    private static int getMultiplier(RoulettePlayer player, Place place, int winningPlace) {
+        if (player.getPlace().equals(Integer.toString(winningPlace))) {
+            return 36;
+        } else if (place != null && TESTS.get(place).test(winningPlace)) {
+            return 2;
+        } else {
+            return 0;
+        }
+    }
+
     @Override
     public Mono<Void> show() {
         return Flux.fromIterable(this.getPlayers().values())
-                .flatMap(player -> Mono.zip(Mono.just(player),
-                        player.getUsername(this.getContext().getClient())))
+                .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
                 .collectList()
                 .map(list -> EmbedUtils.getDefaultEmbed()
                         .andThen(embed -> {

@@ -1,13 +1,9 @@
 package me.shadorc.shadbot.command.game.dice;
 
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.core.game.MultiplayerGame;
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.UpdateableMessage;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -48,15 +44,14 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
                 .map(tuple -> {
-                    if (tuple.getT1().getNumber() == winningNum) {
+                    final DicePlayer player = tuple.getT1();
+                    final String username = tuple.getT2();
+                    if (player.getNumber() == winningNum) {
                         long gains = Math.min((long) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER)), Config.MAX_COINS);
-                        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), gains);
-                        Shadbot.getDatabase().getDBMember(this.getContext().getGuildId(), tuple.getT1().getUserId()).addCoins(gains);
-                        return String.format("**%s** (Gains: **%s**)", tuple.getT2(), FormatUtils.coins(gains));
+                        player.win(gains);
+                        return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains));
                     } else {
-                        StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, CommandInitializer.getCommand(this.getContext().getCommandName()).getName(), this.bet);
-                        Shadbot.getLottery().addToJackpot(this.bet);
-                        return String.format("**%s** (Losses: **%s**)", tuple.getT2(), this.bet);
+                        return String.format("**%s** (Losses: **%s**)", username, this.bet);
                     }
 
                 })

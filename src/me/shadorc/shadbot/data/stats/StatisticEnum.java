@@ -4,8 +4,7 @@ import me.shadorc.shadbot.data.stats.core.Statistic;
 
 public enum StatisticEnum {
     VARIOUS(StatsManager.VARIOUS_STATS),
-    COMMAND(StatsManager.COMMAND_STATS),
-    MONEY(StatsManager.MONEY_STATS);
+    COMMAND(StatsManager.COMMAND_STATS);
 
     private final Statistic<?> stat;
 

@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.game.dice;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.exception.CommandException;
@@ -76,8 +75,10 @@ public class DiceCmd extends GameCmd<DiceGame> {
             }
 
             final long bet = Utils.requireValidBet(context.getMember(), Long.toString(diceManager.getBet()));
-            Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(-bet);
-            diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));
+            final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(), diceManager.getBet(), number);
+            if (diceManager.addPlayerIfAbsent(player)) {
+                player.bet();
+            }
             return diceManager.show();
         }
         // A game is not already started...
@@ -90,7 +91,10 @@ public class DiceCmd extends GameCmd<DiceGame> {
             final long bet = Utils.requireValidBet(context.getMember(), args.get(1));
             final DiceGame diceManager = this.getManagers().computeIfAbsent(context.getChannelId(),
                     ignored -> new DiceGame(this, context, bet));
-            diceManager.addPlayerIfAbsent(new DicePlayer(context.getAuthorId(), number));
+            final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(), diceManager.getBet(), number);
+            if (diceManager.addPlayerIfAbsent(player)) {
+                player.bet();
+            }
             diceManager.start();
             return diceManager.show();
         }

@@ -2,19 +2,8 @@ package me.shadorc.shadbot.utils.embed;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.data.stats.enums.CommandEnum;
-import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.Utils;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class EmbedUtils {
 
@@ -22,6 +11,7 @@ public class EmbedUtils {
         return spec -> spec.setColor(Config.BOT_COLOR);
     }
 
+    /*
     public static Consumer<EmbedCreateSpec> getAverageEmbed() {
         return embed -> {
             final Map<String, AtomicLong> moneyGained = StatsManager.MONEY_STATS.getMap(MoneyEnum.MONEY_GAINED);
@@ -56,5 +46,6 @@ public class EmbedUtils {
             embed.addField("Count", FormatUtils.format(sortedMap.values().stream().map(Tuple2::getT2), (Function<Long, String>) FormatUtils::number, "\n"), true);
         };
     }
+     */
 
 }

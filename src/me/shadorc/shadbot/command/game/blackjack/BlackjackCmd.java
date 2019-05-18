@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.game.blackjack;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.object.Emoji;
@@ -32,8 +31,9 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
                     return game;
                 });
 
-        if (blackjackManager.addPlayerIfAbsent(new BlackjackPlayer(context.getAuthorId(), bet))) {
-            Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(-bet);
+        final BlackjackPlayer player = new BlackjackPlayer(context.getGuildId(), context.getAuthorId(), bet);
+        if (blackjackManager.addPlayerIfAbsent(player)) {
+            player.bet();
             if (blackjackManager.areAllPlayersStanding()) {
                 return blackjackManager.end();
             }

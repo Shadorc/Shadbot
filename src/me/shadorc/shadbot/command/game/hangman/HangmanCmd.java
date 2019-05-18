@@ -39,11 +39,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                 new CommandException(String.format("`%s` is not a valid difficulty. %s",
                         context.getArg().orElse(""), FormatUtils.options(Difficulty.class))));
 
-        if (difficulty == Difficulty.EASY && !this.easyWords.isLoaded()) {
-            this.easyWords.load();
-        } else if (difficulty == Difficulty.HARD && !this.hardWords.isLoaded()) {
-            this.hardWords.load();
-        }
+        this.loadWords(difficulty);
 
         final HangmanGame hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
         if (hangmanManager == null) {
@@ -56,6 +52,14 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                                     + " Please, wait for him to finish.",
                             context.getUsername(), hangmanManager.getContext().getUsername()), channel))
                     .then();
+        }
+    }
+
+    private void loadWords(Difficulty difficulty) {
+        if (difficulty == Difficulty.EASY && !this.easyWords.isLoaded()) {
+            this.easyWords.load();
+        } else if (difficulty == Difficulty.HARD && !this.hardWords.isLoaded()) {
+            this.hardWords.load();
         }
     }
 

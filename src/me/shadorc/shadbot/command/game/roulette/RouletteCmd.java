@@ -1,7 +1,6 @@
 package me.shadorc.shadbot.command.game.roulette;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.game.GameCmd;
 import me.shadorc.shadbot.exception.CommandException;
@@ -46,8 +45,9 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                     return game;
                 });
 
-        if (rouletteManager.addPlayerIfAbsent(new RoulettePlayer(context.getAuthorId(), bet, place))) {
-            Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(-bet);
+        final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet, place);
+        if (rouletteManager.addPlayerIfAbsent(player)) {
+            player.bet();
             return rouletteManager.show();
         } else {
             return context.getChannel()

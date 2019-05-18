@@ -1,12 +1,10 @@
 package me.shadorc.shadbot.command.game.slotmachine;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.data.stats.StatsManager;
-import me.shadorc.shadbot.data.stats.enums.MoneyEnum;
+import me.shadorc.shadbot.core.game.player.GamblerPlayer;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -18,7 +16,6 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class SlotMachineCmd extends BaseCmd {
@@ -61,27 +58,26 @@ public class SlotMachineCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         Utils.requireValidBet(context.getMember(), Integer.toString(PAID_COST));
 
-        final AtomicInteger gains = new AtomicInteger(-PAID_COST);
+        final GamblerPlayer player = new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST);
+        player.bet();
 
         final List<SlotOptions> slots = SlotMachineCmd.randSlots();
+
+        final StringBuilder text = new StringBuilder(String.format("%s%n%s (**%s**) ",
+                FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername()));
+
         if (slots.stream().distinct().count() == 1) {
             final int slotGains = slots.get(0).getGains();
-            gains.set(ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
-                    (int) (slotGains * (RAND_FACTOR + 1))));
-        }
-
-        Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId()).addCoins(gains.get());
-        if (gains.get() > 0) {
-            StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_GAINED, this.getName(), gains.get());
+            final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
+                    (int) (slotGains * (RAND_FACTOR + 1)));
+            player.win(gains);
+            text.append(String.format("You win **%s** !", FormatUtils.coins(gains)));
         } else {
-            StatsManager.MONEY_STATS.log(MoneyEnum.MONEY_LOST, this.getName(), Math.abs(gains.get()));
-            Shadbot.getLottery().addToJackpot(Math.abs(gains.get()));
+            text.append(String.format("You lose **%s** !", FormatUtils.coins(PAID_COST)));
         }
 
         return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format("%s%n%s (**%s**) You %s **%s** !",
-                        FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername(),
-                        gains.get() > 0 ? "win" : "lose", FormatUtils.coins(Math.abs(gains.get()))), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(text.toString(), channel))
                 .then();
     }
 
