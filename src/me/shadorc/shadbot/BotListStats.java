@@ -1,22 +1,25 @@
 package me.shadorc.shadbot;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import me.shadorc.shadbot.core.shard.Shard;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.ExceptionHandler;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.netty.http.client.HttpClient;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Map;
 
 public class BotListStats {
+
+    private static final HttpClient HTTP_CLIENT = HttpClient.create();
 
     private final long selfId;
     private final Disposable task;
@@ -35,20 +38,23 @@ public class BotListStats {
                 .count()
                 .flatMap(guildCount -> this.postOnBotListDotSpace(guildCount)
                         .then(this.postOnBotsOnDiscordXyz(guildCount))
-                        .then(this.postOnDiscordBotListDotCom(guildCount))
-                        .then(this.postOnDiscordBotsDotGg(guildCount))
-                        .then(this.postOnDiscordBotsDotOrg(guildCount))
-                        .then(this.postOnDivineDiscordBotsDotCom(guildCount)))
+                        .then(this.postOnDivineDiscordBotsDotCom(guildCount))
+                        .thenMany(this.postOnDiscordBotListDotCom(guildCount))
+                        .thenMany(this.postOnDiscordBotsDotGg(guildCount))
+                        .thenMany(this.postOnDiscordBotsDotOrg(guildCount))
+                        .then())
                 .then(Mono.fromRunnable(() -> LogUtils.info("Statistics posted.")));
     }
 
-    // TODO: Use reactor.netty
-    private static Mono<Document> post(String url, String authorization, JSONObject content) {
-        return Mono.fromCallable(() -> Jsoup.connect(url)
-                .ignoreContentType(true)
-                .requestBody(content.toString())
-                .headers(Map.of("Content-Type", "application/json", "Authorization", authorization))
-                .post())
+    private static Mono<String> post(String url, String authorization, JSONObject content) {
+        return HTTP_CLIENT
+                .headers(header -> header.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                        .add(HttpHeaderNames.AUTHORIZATION, authorization))
+                .post()
+                .uri(url)
+                .send((req, res) -> res.sendString(Mono.just(content.toString()), StandardCharsets.UTF_8))
+                .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8))
+                .timeout(Config.DEFAULT_TIMEOUT)
                 .onErrorResume(err -> Mono.fromRunnable(() -> LogUtils.warn(Shadbot.getClient(),
                         String.format("An error occurred while posting statistics on %s: %s", url, err.getMessage()))));
     }
@@ -57,7 +63,7 @@ public class BotListStats {
      * WebSite: https://botlist.space/bots <br>
      * Documentation: https://docs.botlist.space/bl-docs/bots
      */
-    private Mono<Document> postOnBotListDotSpace(Long guildCount) {
+    private Mono<String> postOnBotListDotSpace(Long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://api.botlist.space/v1/bots/%d", this.selfId);
@@ -68,7 +74,7 @@ public class BotListStats {
      * WebSite: https://bots.ondiscord.xyz/ <br>
      * Documentation: https://bots.ondiscord.xyz/info/api
      */
-    private Mono<Document> postOnBotsOnDiscordXyz(Long guildCount) {
+    private Mono<String> postOnBotsOnDiscordXyz(Long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
         final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", this.selfId);
@@ -79,7 +85,7 @@ public class BotListStats {
      * WebSite: https://divinediscordbots.com/ <br>
      * Documentation: https://divinediscordbots.com/api
      */
-    private Mono<Document> postOnDivineDiscordBotsDotCom(Long guildCount) {
+    private Mono<String> postOnDivineDiscordBotsDotCom(Long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://divinediscordbots.com/bot/%d/stats", this.selfId);
@@ -90,7 +96,7 @@ public class BotListStats {
      * WebSite: https://discordbotlist.com/ <br>
      * Documentation: https://discordbotlist.com/api-docs
      */
-    private Mono<Void> postOnDiscordBotListDotCom(Long guildCount) {
+    private Flux<String> postOnDiscordBotListDotCom(Long guildCount) {
         return Flux.fromIterable(Shadbot.getShards().values())
                 .map(Shard::getClient)
                 .flatMap(client -> {
@@ -99,15 +105,14 @@ public class BotListStats {
                             .put("guilds ", guildCount);
                     final String url = String.format("https://discordbotlist.com/api/bots/%d/stats", this.selfId);
                     return BotListStats.post(url, String.format("Bot %s", Credentials.get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
-                })
-                .then();
+                });
     }
 
     /**
      * WebSite: https://discord.bots.gg/ <br>
      * Documentation: https://discord.bots.gg/docs/endpoints
      */
-    private Mono<Void> postOnDiscordBotsDotGg(Long guildCount) {
+    private Flux<String> postOnDiscordBotsDotGg(Long guildCount) {
         return Flux.fromIterable(Shadbot.getShards().values())
                 .map(Shard::getClient)
                 .flatMap(client -> {
@@ -117,15 +122,14 @@ public class BotListStats {
                             .put("guildCount", (int) (guildCount / client.getConfig().getShardCount()));
                     final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", this.selfId);
                     return BotListStats.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
-                })
-                .then();
+                });
     }
 
     /**
      * WebSite: https://discordbots.org/ <br>
      * Documentation: https://discordbots.org/api/docs#bots
      */
-    private Mono<Void> postOnDiscordBotsDotOrg(Long guildCount) {
+    private Flux<String> postOnDiscordBotsDotOrg(Long guildCount) {
         return Flux.fromIterable(Shadbot.getShards().values())
                 .map(Shard::getClient)
                 .flatMap(client -> {
@@ -135,8 +139,7 @@ public class BotListStats {
                             .put("server_count", (int) (guildCount / client.getConfig().getShardCount()));
                     final String url = String.format("https://discordbots.org/api/bots/%d/stats", this.selfId);
                     return BotListStats.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
-                })
-                .then();
+                });
     }
 
     public void stop() {
