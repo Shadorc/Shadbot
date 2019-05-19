@@ -42,9 +42,12 @@ public class RouletteInputs extends Inputs {
         return Mono.justOrEmpty(event.getMember())
                 .filterWhen(ignored -> this.game.isCancelMessage(event.getMessage()))
                 .flatMap(member -> event.getMessage().getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.CHECK_MARK + " Roulette game cancelled by **%s**.",
-                                        member.getUsername()), channel))
+                        .flatMap(channel -> {
+                            this.game.getPlayers().values().forEach(RoulettePlayer::cancelBet);
+                            return DiscordUtils.sendMessage(
+                                    String.format(Emoji.CHECK_MARK + " Roulette game cancelled by **%s**.",
+                                            member.getUsername()), channel);
+                        })
                         .then(Mono.fromRunnable(this.game::stop)));
     }
 

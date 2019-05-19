@@ -49,6 +49,7 @@ public class BlackjackInputs extends Inputs {
                 .flatMap(isCancelMsg -> {
                     final Member member = event.getMember().get();
                     if (isCancelMsg) {
+                        this.game.getPlayers().values().forEach(BlackjackPlayer::cancelBet);
                         return event.getMessage().getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
                                         String.format(Emoji.CHECK_MARK + " Blackjack game cancelled by **%s**.",
