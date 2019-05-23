@@ -48,7 +48,7 @@ public class ImageCmd extends BaseCmd {
         return this.getPopularImages(NetUtils.encode(arg))
                 .collectList()
                 .map(images -> {
-                    if(images.isEmpty()) {
+                    if (images.isEmpty()) {
                         return loadingMsg.setContent(String.format(
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
                                 context.getUsername(), arg));
@@ -83,13 +83,11 @@ public class ImageCmd extends BaseCmd {
     }
 
     private Mono<TokenResponse> generateAccessToken() {
-        final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
+        return Mono.just(String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
                 Credentials.get(Credential.DEVIANTART_CLIENT_ID),
-                Credentials.get(Credential.DEVIANTART_API_SECRET));
-
-        return Mono.just(url)
-                .filter(ignored -> this.isTokenExpired())
-                .flatMap(ignored -> NetUtils.get(url, TokenResponse.class))
+                Credentials.get(Credential.DEVIANTART_API_SECRET)))
+                .filter(url -> this.isTokenExpired())
+                .flatMap(url -> NetUtils.get(url, TokenResponse.class))
                 .doOnNext(token -> {
                     this.token = token;
                     this.lastTokenGeneration.set(System.currentTimeMillis());
