@@ -33,7 +33,7 @@ public class ThisDayCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
         return Mono.fromCallable(() -> {
-            final Document doc = NetUtils.getDocument(HOME_URL);
+            final Document doc = Jsoup.parse(NetUtils.get(HOME_URL).block());
 
             final String date = doc.getElementsByClass("date-large")
                     .first()

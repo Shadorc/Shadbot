@@ -34,7 +34,7 @@ public class DtcCmd extends BaseCmd {
                     Credentials.get(Credential.DTC_API_KEY));
 
             final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
-            final List<Quote> quotes = NetUtils.readValue(url, valueType);
+            final List<Quote> quotes = (List<Quote>) NetUtils.get(url, valueType).block();
 
             Quote quote;
             do {

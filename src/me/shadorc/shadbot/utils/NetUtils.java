@@ -1,21 +1,21 @@
 package me.shadorc.shadbot.utils;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpMethod;
 import me.shadorc.shadbot.Config;
-import org.apache.http.HttpStatus;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
-import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
+import reactor.netty.ByteBufMono;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.http.client.HttpClient.RequestSender;
 import reactor.netty.http.client.HttpClientResponse;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -57,74 +57,74 @@ public class NetUtils {
      * @param url - a string representing an URL to check
      * @return true if the string is a valid and reachable URL, false otherwise
      */
-    public static boolean isValidUrl(String url) {
-        try {
-            HTTP_CLIENT.get()
-                    .uri(url)
-                    .response()
-                    .timeout(Config.DEFAULT_TIMEOUT)
-                    .block();
-            return true;
-        } catch (final Exception err) {
-            return false;
-        }
+    public static Mono<Boolean> isValidUrl(String url) {
+        return NetUtils.get(url)
+                .map(ignored -> true)
+                .onErrorResume(ignored -> Mono.just(false));
     }
 
-    public static Tuple2<HttpClientResponse, String> getResponseSingle(String url, Consumer<HttpHeaders> headerBuilder) {
+    private static <T> Mono<T> handleResponse(HttpClientResponse resp, ByteBufMono body, JavaType type) {
+        final int statusCode = resp.status().code();
+        if (statusCode / 100 != 2) {
+            return body.asString()
+                    .flatMap(err -> Mono.error(new IOException(String.format("%s %s failed (%d) %s",
+                            resp.method().asciiName(), resp.uri(), statusCode, err))));
+        }
+        if (!resp.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE).startsWith(HttpHeaderValues.APPLICATION_JSON.toString())) {
+            return body.asString()
+                    .flatMap(err -> Mono.error(new IOException(String.format("%s %s wrong header (%s) %s",
+                            resp.method().asciiName(), resp.uri(), resp.responseHeaders(), err))));
+        }
+
+        return body.asInputStream()
+                .flatMap(input -> Mono.fromCallable(() -> Utils.MAPPER.readValue(input, type)));
+    }
+
+    public static RequestSender request(Consumer<HttpHeaders> headerBuilder, HttpMethod method, String url) {
         return HTTP_CLIENT
-                .headers(headerBuilder
-                        .andThen(header -> header.add(HttpHeaderNames.USER_AGENT, Config.USER_AGENT)))
-                .get()
-                .uri(url)
-                .responseSingle((response, content) -> content.asString(StandardCharsets.UTF_8)
-                        .map(body -> Tuples.of(response, body)))
-                .timeout(Config.DEFAULT_TIMEOUT)
-                .block();
+                .headers(headerBuilder.andThen(header -> header.add(HttpHeaderNames.USER_AGENT, Config.USER_AGENT)))
+                .request(method)
+                .uri(url);
     }
 
-    public static Tuple2<HttpClientResponse, String> getResponseSingle(String url) {
-        return NetUtils.getResponseSingle(url, header -> {
-        });
+    public static RequestSender request(HttpMethod method, String url) {
+        return NetUtils.request(ignored -> {
+        }, method, url);
     }
 
-    public static HttpClientResponse getResponse(String url) {
-        return NetUtils.getResponseSingle(url).getT1();
+    public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, JavaType type) {
+        return NetUtils.request(headerBuilder, HttpMethod.GET, url)
+                .<T>responseSingle((resp, body) -> NetUtils.handleResponse(resp, body, type))
+                .timeout(Config.DEFAULT_TIMEOUT);
     }
 
-    public static String getBody(String url) {
-        return NetUtils.getResponseSingle(url).getT2();
+    public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, Class<? extends T> type) {
+        return NetUtils.get(headerBuilder, url, TypeFactory.defaultInstance().constructType(type));
     }
 
-    public static Document getDocument(String url) {
-        return Jsoup.parse(NetUtils.getBody(url));
+    public static <T> Mono<T> get(String url, JavaType type) {
+        return NetUtils.get(ignored -> {
+        }, url, type);
     }
 
-    public static <T> T readValue(String url, Class<T> type) {
-        try {
-            return Utils.MAPPER.readValue(NetUtils.getJSON(url), type);
-        } catch (final IOException err) {
-            throw Exceptions.propagate(err);
-        }
+    public static <T> Mono<T> get(String url, Class<? extends T> type) {
+        return NetUtils.get(url, TypeFactory.defaultInstance().constructType(type));
     }
 
-    public static <T> T readValue(String url, JavaType type) {
-        try {
-            return Utils.MAPPER.readValue(NetUtils.getJSON(url), type);
-        } catch (final IOException err) {
-            throw Exceptions.propagate(err);
-        }
+    public static Mono<String> get(String url) {
+        return NetUtils.request(HttpMethod.GET, url)
+                .responseSingle((resp, body) -> body.asString(StandardCharsets.UTF_8))
+                .timeout(Config.DEFAULT_TIMEOUT);
     }
 
-    public static String getJSON(String url) throws HttpStatusException {
-        final Tuple2<HttpClientResponse, String> responseSingle = NetUtils.getResponseSingle(url);
-        final HttpClientResponse response = responseSingle.getT1();
-        final String content = responseSingle.getT2();
-        if (!response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE).startsWith(HttpHeaderValues.APPLICATION_JSON.toString())
-                || !response.status().equals(HttpResponseStatus.OK)) {
-            throw new HttpStatusException(String.format("Invalid JSON:%nURL: %s%nStatus: %s%nHeaders: %s%nContent: %s",
-                    url, response.status(), response.responseHeaders(), content),
-                    HttpStatus.SC_SERVICE_UNAVAILABLE, url);
-        }
-        return content;
+    public static Mono<HttpClientResponse> post(String url, String authorization, Object payload) {
+        final Consumer<HttpHeaders> headerBuilder = header -> header.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                .add(HttpHeaderNames.AUTHORIZATION, authorization);
+
+        return NetUtils.request(headerBuilder, HttpMethod.POST, url)
+                .send(Mono.just(Unpooled.wrappedBuffer(payload.toString().getBytes(StandardCharsets.UTF_8))))
+                .response()
+                .timeout(Config.DEFAULT_TIMEOUT);
     }
+
 }

@@ -80,7 +80,7 @@ public class ChatCmd extends BaseCmd {
     private String talk(Snowflake channelId, String botId, String input) throws IOException {
         final String url = String.format("https://www.pandorabots.com/pandora/talk-xml?botid=%s&input=%s&custid=%s",
                 botId, NetUtils.encode(input), this.channelsCustid.getOrDefault(channelId, ""));
-        final JSONObject resultObj = XML.toJSONObject(NetUtils.getBody(url)).getJSONObject("result");
+        final JSONObject resultObj = XML.toJSONObject(NetUtils.get(url).block()).getJSONObject("result");
         final ChatBotResponse chat = Utils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class);
         this.channelsCustid.put(channelId, chat.getCustId());
         return chat.getResponse();

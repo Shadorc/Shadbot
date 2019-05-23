@@ -31,7 +31,7 @@ public class GifCmd extends BaseCmd {
             final String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
                     Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
 
-            final GiphyResponse giphy = NetUtils.readValue(url, GiphyResponse.class);
+            final GiphyResponse giphy = NetUtils.get(url, GiphyResponse.class).block();
             if (giphy.getGifs().isEmpty()) {
                 return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
                         context.getUsername(), context.getArg().orElse("random search")));

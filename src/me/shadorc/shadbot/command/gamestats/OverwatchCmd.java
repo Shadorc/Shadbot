@@ -94,11 +94,11 @@ public class OverwatchCmd extends BaseCmd {
                 new CommandException(String.format("`%s` is not a valid Platform. %s",
                         platformStr, FormatUtils.options(Platform.class))));
 
-        final ProfileResponse profile = NetUtils.readValue(OverwatchCmd.getUrl("profile", platform, username), ProfileResponse.class);
+        final ProfileResponse profile = NetUtils.get(OverwatchCmd.getUrl("profile", platform, username), ProfileResponse.class).block();
         if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
             return null;
         }
-        final StatsResponse stats = NetUtils.readValue(OverwatchCmd.getUrl("stats", platform, username), StatsResponse.class);
+        final StatsResponse stats = NetUtils.get(OverwatchCmd.getUrl("stats", platform, username), StatsResponse.class).block();
         return Tuples.of(platform, profile, stats);
     }
 

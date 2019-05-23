@@ -11,6 +11,7 @@ import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import reactor.core.publisher.Mono;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class SuicideGirlsCmd extends BaseCmd {
+
+    private static final String HOME_URL = "https://www.suicidegirls.com/photos/sg/recent/all/";
 
     public SuicideGirlsCmd() {
         super(CommandCategory.IMAGE, List.of("suicide_girls", "suicide-girls", "suicidegirls"), "sg");
@@ -35,7 +38,7 @@ public class SuicideGirlsCmd extends BaseCmd {
                         return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
                     }
 
-                    final Document doc = NetUtils.getDocument("https://www.suicidegirls.com/photos/sg/recent/all/");
+                    final Document doc = Jsoup.parse(NetUtils.get(HOME_URL).block());
 
                     final Element girl = Utils.randValue(doc.getElementsByTag("article"));
                     final String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();

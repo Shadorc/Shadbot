@@ -34,7 +34,7 @@ public class UrbanCmd extends BaseCmd {
         return Mono.fromCallable(() -> {
             final String url = String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(arg));
 
-            final UrbanDictionaryResponse urbanDictionary = NetUtils.readValue(url, UrbanDictionaryResponse.class);
+            final UrbanDictionaryResponse urbanDictionary = NetUtils.get(url, UrbanDictionaryResponse.class).block();
 
             if (urbanDictionary.getDefinitions().isEmpty()) {
                 return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",

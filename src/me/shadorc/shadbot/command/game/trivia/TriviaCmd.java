@@ -35,7 +35,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
 
         if (context.getArg().isPresent()) {
             if (this.categories == null) {
-                this.categories = NetUtils.readValue(CATEGORY_URL, TriviaCategoriesResponse.class);
+                this.categories = NetUtils.get(CATEGORY_URL, TriviaCategoriesResponse.class).block();
             }
 
             if ("categories".equalsIgnoreCase(context.getArg().get())) {

@@ -40,7 +40,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
         super(gameCmd, context, Duration.ofSeconds(30));
 
         final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(categoryId, ""));
-        final TriviaResponse response = NetUtils.readValue(url, TriviaResponse.class);
+        final TriviaResponse response = NetUtils.get(url, TriviaResponse.class).block();
         this.trivia = response.getResults().get(0);
 
         this.answers = new ArrayList<>();

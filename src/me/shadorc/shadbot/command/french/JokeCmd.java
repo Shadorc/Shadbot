@@ -32,7 +32,7 @@ public class JokeCmd extends BaseCmd {
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
         return Mono.fromCallable(() -> {
-            final List<String> jokes = NetUtils.getDocument(HOME_URL)
+            final List<String> jokes = Jsoup.parse(NetUtils.get(HOME_URL).block())
                     .getElementsByClass("gag__content")
                     .stream()
                     .map(Element::html)

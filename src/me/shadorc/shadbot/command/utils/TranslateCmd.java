@@ -81,7 +81,7 @@ public class TranslateCmd extends BaseCmd {
                             + "&q=%s",
                     NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
 
-            final JSONArray result = new JSONArray(NetUtils.getJSON(url));
+            final JSONArray result = new JSONArray(NetUtils.get(url).block());
 
             if (langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
                 throw new CommandException(String.format("One of the specified language isn't supported. "

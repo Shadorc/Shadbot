@@ -41,7 +41,7 @@ public class Rule34Cmd extends BaseCmd {
                     final String url = String.format("https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=%s",
                             NetUtils.encode(arg.replace(" ", "_")));
 
-                    final R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.getBody(url)).toString(), R34Response.class);
+                    final R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.get(url).block()).toString(), R34Response.class);
                     if (!r34.getPosts().map(R34Posts::getCount).map(count -> count != 0).orElse(false)) {
                         return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
                                 context.getUsername(), arg));

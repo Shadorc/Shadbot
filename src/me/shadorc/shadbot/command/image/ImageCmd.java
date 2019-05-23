@@ -79,7 +79,7 @@ public class ImageCmd extends BaseCmd {
                         + "&access_token=%s",
                 encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken());
 
-        final DeviantArtResponse deviantArt = NetUtils.readValue(url, DeviantArtResponse.class);
+        final DeviantArtResponse deviantArt = NetUtils.get(url, DeviantArtResponse.class).block();
         final List<Image> images = deviantArt.getResults().stream()
                 .filter(image -> image.getContent().isPresent())
                 .collect(Collectors.toList());
@@ -96,7 +96,7 @@ public class ImageCmd extends BaseCmd {
         final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
                 Credentials.get(Credential.DEVIANTART_CLIENT_ID),
                 Credentials.get(Credential.DEVIANTART_API_SECRET));
-        this.token = NetUtils.readValue(url, TokenResponse.class);
+        this.token = NetUtils.get(url, TokenResponse.class).block();
         this.lastTokenGeneration.set(System.currentTimeMillis());
         LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
     }

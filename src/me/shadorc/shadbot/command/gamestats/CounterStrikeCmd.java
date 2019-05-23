@@ -58,14 +58,14 @@ public class CounterStrikeCmd extends BaseCmd {
             else {
                 final String resolveVanityUrl = String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
                         Credentials.get(Credential.STEAM_API_KEY), NetUtils.encode(identificator));
-                final ResolveVanityUrlResponse response = NetUtils.readValue(resolveVanityUrl, ResolveVanityUrlResponse.class);
+                final ResolveVanityUrlResponse response = NetUtils.get(resolveVanityUrl, ResolveVanityUrlResponse.class).block();
                 steamId = response.getResponse().getSteamId();
             }
 
             final String playerSummariesUrl = String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
                     Credentials.get(Credential.STEAM_API_KEY), steamId);
 
-            final PlayerSummariesResponse playerSummary = NetUtils.readValue(playerSummariesUrl, PlayerSummariesResponse.class);
+            final PlayerSummariesResponse playerSummary = NetUtils.get(playerSummariesUrl, PlayerSummariesResponse.class).block();
 
             // Search users matching the steamId
             final List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
@@ -85,14 +85,14 @@ public class CounterStrikeCmd extends BaseCmd {
             final String userStatsUrl = String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
                     Credentials.get(Credential.STEAM_API_KEY), steamId);
 
-            final String body = NetUtils.getBody(userStatsUrl);
+            final String body = NetUtils.get(userStatsUrl).block();
             if (body.contains("500 Internal Server Error")) {
                 return loadingMsg.setContent(
                         String.format(Emoji.ACCESS_DENIED + " (**%s**) The game details of this profile are not public, more info here: <%s>",
                                 context.getUsername(), PRIVACY_HELP_URL));
             }
 
-            final UserStatsForGameResponse userStats = NetUtils.readValue(userStatsUrl, UserStatsForGameResponse.class);
+            final UserStatsForGameResponse userStats = NetUtils.get(userStatsUrl, UserStatsForGameResponse.class).block();
 
             if (userStats.getPlayerStats().flatMap(PlayerStats::getStats).isEmpty()) {
                 return loadingMsg.setContent(

@@ -1,6 +1,7 @@
 package me.shadorc.shadbot.command.gamestats;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import io.netty.handler.codec.http.HttpHeaders;
 import me.shadorc.shadbot.api.gamestats.fortnite.FortniteResponse;
 import me.shadorc.shadbot.api.gamestats.fortnite.Stats;
 import me.shadorc.shadbot.core.command.BaseCmd;
@@ -49,11 +50,8 @@ public class FortniteCmd extends BaseCmd {
             final String url = String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
                     StringUtils.toLowerCase(platform), encodedNickname);
 
-            final String body = NetUtils.getResponseSingle(url,
-                    header -> header.add("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY)))
-                    .getT2();
-
-            final FortniteResponse fortnite = Utils.MAPPER.readValue(body, FortniteResponse.class);
+            final Consumer<HttpHeaders> headerBuilder = header -> header.add("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY));
+            final FortniteResponse fortnite = NetUtils.get(headerBuilder, url, FortniteResponse.class).block();
 
             if (fortnite.getError().map("Player Not Found"::equals).orElse(false)) {
                 return loadingMsg.setContent(

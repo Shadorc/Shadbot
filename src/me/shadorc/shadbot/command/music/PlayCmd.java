@@ -46,7 +46,7 @@ public class PlayCmd extends BaseCmd {
                                 identifier = AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");
                             }
                             // ... else if the argument is an URL...
-                            else if (NetUtils.isValidUrl(arg)) {
+                            else if (NetUtils.isValidUrl(arg).block()) {
                                 identifier = arg;
                             }
                             // ...else, search on YouTube

@@ -66,7 +66,7 @@ public class DiabloCmd extends BaseCmd {
             final String url = String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
                     region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken());
 
-            final ProfileResponse profile = NetUtils.readValue(url, ProfileResponse.class);
+            final ProfileResponse profile = NetUtils.get(url, ProfileResponse.class).block();
 
             if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
                 return loadingMsg.setContent(String.format(
@@ -79,7 +79,7 @@ public class DiabloCmd extends BaseCmd {
                 final String heroUrl = String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
                         region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken());
 
-                final HeroResponse hero = NetUtils.readValue(heroUrl, HeroResponse.class);
+                final HeroResponse hero = NetUtils.get(heroUrl, HeroResponse.class).block();
                 if (hero.getCode().isEmpty()) {
                     heroResponses.add(hero);
                 }
@@ -117,7 +117,7 @@ public class DiabloCmd extends BaseCmd {
         final String url = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
                 Credentials.get(Credential.BLIZZARD_CLIENT_ID),
                 Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
-        this.token = NetUtils.readValue(url, TokenResponse.class);
+        this.token = NetUtils.get(url, TokenResponse.class).block();
         this.lastTokenGeneration.set(System.currentTimeMillis());
         LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
     }
