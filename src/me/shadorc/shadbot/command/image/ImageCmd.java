@@ -18,6 +18,7 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -25,7 +26,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class ImageCmd extends BaseCmd {
 
@@ -45,60 +45,61 @@ public class ImageCmd extends BaseCmd {
         final String arg = context.requireArg();
 
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-        return Mono.fromCallable(() -> {
-            final Image image = this.getRandomPopularImage(NetUtils.encode(arg));
-            if (image == null) {
-                return loadingMsg.setContent(String.format(
-                        Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
-                        context.getUsername(), arg));
-            }
-
-            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-                    .andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
-                            .setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
-                            .addField("Title", image.getTitle(), false)
-                            .addField("Author", image.getAuthor().getUsername(), false)
-                            .addField("Category", image.getCategoryPath(), false)
-                            .setImage(image.getContent().map(Content::getSource).get())));
-        })
+        return this.getPopularImages(NetUtils.encode(arg))
+                .collectList()
+                .map(images -> {
+                    if(images.isEmpty()) {
+                        return loadingMsg.setContent(String.format(
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
+                                context.getUsername(), arg));
+                    }
+                    final Image image = Utils.randValue(images);
+                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                            .andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
+                                    .setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
+                                    .addField("Title", image.getTitle(), false)
+                                    .addField("Author", image.getAuthor().getUsername(), false)
+                                    .addField("Category", image.getCategoryPath(), false)
+                                    .setImage(image.getContent().map(Content::getSource).get())));
+                })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
                 .then();
     }
 
-    private Image getRandomPopularImage(String encodedSearch) {
-        if (this.isTokenExpired()) {
-            this.generateAccessToken();
-        }
+    private Flux<Image> getPopularImages(String encodedSearch) {
+        return this.generateAccessToken()
+                .then(Mono.defer(() -> Mono.just(String.format("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
+                                + "q=%s"
+                                + "&timerange=alltime"
+                                + "&limit=25" // The pagination limit (min: 1 max: 50)
+                                + "&offset=%d" // The pagination offset (min: 0 max: 50000)
+                                + "&access_token=%s",
+                        encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken()))))
+                .flatMap(url -> NetUtils.get(url, DeviantArtResponse.class))
+                .map(DeviantArtResponse::getResults)
+                .flatMapMany(Flux::fromIterable)
+                .filter(image -> image.getContent().isPresent());
+    }
 
-        final String url = String.format("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
-                        + "q=%s"
-                        + "&timerange=alltime"
-                        + "&limit=25" // The pagination limit (min: 1 max: 50)
-                        + "&offset=%d" // The pagination offset (min: 0 max: 50000)
-                        + "&access_token=%s",
-                encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken());
+    private Mono<TokenResponse> generateAccessToken() {
+        final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
+                Credentials.get(Credential.DEVIANTART_CLIENT_ID),
+                Credentials.get(Credential.DEVIANTART_API_SECRET));
 
-        final DeviantArtResponse deviantArt = NetUtils.get(url, DeviantArtResponse.class).block();
-        final List<Image> images = deviantArt.getResults().stream()
-                .filter(image -> image.getContent().isPresent())
-                .collect(Collectors.toList());
-
-        return images.isEmpty() ? null : Utils.randValue(images);
+        return Mono.just(url)
+                .filter(ignored -> this.isTokenExpired())
+                .flatMap(ignored -> NetUtils.get(url, TokenResponse.class))
+                .doOnNext(token -> {
+                    this.token = token;
+                    this.lastTokenGeneration.set(System.currentTimeMillis());
+                    LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
+                });
     }
 
     private boolean isTokenExpired() {
         return this.token == null
                 || TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
-    }
-
-    private void generateAccessToken() {
-        final String url = String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
-                Credentials.get(Credential.DEVIANTART_CLIENT_ID),
-                Credentials.get(Credential.DEVIANTART_API_SECRET));
-        this.token = NetUtils.get(url, TokenResponse.class).block();
-        this.lastTokenGeneration.set(System.currentTimeMillis());
-        LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
     }
 
     @Override
