@@ -19,6 +19,8 @@ import java.util.function.Consumer;
 
 public class GifCmd extends BaseCmd {
 
+    private static final String HOME_URl = "https://api.giphy.com/v1/gifs/random";
+
     public GifCmd() {
         super(CommandCategory.IMAGE, List.of("gif"));
         this.setDefaultRateLimiter();
@@ -27,19 +29,19 @@ public class GifCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-        return Mono.fromCallable(() -> {
-            final String url = String.format("https://api.giphy.com/v1/gifs/random?api_key=%s&tag=%s",
-                    Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
+        final String url = String.format("%s?api_key=%s&tag=%s",
+                HOME_URl, Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
 
-            final GiphyResponse giphy = NetUtils.get(url, GiphyResponse.class).block();
-            if (giphy.getGifs().isEmpty()) {
-                return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
-                        context.getUsername(), context.getArg().orElse("random search")));
-            }
+        return NetUtils.get(url, GiphyResponse.class)
+                .map(giphy -> {
+                    if (giphy.getGifs().isEmpty()) {
+                        return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
+                                context.getUsername(), context.getArg().orElse("random search")));
+                    }
 
-            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-                    .andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl())));
-        })
+                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                            .andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl())));
+                })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
                 .then();
