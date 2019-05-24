@@ -58,8 +58,10 @@ public class NetUtils {
      * @return true if the string is a valid and reachable URL, false otherwise
      */
     public static Mono<Boolean> isValidUrl(String url) {
-        return NetUtils.get(url)
-                .map(ignored -> true)
+        return NetUtils.request(HttpMethod.GET, url)
+                .response()
+                .timeout(Config.DEFAULT_TIMEOUT)
+                .map(response -> true)
                 .onErrorResume(ignored -> Mono.just(false));
     }
 
