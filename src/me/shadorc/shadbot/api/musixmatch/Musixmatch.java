@@ -28,8 +28,9 @@ public class Musixmatch {
     }
 
     public String getLyrics() {
-        return StringUtils.abbreviate(
+        final String lyrics = StringUtils.abbreviate(
                 NetUtils.br2nl(this.document.getElementsByClass("mxm-lyrics__content ").html()), MAX_LYRICS_LENGTH);
+        return lyrics.isBlank() ? "Lyrics not available. This could be because the music is instrumental." : lyrics;
     }
 
 }
