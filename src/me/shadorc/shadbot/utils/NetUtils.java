@@ -73,7 +73,7 @@ public class NetUtils {
 
     private static <T> Mono<T> handleResponse(HttpClientResponse resp, ByteBufMono body, JavaType type) {
         final int statusCode = resp.status().code();
-        if (statusCode / 100 != 2) {
+        if (statusCode / 100 != 2 && statusCode != 404) {
             return body.asString()
                     .flatMap(err -> Mono.error(new IOException(String.format("%s %s failed (%d) %s",
                             resp.method().asciiName(), resp.uri(), statusCode, err))));

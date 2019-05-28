@@ -11,14 +11,8 @@ import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import org.jsoup.HttpStatusException;
 import reactor.core.publisher.Mono;
 
-import javax.net.ssl.SSLException;
-import java.net.ConnectException;
-import java.net.NoRouteToHostException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
 
 public class ExceptionHandler {
@@ -36,20 +30,10 @@ public class ExceptionHandler {
         if (err instanceof NoMusicException) {
             return ExceptionHandler.onNoMusicException(context);
         }
-        if (ExceptionHandler.isServerAccessError(err)) {
+        if (err instanceof TimeoutException) {
             return ExceptionHandler.onServerAccessError(err, cmd, context);
         }
         return ExceptionHandler.onUnknown(err, cmd, context);
-    }
-
-    private static boolean isServerAccessError(Throwable err) {
-        return err instanceof HttpStatusException
-                || err instanceof NoRouteToHostException
-                || err instanceof SocketTimeoutException
-                || err instanceof UnknownHostException
-                || err instanceof ConnectException
-                || err instanceof SSLException
-                || err instanceof TimeoutException;
     }
 
     private static Mono<Void> onCommandException(CommandException err, BaseCmd cmd, Context context) {
