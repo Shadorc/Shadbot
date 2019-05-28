@@ -140,6 +140,6 @@ public class PollCmd extends BaseCmd {
     }
 
     public Map<Snowflake, PollManager> getManagers() {
-        return Collections.unmodifiableMap(this.managers);
+        return this.managers;
     }
 }
