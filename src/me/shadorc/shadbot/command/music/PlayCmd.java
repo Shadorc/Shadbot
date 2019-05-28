@@ -39,20 +39,11 @@ public class PlayCmd extends BaseCmd {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK)
                         .then(DiscordUtils.requireSameVoiceChannel(context))
-                        .flatMap(voiceChannelId -> {
-                            final String identifier;
-                            // If this is a SoundCloud search...
-                            if (arg.startsWith("soundcloud ")) {
-                                identifier = AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");
-                            }
-                            // ... else if the argument is an URL...
-                            else if (NetUtils.isValidUrl(arg).block()) {
-                                identifier = arg;
-                            }
-                            // ...else, search on YouTube
-                            else {
-                                identifier = AudioLoadResultListener.YT_SEARCH + arg;
-                            }
+                        .zipWith(NetUtils.isValidUrl(arg)
+                                .map(isValidUrl -> PlayCmd.getIdentifier(arg, isValidUrl)))
+                        .flatMap(tuple -> {
+                            final Snowflake voiceChannelId = tuple.getT1();
+                            final String identifier = tuple.getT2();
 
                             final GuildMusic guildMusic = MusicManager.getOrCreate(context.getClient(), guildId, voiceChannelId);
                             if (guildMusic.isWaitingForChoice()) {
@@ -86,6 +77,21 @@ public class PlayCmd extends BaseCmd {
 
                             return Mono.empty();
                         }));
+    }
+
+    private static String getIdentifier(String arg, boolean isValidUrl) {
+        // If this is a SoundCloud search...
+        if (arg.startsWith("soundcloud ")) {
+            return AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");
+        }
+        // ... else if the argument is an URL...
+        else if (isValidUrl) {
+            return arg;
+        }
+        // ...else, search on YouTube
+        else {
+            return AudioLoadResultListener.YT_SEARCH + arg;
+        }
     }
 
     @Override
