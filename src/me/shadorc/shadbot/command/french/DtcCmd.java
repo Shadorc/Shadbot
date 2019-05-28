@@ -29,28 +29,29 @@ public class DtcCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-        return Mono.fromCallable(() -> {
-            final String url = String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
-                    Credentials.get(Credential.DTC_API_KEY));
 
-            final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
-            final List<Quote> quotes = (List<Quote>) NetUtils.get(url, valueType).block();
+        final String url = String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
+                Credentials.get(Credential.DTC_API_KEY));
 
-            Quote quote;
-            do {
-                quote = Utils.randValue(quotes);
-            } while (quote.getContent().length() > 1000);
+        final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
+        return NetUtils.get(url, valueType)
+                .cast((Class<List<Quote>>) (Object) List.class)
+                .map(quotes -> {
+                    Quote quote;
+                    do {
+                        quote = Utils.randValue(quotes);
+                    } while (quote.getContent().length() > 1000);
 
-            final String content = quote.getContent().replace("*", "\\*");
-            final String id = quote.getId();
+                    final String content = quote.getContent().replace("*", "\\*");
+                    final String id = quote.getId();
 
-            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-                    .andThen(embed -> embed.setAuthor("Quote DansTonChat",
-                            String.format("https://danstonchat.com/%s.html", id),
-                            context.getAvatarUrl())
-                            .setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
-                            .setDescription(FormatUtils.format(content.split("\n"), DtcCmd::format, "\n"))));
-        })
+                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                            .andThen(embed -> embed.setAuthor("Quote DansTonChat",
+                                    String.format("https://danstonchat.com/%s.html", id),
+                                    context.getAvatarUrl())
+                                    .setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+                                    .setDescription(FormatUtils.format(content.split("\n"), DtcCmd::format, "\n"))));
+                })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
                 .then();
