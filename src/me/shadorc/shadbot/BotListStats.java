@@ -16,6 +16,7 @@ import reactor.netty.http.client.HttpClient;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 public class BotListStats {
 
@@ -55,8 +56,15 @@ public class BotListStats {
                 .send((req, res) -> res.sendString(Mono.just(content.toString()), StandardCharsets.UTF_8))
                 .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8))
                 .timeout(Config.DEFAULT_TIMEOUT)
-                .onErrorResume(err -> Mono.fromRunnable(() -> LogUtils.warn(Shadbot.getClient(),
-                        String.format("An error occurred while posting statistics on %s: %s", url, err.getMessage()))));
+                .onErrorResume(err -> {
+                    if(err instanceof TimeoutException) {
+                        return Mono.fromRunnable(() -> LogUtils.warn(Shadbot.getClient(),
+                                String.format("A timeout occurred while posting statistics on %s", url)));
+
+                    }
+                    return Mono.fromRunnable(() -> LogUtils.warn(Shadbot.getClient(),
+                            String.format("An error occurred while posting statistics on %s: %s", url, err.getMessage())));
+                });
     }
 
     /**
