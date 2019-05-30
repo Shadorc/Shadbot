@@ -24,8 +24,10 @@ public class MessageUpdateListener {
 
         final Snowflake guildId = event.getGuildId().get();
         return Mono.zip(event.getMessage(), event.getMessage().flatMap(Message::getAuthorAsMember))
-                .doOnNext(tuple -> MessageCreateListener.onMessageCreate(
-                        new MessageCreateEvent(event.getClient(), tuple.getT1(), guildId.asLong(), tuple.getT2())))
+                .doOnNext(tuple -> event.getClient()
+                        .getServiceMediator()
+                        .getEventDispatcher()
+                        .publish(new MessageCreateEvent(event.getClient(), tuple.getT1(), guildId.asLong(), tuple.getT2())))
                 .then();
     }
 
