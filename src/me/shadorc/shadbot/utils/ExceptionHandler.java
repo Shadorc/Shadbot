@@ -13,6 +13,7 @@ import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
+import javax.net.ssl.SSLException;
 import java.util.concurrent.TimeoutException;
 
 public class ExceptionHandler {
@@ -30,7 +31,7 @@ public class ExceptionHandler {
         if (err instanceof NoMusicException) {
             return ExceptionHandler.onNoMusicException(context);
         }
-        if (err instanceof TimeoutException) {
+        if (err instanceof TimeoutException || err instanceof SSLException) {
             return ExceptionHandler.onServerAccessError(err, cmd, context);
         }
         return ExceptionHandler.onUnknown(err, cmd, context);
