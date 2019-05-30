@@ -22,7 +22,6 @@ import me.shadorc.shadbot.listener.*;
 import me.shadorc.shadbot.utils.ExceptionHandler;
 import me.shadorc.shadbot.utils.TextUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -100,7 +99,7 @@ public class Shard {
                         .thenReturn(event.toString())
                         .elapsed()
                         .doOnNext(tuple -> {
-                            if(this.logger.isTraceEnabled()) {
+                            if (this.logger.isTraceEnabled()) {
                                 this.logger.trace("{} took {}ms to be processed.", tuple.getT2(), tuple.getT1());
                             }
                             if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {

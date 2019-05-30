@@ -57,7 +57,7 @@ public class BotListStats {
                 .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8))
                 .timeout(Config.DEFAULT_TIMEOUT)
                 .onErrorResume(err -> {
-                    if(err instanceof TimeoutException) {
+                    if (err instanceof TimeoutException) {
                         return Mono.fromRunnable(() -> LogUtils.warn(Shadbot.getClient(),
                                 String.format("A timeout occurred while posting statistics on %s", url)));
 
