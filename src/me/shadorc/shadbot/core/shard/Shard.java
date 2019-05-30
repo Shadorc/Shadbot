@@ -100,11 +100,11 @@ public class Shard {
                         .thenReturn(event.toString())
                         .elapsed()
                         .doOnNext(tuple -> {
-                            this.logger.trace("{} took {}ms to be processed.", tuple.getT2(), tuple.getT1());
+                            if(this.logger.isTraceEnabled()) {
+                                this.logger.trace("{} took {}ms to be processed.", tuple.getT2(), tuple.getT1());
+                            }
                             if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
-                                LogUtils.warn(this.client,
-                                        String.format("%s took a long time to be processed (%dms).",
-                                                tuple.getT2(), tuple.getT1()));
+                                this.logger.warn("{} took a long time to be processed ({}ms).", tuple.getT2(), tuple.getT1());
                             }
                         })
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err))))
