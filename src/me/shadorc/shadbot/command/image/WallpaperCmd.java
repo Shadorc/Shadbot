@@ -1,15 +1,8 @@
 package me.shadorc.shadbot.command.image;
 
-import com.ivkos.wallhaven4j.Wallhaven;
-import com.ivkos.wallhaven4j.models.misc.Ratio;
-import com.ivkos.wallhaven4j.models.misc.Resolution;
-import com.ivkos.wallhaven4j.models.misc.enums.Category;
-import com.ivkos.wallhaven4j.models.misc.enums.Purity;
-import com.ivkos.wallhaven4j.models.wallpaper.Wallpaper;
-import com.ivkos.wallhaven4j.util.exceptions.ConnectionException;
-import com.ivkos.wallhaven4j.util.exceptions.WallhavenException;
-import com.ivkos.wallhaven4j.util.searchquery.SearchQueryBuilder;
 import discord4j.core.spec.EmbedCreateSpec;
+import me.shadorc.shadbot.api.image.wallhaven.WallhavenResponse;
+import me.shadorc.shadbot.api.image.wallhaven.Wallpaper;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
@@ -22,16 +15,16 @@ import me.shadorc.shadbot.utils.*;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.apache.commons.cli.*;
-import org.apache.http.HttpStatus;
-import org.jsoup.HttpStatusException;
 import reactor.core.publisher.Mono;
 
-import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class WallpaperCmd extends BaseCmd {
 
+    private static final String HOME_URL = "https://wallhaven.cc/api/v1/search";
     private static final String PURITY = "purity";
     private static final String CATEGORY = "category";
     private static final String RATIO = "ratio";
@@ -39,7 +32,34 @@ public class WallpaperCmd extends BaseCmd {
     private static final String KEYWORD = "keyword";
 
     private final Options options;
-    private Wallhaven wallhaven;
+
+    private enum Purity {
+        SFW("100"), SKETCHY("010"), NSFW("001");
+
+        private final String value;
+
+        Purity(String value) {
+            this.value = value;
+        }
+
+        private String getValue() {
+            return this.value;
+        }
+    }
+
+    private enum Category {
+        GENERAL("100"), ANIME("010"), PEOPLE("001");
+
+        private final String value;
+
+        Category(String value) {
+            this.value = value;
+        }
+
+        private String getValue() {
+            return this.value;
+        }
+    }
 
     public WallpaperCmd() {
         super(CommandCategory.IMAGE, List.of("wallpaper"), "wp");
@@ -51,15 +71,12 @@ public class WallpaperCmd extends BaseCmd {
         this.options.addOption("c", CATEGORY, true, FormatUtils.format(Category.class, ", "));
 
         final Option ratioOption = new Option("rat", RATIO, true, "image ratio");
-        ratioOption.setValueSeparator('x');
         this.options.addOption(ratioOption);
 
         final Option resOption = new Option("res", RESOLUTION, true, "image resolution");
-        resOption.setValueSeparator('x');
         this.options.addOption(resOption);
 
         final Option keyOption = new Option("k", KEYWORD, true, KEYWORD);
-        keyOption.setValueSeparator(',');
         this.options.addOption(keyOption);
     }
 
@@ -74,45 +91,51 @@ public class WallpaperCmd extends BaseCmd {
                 .onErrorMap(err -> err instanceof UnrecognizedOptionException || err instanceof org.apache.commons.cli.MissingArgumentException,
                         err -> new CommandException(String.format("%s. Use `%shelp %s` for more information.",
                                 err.getMessage(), context.getPrefix(), this.getName())))
-                .map(cmdLine -> {
-                    if (this.wallhaven == null) {
-                        this.wallhaven = new Wallhaven(Credentials.get(Credential.WALLHAVEN_LOGIN),
-                                Credentials.get(Credential.WALLHAVEN_PASSWORD));
-                    }
-                    return cmdLine;
-                })
                 .zipWith(context.isChannelNsfw())
-                .map(tuple -> {
+                .flatMap(tuple -> {
                     final CommandLine cmdLine = tuple.getT1();
                     final boolean isNsfw = tuple.getT2();
 
-                    final Purity purity = this.parseEnum(context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
-                    if ((purity == Purity.NSFW || purity == Purity.SKETCHY) && !isNsfw) {
-                        return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
+                    final StringBuilder urlBuilder = new StringBuilder(HOME_URL);
+                    urlBuilder.append(String.format("?apikey=%s", Credentials.get(Credential.WALLHAVEN_API_KEY)));
+
+                    if (cmdLine.hasOption(PURITY)) {
+                        final Purity purity = this.parseEnum(context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
+                        if ((purity == Purity.NSFW || purity == Purity.SKETCHY) && !isNsfw) {
+                            return Mono.error(new CommandException("Must be NSFW"));
+                        }
+                        urlBuilder.append(String.format("&purity=%s", purity.getValue()));
                     }
 
-                    final SearchQueryBuilder queryBuilder = new SearchQueryBuilder();
-                    queryBuilder.purity(purity);
-
                     if (cmdLine.hasOption(CATEGORY)) {
-                        queryBuilder.categories(this.parseEnum(context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY)));
+                        final Category category = this.parseEnum(context, Category.class, CATEGORY, cmdLine.getOptionValue(CATEGORY));
+                        urlBuilder.append(String.format("&categories=%s", category.getValue()));
                     }
 
                     if (cmdLine.hasOption(RATIO)) {
-                        final Dimension dim = this.parseDim(context, RATIO, cmdLine.getOptionValues(RATIO));
-                        queryBuilder.ratios(new Ratio((int) dim.getWidth(), (int) dim.getHeight()));
+                        urlBuilder.append(String.format("&ratios=%s", cmdLine.getOptionValue(RATIO)));
                     }
 
                     if (cmdLine.hasOption(RESOLUTION)) {
-                        final Dimension dim = this.parseDim(context, RESOLUTION, cmdLine.getOptionValues(RESOLUTION));
-                        queryBuilder.resolutions(new Resolution((int) dim.getWidth(), (int) dim.getHeight()));
+                        urlBuilder.append(String.format("&resolutions=%s", cmdLine.getOptionValue(RESOLUTION)));
                     }
 
                     if (cmdLine.hasOption(KEYWORD)) {
-                        queryBuilder.keywords(cmdLine.getOptionValues(KEYWORD));
+                        final String keywords = Arrays.stream(cmdLine.getOptionValue(KEYWORD).split(","))
+                                .map(keyword -> String.format("+%s", keyword.trim()))
+                                .collect(Collectors.joining());
+                        urlBuilder.append(String.format("&q=%s", keywords));
+                        urlBuilder.append("&sorting=relevance");
+                    } else {
+                        urlBuilder.append("&sorting=toplist");
                     }
 
-                    final List<Wallpaper> wallpapers = this.wallhaven.search(queryBuilder.pages(1).build());
+                    System.err.println(urlBuilder);
+
+                    return NetUtils.get(urlBuilder.toString(), WallhavenResponse.class);
+                })
+                .map(wallhaven -> {
+                    final List<Wallpaper> wallpapers = wallhaven.getWallpapers();
                     if (wallpapers.isEmpty()) {
                         return loadingMsg.setContent(
                                 String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
@@ -120,33 +143,16 @@ public class WallpaperCmd extends BaseCmd {
                     }
 
                     final Wallpaper wallpaper = Utils.randValue(wallpapers);
-                    final String tags = FormatUtils.format(wallpaper.getTags(),
-                            tag -> String.format("`%s`", StringUtils.remove(tag.toString(), "#")), " ");
-
                     return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Wallpaper", wallpaper.getUrl(), context.getAvatarUrl())
-                                    .setImage(wallpaper.getImageUrl())
-                                    .addField("Resolution", wallpaper.getResolution().toString(), false)
-                                    .addField("Tags", tags, false)));
+                                    .setImage(wallpaper.getPath())
+                                    .addField("Resolution", wallpaper.getResolution(), false)));
                 })
-                .onErrorMap(err -> err instanceof WallhavenException && err.getCause() != null && err.getCause() instanceof ConnectionException,
-                        err -> new HttpStatusException("Wallhaven is unavailable.", HttpStatus.SC_SERVICE_UNAVAILABLE, "https://alpha.wallhaven.cc/"))
+                .onErrorResume(err -> "Must be NSFW".equals(err.getMessage()),
+                        err -> Mono.just(loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()))))
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
                 .then();
-    }
-
-    private Dimension parseDim(Context context, String name, String... values) {
-        final List<String> sizeList = List.of(values);
-        if (sizeList.size() != 2) {
-            this.throwInvalidArg(context, name);
-        }
-        final Integer width = NumberUtils.asPositiveInt(sizeList.get(0));
-        final Integer height = NumberUtils.asPositiveInt(sizeList.get(1));
-        if (width == null || height == null) {
-            this.throwInvalidArg(context, name);
-        }
-        return new Dimension(width, height);
     }
 
     private <T extends Enum<T>> T parseEnum(Context context, Class<T> enumClass, String name, String value) {
@@ -174,7 +180,7 @@ public class WallpaperCmd extends BaseCmd {
                 .addArg(KEYWORD, "keywords (e.g. doom,game)", true)
                 .setExample(String.format("Search a *SFW* wallpaper in category *Anime*, with a *16x9* ratio :"
                         + "%n`%s%s -p sfw -c anime -rat 16x9`", context.getPrefix(), this.getName()))
-                .setSource("https://alpha.wallhaven.cc/")
+                .setSource("https://wallhaven.cc/")
                 .build();
     }
 }
