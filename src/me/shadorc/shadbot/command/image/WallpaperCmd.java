@@ -130,8 +130,6 @@ public class WallpaperCmd extends BaseCmd {
                         urlBuilder.append("&sorting=toplist");
                     }
 
-                    System.err.println(urlBuilder);
-
                     return NetUtils.get(urlBuilder.toString(), WallhavenResponse.class);
                 })
                 .map(wallhaven -> {
