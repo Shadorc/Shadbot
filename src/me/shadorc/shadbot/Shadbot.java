@@ -29,8 +29,6 @@ import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.utils.ExceptionHandler;
 import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import reactor.blockhound.BlockHound;
-import reactor.blockhound.integration.BlockHoundIntegration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -41,11 +39,9 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.StreamSupport;
 
 public class Shadbot {
 
@@ -123,7 +119,6 @@ public class Shadbot {
     public static void onFullyReadyEvent(DiscordClient client) {
         if (CONNECTED_SHARDS.incrementAndGet() == client.getConfig().getShardCount()) {
             LogUtils.info("Shadbot is connected to all guilds.");
-            Shadbot.installBlockHound();
             if (!Config.IS_SNAPSHOT) {
                 Shadbot.botListStats = new BotListStats();
                 LogUtils.info("Bot list stats scheduler started.");
@@ -177,17 +172,6 @@ public class Shadbot {
                 .map(Shard::getClient)
                 .flatMap(DiscordClient::logout)
                 .then(Mono.fromRunnable(() -> System.exit(exitCode.value())));
-    }
-
-    private static void installBlockHound() {
-        final BlockHound.Builder builder = BlockHound.builder();
-        final ServiceLoader<BlockHoundIntegration> serviceLoader = ServiceLoader.load(BlockHoundIntegration.class);
-        StreamSupport.stream(serviceLoader.spliterator(), false)
-                .sorted()
-                .forEach(builder::with);
-        builder.blockingMethodCallback(method ->
-                LogUtils.error(Shadbot.getClient(), new Exception(method.toString()), String.format("Blocking Method: %s", method.toString())));
-        builder.install();
     }
 
 }
