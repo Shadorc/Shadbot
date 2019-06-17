@@ -8,14 +8,11 @@ import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.shard.ShardingClientBuilder;
-import discord4j.core.shard.ShardingJdkStoreRegistry;
-import discord4j.core.shard.ShardingJdkStoreService;
-import discord4j.core.shard.ShardingStoreRegistry;
-import discord4j.gateway.retry.RetryOptions;
 import discord4j.rest.request.RouterOptions;
 import discord4j.rest.response.ResponseFunction;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.caffeine.CaffeineStoreService;
+import discord4j.store.jdk.JdkStoreService;
 import me.shadorc.shadbot.command.game.LotteryCmd;
 import me.shadorc.shadbot.core.command.CommandInitializer;
 import me.shadorc.shadbot.core.shard.Shard;
@@ -82,18 +79,16 @@ public class Shadbot {
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 
         LogUtils.info("Connecting...");
-        final ShardingStoreRegistry registry = new ShardingJdkStoreRegistry();
         new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
                 .setRouterOptions(RouterOptions.builder()
                         .onClientResponse(ResponseFunction.emptyIfNotFound())
                         .build())
+                .setStoreService(MappingStoreService.create()
+                        .setMapping(new CaffeineStoreService(caffeine -> caffeine
+                                .expireAfterWrite(Duration.ofHours(6))), MessageBean.class)
+                        .setFallback(new JdkStoreService()))
                 .build()
                 .map(builder -> builder
-                        .setStoreService(MappingStoreService.create()
-                                .setMapping(new CaffeineStoreService(caffeine -> caffeine.expireAfterAccess(Duration.ofHours(6))), MessageBean.class)
-                                .setFallback(new ShardingJdkStoreService(registry)))
-                        .setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
-                                Integer.MAX_VALUE, Schedulers.elastic()))
                         .setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
                 .map(DiscordClientBuilder::build)
                 .doOnNext(client -> {
