@@ -126,10 +126,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
                 });
 
-        // TODO: Remove once the 400 error with author name is fixed
-        LogUtils.info("[DEBUG] Playlist name: " + playlist.getName());
         return EmbedUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor(String.format("Playlist: %s", playlist.getName()), null, avatarUrl)
+                .andThen(embed -> embed.setAuthor(String.format("Playlist: %s", StringUtils.remove(identifier, SC_SEARCH, YT_SEARCH)), null, avatarUrl)
                         .setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
                         .setDescription("**Select a music by typing the corresponding number.**"
                                 + "\nYou can choose several musics by separating them with a comma."
