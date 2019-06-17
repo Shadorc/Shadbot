@@ -12,8 +12,6 @@ import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -33,23 +31,26 @@ public class SuicideGirlsCmd extends BaseCmd {
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
         return context.isChannelNsfw()
-                .flatMap(isNsfw -> Mono.fromCallable(() -> {
+                .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
+                        return Mono.just(loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix())));
                     }
 
-                    final Document doc = Jsoup.parse(NetUtils.get(HOME_URL).block());
+                    return NetUtils.get(HOME_URL)
+                            .map(Jsoup::parse)
+                            .map(doc -> doc.getElementsByTag("article"))
+                            .map(Utils::randValue)
+                            .map(girl -> {
+                                final String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();
+                                final String imageUrl = girl.select("noscript").attr("data-retina");
+                                final String url = girl.getElementsByClass("facebook-share").attr("href");
 
-                    final Element girl = Utils.randValue(doc.getElementsByTag("article"));
-                    final String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();
-                    final String imageUrl = girl.select("noscript").attr("data-retina");
-                    final String url = girl.getElementsByClass("facebook-share").attr("href");
-
-                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
-                                    .setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
-                                    .setImage(imageUrl)));
-                }))
+                                return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                                        .andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
+                                                .setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
+                                                .setImage(imageUrl)));
+                            });
+                })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
                 .then();
