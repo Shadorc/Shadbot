@@ -2,6 +2,7 @@ package me.shadorc.shadbot.command.info;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import discord4j.common.GitProperties;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -12,7 +13,7 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.music.MusicManager;
 import me.shadorc.shadbot.object.Emoji;
-import me.shadorc.shadbot.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.Utils;
@@ -42,19 +43,18 @@ public class InfoCmd extends BaseCmd {
         final long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / MB_UNIT;
         final long maxMemory = runtime.maxMemory() / MB_UNIT;
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
         return Mono.zip(context.getClient().getUserById(Snowflake.of(Shadbot.OWNER_ID.get())),
                 context.getClient().getGuilds().count(),
-                context.getClient().getUsers().count())
+                context.getClient().getUsers().count(),
+                context.getChannel())
                 .flatMap(tuple -> {
                     final User owner = tuple.getT1();
                     final Long guildCount = tuple.getT2();
                     final Long memberCount = tuple.getT3();
+                    final MessageChannel channel = tuple.getT4();
 
                     final long start = System.currentTimeMillis();
-                    return loadingMsg.setContent(String.format(Emoji.GEAR + " (**%s**) Testing ping...", context.getUsername()))
-                            .send()
+                    return DiscordUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Testing ping...", context.getUsername()), channel)
                             .flatMap(message -> message.edit(spec -> spec.setContent("```prolog"
                                     + String.format("%n-= Versions =-")
                                     + String.format("%nJava: %s", System.getProperty("java.version"))
@@ -77,7 +77,6 @@ public class InfoCmd extends BaseCmd {
                                     + String.format("%nUsers: %s", FormatUtils.number(memberCount))
                                     + "```")));
                 })
-                .doOnTerminate(loadingMsg::stopTyping)
                 .then();
     }
 

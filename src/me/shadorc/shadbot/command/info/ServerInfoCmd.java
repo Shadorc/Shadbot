@@ -7,7 +7,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
 import me.shadorc.shadbot.utils.embed.EmbedUtils;
@@ -32,37 +32,32 @@ public class ServerInfoCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-
         return Mono.zip(context.getGuild(),
                 context.getGuild().flatMap(Guild::getOwner),
                 context.getGuild().flatMapMany(Guild::getChannels).collectList(),
                 context.getGuild().flatMap(Guild::getRegion))
-                .map(tuple -> {
-                    final Guild guild = tuple.getT1();
-                    final Member owner = tuple.getT2();
-                    final List<GuildChannel> channels = tuple.getT3();
-                    final Region region = tuple.getT4();
-
-                    final String creationDate = String.format("%s%n(%s)",
-                            TimeUtils.toLocalDate(guild.getId().getTimestamp()).format(this.dateFormatter),
-                            FormatUtils.longDuration(guild.getId().getTimestamp()));
-                    final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
-                    final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
-
-                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, context.getAvatarUrl())
-                                    .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
-                                    .addField("Owner", owner.getUsername(), true)
-                                    .addField("Server ID", guild.getId().asString(), true)
-                                    .addField("Creation date", creationDate, true)
-                                    .addField("Region", region.getName(), true)
-                                    .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), true)
-                                    .addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true)));
-                })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .map(tuple -> this.getEmbed(tuple.getT1(), tuple.getT3(), tuple.getT2(), tuple.getT4(), context.getAvatarUrl()))
+                .flatMap(embed -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                 .then();
+    }
+
+    private Consumer<EmbedCreateSpec> getEmbed(Guild guild, List<GuildChannel> channels, Member owner, Region region, String avatarUrl) {
+        final String creationDate = String.format("%s%n(%s)",
+                TimeUtils.toLocalDate(guild.getId().getTimestamp()).format(this.dateFormatter),
+                FormatUtils.longDuration(guild.getId().getTimestamp()));
+        final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
+        final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
+
+        return EmbedUtils.getDefaultEmbed()
+                .andThen(embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
+                        .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
+                        .addField("Owner", owner.getUsername(), true)
+                        .addField("Server ID", guild.getId().asString(), true)
+                        .addField("Creation date", creationDate, true)
+                        .addField("Region", region.getName(), true)
+                        .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), true)
+                        .addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true));
     }
 
     @Override
