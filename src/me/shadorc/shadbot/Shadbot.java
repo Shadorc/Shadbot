@@ -8,6 +8,7 @@ import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.shard.ShardingClientBuilder;
+import discord4j.gateway.retry.RetryOptions;
 import discord4j.rest.request.RouterOptions;
 import discord4j.rest.response.ResponseFunction;
 import discord4j.store.api.mapping.MappingStoreService;
@@ -89,6 +90,8 @@ public class Shadbot {
                         .setFallback(new JdkStoreService()))
                 .build()
                 .map(builder -> builder
+                        .setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
+                                Integer.MAX_VALUE, Schedulers.elastic()))
                         .setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
                 .map(DiscordClientBuilder::build)
                 .doOnNext(client -> {
