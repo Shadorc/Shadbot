@@ -12,7 +12,7 @@ import reactor.util.Loggers;
 
 public class LogUtils {
 
-    private static final Logger LOGGER = Loggers.getLogger(Shadbot.class);
+    private static final Logger LOGGER = Loggers.getLogger("shadbot");
 
     public static void error(DiscordClient client, Throwable err, String msg, String input) {
         LOGGER.error(String.format("%s (Input: %s)", msg, input), err);

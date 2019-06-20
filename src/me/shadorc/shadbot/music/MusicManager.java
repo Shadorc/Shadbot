@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class MusicManager {
 
-    public static final Logger LOGGER = Loggers.getLogger(MusicManager.class);
+    public static final Logger LOGGER = Loggers.getLogger("shadbot.music");
     private static final AudioPlayerManager AUDIO_PLAYER_MANAGER = new DefaultAudioPlayerManager();
     private static final Map<Snowflake, GuildMusicConnection> GUILD_MUSIC_CONNECTIONS = new ConcurrentHashMap<>();
 
