@@ -3,8 +3,6 @@ package me.shadorc.shadbot.music;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -61,16 +59,9 @@ public class GuildMusic {
 
     public Mono<Void> end() {
         LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId.asLong());
-        final StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
-        if (!PremiumManager.getInstance().isGuildPremium(this.guildId)) {
-            strBuilder.append(String.format(" If you like me, you can make a donation on **%s**, "
-                            + "it will help my creator keeping me alive :heart:",
-                    Config.PATREON_URL));
-        }
-
         MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel();
         return this.getMessageChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel))
                 .then();
     }
 
