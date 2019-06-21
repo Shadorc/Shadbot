@@ -23,8 +23,9 @@ public class TextUtils {
 
     public static final List<String> TIP_MESSAGES = List.of(String.format("Check %slottery", Config.DEFAULT_PREFIX),
             String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
-            String.format("Help me keep Shadbot alive ! %s", Config.PATREON_URL),
-            String.format("Support server: %s", Config.SUPPORT_SERVER_URL));
+            String.format("Help me keep Shadbot alive! %s", Config.PATREON_URL),
+            String.format("Support server: %s", Config.SUPPORT_SERVER_URL),
+            "The Baguette is a Lie");
 
     /**
      * @param err - the exception containing the error message to clean
