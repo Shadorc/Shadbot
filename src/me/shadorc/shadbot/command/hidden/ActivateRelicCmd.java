@@ -28,7 +28,7 @@ public class ActivateRelicCmd extends BaseCmd {
         return context.getChannel()
                 .flatMap(channel -> Mono.fromCallable(() -> {
                     PremiumManager.getInstance().activateRelic(context.getGuildId(), context.getAuthorId(), arg);
-                    return String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy !",
+                    return String.format(Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy!",
                             context.getUsername());
                 })
                         .onErrorResume(RelicActivationException.class,

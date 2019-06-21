@@ -83,7 +83,7 @@ public class PremiumManager extends Data {
         return this.isGuildPremium(guildId) || this.isUserPremium(userId);
     }
 
-    public boolean isGuildPremium(Snowflake guildId) {
+    private boolean isGuildPremium(Snowflake guildId) {
         return this.relics.stream()
                 .filter(relic -> relic.getGuildId().map(guildId::equals).orElse(false))
                 .anyMatch(relic -> !relic.isExpired());

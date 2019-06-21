@@ -81,7 +81,7 @@ public class Relic {
     }
 
     /**
-     * @return The activation time of this relic in milliseconds if activated
+     * @return The activation time of this relic, if activated
      */
     public Optional<Instant> getActivationInstant() {
         return Optional.ofNullable(this.activationTime).map(Instant::ofEpochMilli);
