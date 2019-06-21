@@ -1,16 +1,29 @@
 package me.shadorc.shadbot.data.lottery;
 
 import me.shadorc.shadbot.data.Data;
+import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 import java.io.IOException;
 import java.time.Duration;
 
 public class LotteryManager extends Data {
 
+    private static LotteryManager instance;
+
+    static {
+        try {
+            LotteryManager.instance = new LotteryManager();
+        } catch (final IOException err) {
+            LogUtils.error(err, String.format("An error occurred while initializing %s.", LotteryManager.class.getSimpleName()));
+            System.exit(ExitCode.FATAL_ERROR.value());
+        }
+    }
+
     private final Lottery lottery;
 
-    public LotteryManager() throws IOException {
+    private LotteryManager() throws IOException {
         super("lotto_data.json", Duration.ofMinutes(30), Duration.ofMinutes(30));
 
         this.lottery = this.getFile().exists() ? Utils.MAPPER.readValue(this.getFile(), Lottery.class) : new Lottery();
@@ -23,6 +36,10 @@ public class LotteryManager extends Data {
     @Override
     public Object getData() {
         return this.lottery;
+    }
+
+    public static LotteryManager getInstance() {
+        return LotteryManager.instance;
     }
 
 }

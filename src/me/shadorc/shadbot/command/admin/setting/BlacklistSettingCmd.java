@@ -1,12 +1,12 @@
 package me.shadorc.shadbot.command.admin.setting;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.CommandInitializer;
+import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -40,13 +40,13 @@ public class BlacklistSettingCmd extends BaseSetting {
 
         final List<String> commands = StringUtils.split(args.get(2).toLowerCase());
 
-        final List<String> unknownCmds = commands.stream().filter(cmd -> CommandInitializer.getCommand(cmd) == null).collect(Collectors.toList());
+        final List<String> unknownCmds = commands.stream().filter(cmd -> CommandManager.getInstance().getCommand(cmd) == null).collect(Collectors.toList());
         if (!unknownCmds.isEmpty()) {
             return Mono.error(new CommandException(String.format("Command %s doesn't exist.",
                     FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", "))));
         }
 
-        final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
         final List<String> blacklist = dbGuild.getBlacklistedCmd();
 
         final String actionVerbose;

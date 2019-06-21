@@ -93,7 +93,7 @@ public class Context {
     public Mono<CommandPermission> getPermission() {
         // The author is the bot's owner
         final Mono<CommandPermission> ownerPerm = Mono.just(this.getAuthorId())
-                .filter(Snowflake.of(Shadbot.OWNER_ID.get())::equals)
+                .filter(Shadbot.getOwnerId()::equals)
                 .map(ignored -> CommandPermission.OWNER);
 
         // Private message, the author is considered as an administrator
@@ -170,7 +170,7 @@ public class Context {
     }
 
     public GuildMusic requireGuildMusic() {
-        final GuildMusic guildMusic = MusicManager.getMusic(this.getGuildId());
+        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.getGuildId());
         if (guildMusic == null || guildMusic.getTrackScheduler().isStopped()) {
             throw new NoMusicException();
         }

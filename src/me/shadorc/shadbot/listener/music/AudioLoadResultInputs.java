@@ -4,8 +4,8 @@ import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
-import me.shadorc.shadbot.core.command.CommandInitializer;
+import me.shadorc.shadbot.core.command.CommandManager;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.MusicManager;
 import me.shadorc.shadbot.object.Emoji;
@@ -30,7 +30,7 @@ public class AudioLoadResultInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        final GuildMusic guildMusic = MusicManager.getMusic(this.listener.getGuildId());
+        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
         return Mono.just(guildMusic != null
                 && event.getMessage().getContent().isPresent()
                 && event.getMessage().getChannelId().equals(guildMusic.getMessageChannelId())
@@ -39,10 +39,10 @@ public class AudioLoadResultInputs extends Inputs {
 
     @Override
     public Mono<Void> processEvent(MessageCreateEvent event) {
-        final GuildMusic guildMusic = MusicManager.getMusic(this.listener.getGuildId());
+        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
 
         final String content = event.getMessage().getContent().get();
-        final String prefix = Shadbot.getDatabase().getDBGuild(this.listener.getGuildId()).getPrefix();
+        final String prefix = DatabaseManager.getInstance().getDBGuild(this.listener.getGuildId()).getPrefix();
         if (content.equals(String.format("%scancel", prefix))) {
             guildMusic.setWaitingForChoice(false);
             return guildMusic.getMessageChannel()
@@ -54,7 +54,8 @@ public class AudioLoadResultInputs extends Inputs {
 
         // Remove prefix and command names from message content
         String contentCleaned = StringUtils.remove(content, prefix);
-        contentCleaned = StringUtils.remove(contentCleaned, CommandInitializer.getCommand("play").getNames().toArray(new String[0]));
+        contentCleaned = StringUtils.remove(contentCleaned, CommandManager.getInstance()
+                .getCommand("play").getNames().toArray(new String[0]));
 
         final Set<Integer> choices = new HashSet<>();
         for (final String choice : contentCleaned.split(",")) {
@@ -76,7 +77,7 @@ public class AudioLoadResultInputs extends Inputs {
 
     @Override
     public boolean takeEventWile(MessageCreateEvent ignored) {
-        final GuildMusic guildMusic = MusicManager.getMusic(this.listener.getGuildId());
+        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
         return guildMusic != null && guildMusic.isWaitingForChoice();
     }
 

@@ -5,10 +5,10 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.music.GuildMusic;
@@ -45,7 +45,7 @@ public class PlayCmd extends BaseCmd {
                             final Snowflake voiceChannelId = tuple.getT1();
                             final String identifier = tuple.getT2();
 
-                            final GuildMusic guildMusic = MusicManager.getOrCreate(context.getClient(), guildId, voiceChannelId);
+                            final GuildMusic guildMusic = MusicManager.getInstance().getOrCreate(context.getClient(), guildId, voiceChannelId);
                             if (guildMusic.isWaitingForChoice()) {
                                 if (guildMusic.getDjId().equals(context.getAuthorId())) {
                                     return Mono.error(new CommandException(String.format("You're already selecting a music. "
@@ -63,7 +63,7 @@ public class PlayCmd extends BaseCmd {
                             }
 
                             if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-                                    && !Shadbot.getPremium().isPremium(guildId, context.getAuthorId())) {
+                                    && !PremiumManager.getInstance().isPremium(guildId, context.getAuthorId())) {
                                 return DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel).then();
                             }
 

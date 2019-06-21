@@ -10,6 +10,8 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.data.database.DatabaseManager;
+import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.MusicManager;
 import me.shadorc.shadbot.object.Emoji;
@@ -44,7 +46,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     @Override
     public void trackLoaded(AudioTrack track) {
-        Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(track, this.insertFirst))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(
@@ -75,7 +77,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private void onSearchResult(AudioPlaylist playlist) {
-        Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .flatMapMany(guildMusic -> {
                     this.resultTracks = playlist.getTracks()
                             .subList(0, Math.min(Config.MUSIC_SEARCHES, playlist.getTracks().size()));
@@ -95,7 +97,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private void onPlaylistLoaded(AudioPlaylist playlist) {
-        Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     final StringBuilder strBuilder = new StringBuilder();
 
@@ -105,7 +107,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         musicsAdded++;
                         // The playlist limit is reached and the user / guild is not premium
                         if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE
-                                && !Shadbot.getPremium().isPremium(this.guildId, this.djId)) {
+                                && !PremiumManager.getInstance().isPremium(this.guildId, this.djId)) {
                             strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
                             break;
                         }
@@ -134,12 +136,12 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                 + "\nExample: 1,3,4"
                                 + "\n\n" + choices)
                         .setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-                                Shadbot.getDatabase().getDBGuild(this.guildId).getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
+                                DatabaseManager.getInstance().getDBGuild(this.guildId).getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
     }
 
     @Override
     public void loadFailed(FriendlyException err) {
-        Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     final String errMessage = TextUtils.cleanLavaplayerErr(err);
                     LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildId.asLong(), errMessage);
@@ -157,7 +159,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private void onNoMatches() {
-        Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
                         StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
@@ -166,7 +168,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private void terminate() {
-        final GuildMusic guildMusic = MusicManager.getMusic(this.guildId);
+        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.guildId);
         if (guildMusic != null) {
             guildMusic.removeAudioLoadResultListener(this);
         }

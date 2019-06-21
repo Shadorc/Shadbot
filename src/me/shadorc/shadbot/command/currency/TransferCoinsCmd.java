@@ -4,11 +4,11 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.database.DBMember;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.object.Emoji;
@@ -50,12 +50,12 @@ public class TransferCoinsCmd extends BaseCmd {
                     args.get(0))));
         }
 
-        final DBMember dbSender = Shadbot.getDatabase().getDBMember(context.getGuildId(), senderUserId);
+        final DBMember dbSender = DatabaseManager.getInstance().getDBMember(context.getGuildId(), senderUserId);
         if (dbSender.getCoins() < coins) {
             return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
         }
 
-        final DBMember dbReceiver = Shadbot.getDatabase().getDBMember(context.getGuildId(), receiverUserId);
+        final DBMember dbReceiver = DatabaseManager.getInstance().getDBMember(context.getGuildId(), receiverUserId);
         if (dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
             return context.getClient().getUserById(receiverUserId)
                     .map(User::getUsername)

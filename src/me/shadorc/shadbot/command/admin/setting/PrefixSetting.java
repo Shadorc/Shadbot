@@ -1,10 +1,10 @@
 package me.shadorc.shadbot.command.admin.setting;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -35,7 +35,7 @@ public class PrefixSetting extends BaseSetting {
             return Mono.error(new CommandException("Prefix cannot contain spaces."));
         }
 
-        Shadbot.getDatabase().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), args.get(1));
+        DatabaseManager.getInstance().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), args.get(1));
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", args.get(1)), channel))
                 .then();

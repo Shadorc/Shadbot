@@ -5,7 +5,6 @@ import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
 import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
@@ -13,6 +12,7 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.object.message.ReactionMessage;
@@ -79,7 +79,7 @@ public class IamCmd extends BaseCmd {
                             return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
                                     .send(embedConsumer)
                                     .doOnNext(message -> {
-                                        final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+                                        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
                                         final Map<String, Long> setting = dbGuild.getIamMessages();
                                         roles.stream().map(Role::getId)
                                                 .forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));

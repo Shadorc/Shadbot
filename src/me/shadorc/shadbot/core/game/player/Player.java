@@ -3,8 +3,9 @@ package me.shadorc.shadbot.core.game.player;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.database.DBMember;
+import me.shadorc.shadbot.data.database.DatabaseManager;
+import me.shadorc.shadbot.data.lottery.LotteryManager;
 import reactor.core.publisher.Mono;
 
 public class Player {
@@ -26,7 +27,7 @@ public class Player {
     }
 
     public DBMember getDBMember() {
-        return Shadbot.getDatabase().getDBMember(this.guildId, this.userId);
+        return DatabaseManager.getInstance().getDBMember(this.guildId, this.userId);
     }
 
     public void win(long coins) {
@@ -35,7 +36,7 @@ public class Player {
 
     public void lose(long coins) {
         this.getDBMember().addCoins(-coins);
-        Shadbot.getLottery().addToJackpot(coins);
+        LotteryManager.getInstance().getLottery().addToJackpot(coins);
     }
 
 }

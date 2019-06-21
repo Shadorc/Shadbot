@@ -23,7 +23,7 @@ public class VoiceStateUpdateListener {
         final Snowflake guildId = event.getCurrent().getGuildId();
         final Snowflake selfId = event.getClient().getSelfId().get();
 
-        final GuildMusic guildMusic = MusicManager.getMusic(guildId);
+        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(guildId);
         // The bot is not playing music, ignore the event
         if (guildMusic == null) {
             return Mono.empty();

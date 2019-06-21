@@ -17,7 +17,13 @@ public class StatsManager extends Data {
     public static final MapStatistic<VariousEnum> VARIOUS_STATS = new MapStatistic<>("various.json", VariousEnum.class);
     public static final TableStatistic<CommandEnum> COMMAND_STATS = new TableStatistic<>("command.json", CommandEnum.class);
 
-    public StatsManager() {
+    private static StatsManager instance;
+
+    static {
+        StatsManager.instance = new StatsManager();
+    }
+
+    private StatsManager() {
         super("statistics", Duration.ofMinutes(10), Duration.ofMinutes(10));
     }
 
@@ -31,6 +37,10 @@ public class StatsManager extends Data {
     @Override
     public Object getData() {
         return null;
+    }
+
+    public static StatsManager getInstance() {
+        return StatsManager.instance;
     }
 
 }

@@ -1,11 +1,11 @@
 package me.shadorc.shadbot.command.currency;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.database.DBMember;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
@@ -29,7 +29,7 @@ public class CoinsCmd extends BaseCmd {
                 .switchIfEmpty(Mono.just(context.getAuthor()))
                 .next()
                 .map(user -> {
-                    final DBMember dbMember = Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId());
+                    final DBMember dbMember = DatabaseManager.getInstance().getDBMember(context.getGuildId(), user.getId());
                     final String coins = FormatUtils.coins(dbMember.getCoins());
                     if (user.getId().equals(context.getAuthorId())) {
                         return String.format("(**%s**) You have **%s**.", user.getUsername(), coins);

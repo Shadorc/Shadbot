@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import discord4j.common.GitProperties;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.Shadbot;
@@ -43,7 +42,7 @@ public class InfoCmd extends BaseCmd {
         final long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / MB_UNIT;
         final long maxMemory = runtime.maxMemory() / MB_UNIT;
 
-        return Mono.zip(context.getClient().getUserById(Snowflake.of(Shadbot.OWNER_ID.get())),
+        return Mono.zip(context.getClient().getUserById(Shadbot.getOwnerId()),
                 context.getClient().getGuilds().count(),
                 context.getClient().getUsers().count(),
                 context.getChannel())
@@ -73,7 +72,7 @@ public class InfoCmd extends BaseCmd {
                                     + String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
                                     + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
                                     + String.format("%nServers: %s", FormatUtils.number(guildCount))
-                                    + String.format("%nVoice Channels: %d (GM: %d)", MusicManager.getGuildIdsWithVoice().size(), MusicManager.getGuildIdsWithGuildMusics().size())
+                                    + String.format("%nVoice Channels: %d (GM: %d)", MusicManager.getInstance().getGuildIdsWithVoice().size(), MusicManager.getInstance().getGuildIdsWithGuildMusics().size())
                                     + String.format("%nUsers: %s", FormatUtils.number(memberCount))
                                     + "```")));
                 })

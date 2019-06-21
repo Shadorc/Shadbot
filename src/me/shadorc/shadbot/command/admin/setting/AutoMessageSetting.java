@@ -3,11 +3,11 @@ package me.shadorc.shadbot.command.admin.setting;
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.object.Emoji;
@@ -69,7 +69,7 @@ public class AutoMessageSetting extends BaseSetting {
                         throw new MissingArgumentException();
                     }
 
-                    final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+                    final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
                     final Channel channel = mentionedChannels.get(0);
                     if (action == Action.ENABLE) {
                         dbGuild.setSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong());
@@ -86,7 +86,7 @@ public class AutoMessageSetting extends BaseSetting {
     }
 
     private Mono<Message> updateMessage(Context context, Setting setting, Action action, List<String> args) {
-        final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
         final StringBuilder strBuilder = new StringBuilder();
         if (action == Action.ENABLE) {
             if (args.size() < 4) {

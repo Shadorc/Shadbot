@@ -1,5 +1,6 @@
 package me.shadorc.shadbot;
 
+import discord4j.core.DiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import me.shadorc.shadbot.core.shard.Shard;
@@ -20,16 +21,18 @@ import java.util.concurrent.TimeoutException;
 
 public class BotListStats {
 
-    private static final HttpClient HTTP_CLIENT = HttpClient.create();
-
+    private final DiscordClient client;
+    private final HttpClient httpClient;
     private final long selfId;
     private final Disposable task;
 
-    public BotListStats() {
-        this.selfId = Shadbot.getClient().getSelfId().get().asLong();
+    public BotListStats(DiscordClient client) {
+        this.client = client;
+        this.httpClient = HttpClient.create();
+        this.selfId = this.client.getSelfId().get().asLong();
         this.task = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), Schedulers.elastic())
                 .flatMap(ignored -> this.postStats())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
     }
 
     private Mono<Void> postStats() {
@@ -47,8 +50,8 @@ public class BotListStats {
                 .then(Mono.fromRunnable(() -> LogUtils.info("Statistics posted.")));
     }
 
-    private static Mono<String> post(String url, String authorization, JSONObject content) {
-        return HTTP_CLIENT
+    private Mono<String> post(String url, String authorization, JSONObject content) {
+        return this.httpClient
                 .headers(header -> header.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
                         .add(HttpHeaderNames.AUTHORIZATION, authorization))
                 .post()
@@ -58,11 +61,11 @@ public class BotListStats {
                 .timeout(Config.DEFAULT_TIMEOUT)
                 .onErrorResume(err -> {
                     if (err instanceof TimeoutException) {
-                        return Mono.fromRunnable(() -> LogUtils.warn(Shadbot.getClient(),
+                        return Mono.fromRunnable(() -> LogUtils.warn(this.client,
                                 String.format("A timeout occurred while posting statistics on %s", url)));
 
                     }
-                    return Mono.fromRunnable(() -> LogUtils.warn(Shadbot.getClient(),
+                    return Mono.fromRunnable(() -> LogUtils.warn(this.client,
                             String.format("An error occurred while posting statistics on %s: %s", url, err.getMessage())));
                 });
     }
@@ -75,7 +78,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://api.botlist.space/v1/bots/%d", this.selfId);
-        return BotListStats.post(url, Credentials.get(Credential.BOT_LIST_DOT_SPACE), content);
+        return this.post(url, Credentials.get(Credential.BOT_LIST_DOT_SPACE), content);
     }
 
     /**
@@ -86,7 +89,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
         final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", this.selfId);
-        return BotListStats.post(url, Credentials.get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
+        return this.post(url, Credentials.get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
     }
 
     /**
@@ -97,7 +100,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://divinediscordbots.com/bot/%d/stats", this.selfId);
-        return BotListStats.post(url, Credentials.get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
+        return this.post(url, Credentials.get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
     }
 
     /**
@@ -112,7 +115,7 @@ public class BotListStats {
                             .put("shard_id", client.getConfig().getShardIndex())
                             .put("guilds ", guildCount);
                     final String url = String.format("https://discordbotlist.com/api/bots/%d/stats", this.selfId);
-                    return BotListStats.post(url, String.format("Bot %s", Credentials.get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
+                    return this.post(url, String.format("Bot %s", Credentials.get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
                 });
     }
 
@@ -129,7 +132,7 @@ public class BotListStats {
                             .put("shardCount", client.getConfig().getShardCount())
                             .put("guildCount", (int) (guildCount / client.getConfig().getShardCount()));
                     final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", this.selfId);
-                    return BotListStats.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
+                    return this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
                 });
     }
 
@@ -146,7 +149,7 @@ public class BotListStats {
                             .put("shard_count", client.getConfig().getShardCount())
                             .put("server_count", (int) (guildCount / client.getConfig().getShardCount()));
                     final String url = String.format("https://discordbots.org/api/bots/%d/stats", this.selfId);
-                    return BotListStats.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
+                    return this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
                 });
     }
 

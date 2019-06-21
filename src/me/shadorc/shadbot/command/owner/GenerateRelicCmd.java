@@ -1,11 +1,11 @@
 package me.shadorc.shadbot.command.owner;
 
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.exception.CommandException;
@@ -34,7 +34,7 @@ public class GenerateRelicCmd extends BaseCmd {
                 new CommandException(String.format("`%s` in not a valid type. %s",
                         arg, FormatUtils.options(RelicType.class))));
 
-        final Relic relic = Shadbot.getPremium().generateRelic(type);
+        final Relic relic = PremiumManager.getInstance().generateRelic(type);
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
                         StringUtils.capitalize(type.toString()), relic.getId()), channel))

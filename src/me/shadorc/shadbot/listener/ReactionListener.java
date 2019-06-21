@@ -11,8 +11,8 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.admin.IamCmd;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.TemporaryMessage;
 import me.shadorc.shadbot.utils.StringUtils;
@@ -87,7 +87,7 @@ public class ReactionListener {
                 // If the bot is not the author of the message, this is not an Iam message
                 .filter(selfId -> message.getAuthor().map(User::getId).map(selfId::equals).orElse(false))
                 .flatMap(ignored -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
-                .flatMap(member -> Mono.justOrEmpty(Shadbot.getDatabase()
+                .flatMap(member -> Mono.justOrEmpty(DatabaseManager.getInstance()
                         .getDBGuild(member.getGuildId())
                         .getIamMessages()
                         .get(message.getId().asString()))

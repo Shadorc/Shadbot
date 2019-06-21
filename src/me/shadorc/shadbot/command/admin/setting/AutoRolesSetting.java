@@ -3,11 +3,11 @@ package me.shadorc.shadbot.command.admin.setting;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -38,7 +38,7 @@ public class AutoRolesSetting extends BaseSetting {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(1), FormatUtils.options(Action.class))));
 
-        final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
         final List<Long> autoRoles = dbGuild.getAutoRoles();
 
         return context.getGuild()

@@ -4,11 +4,11 @@ import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
-import me.shadorc.shadbot.core.command.CommandInitializer;
+import me.shadorc.shadbot.core.command.CommandManager;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -30,7 +30,7 @@ public class HelpCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         if (context.getArg().isPresent()) {
-            final BaseCmd cmd = CommandInitializer.getCommand(context.getArg().get());
+            final BaseCmd cmd = CommandManager.getInstance().getCommand(context.getArg().get());
             if (cmd == null) {
                 return Mono.empty();
             }
@@ -42,11 +42,11 @@ public class HelpCmd extends BaseCmd {
         }
 
         return context.getPermission()
-                .flatMap(authorPerm -> Flux.fromIterable(CommandInitializer.getCommands().values())
+                .flatMap(authorPerm -> Flux.fromIterable(CommandManager.getInstance().getCommands().values())
                         .distinct()
                         .filter(cmd -> !cmd.getPermission().isHigher(authorPerm))
                         .filterWhen(cmd -> context.getChannel().map(Channel::getType)
-                                .map(type -> type == Type.DM || Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd)))
+                                .map(type -> type == Type.DM || DatabaseManager.getInstance().getDBGuild(context.getGuildId()).isCommandAllowed(cmd)))
                         .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
                 .map(map -> EmbedUtils.getDefaultEmbed()
                         .andThen(embed -> {

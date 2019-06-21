@@ -5,7 +5,9 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.exception.RelicActivationException;
+import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.util.annotation.Nullable;
 
 import java.io.IOException;
@@ -20,9 +22,20 @@ import java.util.stream.Collectors;
 
 public class PremiumManager extends Data {
 
+    private static PremiumManager instance;
+
+    static {
+        try {
+            PremiumManager.instance = new PremiumManager();
+        } catch (final IOException err) {
+            LogUtils.error(err, String.format("An error occurred while initializing %s.", PremiumManager.class.getSimpleName()));
+            System.exit(ExitCode.FATAL_ERROR.value());
+        }
+    }
+
     private final List<Relic> relics;
 
-    public PremiumManager() throws IOException {
+    private PremiumManager() throws IOException {
         super("premium_data.json", Duration.ofHours(1), Duration.ofHours(1));
 
         this.relics = new CopyOnWriteArrayList<>();
@@ -84,6 +97,10 @@ public class PremiumManager extends Data {
     @Override
     public Object getData() {
         return Collections.unmodifiableList(this.relics);
+    }
+
+    public static PremiumManager getInstance() {
+        return PremiumManager.instance;
     }
 
 }

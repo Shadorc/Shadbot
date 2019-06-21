@@ -9,6 +9,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.listener.music.TrackEventListener;
 import me.shadorc.shadbot.utils.ExceptionHandler;
@@ -23,13 +24,23 @@ import java.util.stream.Collectors;
 
 public class MusicManager {
 
-    public static final Logger LOGGER = Loggers.getLogger("shadbot.music");
-    private static final AudioPlayerManager AUDIO_PLAYER_MANAGER = new DefaultAudioPlayerManager();
-    private static final Map<Snowflake, GuildMusicConnection> GUILD_MUSIC_CONNECTIONS = new ConcurrentHashMap<>();
+    private static MusicManager instance;
 
     static {
-        AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
-        AudioSourceManagers.registerRemoteSources(AUDIO_PLAYER_MANAGER);
+        MusicManager.instance = new MusicManager();
+    }
+
+    public static final Logger LOGGER = Loggers.getLogger("shadbot.music");
+
+    private final AudioPlayerManager audioPlayerManager;
+    private final Map<Snowflake, GuildMusicConnection> guildMusicConnections;
+
+    private MusicManager() {
+        this.audioPlayerManager = new DefaultAudioPlayerManager();
+        this.audioPlayerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
+        AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
+        this.guildMusicConnections = new ConcurrentHashMap<>();
+
     }
 
     /**
@@ -38,8 +49,8 @@ public class MusicManager {
      *
      * @return A future for this operation
      */
-    public static Future<Void> loadItemOrdered(Snowflake guildId, String identifier, AudioLoadResultListener listener) {
-        return AUDIO_PLAYER_MANAGER.loadItemOrdered(guildId, identifier, listener);
+    public Future<Void> loadItemOrdered(Snowflake guildId, String identifier, AudioLoadResultListener listener) {
+        return this.audioPlayerManager.loadItemOrdered(guildId, identifier, listener);
     }
 
     /**
@@ -47,8 +58,8 @@ public class MusicManager {
      * a new one is created and a request to join the {@link VoiceChannel} corresponding to the provided
      * {@code voiceChannelId} is sent.
      */
-    public static GuildMusic getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
-        final GuildMusicConnection guildMusicConnection = GUILD_MUSIC_CONNECTIONS.computeIfAbsent(guildId,
+    public GuildMusic getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
+        final GuildMusicConnection guildMusicConnection = this.guildMusicConnections.computeIfAbsent(guildId,
                 ignored -> {
                     LOGGER.debug("{Guild ID: {}} Creating guild music connection.", guildId.asLong());
                     return new GuildMusicConnection(client, guildId);
@@ -56,10 +67,10 @@ public class MusicManager {
 
         if (guildMusicConnection.getGuildMusic() == null) {
             LOGGER.debug("{Guild ID: {}} Creating guild music.", guildId.asLong());
-            final AudioPlayer audioPlayer = AUDIO_PLAYER_MANAGER.createPlayer();
+            final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
             audioPlayer.addListener(new TrackEventListener(guildId));
 
-            final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, Shadbot.getDatabase().getDBGuild(guildId).getDefaultVol());
+            final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, DatabaseManager.getInstance().getDBGuild(guildId).getDefaultVol());
             final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
             guildMusicConnection.setGuildMusic(guildMusic);
 
@@ -71,35 +82,39 @@ public class MusicManager {
         return guildMusicConnection.getGuildMusic();
     }
 
-    public static GuildMusicConnection getConnection(Snowflake guildId) {
-        return GUILD_MUSIC_CONNECTIONS.get(guildId);
+    public GuildMusicConnection getConnection(Snowflake guildId) {
+        return this.guildMusicConnections.get(guildId);
     }
 
-    public static GuildMusic getMusic(Snowflake guildId) {
-        final GuildMusicConnection guildMusicConnection = MusicManager.getConnection(guildId);
+    public GuildMusic getMusic(Snowflake guildId) {
+        final GuildMusicConnection guildMusicConnection = this.getConnection(guildId);
         if (guildMusicConnection == null) {
             return null;
         }
         return guildMusicConnection.getGuildMusic();
     }
 
-    public static void removeConnection(Snowflake guildId) {
-        final GuildMusicConnection guildMusicConnection = GUILD_MUSIC_CONNECTIONS.remove(guildId);
+    public void removeConnection(Snowflake guildId) {
+        final GuildMusicConnection guildMusicConnection = this.guildMusicConnections.remove(guildId);
         if (guildMusicConnection != null) {
             guildMusicConnection.leaveVoiceChannel();
         }
     }
 
-    public static List<Snowflake> getGuildIdsWithGuildMusics() {
-        return GUILD_MUSIC_CONNECTIONS.keySet().stream()
-                .filter(guildId -> MusicManager.getConnection(guildId).getGuildMusic() != null)
+    public List<Snowflake> getGuildIdsWithGuildMusics() {
+        return this.guildMusicConnections.keySet().stream()
+                .filter(guildId -> this.getConnection(guildId).getGuildMusic() != null)
                 .collect(Collectors.toList());
     }
 
-    public static List<Snowflake> getGuildIdsWithVoice() {
-        return GUILD_MUSIC_CONNECTIONS.keySet().stream()
-                .filter(guildId -> MusicManager.getConnection(guildId).getVoiceConnection() != null)
+    public List<Snowflake> getGuildIdsWithVoice() {
+        return this.guildMusicConnections.keySet().stream()
+                .filter(guildId -> this.getConnection(guildId).getVoiceConnection() != null)
                 .collect(Collectors.toList());
+    }
+
+    public static MusicManager getInstance() {
+        return MusicManager.instance;
     }
 
 }

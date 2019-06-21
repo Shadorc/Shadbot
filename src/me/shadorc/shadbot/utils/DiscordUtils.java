@@ -9,8 +9,8 @@ import discord4j.core.spec.MessageCreateSpec;
 import discord4j.rest.http.client.ClientException;
 import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.exception.CommandException;
@@ -169,7 +169,7 @@ public class DiscordUtils {
                     final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
 
                     // If the user is in a voice channel but the bot is not allowed to join
-                    if (userVoiceChannelId.isPresent() && !Shadbot.getDatabase().getDBGuild(context.getGuildId()).isVoiceChannelAllowed(userVoiceChannelId.get())) {
+                    if (userVoiceChannelId.isPresent() && !DatabaseManager.getInstance().getDBGuild(context.getGuildId()).isVoiceChannelAllowed(userVoiceChannelId.get())) {
                         throw new CommandException("I'm not allowed to join this voice channel.");
                     }
 

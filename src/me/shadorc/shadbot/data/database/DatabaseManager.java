@@ -3,7 +3,9 @@ package me.shadorc.shadbot.data.database;
 import com.fasterxml.jackson.databind.JavaType;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.Data;
+import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.Utils;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -15,9 +17,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DatabaseManager extends Data {
 
+    private static DatabaseManager instance;
+
+    static {
+        try {
+            DatabaseManager.instance = new DatabaseManager();
+        } catch (final IOException err) {
+            LogUtils.error(err, String.format("An error occurred while initializing %s.", DatabaseManager.class.getSimpleName()));
+            System.exit(ExitCode.FATAL_ERROR.value());
+        }
+    }
+
     private final Map<Snowflake, DBGuild> guildsMap;
 
-    public DatabaseManager() throws IOException {
+    private DatabaseManager() throws IOException {
         super("database.json", Duration.ofMinutes(15), Duration.ofMinutes(15));
 
         this.guildsMap = new ConcurrentHashMap<>();
@@ -61,6 +74,10 @@ public class DatabaseManager extends Data {
     @Override
     public Object getData() {
         return this.guildsMap.values();
+    }
+
+    public static DatabaseManager getInstance() {
+        return DatabaseManager.instance;
     }
 
 }

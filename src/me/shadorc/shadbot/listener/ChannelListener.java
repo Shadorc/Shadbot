@@ -1,9 +1,9 @@
 package me.shadorc.shadbot.listener;
 
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public class ChannelListener {
 
     public static Mono<Void> onTextChannelDelete(TextChannelDeleteEvent event) {
         return Mono.fromRunnable(() -> {
-            final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(event.getChannel().getGuildId());
+            final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(event.getChannel().getGuildId());
             final List<Long> allowedTextChannelIds = dbGuild.getAllowedTextChannels();
             // If the channel was an allowed channel...
             if (allowedTextChannelIds.remove(event.getChannel().getId().asLong())) {

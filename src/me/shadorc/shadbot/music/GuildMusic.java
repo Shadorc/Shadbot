@@ -4,7 +4,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -48,7 +48,7 @@ public class GuildMusic {
         LOGGER.debug("{Guild ID: {}} Scheduling auto-leave.", this.guildId.asLong());
         Mono.delay(Duration.ofMinutes(1), Schedulers.elastic())
                 .filter(ignored -> this.isLeavingScheduled())
-                .doOnNext(ignored -> MusicManager.getConnection(this.guildId).leaveVoiceChannel())
+                .doOnNext(ignored -> MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel())
                 .doOnSubscribe(ignored -> this.isLeavingScheduled.set(true))
                 .doOnTerminate(() -> this.isLeavingScheduled.set(false))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
@@ -62,13 +62,13 @@ public class GuildMusic {
     public Mono<Void> end() {
         LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId.asLong());
         final StringBuilder strBuilder = new StringBuilder(Emoji.INFO + " End of the playlist.");
-        if (!Shadbot.getPremium().isGuildPremium(this.guildId)) {
+        if (!PremiumManager.getInstance().isGuildPremium(this.guildId)) {
             strBuilder.append(String.format(" If you like me, you can make a donation on **%s**, "
                             + "it will help my creator keeping me alive :heart:",
                     Config.PATREON_URL));
         }
 
-        MusicManager.getConnection(this.guildId).leaveVoiceChannel();
+        MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel();
         return this.getMessageChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
                 .then();
@@ -117,7 +117,7 @@ public class GuildMusic {
 
     public void addAudioLoadResultListener(AudioLoadResultListener listener, String identifier) {
         LOGGER.debug("{Guild ID: {}} Adding audio load result listener.", this.guildId.asLong());
-        this.listeners.put(listener, MusicManager.loadItemOrdered(this.guildId, identifier, listener));
+        this.listeners.put(listener, MusicManager.getInstance().loadItemOrdered(this.guildId, identifier, listener));
     }
 
     public void removeAudioLoadResultListener(AudioLoadResultListener listener) {
@@ -125,7 +125,7 @@ public class GuildMusic {
         this.listeners.remove(listener);
         // If there is no music playing and nothing is loading, leave the voice channel
         if (this.trackScheduler.isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
-            MusicManager.getConnection(this.guildId).leaveVoiceChannel();
+            MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel();
         }
     }
 

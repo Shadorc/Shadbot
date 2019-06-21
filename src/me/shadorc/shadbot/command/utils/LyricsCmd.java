@@ -57,7 +57,7 @@ public class LyricsCmd extends BaseCmd {
             if (arg.isPresent()) {
                 search = arg.get();
             } else {
-                final GuildMusic guildMusic = MusicManager.getMusic(context.getGuildId());
+                final GuildMusic guildMusic = MusicManager.getInstance().getMusic(context.getGuildId());
                 if (guildMusic == null) {
                     throw new MissingArgumentException();
                 }

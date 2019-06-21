@@ -44,12 +44,19 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CommandInitializer {
+public class CommandManager {
 
-    private static final Map<String, BaseCmd> COMMANDS_MAP = new LinkedHashMap<>();
+    private static CommandManager instance;
 
-    public static void initialize() {
-        CommandInitializer.add(
+    static {
+        CommandManager.instance = new CommandManager();
+    }
+
+    private final Map<String, BaseCmd> commandsMap;
+
+    private CommandManager() {
+        this.commandsMap = new LinkedHashMap<>();
+        this.add(
                 // Utility Commands
                 new WeatherCmd(), new CalcCmd(), new TranslateCmd(), new WikiCmd(), new PollCmd(),
                 new UrbanCmd(), new LyricsCmd(),
@@ -86,23 +93,27 @@ public class CommandInitializer {
                 new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd());
     }
 
-    private static void add(BaseCmd... cmds) {
+    private void add(BaseCmd... cmds) {
         for (final BaseCmd cmd : cmds) {
             for (final String name : cmd.getNames()) {
-                if (COMMANDS_MAP.putIfAbsent(name, cmd) != null) {
+                if (this.commandsMap.putIfAbsent(name, cmd) != null) {
                     LogUtils.error(String.format("Command name collision between %s and %s.",
-                            name, COMMANDS_MAP.get(name).getClass().getSimpleName()));
+                            name, this.commandsMap.get(name).getClass().getSimpleName()));
                 }
             }
         }
         LogUtils.info("%d commands initialized.", cmds.length);
     }
 
-    public static Map<String, BaseCmd> getCommands() {
-        return Collections.unmodifiableMap(COMMANDS_MAP);
+    public Map<String, BaseCmd> getCommands() {
+        return Collections.unmodifiableMap(this.commandsMap);
     }
 
-    public static BaseCmd getCommand(String name) {
-        return COMMANDS_MAP.get(name);
+    public BaseCmd getCommand(String name) {
+        return this.commandsMap.get(name);
+    }
+
+    public static CommandManager getInstance() {
+        return CommandManager.instance;
     }
 }

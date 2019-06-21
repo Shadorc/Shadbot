@@ -7,13 +7,14 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.database.DBMember;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.lottery.LotteryGambler;
 import me.shadorc.shadbot.data.lottery.LotteryHistoric;
+import me.shadorc.shadbot.data.lottery.LotteryManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.*;
@@ -50,12 +51,12 @@ public class LotteryCmd extends BaseCmd {
 
         final String arg = context.requireArg();
 
-        final DBMember dbMember = Shadbot.getDatabase().getDBMember(context.getGuildId(), context.getAuthorId());
+        final DBMember dbMember = DatabaseManager.getInstance().getDBMember(context.getGuildId(), context.getAuthorId());
         if (dbMember.getCoins() < PAID_COST) {
             return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
         }
 
-        final LotteryGambler gambler = Shadbot.getLottery().getGamblers().stream()
+        final LotteryGambler gambler = LotteryManager.getInstance().getLottery().getGamblers().stream()
                 .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
                 .findAny()
                 .orElse(null);
@@ -72,7 +73,7 @@ public class LotteryCmd extends BaseCmd {
 
         dbMember.addCoins(-PAID_COST);
 
-        Shadbot.getLottery().addGambler(context.getGuildId(), context.getAuthorId(), num);
+        LotteryManager.getInstance().getLottery().addGambler(context.getGuildId(), context.getAuthorId(), num);
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
@@ -82,7 +83,7 @@ public class LotteryCmd extends BaseCmd {
     }
 
     private Mono<Message> show(Context context) {
-        final List<LotteryGambler> gamblers = Shadbot.getLottery().getGamblers();
+        final List<LotteryGambler> gamblers = LotteryManager.getInstance().getLottery().getGamblers();
 
         final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
                 .andThen(embed -> {
@@ -92,14 +93,14 @@ public class LotteryCmd extends BaseCmd {
                                     FormatUtils.customDate(LotteryCmd.getDelay()),
                                     context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
                             .addField("Number of participants", Integer.toString(gamblers.size()), false)
-                            .addField("Prize pool", FormatUtils.coins(Shadbot.getLottery().getJackpot()), false);
+                            .addField("Prize pool", FormatUtils.coins(LotteryManager.getInstance().getLottery().getJackpot()), false);
 
                     gamblers.stream()
                             .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
                             .findAny().ifPresent(gambler -> embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
                             "https://images.emojiterra.com/twitter/512px/1f39f.png"));
 
-                    final LotteryHistoric historic = Shadbot.getLottery().getHistoric();
+                    final LotteryHistoric historic = LotteryManager.getInstance().getLottery().getHistoric();
                     if (historic != null) {
                         final String people;
                         switch (historic.getWinnerCount()) {
@@ -142,18 +143,18 @@ public class LotteryCmd extends BaseCmd {
         LogUtils.info("Lottery draw started...");
         final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
-        final List<LotteryGambler> winners = Shadbot.getLottery().getGamblers().stream()
+        final List<LotteryGambler> winners = LotteryManager.getInstance().getLottery().getGamblers().stream()
                 .filter(gambler -> gambler.getNumber() == winningNum)
                 .collect(Collectors.toList());
 
         LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
-                winningNum, winners.size(), Shadbot.getLottery().getJackpot());
+                winningNum, winners.size(), LotteryManager.getInstance().getLottery().getJackpot());
 
         return Flux.fromIterable(winners)
                 .flatMap(winner -> client.getMemberById(winner.getGuildId(), winner.getUserId()))
                 .flatMap(member -> {
-                    final long coins = Math.min(Shadbot.getLottery().getJackpot() / winners.size(), Config.MAX_COINS);
-                    Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
+                    final long coins = Math.min(LotteryManager.getInstance().getLottery().getJackpot() / winners.size(), Config.MAX_COINS);
+                    DatabaseManager.getInstance().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
                     return member.getPrivateChannel()
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn **%s**.",
@@ -161,10 +162,10 @@ public class LotteryCmd extends BaseCmd {
                             .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty());
                 })
                 .then(Mono.fromRunnable(() -> {
-                    Shadbot.getLottery().setHistoric(new LotteryHistoric(Shadbot.getLottery().getJackpot(), winners.size(), winningNum));
-                    Shadbot.getLottery().resetGamblers();
+                    LotteryManager.getInstance().getLottery().setHistoric(new LotteryHistoric(LotteryManager.getInstance().getLottery().getJackpot(), winners.size(), winningNum));
+                    LotteryManager.getInstance().getLottery().resetGamblers();
                     if (!winners.isEmpty()) {
-                        Shadbot.getLottery().resetJackpot();
+                        LotteryManager.getInstance().getLottery().resetJackpot();
                     }
                 }));
     }

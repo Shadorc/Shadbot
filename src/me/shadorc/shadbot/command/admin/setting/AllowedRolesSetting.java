@@ -3,11 +3,11 @@ package me.shadorc.shadbot.command.admin.setting;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -47,7 +47,7 @@ public class AllowedRolesSetting extends BaseSetting {
                         throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
                     }
 
-                    final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+                    final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
                     final List<Long> allowedRoles = dbGuild.getAllowedRoles();
                     final List<Long> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)

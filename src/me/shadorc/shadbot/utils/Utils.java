@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.HashBasedTable;
 import discord4j.core.object.entity.Member;
-import me.shadorc.shadbot.Shadbot;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 
 import javax.management.*;
@@ -143,7 +143,7 @@ public class Utils {
             throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
         }
 
-        if (Shadbot.getDatabase().getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
+        if (DatabaseManager.getInstance().getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
             throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
         }
 

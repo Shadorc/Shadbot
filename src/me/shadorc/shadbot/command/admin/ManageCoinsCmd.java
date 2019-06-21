@@ -2,12 +2,12 @@ package me.shadorc.shadbot.command.admin;
 
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -56,13 +56,13 @@ public class ManageCoinsCmd extends BaseCmd {
                     final String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(members, User::getUsername, ", ");
                     switch (action) {
                         case ADD:
-                            members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
+                            members.forEach(user -> DatabaseManager.getInstance().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
                             return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.coins(coins));
                         case REMOVE:
-                            members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
+                            members.forEach(user -> DatabaseManager.getInstance().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
                             return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.coins(coins));
                         case RESET:
-                            members.forEach(user -> Shadbot.getDatabase().getDBMember(context.getGuildId(), user.getId()).resetCoins());
+                            members.forEach(user -> DatabaseManager.getInstance().getDBMember(context.getGuildId(), user.getId()).resetCoins());
                             return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, members.size() == 1 ? "his" : "their");
                         default:
                             return null;

@@ -4,9 +4,9 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
 import me.shadorc.shadbot.data.stats.enums.VariousEnum;
@@ -20,10 +20,19 @@ import java.util.Optional;
 
 public class CommandProcessor {
 
-    public static Mono<Void> processMessageEvent(MessageCreateEvent event) {
+    private static CommandProcessor instance;
+
+    static {
+        CommandProcessor.instance = new CommandProcessor();
+    }
+
+    private CommandProcessor() {
+    }
+
+    public Mono<Void> processMessageEvent(MessageCreateEvent event) {
         // This is not a private channel
         if (event.getGuildId().isEmpty()) {
-            return CommandProcessor.onPrivateMessage(event);
+            return this.processPrivateMessage(event);
         }
 
         // The content is not a Webhook
@@ -33,7 +42,7 @@ public class CommandProcessor {
 
         final String content = event.getMessage().getContent().get();
         final Snowflake guildId = event.getGuildId().get();
-        final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(guildId);
+        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(guildId);
         return Mono.justOrEmpty(event.getMember())
                 // The author is not a bot
                 .filter(member -> !member.isBot())
@@ -47,10 +56,10 @@ public class CommandProcessor {
                 .map(ignored -> dbGuild.getPrefix())
                 .filter(content::startsWith)
                 // Execute the command
-                .flatMap(prefix -> CommandProcessor.executeCommand(new Context(event, prefix)));
+                .flatMap(prefix -> this.executeCommand(new Context(event, prefix)));
     }
 
-    private static boolean isRateLimited(Context context, BaseCmd cmd) {
+    private boolean isRateLimited(Context context, BaseCmd cmd) {
         final Optional<RateLimiter> rateLimiter = cmd.getRateLimiter();
         if (rateLimiter.isEmpty()) {
             return false;
@@ -63,8 +72,8 @@ public class CommandProcessor {
         return false;
     }
 
-    private static Mono<Void> executeCommand(Context context) {
-        final BaseCmd command = CommandInitializer.getCommand(context.getCommandName());
+    private Mono<Void> executeCommand(Context context) {
+        final BaseCmd command = CommandManager.getInstance().getCommand(context.getCommandName());
         if (command == null) {
             return Mono.empty();
         }
@@ -79,9 +88,9 @@ public class CommandProcessor {
                                 .then(Mono.empty())))
                 .flatMap(perm -> Mono.just(command))
                 // The command is allowed in the guild
-                .filter(cmd -> Shadbot.getDatabase().getDBGuild(context.getGuildId()).isCommandAllowed(cmd))
+                .filter(cmd -> DatabaseManager.getInstance().getDBGuild(context.getGuildId()).isCommandAllowed(cmd))
                 // The user is not rate limited
-                .filter(cmd -> !CommandProcessor.isRateLimited(context, cmd))
+                .filter(cmd -> !this.isRateLimited(context, cmd))
                 .flatMap(cmd -> cmd.execute(context))
                 .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context))
                 .doOnTerminate(() -> {
@@ -90,7 +99,7 @@ public class CommandProcessor {
                 });
     }
 
-    private static Mono<Void> onPrivateMessage(MessageCreateEvent event) {
+    private Mono<Void> processPrivateMessage(MessageCreateEvent event) {
         StatsManager.VARIOUS_STATS.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
 
         final String text = String.format("Hello !"
@@ -101,7 +110,7 @@ public class CommandProcessor {
 
         final String content = event.getMessage().getContent().orElse("");
         if (content.startsWith(Config.DEFAULT_PREFIX + "help")) {
-            return CommandInitializer.getCommand("help")
+            return CommandManager.getInstance().getCommand("help")
                     .execute(new Context(event, Config.DEFAULT_PREFIX));
         } else {
             return event.getMessage()
@@ -116,6 +125,10 @@ public class CommandProcessor {
                     .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
                     .then();
         }
+    }
+
+    public static CommandProcessor getInstance() {
+        return CommandProcessor.instance;
     }
 
 }

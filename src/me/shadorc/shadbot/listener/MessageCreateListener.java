@@ -10,7 +10,7 @@ public class MessageCreateListener {
 
     public static Mono<Void> onMessageCreate(MessageCreateEvent event) {
         return Mono.fromRunnable(() -> StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_RECEIVED))
-                .and(CommandProcessor.processMessageEvent(event));
+                .and(CommandProcessor.getInstance().processMessageEvent(event));
     }
 
 }

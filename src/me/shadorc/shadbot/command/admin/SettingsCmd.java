@@ -5,7 +5,6 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.command.admin.setting.*;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
@@ -15,6 +14,7 @@ import me.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.object.Emoji;
@@ -89,7 +89,7 @@ public class SettingsCmd extends BaseCmd {
     }
 
     private static Mono<Consumer<EmbedCreateSpec>> show(Context context) {
-        final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
         final StringBuilder settingsStr = new StringBuilder();
 
         if (!dbGuild.getPrefix().equals(Config.DEFAULT_PREFIX)) {

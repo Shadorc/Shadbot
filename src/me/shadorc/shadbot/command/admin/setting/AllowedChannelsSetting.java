@@ -4,11 +4,11 @@ import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Channel.Type;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.core.setting.BaseSetting;
 import me.shadorc.shadbot.core.setting.Setting;
 import me.shadorc.shadbot.data.database.DBGuild;
+import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
@@ -48,7 +48,7 @@ public class AllowedChannelsSetting extends BaseSetting {
                         throw new CommandException(String.format("Channel `%s` not found.", args.get(2)));
                     }
 
-                    final DBGuild dbGuild = Shadbot.getDatabase().getDBGuild(context.getGuildId());
+                    final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
                     final List<Long> allowedTextChannels = dbGuild.getAllowedTextChannels();
                     final List<Long> allowedVoiceChannels = dbGuild.getAllowedVoiceChannels();
                     final List<Long> mentionedChannelIds = mentionedChannels.stream()

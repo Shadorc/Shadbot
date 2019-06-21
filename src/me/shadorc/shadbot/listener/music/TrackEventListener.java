@@ -31,7 +31,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     final String message = String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
                             FormatUtils.trackName(track.getInfo()));
@@ -43,7 +43,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .filter(ignored -> endReason.mayStartNext)
                 // Everything seems fine, reset error counter.
                 .doOnNext(ignored -> this.errorCount.set(0))
@@ -53,7 +53,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
-        Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     this.errorCount.incrementAndGet();
 
@@ -85,7 +85,7 @@ public class TrackEventListener extends AudioEventAdapter {
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         LogUtils.info("{Guild ID: %d} Music stuck, skipping it.", this.guildId.asLong());
-        Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "
                         + "try to play the next available song.", channel))
@@ -99,7 +99,7 @@ public class TrackEventListener extends AudioEventAdapter {
      * @return A {@link Mono} that completes when a new track has been started or when the guild music ended
      */
     private Mono<Void> nextOrEnd() {
-        return Mono.justOrEmpty(MusicManager.getMusic(this.guildId))
+        return Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 // If the next track could not be started
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().nextTrack())
                 .flatMap(GuildMusic::end);
