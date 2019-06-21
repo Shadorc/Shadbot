@@ -16,7 +16,7 @@ public class TextUtils {
             "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
 
     public static final String PLAYLIST_LIMIT_REACHED =
-            String.format(Emoji.WARNING + " You've reached the maximum number (%d) of tracks in a playlist. "
+            String.format(Emoji.LOCK + " You've reached the maximum number of tracks (%d) in a playlist. "
                             + "You can remove this limit and gain other advantage by contributing to Shadbot. More info here: <%s>",
                     Config.DEFAULT_PLAYLIST_SIZE, Config.PATREON_URL);
 

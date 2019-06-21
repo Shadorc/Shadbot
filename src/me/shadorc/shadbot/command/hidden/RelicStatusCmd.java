@@ -34,7 +34,7 @@ public class RelicStatusCmd extends BaseCmd {
         if (relics.isEmpty()) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
-                                    + "you can help me keep it alive by making a donation on **%s**."
+                                    + "you can help me keep it alive by making a donation on <%s>."
                                     + "%nAll donations are important and really help me %s",
                             context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), channel))
                     .then();

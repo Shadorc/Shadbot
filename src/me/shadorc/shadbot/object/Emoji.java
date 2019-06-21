@@ -6,6 +6,7 @@ public enum Emoji {
     WARNING("warning"),
     ACCESS_DENIED("no_entry_sign"),
     RED_CROSS("x"),
+    LOCK("lock"),
 
     GREY_EXCLAMATION("grey_exclamation"),
     RED_EXCLAMATION("exclamation"),
