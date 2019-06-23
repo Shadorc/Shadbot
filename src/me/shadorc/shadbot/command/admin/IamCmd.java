@@ -93,7 +93,9 @@ public class IamCmd extends BaseCmd {
         return new HelpBuilder(this, context)
                 .setDescription(String.format("Send a message with a reaction, users will be able to get the role(s) "
                         + "associated with the message by clicking on %s", REACTION.getRaw()))
-                .addArg("@role(s)", false).addArg("\"text\"", "Replace the default text", true).build();
+                .addArg("@role(s)", false)
+                .addArg("\"text\"", "Replace the default text", true)
+                .build();
     }
 
 }

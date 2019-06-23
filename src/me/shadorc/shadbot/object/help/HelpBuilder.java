@@ -11,7 +11,6 @@ import reactor.util.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -125,7 +124,7 @@ public class HelpBuilder {
                         embed.addField(field.getName(), field.getValue(), field.isInline());
                     }
 
-                    if (this.cmd.getAlias() != null) {
+                    if (this.cmd.getAlias() != null && !this.cmd.getAlias().isBlank()) {
                         embed.setFooter(String.format("Alias: %s", this.cmd.getAlias()), null);
                     }
                 });
@@ -143,7 +142,7 @@ public class HelpBuilder {
 
     private String getArguments() {
         return this.args.stream()
-                .filter(arg -> Objects.nonNull(arg.getDescription()))
+                .filter(arg -> arg.getDescription() != null && !arg.getDescription().isBlank())
                 .map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isFacultative() ? "[optional] " : "", arg.getDescription()))
                 .collect(Collectors.joining());
     }
