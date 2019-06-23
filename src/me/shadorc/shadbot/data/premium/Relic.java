@@ -22,17 +22,17 @@ public class Relic {
     private final String id;
     @Nullable
     @JsonProperty("guildId")
-    private long guildId;
+    private Long guildId;
     @Nullable
     @JsonProperty("userId")
-    private long userId;
+    private Long userId;
     @JsonProperty("type")
     private final String type;
     @JsonProperty("duration")
     private final long duration;
     @Nullable
     @JsonProperty("activationTime")
-    private long activationTime;
+    private Long activationTime;
 
     public Relic(String id, long duration, RelicType type) {
         this.id = id;
@@ -41,9 +41,7 @@ public class Relic {
     }
 
     public Relic() {
-        this.id = null;
-        this.duration = 0;
-        this.type = null;
+        this(null, 0, null);
     }
 
     public void activate(Snowflake userId) {
@@ -91,6 +89,10 @@ public class Relic {
         return this.getActivationInstant()
                 .map(instant -> TimeUtils.getMillisUntil(instant) >= this.getDuration().toMillis())
                 .orElse(false);
+    }
+
+    public boolean isActivated() {
+        return this.activationTime != null;
     }
 
     public void setGuildId(Snowflake guildId) {

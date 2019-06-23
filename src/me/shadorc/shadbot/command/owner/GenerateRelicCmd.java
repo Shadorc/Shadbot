@@ -15,6 +15,7 @@ import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class GenerateRelicCmd extends BaseCmd {
                         arg, FormatUtils.options(RelicType.class))));
 
         final Relic relic = PremiumManager.getInstance().generateRelic(type);
+        LogUtils.info("Relic generated. Type: %s, ID: %s", relic.getType(), relic.getId());
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
                         StringUtils.capitalize(type.toString()), relic.getId()), channel))

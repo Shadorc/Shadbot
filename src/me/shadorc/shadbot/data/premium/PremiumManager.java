@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.JavaType;
 import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
-import me.shadorc.shadbot.exception.RelicActivationException;
 import me.shadorc.shadbot.utils.ExitCode;
 import me.shadorc.shadbot.utils.Utils;
 import me.shadorc.shadbot.utils.embed.log.LogUtils;
-import reactor.util.annotation.Nullable;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -51,26 +49,10 @@ public class PremiumManager extends Data {
         return relic;
     }
 
-    public void activateRelic(@Nullable Snowflake guildId, Snowflake userId, String relicId) throws RelicActivationException {
-        final Optional<Relic> relicOpt = this.relics.stream()
-                .filter(relicItr -> relicItr.getId().equals(relicId))
+    public Optional<Relic> getRelic(String id) {
+        return this.relics.stream()
+                .filter(relic -> relic.getId().equals(id))
                 .findFirst();
-
-        if (relicOpt.isEmpty()) {
-            throw new RelicActivationException("This key is already activated or doesn't exist.");
-        }
-
-        final Relic relic = relicOpt.get();
-
-        if (relic.getType().equals(RelicType.GUILD.toString()) && guildId == null) {
-            throw new RelicActivationException("You must activate a Legendary Relic in the desired server.");
-        }
-
-        relic.activate(userId);
-
-        if (relic.getType().equals(RelicType.GUILD.toString())) {
-            relic.setGuildId(guildId);
-        }
     }
 
     public List<Relic> getRelicsForUser(Snowflake userId) {
