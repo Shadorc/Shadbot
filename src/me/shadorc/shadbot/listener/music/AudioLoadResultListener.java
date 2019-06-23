@@ -147,7 +147,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildId.asLong(), errMessage);
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(
-                                    String.format(Emoji.RED_CROSS + " Sorry, %s", errMessage.toLowerCase()), channel));
+                                    String.format(Emoji.RED_CROSS + " Something went wrong while loading the track: %s",
+                                            errMessage.toLowerCase()), channel));
                 })
                 .doOnTerminate(this::terminate)
                 .subscribe(null, thr -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), thr));
