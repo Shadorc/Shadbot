@@ -69,8 +69,6 @@ public class Shadbot {
                         .setFallback(new JdkStoreService()))
                 .build()
                 .map(builder -> builder
-                        .setRetryOptions(new RetryOptions(Duration.ofSeconds(3), Duration.ofSeconds(120),
-                                Integer.MAX_VALUE, Schedulers.elastic()))
                         .setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
                 .map(DiscordClientBuilder::build)
                 .doOnNext(client -> {
