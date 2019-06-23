@@ -30,6 +30,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     public static final String YT_SEARCH = "ytsearch: ";
     public static final String SC_SEARCH = "scsearch: ";
 
+    private static final int MAX_PLAYLIST_NAME_LENGTH = 70;
+
     private final Snowflake guildId;
     private final Snowflake djId;
     private final String identifier;
@@ -128,8 +130,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
                 });
 
+        final String playlistName = org.apache.commons.lang3.StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
         return EmbedUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor(String.format("Playlist: %s", StringUtils.remove(this.identifier, SC_SEARCH, YT_SEARCH)), null, avatarUrl)
+                .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
                         .setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
                         .setDescription("**Select a music by typing the corresponding number.**"
                                 + "\nYou can choose several musics by separating them with a comma."
