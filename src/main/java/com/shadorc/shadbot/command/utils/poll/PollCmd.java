@@ -95,7 +95,7 @@ public class PollCmd extends BaseCmd {
             } catch (final IllegalArgumentException err) {
                 throw new CommandException(err.getMessage());
             }
-            if (!NumberUtils.isInRange(seconds, MIN_DURATION, MAX_DURATION)) {
+            if (!NumberUtils.isBetween(seconds, MIN_DURATION, MAX_DURATION)) {
                 throw new CommandException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
                         args.get(0), MIN_DURATION, MAX_DURATION));
             }
@@ -111,7 +111,7 @@ public class PollCmd extends BaseCmd {
                 .skip(1)
                 .distinct()
                 .collect(Collectors.toList());
-        if (!NumberUtils.isInRange(choices.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
+        if (!NumberUtils.isBetween(choices.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
             throw new CommandException(String.format("You must specify between %d and %d different non-empty choices and one question.",
                     MIN_CHOICES_NUM, MAX_CHOICES_NUM));
         }

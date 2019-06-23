@@ -24,8 +24,8 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     private static final Map<Place, Predicate<Integer>> TESTS = Map.of(
             Place.RED, RED_NUMS::contains,
             Place.BLACK, Predicate.not(RED_NUMS::contains),
-            Place.LOW, num -> NumberUtils.isInRange(num, 1, 19),
-            Place.HIGH, num -> NumberUtils.isInRange(num, 19, 37),
+            Place.LOW, num -> NumberUtils.isBetween(num, 1, 19),
+            Place.HIGH, num -> NumberUtils.isBetween(num, 19, 37),
             Place.EVEN, num -> num % 2 == 0,
             Place.ODD, num -> num % 2 != 0);
 

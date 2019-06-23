@@ -48,7 +48,7 @@ public class FormatUtils {
     }
 
     public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
-        return format(enumClass.getEnumConstants(), StringUtils::toLowerCase, delimiter);
+        return FormatUtils.format(enumClass.getEnumConstants(), StringUtils::toLowerCase, delimiter);
     }
 
     public static <T> String format(Collection<T> collection, Function<T, String> mapper, CharSequence delimiter) {

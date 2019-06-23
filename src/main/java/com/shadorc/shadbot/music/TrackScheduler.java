@@ -78,7 +78,7 @@ public class TrackScheduler {
 
     public long changePosition(long time) {
         final AudioTrack track = this.audioPlayer.getPlayingTrack();
-        final long newPosition = NumberUtils.between(track.getPosition() + time, 0, track.getDuration() - 1);
+        final long newPosition = NumberUtils.truncateBetween(track.getPosition() + time, 0, track.getDuration() - 1);
         track.setPosition(newPosition);
         return newPosition;
     }
@@ -120,7 +120,7 @@ public class TrackScheduler {
     }
 
     public void setVolume(int volume) {
-        this.audioPlayer.setVolume(NumberUtils.between(volume, 0, 100));
+        this.audioPlayer.setVolume((int) NumberUtils.truncateBetween(volume, 0, 100));
     }
 
     public void setRepeatMode(RepeatMode repeatMode) {

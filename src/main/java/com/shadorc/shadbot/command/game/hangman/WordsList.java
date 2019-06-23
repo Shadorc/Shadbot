@@ -23,7 +23,7 @@ public class WordsList {
         if (this.words.isEmpty()) {
             this.words.addAll(
                     StringUtils.split(NetUtils.get(this.url).block(), "\n").stream()
-                            .filter(word -> NumberUtils.isInRange(word.length(), HangmanCmd.MIN_WORD_LENGTH, HangmanCmd.MAX_WORD_LENGTH))
+                            .filter(word -> NumberUtils.isBetween(word.length(), HangmanCmd.MIN_WORD_LENGTH, HangmanCmd.MAX_WORD_LENGTH))
                             .limit(500)
                             .collect(Collectors.toList()));
         }

@@ -48,7 +48,7 @@ public class Lottery {
 
     public void addToJackpot(long coins) {
         final long newPool = this.jackpot.get() + (int) Math.ceil(coins / 100.0f);
-        this.jackpot.set(NumberUtils.between(newPool, 0, Config.MAX_COINS));
+        this.jackpot.set((int) NumberUtils.truncateBetween(newPool, 0, Config.MAX_COINS));
     }
 
     public void addGambler(Snowflake guildId, Snowflake userId, int number) {

@@ -163,7 +163,7 @@ public class Context {
 
     public List<String> requireArgs(int min, int max, String delimiter) {
         final List<String> args = StringUtils.split(this.requireArg(), max, delimiter);
-        if (!NumberUtils.isInRange(args.size(), min, max)) {
+        if (!NumberUtils.isBetween(args.size(), min, max)) {
             throw new MissingArgumentException();
         }
         return args;

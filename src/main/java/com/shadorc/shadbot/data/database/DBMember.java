@@ -41,7 +41,7 @@ public class DBMember {
     }
 
     public void addCoins(long gains) {
-        this.coins.set(NumberUtils.between(this.getCoins() + gains, 0, Config.MAX_COINS));
+        this.coins.set((int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS));
     }
 
     public void resetCoins() {

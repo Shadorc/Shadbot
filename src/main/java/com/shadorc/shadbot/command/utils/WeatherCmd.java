@@ -100,27 +100,27 @@ public class WeatherCmd extends BaseCmd {
     private static String getWindDesc(double windSpeed) {
         if (windSpeed < 1) {
             return "Calm";
-        } else if (NumberUtils.isInRange(windSpeed, 1, 6)) {
+        } else if (NumberUtils.isBetween(windSpeed, 1, 6)) {
             return "Light air";
-        } else if (NumberUtils.isInRange(windSpeed, 6, 12)) {
+        } else if (NumberUtils.isBetween(windSpeed, 6, 12)) {
             return "Light breeze";
-        } else if (NumberUtils.isInRange(windSpeed, 12, 20)) {
+        } else if (NumberUtils.isBetween(windSpeed, 12, 20)) {
             return "Gentle breeze";
-        } else if (NumberUtils.isInRange(windSpeed, 20, 29)) {
+        } else if (NumberUtils.isBetween(windSpeed, 20, 29)) {
             return "Moderate breeze";
-        } else if (NumberUtils.isInRange(windSpeed, 29, 39)) {
+        } else if (NumberUtils.isBetween(windSpeed, 29, 39)) {
             return "Fresh breeze";
-        } else if (NumberUtils.isInRange(windSpeed, 39, 50)) {
+        } else if (NumberUtils.isBetween(windSpeed, 39, 50)) {
             return "Strong breeze";
-        } else if (NumberUtils.isInRange(windSpeed, 50, 62)) {
+        } else if (NumberUtils.isBetween(windSpeed, 50, 62)) {
             return "Near gale";
-        } else if (NumberUtils.isInRange(windSpeed, 62, 75)) {
+        } else if (NumberUtils.isBetween(windSpeed, 62, 75)) {
             return "Gale";
-        } else if (NumberUtils.isInRange(windSpeed, 75, 89)) {
+        } else if (NumberUtils.isBetween(windSpeed, 75, 89)) {
             return "Strong gale";
-        } else if (NumberUtils.isInRange(windSpeed, 89, 103)) {
+        } else if (NumberUtils.isBetween(windSpeed, 89, 103)) {
             return "Storm";
-        } else if (NumberUtils.isInRange(windSpeed, 103, 118)) {
+        } else if (NumberUtils.isBetween(windSpeed, 103, 118)) {
             return "Violent storm";
         } else {
             return "Hurricane";

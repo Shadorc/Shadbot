@@ -4,7 +4,7 @@ public class NumberUtils {
 
     /**
      * @param str - the string to convert, may be null
-     * @return The Integer represented by the string, or null if conversion fails
+     * @return The integer represented by the string or null if the string does not represent an integer
      */
     public static Integer asInt(String str) {
         if (str == null) {
@@ -12,7 +12,7 @@ public class NumberUtils {
         }
 
         try {
-            return Integer.parseInt(str);
+            return Integer.parseInt(str.trim());
         } catch (final NumberFormatException err) {
             return null;
         }
@@ -20,38 +20,42 @@ public class NumberUtils {
 
     /**
      * @param str - the string to convert, may be null
-     * @param min - the minimum value
-     * @param max - the maximum value
-     * @return The Integer represented by the string, or null if conversion fails
-     */
-    public static Integer asIntBetween(String str, int min, int max) {
-        if (str == null) {
-            return null;
-        }
-
-        try {
-            final int nbr = Integer.parseInt(str);
-            if (!NumberUtils.isInRange(nbr, min, max)) {
-                return null;
-            }
-            return nbr;
-        } catch (final NumberFormatException err) {
-            return null;
-        }
-    }
-
-    /**
-     * @param str - the string to convert, may be null
-     * @return The positive Integer represented by the string, or null if conversion fails
+     * @return The positive integer represented by the string or null if the string does not represent a positive integer
      */
     public static Integer asPositiveInt(String str) {
+        final Integer value = NumberUtils.asInt(str);
+        if (value == null || value <= 0) {
+            return null;
+        }
+        return value;
+    }
+
+    /**
+     * @param str - the string to convert, may be null
+     * @param min - the minimum value, inclusive
+     * @param max - the maximum value, inclusive
+     * @return The integer represented by the string or null if the string does not represent a positive integer
+     * or is not between min and max
+     */
+    public static Integer asIntBetween(String str, int min, int max) {
+        final Integer value = NumberUtils.asInt(str);
+        if (value == null || !NumberUtils.isBetween(value, min, max)) {
+            return null;
+        }
+        return value;
+    }
+
+    /**
+     * @param str - the string to convert, may be null
+     * @return The long represented by the string or null if the string does not represent a long
+     */
+    public static Long asLong(String str) {
         if (str == null) {
             return null;
         }
 
         try {
-            final int nbr = Integer.parseInt(str);
-            return nbr > 0 ? nbr : null;
+            return Long.parseLong(str.trim());
         } catch (final NumberFormatException err) {
             return null;
         }
@@ -59,29 +63,32 @@ public class NumberUtils {
 
     /**
      * @param str - the string to convert, may be null
-     * @return The positive Long represented by the string, or null if conversion fails
+     * @return The long represented by the string or null if the string does not represent a long
      */
     public static Long asPositiveLong(String str) {
-        if (str == null) {
+        final Long value = NumberUtils.asLong(str);
+        if (value == null || value <= 0) {
             return null;
         }
-
-        try {
-            final long nbr = Long.parseLong(str);
-            return nbr > 0 ? nbr : null;
-        } catch (final NumberFormatException err) {
-            return null;
-        }
+        return value;
     }
 
     /**
-     * @param num - the double to convert as an int between {@code min} and {@code max}
-     * @param min - the minimum value
-     * @param max - the maximum value
-     * @return The double converted as an int between {@code min} and {@code max}
+     * @param str - the string to check, may be null
+     * @return true if the string represents a positive long, false otherwise
      */
-    public static int between(double num, double min, double max) {
-        return (int) Math.max(min, Math.min(num, max));
+    public static boolean isPositiveLong(String str) {
+        return NumberUtils.asPositiveLong(str) != null;
+    }
+
+    /**
+     * @param num - the long to truncate between {@code min} and {@code max}
+     * @param min - the minimum value, inclusive
+     * @param max - the maximum value, inclusive
+     * @return The long truncated between {@code min} and {@code max}
+     */
+    public static long truncateBetween(long num, long min, long max) {
+        return Math.max(min, Math.min(num, max));
     }
 
     /**
@@ -90,16 +97,8 @@ public class NumberUtils {
      * @param max - the maximum value, inclusive
      * @return true if {@code num} is between {@code min}, inclusive, and {@code max}, inclusive, false otherwise
      */
-    public static boolean isInRange(double num, double min, double max) {
+    public static boolean isBetween(double num, double min, double max) {
         return num >= min && num <= max;
-    }
-
-    /**
-     * @param str - the string to check, may be null
-     * @return true if the string represents a positive long, false otherwise
-     */
-    public static boolean isPositiveLong(String str) {
-        return NumberUtils.asPositiveInt(str) != null;
     }
 
 }
