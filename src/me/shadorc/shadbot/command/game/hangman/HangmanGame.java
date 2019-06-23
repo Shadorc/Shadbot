@@ -12,7 +12,6 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -90,7 +89,7 @@ public class HangmanGame extends Game {
                 .map(String::toUpperCase)
                 .collect(Collectors.toList());
 
-        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     embed.setAuthor("Hangman Game", null, this.getContext().getAvatarUrl())
                             .setThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")

@@ -8,10 +8,9 @@ import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
 import me.shadorc.shadbot.utils.*;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.json.XML;
 import reactor.core.publisher.Mono;
 
@@ -59,7 +58,7 @@ public class Rule34Cmd extends BaseCmd {
                     final String formattedtags = org.apache.commons.lang3.StringUtils.truncate(
                             FormatUtils.format(tags, tag -> String.format("`%s`", tag), " "), MAX_TAGS_LENGTH);
 
-                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> {
                                 embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
                                         .setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")

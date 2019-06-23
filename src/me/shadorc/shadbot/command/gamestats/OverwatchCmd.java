@@ -9,13 +9,9 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import me.shadorc.shadbot.utils.*;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
@@ -59,7 +55,7 @@ public class OverwatchCmd extends BaseCmd {
                                 context.getUsername()));
             }
 
-            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
                             StringUtils.toLowerCase(platform), profile.getUsername()), context.getAvatarUrl())
                             .setThumbnail(profile.getPortrait())

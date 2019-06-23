@@ -2,8 +2,8 @@ package me.shadorc.shadbot.data;
 
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.utils.ExceptionHandler;
+import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;

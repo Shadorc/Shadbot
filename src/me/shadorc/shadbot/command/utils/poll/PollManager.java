@@ -12,7 +12,6 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.ExceptionHandler;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -58,7 +57,7 @@ public class PollManager {
             representation.append(String.format("%n\t**%d.** %s", i + 1, this.spec.getChoices().keySet().toArray()[i]));
         }
 
-        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Poll by %s", this.context.getUsername()),
                         null, this.context.getAvatarUrl())
                         .setDescription(String.format("Vote by clicking on the corresponding number.%n%n__**%s**__%s",
@@ -110,7 +109,7 @@ public class PollManager {
             count++;
         }
 
-        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Poll results (Author: %s)", this.context.getUsername()),
                         null, this.context.getAvatarUrl())
                         .setDescription(String.format("__**%s**__%s", this.spec.getQuestion(), representation.toString())));

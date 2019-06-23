@@ -11,13 +11,9 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
-import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -54,7 +50,7 @@ public class ImageCmd extends BaseCmd {
                                 context.getUsername(), arg));
                     }
                     final Image image = Utils.randValue(images);
-                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
                                     .setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
                                     .addField("Title", image.getTitle(), false)

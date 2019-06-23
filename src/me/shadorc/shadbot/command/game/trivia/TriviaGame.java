@@ -15,7 +15,6 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -75,7 +74,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
                 FormatUtils.numberedList(this.answers.size(), this.answers.size(),
                         count -> String.format("\t**%d**. %s", count, this.answers.get(count - 1))));
 
-        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
                         .setDescription(description)
                         .addField("Category", String.format("`%s`", this.trivia.getCategory()), true)

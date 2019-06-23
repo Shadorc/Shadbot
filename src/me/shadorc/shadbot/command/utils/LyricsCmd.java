@@ -13,11 +13,11 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.MusicManager;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import org.apache.http.HttpStatus;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -76,7 +76,7 @@ public class LyricsCmd extends BaseCmd {
             final Document doc = this.getLyricsDocument(context.getClient(), url).outputSettings(PRESERVE_FORMAT);
             final Musixmatch musixmatch = new Musixmatch(doc);
 
-            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
                             musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
                             .setThumbnail(musixmatch.getImageUrl())

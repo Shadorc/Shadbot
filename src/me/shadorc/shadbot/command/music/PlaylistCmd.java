@@ -6,11 +6,10 @@ import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.music.GuildMusic;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
@@ -28,7 +27,7 @@ public class PlaylistCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor("Playlist", null, context.getAvatarUrl())
                         .setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
                         .setDescription(PlaylistCmd.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist())));

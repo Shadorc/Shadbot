@@ -7,11 +7,10 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 import java.time.format.DateTimeFormatter;
@@ -49,7 +48,7 @@ public class ServerInfoCmd extends BaseCmd {
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
-        return EmbedUtils.getDefaultEmbed()
+        return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
                         .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
                         .addField("Owner", owner.getUsername(), true)

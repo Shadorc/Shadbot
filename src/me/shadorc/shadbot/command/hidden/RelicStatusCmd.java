@@ -10,10 +10,9 @@ import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.premium.Relic;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -61,7 +60,7 @@ public class RelicStatusCmd extends BaseCmd {
                     return new EmbedFieldEntity(titleBld.toString(), contentBld.toString(), false);
                 })
                 .collectList()
-                .map(fields -> EmbedUtils.getDefaultEmbed()
+                .map(fields -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Contributor Status", null, context.getAvatarUrl())
                                     .setThumbnail("https://orig00.deviantart.net/24e1/f/2015/241/8/7/relic_fragment_by_yukimemories-d97l8c8.png");

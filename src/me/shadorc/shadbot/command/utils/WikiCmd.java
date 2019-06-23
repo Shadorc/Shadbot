@@ -8,10 +8,10 @@ import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
@@ -61,7 +61,7 @@ public class WikiCmd extends BaseCmd {
 
             final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
 
-            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
                             String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
                             context.getAvatarUrl())

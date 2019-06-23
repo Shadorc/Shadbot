@@ -8,11 +8,11 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.json.JSONArray;
 import reactor.core.publisher.Mono;
 
@@ -100,7 +100,7 @@ public class TranslateCmd extends BaseCmd {
                         + "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
             }
 
-            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
                             .setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
                                     StringUtils.capitalize(this.langIsoMap.inverse().get(langFrom)), sourceText,

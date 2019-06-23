@@ -17,10 +17,8 @@ import me.shadorc.shadbot.data.lottery.LotteryHistoric;
 import me.shadorc.shadbot.data.lottery.LotteryManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.*;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -85,7 +83,7 @@ public class LotteryCmd extends BaseCmd {
     private Mono<Message> show(Context context) {
         final List<LotteryGambler> gamblers = LotteryManager.getInstance().getLottery().getGamblers();
 
-        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     embed.setAuthor("Lottery", null, context.getAvatarUrl())
                             .setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")

@@ -8,7 +8,6 @@ import me.shadorc.shadbot.core.game.MultiplayerGame;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.object.message.UpdateableMessage;
 import me.shadorc.shadbot.utils.*;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -90,7 +89,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
                 .collectList()
-                .map(list -> EmbedUtils.getDefaultEmbed()
+                .map(list -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
                                     .setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")

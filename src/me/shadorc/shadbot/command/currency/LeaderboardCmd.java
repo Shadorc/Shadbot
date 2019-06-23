@@ -7,10 +7,9 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.database.DBMember;
 import me.shadorc.shadbot.data.database.DatabaseManager;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -44,7 +43,7 @@ public class LeaderboardCmd extends BaseCmd {
                                 return String.format("%d. **%s** - %s", count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
                             });
                 })
-                .map(description -> EmbedUtils.getDefaultEmbed()
+                .map(description -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Leaderboard", null, context.getAvatarUrl())
                                 .setDescription(description)))
                 .flatMap(embed -> context.getChannel()

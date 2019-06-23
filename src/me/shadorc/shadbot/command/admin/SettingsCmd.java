@@ -18,11 +18,10 @@ import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -148,7 +147,7 @@ public class SettingsCmd extends BaseCmd {
                 .then(allowedChannelsStr)
                 .then(autoRolesStr)
                 .then(allowedRolesStr)
-                .thenReturn(EmbedUtils.getDefaultEmbed()
+                .thenReturn(DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Settings", null, context.getAvatarUrl())
                                 .setDescription(
                                         settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString())));

@@ -1,14 +1,14 @@
-package me.shadorc.shadbot.utils.embed.help;
+package me.shadorc.shadbot.object.help;
 
 public class Argument {
 
     private final String name;
-    private final String desc;
+    private final String description;
     private final boolean isFacultative;
 
-    protected Argument(String name, String desc, boolean isFacultative) {
+    protected Argument(String name, String description, boolean isFacultative) {
         this.name = name;
-        this.desc = desc;
+        this.description = description;
         this.isFacultative = isFacultative;
     }
 
@@ -16,8 +16,8 @@ public class Argument {
         return this.name;
     }
 
-    protected String getDesc() {
-        return this.desc;
+    protected String getDescription() {
+        return this.description;
     }
 
     protected boolean isFacultative() {

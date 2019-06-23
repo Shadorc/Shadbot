@@ -4,9 +4,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class BaguetteCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg"));
 
         return context.getChannel()

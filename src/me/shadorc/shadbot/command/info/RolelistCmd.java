@@ -8,10 +8,9 @@ import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -51,7 +50,7 @@ public class RolelistCmd extends BaseCmd {
 
                     return Mono.zip(mentionedRoles, usernames);
                 })
-                .map(tuple -> EmbedUtils.getDefaultEmbed()
+                .map(tuple -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor(String.format("Rolelist: %s", FormatUtils.format(tuple.getT1(), Role::getName, ", ")),
                                     null, context.getAvatarUrl());

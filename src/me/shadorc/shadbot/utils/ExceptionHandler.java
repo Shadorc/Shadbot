@@ -10,7 +10,6 @@ import me.shadorc.shadbot.exception.MissingArgumentException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.exception.NoMusicException;
 import me.shadorc.shadbot.object.Emoji;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
 import javax.net.ssl.SSLException;

@@ -8,7 +8,6 @@ import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -43,7 +42,7 @@ public class PrefixSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return EmbedUtils.getDefaultEmbed()
+        return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.addField("Usage", String.format("`%s%s <prefix>`", context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
                         .addField("Example", String.format("`%s%s !`", context.getPrefix(), this.getCommandName()), false));

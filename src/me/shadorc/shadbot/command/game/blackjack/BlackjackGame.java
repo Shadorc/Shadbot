@@ -13,7 +13,6 @@ import me.shadorc.shadbot.object.message.UpdateableMessage;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -111,7 +110,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> player.format(this.getContext().getClient()))
                 .collectList()
-                .map(hands -> EmbedUtils.getDefaultEmbed()
+                .map(hands -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             final Hand visibleDealerHand = this.isScheduled() ? new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
                             embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())

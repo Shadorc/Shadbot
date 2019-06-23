@@ -8,12 +8,12 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public class DtcCmd extends BaseCmd {
                     final String content = quote.getContent().replace("*", "\\*");
                     final String id = quote.getId();
 
-                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Quote DansTonChat",
                                     String.format("https://danstonchat.com/%s.html", id),
                                     context.getAvatarUrl())

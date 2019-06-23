@@ -9,7 +9,6 @@ import me.shadorc.shadbot.object.message.UpdateableMessage;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -68,7 +67,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> player.getUsername(this.getContext().getClient()))
                 .collectList()
-                .map(usernames -> EmbedUtils.getDefaultEmbed()
+                .map(usernames -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
                                     .setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")

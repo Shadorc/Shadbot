@@ -1,9 +1,10 @@
-package me.shadorc.shadbot.utils.embed.log;
+package me.shadorc.shadbot.object;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import reactor.util.annotation.Nullable;
 
 import java.awt.*;
 import java.util.function.Consumer;
@@ -15,30 +16,40 @@ public class LogBuilder {
     }
 
     private final LogType type;
-    private final String message;
-    private final Throwable err;
-    private final String input;
+    @Nullable
+    private String message;
+    @Nullable
+    private Throwable error;
+    @Nullable
+    private String input;
 
-    public LogBuilder(LogType type, String message, Throwable err, String input) {
+    public LogBuilder(LogType type) {
         this.type = type;
+    }
+
+    public LogBuilder setMessage(String message) {
         this.message = message;
-        this.err = err;
+        return this;
+    }
+
+    public LogBuilder setError(Throwable error) {
+        this.error = error;
+        return this;
+    }
+
+    public LogBuilder setInput(String input) {
         this.input = input;
-    }
-
-    public LogBuilder(LogType type, String message, Throwable err) {
-        this(type, message, err, null);
-    }
-
-    public LogBuilder(LogType type, String message) {
-        this(type, message, null, null);
+        return this;
     }
 
     public Consumer<EmbedCreateSpec> build() {
-        return EmbedUtils.getDefaultEmbed()
+        return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     embed.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeEnum(this.type), Config.VERSION), null, null);
-                    embed.setDescription(this.message);
+
+                    if (this.message != null && !this.message.isBlank()) {
+                        embed.setDescription(this.message);
+                    }
 
                     switch (this.type) {
                         case ERROR:
@@ -55,14 +66,14 @@ public class LogBuilder {
                             break;
                     }
 
-                    if (this.err != null) {
-                        embed.addField("Error type", this.err.getClass().getSimpleName(), false);
-                        if (this.err.getMessage() != null) {
-                            embed.addField("Error message", this.err.getMessage(), false);
+                    if (this.error != null) {
+                        embed.addField("Error type", this.error.getClass().getSimpleName(), false);
+                        if (this.error.getMessage() != null && !this.error.getMessage().isBlank()) {
+                            embed.addField("Error message", this.error.getMessage(), false);
                         }
                     }
 
-                    if (this.input != null) {
+                    if (this.input != null && !this.input.isBlank()) {
                         embed.addField("Input", this.input, false);
                     }
                 });

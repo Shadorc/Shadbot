@@ -8,7 +8,7 @@ import discord4j.voice.VoiceConnection;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 

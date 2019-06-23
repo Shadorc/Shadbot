@@ -9,12 +9,11 @@ import me.shadorc.shadbot.data.stats.StatisticEnum;
 import me.shadorc.shadbot.data.stats.core.MapStatistic;
 import me.shadorc.shadbot.data.stats.core.TableStatistic;
 import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
@@ -32,17 +31,6 @@ public class StatsCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(1, 2);
-
-        /*
-        if ("average".equalsIgnoreCase(args.get(0))) {
-            final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getAverageEmbed()
-                    .andThen(embed -> embed.setAuthor("Stats: average", null, context.getAvatarUrl()));
-
-            return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-                    .then();
-        }
-         */
 
         final StatisticEnum statEnum = Utils.parseEnum(StatisticEnum.class, args.get(0),
                 new CommandException(String.format("`%s` is not a valid category. %s",
@@ -68,7 +56,7 @@ public class StatsCmd extends BaseCmd {
             }
         }
 
-        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, context.getAvatarUrl());
 
@@ -95,7 +83,6 @@ public class StatsCmd extends BaseCmd {
                 .setDescription("Show statistics for the specified category.")
                 .addArg("category", FormatUtils.options(StatisticEnum.class), false)
                 .addArg("sub-category", "Needed when checking table statistics or to see a specific statistic", true)
-                .addField("Info", "You can also use `average` as a *category* to get average winnings per game", false)
                 .build();
     }
 }

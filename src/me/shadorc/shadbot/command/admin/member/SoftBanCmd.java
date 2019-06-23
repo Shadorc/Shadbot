@@ -4,7 +4,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.Context;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;

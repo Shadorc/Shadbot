@@ -23,7 +23,7 @@ import me.shadorc.shadbot.data.premium.PremiumManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.utils.ExceptionHandler;
 import me.shadorc.shadbot.utils.ExitCode;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;

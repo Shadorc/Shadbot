@@ -16,8 +16,6 @@ import me.shadorc.shadbot.music.GuildMusic;
 import me.shadorc.shadbot.music.MusicManager;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.*;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -131,7 +129,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 });
 
         final String playlistName = org.apache.commons.lang3.StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
-        return EmbedUtils.getDefaultEmbed()
+        return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
                         .setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
                         .setDescription("**Select a music by typing the corresponding number.**"

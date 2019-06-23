@@ -1,8 +1,8 @@
 package me.shadorc.shadbot.data.stats.core;
 
 import com.fasterxml.jackson.databind.JavaType;
+import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 import java.io.IOException;
 import java.util.Collections;

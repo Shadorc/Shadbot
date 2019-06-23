@@ -4,12 +4,12 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.NetUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import reactor.core.publisher.Flux;
@@ -44,7 +44,7 @@ public class JokeCmd extends BaseCmd {
                 .map(joke -> joke.split("<br>"))
                 // Remove HTML codes in joke string
                 .map(lines -> FormatUtils.format(lines, line -> Jsoup.parse(line).text().trim(), "\n"))
-                .map(joke -> loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                .map(joke -> loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Blague", HOME_URL, context.getAvatarUrl())
                                 .setDescription(joke))))
                 .flatMap(LoadingMessage::send)

@@ -11,9 +11,8 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
 import me.shadorc.shadbot.data.stats.enums.CommandEnum;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -48,7 +47,7 @@ public class HelpCmd extends BaseCmd {
                         .filterWhen(cmd -> context.getChannel().map(Channel::getType)
                                 .map(type -> type == Type.DM || DatabaseManager.getInstance().getDBGuild(context.getGuildId()).isCommandAllowed(cmd)))
                         .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
-                .map(map -> EmbedUtils.getDefaultEmbed()
+                .map(map -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Shadbot Help", null, context.getAvatarUrl())
                                     .setDescription(String.format("Any issues, questions or suggestions ?"

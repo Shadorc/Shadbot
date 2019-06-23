@@ -15,12 +15,11 @@ import me.shadorc.shadbot.data.database.DBGuild;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingArgumentException;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.ReactionMessage;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -70,7 +69,7 @@ public class IamCmd extends BaseCmd {
                                 description.append(quotedElements.get(0));
                             }
 
-                            final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+                            final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                                     .andThen(embed -> embed.setAuthor(String.format("Iam: %s",
                                             FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
                                             null, context.getAvatarUrl())

@@ -15,7 +15,6 @@ import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -113,7 +112,7 @@ public class AutoMessageSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return EmbedUtils.getDefaultEmbed()
+        return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s"
                                         + "%n**type** - %s"

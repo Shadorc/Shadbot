@@ -8,10 +8,10 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class GifCmd extends BaseCmd {
                                 context.getUsername(), context.getArg().orElse("random search")));
                     }
 
-                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl())));
                 })
                 .flatMap(LoadingMessage::send)

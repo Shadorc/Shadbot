@@ -4,13 +4,9 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
-import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.TextUtils;
-import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import me.shadorc.shadbot.utils.*;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 
@@ -45,7 +41,7 @@ public class SuicideGirlsCmd extends BaseCmd {
                                 final String imageUrl = girl.select("noscript").attr("data-retina");
                                 final String url = girl.getElementsByClass("facebook-share").attr("href");
 
-                                return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                                return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                                         .andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
                                                 .setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
                                                 .setImage(imageUrl)));

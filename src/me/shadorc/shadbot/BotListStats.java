@@ -7,7 +7,7 @@ import me.shadorc.shadbot.core.shard.Shard;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.utils.ExceptionHandler;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import org.json.JSONObject;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;

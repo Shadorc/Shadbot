@@ -11,13 +11,9 @@ import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.StringUtils;
-import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
+import me.shadorc.shadbot.utils.*;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -71,7 +67,7 @@ public class FortniteCmd extends BaseCmd {
                             + String.format(format, "K/D lifetime", stats.getSoloStats().getRatio(), stats.getDuoStats().getRatio(), stats.getSquadStats().getRatio())
                             + "```";
 
-                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Fortnite Stats",
                                     String.format("https://fortnitetracker.com/profile/%s/%s",
                                             StringUtils.toLowerCase(platform), encodedNickname),

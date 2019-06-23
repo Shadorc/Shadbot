@@ -5,8 +5,8 @@ import discord4j.core.object.util.Snowflake;
 import me.shadorc.shadbot.data.Data;
 import me.shadorc.shadbot.data.premium.Relic.RelicType;
 import me.shadorc.shadbot.utils.ExitCode;
+import me.shadorc.shadbot.utils.LogUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 
 import java.io.IOException;
 import java.time.Duration;

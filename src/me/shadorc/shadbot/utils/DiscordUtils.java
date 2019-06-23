@@ -9,6 +9,7 @@ import discord4j.core.spec.MessageCreateSpec;
 import discord4j.rest.http.client.ClientException;
 import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.data.stats.StatsManager;
@@ -16,7 +17,6 @@ import me.shadorc.shadbot.data.stats.enums.VariousEnum;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.exception.MissingPermissionException;
 import me.shadorc.shadbot.object.Emoji;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.PrematureCloseException;
@@ -186,6 +186,10 @@ public class DiscordUtils {
 
                     return userVoiceChannelId.get();
                 });
+    }
+
+    public static Consumer<EmbedCreateSpec> getDefaultEmbed() {
+        return spec -> spec.setColor(Config.BOT_COLOR);
     }
 
 }

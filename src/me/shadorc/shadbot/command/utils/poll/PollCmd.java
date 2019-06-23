@@ -9,10 +9,10 @@ import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.CommandPermission;
 import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.exception.CommandException;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 

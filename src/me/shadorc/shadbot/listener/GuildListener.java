@@ -5,7 +5,7 @@ import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import me.shadorc.shadbot.Shadbot;
 import me.shadorc.shadbot.data.database.DatabaseManager;
 import me.shadorc.shadbot.music.MusicManager;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 import reactor.core.publisher.Mono;
 
 public class GuildListener {

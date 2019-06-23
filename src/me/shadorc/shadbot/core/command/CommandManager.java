@@ -38,7 +38,7 @@ import me.shadorc.shadbot.command.music.*;
 import me.shadorc.shadbot.command.owner.*;
 import me.shadorc.shadbot.command.utils.*;
 import me.shadorc.shadbot.command.utils.poll.PollCmd;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.LogUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

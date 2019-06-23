@@ -12,14 +12,9 @@ import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
-import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.NetUtils;
-import me.shadorc.shadbot.utils.TimeUtils;
-import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
-import me.shadorc.shadbot.utils.embed.log.LogUtils;
+import me.shadorc.shadbot.utils.*;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -89,7 +84,7 @@ public class DiabloCmd extends BaseCmd {
             heroResponses.sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()));
             Collections.reverse(heroResponses);
 
-            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
                             .setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
                             .setDescription(String.format("Stats for **%s** (Guild: **%s**)"

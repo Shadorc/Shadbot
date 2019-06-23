@@ -1,12 +1,13 @@
-package me.shadorc.shadbot.utils.embed.help;
+package me.shadorc.shadbot.object.help;
 
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.Config;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.FormatUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
+import reactor.util.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +22,15 @@ public class HelpBuilder {
     private final List<Argument> args;
     private final List<EmbedFieldEntity> fields;
 
+    @Nullable
     private String thumbnail;
+    @Nullable
     private String description;
+    @Nullable
     private String usage;
+    @Nullable
     private String example;
+    @Nullable
     private String source;
     private String delimiter;
 
@@ -89,17 +95,17 @@ public class HelpBuilder {
     }
 
     public Consumer<EmbedCreateSpec> build() {
-        return EmbedUtils.getDefaultEmbed()
+        return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     embed.setAuthor(String.format("Help for %s command", this.cmd.getName()),
                             null, this.context.getAvatarUrl());
                     embed.addField("Usage", this.getUsage(), false);
 
-                    if (this.description != null) {
+                    if (this.description != null && !this.description.isBlank()) {
                         embed.setDescription(this.description);
                     }
 
-                    if (this.thumbnail != null) {
+                    if (this.thumbnail != null && !this.thumbnail.isBlank()) {
                         embed.setThumbnail(this.thumbnail);
                     }
 
@@ -107,11 +113,11 @@ public class HelpBuilder {
                         embed.addField("Arguments", this.getArguments(), false);
                     }
 
-                    if (this.example != null) {
+                    if (this.example != null && !this.example.isBlank()) {
                         embed.addField("Example", this.example, false);
                     }
 
-                    if (this.source != null) {
+                    if (this.source != null && !this.source.isBlank()) {
                         embed.addField("Source", this.source, false);
                     }
 
@@ -126,7 +132,7 @@ public class HelpBuilder {
     }
 
     private String getUsage() {
-        if (this.usage != null) {
+        if (this.usage != null && !this.usage.isBlank()) {
             return String.format("`%s`", this.usage);
         }
 
@@ -137,8 +143,8 @@ public class HelpBuilder {
 
     private String getArguments() {
         return this.args.stream()
-                .filter(arg -> Objects.nonNull(arg.getDesc()))
-                .map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isFacultative() ? "[optional] " : "", arg.getDesc()))
+                .filter(arg -> Objects.nonNull(arg.getDescription()))
+                .map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isFacultative() ? "[optional] " : "", arg.getDescription()))
                 .collect(Collectors.joining());
     }
 }

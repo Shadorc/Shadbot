@@ -7,12 +7,12 @@ import me.shadorc.shadbot.core.command.Context;
 import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
+import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
 import me.shadorc.shadbot.utils.StringUtils;
 import me.shadorc.shadbot.utils.Utils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import net.aksingh.owmjapis.api.APIException;
 import net.aksingh.owmjapis.core.OWM;
 import net.aksingh.owmjapis.core.OWM.Country;
@@ -68,7 +68,7 @@ public class WeatherCmd extends BaseCmd {
             final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ? String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
             final String countryCode = currentWeather.getSystemData().getCountryCode();
 
-            return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
                             String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
                             context.getAvatarUrl())

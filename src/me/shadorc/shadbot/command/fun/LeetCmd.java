@@ -4,9 +4,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.shadorc.shadbot.core.command.BaseCmd;
 import me.shadorc.shadbot.core.command.CommandCategory;
 import me.shadorc.shadbot.core.command.Context;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.utils.DiscordUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class LeetCmd extends BaseCmd {
                 .replace("S", "5")
                 .replace("T", "7");
 
-        final Consumer<EmbedCreateSpec> embedConsumer = EmbedUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor("Leetifier", null, context.getAvatarUrl())
                         .setDescription(String.format("**Original**%n%s%n%n**Leetified**%n%s", arg, text)));
 

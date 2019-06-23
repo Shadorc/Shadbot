@@ -10,10 +10,9 @@ import me.shadorc.shadbot.data.credential.Credential;
 import me.shadorc.shadbot.data.credential.Credentials;
 import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
+import me.shadorc.shadbot.object.help.HelpBuilder;
 import me.shadorc.shadbot.object.message.LoadingMessage;
 import me.shadorc.shadbot.utils.*;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
-import me.shadorc.shadbot.utils.embed.help.HelpBuilder;
 import org.apache.commons.cli.*;
 import reactor.core.publisher.Mono;
 
@@ -141,7 +140,7 @@ public class WallpaperCmd extends BaseCmd {
                     }
 
                     final Wallpaper wallpaper = Utils.randValue(wallpapers);
-                    return loadingMsg.setEmbed(EmbedUtils.getDefaultEmbed()
+                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Wallpaper", wallpaper.getUrl(), context.getAvatarUrl())
                                     .setImage(wallpaper.getPath())
                                     .addField("Resolution", wallpaper.getResolution(), false)));

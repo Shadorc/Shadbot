@@ -10,7 +10,6 @@ import me.shadorc.shadbot.exception.CommandException;
 import me.shadorc.shadbot.object.Emoji;
 import me.shadorc.shadbot.utils.DiscordUtils;
 import me.shadorc.shadbot.utils.NumberUtils;
-import me.shadorc.shadbot.utils.embed.EmbedUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -43,7 +42,7 @@ public class VolumeSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return EmbedUtils.getDefaultEmbed()
+        return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.addField("Usage", String.format("`%s%s <volume>`", context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**volume** - min: %d / max: %d / default: %d",
                                 MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME), false)
