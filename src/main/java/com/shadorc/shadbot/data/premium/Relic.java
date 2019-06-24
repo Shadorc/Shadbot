@@ -41,7 +41,9 @@ public class Relic {
     }
 
     public Relic() {
-        this(null, 0, null);
+        this.id = null;
+        this.duration = 0;
+        this.type = null;
     }
 
     public void activate(Snowflake userId) {
@@ -95,12 +97,8 @@ public class Relic {
         return this.activationTime != null;
     }
 
-    public void setGuildId(Snowflake guildId) {
-        this.guildId = guildId.asLong();
-    }
-
-    public void setUserId(Snowflake userId) {
-        this.userId = userId.asLong();
+    public void setGuildId(Long guildId) {
+        this.guildId = guildId;
     }
 
 }
