@@ -24,8 +24,8 @@ dependency-reduced-pom.xml
 Thumbs.db
 
 # Project Files
-./saves/
-./stats/
-./logs/
+*.log
+saves/*.json
+stats/*.json
 clean.bat
 credentials.properties
