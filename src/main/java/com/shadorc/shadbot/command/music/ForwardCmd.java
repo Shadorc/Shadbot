@@ -33,7 +33,7 @@ public class ForwardCmd extends BaseCmd {
         return DiscordUtils.requireSameVoiceChannel(context)
                 .map(voiceChannelId -> {
                     // If the argument is a number of seconds...
-                    Long num = NumberUtils.asPositiveLong(arg);
+                    Long num = NumberUtils.toPositiveLongOrNull(arg);
                     if (num == null) {
                         try {
                             // ... else, try to parse it

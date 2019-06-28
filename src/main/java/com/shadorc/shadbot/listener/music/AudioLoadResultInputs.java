@@ -60,7 +60,7 @@ public class AudioLoadResultInputs extends Inputs {
         final Set<Integer> choices = new HashSet<>();
         for (final String choice : contentCleaned.split(",")) {
             // If the choice is not valid, ignore the message
-            final Integer num = NumberUtils.asIntBetween(choice.trim(), 1, Math.min(Config.MUSIC_SEARCHES, this.listener.getResultTracks().size()));
+            final Integer num = NumberUtils.toIntBetweenOrNull(choice.trim(), 1, Math.min(Config.MUSIC_SEARCHES, this.listener.getResultTracks().size()));
             if (num == null) {
                 return Mono.empty();
             }

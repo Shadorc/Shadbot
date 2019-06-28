@@ -27,7 +27,7 @@ public class LeaveCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final Long guildId = NumberUtils.asPositiveLong(arg);
+        final Long guildId = NumberUtils.toPositiveLongOrNull(arg);
         if (guildId == null) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.", arg)));
         }

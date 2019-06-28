@@ -62,7 +62,7 @@ public class PruneCmd extends BaseCmd {
                                     String.format("\"%s\"", words))
                                     .trim();
 
-                            Integer count = NumberUtils.asPositiveInt(argCleaned);
+                            Integer count = NumberUtils.toPositiveIntOrNull(argCleaned);
                             if (!argCleaned.isEmpty() && count == null) {
                                 return Flux.error(new CommandException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
                                                 + "please include them in quotation marks. See `%shelp %s` for more information.",

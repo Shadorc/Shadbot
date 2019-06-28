@@ -30,7 +30,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
         // This boolean indicates if the user is trying to join or to create a game
         final boolean isJoining = args.size() == 1;
 
-        final Integer number = NumberUtils.asIntBetween(args.get(0), 1, 6);
+        final Integer number = NumberUtils.toIntBetweenOrNull(args.get(0), 1, 6);
         if (number == null) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid number, must be between 1 and 6.",
                     args.get(0))));

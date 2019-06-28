@@ -84,7 +84,7 @@ public class PollCmd extends BaseCmd {
 
         final Integer seconds;
         if (NumberUtils.isPositiveLong(args.get(0))) {
-            seconds = NumberUtils.asIntBetween(args.get(0), MIN_DURATION, MAX_DURATION);
+            seconds = NumberUtils.toIntBetweenOrNull(args.get(0), MIN_DURATION, MAX_DURATION);
             if (seconds == null) {
                 throw new CommandException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
                         args.get(0), MIN_DURATION, MAX_DURATION));

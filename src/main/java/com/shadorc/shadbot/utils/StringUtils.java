@@ -11,30 +11,36 @@ import java.util.stream.Collectors;
 public class StringUtils {
 
     /**
-     * @param str - the String to capitalize, may be null
-     * @return The capitalized String, null if null String input
+     * @param str - the string to capitalize, may be null
+     * @return The capitalized string or null if null string input
      */
     public static String capitalize(String str) {
-        if (str == null || str.isEmpty()) {
+        if (str == null || str.isBlank()) {
             return str;
         }
-        return str.substring(0, 1).toUpperCase() + str.toLowerCase().substring(1);
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
     /**
-     * @param enumeration - the enumeration to format
-     * @return The enumeration converted to a capitalized string with underscores replaced with spaces
+     * @param enumeration - the enumeration to format, may be null
+     * @return The enumeration converted as a capitalized string with underscores replaced with spaces
      */
     public static <E extends Enum<E>> String capitalizeEnum(E enumeration) {
+        if (enumeration == null) {
+            return null;
+        }
         return StringUtils.capitalize(StringUtils.toLowerCase(enumeration).replace("_", " "));
     }
 
     /**
-     * @param text - the string to check
+     * @param text - the string
      * @return A {@link List} containing the quoted elements from {@code text}
      */
     public static List<String> getQuotedElements(String text) {
         final List<String> matches = new ArrayList<>();
+        if (text == null || text.isBlank()) {
+            return matches;
+        }
         final Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(text);
         while (matcher.find()) {
             matches.add(matcher.group(1));
@@ -47,8 +53,8 @@ public class StringUtils {
      * The function returns the argument string with whitespace normalized by using {@link String#trim()} to remove leading and trailing whitespace and
      * then replacing sequences of whitespace characters by a single space.
      *
-     * @param str - the source String to normalize whitespaces from, may be null
-     * @return the modified string with whitespace normalized, {@code null} if null String input
+     * @param str - the source string to normalize whitespaces from, may be null
+     * @return the modified string with whitespace normalized or {@code null} if null string input
      */
     public static String normalizeSpace(String str) {
         if (str == null || str.isEmpty()) {
@@ -59,10 +65,13 @@ public class StringUtils {
 
     /**
      * @param count - the number of elements
-     * @param str   - the string to get plural from
+     * @param str   - the string to get plural from, may be null
      * @return {@code String.format("%d %ss", count, str)} if count > 1, String.format("%d %s", count, str) otherwise
      */
     public static String pluralOf(long count, String str) {
+        if (str == null || str.isBlank()) {
+            return null;
+        }
         if (count > 1) {
             return String.format("%d %ss", count, str);
         }
@@ -70,20 +79,23 @@ public class StringUtils {
     }
 
     /**
-     * @param str      - the string from which to remove patterns
+     * @param str      - the string from which to remove patterns, may be null
      * @param toRemove - the strings to be substituted for each match
-     * @return The resulting {@code String}
+     * @return The resulting string
      */
     public static String remove(String str, List<String> toRemove) {
         return StringUtils.remove(str, toRemove.toArray(new String[0]));
     }
 
     /**
-     * @param str      - the string from which to remove patterns
+     * @param str      - the string from which to remove patterns, may be null
      * @param toRemove - the strings to be substituted for each match
-     * @return The resulting {@code String}
+     * @return The resulting string
      */
     public static String remove(String str, String... toRemove) {
+        if (str == null) {
+            return null;
+        }
         return str.replaceAll(Arrays.stream(toRemove)
                 .filter(replacement -> !replacement.isEmpty())
                 .map(Pattern::quote)
@@ -101,7 +113,7 @@ public class StringUtils {
     /**
      * @param str   - the string to split
      * @param limit - the result threshold
-     * @return A endless list containing all the elements resulting of {@code str} splitted using space excluding empty results
+     * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding empty results
      */
     public static List<String> split(String str, int limit) {
         return StringUtils.split(str, limit, " ");
@@ -131,10 +143,13 @@ public class StringUtils {
     }
 
     /**
-     * @param object - the object to format
+     * @param object - the object to format, may be null
      * @return The object converted to a lower case string
      */
     public static String toLowerCase(Object object) {
+        if (object == null) {
+            return null;
+        }
         return object.toString().toLowerCase();
     }
 

@@ -63,7 +63,7 @@ public class LotteryCmd extends BaseCmd {
             return Mono.error(new CommandException("You're already participating."));
         }
 
-        final Integer num = NumberUtils.asIntBetween(arg, MIN_NUM, MAX_NUM);
+        final Integer num = NumberUtils.toIntBetweenOrNull(arg, MIN_NUM, MAX_NUM);
         if (num == null) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
                     arg, MIN_NUM, MAX_NUM)));

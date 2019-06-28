@@ -3,10 +3,10 @@ package com.shadorc.shadbot.utils;
 public class NumberUtils {
 
     /**
-     * @param str - the string to convert, may be null
-     * @return The integer represented by the string or null if the string does not represent an integer
+     * @param str - the string to parse as an integer number, may be {@code null}
+     * @return The string parsed as an Integer number or {@code null} if the string is not a valid representation of a number
      */
-    public static Integer asInt(String str) {
+    public static Integer toIntOrNull(String str) {
         if (str == null) {
             return null;
         }
@@ -19,11 +19,11 @@ public class NumberUtils {
     }
 
     /**
-     * @param str - the string to convert, may be null
-     * @return The positive integer represented by the string or null if the string does not represent a positive integer
+     * @param str - the string to parse as a positive integer number, may be {@code null}
+     * @return The string parsed as a positive Integer number or {@code null} if the string is not a valid representation of a positive number
      */
-    public static Integer asPositiveInt(String str) {
-        final Integer value = NumberUtils.asInt(str);
+    public static Integer toPositiveIntOrNull(String str) {
+        final Integer value = NumberUtils.toIntOrNull(str);
         if (value == null || value <= 0) {
             return null;
         }
@@ -31,14 +31,14 @@ public class NumberUtils {
     }
 
     /**
-     * @param str - the string to convert, may be null
+     * @param str - the string to parse as an integer number between {@code min} and {@code max}, may be null
      * @param min - the minimum value, inclusive
      * @param max - the maximum value, inclusive
-     * @return The integer represented by the string or null if the string does not represent a positive integer
-     * or is not between min and max
+     * @return The string parsed as an integer or {@code null} if the string is not a valid representation of a positive integer
+     * or is not between {@code min} and {@code max}
      */
-    public static Integer asIntBetween(String str, int min, int max) {
-        final Integer value = NumberUtils.asInt(str);
+    public static Integer toIntBetweenOrNull(String str, int min, int max) {
+        final Integer value = NumberUtils.toIntOrNull(str);
         if (value == null || !NumberUtils.isBetween(value, min, max)) {
             return null;
         }
@@ -46,10 +46,10 @@ public class NumberUtils {
     }
 
     /**
-     * @param str - the string to convert, may be null
-     * @return The long represented by the string or null if the string does not represent a long
+     * @param str - the string to parse as a long number, may be {@code null}
+     * @return The string parsed as a Long number or {@code null} if the string is not a valid representation of a number
      */
-    public static Long asLong(String str) {
+    public static Long toLongOrNull(String str) {
         if (str == null) {
             return null;
         }
@@ -62,11 +62,11 @@ public class NumberUtils {
     }
 
     /**
-     * @param str - the string to convert, may be null
-     * @return The long represented by the string or null if the string does not represent a long
+     * @param str - the string to parse as a positive long number, may be {@code null}
+     * @return The string parsed as a positive Long number or {@code null} if the string is not a valid representation of a number
      */
-    public static Long asPositiveLong(String str) {
-        final Long value = NumberUtils.asLong(str);
+    public static Long toPositiveLongOrNull(String str) {
+        final Long value = NumberUtils.toLongOrNull(str);
         if (value == null || value <= 0) {
             return null;
         }
@@ -75,10 +75,10 @@ public class NumberUtils {
 
     /**
      * @param str - the string to check, may be null
-     * @return true if the string represents a positive long, false otherwise
+     * @return true if the string is a valid representation of a positive Long number, false otherwise
      */
     public static boolean isPositiveLong(String str) {
-        return NumberUtils.asPositiveLong(str) != null;
+        return NumberUtils.toPositiveLongOrNull(str) != null;
     }
 
     /**
@@ -95,7 +95,7 @@ public class NumberUtils {
      * @param num - the double to check
      * @param min - the minimum value, inclusive
      * @param max - the maximum value, inclusive
-     * @return true if {@code num} is between {@code min}, inclusive, and {@code max}, inclusive, false otherwise
+     * @return true if {@code num} is between {@code min} and {@code max}, false otherwise
      */
     public static boolean isBetween(double num, double min, double max) {
         return num >= min && num <= max;

@@ -138,7 +138,7 @@ public class Utils {
      *                          or if the {@code user} does not have enough coins.
      */
     public static long requireValidBet(Member member, String betStr) {
-        final Long bet = NumberUtils.asPositiveLong(betStr);
+        final Long bet = NumberUtils.toPositiveLongOrNull(betStr);
         if (bet == null) {
             throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
         }

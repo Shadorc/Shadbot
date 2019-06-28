@@ -26,7 +26,7 @@ public class DatabaseCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(1, 2);
 
-        final Long guildId = NumberUtils.asPositiveLong(args.get(0));
+        final Long guildId = NumberUtils.toPositiveLongOrNull(args.get(0));
         if (guildId == null) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.",
                     args.get(0))));
@@ -39,7 +39,7 @@ public class DatabaseCmd extends BaseCmd {
                         return Mono.just(DatabaseManager.getInstance().getDBGuild(guild.getId()).toString());
                     }
 
-                    final Long memberId = NumberUtils.asPositiveLong(args.get(1));
+                    final Long memberId = NumberUtils.toPositiveLongOrNull(args.get(1));
                     if (memberId == null) {
                         return Mono.error(new CommandException(String.format("`%s` is not a valid member ID.",
                                 args.get(1))));

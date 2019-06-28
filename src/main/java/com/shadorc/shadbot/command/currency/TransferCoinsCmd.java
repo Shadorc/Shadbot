@@ -44,7 +44,7 @@ public class TransferCoinsCmd extends BaseCmd {
             return Mono.error(new CommandException("You cannot transfer coins to yourself."));
         }
 
-        final Integer coins = NumberUtils.asPositiveInt(args.get(0));
+        final Integer coins = NumberUtils.toPositiveIntOrNull(args.get(0));
         if (coins == null) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.",
                     args.get(0))));

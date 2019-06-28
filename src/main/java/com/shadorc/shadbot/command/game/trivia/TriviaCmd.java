@@ -30,7 +30,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final Integer categoryId = NumberUtils.asPositiveInt(context.getArg().orElse(""));
+        final Integer categoryId = NumberUtils.toPositiveIntOrNull(context.getArg().orElse(""));
 
         if (context.getArg().isPresent()) {
             if (this.categories == null) {

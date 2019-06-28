@@ -6,63 +6,63 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestNumberUtils {
 
     @Test
-    public void test_asInt() {
-        assertEquals(Integer.valueOf(14), NumberUtils.asInt("14"));
-        assertEquals(Integer.valueOf(14), NumberUtils.asInt("  14   "));
-        assertEquals(Integer.valueOf(0), NumberUtils.asInt("0"));
-        assertEquals(Integer.valueOf(-14), NumberUtils.asInt("-14"));
-        assertEquals(Integer.valueOf(-14), NumberUtils.asInt("  -14   "));
-        assertNull(NumberUtils.asInt("quatorze"));
-        assertNull(NumberUtils.asInt(null));
-        assertNull(NumberUtils.asInt("9223372036854775807"));
+    public void test_toIntOrNull() {
+        assertEquals(Integer.valueOf(14), NumberUtils.toIntOrNull("14"));
+        assertEquals(Integer.valueOf(14), NumberUtils.toIntOrNull("  14   "));
+        assertEquals(Integer.valueOf(0), NumberUtils.toIntOrNull("0"));
+        assertEquals(Integer.valueOf(-14), NumberUtils.toIntOrNull("-14"));
+        assertEquals(Integer.valueOf(-14), NumberUtils.toIntOrNull("  -14   "));
+        assertNull(NumberUtils.toIntOrNull("quatorze"));
+        assertNull(NumberUtils.toIntOrNull(null));
+        assertNull(NumberUtils.toIntOrNull("9223372036854775807"));
     }
 
     @Test
-    public void test_asPositiveInt() {
-        assertEquals(Integer.valueOf(14), NumberUtils.asPositiveInt("14"));
-        assertEquals(Integer.valueOf(14), NumberUtils.asPositiveInt("  14   "));
-        assertNull(NumberUtils.asPositiveInt("0"));
-        assertNull(NumberUtils.asPositiveInt("-14"));
-        assertNull(NumberUtils.asPositiveInt("  -14   "));
-        assertNull(NumberUtils.asPositiveInt("quatorze"));
-        assertNull(NumberUtils.asPositiveInt(null));
-        assertNull(NumberUtils.asPositiveInt("9223372036854775807"));
+    public void test_toPositiveIntOrNull() {
+        assertEquals(Integer.valueOf(14), NumberUtils.toPositiveIntOrNull("14"));
+        assertEquals(Integer.valueOf(14), NumberUtils.toPositiveIntOrNull("  14   "));
+        assertNull(NumberUtils.toPositiveIntOrNull("0"));
+        assertNull(NumberUtils.toPositiveIntOrNull("-14"));
+        assertNull(NumberUtils.toPositiveIntOrNull("  -14   "));
+        assertNull(NumberUtils.toPositiveIntOrNull("quatorze"));
+        assertNull(NumberUtils.toPositiveIntOrNull(null));
+        assertNull(NumberUtils.toPositiveIntOrNull("9223372036854775807"));
     }
 
     @Test
-    public void test_asIntBetween() {
-        assertEquals(14, NumberUtils.asIntBetween("14", 10, 20));
-        assertNull(NumberUtils.asIntBetween("4", 10, 20));
-        assertNull(NumberUtils.asIntBetween("24", 10, 20));
-        assertNull(NumberUtils.asIntBetween("-12", 10, 20));
-        assertEquals(10, NumberUtils.asIntBetween("10", 10, 20));
-        assertEquals(10, NumberUtils.asIntBetween(" 10   ", 10, 20));
-        assertNull(NumberUtils.asIntBetween(null, 10, 20));
-        assertNull(NumberUtils.asIntBetween("9223372036854775807", 10, 20));
+    public void test_toIntBetweenOrNull() {
+        assertEquals(14, NumberUtils.toIntBetweenOrNull("14", 10, 20));
+        assertNull(NumberUtils.toIntBetweenOrNull("4", 10, 20));
+        assertNull(NumberUtils.toIntBetweenOrNull("24", 10, 20));
+        assertNull(NumberUtils.toIntBetweenOrNull("-12", 10, 20));
+        assertEquals(10, NumberUtils.toIntBetweenOrNull("10", 10, 20));
+        assertEquals(10, NumberUtils.toIntBetweenOrNull(" 10   ", 10, 20));
+        assertNull(NumberUtils.toIntBetweenOrNull(null, 10, 20));
+        assertNull(NumberUtils.toIntBetweenOrNull("9223372036854775807", 10, 20));
     }
 
     @Test
-    public void test_asLong() {
-        assertEquals(Long.valueOf(14), NumberUtils.asLong("14"));
-        assertEquals(Long.valueOf(14), NumberUtils.asLong("  14   "));
-        assertEquals(Long.valueOf(0), NumberUtils.asLong("0"));
-        assertEquals(Long.valueOf(-14), NumberUtils.asLong("-14"));
-        assertEquals(Long.valueOf(-14), NumberUtils.asLong("  -14   "));
-        assertNull(NumberUtils.asLong("quatorze"));
-        assertNull(NumberUtils.asLong(null));
-        assertEquals(Long.MAX_VALUE, NumberUtils.asLong("9223372036854775807"));
+    public void test_toLongOrNull() {
+        assertEquals(Long.valueOf(14), NumberUtils.toLongOrNull("14"));
+        assertEquals(Long.valueOf(14), NumberUtils.toLongOrNull("  14   "));
+        assertEquals(Long.valueOf(0), NumberUtils.toLongOrNull("0"));
+        assertEquals(Long.valueOf(-14), NumberUtils.toLongOrNull("-14"));
+        assertEquals(Long.valueOf(-14), NumberUtils.toLongOrNull("  -14   "));
+        assertNull(NumberUtils.toLongOrNull("quatorze"));
+        assertNull(NumberUtils.toLongOrNull(null));
+        assertEquals(Long.MAX_VALUE, NumberUtils.toLongOrNull("9223372036854775807"));
     }
 
     @Test
-    public void test_asPositiveLong() {
-        assertEquals(Long.valueOf(14), NumberUtils.asPositiveLong("14"));
-        assertEquals(Long.valueOf(14), NumberUtils.asPositiveLong("  14   "));
-        assertNull(NumberUtils.asPositiveLong("0"));
-        assertNull(NumberUtils.asPositiveLong("-14"));
-        assertNull(NumberUtils.asPositiveLong("  -14   "));
-        assertNull(NumberUtils.asPositiveLong("quatorze"));
-        assertNull(NumberUtils.asPositiveLong(null));
-        assertEquals(Long.MAX_VALUE, NumberUtils.asPositiveLong("9223372036854775807"));
+    public void test_toPositiveLongOrNull() {
+        assertEquals(Long.valueOf(14), NumberUtils.toPositiveLongOrNull("14"));
+        assertEquals(Long.valueOf(14), NumberUtils.toPositiveLongOrNull("  14   "));
+        assertNull(NumberUtils.toPositiveLongOrNull("0"));
+        assertNull(NumberUtils.toPositiveLongOrNull("-14"));
+        assertNull(NumberUtils.toPositiveLongOrNull("  -14   "));
+        assertNull(NumberUtils.toPositiveLongOrNull("quatorze"));
+        assertNull(NumberUtils.toPositiveLongOrNull(null));
+        assertEquals(Long.MAX_VALUE, NumberUtils.toPositiveLongOrNull("9223372036854775807"));
     }
 
     @Test

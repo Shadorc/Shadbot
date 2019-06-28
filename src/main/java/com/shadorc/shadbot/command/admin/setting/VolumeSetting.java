@@ -28,7 +28,7 @@ public class VolumeSetting extends BaseSetting {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(2);
 
-        final Integer volume = NumberUtils.asIntBetween(args.get(1), MIN_VOLUME, MAX_VOLUME);
+        final Integer volume = NumberUtils.toIntBetweenOrNull(args.get(1), MIN_VOLUME, MAX_VOLUME);
         if (volume == null) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
                     args.get(1), MIN_VOLUME, MAX_VOLUME)));

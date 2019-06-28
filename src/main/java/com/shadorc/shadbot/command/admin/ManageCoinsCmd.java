@@ -40,7 +40,7 @@ public class ManageCoinsCmd extends BaseCmd {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(0), FormatUtils.options(Action.class))));
 
-        final Integer coins = NumberUtils.asInt(args.get(1));
+        final Integer coins = NumberUtils.toIntOrNull(args.get(1));
         if (coins == null && action != Action.RESET) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.",
                     args.get(1))));

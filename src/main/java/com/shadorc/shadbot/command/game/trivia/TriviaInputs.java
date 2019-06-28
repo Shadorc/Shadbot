@@ -51,7 +51,7 @@ public class TriviaInputs extends Inputs {
 
                     // It's a number or a text
                     final String content = event.getMessage().getContent().get();
-                    final Integer choice = NumberUtils.asIntBetween(content, 1, this.game.getAnswers().size());
+                    final Integer choice = NumberUtils.toIntBetweenOrNull(content, 1, this.game.getAnswers().size());
 
                     // Message is a text and doesn't match any answers, ignore it
                     if (choice == null && this.game.getAnswers().stream().noneMatch(content::equalsIgnoreCase)) {
