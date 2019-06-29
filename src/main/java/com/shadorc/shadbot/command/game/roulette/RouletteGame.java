@@ -96,7 +96,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                                     .setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
                                                     + "%n%n**place** is a `number between 1 and 36`, %s",
                                             this.getContext().getPrefix(), this.getContext().getCommandName(),
-                                            FormatUtils.format(Place.values(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", ")))
+                                            FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
                                     .addField("Player (Bet)", FormatUtils.format(list,
                                             tuple -> String.format("**%s** (%s)", tuple.getT2(), FormatUtils.coins(tuple.getT1().getBet())), "\n"), true)
                                     .addField("Place", this.getPlayers().values().stream().map(RoulettePlayer::getPlace).collect(Collectors.joining("\n")), true);

@@ -48,7 +48,7 @@ public class FormatUtils {
     }
 
     public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
-        return FormatUtils.format(enumClass.getEnumConstants(), StringUtils::toLowerCase, delimiter);
+        return FormatUtils.format(enumClass.getEnumConstants(), value -> value.toString().toLowerCase(), delimiter);
     }
 
     public static <T> String format(Collection<T> collection, Function<T, String> mapper, CharSequence delimiter) {
@@ -67,7 +67,7 @@ public class FormatUtils {
         final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
         final String str = period.getUnits().stream()
                 .filter(unit -> period.get(unit) != 0)
-                .map(unit -> String.format("%d %s", period.get(unit), StringUtils.toLowerCase(unit)))
+                .map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
                 .collect(Collectors.joining(", "));
         return str.isEmpty() ? FormatUtils.shortDuration(instant.toEpochMilli()) : str;
     }
@@ -90,7 +90,7 @@ public class FormatUtils {
 
     public static <E extends Enum<E>> String options(Class<E> enumClass) {
         return String.format("Options: %s",
-                FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", StringUtils.toLowerCase(value)), ", "));
+                FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
     }
 
     /**

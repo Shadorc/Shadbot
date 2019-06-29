@@ -10,7 +10,10 @@ import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.LoadingMessage;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
@@ -57,7 +60,7 @@ public class OverwatchCmd extends BaseCmd {
 
             return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
-                            StringUtils.toLowerCase(platform), profile.getUsername()), context.getAvatarUrl())
+                            platform.toString().toLowerCase(), profile.getUsername()), context.getAvatarUrl())
                             .setThumbnail(profile.getPortrait())
                             .setDescription(String.format("Stats for user **%s**", profile.getUsername()))
                             .addField("Level", profile.getLevel(), true)
@@ -100,7 +103,7 @@ public class OverwatchCmd extends BaseCmd {
 
     private static String getUrl(String endpoint, Platform platform, String username) {
         return String.format("http://overwatchy.com/%s/%s/global/%s",
-                endpoint, StringUtils.toLowerCase(platform), username);
+                endpoint, platform.toString().toLowerCase(), username);
     }
 
     @Override

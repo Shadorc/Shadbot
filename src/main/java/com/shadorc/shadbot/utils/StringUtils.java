@@ -29,7 +29,7 @@ public class StringUtils {
         if (enumeration == null) {
             return null;
         }
-        return StringUtils.capitalize(StringUtils.toLowerCase(enumeration).replace("_", " "));
+        return StringUtils.capitalize(enumeration.toString().toLowerCase().replace("_", " "));
     }
 
     /**
@@ -140,17 +140,6 @@ public class StringUtils {
      */
     public static List<String> split(String str, String delimiter) {
         return StringUtils.split(str, -1, delimiter);
-    }
-
-    /**
-     * @param object - the object to format, may be null
-     * @return The object converted to a lower case string
-     */
-    public static String toLowerCase(Object object) {
-        if (object == null) {
-            return null;
-        }
-        return object.toString().toLowerCase();
     }
 
 }

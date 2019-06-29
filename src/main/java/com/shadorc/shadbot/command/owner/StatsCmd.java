@@ -11,7 +11,6 @@ import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -58,7 +57,7 @@ public class StatsCmd extends BaseCmd {
 
         final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
-                    embed.setAuthor(String.format("Stats: %s", StringUtils.toLowerCase(statEnum)), null, context.getAvatarUrl());
+                    embed.setAuthor(String.format("Stats: %s", statEnum.toString().toLowerCase()), null, context.getAvatarUrl());
 
                     if (map == null || map.isEmpty()) {
                         embed.setDescription("No statistics yet.");
@@ -67,7 +66,7 @@ public class StatsCmd extends BaseCmd {
                                 Map.Entry.comparingByValue(Comparator.comparingLong(AtomicLong::get));
                         final Map<String, AtomicLong> sortedMap = Utils.sortByValue(map, comparator.reversed());
 
-                        embed.addField("Name", FormatUtils.format(sortedMap.keySet(), StringUtils::toLowerCase, "\n"), true)
+                        embed.addField("Name", FormatUtils.format(sortedMap.keySet(), String::toLowerCase, "\n"), true)
                                 .addField("Value", FormatUtils.format(sortedMap.values(), value -> FormatUtils.number(Long.parseLong(value.toString())), "\n"), true);
                     }
                 });

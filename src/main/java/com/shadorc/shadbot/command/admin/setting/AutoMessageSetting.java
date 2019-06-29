@@ -97,7 +97,7 @@ public class AutoMessageSetting extends BaseSetting {
             if (dbGuild.getMessageChannelId().isEmpty()) {
                 strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
                                 + "in which send the auto-messages. Use `%s%s %s %s <#channel>`%n",
-                        context.getPrefix(), this.getCommandName(), StringUtils.toLowerCase(Action.ENABLE), StringUtils.toLowerCase(Type.CHANNEL)));
+                        context.getPrefix(), this.getCommandName(), Action.ENABLE.toString().toLowerCase(), Type.CHANNEL.toString().toLowerCase()));
             }
             strBuilder.append(String.format(Emoji.CHECK_MARK + " %s set to `%s`", StringUtils.capitalizeEnum(setting), message));
 
@@ -119,9 +119,9 @@ public class AutoMessageSetting extends BaseSetting {
                                         + "%n**value** - a message for *%s* and *%s* or a #channel for *%s*",
                                 FormatUtils.format(Action.class, "/"),
                                 FormatUtils.format(Type.class, "/"),
-                                StringUtils.toLowerCase(Type.JOIN_MESSAGE),
-                                StringUtils.toLowerCase(Type.LEAVE_MESSAGE),
-                                StringUtils.toLowerCase(Type.CHANNEL)), false)
+                                Type.JOIN_MESSAGE.toString().toLowerCase(),
+                                Type.LEAVE_MESSAGE.toString().toLowerCase(),
+                                Type.CHANNEL.toString().toLowerCase()), false)
                         .addField("Info", "You don't need to specify *value* to disable a type.", false)
                         .addField("Formatting", "**{mention}** - the mention of the user who joined/left"
                                 + "\n**{username}** - the username of the user who joined/left"

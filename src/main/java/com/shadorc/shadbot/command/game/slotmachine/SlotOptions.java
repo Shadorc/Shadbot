@@ -1,7 +1,5 @@
 package com.shadorc.shadbot.command.game.slotmachine;
 
-import com.shadorc.shadbot.utils.StringUtils;
-
 public enum SlotOptions {
 
     APPLE(100),
@@ -20,6 +18,6 @@ public enum SlotOptions {
     }
 
     public String getEmoji() {
-        return String.format(":%s:", StringUtils.toLowerCase(this));
+        return String.format(":%s:", this.toString().toLowerCase());
     }
 }

@@ -11,7 +11,10 @@ import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.LoadingMessage;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpHeaders;
 import reactor.core.Exceptions;
@@ -46,7 +49,7 @@ public class FortniteCmd extends BaseCmd {
 
         final String encodedNickname = epicNickname.replace(" ", "%20");
         final String url = String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
-                StringUtils.toLowerCase(platform), encodedNickname);
+                platform.toString().toLowerCase(), encodedNickname);
 
         final Consumer<HttpHeaders> headerBuilder = header -> header.add("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY));
         return NetUtils.get(headerBuilder, url, FortniteResponse.class)
@@ -70,7 +73,7 @@ public class FortniteCmd extends BaseCmd {
                     return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Fortnite Stats",
                                     String.format("https://fortnitetracker.com/profile/%s/%s",
-                                            StringUtils.toLowerCase(platform), encodedNickname),
+                                            platform.toString().toLowerCase(), encodedNickname),
                                     context.getAvatarUrl())
                                     .setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
                                     .setDescription(description)));
