@@ -103,7 +103,7 @@ public class StringUtils {
     }
 
     /**
-     * @param str - the string to split
+     * @param str - the string to split, may be null
      * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding empty results
      */
     public static List<String> split(String str) {
@@ -111,7 +111,7 @@ public class StringUtils {
     }
 
     /**
-     * @param str   - the string to split
+     * @param str   - the string to split, may be null
      * @param limit - the result threshold
      * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding empty results
      */
@@ -120,13 +120,16 @@ public class StringUtils {
     }
 
     /**
-     * @param str       - the string to split
+     * @param str       - the string to split, may be null
      * @param limit     - the result threshold
      * @param delimiter - the delimiting regular expression
      * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted using {@code delimiter} excluding
      * empty results
      */
     public static List<String> split(String str, int limit, String delimiter) {
+        if(str == null) {
+            return new ArrayList<>();
+        }
         return Arrays.stream(str.split(delimiter, limit))
                 .map(String::trim)
                 .filter(word -> !word.isEmpty())
