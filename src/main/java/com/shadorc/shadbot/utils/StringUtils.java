@@ -1,5 +1,8 @@
 package com.shadorc.shadbot.utils;
 
+import reactor.util.annotation.NonNull;
+import reactor.util.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,7 +17,7 @@ public class StringUtils {
      * @param str - the string to capitalize, may be null
      * @return The capitalized string or null if null string input
      */
-    public static String capitalize(String str) {
+    public static String capitalize(@Nullable String str) {
         if (str == null || str.isBlank()) {
             return str;
         }
@@ -25,7 +28,7 @@ public class StringUtils {
      * @param enumeration - the enumeration to format, may be null
      * @return The enumeration converted as a capitalized string with underscores replaced with spaces
      */
-    public static <E extends Enum<E>> String capitalizeEnum(E enumeration) {
+    public static <E extends Enum<E>> String capitalizeEnum(@Nullable E enumeration) {
         if (enumeration == null) {
             return null;
         }
@@ -36,7 +39,7 @@ public class StringUtils {
      * @param text - the string
      * @return A {@link List} containing the quoted elements from {@code text}
      */
-    public static List<String> getQuotedElements(String text) {
+    public static List<String> getQuotedElements(@Nullable String text) {
         final List<String> matches = new ArrayList<>();
         if (text == null || text.isBlank()) {
             return matches;
@@ -56,7 +59,7 @@ public class StringUtils {
      * @param str - the source string to normalize whitespaces from, may be null
      * @return the modified string with whitespace normalized or {@code null} if null string input
      */
-    public static String normalizeSpace(String str) {
+    public static String normalizeSpace(@Nullable String str) {
         if (str == null || str.isEmpty()) {
             return str;
         }
@@ -68,7 +71,7 @@ public class StringUtils {
      * @param str   - the string to get plural from, may be null
      * @return {@code String.format("%d %ss", count, str)} if count > 1, String.format("%d %s", count, str) otherwise
      */
-    public static String pluralOf(long count, String str) {
+    public static String pluralOf(long count, @Nullable String str) {
         if (str == null || str.isBlank()) {
             return null;
         }
@@ -83,7 +86,7 @@ public class StringUtils {
      * @param toRemove - the strings to be substituted for each match
      * @return The resulting string
      */
-    public static String remove(String str, List<String> toRemove) {
+    public static String remove(@Nullable String str, @NonNull List<String> toRemove) {
         return StringUtils.remove(str, toRemove.toArray(new String[0]));
     }
 
@@ -92,7 +95,7 @@ public class StringUtils {
      * @param toRemove - the strings to be substituted for each match
      * @return The resulting string
      */
-    public static String remove(String str, String... toRemove) {
+    public static String remove(@Nullable String str, @NonNull String... toRemove) {
         if (str == null) {
             return null;
         }
@@ -106,7 +109,7 @@ public class StringUtils {
      * @param str - the string to split, may be null
      * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding empty results
      */
-    public static List<String> split(String str) {
+    public static List<String> split(@Nullable String str) {
         return StringUtils.split(str, -1);
     }
 
@@ -115,7 +118,7 @@ public class StringUtils {
      * @param limit - the result threshold
      * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding empty results
      */
-    public static List<String> split(String str, int limit) {
+    public static List<String> split(@Nullable String str, int limit) {
         return StringUtils.split(str, limit, " ");
     }
 
@@ -126,8 +129,8 @@ public class StringUtils {
      * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted using {@code delimiter} excluding
      * empty results
      */
-    public static List<String> split(String str, int limit, String delimiter) {
-        if(str == null) {
+    public static List<String> split(@Nullable String str, int limit, @NonNull String delimiter) {
+        if (str == null) {
             return new ArrayList<>();
         }
         return Arrays.stream(str.split(delimiter, limit))
@@ -141,7 +144,7 @@ public class StringUtils {
      * @param delimiter - the delimiting regular expression
      * @return A endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding empty results
      */
-    public static List<String> split(String str, String delimiter) {
+    public static List<String> split(@Nullable String str, @NonNull String delimiter) {
         return StringUtils.split(str, -1, delimiter);
     }
 

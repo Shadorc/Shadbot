@@ -3,7 +3,6 @@ package com.shadorc.shadbot.object;
 import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.util.annotation.Nullable;
