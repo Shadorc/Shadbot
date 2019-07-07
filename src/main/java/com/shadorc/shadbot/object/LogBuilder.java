@@ -3,6 +3,8 @@ package com.shadorc.shadbot.object;
 import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.StringUtils;
+import discord4j.common.json.EmbedFieldEntity;
+import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.util.annotation.Nullable;
 
@@ -48,7 +50,7 @@ public class LogBuilder {
                     embed.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeEnum(this.type), Config.VERSION), null, null);
 
                     if (this.message != null && !this.message.isBlank()) {
-                        embed.setDescription(this.message);
+                        embed.setDescription(org.apache.commons.lang3.StringUtils.abbreviate(this.message, Embed.MAX_DESCRIPTION_LENGTH));
                     }
 
                     switch (this.type) {
@@ -69,12 +71,12 @@ public class LogBuilder {
                     if (this.error != null) {
                         embed.addField("Error type", this.error.getClass().getSimpleName(), false);
                         if (this.error.getMessage() != null && !this.error.getMessage().isBlank()) {
-                            embed.addField("Error message", this.error.getMessage(), false);
+                            embed.addField("Error message", org.apache.commons.lang3.StringUtils.abbreviate(this.error.getMessage(), Embed.Field.MAX_VALUE_LENGTH), false);
                         }
                     }
 
                     if (this.input != null && !this.input.isBlank()) {
-                        embed.addField("Input", this.input, false);
+                        embed.addField("Input", org.apache.commons.lang3.StringUtils.abbreviate(this.input, Embed.Field.MAX_VALUE_LENGTH), false);
                     }
                 });
     }
