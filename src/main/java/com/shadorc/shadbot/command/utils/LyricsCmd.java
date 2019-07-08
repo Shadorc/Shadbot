@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.command.utils;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.api.musixmatch.Musixmatch;
@@ -62,7 +63,11 @@ public class LyricsCmd extends BaseCmd {
                     throw new MissingArgumentException();
                 }
 
-                final AudioTrackInfo info = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack().getInfo();
+                final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
+                if (track == null) {
+                    throw new MissingArgumentException();
+                }
+                final AudioTrackInfo info = track.getInfo();
                 // Remove from title (case insensitive): official, video, music, [, ], (, )
                 search = info.title.replaceAll("(?i)official|video|music|\\[|]|\\(|\\)", "");
             }
