@@ -162,7 +162,7 @@ public class SettingsCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         final HelpBuilder embed = new HelpBuilder(this, context)
-                .setThumbnail("http://www.emoji.co.uk/files/emoji-one/objects-emoji-one/1898-gear.png")
+                .setThumbnail("https://i.imgur.com/QA2PUjM.png")
                 .setDescription("Change Shadbot's settings for this server.")
                 .addArg("name", false)
                 .addArg("args", false)

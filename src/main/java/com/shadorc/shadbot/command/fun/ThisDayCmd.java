@@ -53,7 +53,7 @@ public class ThisDayCmd extends BaseCmd {
 
                     return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(String.format("On This Day: %s", date), HOME_URL, context.getAvatarUrl())
-                                    .setThumbnail("http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png")
+                                    .setThumbnail("https://i.imgur.com/FdfyJDD.png")
                                     .setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH))));
                 })
                 .flatMap(LoadingMessage::send)

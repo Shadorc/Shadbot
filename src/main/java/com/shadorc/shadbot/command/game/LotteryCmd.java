@@ -86,7 +86,7 @@ public class LotteryCmd extends BaseCmd {
         final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     embed.setAuthor("Lottery", null, context.getAvatarUrl())
-                            .setThumbnail("https://cdn.onlineunitedstatescasinos.com/wp-content/uploads/2016/04/Lottery-icon.png")
+                            .setThumbnail("https://i.imgur.com/peLGtkS.png")
                             .setDescription(String.format("The next draw will take place in **%s**%nTo participate, type: `%s%s %d-%d`",
                                     FormatUtils.customDate(LotteryCmd.getDelay()),
                                     context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
@@ -96,7 +96,7 @@ public class LotteryCmd extends BaseCmd {
                     gamblers.stream()
                             .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
                             .findAny().ifPresent(gambler -> embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
-                            "https://images.emojiterra.com/twitter/512px/1f39f.png"));
+                            "https://i.imgur.com/btJAaAt.png"));
 
                     final LotteryHistoric historic = LotteryManager.getInstance().getLottery().getHistoric();
                     if (historic != null) {

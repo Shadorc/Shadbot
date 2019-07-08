@@ -70,7 +70,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                 .map(usernames -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
-                                    .setThumbnail("http://findicons.com/files/icons/2118/nuvola/128/package_games_board.png")
+                                    .setThumbnail("https://i.imgur.com/XgOilIW.png")
                                     .setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
                                             this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
                                     .addField("Player", String.join("\n", usernames), true)

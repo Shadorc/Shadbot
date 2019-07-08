@@ -86,7 +86,7 @@ public class DiabloCmd extends BaseCmd {
 
             return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
-                            .setThumbnail("http://osx.wdfiles.com/local--files/icon:d3/D3.png")
+                            .setThumbnail("https://i.imgur.com/QUS9QkX.png")
                             .setDescription(String.format("Stats for **%s** (Guild: **%s**)"
                                             + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
                                             + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",

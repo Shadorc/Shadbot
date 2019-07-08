@@ -52,7 +52,7 @@ public class ImageCmd extends BaseCmd {
                     final Image image = Utils.randValue(images);
                     return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
-                                    .setThumbnail("http://www.pngall.com/wp-content/uploads/2016/04/Deviantart-Logo-Transparent.png")
+                                    .setThumbnail("https://i.imgur.com/gT4hHUB.png")
                                     .addField("Title", image.getTitle(), false)
                                     .addField("Author", image.getAuthor().getUsername(), false)
                                     .addField("Category", image.getCategoryPath(), false)

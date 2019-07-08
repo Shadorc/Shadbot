@@ -48,7 +48,7 @@ public class UrbanCmd extends BaseCmd {
                     return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> {
                                 embed.setAuthor(String.format("Urban Dictionary: %s", urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())
-                                        .setThumbnail("http://www.packal.org/sites/default/files/public/styles/icon_large/public/workflow-files/florianurban/icon/icon.png")
+                                        .setThumbnail("https://i.imgur.com/7KJtwWp.png")
                                         .setDescription(definition);
                                 if (!example.isBlank()) {
                                     embed.addField("Example", example, false);

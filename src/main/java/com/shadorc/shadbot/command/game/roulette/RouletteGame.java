@@ -92,7 +92,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                 .map(list -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
-                                    .setThumbnail("http://icongal.com/gallery/image/278586/roulette_baccarat_casino.png")
+                                    .setThumbnail("https://i.imgur.com/D7xZd6C.png")
                                     .setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
                                                     + "%n%n**place** is a `number between 1 and 36`, %s",
                                             this.getContext().getPrefix(), this.getContext().getCommandName(),

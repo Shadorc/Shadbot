@@ -82,7 +82,7 @@ public class LyricsCmd extends BaseCmd {
                             .setThumbnail(musixmatch.getImageUrl())
                             .setDescription(musixmatch.getLyrics())
                             .setFooter("Click on the title to see the full version",
-                                    "https://www.shareicon.net/download/2015/09/11/99440_info_512x512.png")));
+                                    "https://i.imgur.com/G7q6Hmq.png")));
         })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)

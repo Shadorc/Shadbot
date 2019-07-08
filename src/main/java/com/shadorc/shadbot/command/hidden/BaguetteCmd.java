@@ -21,7 +21,7 @@ public class BaguetteCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setImage("http://i.telegraph.co.uk/multimedia/archive/02600/CECPY7_2600591b.jpg"));
+                .andThen(embed -> embed.setImage("https://i.imgur.com/2Ean5iI.jpg"));
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))

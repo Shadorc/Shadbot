@@ -29,7 +29,7 @@ public class PlaylistCmd extends BaseCmd {
 
         final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor("Playlist", null, context.getAvatarUrl())
-                        .setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
+                        .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
                         .setDescription(PlaylistCmd.formatPlaylist(guildMusic.getTrackScheduler().getPlaylist())));
 
         return context.getChannel()

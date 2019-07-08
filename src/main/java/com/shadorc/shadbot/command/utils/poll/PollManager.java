@@ -64,7 +64,7 @@ public class PollManager {
                                 this.spec.getQuestion(), representation.toString()))
                         .setFooter(String.format("You have %s to vote.",
                                 FormatUtils.shortDuration(this.spec.getDuration().toMillis())),
-                                "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Clock_simple_white.svg/2000px-Clock_simple_white.svg.png"));
+                                "https://i.imgur.com/jcrUDLY.png"));
 
         return this.voteMessage.send(embedConsumer)
                 .flatMap(message -> Mono.delay(this.spec.getDuration(), Schedulers.elastic())

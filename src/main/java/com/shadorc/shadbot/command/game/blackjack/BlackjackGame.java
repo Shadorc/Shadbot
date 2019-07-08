@@ -114,7 +114,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                         .andThen(embed -> {
                             final Hand visibleDealerHand = this.isScheduled() ? new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
                             embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())
-                                    .setThumbnail("https://pbs.twimg.com/profile_images/1874281601/BlackjackIcon_400x400.png")
+                                    .setThumbnail("https://i.imgur.com/oESeVrU.png")
                                     .setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
                                                     + "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
                                             this.getContext().getPrefix(), this.getContext().getCommandName()))

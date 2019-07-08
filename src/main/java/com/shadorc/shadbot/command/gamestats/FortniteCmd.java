@@ -75,7 +75,7 @@ public class FortniteCmd extends BaseCmd {
                                     String.format("https://fortnitetracker.com/profile/%s/%s",
                                             platform.toString().toLowerCase(), encodedNickname),
                                     context.getAvatarUrl())
-                                    .setThumbnail("https://orig00.deviantart.net/9517/f/2017/261/9/f/fortnite___icon_by_blagoicons-dbnu8a0.png")
+                                    .setThumbnail("https://i.imgur.com/8NrvS8e.png")
                                     .setDescription(description)));
                 })
                 .onErrorResume(err -> err.getMessage().contains("HTTP Error 400. The request URL is invalid."),

@@ -49,7 +49,7 @@ public class DtcCmd extends BaseCmd {
                             .andThen(embed -> embed.setAuthor("Quote DansTonChat",
                                     String.format("https://danstonchat.com/%s.html", id),
                                     context.getAvatarUrl())
-                                    .setThumbnail("https://danstonchat.com/themes/danstonchat/images/logo2.png")
+                                    .setThumbnail("https://i.imgur.com/5YvTlAA.png")
                                     .setDescription(FormatUtils.format(content.split("\n"), DtcCmd::format, "\n"))));
                 })
                 .flatMap(LoadingMessage::send)

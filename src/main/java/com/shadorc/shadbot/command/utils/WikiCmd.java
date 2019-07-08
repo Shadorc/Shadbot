@@ -65,7 +65,7 @@ public class WikiCmd extends BaseCmd {
                     .andThen(embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
                             String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
                             context.getAvatarUrl())
-                            .setThumbnail("https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png")
+                            .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
                             .setDescription(extract)));
         })
                 .flatMap(LoadingMessage::send)

@@ -61,7 +61,7 @@ public class Rule34Cmd extends BaseCmd {
                     return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> {
                                 embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
-                                        .setThumbnail("http://rule34.paheal.net/themes/rule34v2/rule34_logo_top.png")
+                                        .setThumbnail("https://i.imgur.com/t6JJWFN.png")
                                         .addField("Resolution", String.format("%dx%s", post.getWidth(), post.getHeight()), false)
                                         .addField("Tags", formattedtags, false)
                                         .setImage(post.getFileUrl())

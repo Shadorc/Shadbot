@@ -131,7 +131,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         final String playlistName = org.apache.commons.lang3.StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
         return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
-                        .setThumbnail("http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png")
+                        .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
                         .setDescription("**Select a music by typing the corresponding number.**"
                                 + "\nYou can choose several musics by separating them with a comma."
                                 + "\nExample: 1,3,4"
