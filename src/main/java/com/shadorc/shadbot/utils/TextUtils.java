@@ -7,6 +7,7 @@ import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.object.Emoji;
 import discord4j.core.object.util.Permission;
 import org.jsoup.Jsoup;
+import reactor.util.annotation.NonNull;
 
 import java.util.List;
 
@@ -30,9 +31,9 @@ public class TextUtils {
 
     /**
      * @param err - the exception containing the error message to clean
-     * @return A cleaned version of the error message, without HTML tags and YouTube links
+     * @return The error message trimmed, without HTML tags nor YouTube links
      */
-    public static String cleanLavaplayerErr(FriendlyException err) {
+    public static String cleanLavaplayerErr(@NonNull FriendlyException err) {
         return Jsoup.parse(StringUtils.remove(err.getMessage(), "Watch on YouTube")).text().trim();
     }
 
