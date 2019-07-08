@@ -68,11 +68,9 @@ public class ExceptionHandler {
 
     private static Mono<Void> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {
         final Throwable cause = err.getCause() != null ? err.getCause() : err;
-        return Mono.fromRunnable(() -> LogUtils.warn(context.getClient(),
-                String.format("{Guild ID: %d} [%s] Server access error. %s: %s",
-                        context.getGuildId().asLong(), cmd.getClass().getSimpleName(),
-                        cause.getClass().getName(), cause.getMessage()),
-                context.getContent()))
+        return Mono.fromRunnable(() -> LogUtils.warn(String.format("{Guild ID: %d} [%s] Server access error on input '%s'. %s: %s",
+                        context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent(),
+                        cause.getClass().getName(), cause.getMessage())))
                 .and(context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(String.format(
                                 Emoji.RED_FLAG + " (**%s**) Mmmh... The web service related to the `%s%s` command is not available right now... "
