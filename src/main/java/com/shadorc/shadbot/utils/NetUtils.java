@@ -81,7 +81,7 @@ public class NetUtils {
         if (!resp.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE).startsWith(HttpHeaderValues.APPLICATION_JSON.toString())) {
             return body.asString()
                     .flatMap(err -> Mono.error(new IOException(String.format("%s %s wrong header (%s) %s",
-                            resp.method().asciiName(), resp.uri(), resp.responseHeaders(), err))));
+                            resp.method().asciiName(), resp.uri(), resp.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE), err))));
         }
 
         return body.asInputStream()
