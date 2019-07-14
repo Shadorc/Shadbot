@@ -11,9 +11,15 @@ import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 
-public class VoiceStateUpdateListener {
+public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
 
-    public static Mono<Void> onVoiceStateUpdateEvent(VoiceStateUpdateEvent event) {
+    @Override
+    public Class<VoiceStateUpdateEvent> getEventType() {
+        return VoiceStateUpdateEvent.class;
+    }
+
+    @Override
+    public Mono<Void> execute(VoiceStateUpdateEvent event) {
         return Mono.justOrEmpty(event.getClient().getSelfId())
                 .filter(selfId -> !event.getCurrent().getUserId().equals(selfId))
                 .flatMap(selfId -> VoiceStateUpdateListener.onUserEvent(event));

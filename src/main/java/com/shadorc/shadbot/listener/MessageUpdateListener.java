@@ -9,9 +9,15 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.TimeUnit;
 
-public class MessageUpdateListener {
+public class MessageUpdateListener implements EventListener<MessageUpdateEvent> {
 
-    public static Mono<Void> onMessageUpdateEvent(MessageUpdateEvent event) {
+    @Override
+    public Class<MessageUpdateEvent> getEventType() {
+        return MessageUpdateEvent.class;
+    }
+
+    @Override
+    public Mono<Void> execute(MessageUpdateEvent event) {
         if (!event.isContentChanged() || event.getOld().isEmpty() || event.getGuildId().isEmpty()) {
             return Mono.empty();
         }

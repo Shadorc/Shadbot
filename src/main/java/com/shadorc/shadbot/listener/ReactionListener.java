@@ -27,16 +27,34 @@ public class ReactionListener {
         ADD, REMOVE;
     }
 
-    public static Mono<Void> onReactionAddEvent(ReactionAddEvent event) {
-        return event.getMessage()
-                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
-                .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.ADD));
+    public static class ReactionAddListener implements EventListener<ReactionAddEvent> {
+
+        @Override
+        public Class<ReactionAddEvent> getEventType() {
+            return ReactionAddEvent.class;
+        }
+
+        @Override
+        public Mono<Void> execute(ReactionAddEvent event) {
+            return event.getMessage()
+                    .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
+                    .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.ADD));
+        }
     }
 
-    public static Mono<Void> onReactionRemoveEvent(ReactionRemoveEvent event) {
-        return event.getMessage()
-                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
-                .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.REMOVE));
+    public static class ReactionRemoveListener implements EventListener<ReactionRemoveEvent> {
+
+        @Override
+        public Class<ReactionRemoveEvent> getEventType() {
+            return ReactionRemoveEvent.class;
+        }
+
+        @Override
+        public Mono<Void> execute(ReactionRemoveEvent event) {
+            return event.getMessage()
+                    .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
+                    .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.REMOVE));
+        }
     }
 
     private static Mono<Boolean> canManageRole(Message message, Snowflake roleId) {

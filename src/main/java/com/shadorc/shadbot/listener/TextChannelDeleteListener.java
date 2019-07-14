@@ -8,9 +8,15 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-public class ChannelListener {
+public class TextChannelDeleteListener implements EventListener<TextChannelDeleteEvent> {
 
-    public static Mono<Void> onTextChannelDelete(TextChannelDeleteEvent event) {
+    @Override
+    public Class<TextChannelDeleteEvent> getEventType() {
+        return TextChannelDeleteEvent.class;
+    }
+
+    @Override
+    public Mono<Void> execute(TextChannelDeleteEvent event) {
         return Mono.fromRunnable(() -> {
             final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(event.getChannel().getGuildId());
             final List<Long> allowedTextChannelIds = dbGuild.getAllowedTextChannels();

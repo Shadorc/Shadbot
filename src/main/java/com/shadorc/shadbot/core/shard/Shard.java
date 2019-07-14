@@ -8,20 +8,10 @@ import com.shadorc.shadbot.utils.TextUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
-import discord4j.core.event.domain.VoiceStateUpdateEvent;
-import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
-import discord4j.core.event.domain.guild.GuildDeleteEvent;
-import discord4j.core.event.domain.guild.MemberJoinEvent;
-import discord4j.core.event.domain.guild.MemberLeaveEvent;
-import discord4j.core.event.domain.lifecycle.*;
-import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.event.domain.message.MessageUpdateEvent;
-import discord4j.core.event.domain.message.ReactionAddEvent;
-import discord4j.core.event.domain.message.ReactionRemoveEvent;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
-import discord4j.gateway.retry.GatewayStateChange.State;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -30,15 +20,12 @@ import reactor.util.Loggers;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 public class Shard {
 
     private final DiscordClient client;
     private final AtomicBoolean isFullyReady;
     private final Logger logger;
-
-    private volatile State state;
 
     public Shard(DiscordClient client) {
         this.client = client;
@@ -49,17 +36,17 @@ public class Shard {
         this.registerReadyEvent();
         this.registerFullyReadyEvent();
 
-        this.register(GatewayLifecycleEvent.class, this::onGatewayLifecycleEvent);
-        this.register(TextChannelDeleteEvent.class, ChannelListener::onTextChannelDelete);
-        this.register(GuildCreateEvent.class, GuildListener::onGuildCreate);
-        this.register(GuildDeleteEvent.class, GuildListener::onGuildDelete);
-        this.register(MemberJoinEvent.class, MemberListener::onMemberJoin);
-        this.register(MemberLeaveEvent.class, MemberListener::onMemberLeave);
-        this.register(MessageCreateEvent.class, MessageCreateListener::onMessageCreate);
-        this.register(MessageUpdateEvent.class, MessageUpdateListener::onMessageUpdateEvent);
-        this.register(VoiceStateUpdateEvent.class, VoiceStateUpdateListener::onVoiceStateUpdateEvent);
-        this.register(ReactionAddEvent.class, ReactionListener::onReactionAddEvent);
-        this.register(ReactionRemoveEvent.class, ReactionListener::onReactionRemoveEvent);
+        this.register(new GatewayLifecycleListener(this.logger, this.isFullyReady));
+        this.register(new TextChannelDeleteListener());
+        this.register(new GuildCreateListener());
+        this.register(new GuildDeleteListener());
+        this.register(new MemberListener.MemberJoinListener());
+        this.register(new MemberListener.MemberLeaveListener());
+        this.register(new MessageCreateListener());
+        this.register(new MessageUpdateListener());
+        this.register(new VoiceStateUpdateListener());
+        this.register(new ReactionListener.ReactionAddListener());
+        this.register(new ReactionListener.ReactionRemoveListener());
     }
 
     private void registerReadyEvent() {
@@ -92,10 +79,10 @@ public class Shard {
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
     }
 
-    private <T extends Event> void register(Class<T> eventClass, Function<T, Mono<Void>> mapper) {
+    private <T extends Event> void register(EventListener<T> eventListener) {
         this.client.getEventDispatcher()
-                .on(eventClass)
-                .flatMap(event -> mapper.apply(event)
+                .on(eventListener.getEventType())
+                .flatMap(event -> eventListener.execute(event)
                         .thenReturn(event.toString())
                         .elapsed()
                         .doOnNext(tuple -> {
@@ -108,31 +95,6 @@ public class Shard {
                         })
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(this.client, err))))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
-    }
-
-    private Mono<Void> onGatewayLifecycleEvent(GatewayLifecycleEvent event) {
-        return Mono.fromRunnable(() -> {
-            if (event instanceof ConnectEvent) {
-                this.state = State.CONNECTED;
-            } else if (event instanceof ResumeEvent) {
-                this.state = State.CONNECTED;
-            } else if (event instanceof ReadyEvent) {
-                this.state = State.CONNECTED;
-            } else if (event instanceof DisconnectEvent) {
-                this.state = State.DISCONNECTED;
-            } else if (event instanceof ReconnectStartEvent) {
-                this.state = State.RETRY_STARTED;
-            } else if (event instanceof ReconnectFailEvent) {
-                this.state = State.RETRY_FAILED;
-            } else if (event instanceof ReconnectEvent) {
-                this.state = State.RETRY_SUCCEEDED;
-            }
-
-            this.isFullyReady.set(this.state == State.RETRY_SUCCEEDED);
-
-            this.logger.info("New event: {} / fully ready: {}.",
-                    event.getClass().getSimpleName(), this.isFullyReady());
-        });
     }
 
     public DiscordClient getClient() {
