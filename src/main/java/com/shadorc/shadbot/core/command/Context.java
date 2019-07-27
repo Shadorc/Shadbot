@@ -11,10 +11,11 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.*;
 import discord4j.core.object.entity.Channel.Type;
+import discord4j.core.object.entity.*;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -90,27 +91,19 @@ public class Context {
         return this.event.getMessage();
     }
 
-    public Mono<CommandPermission> getPermission() {
-        // The author is the bot's owner
+    public Flux<CommandPermission> getPermissions() {
+        // The author is a bot's owner
         final Mono<CommandPermission> ownerPerm = Mono.just(this.getAuthorId())
-                .filter(Shadbot.getOwnerId()::equals)
+                .filter(authorId -> Shadbot.getOwnerId().equals(authorId) || Config.ADDITIONAL_OWNERS.contains(authorId))
                 .map(ignored -> CommandPermission.OWNER);
 
-        // Private message, the author is considered as an administrator
-        final Mono<CommandPermission> dmPerm = this.getChannel()
-                .map(Channel::getType)
-                .filter(Type.DM::equals)
-                .map(ignored -> CommandPermission.ADMIN);
-
-        // The member is an administrator
+        // The member is an administrator or it's a private message
         final Mono<CommandPermission> adminPerm = this.getChannel()
-                .filterWhen(channel -> DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR))
+                .filterWhen(channel -> DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR)
+                        .map(isAdmin -> isAdmin || channel.getType() == Type.DM))
                 .map(ignored -> CommandPermission.ADMIN);
 
-        return ownerPerm
-                .switchIfEmpty(dmPerm)
-                .switchIfEmpty(adminPerm)
-                .defaultIfEmpty(CommandPermission.USER);
+        return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER));
     }
 
     public String getPrefix() {

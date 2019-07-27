@@ -78,9 +78,10 @@ public class CommandProcessor {
             return Mono.empty();
         }
 
-        return context.getPermission()
+        return context.getPermissions()
+                .collectList()
                 // The author has the permission to execute this command
-                .filter(userPerm -> !command.getPermission().isHigher(userPerm))
+                .filter(userPerms -> userPerms.contains(command.getPermission()))
                 .switchIfEmpty(context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(
                                 String.format(Emoji.ACCESS_DENIED + " (**%s**) You do not have the permission to execute this command.",

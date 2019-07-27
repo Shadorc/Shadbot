@@ -51,8 +51,9 @@ public class PollCmd extends BaseCmd {
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.ADD_REACTIONS))
-                .then(context.getPermission())
-                .doOnNext(permission -> {
+                .thenMany(context.getPermissions())
+                .collectList()
+                .doOnNext(permissions -> {
                     final PollManager pollManager = this.managers.computeIfAbsent(context.getChannelId(),
                             channelId -> {
                                 final PollManager game = this.createPoll(context);
@@ -60,16 +61,16 @@ public class PollCmd extends BaseCmd {
                                 return game;
                             });
 
-                    if (PollCmd.isCancelMsg(context, permission, pollManager)) {
+                    if (PollCmd.isCancelMsg(context, permissions, pollManager)) {
                         pollManager.stop();
                     }
                 })
                 .then();
     }
 
-    private static boolean isCancelMsg(Context context, CommandPermission perm, PollManager pollManager) {
+    private static boolean isCancelMsg(Context context, List<CommandPermission> permissions, PollManager pollManager) {
         final boolean isAuthor = context.getAuthorId().equals(pollManager.getContext().getAuthorId());
-        final boolean isAdmin = perm == CommandPermission.ADMIN;
+        final boolean isAdmin = permissions.contains(CommandPermission.ADMIN);
         final boolean isCancelMsg = context.getArg().map(arg -> arg.matches("stop|cancel")).orElse(false);
         return isCancelMsg && (isAuthor || isAdmin);
     }

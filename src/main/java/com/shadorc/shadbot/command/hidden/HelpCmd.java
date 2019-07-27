@@ -40,10 +40,11 @@ public class HelpCmd extends BaseCmd {
                     .then();
         }
 
-        return context.getPermission()
-                .flatMap(authorPerm -> Flux.fromIterable(CommandManager.getInstance().getCommands().values())
+        return context.getPermissions()
+                .collectList()
+                .flatMap(authorPerms -> Flux.fromIterable(CommandManager.getInstance().getCommands().values())
                         .distinct()
-                        .filter(cmd -> !cmd.getPermission().isHigher(authorPerm))
+                        .filter(cmd -> authorPerms.contains(cmd.getPermission()))
                         .filterWhen(cmd -> context.getChannel().map(Channel::getType)
                                 .map(type -> type == Type.DM || DatabaseManager.getInstance().getDBGuild(context.getGuildId()).isCommandAllowed(cmd)))
                         .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
