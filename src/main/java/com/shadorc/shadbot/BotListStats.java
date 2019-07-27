@@ -61,7 +61,7 @@ public class BotListStats {
                 .timeout(Config.DEFAULT_TIMEOUT)
                 .onErrorResume(err -> {
                     if (err instanceof TimeoutException) {
-                        return Mono.fromRunnable(() -> LogUtils.warn(this.client,
+                        return Mono.fromRunnable(() -> LogUtils.warn(
                                 String.format("A timeout occurred while posting statistics on %s", url)));
 
                     }
