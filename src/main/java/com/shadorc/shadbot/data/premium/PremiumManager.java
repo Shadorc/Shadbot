@@ -61,17 +61,13 @@ public class PremiumManager extends Data {
                 .collect(Collectors.toList());
     }
 
-    public boolean isPremium(Snowflake guildId, Snowflake userId) {
-        return this.isGuildPremium(guildId) || this.isUserPremium(userId);
-    }
-
-    private boolean isGuildPremium(Snowflake guildId) {
+    public boolean isGuildPremium(Snowflake guildId) {
         return this.relics.stream()
                 .filter(relic -> relic.getGuildId().map(guildId::equals).orElse(false))
                 .anyMatch(relic -> !relic.isExpired());
     }
 
-    private boolean isUserPremium(Snowflake userId) {
+    public boolean isUserPremium(Snowflake userId) {
         return this.getRelicsForUser(userId).stream()
                 .anyMatch(relic -> relic.getType().equals(RelicType.USER.toString()) && !relic.isExpired());
     }

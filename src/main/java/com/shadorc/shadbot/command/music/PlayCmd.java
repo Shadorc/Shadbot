@@ -63,7 +63,8 @@ public class PlayCmd extends BaseCmd {
                             }
 
                             if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-                                    && !PremiumManager.getInstance().isPremium(guildId, context.getAuthorId())) {
+                                    && !PremiumManager.getInstance().isGuildPremium(guildId)
+                                    && !PremiumManager.getInstance().isUserPremium(context.getAuthorId())) {
                                 return DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel).then();
                             }
 
