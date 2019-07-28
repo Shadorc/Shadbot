@@ -9,7 +9,11 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class Config {
 
@@ -19,6 +23,7 @@ public class Config {
 
     public static final String VERSION = PROPERTIES.getProperty("version");
     public static final boolean IS_SNAPSHOT = VERSION.endsWith("SNAPSHOT");
+    public static final List<Snowflake> ADDITIONAL_OWNERS = Config.parseAdditionalOwners();
     public static final String GITHUB_URL = PROPERTIES.getProperty("url.github");
     public static final String PATREON_URL = PROPERTIES.getProperty("url.patreon");
     public static final String SUPPORT_SERVER_URL = PROPERTIES.getProperty("url.support.server");
@@ -49,6 +54,15 @@ public class Config {
             System.exit(ExitCode.FATAL_ERROR.value());
         }
         return properties;
+    }
+
+    private static List<Snowflake> parseAdditionalOwners() {
+        final String property = PROPERTIES.getProperty("additional.owners");
+        final String[] owners = property.split(",");
+        final List<Snowflake> ownersIds = Arrays.stream(owners)
+                .map(Snowflake::of)
+                .collect(Collectors.toList());
+        return Collections.unmodifiableList(ownersIds);
     }
 
 }
