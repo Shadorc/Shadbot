@@ -39,10 +39,20 @@ public class BlacklistSettingCmd extends BaseSetting {
 
         final List<String> commands = StringUtils.split(args.get(2).toLowerCase());
 
-        final List<String> unknownCmds = commands.stream().filter(cmd -> CommandManager.getInstance().getCommand(cmd) == null).collect(Collectors.toList());
+        final List<String> unknownCmds = commands.stream()
+                .filter(cmd -> CommandManager.getInstance().getCommand(cmd) == null)
+                .collect(Collectors.toList());
+
         if (!unknownCmds.isEmpty()) {
             return Mono.error(new CommandException(String.format("Command %s doesn't exist.",
                     FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", "))));
+        }
+
+        for(final String settingCmdName : CommandManager.getInstance().getCommand("setting").getNames()) {
+            if(commands.contains(settingCmdName)) {
+                return Mono.error(new CommandException(String.format("You cannot blacklist the command `%s%s`.",
+                        context.getPrefix(), settingCmdName)));
+            }
         }
 
         final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
