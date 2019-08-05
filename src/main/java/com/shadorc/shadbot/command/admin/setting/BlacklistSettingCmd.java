@@ -69,7 +69,7 @@ public class BlacklistSettingCmd extends BaseSetting {
 
         dbGuild.setSetting(this.getSetting(), blacklist);
         return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) `%s` %s to the blacklist.",
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) %s %s to the blacklist.",
                         FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "), actionVerbose),
                         channel))
                 .then();
