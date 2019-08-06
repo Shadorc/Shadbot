@@ -46,7 +46,8 @@ public class PlaylistCmd extends BaseCmd {
 
         int count = 1;
         for (final AudioTrack track : queue) {
-            final String name = String.format("%n\t**%d.** %s", count, FormatUtils.trackName(track.getInfo()));
+            final String name = String.format("%n\t**%d.** [%s](%s)",
+                    count, FormatUtils.trackName(track.getInfo()), track.getInfo().uri);
             if (playlistStr.length() + name.length() < 1800) {
                 playlistStr.append(name);
             } else {
