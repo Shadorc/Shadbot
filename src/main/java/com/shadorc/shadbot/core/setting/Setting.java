@@ -15,7 +15,8 @@ public enum Setting {
     JOIN_MESSAGE,
     LEAVE_MESSAGE,
     AUTO_ROLES,
-    IAM_MESSAGES;
+    IAM_MESSAGES,
+    SAVED_PLAYLISTS;
 
     @Override
     public String toString() {

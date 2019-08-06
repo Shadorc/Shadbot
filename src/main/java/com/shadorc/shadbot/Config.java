@@ -32,6 +32,7 @@ public class Config {
     public static final String DEFAULT_PREFIX = PROPERTIES.getProperty("default.prefix");
     public static final int DEFAULT_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.volume"));
     public static final int DEFAULT_PLAYLIST_SIZE = Integer.parseInt(PROPERTIES.getProperty("default.playlist.size"));
+    public static final int DEFAULT_SAVED_PLAYLIST_SIZE = Integer.parseInt(PROPERTIES.getProperty("default.saved.playlist.size"));
     public static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(Long.parseLong(PROPERTIES.getProperty("default.timeout")));
     public static final String DEFAULT_COMMAND_DELIMITER = PROPERTIES.getProperty("default.command.delimiter");
 

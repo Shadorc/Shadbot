@@ -90,6 +90,11 @@ public class DBGuild {
         return Optional.ofNullable((Long) this.settings.get(Setting.MESSAGE_CHANNEL_ID.toString()));
     }
 
+    public Map<String, List<String>> getPlaylists() {
+        return (Map<String, List<String>>) Optional.ofNullable(this.settings.get(Setting.SAVED_PLAYLISTS.toString()))
+                .orElse(new HashMap<>());
+    }
+
     public String getPrefix() {
         return Objects.toString(
                 this.settings.get(Setting.PREFIX.toString()),
