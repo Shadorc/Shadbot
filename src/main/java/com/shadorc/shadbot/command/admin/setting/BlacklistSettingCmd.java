@@ -48,8 +48,8 @@ public class BlacklistSettingCmd extends BaseSetting {
                     FormatUtils.format(unknownCmds, cmd -> String.format("`%s`", cmd), ", "))));
         }
 
-        for(final String settingCmdName : CommandManager.getInstance().getCommand("setting").getNames()) {
-            if(commands.contains(settingCmdName)) {
+        for (final String settingCmdName : CommandManager.getInstance().getCommand("setting").getNames()) {
+            if (commands.contains(settingCmdName)) {
                 return Mono.error(new CommandException(String.format("You cannot blacklist the command `%s%s`.",
                         context.getPrefix(), settingCmdName)));
             }

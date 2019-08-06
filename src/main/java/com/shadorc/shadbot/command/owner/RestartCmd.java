@@ -21,7 +21,7 @@ public class RestartCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final boolean cleanRestart = Boolean.valueOf(context.getArg().orElse("false"));
+        final boolean cleanRestart = Boolean.parseBoolean(context.getArg().orElse("false"));
         return Shadbot.quit(cleanRestart ? ExitCode.RESTART_CLEAN : ExitCode.RESTART);
     }
 
