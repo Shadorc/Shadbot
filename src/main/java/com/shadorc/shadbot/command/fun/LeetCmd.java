@@ -5,13 +5,17 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 public class LeetCmd extends BaseCmd {
+
+    private static final int MAX_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 3;
 
     public LeetCmd() {
         super(CommandCategory.FUN, List.of("leet"));
@@ -34,7 +38,8 @@ public class LeetCmd extends BaseCmd {
 
         final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor("Leetifier", null, context.getAvatarUrl())
-                        .setDescription(String.format("**Original**%n%s%n%n**Leetified**%n%s", arg, text)));
+                        .setDescription(String.format("**Original**%n%s%n%n**Leetified**%n%s",
+                                StringUtils.abbreviate(arg, MAX_LENGTH), StringUtils.abbreviate(text, MAX_LENGTH))));
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
