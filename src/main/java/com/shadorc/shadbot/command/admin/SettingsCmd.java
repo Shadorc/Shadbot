@@ -118,13 +118,22 @@ public class SettingsCmd extends BaseCmd {
                 .map(channel -> settingsStr.append(String.format("%n**Auto message channel:** %s", channel)))
                 .then();
 
-        final Mono<Void> allowedChannelsStr = Flux.fromIterable(dbGuild.getAllowedTextChannels())
+        final Mono<Void> allowedTextChannelsStr = Flux.fromIterable(dbGuild.getAllowedTextChannels())
                 .map(Snowflake::of)
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
                 .collectList()
                 .filter(channels -> !channels.isEmpty())
-                .map(channels -> settingsStr.append(String.format("%n**Allowed channels:**%n\t%s", String.join("\n\t", channels))))
+                .map(channels -> settingsStr.append(String.format("%n**Allowed text channels:**%n\t%s", String.join("\n\t", channels))))
+                .then();
+
+        final Mono<Void> allowedVoiceChannelsStr = Flux.fromIterable(dbGuild.getAllowedVoiceChannels())
+                .map(Snowflake::of)
+                .flatMap(context.getClient()::getChannelById)
+                .map(Channel::getMention)
+                .collectList()
+                .filter(channels -> !channels.isEmpty())
+                .map(channels -> settingsStr.append(String.format("%n**Allowed voice channels:**%n\t%s", String.join("\n\t", channels))))
                 .then();
 
         final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getAutoRoles())
@@ -146,7 +155,8 @@ public class SettingsCmd extends BaseCmd {
                 .then();
 
         return autoMessageChannelStr
-                .then(allowedChannelsStr)
+                .then(allowedTextChannelsStr)
+                .then(allowedVoiceChannelsStr)
                 .then(autoRolesStr)
                 .then(allowedRolesStr)
                 .thenReturn(DiscordUtils.getDefaultEmbed()
