@@ -80,6 +80,13 @@ public class AllowedChannelsSetting extends BaseSetting {
                         allowedVoiceChannels.removeAll(mentionedChannelIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s removed from allowed channels.",
                                 FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
+                        
+                        if (allowedTextChannels.isEmpty()) {
+							strBuilder.append("\n" + Emoji.INFO + " There are no more allowed text channels set, I can now speak in all the text channels.");
+						}
+						if (allowedVoiceChannels.isEmpty()) {
+							strBuilder.append("\n" + Emoji.INFO + " There are no more allowed voice channels set, I can now connect to all voice channels.");
+						}
                     }
 
                     dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
