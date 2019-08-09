@@ -62,8 +62,9 @@ public class AllowedRolesSetting extends BaseSetting {
                         allowedRoles.removeAll(mentionedRoleIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s will not be able to interact with me anymore.",
                                 FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
+                        
                         if (allowedRoles.isEmpty()) {
-                            strBuilder.append("\n" + Emoji.INFO + " There are no more roles set, everyone can now interact with me.");
+                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed roles set, everyone can now interact with me.");
                         }
                     }
 
