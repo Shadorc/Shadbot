@@ -82,8 +82,8 @@ public class AllowedRolesSetting extends BaseSetting {
                 .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <role(s)>`", context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s",
                                 FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s add @admin`", context.getPrefix(), this.getCommandName()), false)
-                        .addField("Info", "By default, **administrators** will always be able to interact with Shadbot.", false));
+                        .addField("Example", String.format("`%s%s add @role`", context.getPrefix(), this.getCommandName()), false)
+                        .addField("Info", "By default, **server owner** and **administrators** will always be able to interact with Shadbot.", false));
     }
 
 }
