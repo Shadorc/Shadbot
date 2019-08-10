@@ -50,15 +50,23 @@ public class AllowedChannelsSetting extends BaseSetting {
                     final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
                     final List<Long> allowedTextChannels = dbGuild.getAllowedTextChannels();
                     final List<Long> allowedVoiceChannels = dbGuild.getAllowedVoiceChannels();
-                    final List<Long> mentionedChannelIds = mentionedChannels.stream()
+
+                    final List<Long> mentionedVoiceChannelIds = mentionedChannels.stream()
+                            .filter(channel -> channel.getType() == Type.GUILD_VOICE)
+                            .map(Channel::getId)
+                            .map(Snowflake::asLong)
+                            .collect(Collectors.toList());
+
+                    final List<Long> mentionedTextChannelIds = mentionedChannels.stream()
+                            .filter(channel -> channel.getType() == Type.GUILD_TEXT)
                             .map(Channel::getId)
                             .map(Snowflake::asLong)
                             .collect(Collectors.toList());
 
                     final StringBuilder strBuilder = new StringBuilder();
                     if (action == Action.ADD) {
-                        if (allowedTextChannels.isEmpty()
-                                && mentionedChannelIds.stream().noneMatch(channelId -> channelId.equals(context.getChannelId().asLong()))) {
+                        if (allowedTextChannels.isEmpty() && !mentionedTextChannelIds.isEmpty()
+                                && mentionedTextChannelIds.stream().noneMatch(channelId -> channelId.equals(context.getChannelId().asLong()))) {
                             strBuilder.append(Emoji.WARNING + " You did not mentioned this channel. "
                                     + "I will not reply here until this channel is added to the list of allowed channels.\n");
                         }
@@ -76,15 +84,15 @@ public class AllowedChannelsSetting extends BaseSetting {
                                 FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
 
                     } else {
-                        allowedTextChannels.removeAll(mentionedChannelIds);
-                        allowedVoiceChannels.removeAll(mentionedChannelIds);
+                        allowedTextChannels.removeAll(mentionedTextChannelIds);
+                        allowedVoiceChannels.removeAll(mentionedVoiceChannelIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s removed from allowed channels.",
                                 FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
-                        
-                        if (allowedTextChannels.isEmpty()) {
+
+                        if (!mentionedTextChannelIds.isEmpty() && allowedTextChannels.isEmpty()) {
                             strBuilder.append("\n" + Emoji.INFO + " There are no more allowed text channels set, I can now speak in all the text channels.");
                         }
-                        if (allowedVoiceChannels.isEmpty()) {
+                        if (!mentionedVoiceChannelIds.isEmpty() && allowedVoiceChannels.isEmpty()) {
                             strBuilder.append("\n" + Emoji.INFO + " There are no more allowed voice channels set, I can now connect to all voice channels.");
                         }
                     }
