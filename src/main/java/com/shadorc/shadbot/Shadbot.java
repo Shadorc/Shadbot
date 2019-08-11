@@ -141,7 +141,7 @@ public class Shadbot {
         return Flux.fromIterable(Shadbot.SHARDS.values())
                 .map(Shard::getClient)
                 .flatMap(DiscordClient::logout)
-                .then(Mono.fromRunnable(() -> System.exit(exitCode.value())));
+                .then(Mono.fromRunnable(() -> System.exit(exitCode.getValue())));
     }
 
 }

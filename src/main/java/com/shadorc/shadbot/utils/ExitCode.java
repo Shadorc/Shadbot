@@ -3,9 +3,10 @@ package com.shadorc.shadbot.utils;
 public enum ExitCode {
     UNKNWON(-1),
     NORMAL(0),
-    FATAL_ERROR(1),
+    NORMAL_CLEAN(1),
     RESTART(2),
-    RESTART_CLEAN(3);
+    RESTART_CLEAN(3),
+    FATAL_ERROR(4);
 
     private final int value;
 
@@ -13,7 +14,16 @@ public enum ExitCode {
         this.value = value;
     }
 
-    public int value() {
+    public static ExitCode valueOf(int value) {
+        for (final ExitCode exitCode : ExitCode.values()) {
+            if (exitCode.getValue() == value) {
+                return exitCode;
+            }
+        }
+        return ExitCode.UNKNWON;
+    }
+
+    public int getValue() {
         return this.value;
     }
 }

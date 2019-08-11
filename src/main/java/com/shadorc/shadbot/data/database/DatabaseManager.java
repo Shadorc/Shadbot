@@ -24,7 +24,7 @@ public class DatabaseManager extends Data {
             DatabaseManager.instance = new DatabaseManager();
         } catch (final IOException err) {
             LogUtils.error(err, String.format("An error occurred while initializing %s.", DatabaseManager.class.getSimpleName()));
-            System.exit(ExitCode.FATAL_ERROR.value());
+            System.exit(ExitCode.FATAL_ERROR.getValue());
         }
     }
 

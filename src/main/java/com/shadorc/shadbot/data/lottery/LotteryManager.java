@@ -17,7 +17,7 @@ public class LotteryManager extends Data {
             LotteryManager.instance = new LotteryManager();
         } catch (final IOException err) {
             LogUtils.error(err, String.format("An error occurred while initializing %s.", LotteryManager.class.getSimpleName()));
-            System.exit(ExitCode.FATAL_ERROR.value());
+            System.exit(ExitCode.FATAL_ERROR.getValue());
         }
     }
 

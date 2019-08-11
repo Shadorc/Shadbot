@@ -21,13 +21,15 @@ public class ShutdownCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        return Shadbot.quit(ExitCode.NORMAL);
+        final boolean cleanShutdown = Boolean.parseBoolean(context.getArg().orElse("false"));
+        return Shadbot.quit(cleanShutdown ? ExitCode.NORMAL_CLEAN : ExitCode.NORMAL);
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
                 .setDescription("Shutdown the bot.")
+                .addArg("clean", "true if the logs should be cleaned on shutdown, false otherwise", true)
                 .build();
     }
 

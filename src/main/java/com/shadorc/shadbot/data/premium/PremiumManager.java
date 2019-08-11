@@ -27,7 +27,7 @@ public class PremiumManager extends Data {
             PremiumManager.instance = new PremiumManager();
         } catch (final IOException err) {
             LogUtils.error(err, String.format("An error occurred while initializing %s.", PremiumManager.class.getSimpleName()));
-            System.exit(ExitCode.FATAL_ERROR.value());
+            System.exit(ExitCode.FATAL_ERROR.getValue());
         }
     }
 
