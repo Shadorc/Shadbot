@@ -30,7 +30,7 @@ public class ConfirmInputs extends Inputs {
                 .map(ignored -> event.getMessage().getContent())
                 .flatMap(Mono::justOrEmpty)
                 .map(content -> {
-                    if("n".equalsIgnoreCase(content) || "no".equalsIgnoreCase(content)) {
+                    if ("n".equalsIgnoreCase(content) || "no".equalsIgnoreCase(content)) {
                         this.isCancelled.set(true);
                     }
                     return "y".equalsIgnoreCase(content) || "yes".equalsIgnoreCase(content);
