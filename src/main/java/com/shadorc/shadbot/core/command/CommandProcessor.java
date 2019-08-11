@@ -11,7 +11,9 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 
@@ -46,9 +48,11 @@ public class CommandProcessor {
         return Mono.justOrEmpty(event.getMember())
                 // The author is not a bot
                 .filter(member -> !member.isBot())
-                // The role is allowed
                 .flatMap(member -> member.getRoles().collectList())
-                .filter(dbGuild::hasAllowedRole)
+                .zipWith(event.getGuild().map(Guild::getOwnerId))
+                // The role is allowed or the author is the guild's owner
+                .filter(tuple -> dbGuild.hasAllowedRole(tuple.getT1())
+                        || event.getMessage().getAuthor().map(User::getId).map(tuple.getT2()::equals).orElse(false))
                 // The channel is allowed
                 .flatMap(ignored -> event.getMessage().getChannel())
                 .filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
