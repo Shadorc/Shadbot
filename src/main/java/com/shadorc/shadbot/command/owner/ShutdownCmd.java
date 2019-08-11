@@ -10,6 +10,7 @@ import com.shadorc.shadbot.utils.ExitCode;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -22,7 +23,11 @@ public class ShutdownCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final boolean cleanShutdown = Boolean.parseBoolean(context.getArg().orElse("false"));
-        return Shadbot.quit(cleanShutdown ? ExitCode.NORMAL_CLEAN : ExitCode.NORMAL);
+        new ConfirmInputs(context.getClient(), Duration.ofSeconds(15),
+                Shadbot.quit(cleanShutdown ? ExitCode.NORMAL_CLEAN : ExitCode.NORMAL))
+                .subscribe();
+
+        return Mono.empty();
     }
 
     @Override
