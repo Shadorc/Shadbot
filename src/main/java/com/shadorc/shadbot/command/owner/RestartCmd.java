@@ -5,7 +5,9 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExitCode;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -22,19 +24,17 @@ public class RestartCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final boolean cleanRestart = Boolean.parseBoolean(context.getArg().orElse("false"));
-        new ConfirmInputs(context.getClient(), Duration.ofSeconds(15),
-                Shadbot.quit(cleanRestart ? ExitCode.RESTART_CLEAN : ExitCode.RESTART))
-                .subscribe();
-
-        return Mono.empty();
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(Emoji.QUESTION + " Do you really want to restart ? y/n", channel))
+                .then(Mono.fromRunnable(() -> new ConfirmInputs(context.getClient(), Duration.ofSeconds(15),
+                        Shadbot.quit(ExitCode.RESTART))
+                        .subscribe()));
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
                 .setDescription("Restart the bot.")
-                .addArg("clean", "true if the logs should be cleaned on restart, false otherwise", true)
                 .build();
     }
 

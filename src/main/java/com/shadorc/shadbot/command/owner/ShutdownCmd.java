@@ -5,7 +5,9 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExitCode;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -22,19 +24,17 @@ public class ShutdownCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final boolean cleanShutdown = Boolean.parseBoolean(context.getArg().orElse("false"));
-        new ConfirmInputs(context.getClient(), Duration.ofSeconds(15),
-                Shadbot.quit(cleanShutdown ? ExitCode.NORMAL_CLEAN : ExitCode.NORMAL))
-                .subscribe();
-
-        return Mono.empty();
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(Emoji.QUESTION + " Do you really want to shutdown ? y/n", channel))
+                .then(Mono.fromRunnable(() -> new ConfirmInputs(context.getClient(), Duration.ofSeconds(15),
+                        Shadbot.quit(ExitCode.NORMAL))
+                        .subscribe()));
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
                 .setDescription("Shutdown the bot.")
-                .addArg("clean", "true if the logs should be cleaned on shutdown, false otherwise", true)
                 .build();
     }
 
