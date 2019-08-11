@@ -9,14 +9,17 @@ import discord4j.core.object.entity.User;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ConfirmInputs extends Inputs {
 
     private final Mono<Void> task;
+    private final AtomicBoolean isCancelled;
 
     public ConfirmInputs(DiscordClient client, Duration timeout, Mono<Void> task) {
         super(client, timeout);
         this.task = task;
+        this.isCancelled = new AtomicBoolean(false);
     }
 
     @Override
@@ -26,16 +29,21 @@ public class ConfirmInputs extends Inputs {
                 .filter(authorId -> authorId.equals(Shadbot.getOwnerId()) || Config.ADDITIONAL_OWNERS.contains(authorId))
                 .map(ignored -> event.getMessage().getContent())
                 .flatMap(Mono::justOrEmpty)
-                .map(content -> content.equalsIgnoreCase("y") || content.equalsIgnoreCase("yes"));
+                .map(content -> {
+                    if("n".equalsIgnoreCase(content) || "no".equalsIgnoreCase(content)) {
+                        this.isCancelled.set(true);
+                    }
+                    return "y".equalsIgnoreCase(content) || "yes".equalsIgnoreCase(content);
+                });
     }
 
     @Override
     public boolean takeEventWile(MessageCreateEvent event) {
-        return true;
+        return !this.isCancelled.get();
     }
 
     @Override
     public Mono<Void> processEvent(MessageCreateEvent event) {
-        return task;
+        return this.task;
     }
 }
