@@ -58,11 +58,11 @@ public class AutoRolesSetting extends BaseSetting {
                     if (action == Action.ADD) {
                         autoRoles.addAll(mentionedRoleIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s added to auto-assigned roles.",
-                                FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getMention()), ", ")));
+                                FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
                     } else {
                         autoRoles.removeAll(mentionedRoleIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
-                                FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getMention()), ", ")));
+                                FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
                     }
 
                     dbGuild.setSetting(this.getSetting(), autoRoles);
