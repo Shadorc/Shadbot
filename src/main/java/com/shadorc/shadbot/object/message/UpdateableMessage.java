@@ -21,7 +21,7 @@ public class UpdateableMessage {
      * Sends a message that will be deleted each time the {@code send} method is called
      *
      * @param client    - the Discord client
-     * @param channelId - the Channel ID in which send the message
+     * @param channelId - the Channel ID in which to send the message
      */
     public UpdateableMessage(DiscordClient client, Snowflake channelId) {
         this.client = client;
