@@ -12,7 +12,7 @@ import com.shadorc.shadbot.object.Emoji;
 import discord4j.core.DiscordClient;
 import reactor.core.publisher.Mono;
 
-import javax.net.ssl.SSLException;
+import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class ExceptionHandler {
@@ -30,7 +30,7 @@ public class ExceptionHandler {
         if (err instanceof NoMusicException) {
             return ExceptionHandler.onNoMusicException(context);
         }
-        if (err instanceof TimeoutException || err instanceof SSLException) {
+        if (err instanceof TimeoutException || err instanceof IOException) {
             return ExceptionHandler.onServerAccessError(err, cmd, context);
         }
         return ExceptionHandler.onUnknown(err, cmd, context);
