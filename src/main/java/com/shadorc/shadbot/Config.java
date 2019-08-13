@@ -8,6 +8,7 @@ import reactor.util.Loggers;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Inet4Address;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +30,8 @@ public class Config {
     public static final String SUPPORT_SERVER_URL = PROPERTIES.getProperty("url.support.server");
     public static final String USER_AGENT = String.format("Shadbot/%s/D4J-DiscordBot (%s)", VERSION, GITHUB_URL);
 
+    public static final Integer PREMIUM_MAX_VOLUME = Integer.parseInt(PROPERTIES.getProperty("premium.max.volume"));
+    public static final Integer DEFAULT_MAX_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.max.volume"));
     public static final String DEFAULT_PREFIX = PROPERTIES.getProperty("default.prefix");
     public static final int DEFAULT_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.volume"));
     public static final int DEFAULT_PLAYLIST_SIZE = Integer.parseInt(PROPERTIES.getProperty("default.playlist.size"));

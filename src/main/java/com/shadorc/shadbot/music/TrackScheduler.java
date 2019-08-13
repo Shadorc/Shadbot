@@ -120,7 +120,7 @@ public class TrackScheduler {
     }
 
     public void setVolume(int volume) {
-        this.audioPlayer.setVolume((int) NumberUtils.truncateBetween(volume, 0, 100));
+        this.audioPlayer.setVolume(volume);
     }
 
     public void setRepeatMode(RepeatMode repeatMode) {
