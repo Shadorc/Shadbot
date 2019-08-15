@@ -47,8 +47,8 @@ public class VolumeCmd extends BaseCmd {
                     if (volume > Config.DEFAULT_MAX_VOLUME && !PremiumManager.getInstance().isGuildPremium(context.getGuildId())
                             && !PremiumManager.getInstance().isUserPremium(context.getAuthorId())) {
                         return Mono.error(new CommandException(String.format("You cannot set the volume higher than %d%%. " +
-                                "You can set the volume up to %d%% and gain other advantage by contributing " +
-                                "to Shadbot. More info here: <%s>",
+                                        "You can set the volume up to %d%% and gain other advantage by contributing " +
+                                        "to Shadbot. More info here: <%s>",
                                 Config.DEFAULT_MAX_VOLUME, Config.PREMIUM_MAX_VOLUME, Config.PATREON_URL)));
                     }
 
