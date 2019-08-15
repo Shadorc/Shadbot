@@ -37,7 +37,7 @@ public class LoadingMessage implements Publisher<Void> {
      * Start typing until a message is send or 30 seconds have passed
      *
      * @param client    - the Discord client
-     * @param channelId - the Channel ID in which send the message
+     * @param channelId - the Channel ID in which to send the message
      */
     public LoadingMessage(DiscordClient client, Snowflake channelId) {
         this.client = client;
