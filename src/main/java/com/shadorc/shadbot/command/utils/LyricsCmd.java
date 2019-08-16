@@ -81,10 +81,18 @@ public class LyricsCmd extends BaseCmd {
             final Document doc = this.getLyricsDocument(context.getClient(), url).outputSettings(PRESERVE_FORMAT);
             final Musixmatch musixmatch = new Musixmatch(doc);
 
+            // TODO: remove once fixed
+            final StringBuilder thumbnailUrl = new StringBuilder("");
+            try {
+                thumbnailUrl.append(musixmatch.getImageUrl());
+            } catch (NullPointerException err) {
+                LogUtils.error(context.getClient(), "[LyricsCmd] Image URL was null. URL: " + doc.baseUri() + ". HTML: " + doc.html());
+            }
+
             return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
                             musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
-                            .setThumbnail(musixmatch.getImageUrl())
+                            .setThumbnail(thumbnailUrl.toString())
                             .setDescription(musixmatch.getLyrics())
                             .setFooter("Click on the title to see the full version",
                                     "https://i.imgur.com/G7q6Hmq.png")));
