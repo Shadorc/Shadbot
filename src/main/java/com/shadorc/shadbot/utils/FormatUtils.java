@@ -118,7 +118,7 @@ public class FormatUtils {
             strBuilder.append(String.format(" (%s)", FormatUtils.shortDuration(info.length)));
         }
 
-        return strBuilder.toString();
+        return String.format("[%s](%s)", strBuilder.toString(), info.uri);
     }
 
 }
