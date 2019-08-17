@@ -82,7 +82,7 @@ public class LyricsCmd extends BaseCmd {
             final Musixmatch musixmatch = new Musixmatch(doc);
 
             // TODO: remove once fixed
-            final StringBuilder thumbnailUrl = new StringBuilder("");
+            final StringBuilder thumbnailUrl = new StringBuilder();
             try {
                 thumbnailUrl.append(musixmatch.getImageUrl());
             } catch (NullPointerException err) {

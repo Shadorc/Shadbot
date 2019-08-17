@@ -81,7 +81,7 @@ public class SettingsCmd extends BaseCmd {
 
         try {
             return setting.execute(context);
-        } catch (MissingArgumentException err) {
+        } catch (final MissingArgumentException err) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
                             Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", SettingsCmd.getHelp(context, setting), channel))
