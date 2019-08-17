@@ -47,11 +47,13 @@ public class PlaylistCmd extends BaseCmd {
         final StringBuilder playlistStr = new StringBuilder(String.format("**%s in the playlist:**%n",
                 StringUtils.pluralOf(musicCount, "music")));
 
-        playlistStr.append(String.format("%n\t**1.** %s", FormatUtils.trackName(currentTrack.getInfo())));
+        playlistStr.append(String.format("%n\t**1.** [%s](%s)",
+                FormatUtils.trackName(currentTrack.getInfo()), currentTrack.getInfo().uri));
 
         int count = 2;
         for (final AudioTrack track : trackScheduler.getPlaylist()) {
-            final String name = String.format("%n\t**%d.** %s", count, FormatUtils.trackName(track.getInfo()));
+            final String name = String.format("%n\t**%d.** [%s](%s)",
+                    count, FormatUtils.trackName(track.getInfo()), track.getInfo().uri);
             if (playlistStr.length() + name.length() < 1800) {
                 playlistStr.append(name);
             } else {

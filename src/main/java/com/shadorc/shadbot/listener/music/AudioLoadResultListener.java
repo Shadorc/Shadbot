@@ -126,7 +126,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         final String choices = FormatUtils.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
                 count -> {
                     final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
-                    return String.format("\t**%d.** %s", count, FormatUtils.trackName(info));
+                    return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
                 });
 
         final String playlistName = org.apache.commons.lang3.StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
