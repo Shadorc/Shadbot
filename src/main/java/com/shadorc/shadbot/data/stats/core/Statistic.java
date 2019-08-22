@@ -34,10 +34,6 @@ public abstract class Statistic<E extends Enum<E>> {
         return this.enumClass;
     }
 
-    public E[] getEnumConstants() {
-        return this.enumClass.getEnumConstants();
-    }
-
     public File getFile() {
         return new File(StatsManager.STATS_DIR.getPath(), this.fileName);
     }
