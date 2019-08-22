@@ -3,7 +3,6 @@ package com.shadorc.shadbot.utils;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.shadorc.shadbot.Config;
-import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
