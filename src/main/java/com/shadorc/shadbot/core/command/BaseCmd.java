@@ -21,8 +21,6 @@ public abstract class BaseCmd {
     private final String alias;
 
     @Nullable
-    private String prefix;
-    @Nullable
     private RateLimiter rateLimiter;
 
     protected BaseCmd(CommandCategory category, CommandPermission permission, List<String> names, String alias) {
@@ -30,7 +28,6 @@ public abstract class BaseCmd {
         this.permission = permission;
         this.names = new ArrayList<>(names);
         this.alias = alias;
-        this.prefix = null;
         this.rateLimiter = null;
 
         if (this.alias != null) {
@@ -75,17 +72,8 @@ public abstract class BaseCmd {
         return this.alias;
     }
 
-    @Nullable
-    public String getPrefix() {
-        return this.prefix;
-    }
-
     public Optional<RateLimiter> getRateLimiter() {
         return Optional.ofNullable(this.rateLimiter);
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
     }
 
     public void setRateLimiter(RateLimiter rateLimiter) {
