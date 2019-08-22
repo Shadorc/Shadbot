@@ -57,10 +57,19 @@ public class CommandProcessor {
                 .flatMap(ignored -> event.getMessage().getChannel())
                 .filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
                 // The message starts with the correct prefix
-                .map(ignored -> dbGuild.getPrefix())
-                .filter(content::startsWith)
+                .map(ignored -> this.checkPrefix(dbGuild, content))
                 // Execute the command
                 .flatMap(prefix -> this.executeCommand(new Context(event, prefix)));
+    }
+
+    private String checkPrefix(DBGuild dbGuild, String content) {
+        if(content.startsWith(dbGuild.getPrefix())) {
+            return dbGuild.getPrefix();
+        }
+        if(content.equalsIgnoreCase(String.format("%sprefix", Config.DEFAULT_PREFIX))) {
+            return Config.DEFAULT_PREFIX;
+        }
+        return null;
     }
 
     private boolean isRateLimited(Context context, BaseCmd cmd) {
