@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.command.hidden;
 
+import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -36,6 +37,7 @@ public class PrefixCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
                 .setDescription("Show the current prefix for this server.")
+                .setFullUsage(String.format("%s%s", Config.DEFAULT_PREFIX, this.getName()))
                 .build();
     }
 }
