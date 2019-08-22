@@ -35,11 +35,6 @@ public class LogUtils {
         LOGGER.error(message);
     }
 
-    public static void warn(DiscordClient client, String message, String input) {
-        LOGGER.warn(String.format("%s (Input: %s)", message, input));
-        LogUtils.sendLog(client, new LogBuilder(LogType.WARN).setMessage(message).setInput(input));
-    }
-
     public static void warn(DiscordClient client, String message) {
         LOGGER.warn(message);
         LogUtils.sendLog(client, new LogBuilder(LogType.WARN).setMessage(message));
