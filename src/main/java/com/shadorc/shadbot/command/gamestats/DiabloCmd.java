@@ -70,7 +70,7 @@ public class DiabloCmd extends BaseCmd {
             }
 
             final List<HeroResponse> heroResponses = new ArrayList<>();
-            for (final HeroId heroId : profile.getHeroeIds()) {
+            for (final HeroId heroId : profile.getHeroIds()) {
                 final String heroUrl = String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
                         region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken());
 
