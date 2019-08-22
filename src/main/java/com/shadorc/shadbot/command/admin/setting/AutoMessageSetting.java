@@ -59,6 +59,14 @@ public class AutoMessageSetting extends BaseSetting {
     }
 
     private static Mono<Message> channel(Context context, Action action) {
+        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
+        if (action == Action.DISABLE) {
+            dbGuild.removeSetting(Setting.MESSAGE_CHANNEL_ID);
+            return context.getChannel()
+                    .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
+                            + "until a new channel is defined.", channel));
+        }
+
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractChannels(guild, context.getContent()))
                 .flatMap(channelId -> context.getClient().getChannelById(channelId))
@@ -68,17 +76,10 @@ public class AutoMessageSetting extends BaseSetting {
                         throw new MissingArgumentException();
                     }
 
-                    final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
                     final Channel channel = mentionedChannels.get(0);
-                    if (action == Action.ENABLE) {
-                        dbGuild.setSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong());
-                        return String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
-                                channel.getMention());
-                    } else {
-                        dbGuild.removeSetting(Setting.MESSAGE_CHANNEL_ID);
-                        return String.format(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
-                                + "until a new channel is defined.", channel.getMention());
-                    }
+                    dbGuild.setSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong());
+                    return String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
+                            channel.getMention());
                 })
                 .flatMap(message -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(message, channel)));
