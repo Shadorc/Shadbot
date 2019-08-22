@@ -40,7 +40,7 @@ public class TrackEventListener extends AudioEventAdapter {
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
-                .filter(ignored -> endReason.mayStartNext)
+                .filter(ignored -> endReason == AudioTrackEndReason.FINISHED)
                 // Everything seems fine, reset error counter.
                 .doOnNext(ignored -> this.errorCount.set(0))
                 .flatMap(ignored -> this.nextOrEnd())
