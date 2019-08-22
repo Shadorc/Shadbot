@@ -1,0 +1,47 @@
+package com.shadorc.shadbot.command.info;
+
+import com.shadorc.shadbot.Config;
+import com.shadorc.shadbot.Shadbot;
+import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.CommandCategory;
+import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.utils.DiscordUtils;
+
+import java.time.Duration;
+import java.util.List;
+
+public class FeedbackCmd extends BaseCmd {
+
+    public FeedbackCmd() {
+        super(CommandCategory.INFO, List.of("feedback"));
+        this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(5)));
+    }
+
+    @Override
+    public Mono<Void> execute(Context context) {
+        final String arg = context.requireArg();
+
+        return context.getClient()
+                .getUserById(Shadbot.getOwnerId())
+                .flatMap(User::getPrivateChannel)
+                .cast(MessageChannel.class)
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SPEECH + " Feedback from %d: %s",
+                        context.getAuthorId().asLong(), arg), channel))
+                .then(context.getChannel())
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.INFO + " (**%s**) Feedback sent, thank you!", context.getUsername()), channel))
+                .then();
+    }
+
+    @Override
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return new HelpBuilder(this, context)
+                .setDescription(String.format("Send a message to my owner. This can be a bug report, a suggestion or " +
+                        "anything related to Shadbot. You can also join the [support server](%s).", Config.SUPPORT_SERVER_URL))
+                .addArg("text", false)
+                .build();
+    }
+}
