@@ -125,14 +125,4 @@ public class NetUtils {
                 .timeout(Config.DEFAULT_TIMEOUT);
     }
 
-    public static Mono<HttpClientResponse> post(String url, String authorization, Object payload) {
-        final Consumer<HttpHeaders> headerBuilder = header -> header.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-                .add(HttpHeaderNames.AUTHORIZATION, authorization);
-
-        return NetUtils.request(headerBuilder, HttpMethod.POST, url)
-                .send(Mono.just(Unpooled.wrappedBuffer(payload.toString().getBytes(StandardCharsets.UTF_8))))
-                .response()
-                .timeout(Config.DEFAULT_TIMEOUT);
-    }
-
 }
