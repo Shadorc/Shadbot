@@ -25,7 +25,7 @@ public class ProfileResponse {
     @JsonProperty("guildName")
     private String guildName;
     @JsonProperty("heroes")
-    private List<HeroId> heroeIds;
+    private List<HeroId> heroIds;
 
     public Optional<String> getCode() {
         return Optional.ofNullable(this.code);
@@ -55,8 +55,8 @@ public class ProfileResponse {
         return this.guildName;
     }
 
-    public List<HeroId> getHeroeIds() {
-        return Collections.unmodifiableList(this.heroeIds);
+    public List<HeroId> getHeroIds() {
+        return Collections.unmodifiableList(this.heroIds);
     }
 
 }
