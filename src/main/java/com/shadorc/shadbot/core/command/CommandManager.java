@@ -79,7 +79,7 @@ public class CommandManager {
                 new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
                 // Info Commands
                 new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
-                new RolelistCmd(),
+                new RolelistCmd(), new FeedbackCmd(),
                 // French Commands
                 new JokeCmd(), new DtcCmd(),
                 // Admin Commands
