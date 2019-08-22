@@ -64,10 +64,6 @@ public class BlackjackPlayer extends GamblerPlayer {
         return this.hand;
     }
 
-    public boolean isDoubleDown() {
-        return this.isDoubleDown;
-    }
-
     public boolean isStanding() {
         return this.isStanding;
     }
