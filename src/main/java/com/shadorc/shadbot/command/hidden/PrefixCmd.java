@@ -17,7 +17,6 @@ public class PrefixCmd extends BaseCmd {
     public PrefixCmd() {
         super(CommandCategory.HIDDEN, List.of("prefix"));
         this.setDefaultRateLimiter();
-        this.setPrefix(Config.DEFAULT_PREFIX);
     }
 
     @Override
