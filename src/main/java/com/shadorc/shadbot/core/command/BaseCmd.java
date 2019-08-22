@@ -67,9 +67,8 @@ public abstract class BaseCmd {
         return this.names.get(0);
     }
 
-    @Nullable
-    public String getAlias() {
-        return this.alias;
+    public Optional<String> getAlias() {
+        return Optional.ofNullable(this.alias);
     }
 
     public Optional<RateLimiter> getRateLimiter() {
