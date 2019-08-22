@@ -45,7 +45,6 @@ public enum Emoji {
     SOUND("sound"),
     MUTE("mute"),
 
-    SLEEPING("sleeping_accommodation"),
     THUMBSDOWN("thumbsdown"),
     SPEECH("speech_balloon"),
     CLAP("clap"),
