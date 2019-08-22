@@ -44,7 +44,7 @@ public class FeedbackCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
-                .setDescription(String.format("Send a message to my owner. This can be a bug report, a suggestion or " +
+                .setDescription(String.format("Send a message to my developer. This can be a bug report, a suggestion or " +
                         "anything related to Shadbot. You can also join the [support server](%s).", Config.SUPPORT_SERVER_URL))
                 .addArg("text", false)
                 .build();
