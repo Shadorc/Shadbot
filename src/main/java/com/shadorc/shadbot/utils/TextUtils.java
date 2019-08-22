@@ -24,9 +24,10 @@ public class TextUtils {
     public static final TextFile SPAMS = new TextFile("texts/spam.txt");
 
     public static final List<String> TIP_MESSAGES = List.of(String.format("Check %slottery", Config.DEFAULT_PREFIX),
-            String.format("Add a music first using %splayfirst", Config.DEFAULT_PREFIX),
-            String.format("Help me keep Shadbot alive! %s", Config.PATREON_URL),
+            String.format("Add music first: %splayfirst", Config.DEFAULT_PREFIX),
+            String.format("Contribute to Shadbot! %s", Config.PATREON_URL),
             String.format("Support server: %s", Config.SUPPORT_SERVER_URL),
+            String.format("A feedback? %sfeedback", Config.DEFAULT_PREFIX),
             "The Baguette is a Lie");
 
     /**
