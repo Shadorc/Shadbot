@@ -42,7 +42,7 @@ public class GenerateRelicCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
                 .setDescription("Generate a relic.")
-                .addArg(Relic.RelicType.values(), false)
+                .addArg("type", FormatUtils.format(Relic.RelicType.class, "/"), false)
                 .build();
     }
 }

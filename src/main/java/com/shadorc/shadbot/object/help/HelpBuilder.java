@@ -84,10 +84,6 @@ public class HelpBuilder {
         return this.addArg(name, null, isFacultative);
     }
 
-    public <T> HelpBuilder addArg(T[] options, boolean isFacultative) {
-        return this.addArg(FormatUtils.format(options, Object::toString, "|"), null, isFacultative);
-    }
-
     public HelpBuilder addField(String name, String value, boolean inline) {
         this.fields.add(new EmbedFieldEntity(name, value, inline));
         return this;
