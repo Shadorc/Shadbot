@@ -90,7 +90,7 @@ public class CommandManager {
                 new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(), new DatabaseCmd(),
                 new CleanDatabaseCmd(),
                 // Hidden Commands
-                new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd());
+                new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd());
     }
 
     private void add(BaseCmd... cmds) {
