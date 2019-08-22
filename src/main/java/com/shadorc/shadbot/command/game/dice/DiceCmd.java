@@ -75,7 +75,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
             }
 
             final long bet = Utils.requireValidBet(context.getMember(), Long.toString(diceManager.getBet()));
-            final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(), diceManager.getBet(), number);
+            final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(), bet, number);
             if (diceManager.addPlayerIfAbsent(player)) {
                 player.bet();
             }
