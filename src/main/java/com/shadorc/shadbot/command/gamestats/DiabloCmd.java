@@ -91,7 +91,7 @@ public class DiabloCmd extends BaseCmd {
                                             + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
                                             + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
                                     profile.getBattleTag(), profile.getGuildName(),
-                                    profile.getParagonLevel(), profile.getParagonLevelSeasonHardcore(),
+                                    profile.getParagonLevel(), profile.getParagonLevelHardcore(),
                                     profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
                             .addField("Heroes", FormatUtils.format(heroResponses,
                                     hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
