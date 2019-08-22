@@ -28,10 +28,6 @@ public class TextFile {
         }
     }
 
-    public List<String> getTexts() {
-        return Collections.unmodifiableList(this.texts);
-    }
-
     public String getText() {
         return Utils.randValue(this.texts);
     }
