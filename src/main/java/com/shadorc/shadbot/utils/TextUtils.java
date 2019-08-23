@@ -28,6 +28,7 @@ public class TextUtils {
             String.format("Contribute to Shadbot! %s", Config.PATREON_URL),
             String.format("Support server: %s", Config.SUPPORT_SERVER_URL),
             String.format("A feedback? %sfeedback", Config.DEFAULT_PREFIX),
+            String.format("Prefix lost? %sprefix", Config.DEFAULT_PREFIX),
             "The Baguette is a Lie");
 
     /**
