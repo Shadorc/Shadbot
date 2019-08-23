@@ -134,7 +134,9 @@ public class SavedPlaylistCmd extends BaseCmd {
 
         final String playlistName = args.get(1);
         if (!map.containsKey(playlistName)) {
-            return Mono.error(new CommandException("There is no playlist with this name."));
+            return Mono.error(new CommandException(String.format("There is no playlist saved with this name. " +
+                            "Use `%s%s %s` to see all the playlists saved.",
+                    context.getPrefix(), this.getName(), Action.SEE.toString().toLowerCase())));
         }
 
         for (final String url : map.get(playlistName)) {
