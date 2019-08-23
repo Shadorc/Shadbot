@@ -42,7 +42,7 @@ public class SavedPlaylistCmd extends BaseCmd {
         if (!PremiumManager.getInstance().isGuildPremium(context.getGuildId())) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.LOCK + "  This server is not premium. " +
-                            "You can unlock this feature for this server and gain other advantage by contributing " +
+                            "You can **unlock this feature for this server and gain other advantage** by contributing " +
                             "to Shadbot. More info here: <%s>", Config.PATREON_URL), channel))
                     .then();
         }
@@ -70,7 +70,10 @@ public class SavedPlaylistCmd extends BaseCmd {
     private Mono<Void> see(Context context, Map<String, List<String>> map) {
         if (map.isEmpty()) {
             return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " There is no playlist saved.", channel))
+                    .flatMap(channel -> DiscordUtils.sendMessage(
+                            String.format(Emoji.INFO + " (**%s**) There are no playlists saved. To save a playlist," +
+                                    " use `%s%s %s` while listening to music.",
+                                    context.getUsername(), context.getPrefix(), this.getName(), Action.SAVE.toString().toLowerCase()), channel))
                     .then();
         }
 
