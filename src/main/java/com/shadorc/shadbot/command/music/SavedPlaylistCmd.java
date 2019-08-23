@@ -148,6 +148,11 @@ public class SavedPlaylistCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context).build();
+        return new HelpBuilder(this, context)
+            .setDescription("Save the current playlist or load a previously saved playlist.")
+            .addArg("action", FormatUtils.format(Action.class, "/"), false)
+            .addArg("name", "playlist name", false)
+            .addField("Info", String.format("You can save up to %d playlist.", Config.DEFAULT_SAVED_PLAYLIST_SIZE), false)
+            .build();
     }
 }
