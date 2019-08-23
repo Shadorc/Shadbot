@@ -130,6 +130,10 @@ public class SavedPlaylistCmd extends BaseCmd {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
         final String playlistName = args.get(1);
+        if(map.containsKey(playlistName)) {
+            return Mono.error(new IllegalArgumentException("There is no playlist with this name."));
+        }
+
         for (final String url : map.get(playlistName)) {
             final AudioLoadResultListener resultListener = new AudioLoadResultListener(
                     context.getGuildId(), context.getAuthorId(), url, false);
