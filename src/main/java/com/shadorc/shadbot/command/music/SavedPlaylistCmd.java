@@ -72,7 +72,7 @@ public class SavedPlaylistCmd extends BaseCmd {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
                             String.format(Emoji.INFO + " (**%s**) There are no playlists saved. To save a playlist," +
-                                    " use `%s%s %s` while listening to music.",
+                                            " use `%s%s %s` while listening to music.",
                                     context.getUsername(), context.getPrefix(), this.getName(), Action.SAVE.toString().toLowerCase()), channel))
                     .then();
         }
@@ -133,7 +133,7 @@ public class SavedPlaylistCmd extends BaseCmd {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
         final String playlistName = args.get(1);
-        if(map.containsKey(playlistName)) {
+        if (map.containsKey(playlistName)) {
             return Mono.error(new CommandException("There is no playlist with this name."));
         }
 
@@ -152,10 +152,10 @@ public class SavedPlaylistCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
-            .setDescription("Save the current playlist or load a previously saved playlist.")
-            .addArg("action", FormatUtils.format(Action.class, "/"), false)
-            .addArg("name", "playlist name", false)
-            .addField("Info", String.format("You can save up to %d playlist.", Config.DEFAULT_SAVED_PLAYLIST_SIZE), false)
-            .build();
+                .setDescription("Save the current playlist or load a previously saved playlist.")
+                .addArg("action", FormatUtils.format(Action.class, "/"), false)
+                .addArg("name", "playlist name", false)
+                .addField("Info", String.format("You can save up to %d playlist.", Config.DEFAULT_SAVED_PLAYLIST_SIZE), false)
+                .build();
     }
 }
