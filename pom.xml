@@ -117,7 +117,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20180813</version>
+            <version>20190722</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
@@ -153,12 +153,12 @@
         <dependency>
             <groupId>com.fathzer</groupId>
             <artifactId>javaluator</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.5.0-M1</version>
+            <version>5.5.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
