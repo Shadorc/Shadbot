@@ -23,6 +23,7 @@ import net.aksingh.owmjapis.model.param.Weather;
 import org.apache.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -90,7 +91,7 @@ public class WeatherCmd extends BaseCmd {
                         strBuilder.append(" not found.");
                         return Mono.just(loadingMsg.setContent(strBuilder.toString()));
                     }
-                    return Mono.error(err);
+                    return Mono.error(new IOException(err));
                 })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
