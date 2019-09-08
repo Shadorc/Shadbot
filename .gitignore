@@ -12,6 +12,7 @@ gen/
 
 # IntelliJ project files
 .idea
+*.iml
 
 # Maven build files
 target/
@@ -25,7 +26,6 @@ Thumbs.db
 
 # Project Files
 *.log
-saves/*.json
-stats/*.json
-clean.bat
+saves/
+stats/
 credentials.properties
