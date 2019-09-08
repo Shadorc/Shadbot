@@ -1,9 +1,9 @@
 package com.shadorc.shadbot.data.credential;
 
 public enum Credential {
+    DISCORD_TOKEN,
     GIPHY_API_KEY,
     DTC_API_KEY,
-    DISCORD_TOKEN,
     STEAM_API_KEY,
     OPENWEATHERMAP_API_KEY,
     DEVIANTART_CLIENT_ID,
