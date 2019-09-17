@@ -39,7 +39,8 @@ public class SendMessageCmd extends BaseCmd {
             return Mono.error(new CommandException("I can't send a private message to myself."));
         }
 
-        return context.getClient().getUserById(Snowflake.of(userId))
+        return context.getClient()
+                .getUserById(Snowflake.of(userId))
                 .switchIfEmpty(Mono.error(new CommandException("User not found.")))
                 .flatMap(user -> {
                     if (user.isBot()) {
@@ -50,10 +51,11 @@ public class SendMessageCmd extends BaseCmd {
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtils.sendMessage(args.get(1), privateChannel))
                             .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
-                                    err -> new CommandException("I'm not allowed to send a private message to this user."));
+                                    err -> new CommandException("I'm not allowed to send a private message to this user."))
+                            .then(context.getChannel())
+                            .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Message \"%s\" sent to **%s** (%s).",
+                                    args.get(1), user.getUsername(), user.getId().asLong()), channel));
                 })
-                .then(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Message sent.", channel)))
                 .then();
     }
 
