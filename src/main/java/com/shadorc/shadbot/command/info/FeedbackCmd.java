@@ -33,8 +33,8 @@ public class FeedbackCmd extends BaseCmd {
                 .getUserById(Shadbot.getOwnerId())
                 .flatMap(User::getPrivateChannel)
                 .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SPEECH + " Feedback from %d: %s",
-                        context.getAuthorId().asLong(), arg), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SPEECH + " Feedback from **%s** (User ID: %d, Guild ID: %d):%n%s",
+                        context.getUsername(), context.getAuthorId().asLong(), context.getGuildId().asLong(), arg), channel))
                 .then(context.getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.INFO + " (**%s**) Feedback sent, thank you!", context.getUsername()), channel))
