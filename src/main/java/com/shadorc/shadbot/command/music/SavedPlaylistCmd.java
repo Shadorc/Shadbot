@@ -12,6 +12,7 @@ import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.music.GuildMusic;
+import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -21,6 +22,7 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -110,8 +112,13 @@ public class SavedPlaylistCmd extends BaseCmd {
             return Mono.error(new IllegalArgumentException("There is already a playlist with this name."));
         }
 
-        final GuildMusic guildMusic = context.requireGuildMusic();
-        final List<String> urls = guildMusic.getTrackScheduler().getPlaylist().stream()
+        final TrackScheduler trackScheduler = context.requireGuildMusic().getTrackScheduler();
+
+        final List<AudioTrack> playlist = new ArrayList<>();
+        playlist.add(trackScheduler.getAudioPlayer().getPlayingTrack());
+        playlist.addAll(trackScheduler.getPlaylist());
+
+        final List<String> urls = playlist.stream()
                 .map(AudioTrack::getInfo)
                 .map(info -> info.uri)
                 .collect(Collectors.toList());
