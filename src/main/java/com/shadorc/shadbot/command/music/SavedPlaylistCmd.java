@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class SavedPlaylistCmd extends BaseCmd {
 
     private enum Action {
-        SEE, SAVE, LOAD;
+        SEE, SAVE, DELETE, LOAD;
     }
 
     public SavedPlaylistCmd() {
@@ -62,6 +62,8 @@ public class SavedPlaylistCmd extends BaseCmd {
                 return this.see(context, map);
             case SAVE:
                 return this.save(context, args, map);
+            case DELETE:
+                return this.delete(context, args, map);
             case LOAD:
                 return this.load(context, args, map);
             default:
@@ -128,7 +130,27 @@ public class SavedPlaylistCmd extends BaseCmd {
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.CHECK_MARK + " Playlist `%s` saved.", playlistName), channel))
+                        String.format(Emoji.CHECK_MARK + " (**%s**) Playlist `%s` saved.", context.getUsername(), playlistName), channel))
+                .then();
+    }
+
+    private Mono<Void> delete(Context context, List<String> args, Map<String, List<String>> map) {
+        if (args.size() < 2) {
+            return Mono.error(new MissingArgumentException());
+        }
+
+        final String playlistName = args.get(1);
+
+        if (!map.containsKey(playlistName)) {
+            return Mono.error(new IllegalArgumentException("There is no playlist with this name."));
+        }
+
+        map.remove(playlistName);
+        DatabaseManager.getInstance().getDBGuild(context.getGuildId()).setSetting(Setting.SAVED_PLAYLISTS, map);
+
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.CHECK_MARK + " (**%s**) Playlist `%s` deleted.", context.getUsername(), playlistName), channel))
                 .then();
     }
 
@@ -154,16 +176,16 @@ public class SavedPlaylistCmd extends BaseCmd {
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.CHECK_MARK + " Playlist `%s` loaded.", playlistName), channel))
+                        String.format(Emoji.CHECK_MARK + " (**%s**) Playlist `%s` loaded.", context.getUsername(), playlistName), channel))
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
-                .setDescription("Display the saved playlists, save the current playlist or load a previously saved playlist.")
+                .setDescription("Display, save, delete or load saved playlists.")
                 .addArg("action", FormatUtils.format(Action.class, "/"), false)
-                .addArg("name", "playlist name, must be specified to save or load a playlist", true)
+                .addArg("name", "playlist name, must be specified to save, delete or load a playlist", true)
                 .addField("Info", String.format("You can save up to %d playlist.", Config.DEFAULT_SAVED_PLAYLIST_SIZE), false)
                 .build();
     }
