@@ -90,7 +90,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                             .flatMap(avatarUrl -> guildMusic.getMessageChannel()
                                     .flatMap(channel -> DiscordUtils.sendMessage(this.getPlaylistEmbed(playlist, avatarUrl), channel)))
                             .flatMapMany(ignored -> new AudioLoadResultInputs(guildMusic.getClient(), Duration.ofSeconds(30), this)
-                                    .waitForInputs());
+                                    .waitForInputs()
+                                    .then(Mono.fromRunnable(() -> guildMusic.setWaitingForChoice(false))));
                 })
                 .doOnTerminate(this::terminate)
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
