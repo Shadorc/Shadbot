@@ -71,10 +71,7 @@ public class ChatCmd extends BaseCmd {
                 .flatMap(resultObj -> Mono.fromCallable(() -> Utils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class)))
                 .doOnNext(chat -> this.channelsCustid.put(channelId, chat.getCustId()))
                 .map(ChatBotResponse::getResponse)
-                .onErrorResume(err -> {
-                    LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botId);
-                    return Mono.empty();
-                });
+                .onErrorResume(err -> Mono.fromRunnable(() -> LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botId)));
     }
 
     @Override
