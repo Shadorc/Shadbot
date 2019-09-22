@@ -62,6 +62,7 @@ public class DiabloCmd extends BaseCmd {
                 .then(Mono.just(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
                         region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken())))
                 .flatMap(url -> NetUtils.get(url, ProfileResponse.class))
+                // TODO: Remove once every block operations are removed
                 .publishOn(Schedulers.elastic())
                 .map(profile -> {
                     if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
