@@ -31,43 +31,44 @@ public class WikiCmd extends BaseCmd {
         final String arg = context.requireArg();
 
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-        return Mono.fromCallable(() -> {
-            // Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-            final String url = String.format("https://en.wikipedia.org/w/api.php?"
-                            + "format=json"
-                            + "&action=query"
-                            + "&titles=%s"
-                            + "&redirects=true"
-                            + "&prop=extracts"
-                            + "&explaintext=true"
-                            + "&exintro=true"
-                            + "&exsentences=5",
-                    NetUtils.encode(arg));
 
-            final WikipediaResponse wikipedia = NetUtils.get(url, WikipediaResponse.class).block();
-            final Map<String, WikipediaPage> pages = wikipedia.getQuery().getPages();
-            final String pageId = pages.keySet().toArray()[0].toString();
-            final WikipediaPage page = pages.get(pageId);
+        // Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
+        final String url = String.format("https://en.wikipedia.org/w/api.php?"
+                        + "format=json"
+                        + "&action=query"
+                        + "&titles=%s"
+                        + "&redirects=true"
+                        + "&prop=extracts"
+                        + "&explaintext=true"
+                        + "&exintro=true"
+                        + "&exsentences=5",
+                NetUtils.encode(arg));
 
-            if ("-1".equals(pageId) || page.getExtract() == null) {
-                return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
-                        context.getUsername(), arg));
-            }
+        return NetUtils.get(url, WikipediaResponse.class)
+                .map(wikipedia -> {
+                    final Map<String, WikipediaPage> pages = wikipedia.getQuery().getPages();
+                    final String pageId = pages.keySet().toArray()[0].toString();
+                    final WikipediaPage page = pages.get(pageId);
 
-            if (page.getExtract().endsWith("may refer to:")) {
-                return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
-                        + "try with a more precise search.", context.getUsername()));
-            }
+                    if ("-1".equals(pageId) || page.getExtract() == null) {
+                        return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
+                                context.getUsername(), arg));
+                    }
 
-            final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
+                    if (page.getExtract().endsWith("may refer to:")) {
+                        return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
+                                + "try with a more precise search.", context.getUsername()));
+                    }
 
-            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                    .andThen(embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
-                            String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
-                            context.getAvatarUrl())
-                            .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
-                            .setDescription(extract)));
-        })
+                    final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
+
+                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                            .andThen(embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
+                                    String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
+                                    context.getAvatarUrl())
+                                    .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
+                                    .setDescription(extract)));
+                })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
                 .then();
