@@ -10,7 +10,7 @@ import com.shadorc.shadbot.data.credential.Credentials;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.apache.commons.cli.*;
@@ -81,12 +81,14 @@ public class WallpaperCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return Mono.fromCallable(() -> {
-            final List<String> args = StringUtils.split(context.getArg().orElse(""));
-            return new DefaultParser().parse(this.options, args.toArray(new String[0]));
-        })
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading wallpaper...", context.getUsername()))
+                .send()
+                .then(Mono.fromCallable(() -> {
+                    final List<String> args = StringUtils.split(context.getArg().orElse(""));
+                    return new DefaultParser().parse(this.options, args.toArray(new String[0]));
+                }))
                 .onErrorMap(err -> err instanceof UnrecognizedOptionException || err instanceof org.apache.commons.cli.MissingArgumentException,
                         err -> new CommandException(String.format("%s. Use `%shelp %s` for more information.",
                                 err.getMessage(), context.getPrefix(), this.getName())))
@@ -134,21 +136,20 @@ public class WallpaperCmd extends BaseCmd {
                 .map(wallhaven -> {
                     final List<Wallpaper> wallpapers = wallhaven.getWallpapers();
                     if (wallpapers.isEmpty()) {
-                        return loadingMsg.setContent(
+                        return updatableMsg.setContent(
                                 String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
                                         context.getUsername(), context.getContent()));
                     }
 
                     final Wallpaper wallpaper = Utils.randValue(wallpapers);
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Wallpaper", wallpaper.getUrl(), context.getAvatarUrl())
                                     .setImage(wallpaper.getPath())
                                     .addField("Resolution", wallpaper.getResolution(), false)));
                 })
                 .onErrorResume(err -> "Must be NSFW".equals(err.getMessage()),
-                        err -> Mono.just(loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()))))
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                        err -> Mono.just(updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()))))
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

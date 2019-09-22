@@ -7,7 +7,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.object.Embed;
@@ -30,13 +30,15 @@ public class UrbanCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         final String url = String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(arg));
-        return NetUtils.get(url, UrbanDictionaryResponse.class)
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Urban Dictionary definition...", context.getUsername()))
+                .send()
+                .then(NetUtils.get(url, UrbanDictionaryResponse.class))
                 .map(urbanDictionary -> {
                     if (urbanDictionary.getDefinitions().isEmpty()) {
-                        return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",
+                        return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",
                                 context.getUsername(), arg));
                     }
 
@@ -45,7 +47,7 @@ public class UrbanCmd extends BaseCmd {
                     final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
                     final String example = StringUtils.abbreviate(urbanDefinition.getExample(), Field.MAX_VALUE_LENGTH);
 
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> {
                                 embed.setAuthor(String.format("Urban Dictionary: %s", urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())
                                         .setThumbnail("https://i.imgur.com/7KJtwWp.png")
@@ -55,8 +57,7 @@ public class UrbanCmd extends BaseCmd {
                                 }
                             }));
                 })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

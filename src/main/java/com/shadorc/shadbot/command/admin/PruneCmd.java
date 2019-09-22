@@ -8,7 +8,7 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
@@ -41,9 +41,11 @@ public class PruneCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return context.getChannel()
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading messages to prune...", context.getUsername()))
+                .send()
+                .then(context.getChannel())
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
                         .then(context.getMessage().getUserMentions().collectList())
                         .flatMapMany(mentions -> {
@@ -88,9 +90,8 @@ public class PruneCmd extends BaseCmd {
                                 .map(messagesNotDeleted -> (int) (messageIds.size() - messagesNotDeleted)))
                         .map(deletedMessages -> String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
                                 context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
-                .map(loadingMsg::setContent)
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .map(updatableMsg::setContent)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

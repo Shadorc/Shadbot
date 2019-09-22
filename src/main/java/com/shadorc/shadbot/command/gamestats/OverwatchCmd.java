@@ -9,7 +9,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -37,24 +37,26 @@ public class OverwatchCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(1, 2);
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         final Mono<Tuple3<Platform, ProfileResponse, StatsResponse>> getResponse =
                 args.size() == 1 ? OverwatchCmd.getResponse(args.get(0)) : OverwatchCmd.getResponse(args.get(0), args.get(1));
 
-        return getResponse
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Overwatch stats...", context.getUsername()))
+                .send()
+                .then(getResponse)
                 .map(response -> {
                     final Platform platform = response.getT1();
                     final ProfileResponse profile = response.getT2();
                     final Quickplay topHeroes = response.getT3().getStats().getTopHeroes().getQuickplay();
 
                     if (profile.isPrivate()) {
-                        return loadingMsg.setContent(
+                        return updatableMsg.setContent(
                                 String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private.",
                                         context.getUsername()));
                     }
 
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
                                     platform.toString().toLowerCase(), profile.getUsername()), context.getAvatarUrl())
                                     .setThumbnail(profile.getPortrait())
@@ -62,12 +64,11 @@ public class OverwatchCmd extends BaseCmd {
                                     .addField("Level", profile.getLevel(), true)
                                     .addField("Time played", profile.getQuickplayPlaytime(), true)
                                     .addField("Games won", profile.getGames().getQuickplayWon(), true)
-                                    .addField("Competitive rank", profile.formatCompetitive(), true)
+                                    .addField("Competitive ranks", profile.formatCompetitive(), true)
                                     .addField("Top hero (Time played)", topHeroes.getPlayed(), true)
                                     .addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true)));
                 })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

@@ -3,8 +3,9 @@ package com.shadorc.shadbot.command.fun;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.object.Embed;
@@ -31,9 +32,11 @@ public class ThisDayCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return NetUtils.get(HOME_URL)
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getUsername()))
+                .send()
+                .then(NetUtils.get(HOME_URL))
                 .map(Jsoup::parse)
                 .map(doc -> {
                     final String date = doc.getElementsByClass("date-large")
@@ -51,13 +54,12 @@ public class ThisDayCmd extends BaseCmd {
                             .map(Document::text)
                             .collect(Collectors.joining("\n\n"));
 
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(String.format("On This Day: %s", date), HOME_URL, context.getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/FdfyJDD.png")
                                     .setDescription(StringUtils.abbreviate(events, Embed.MAX_DESCRIPTION_LENGTH))));
                 })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 
