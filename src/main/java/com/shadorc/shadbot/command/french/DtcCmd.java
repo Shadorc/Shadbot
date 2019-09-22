@@ -7,8 +7,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -28,13 +29,15 @@ public class DtcCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         final String url = String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
                 Credentials.get(Credential.DTC_API_KEY));
 
         final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
-        return NetUtils.get(url, valueType)
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))
+                .send()
+                .then(NetUtils.get(url, valueType))
                 .cast((Class<List<Quote>>) (Object) List.class)
                 .map(quotes -> {
                     Quote quote;
@@ -45,15 +48,14 @@ public class DtcCmd extends BaseCmd {
                     final String content = quote.getContent().replace("*", "\\*");
                     final String id = quote.getId();
 
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Quote DansTonChat",
                                     String.format("https://danstonchat.com/%s.html", id),
                                     context.getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/5YvTlAA.png")
                                     .setDescription(FormatUtils.format(content.split("\n"), DtcCmd::format, "\n"))));
                 })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.message.UpdateableMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class DiceGame extends MultiplayerGame<DicePlayer> {
 
     private final long bet;
-    private final UpdateableMessage updateableMessage;
+    private final UpdatableMessage updatableMessage;
 
     private long startTime;
     private String results;
@@ -27,7 +27,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
     public DiceGame(GameCmd<DiceGame> gameCmd, Context context, long bet) {
         super(gameCmd, context, Duration.ofSeconds(30));
         this.bet = bet;
-        this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
+        this.updatableMessage = new UpdatableMessage(context.getClient(), context.getChannelId());
     }
 
     @Override
@@ -91,7 +91,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                                 embed.setFooter("Finished.", null);
                             }
                         }))
-                .flatMap(this.updateableMessage::send)
+                .flatMap(this.updatableMessage::send)
                 .then();
     }
 

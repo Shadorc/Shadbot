@@ -8,7 +8,7 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.casino.Deck;
 import com.shadorc.shadbot.object.casino.Hand;
-import com.shadorc.shadbot.object.message.UpdateableMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
 
     private final RateLimiter rateLimiter;
-    private final UpdateableMessage updateableMessage;
+    private final UpdatableMessage updatableMessage;
 
     private final Deck deck;
     private final Hand dealerHand;
@@ -36,7 +36,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
         super(gameCmd, context, Duration.ofMinutes(1));
 
         this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(2));
-        this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
+        this.updatableMessage = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         this.deck = new Deck();
         this.deck.shuffle();
@@ -132,7 +132,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                                 embed.addField(field.getName(), field.getValue(), field.isInline());
                             }
                         }))
-                .flatMap(this.updateableMessage::send)
+                .flatMap(this.updatableMessage::send)
                 .then();
     }
 
