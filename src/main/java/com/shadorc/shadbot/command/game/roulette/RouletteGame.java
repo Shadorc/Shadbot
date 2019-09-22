@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.message.UpdateableMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,14 +29,14 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
             Place.EVEN, num -> num % 2 == 0,
             Place.ODD, num -> num % 2 != 0);
 
-    private final UpdateableMessage updateableMessage;
+    private final UpdatableMessage updatableMessage;
 
     private long startTime;
     private String results;
 
     public RouletteGame(GameCmd<RouletteGame> gameCmd, Context context) {
         super(gameCmd, context, Duration.ofSeconds(30));
-        this.updateableMessage = new UpdateableMessage(context.getClient(), context.getChannelId());
+        this.updatableMessage = new UpdatableMessage(context.getClient(), context.getChannelId());
     }
 
     @Override
@@ -113,7 +113,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                                 embed.setFooter("Finished.", null);
                             }
                         }))
-                .flatMap(this.updateableMessage::send)
+                .flatMap(this.updatableMessage::send)
                 .then();
     }
 

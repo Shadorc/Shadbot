@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+@Deprecated
 public class LoadingMessage implements Publisher<Void> {
 
     private static final Duration TYPING_TIMEOUT = Duration.ofMinutes(1);

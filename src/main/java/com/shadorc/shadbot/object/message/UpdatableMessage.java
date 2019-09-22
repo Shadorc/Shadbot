@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-public class UpdateableMessage {
+public class UpdatableMessage {
 
     private final DiscordClient client;
     private final Snowflake channelId;
@@ -23,7 +23,7 @@ public class UpdateableMessage {
      * @param client    - the Discord client
      * @param channelId - the Channel ID in which to send the message
      */
-    public UpdateableMessage(DiscordClient client, Snowflake channelId) {
+    public UpdatableMessage(DiscordClient client, Snowflake channelId) {
         this.client = client;
         this.channelId = channelId;
         this.messageId = new AtomicLong(-1);

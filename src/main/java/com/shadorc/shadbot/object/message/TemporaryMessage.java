@@ -18,7 +18,7 @@ public class TemporaryMessage {
     /**
      * @param client    - the Discord client
      * @param channelId - the Channel ID in which to send the message
-     * @param duration  - the delay to wait
+     * @param duration  - the delay to wait before deleting the message
      */
     public TemporaryMessage(DiscordClient client, Snowflake channelId, Duration duration) {
         this.client = client;
