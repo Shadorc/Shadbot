@@ -1,6 +1,9 @@
 package com.shadorc.shadbot.command.game.hangman;
 
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.Utils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
