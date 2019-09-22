@@ -31,7 +31,6 @@ import reactor.util.function.Tuples;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class LyricsCmd extends BaseCmd {
@@ -48,53 +47,52 @@ public class LyricsCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final Optional<String> arg = context.getArg();
-
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-        return Mono.fromCallable(() -> {
-            String search;
-            if (arg.isPresent()) {
-                search = arg.get();
-            } else {
-                final GuildMusic guildMusic = MusicManager.getInstance().getMusic(context.getGuildId());
-                if (guildMusic == null) {
-                    throw new MissingArgumentException();
-                }
+        final String search = this.getSearch(context);
 
-                final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
-                if (track == null) {
-                    throw new MissingArgumentException();
-                }
-                final AudioTrackInfo info = track.getInfo();
-                // Remove from title (case insensitive): official, video, music, [, ], (, )
-                search = info.title.replaceAll("(?i)official|video|music|\\[|]|\\(|\\)", "");
-            }
+        return this.getCorrectedUrl(search)
+                .flatMap(url -> Mono.zip(this.getLyricsDocument(context.getClient(), url)
+                        .map(doc -> doc.outputSettings(PRESERVE_FORMAT)), Mono.just(url)))
+                .flatMap(tuple -> {
+                    final Document doc = tuple.getT1();
+                    final String url = tuple.getT2();
 
-            final String url = this.getCorrectedUrl(search).block();
-            if (url == null) {
-                return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
-                        context.getUsername(), search));
-            }
+                    final Musixmatch musixmatch = new Musixmatch(doc);
+                    if (musixmatch.getLyrics().isBlank()) {
+                        return Mono.empty();
+                    }
 
-            final Document doc = this.getLyricsDocument(context.getClient(), url).block().outputSettings(PRESERVE_FORMAT);
-            final Musixmatch musixmatch = new Musixmatch(doc);
-
-            if (musixmatch.getLyrics().isBlank()) {
-                return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
-                        context.getUsername(), search));
-            }
-
-            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                    .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
-                            musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
-                            .setThumbnail(musixmatch.getImageUrl())
-                            .setDescription(musixmatch.getLyrics())
-                            .setFooter("Click on the title to see the full version",
-                                    "https://i.imgur.com/G7q6Hmq.png")));
-        })
+                    return Mono.just(loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                            .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
+                                    musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
+                                    .setThumbnail(musixmatch.getImageUrl())
+                                    .setDescription(musixmatch.getLyrics())
+                                    .setFooter("Click on the title to see the full version",
+                                            "https://i.imgur.com/G7q6Hmq.png"))));
+                })
+                .switchIfEmpty(Mono.defer(() -> Mono.just(loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+                        context.getUsername(), search)))))
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
                 .then();
+    }
+
+    private String getSearch(Context context) {
+        return context.getArg()
+                .orElseGet(() -> {
+                    final GuildMusic guildMusic = MusicManager.getInstance().getMusic(context.getGuildId());
+                    if (guildMusic == null) {
+                        throw new MissingArgumentException();
+                    }
+
+                    final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
+                    if (track == null) {
+                        throw new MissingArgumentException();
+                    }
+                    final AudioTrackInfo info = track.getInfo();
+                    // Remove from title (case insensitive): official, video, music, [, ], (, )
+                    return info.title.replaceAll("(?i)official|officiel|clip|video|music|\\[|]|\\(|\\)", "").trim();
+                });
     }
 
     private Mono<Document> getLyricsDocument(DiscordClient client, String url) {
