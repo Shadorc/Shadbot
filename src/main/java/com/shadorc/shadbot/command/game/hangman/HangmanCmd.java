@@ -7,6 +7,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -39,28 +40,33 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                 new CommandException(String.format("`%s` is not a valid difficulty. %s",
                         context.getArg().orElse(""), FormatUtils.options(Difficulty.class))));
 
-        this.loadWords(difficulty);
+        return this.loadWords(difficulty)
+                .then(Mono.defer(() -> {
+                    final HangmanGame hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
+                    if (hangmanManager == null) {
+                        final HangmanGame newHangmanManager = this.getManagers().get(context.getChannelId());
+                        newHangmanManager.start();
+                        return newHangmanManager.show();
+                    } else {
+                        return context.getChannel()
+                                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
+                                                + " Please, wait for him to finish.",
+                                        context.getUsername(), hangmanManager.getContext().getUsername()), channel))
+                                .then();
+                    }
+                }));
 
-        final HangmanGame hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
-        if (hangmanManager == null) {
-            final HangmanGame newHangmanManager = this.getManagers().get(context.getChannelId());
-            newHangmanManager.start();
-            return newHangmanManager.show();
-        } else {
-            return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
-                                    + " Please, wait for him to finish.",
-                            context.getUsername(), hangmanManager.getContext().getUsername()), channel))
-                    .then();
-        }
     }
 
-    private void loadWords(Difficulty difficulty) {
+    private Mono<Void> loadWords(Difficulty difficulty) {
         if (difficulty == Difficulty.EASY && !this.easyWords.isLoaded()) {
-            this.easyWords.load();
+            return this.easyWords.load()
+                    .then(Mono.fromRunnable(() -> LogUtils.info("Hangman word list (difficulty: easy) obtained.")));
         } else if (difficulty == Difficulty.HARD && !this.hardWords.isLoaded()) {
-            this.hardWords.load();
+            return this.hardWords.load()
+                    .then(Mono.fromRunnable(() -> LogUtils.info("Hangman word list (difficulty: hard) obtained.")));
         }
+        return Mono.empty();
     }
 
     protected String getWord(Difficulty difficulty) {
