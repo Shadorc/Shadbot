@@ -41,7 +41,7 @@ public class ImageCmd extends BaseCmd {
         final String arg = context.requireArg();
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMsg.setContent("Loading image...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading image...", context.getUsername()))
                 .send()
                 .thenMany(this.getPopularImages(NetUtils.encode(arg)))
                 .collectList()

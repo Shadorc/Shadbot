@@ -31,7 +31,7 @@ public class Rule34Cmd extends BaseCmd {
         final String arg = context.requireArg();
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return updatableMsg.setContent("Loading rule34 image...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading rule34 image...", context.getUsername()))
                 .send()
                 .then(context.isChannelNsfw())
                 .flatMap(isNsfw -> Mono.fromCallable(() -> {

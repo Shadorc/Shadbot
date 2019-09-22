@@ -51,7 +51,7 @@ public class FortniteCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         final Consumer<HttpHeaders> headerBuilder = header -> header.add("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY));
-        return updatableMsg.setContent("Loading Fortnite stats...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Fortnite stats...", context.getUsername()))
                 .send()
                 .then(NetUtils.get(headerBuilder, url, FortniteResponse.class))
                 .map(fortnite -> {

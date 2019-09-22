@@ -45,7 +45,7 @@ public class WeatherCmd extends BaseCmd {
         final List<String> args = context.requireArgs(1, 2, ",");
 
         final UpdatableMessage updatableMessage = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMessage.setContent("Loading weather...")
+        return updatableMessage.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading weather...", context.getUsername()))
                 .send()
                 .then(Mono.fromCallable(() -> {
                     final OWM owm = new OWM(Credentials.get(Credential.OPENWEATHERMAP_API_KEY));

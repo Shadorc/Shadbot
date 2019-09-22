@@ -44,7 +44,7 @@ public class WikiCmd extends BaseCmd {
                         + "&exsentences=5",
                 NetUtils.encode(arg));
 
-        return updatableMsg.setContent("Loading Wikipedia...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia...", context.getUsername()))
                 .send()
                 .then(NetUtils.get(url, WikipediaResponse.class))
                 .map(wikipedia -> {

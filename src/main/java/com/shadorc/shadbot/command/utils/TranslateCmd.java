@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -70,7 +71,7 @@ public class TranslateCmd extends BaseCmd {
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return updatableMsg.setContent("Loading translation...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading translation...", context.getUsername()))
                 .send()
                 .then(Mono.fromCallable(() -> {
                     final String url = String.format("https://translate.googleapis.com/translate_a/single?"

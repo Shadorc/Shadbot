@@ -32,7 +32,7 @@ public class GifCmd extends BaseCmd {
         final String url = String.format("%s?api_key=%s&tag=%s",
                 HOME_URl, Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
 
-        return updatableMsg.setContent("Loading gif...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getUsername()))
                 .send()
                 .then(NetUtils.get(url, GiphyResponse.class))
                 .map(giphy -> {

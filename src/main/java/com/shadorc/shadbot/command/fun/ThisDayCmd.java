@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.fun;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -33,7 +34,7 @@ public class ThisDayCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return updatableMsg.setContent("Loading events...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getUsername()))
                 .send()
                 .then(NetUtils.get(HOME_URL))
                 .map(Jsoup::parse)

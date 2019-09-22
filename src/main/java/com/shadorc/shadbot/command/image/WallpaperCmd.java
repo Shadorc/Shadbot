@@ -83,7 +83,7 @@ public class WallpaperCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return updatableMsg.setContent("Loading wallpaper...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading wallpaper...", context.getUsername()))
                 .send()
                 .then(Mono.fromCallable(() -> {
                     final List<String> args = StringUtils.split(context.getArg().orElse(""));

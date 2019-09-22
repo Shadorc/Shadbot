@@ -58,7 +58,7 @@ public class DiabloCmd extends BaseCmd {
 
         final String battletag = args.get(1).replaceAll("#", "-");
 
-        return updatableMsg.setContent("Loading Diablo III stats...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Diablo III stats...", context.getUsername()))
                 .send()
                 .then(this.getAccessToken())
                 .then(Mono.just(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",

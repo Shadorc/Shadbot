@@ -79,7 +79,11 @@ public class UpdatableMessage {
                 .then(this.client.getChannelById(this.channelId))
                 .cast(MessageChannel.class)
                 .flatMap(channel -> DiscordUtils.sendMessage(consumer, channel, this.embed != null))
-                .doOnNext(message -> this.messageId.set(message.getId().asLong()));
+                .doOnNext(message -> {
+                    this.messageId.set(message.getId().asLong());
+                    this.content = null;
+                    this.embed = null;
+                });
     }
 
 

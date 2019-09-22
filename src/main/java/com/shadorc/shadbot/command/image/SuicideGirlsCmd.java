@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.image;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
@@ -26,7 +27,7 @@ public class SuicideGirlsCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return updatableMsg.setContent("Loading Suicide Girl picture...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Suicide Girl picture...", context.getUsername()))
                 .send()
                 .then(context.isChannelNsfw())
                 .flatMap(isNsfw -> {

@@ -43,7 +43,7 @@ public class PruneCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return updatableMsg.setContent("Loading messages to prune...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading messages to prune...", context.getUsername()))
                 .send()
                 .then(context.getChannel())
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)

@@ -42,7 +42,7 @@ public class OverwatchCmd extends BaseCmd {
         final Mono<Tuple3<Platform, ProfileResponse, StatsResponse>> getResponse =
                 args.size() == 1 ? OverwatchCmd.getResponse(args.get(0)) : OverwatchCmd.getResponse(args.get(0), args.get(1));
 
-        return updatableMsg.setContent("Loading Overwatch stats...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Overwatch stats...", context.getUsername()))
                 .send()
                 .then(getResponse)
                 .map(response -> {
@@ -64,7 +64,7 @@ public class OverwatchCmd extends BaseCmd {
                                     .addField("Level", profile.getLevel(), true)
                                     .addField("Time played", profile.getQuickplayPlaytime(), true)
                                     .addField("Games won", profile.getGames().getQuickplayWon(), true)
-                                    .addField("Competitive rank", profile.formatCompetitive(), true)
+                                    .addField("Competitive ranks", profile.formatCompetitive(), true)
                                     .addField("Top hero (Time played)", topHeroes.getPlayed(), true)
                                     .addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true)));
                 })

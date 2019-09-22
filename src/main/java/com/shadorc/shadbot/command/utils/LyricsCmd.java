@@ -50,7 +50,7 @@ public class LyricsCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         final String search = this.getSearch(context);
 
-        return updatableMsg.setContent("Loading lyrics...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading lyrics...", context.getUsername()))
                 .send()
                 .then(this.getCorrectedUrl(search))
                 .flatMap(url -> Mono.zip(this.getLyricsDocument(context.getClient(), url)

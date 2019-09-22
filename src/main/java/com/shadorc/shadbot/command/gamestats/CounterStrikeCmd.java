@@ -40,7 +40,7 @@ public class CounterStrikeCmd extends BaseCmd {
         final String arg = context.requireArg();
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMsg.setContent("Loading CS:GO stats...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading CS:GO stats...", context.getUsername()))
                 .send()
                 .then(Mono.fromCallable(() -> {
                     String identificator = arg;

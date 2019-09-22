@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -34,7 +35,7 @@ public class DtcCmd extends BaseCmd {
                 Credentials.get(Credential.DTC_API_KEY));
 
         final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
-        return updatableMsg.setContent("Loading quote...")
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))
                 .send()
                 .then(NetUtils.get(url, valueType))
                 .cast((Class<List<Quote>>) (Object) List.class)
