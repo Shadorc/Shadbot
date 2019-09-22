@@ -51,10 +51,11 @@ public class ProfileResponse {
     }
 
     public String formatCompetitive() {
-        return String.format("Damage rank: %d%nSupport rank: %d%nTank rank: %d",
-                this.competitive.getDamage().getRank().orElse(0),
-                this.competitive.getSupport().getRank().orElse(0),
-                this.competitive.getTank().getRank().orElse(0));
+        final StringBuilder strBuilder = new StringBuilder();
+        this.competitive.getDamage().getRank().ifPresent(rank -> strBuilder.append(String.format("%nDamage: %d", rank)));
+        this.competitive.getTank().getRank().ifPresent(rank -> strBuilder.append(String.format("%nTank: %d", rank)));
+        this.competitive.getSupport().getRank().ifPresent(rank -> strBuilder.append(String.format("%nSupport: %d", rank)));
+        return strBuilder.length() == 0 ? "Not ranked" : strBuilder.toString();
     }
 
     public String getQuickplayPlaytime() {
