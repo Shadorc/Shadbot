@@ -26,7 +26,9 @@ public class SuicideGirlsCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return context.isChannelNsfw()
+        return updatableMsg.setContent("Loading Suicide Girl picture...")
+                .send()
+                .then(context.isChannelNsfw())
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
                         return Mono.just(updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix())));

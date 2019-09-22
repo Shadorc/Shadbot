@@ -32,7 +32,9 @@ public class GifCmd extends BaseCmd {
         final String url = String.format("%s?api_key=%s&tag=%s",
                 HOME_URl, Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
 
-        return NetUtils.get(url, GiphyResponse.class)
+        return updatableMsg.setContent("Loading gif...")
+                .send()
+                .then(NetUtils.get(url, GiphyResponse.class))
                 .map(giphy -> {
                     if (giphy.getGifs().isEmpty()) {
                         return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",

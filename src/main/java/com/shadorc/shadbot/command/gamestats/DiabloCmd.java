@@ -58,7 +58,9 @@ public class DiabloCmd extends BaseCmd {
 
         final String battletag = args.get(1).replaceAll("#", "-");
 
-        return this.getAccessToken()
+        return updatableMsg.setContent("Loading Diablo III stats...")
+                .send()
+                .then(this.getAccessToken())
                 .then(Mono.just(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
                         region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken())))
                 .flatMap(url -> NetUtils.get(url, ProfileResponse.class))

@@ -44,15 +44,16 @@ public class FortniteCmd extends BaseCmd {
                         args.get(0), FormatUtils.options(Platform.class))));
 
         final String epicNickname = args.get(1);
-
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-
         final String encodedNickname = epicNickname.replace(" ", "%20");
         final String url = String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
                 platform.toString().toLowerCase(), encodedNickname);
 
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
+
         final Consumer<HttpHeaders> headerBuilder = header -> header.add("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY));
-        return NetUtils.get(headerBuilder, url, FortniteResponse.class)
+        return updatableMsg.setContent("Loading Fortnite stats...")
+                .send()
+                .then(NetUtils.get(headerBuilder, url, FortniteResponse.class))
                 .map(fortnite -> {
                     if (fortnite.getError().map("Player Not Found"::equals).orElse(false)) {
                         throw Exceptions.propagate(new IOException("HTTP Error 400. The request URL is invalid."));

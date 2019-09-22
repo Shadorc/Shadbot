@@ -50,7 +50,9 @@ public class LyricsCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         final String search = this.getSearch(context);
 
-        return this.getCorrectedUrl(search)
+        return updatableMsg.setContent("Loading lyrics...")
+                .send()
+                .then(this.getCorrectedUrl(search))
                 .flatMap(url -> Mono.zip(this.getLyricsDocument(context.getClient(), url)
                         .map(doc -> doc.outputSettings(PRESERVE_FORMAT)), Mono.just(url)))
                 .flatMap(tuple -> {

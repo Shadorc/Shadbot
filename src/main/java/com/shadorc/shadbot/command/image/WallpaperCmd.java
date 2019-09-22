@@ -83,10 +83,12 @@ public class WallpaperCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return Mono.fromCallable(() -> {
-            final List<String> args = StringUtils.split(context.getArg().orElse(""));
-            return new DefaultParser().parse(this.options, args.toArray(new String[0]));
-        })
+        return updatableMsg.setContent("Loading wallpaper...")
+                .send()
+                .then(Mono.fromCallable(() -> {
+                    final List<String> args = StringUtils.split(context.getArg().orElse(""));
+                    return new DefaultParser().parse(this.options, args.toArray(new String[0]));
+                }))
                 .onErrorMap(err -> err instanceof UnrecognizedOptionException || err instanceof org.apache.commons.cli.MissingArgumentException,
                         err -> new CommandException(String.format("%s. Use `%shelp %s` for more information.",
                                 err.getMessage(), context.getPrefix(), this.getName())))

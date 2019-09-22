@@ -34,7 +34,9 @@ public class DtcCmd extends BaseCmd {
                 Credentials.get(Credential.DTC_API_KEY));
 
         final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
-        return NetUtils.get(url, valueType)
+        return updatableMsg.setContent("Loading quote...")
+                .send()
+                .then(NetUtils.get(url, valueType))
                 .cast((Class<List<Quote>>) (Object) List.class)
                 .map(quotes -> {
                     Quote quote;

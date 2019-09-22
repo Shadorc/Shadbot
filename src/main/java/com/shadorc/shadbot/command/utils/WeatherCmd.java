@@ -45,42 +45,44 @@ public class WeatherCmd extends BaseCmd {
         final List<String> args = context.requireArgs(1, 2, ",");
 
         final UpdatableMessage updatableMessage = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return Mono.fromCallable(() -> {
-            final OWM owm = new OWM(Credentials.get(Credential.OPENWEATHERMAP_API_KEY));
-            owm.setUnit(Unit.METRIC);
+        return updatableMessage.setContent("Loading weather...")
+                .send()
+                .then(Mono.fromCallable(() -> {
+                    final OWM owm = new OWM(Credentials.get(Credential.OPENWEATHERMAP_API_KEY));
+                    owm.setUnit(Unit.METRIC);
 
-            CurrentWeather currentWeather;
-            if (args.size() == 2) {
-                final Country country = Utils.parseEnum(Country.class, args.get(1).replace(" ", "_"));
-                if (country == null) {
-                    return updatableMessage.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
-                            context.getUsername(), args.get(1)));
-                }
-                currentWeather = owm.currentWeatherByCityName(args.get(0), country);
-            } else {
-                currentWeather = owm.currentWeatherByCityName(args.get(0));
-            }
+                    CurrentWeather currentWeather;
+                    if (args.size() == 2) {
+                        final Country country = Utils.parseEnum(Country.class, args.get(1).replace(" ", "_"));
+                        if (country == null) {
+                            return updatableMessage.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
+                                    context.getUsername(), args.get(1)));
+                        }
+                        currentWeather = owm.currentWeatherByCityName(args.get(0), country);
+                    } else {
+                        currentWeather = owm.currentWeatherByCityName(args.get(0));
+                    }
 
-            final Weather weather = currentWeather.getWeatherList().get(0);
-            final Main main = currentWeather.getMainData();
+                    final Weather weather = currentWeather.getWeatherList().get(0);
+                    final Main main = currentWeather.getMainData();
 
-            final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
-            final String windDesc = WeatherCmd.getWindDesc(windSpeed);
-            final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ? String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
-            final String countryCode = currentWeather.getSystemData().getCountryCode();
+                    final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
+                    final String windDesc = WeatherCmd.getWindDesc(windSpeed);
+                    final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ? String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
+                    final String countryCode = currentWeather.getSystemData().getCountryCode();
 
-            return updatableMessage.setEmbed(DiscordUtils.getDefaultEmbed()
-                    .andThen(embed -> embed.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
-                            String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
-                            context.getAvatarUrl())
-                            .setThumbnail(weather.getIconLink())
-                            .setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
-                            .addField(Emoji.CLOUD + " Clouds", StringUtils.capitalize(weather.getDescription()), true)
-                            .addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
-                            .addField(Emoji.RAIN + " Rain", rain, true)
-                            .addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
-                            .addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true)));
-        })
+                    return updatableMessage.setEmbed(DiscordUtils.getDefaultEmbed()
+                            .andThen(embed -> embed.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
+                                    String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
+                                    context.getAvatarUrl())
+                                    .setThumbnail(weather.getIconLink())
+                                    .setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
+                                    .addField(Emoji.CLOUD + " Clouds", StringUtils.capitalize(weather.getDescription()), true)
+                                    .addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
+                                    .addField(Emoji.RAIN + " Rain", rain, true)
+                                    .addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
+                                    .addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true)));
+                }))
                 .onErrorResume(APIException.class, err -> {
                     if (err.getCode() == HttpStatus.SC_NOT_FOUND) {
                         final StringBuilder strBuilder = new StringBuilder(

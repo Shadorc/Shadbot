@@ -33,7 +33,9 @@ public class UrbanCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         final String url = String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(arg));
-        return NetUtils.get(url, UrbanDictionaryResponse.class)
+        return updatableMsg.setContent("Loading Urban Dictionary definition...")
+                .send()
+                .then(NetUtils.get(url, UrbanDictionaryResponse.class))
                 .map(urbanDictionary -> {
                     if (urbanDictionary.getDefinitions().isEmpty()) {
                         return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",

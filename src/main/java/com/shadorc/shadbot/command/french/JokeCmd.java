@@ -30,7 +30,9 @@ public class JokeCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return NetUtils.get(HOME_URL)
+        return updatableMsg.setContent("Loading joke...")
+                .send()
+                .then(NetUtils.get(HOME_URL))
                 .map(Jsoup::parse)
                 // Get all elements representing a joke
                 .map(doc -> doc.getElementsByClass("gag__content"))

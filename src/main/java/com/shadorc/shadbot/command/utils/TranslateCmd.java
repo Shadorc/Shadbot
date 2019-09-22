@@ -70,43 +70,45 @@ public class TranslateCmd extends BaseCmd {
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return Mono.fromCallable(() -> {
-            final String url = String.format("https://translate.googleapis.com/translate_a/single?"
-                            + "client=gtx"
-                            + "&ie=UTF-8"
-                            + "&oe=UTF-8"
-                            + "&sl=%s"
-                            + "&tl=%s"
-                            + "&dt=t"
-                            + "&q=%s",
-                    NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
+        return updatableMsg.setContent("Loading translation...")
+                .send()
+                .then(Mono.fromCallable(() -> {
+                    final String url = String.format("https://translate.googleapis.com/translate_a/single?"
+                                    + "client=gtx"
+                                    + "&ie=UTF-8"
+                                    + "&oe=UTF-8"
+                                    + "&sl=%s"
+                                    + "&tl=%s"
+                                    + "&dt=t"
+                                    + "&q=%s",
+                            NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
 
-            final JSONArray result = new JSONArray(NetUtils.get(url).block());
+                    final JSONArray result = new JSONArray(NetUtils.get(url).block());
 
-            if (langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
-                throw new CommandException(String.format("One of the specified language isn't supported. "
-                        + "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
-            }
+                    if (langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
+                        throw new CommandException(String.format("One of the specified language isn't supported. "
+                                + "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
+                    }
 
-            final StringBuilder translatedText = new StringBuilder();
-            final JSONArray translations = result.getJSONArray(0);
-            for (int i = 0; i < translations.length(); i++) {
-                translatedText.append(translations.getJSONArray(i).getString(0));
-            }
+                    final StringBuilder translatedText = new StringBuilder();
+                    final JSONArray translations = result.getJSONArray(0);
+                    for (int i = 0; i < translations.length(); i++) {
+                        translatedText.append(translations.getJSONArray(i).getString(0));
+                    }
 
-            if (translatedText.toString().equalsIgnoreCase(sourceText)) {
-                throw new CommandException(String.format("The text could not been translated."
-                        + "%nCheck that the specified languages are supported and that the text is in the specified language."
-                        + "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
-            }
+                    if (translatedText.toString().equalsIgnoreCase(sourceText)) {
+                        throw new CommandException(String.format("The text could not been translated."
+                                + "%nCheck that the specified languages are supported and that the text is in the specified language."
+                                + "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
+                    }
 
-            return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                    .andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
-                            .setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
-                                    StringUtils.capitalize(this.langIsoMap.inverse().get(langFrom)), sourceText,
-                                    StringUtils.capitalize(this.langIsoMap.inverse().get(langTo)), translatedText.toString()))));
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                            .andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
+                                    .setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
+                                            StringUtils.capitalize(this.langIsoMap.inverse().get(langFrom)), sourceText,
+                                            StringUtils.capitalize(this.langIsoMap.inverse().get(langTo)), translatedText.toString()))));
 
-        })
+                }))
                 .flatMap(UpdatableMessage::send)
                 .then();
     }

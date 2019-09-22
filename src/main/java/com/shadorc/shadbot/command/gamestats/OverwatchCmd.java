@@ -42,7 +42,9 @@ public class OverwatchCmd extends BaseCmd {
         final Mono<Tuple3<Platform, ProfileResponse, StatsResponse>> getResponse =
                 args.size() == 1 ? OverwatchCmd.getResponse(args.get(0)) : OverwatchCmd.getResponse(args.get(0), args.get(1));
 
-        return getResponse
+        return updatableMsg.setContent("Loading Overwatch stats...")
+                .send()
+                .then(getResponse)
                 .map(response -> {
                     final Platform platform = response.getT1();
                     final ProfileResponse profile = response.getT2();

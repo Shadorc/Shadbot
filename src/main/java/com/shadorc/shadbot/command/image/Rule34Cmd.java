@@ -31,7 +31,9 @@ public class Rule34Cmd extends BaseCmd {
         final String arg = context.requireArg();
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return context.isChannelNsfw()
+        return updatableMsg.setContent("Loading rule34 image...")
+                .send()
+                .then(context.isChannelNsfw())
                 .flatMap(isNsfw -> Mono.fromCallable(() -> {
                     if (!isNsfw) {
                         return updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));

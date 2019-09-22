@@ -33,7 +33,9 @@ public class ThisDayCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return NetUtils.get(HOME_URL)
+        return updatableMsg.setContent("Loading events...")
+                .send()
+                .then(NetUtils.get(HOME_URL))
                 .map(Jsoup::parse)
                 .map(doc -> {
                     final String date = doc.getElementsByClass("date-large")

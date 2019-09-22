@@ -44,7 +44,9 @@ public class WikiCmd extends BaseCmd {
                         + "&exsentences=5",
                 NetUtils.encode(arg));
 
-        return NetUtils.get(url, WikipediaResponse.class)
+        return updatableMsg.setContent("Loading Wikipedia...")
+                .send()
+                .then(NetUtils.get(url, WikipediaResponse.class))
                 .map(wikipedia -> {
                     final Map<String, WikipediaPage> pages = wikipedia.getQuery().getPages();
                     final String pageId = pages.keySet().toArray()[0].toString();
