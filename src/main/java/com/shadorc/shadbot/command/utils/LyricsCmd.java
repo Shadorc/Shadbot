@@ -70,7 +70,7 @@ public class LyricsCmd extends BaseCmd {
                 search = info.title.replaceAll("(?i)official|video|music|\\[|]|\\(|\\)", "");
             }
 
-            final String url = LyricsCmd.getCorrectedUrl(search).block();
+            final String url = this.getCorrectedUrl(search).block();
             if (url == null) {
                 return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
                         context.getUsername(), search));
@@ -79,18 +79,15 @@ public class LyricsCmd extends BaseCmd {
             final Document doc = this.getLyricsDocument(context.getClient(), url).block().outputSettings(PRESERVE_FORMAT);
             final Musixmatch musixmatch = new Musixmatch(doc);
 
-            // TODO: remove once fixed
-            final StringBuilder thumbnailUrl = new StringBuilder();
-            try {
-                thumbnailUrl.append(musixmatch.getImageUrl());
-            } catch (NullPointerException err) {
-                LogUtils.error(context.getClient(), "[LyricsCmd] Image URL was null. URL: " + doc.baseUri() + ". HTML: " + doc.html());
+            if (musixmatch.getLyrics().isBlank()) {
+                return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+                        context.getUsername(), search));
             }
 
             return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
                             musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
-                            .setThumbnail(thumbnailUrl.toString())
+                            .setThumbnail(musixmatch.getImageUrl())
                             .setDescription(musixmatch.getLyrics())
                             .setFooter("Click on the title to see the full version",
                                     "https://i.imgur.com/G7q6Hmq.png")));
@@ -121,7 +118,7 @@ public class LyricsCmd extends BaseCmd {
                 });
     }
 
-    private static Mono<String> getCorrectedUrl(String search) {
+    private Mono<String> getCorrectedUrl(String search) {
         final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
         // Make a search request on the site
         return NetUtils.get(url)
