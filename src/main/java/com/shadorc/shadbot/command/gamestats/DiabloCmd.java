@@ -16,6 +16,7 @@ import com.shadorc.shadbot.object.message.LoadingMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 public class DiabloCmd extends BaseCmd {
+
+    private final static String ACCESS_TOKEN_URL = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
+            Credentials.get(Credential.BLIZZARD_CLIENT_ID), Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
 
     private enum Region {
         EU, US, TW, KR;
@@ -53,11 +57,12 @@ public class DiabloCmd extends BaseCmd {
         final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
 
         final String battletag = args.get(1).replaceAll("#", "-");
-        final String url = String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
-                region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken());
 
-        return this.checkAccessToken()
-                .then(NetUtils.get(url, ProfileResponse.class))
+        return this.getAccessToken()
+                .then(Mono.just(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
+                        region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken())))
+                .flatMap(url -> NetUtils.get(url, ProfileResponse.class))
+                .publishOn(Schedulers.elastic())
                 .map(profile -> {
                     if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
                         return loadingMsg.setContent(String.format(
@@ -104,19 +109,17 @@ public class DiabloCmd extends BaseCmd {
                 || TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
     }
 
-    private Mono<TokenResponse> checkAccessToken() {
-        if (!this.isTokenExpired()) {
-            return Mono.empty();
-        }
-
-        return Mono.just(String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-                Credentials.get(Credential.BLIZZARD_CLIENT_ID), Credentials.get(Credential.BLIZZARD_CLIENT_SECRET)))
-                .flatMap(url -> NetUtils.get(url, TokenResponse.class))
+    private Mono<TokenResponse> getAccessToken() {
+        final Mono<TokenResponse> getAccessToken = NetUtils.get(ACCESS_TOKEN_URL, TokenResponse.class)
                 .doOnNext(token -> {
                     this.token = token;
                     this.lastTokenGeneration.set(System.currentTimeMillis());
                     LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
                 });
+
+        return Mono.justOrEmpty(this.token)
+                .filter(token -> !this.isTokenExpired())
+                .switchIfEmpty(getAccessToken);
     }
 
     @Override
