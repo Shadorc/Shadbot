@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
@@ -24,12 +24,12 @@ public class SuicideGirlsCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return Mono.just(loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix())));
+                        return Mono.just(updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix())));
                     }
 
                     return NetUtils.get(HOME_URL)
@@ -41,14 +41,13 @@ public class SuicideGirlsCmd extends BaseCmd {
                                 final String imageUrl = girl.select("noscript").attr("data-retina");
                                 final String url = girl.getElementsByClass("facebook-share").attr("href");
 
-                                return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                                return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                                         .andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
                                                 .setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
                                                 .setImage(imageUrl)));
                             });
                 })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

@@ -10,7 +10,7 @@ import com.shadorc.shadbot.data.credential.Credentials;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -45,7 +45,7 @@ public class FortniteCmd extends BaseCmd {
 
         final String epicNickname = args.get(1);
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         final String encodedNickname = epicNickname.replace(" ", "%20");
         final String url = String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
@@ -70,7 +70,7 @@ public class FortniteCmd extends BaseCmd {
                             + String.format(format, "K/D lifetime", stats.getSoloStats().getRatio(), stats.getDuoStats().getRatio(), stats.getSquadStats().getRatio())
                             + "```";
 
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Fortnite Stats",
                                     String.format("https://fortnitetracker.com/profile/%s/%s",
                                             platform.toString().toLowerCase(), encodedNickname),
@@ -79,12 +79,11 @@ public class FortniteCmd extends BaseCmd {
                                     .setDescription(description)));
                 })
                 .onErrorResume(err -> err.getMessage().contains("HTTP Error 400. The request URL is invalid."),
-                        err -> Mono.just(loadingMsg.setContent(
+                        err -> Mono.just(updatableMsg.setContent(
                                 String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Fortnite on this platform or doesn't exist." +
                                                 " Please make sure your spelling is correct, or follow this guide if you play on Console: <https://fortnitetracker.com/profile/search>",
                                         context.getUsername()))))
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

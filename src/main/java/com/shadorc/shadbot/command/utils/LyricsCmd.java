@@ -12,7 +12,7 @@ import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -47,7 +47,7 @@ public class LyricsCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         final String search = this.getSearch(context);
 
         return this.getCorrectedUrl(search)
@@ -62,7 +62,7 @@ public class LyricsCmd extends BaseCmd {
                         return Mono.empty();
                     }
 
-                    return Mono.just(loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return Mono.just(updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
                                     musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
                                     .setThumbnail(musixmatch.getImageUrl())
@@ -70,10 +70,9 @@ public class LyricsCmd extends BaseCmd {
                                     .setFooter("Click on the title to see the full version",
                                             "https://i.imgur.com/G7q6Hmq.png"))));
                 })
-                .switchIfEmpty(Mono.defer(() -> Mono.just(loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
                         context.getUsername(), search)))))
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

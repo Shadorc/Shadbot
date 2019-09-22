@@ -11,7 +11,7 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.Credentials;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
@@ -40,17 +40,17 @@ public class ImageCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return this.getPopularImages(NetUtils.encode(arg))
                 .collectList()
                 .map(images -> {
                     if (images.isEmpty()) {
-                        return loadingMsg.setContent(String.format(
+                        return updatableMsg.setContent(String.format(
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
                                 context.getUsername(), arg));
                     }
                     final Image image = Utils.randValue(images);
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/gT4hHUB.png")
                                     .addField("Title", image.getTitle(), false)
@@ -58,8 +58,7 @@ public class ImageCmd extends BaseCmd {
                                     .addField("Category", image.getCategoryPath(), false)
                                     .setImage(image.getContent().map(Content::getSource).get())));
                 })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

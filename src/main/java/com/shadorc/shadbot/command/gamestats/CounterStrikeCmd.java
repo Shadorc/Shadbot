@@ -13,7 +13,7 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.Credentials;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
@@ -39,7 +39,7 @@ public class CounterStrikeCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return Mono.fromCallable(() -> {
             String identificator = arg;
 
@@ -70,14 +70,14 @@ public class CounterStrikeCmd extends BaseCmd {
             // Search users matching the steamId
             final List<PlayerSummary> players = playerSummary.getResponse().getPlayers();
             if (players.isEmpty()) {
-                return loadingMsg.setContent(
+                return updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.",
                                 context.getUsername()));
             }
 
             final PlayerSummary player = players.get(0);
             if (player.getCommunityVisibilityState() != 3) {
-                return loadingMsg.setContent(
+                return updatableMsg.setContent(
                         String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private, more info here: <%s>",
                                 context.getUsername(), PRIVACY_HELP_URL));
             }
@@ -87,7 +87,7 @@ public class CounterStrikeCmd extends BaseCmd {
 
             final String body = NetUtils.get(userStatsUrl).block();
             if (body.contains("500 Internal Server Error")) {
-                return loadingMsg.setContent(
+                return updatableMsg.setContent(
                         String.format(Emoji.ACCESS_DENIED + " (**%s**) The game details of this profile are not public, more info here: <%s>",
                                 context.getUsername(), PRIVACY_HELP_URL));
             }
@@ -95,7 +95,7 @@ public class CounterStrikeCmd extends BaseCmd {
             final UserStatsForGameResponse userStats = NetUtils.get(userStatsUrl, UserStatsForGameResponse.class).block();
 
             if (userStats.getPlayerStats().flatMap(PlayerStats::getStats).isEmpty()) {
-                return loadingMsg.setContent(
+                return updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Counter-Strike: Global Offensive.",
                                 context.getUsername()));
             }
@@ -105,7 +105,7 @@ public class CounterStrikeCmd extends BaseCmd {
             final Map<String, Integer> statsMap = new HashMap<>();
             stats.forEach(stat -> statsMap.put(stat.getName(), stat.getValue()));
 
-            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+            return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor("Counter-Strike: Global Offensive Stats",
                             "http://steamcommunity.com/profiles/" + steamId,
                             context.getAvatarUrl())
@@ -117,8 +117,7 @@ public class CounterStrikeCmd extends BaseCmd {
                             .addField("Total MVP", statsMap.get("total_mvps").toString(), true)
                             .addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), false)));
         })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

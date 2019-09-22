@@ -8,7 +8,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.json.XML;
@@ -29,12 +29,12 @@ public class Rule34Cmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> Mono.fromCallable(() -> {
                     if (!isNsfw) {
-                        return loadingMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
+                        return updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
                     }
 
                     final String url = String.format("https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=%s",
@@ -42,7 +42,7 @@ public class Rule34Cmd extends BaseCmd {
 
                     final R34Response r34 = Utils.MAPPER.readValue(XML.toJSONObject(NetUtils.get(url).block()).toString(), R34Response.class);
                     if (!r34.getPosts().map(R34Posts::getCount).map(count -> count != 0).orElse(false)) {
-                        return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
+                        return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
                                 context.getUsername(), arg));
                     }
 
@@ -50,7 +50,7 @@ public class Rule34Cmd extends BaseCmd {
 
                     final List<String> tags = StringUtils.split(post.getTags(), " ");
                     if (post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
-                        return loadingMsg.setContent(
+                        return updatableMsg.setContent(
                                 String.format(Emoji.WARNING + " (**%s**) I don't display images containing children or tagged with `loli` or `shota`.",
                                         context.getUsername()));
                     }
@@ -58,7 +58,7 @@ public class Rule34Cmd extends BaseCmd {
                     final String formattedtags = org.apache.commons.lang3.StringUtils.truncate(
                             FormatUtils.format(tags, tag -> String.format("`%s`", tag), " "), MAX_TAGS_LENGTH);
 
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> {
                                 embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
                                         .setThumbnail("https://i.imgur.com/t6JJWFN.png")
@@ -72,8 +72,7 @@ public class Rule34Cmd extends BaseCmd {
                                 }
                             }));
                 }))
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

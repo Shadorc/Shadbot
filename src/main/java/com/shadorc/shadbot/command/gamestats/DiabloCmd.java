@@ -12,7 +12,7 @@ import com.shadorc.shadbot.data.credential.Credentials;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -54,7 +54,7 @@ public class DiabloCmd extends BaseCmd {
                 new CommandException(String.format("`%s` is not a valid Region. %s",
                         args.get(0), FormatUtils.options(Region.class))));
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         final String battletag = args.get(1).replaceAll("#", "-");
 
@@ -66,7 +66,7 @@ public class DiabloCmd extends BaseCmd {
                 .publishOn(Schedulers.elastic())
                 .map(profile -> {
                     if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
-                        return loadingMsg.setContent(String.format(
+                        return updatableMsg.setContent(String.format(
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
                                 context.getUsername()));
                     }
@@ -86,7 +86,7 @@ public class DiabloCmd extends BaseCmd {
                     heroResponses.sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()));
                     Collections.reverse(heroResponses);
 
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/QUS9QkX.png")
                                     .setDescription(String.format("Stats for **%s** (Guild: **%s**)"
@@ -100,8 +100,7 @@ public class DiabloCmd extends BaseCmd {
                                     .addField("Damage", FormatUtils.format(heroResponses,
                                             hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true)));
                 })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

@@ -8,7 +8,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.StringUtils;
@@ -68,7 +68,7 @@ public class TranslateCmd extends BaseCmd {
             return Mono.error(new CommandException("The destination language must be different from the source one."));
         }
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         return Mono.fromCallable(() -> {
             final String url = String.format("https://translate.googleapis.com/translate_a/single?"
@@ -100,15 +100,14 @@ public class TranslateCmd extends BaseCmd {
                         + "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
             }
 
-            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+            return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
                             .setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
                                     StringUtils.capitalize(this.langIsoMap.inverse().get(langFrom)), sourceText,
                                     StringUtils.capitalize(this.langIsoMap.inverse().get(langTo)), translatedText.toString()))));
 
         })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

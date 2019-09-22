@@ -7,7 +7,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.object.Embed;
@@ -30,7 +30,7 @@ public class WikiCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         // Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
         final String url = String.format("https://en.wikipedia.org/w/api.php?"
@@ -51,26 +51,25 @@ public class WikiCmd extends BaseCmd {
                     final WikipediaPage page = pages.get(pageId);
 
                     if ("-1".equals(pageId) || page.getExtract() == null) {
-                        return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
+                        return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
                                 context.getUsername(), arg));
                     }
 
                     if (page.getExtract().endsWith("may refer to:")) {
-                        return loadingMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
+                        return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
                                 + "try with a more precise search.", context.getUsername()));
                     }
 
                     final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
 
-                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
                                     String.format("https://en.wikipedia.org/wiki/%s", page.getTitle().replace(" ", "_")),
                                     context.getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
                                     .setDescription(extract)));
                 })
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

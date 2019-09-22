@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.object.message.LoadingMessage;
+import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -29,7 +29,7 @@ public class JokeCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return NetUtils.get(HOME_URL)
                 .map(Jsoup::parse)
                 // Get all elements representing a joke
@@ -44,11 +44,10 @@ public class JokeCmd extends BaseCmd {
                 .map(joke -> joke.split("<br>"))
                 // Remove HTML codes in joke string
                 .map(lines -> FormatUtils.format(lines, line -> Jsoup.parse(line).text().trim(), "\n"))
-                .map(joke -> loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                .map(joke -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Blague", HOME_URL, context.getAvatarUrl())
                                 .setDescription(joke))))
-                .flatMap(LoadingMessage::send)
-                .doOnTerminate(loadingMsg::stopTyping)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 
