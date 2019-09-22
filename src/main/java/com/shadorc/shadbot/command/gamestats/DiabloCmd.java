@@ -16,6 +16,7 @@ import com.shadorc.shadbot.object.message.LoadingMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 public class DiabloCmd extends BaseCmd {
+
+    private final static String ACCESS_TOKEN_URL = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
+            Credentials.get(Credential.BLIZZARD_CLIENT_ID), Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
 
     private enum Region {
         EU, US, TW, KR;
@@ -50,54 +54,52 @@ public class DiabloCmd extends BaseCmd {
                 new CommandException(String.format("`%s` is not a valid Region. %s",
                         args.get(0), FormatUtils.options(Region.class))));
 
+        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
+
         final String battletag = args.get(1).replaceAll("#", "-");
 
-        final LoadingMessage loadingMsg = new LoadingMessage(context.getClient(), context.getChannelId());
-        return Mono.fromCallable(() -> {
-            if (this.isTokenExpired()) {
-                this.generateAccessToken();
-            }
+        return this.getAccessToken()
+                .then(Mono.just(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
+                        region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken())))
+                .flatMap(url -> NetUtils.get(url, ProfileResponse.class))
+                // TODO: Remove once every block operations are removed
+                .publishOn(Schedulers.elastic())
+                .map(profile -> {
+                    if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
+                        return loadingMsg.setContent(String.format(
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
+                                context.getUsername()));
+                    }
 
-            final String url = String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
-                    region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken());
+                    final List<HeroResponse> heroResponses = new ArrayList<>();
+                    for (final HeroId heroId : profile.getHeroIds()) {
+                        final String heroUrl = String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
+                                region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken());
 
-            final ProfileResponse profile = NetUtils.get(url, ProfileResponse.class).block();
+                        final HeroResponse hero = NetUtils.get(heroUrl, HeroResponse.class).block();
+                        if (hero.getCode().isEmpty()) {
+                            heroResponses.add(hero);
+                        }
+                    }
 
-            if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
-                return loadingMsg.setContent(String.format(
-                        Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
-                        context.getUsername()));
-            }
+                    // Sort heroes by ascending damage
+                    heroResponses.sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()));
+                    Collections.reverse(heroResponses);
 
-            final List<HeroResponse> heroResponses = new ArrayList<>();
-            for (final HeroId heroId : profile.getHeroIds()) {
-                final String heroUrl = String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
-                        region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken());
-
-                final HeroResponse hero = NetUtils.get(heroUrl, HeroResponse.class).block();
-                if (hero.getCode().isEmpty()) {
-                    heroResponses.add(hero);
-                }
-            }
-
-            // Sort heroes by ascending damage
-            heroResponses.sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()));
-            Collections.reverse(heroResponses);
-
-            return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                    .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
-                            .setThumbnail("https://i.imgur.com/QUS9QkX.png")
-                            .setDescription(String.format("Stats for **%s** (Guild: **%s**)"
-                                            + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
-                                            + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
-                                    profile.getBattleTag(), profile.getGuildName(),
-                                    profile.getParagonLevel(), profile.getParagonLevelHardcore(),
-                                    profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
-                            .addField("Heroes", FormatUtils.format(heroResponses,
-                                    hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
-                            .addField("Damage", FormatUtils.format(heroResponses,
-                                    hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true)));
-        })
+                    return loadingMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                            .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
+                                    .setThumbnail("https://i.imgur.com/QUS9QkX.png")
+                                    .setDescription(String.format("Stats for **%s** (Guild: **%s**)"
+                                                    + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
+                                                    + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
+                                            profile.getBattleTag(), profile.getGuildName(),
+                                            profile.getParagonLevel(), profile.getParagonLevelHardcore(),
+                                            profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
+                                    .addField("Heroes", FormatUtils.format(heroResponses,
+                                            hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
+                                    .addField("Damage", FormatUtils.format(heroResponses,
+                                            hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true)));
+                })
                 .flatMap(LoadingMessage::send)
                 .doOnTerminate(loadingMsg::stopTyping)
                 .then();
@@ -108,13 +110,17 @@ public class DiabloCmd extends BaseCmd {
                 || TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
     }
 
-    private void generateAccessToken() {
-        final String url = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-                Credentials.get(Credential.BLIZZARD_CLIENT_ID),
-                Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
-        this.token = NetUtils.get(url, TokenResponse.class).block();
-        this.lastTokenGeneration.set(System.currentTimeMillis());
-        LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
+    private Mono<TokenResponse> getAccessToken() {
+        final Mono<TokenResponse> getAccessToken = NetUtils.get(ACCESS_TOKEN_URL, TokenResponse.class)
+                .doOnNext(token -> {
+                    this.token = token;
+                    this.lastTokenGeneration.set(System.currentTimeMillis());
+                    LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
+                });
+
+        return Mono.justOrEmpty(this.token)
+                .filter(token -> !this.isTokenExpired())
+                .switchIfEmpty(getAccessToken);
     }
 
     @Override

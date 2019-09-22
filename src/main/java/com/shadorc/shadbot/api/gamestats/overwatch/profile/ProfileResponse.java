@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import reactor.util.annotation.Nullable;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 public class ProfileResponse {
@@ -25,7 +24,7 @@ public class ProfileResponse {
     @JsonProperty("playtime")
     private Map<String, String> playtime;
     @JsonProperty("competitive")
-    private Map<String, String> competitive;
+    private Competitive competitive;
 
     public Optional<String> getMessage() {
         return Optional.ofNullable(this.message);
@@ -51,8 +50,11 @@ public class ProfileResponse {
         return this.games;
     }
 
-    public String getRank() {
-        return Objects.requireNonNullElse(this.competitive.get("rank"), "0");
+    public String formatCompetitive() {
+        return String.format("Damage rank: %d%nSupport rank: %d%nTank rank: %d",
+                this.competitive.getDamage().getRank().orElse(0),
+                this.competitive.getSupport().getRank().orElse(0),
+                this.competitive.getTank().getRank().orElse(0));
     }
 
     public String getQuickplayPlaytime() {

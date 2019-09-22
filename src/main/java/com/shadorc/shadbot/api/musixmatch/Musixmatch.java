@@ -28,9 +28,8 @@ public class Musixmatch {
     }
 
     public String getLyrics() {
-        final String lyrics = StringUtils.abbreviate(
+        return StringUtils.abbreviate(
                 NetUtils.br2nl(this.document.getElementsByClass("mxm-lyrics__content ").html()), MAX_LYRICS_LENGTH);
-        return lyrics.isBlank() ? "Lyrics not available." : lyrics;
     }
 
 }
