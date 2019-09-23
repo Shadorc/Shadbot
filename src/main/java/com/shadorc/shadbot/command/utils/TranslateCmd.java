@@ -69,23 +69,22 @@ public class TranslateCmd extends BaseCmd {
             return Mono.error(new CommandException("The destination language must be different from the source one."));
         }
 
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
+        final String url = String.format("https://translate.googleapis.com/translate_a/single?"
+                        + "client=gtx"
+                        + "&ie=UTF-8"
+                        + "&oe=UTF-8"
+                        + "&sl=%s"
+                        + "&tl=%s"
+                        + "&dt=t"
+                        + "&q=%s",
+                NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
 
+        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading translation...", context.getUsername()))
                 .send()
-                .then(Mono.fromCallable(() -> {
-                    final String url = String.format("https://translate.googleapis.com/translate_a/single?"
-                                    + "client=gtx"
-                                    + "&ie=UTF-8"
-                                    + "&oe=UTF-8"
-                                    + "&sl=%s"
-                                    + "&tl=%s"
-                                    + "&dt=t"
-                                    + "&q=%s",
-                            NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
-
-                    final JSONArray result = new JSONArray(NetUtils.get(url).block());
-
+                .then(NetUtils.get(url))
+                .map(JSONArray::new)
+                .map(result -> {
                     if (langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
                         throw new CommandException(String.format("One of the specified language isn't supported. "
                                 + "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
@@ -109,7 +108,7 @@ public class TranslateCmd extends BaseCmd {
                                             StringUtils.capitalize(this.langIsoMap.inverse().get(langFrom)), sourceText,
                                             StringUtils.capitalize(this.langIsoMap.inverse().get(langTo)), translatedText.toString()))));
 
-                }))
+                })
                 .flatMap(UpdatableMessage::send)
                 .then();
     }
