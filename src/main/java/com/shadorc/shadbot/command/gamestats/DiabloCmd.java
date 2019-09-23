@@ -2,7 +2,6 @@ package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.TokenResponse;
 import com.shadorc.shadbot.api.gamestats.diablo.hero.HeroResponse;
-import com.shadorc.shadbot.api.gamestats.diablo.profile.HeroId;
 import com.shadorc.shadbot.api.gamestats.diablo.profile.ProfileResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
@@ -15,10 +14,9 @@ import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -64,43 +62,37 @@ public class DiabloCmd extends BaseCmd {
                 .then(Mono.just(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
                         region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken())))
                 .flatMap(url -> NetUtils.get(url, ProfileResponse.class))
-                // TODO: Remove once every block operations are removed
-                .publishOn(Schedulers.elastic())
-                .map(profile -> {
+                .flatMap(profile -> {
                     if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
-                        return updatableMsg.setContent(String.format(
+                        return Mono.just(updatableMsg.setContent(String.format(
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
-                                context.getUsername()));
+                                context.getUsername())));
                     }
 
-                    final List<HeroResponse> heroResponses = new ArrayList<>();
-                    for (final HeroId heroId : profile.getHeroIds()) {
-                        final String heroUrl = String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
-                                region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken());
-
-                        final HeroResponse hero = NetUtils.get(heroUrl, HeroResponse.class).block();
-                        if (hero.getCode().isEmpty()) {
-                            heroResponses.add(hero);
-                        }
-                    }
-
-                    // Sort heroes by ascending damage
-                    heroResponses.sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()));
-                    Collections.reverse(heroResponses);
-
-                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
-                                    .setThumbnail("https://i.imgur.com/QUS9QkX.png")
-                                    .setDescription(String.format("Stats for **%s** (Guild: **%s**)"
-                                                    + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
-                                                    + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
-                                            profile.getBattleTag(), profile.getGuildName(),
-                                            profile.getParagonLevel(), profile.getParagonLevelHardcore(),
-                                            profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
-                                    .addField("Heroes", FormatUtils.format(heroResponses,
-                                            hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
-                                    .addField("Damage", FormatUtils.format(heroResponses,
-                                            hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true)));
+                    return Flux.fromIterable(profile.getHeroIds())
+                            .map(heroId -> String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
+                                    region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken()))
+                            .flatMap(heroUrl -> NetUtils.get(heroUrl, HeroResponse.class))
+                            .filter(hero -> hero.getCode().isEmpty())
+                            // Sort heroes by ascending damage
+                            .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
+                            .collectList()
+                            .map(heroResponses -> {
+                                Collections.reverse(heroResponses);
+                                return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                                        .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
+                                                .setThumbnail("https://i.imgur.com/QUS9QkX.png")
+                                                .setDescription(String.format("Stats for **%s** (Guild: **%s**)"
+                                                                + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
+                                                                + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
+                                                        profile.getBattleTag(), profile.getGuildName(),
+                                                        profile.getParagonLevel(), profile.getParagonLevelHardcore(),
+                                                        profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
+                                                .addField("Heroes", FormatUtils.format(heroResponses,
+                                                        hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
+                                                .addField("Damage", FormatUtils.format(heroResponses,
+                                                        hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true)));
+                            });
                 })
                 .flatMap(UpdatableMessage::send)
                 .then();
