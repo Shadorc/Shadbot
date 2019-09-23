@@ -31,10 +31,12 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
     }
 
     @Override
-    public void start() {
-        this.schedule(this.end());
-        this.startTime = System.currentTimeMillis();
-        new DiceInputs(this.getContext().getClient(), this).subscribe();
+    public Mono<Void> start() {
+        return Mono.fromRunnable(() -> {
+            this.schedule(this.end());
+            this.startTime = System.currentTimeMillis();
+            new DiceInputs(this.getContext().getClient(), this).subscribe();
+        });
     }
 
     @Override

@@ -40,10 +40,12 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     }
 
     @Override
-    public void start() {
-        this.schedule(this.end());
-        this.startTime = System.currentTimeMillis();
-        new RouletteInputs(this.getContext().getClient(), this).subscribe();
+    public Mono<Void> start() {
+        return Mono.fromRunnable(() -> {
+            this.schedule(this.end());
+            this.startTime = System.currentTimeMillis();
+            new RouletteInputs(this.getContext().getClient(), this).subscribe();
+        });
     }
 
     @Override

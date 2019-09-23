@@ -48,15 +48,17 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
     }
 
     @Override
-    public void start() {
-        this.dealerHand.deal(this.deck.pick(2));
-        while (this.dealerHand.getValue() < 17) {
-            this.dealerHand.deal(this.deck.pick());
-        }
+    public Mono<Void> start() {
+        return Mono.fromRunnable(() -> {
+            this.dealerHand.deal(this.deck.pick(2));
+            while (this.dealerHand.getValue() < 17) {
+                this.dealerHand.deal(this.deck.pick());
+            }
 
-        this.schedule(this.end());
-        this.startTime = System.currentTimeMillis();
-        new BlackjackInputs(this.getContext().getClient(), this).subscribe();
+            this.schedule(this.end());
+            this.startTime = System.currentTimeMillis();
+            new BlackjackInputs(this.getContext().getClient(), this).subscribe();
+        });
     }
 
     @Override

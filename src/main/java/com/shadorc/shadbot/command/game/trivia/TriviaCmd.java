@@ -63,8 +63,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                     } else {
                         final TriviaGame triviaManager = new TriviaGame(this, context, categoryId);
                         this.getManagers().put(context.getChannelId(), triviaManager);
-                        triviaManager.start();
-                        return triviaManager.show();
+                        return triviaManager.start().then(triviaManager.show());
                     }
                 }));
     }
