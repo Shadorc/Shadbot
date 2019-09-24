@@ -78,23 +78,25 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
     @Override
     public Mono<Void> show() {
-        final String description = String.format("**%s**%n%s",
-                this.trivia.getQuestion(),
-                FormatUtils.numberedList(this.answers.size(), this.answers.size(),
-                        count -> String.format("\t**%d**. %s", count, this.answers.get(count - 1))));
+        return Mono.defer(() -> {
+            final String description = String.format("**%s**%n%s",
+                    this.trivia.getQuestion(),
+                    FormatUtils.numberedList(this.answers.size(), this.answers.size(),
+                            count -> String.format("\t**%d**. %s", count, this.answers.get(count - 1))));
 
-        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
-                        .setDescription(description)
-                        .addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
-                        .addField("Type", String.format("`%s`", this.trivia.getType()), true)
-                        .addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
-                        .setFooter(String.format("You have %d seconds to answer. Use %scancel to force the stop.",
-                                this.getDuration().toSeconds(), this.getContext().getPrefix()), null));
+            final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
+                    .andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
+                            .setDescription(description)
+                            .addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
+                            .addField("Type", String.format("`%s`", this.trivia.getType()), true)
+                            .addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
+                            .setFooter(String.format("You have %d seconds to answer. Use %scancel to force the stop.",
+                                    this.getDuration().toSeconds(), this.getContext().getPrefix()), null));
 
-        return this.getContext().getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-                .then();
+            return this.getContext().getChannel()
+                    .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+                    .then();
+        });
     }
 
     protected Mono<Message> win(Member member) {
