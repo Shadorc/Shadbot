@@ -37,23 +37,26 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                     place, FormatUtils.format(Place.values(), value -> String.format("**%s**", value.toString().toLowerCase()), ", "))));
         }
 
-        final RouletteGame rouletteManager = this.getManagers().computeIfAbsent(context.getChannelId(),
-                channelId -> {
-                    final RouletteGame game = new RouletteGame(this, context);
-                    game.start();
-                    return game;
+        return Mono.defer(() -> {
+            if (this.getManagers().containsKey(context.getChannelId())) {
+                return Mono.just(this.getManagers().get(context.getChannelId()));
+            } else {
+                final RouletteGame game = new RouletteGame(this, context);
+                this.getManagers().put(context.getChannelId(), game);
+                return game.start().thenReturn(game);
+            }
+        })
+                .flatMap(rouletteManager -> {
+                    final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet, place);
+                    if (rouletteManager.addPlayerIfAbsent(player)) {
+                        player.bet();
+                        return rouletteManager.show();
+                    }
+                    return context.getChannel()
+                            .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+                                    context.getUsername()), channel))
+                            .then();
                 });
-
-        final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet, place);
-        if (rouletteManager.addPlayerIfAbsent(player)) {
-            player.bet();
-            return rouletteManager.show();
-        } else {
-            return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-                            context.getUsername()), channel))
-                    .then();
-        }
     }
 
     @Override

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ResolveVanityUrlResponse {
 
     @JsonProperty("response")
-    private SteamId response;
+    private Response response;
 
-    public SteamId getResponse() {
+    public Response getResponse() {
         return this.response;
     }
 
