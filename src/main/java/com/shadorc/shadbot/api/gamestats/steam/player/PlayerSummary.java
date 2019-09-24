@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PlayerSummary {
 
+    @JsonProperty("steamid")
+    private String steamId;
     @JsonProperty("communityvisibilitystate")
     private int communityVisibilityState;
     @JsonProperty("avatarfull")
@@ -11,11 +13,12 @@ public class PlayerSummary {
     @JsonProperty("personaname")
     private String personaName;
 
-    /**
-     * @return 1: Private 2: FriendsOnly 3: Public
-     */
-    public int getCommunityVisibilityState() {
-        return this.communityVisibilityState;
+    public String getSteamId() {
+        return this.steamId;
+    }
+
+    public CommunityVisibilityState getCommunityVisibilityState() {
+        return CommunityVisibilityState.valueOf(this.communityVisibilityState);
     }
 
     public String getAvatarFull() {
@@ -24,6 +27,25 @@ public class PlayerSummary {
 
     public String getPersonaName() {
         return this.personaName;
+    }
+
+    public enum CommunityVisibilityState {
+        PRIVATE,
+        FRIENDS_ONLY,
+        PUBLIC;
+
+        public static CommunityVisibilityState valueOf(int state) {
+            switch (state) {
+                case 1:
+                    return PRIVATE;
+                case 2:
+                    return FRIENDS_ONLY;
+                case 3:
+                    return PUBLIC;
+                default:
+                    throw new AssertionError();
+            }
+        }
     }
 
 }
