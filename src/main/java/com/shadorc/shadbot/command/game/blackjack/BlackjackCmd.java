@@ -24,26 +24,30 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
         final long bet = Utils.requireValidBet(context.getMember(), arg);
 
-        final BlackjackGame blackjackManager = this.getManagers().computeIfAbsent(context.getChannelId(),
-                channelId -> {
-                    final BlackjackGame game = new BlackjackGame(this, context);
-                    game.start();
-                    return game;
-                });
-
-        final BlackjackPlayer player = new BlackjackPlayer(context.getGuildId(), context.getAuthorId(), bet);
-        if (blackjackManager.addPlayerIfAbsent(player)) {
-            player.bet();
-            if (blackjackManager.areAllPlayersStanding()) {
-                return blackjackManager.end();
+        return Mono.defer(() -> {
+            if (this.getManagers().containsKey(context.getChannelId())) {
+                return Mono.just(this.getManagers().get(context.getChannelId()));
+            } else {
+                final BlackjackGame game = new BlackjackGame(this, context);
+                this.getManagers().put(context.getChannelId(), game);
+                return game.start().thenReturn(game);
             }
-            return blackjackManager.show();
-        }
+        })
+                .flatMap(blackjackManager -> {
+                    final BlackjackPlayer player = new BlackjackPlayer(context.getGuildId(), context.getAuthorId(), bet);
+                    if (blackjackManager.addPlayerIfAbsent(player)) {
+                        player.bet();
+                        if (blackjackManager.areAllPlayersStanding()) {
+                            return blackjackManager.end();
+                        }
+                        return blackjackManager.show();
+                    }
 
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-                        context.getUsername()), channel))
-                .then();
+                    return context.getChannel()
+                            .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
+                                    context.getUsername()), channel))
+                            .then();
+                });
     }
 
     @Override

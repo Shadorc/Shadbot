@@ -45,8 +45,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                     final HangmanGame hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
                     if (hangmanManager == null) {
                         final HangmanGame newHangmanManager = this.getManagers().get(context.getChannelId());
-                        newHangmanManager.start();
-                        return newHangmanManager.show();
+                        return newHangmanManager.start().then(newHangmanManager.show());
                     } else {
                         return context.getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."

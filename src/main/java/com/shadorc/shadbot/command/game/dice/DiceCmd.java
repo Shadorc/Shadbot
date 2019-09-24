@@ -95,8 +95,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
             if (diceManager.addPlayerIfAbsent(player)) {
                 player.bet();
             }
-            diceManager.start();
-            return diceManager.show();
+            return diceManager.start().then(diceManager.show());
         }
     }
 

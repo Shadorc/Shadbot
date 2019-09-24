@@ -28,7 +28,7 @@ public abstract class Game {
         this.isScheduled = new AtomicBoolean(false);
     }
 
-    public abstract void start();
+    public abstract Mono<Void> start();
 
     public abstract Mono<Void> end();
 
@@ -44,7 +44,7 @@ public abstract class Game {
      *
      * @param mono - The {@link Mono} to trigger after the game duration has elapsed.
      */
-    public <T> void schedule(Mono<T> mono) {
+    protected <T> void schedule(Mono<T> mono) {
         this.cancelScheduledTask();
         this.isScheduled.set(true);
         this.scheduledTask = Mono.delay(this.duration, Schedulers.elastic())
