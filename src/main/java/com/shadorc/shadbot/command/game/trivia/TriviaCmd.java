@@ -29,8 +29,6 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
     @Override
     public Mono<Void> execute(Context context) {
         return this.getCategories()
-                // TODO: Remove once every block operations are removed
-                .publishOn(Schedulers.elastic())
                 .then(Mono.defer(() -> {
                     final Integer categoryId = NumberUtils.toPositiveIntOrNull(context.getArg().orElse(""));
 
