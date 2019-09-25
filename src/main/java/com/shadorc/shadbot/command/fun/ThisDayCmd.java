@@ -45,11 +45,12 @@ public class ThisDayCmd extends BaseCmd {
 
                     final Elements eventsElmt = doc.getElementsByClass("event-list event-list--with-advert")
                             .first()
-                            .getElementsByClass("event-list__item");
+                            .getElementsByClass("event");
 
                     final String events = eventsElmt.stream()
                             .map(Element::html)
-                            .map(html -> html.replaceAll("<b>|</b>", "**"))
+                            .map(html -> html.replaceFirst("<a href=\"/events/date/[0-9]+\" class=\"date\">", "**"))
+                            .map(html -> html.replaceFirst("</a>", "**"))
                             .map(Jsoup::parse)
                             .map(Document::text)
                             .collect(Collectors.joining("\n\n"));
