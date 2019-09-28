@@ -9,7 +9,6 @@ import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.function.Consumer;
