@@ -1,79 +1,54 @@
 package com.shadorc.shadbot.data.database;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.shadorc.shadbot.data.Data;
+import com.shadorc.shadbot.Shadbot;
+import com.shadorc.shadbot.data.DatabaseTable;
 import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-public class DatabaseManager extends Data {
+public class DatabaseManager extends DatabaseTable {
 
     private static DatabaseManager instance;
 
     static {
         try {
             DatabaseManager.instance = new DatabaseManager();
-        } catch (final IOException err) {
+        } catch (final Exception err) {
             LogUtils.error(err, String.format("An error occurred while initializing %s.", DatabaseManager.class.getSimpleName()));
             System.exit(ExitCode.FATAL_ERROR.getValue());
         }
     }
 
-    private final Map<Snowflake, DBGuild> guildsMap;
+    public DatabaseManager() {
+        super("guild");
+    }
 
-    private DatabaseManager() throws IOException {
-        super("database.json", Duration.ofMinutes(15), Duration.ofMinutes(15));
-
-        this.guildsMap = new ConcurrentHashMap<>();
-        if (this.getFile().exists()) {
-            final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, DBGuild.class);
-            final List<DBGuild> guilds = Utils.MAPPER.readValue(this.getFile(), valueType);
-            for (final DBGuild guild : guilds) {
-                this.guildsMap.put(guild.getId(), guild);
-            }
+    public DBGuild getDBGuild(Snowflake id) {
+        try {
+            // TODO: What if guild is not present ?
+            // TODO: If not present, insert it and return it
+            final String guildJson = this.table.get(id.asLong()).toJson().toString();
+            return Utils.MAPPER.readValue(guildJson, DBGuild.class);
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting DBGuild.");
+            return null;
         }
-    }
-
-    public Collection<DBGuild> getDBGuilds() {
-        return this.guildsMap.values();
-    }
-
-    public DBGuild getDBGuild(Snowflake guildId) {
-        return this.guildsMap.computeIfAbsent(guildId, DBGuild::new);
     }
 
     public DBMember getDBMember(Snowflake guildId, Snowflake memberId) {
-        final Optional<DBMember> dbMemberOpt = this.getDBGuild(guildId)
-                .getMembers()
-                .stream()
-                .filter(member -> member.getId().equals(memberId))
-                .findFirst();
-
-        if (dbMemberOpt.isPresent()) {
-            return dbMemberOpt.get();
+        try {
+            // TODO: What if the member is not present ?
+            // TODO: If not present, insert it and return it
+            final String memberJson = this.table.get(guildId.asLong())
+                    .filter(guild -> guild.hasFields("members"))
+                    .filter(DB.hashMap("id", memberId.asLong()))
+                    .toJson().toString();
+            return Utils.MAPPER.readValue(memberJson, DBMember.class);
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting DBMember.");
+            return null;
         }
-
-        final DBMember dbMember = new DBMember(guildId, memberId);
-        this.getDBGuild(guildId).addMember(dbMember);
-        return dbMember;
-    }
-
-    public void removeDBGuild(Snowflake guildId) {
-        this.guildsMap.remove(guildId);
-    }
-
-    @Override
-    public Object getData() {
-        return this.guildsMap.values();
     }
 
     public static DatabaseManager getInstance() {

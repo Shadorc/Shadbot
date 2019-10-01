@@ -11,7 +11,6 @@ import com.shadorc.shadbot.data.credential.Credentials;
 import com.shadorc.shadbot.data.database.DBGuild;
 import com.shadorc.shadbot.data.database.DBMember;
 import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.database.DatabaseManagerV2;
 import com.shadorc.shadbot.data.lottery.LotteryManager;
 import com.shadorc.shadbot.data.premium.PremiumManager;
 import com.shadorc.shadbot.data.stats.StatsManager;
@@ -107,8 +106,8 @@ public class Shadbot {
     // TODO: Remove once migrated
     private static void createDatabase() {
         LogUtils.info("Creating database...");
-        final RethinkDB db = DatabaseManagerV2.getInstance().getDatabase();
-        final Connection conn = DatabaseManagerV2.getInstance().getConnection();
+        final RethinkDB db = DatabaseManager.getInstance().getDatabase();
+        final Connection conn = DatabaseManager.getInstance().getConnection();
         db.dbCreate("shadbot").run(conn);
         db.db("shadbot").tableCreate("guild").run(conn);
         db.db("shadbot").tableCreate("premium").run(conn);
@@ -118,8 +117,8 @@ public class Shadbot {
 
     private static void migrateGuild() {
         try {
-            final RethinkDB db = DatabaseManagerV2.getInstance().getDatabase();
-            final Connection conn = DatabaseManagerV2.getInstance().getConnection();
+            final RethinkDB db = DatabaseManager.getInstance().getDatabase();
+            final Connection conn = DatabaseManager.getInstance().getConnection();
 
             LogUtils.info("Connected to %s:%d", conn.hostname, conn.port);
 
@@ -211,7 +210,6 @@ public class Shadbot {
     }
 
     private static void save() {
-        DatabaseManager.getInstance().save();
         PremiumManager.getInstance().save();
         LotteryManager.getInstance().save();
         StatsManager.getInstance().save();
@@ -221,6 +219,8 @@ public class Shadbot {
         if (Shadbot.botListStats != null) {
             Shadbot.botListStats.stop();
         }
+
+        DatabaseManager.getInstance().stop();
 
         return Flux.fromIterable(Shadbot.SHARDS.values())
                 .map(Shard::getClient)
