@@ -75,13 +75,13 @@ public class Shadbot {
                     final int shardIndex = client.getConfig().getShardIndex();
                     Shadbot.SHARDS.put(shardIndex, new Shard(client));
 
-                    // Store owner's ID
+                    // Store bot owner ID
                     if (shardIndex == 0) {
                         client.getApplicationInfo()
                                 .map(ApplicationInfo::getOwnerId)
                                 .map(Snowflake::asLong)
-                                .doOnNext(Shadbot.OWNER_ID::set)
-                                .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+                                .doOnNext(ownerId -> LogUtils.info("Bot owner ID: %d", ownerId))
+                                .subscribe(Shadbot.OWNER_ID::set, err -> ExceptionHandler.handleUnknownError(client, err));
                     }
                 })
                 .flatMap(DiscordClient::login)
