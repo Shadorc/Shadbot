@@ -20,9 +20,6 @@ import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
-import discord4j.core.event.domain.lifecycle.GatewayLifecycleEvent;
-import discord4j.core.event.domain.lifecycle.ReadyEvent;
-import discord4j.core.event.domain.lifecycle.ResumeEvent;
 import discord4j.core.object.data.stored.MessageBean;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.presence.Activity;
@@ -53,8 +50,8 @@ import java.util.stream.Collectors;
 public class Shadbot {
 
     private static final Instant LAUNCH_TIME = Instant.now();
-    private static final AtomicLong OWNER_ID = new AtomicLong();
-    private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger();
+    private static final AtomicLong OWNER_ID = new AtomicLong(0L);
+    private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
     private static final Map<Integer, Shard> SHARDS = new ConcurrentHashMap<>();
     private static final RethinkDB DB = RethinkDB.r;
 
@@ -73,7 +70,7 @@ public class Shadbot {
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 
         LogUtils.info("Connecting...");
-        final Flux<DiscordClient> clients = new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
+        new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
                 .setRouterOptions(RouterOptions.builder()
                         .onClientResponse(ResponseFunction.emptyIfNotFound())
                         .build())
@@ -85,21 +82,20 @@ public class Shadbot {
                 .map(builder -> builder
                         .setInitialPresence(Presence.idle(Activity.playing("Connecting..."))))
                 .map(DiscordClientBuilder::build)
-                .doOnNext(client -> Shadbot.SHARDS.put(client.getConfig().getShardIndex(), new Shard(client)));
+                .doOnNext(client -> {
+                    final int shardIndex = client.getConfig().getShardIndex();
+                    Shadbot.SHARDS.put(shardIndex, new Shard(client));
 
-        // Get the bot owner ID
-        clients.next()
-                .flatMapMany(client -> Flux.first(client.getEventDispatcher().on(ReadyEvent.class),
-                        client.getEventDispatcher().on(ResumeEvent.class)))
-                .next()
-                .map(GatewayLifecycleEvent::getClient)
-                .flatMap(DiscordClient::getApplicationInfo)
-                .map(ApplicationInfo::getOwnerId)
-                .map(Snowflake::asLong)
-                .doOnNext(ownerId -> LogUtils.info("Bot owner ID: %d", ownerId))
-                .subscribe(OWNER_ID::set);
-
-        clients.flatMap(DiscordClient::login)
+                    // Store bot owner ID
+                    if (shardIndex == 0) {
+                        client.getApplicationInfo()
+                                .map(ApplicationInfo::getOwnerId)
+                                .map(Snowflake::asLong)
+                                .doOnNext(ownerId -> LogUtils.info("Bot owner ID: %d", ownerId))
+                                .subscribe(Shadbot.OWNER_ID::set, err -> ExceptionHandler.handleUnknownError(client, err));
+                    }
+                })
+                .flatMap(DiscordClient::login)
                 .blockLast();
     }
 
