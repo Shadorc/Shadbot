@@ -29,7 +29,7 @@ public class BotListStats {
     public BotListStats(DiscordClient client) {
         this.client = client;
         this.httpClient = HttpClient.create();
-        this.selfId = this.client.getSelfId().get().asLong();
+        this.selfId = this.client.getSelfId().orElseThrow().asLong();
         this.task = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), Schedulers.elastic())
                 .flatMap(ignored -> this.postStats())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
