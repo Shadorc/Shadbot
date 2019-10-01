@@ -23,7 +23,7 @@ public class DBGuild {
     @JsonProperty("members")
     private final CopyOnWriteArrayList<DBMember> members;
     @JsonProperty("settings")
-    private final ConcurrentHashMap<String, Object> settings;
+    public final ConcurrentHashMap<String, Object> settings;
 
     public DBGuild(Snowflake id) {
         this.guildId = id.asLong();
