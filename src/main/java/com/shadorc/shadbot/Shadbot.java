@@ -11,6 +11,7 @@ import com.shadorc.shadbot.data.credential.Credentials;
 import com.shadorc.shadbot.data.database.DBGuild;
 import com.shadorc.shadbot.data.database.DBMember;
 import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.data.database.DatabaseManagerV2;
 import com.shadorc.shadbot.data.lottery.LotteryManager;
 import com.shadorc.shadbot.data.premium.PremiumManager;
 import com.shadorc.shadbot.data.stats.StatsManager;
@@ -53,11 +54,15 @@ public class Shadbot {
     private static final AtomicLong OWNER_ID = new AtomicLong(0L);
     private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
     private static final Map<Integer, Shard> SHARDS = new ConcurrentHashMap<>();
-    private static final RethinkDB DB = RethinkDB.r;
 
     private static BotListStats botListStats;
 
     public static void main(String[] args) {
+        createDatabase();
+        migrateGuild();
+        migratePremium();
+        migrateLottery();
+
         // Set default to Locale US
         Locale.setDefault(Locale.US);
 
@@ -100,8 +105,22 @@ public class Shadbot {
     }
 
     // TODO: Remove once migrated
+    private static void createDatabase() {
+        LogUtils.info("Creating database...");
+        final RethinkDB db = DatabaseManagerV2.getInstance().getDatabase();
+        final Connection conn = DatabaseManagerV2.getInstance().getConnection();
+        db.dbCreate("shadbot").run(conn);
+        db.db("shadbot").tableCreate("guild").run(conn);
+        db.db("shadbot").tableCreate("premium").run(conn);
+        db.db("shadbot").tableCreate("lottery").run(conn);
+        LogUtils.info("Database created.");
+    }
+
     private static void migrateGuild() {
-        try (final Connection conn = DB.connection().hostname("localhost").port(28015).db("shadbot").connect()) {
+        try {
+            final RethinkDB db = DatabaseManagerV2.getInstance().getDatabase();
+            final Connection conn = DatabaseManagerV2.getInstance().getConnection();
+
             LogUtils.info("Connected to %s:%d", conn.hostname, conn.port);
 
             final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, DBGuild.class);
@@ -112,37 +131,45 @@ public class Shadbot {
                 }
 
                 LogUtils.info("Migrating guild: %s", guild.getId().asString());
-                DB.table("guild").insert(DB.hashMap("id", guild.getId().asLong())).run(conn);
+                db.table("guild").insert(db.hashMap("id", guild.getId().asLong())).run(conn);
 
                 final List<DBMember> membersFiltered = guild.getMembers().stream()
                         .filter(dbMember -> dbMember.getCoins() > 0)
                         .collect(Collectors.toList());
                 if (!membersFiltered.isEmpty()) {
-                    final List<MapObject> members = DB.array();
+                    final List<MapObject> members = db.array();
                     for (final DBMember member : membersFiltered) {
-                        members.add(DB.hashMap("id", member.getId().asLong())
+                        members.add(db.hashMap("id", member.getId().asLong())
                                 .with("coins", member.getCoins()));
                     }
-                    DB.table("guild").get(guild.getId().asLong()).update(
-                            DB.hashMap("members", members))
+                    db.table("guild").get(guild.getId().asLong()).update(
+                            db.hashMap("members", members))
                             .run(conn);
                 }
 
                 if (!guild.settings.isEmpty()) {
-                    MapObject settings = DB.hashMap();
+                    MapObject settings = db.hashMap();
                     for (final Map.Entry<String, Object> setting : guild.settings.entrySet()) {
                         settings = settings.with(setting.getKey(), setting.getValue());
                     }
-                    DB.table("guild").get(guild.getId().asLong()).update(
-                            DB.hashMap("settings", settings))
+                    db.table("guild").get(guild.getId().asLong()).update(
+                            db.hashMap("settings", settings))
                             .run(conn);
                 }
             }
 
+            LogUtils.info("Guild migration done.");
         } catch (final Exception err) {
             LogUtils.error(err, "An error occurred while migrating guilds.");
         }
-        LogUtils.info("Guild migration done.");
+    }
+
+    private static void migratePremium() {
+
+    }
+
+    private static void migrateLottery() {
+
     }
 
     /**
