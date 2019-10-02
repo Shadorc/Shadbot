@@ -21,7 +21,7 @@ public class DBMember {
     public DBMember(Snowflake guildId, Snowflake id) {
         this.guildId = guildId.asLong();
         this.memberId = id.asLong();
-        this.coins = new AtomicInteger(0);
+        this.coins = new AtomicInteger();
     }
 
     public DBMember() {

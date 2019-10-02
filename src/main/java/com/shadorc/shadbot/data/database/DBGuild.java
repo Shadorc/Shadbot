@@ -72,10 +72,9 @@ public class DBGuild {
     /**
      * @return A map containing message's ID as key and role's ID as value
      */
-    @SuppressWarnings("unchecked")
     public Map<String, Long> getIamMessages() {
         return (Map<String, Long>) Optional.ofNullable(this.settings.get(Setting.IAM_MESSAGES.toString()))
-                .orElse(new HashMap<>());
+                .orElse(new HashMap<String, Long>());
     }
 
     public Optional<String> getJoinMessage() {

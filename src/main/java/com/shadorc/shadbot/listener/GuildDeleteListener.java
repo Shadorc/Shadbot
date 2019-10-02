@@ -18,7 +18,7 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
         return Mono.fromRunnable(() -> {
             LogUtils.info("{Guild ID: %d} Disconnected.", event.getGuildId().asLong());
             MusicManager.getInstance().removeConnection(event.getGuildId());
-            DatabaseManager.getInstance().removeDBGuild(event.getGuildId());
+            DatabaseManager.getInstance().deleteDBGuild(event.getGuildId());
         });
     }
 

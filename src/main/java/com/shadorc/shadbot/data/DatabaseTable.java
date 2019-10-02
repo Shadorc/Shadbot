@@ -3,15 +3,20 @@ package com.shadorc.shadbot.data;
 import com.rethinkdb.RethinkDB;
 import com.rethinkdb.gen.ast.Table;
 import com.rethinkdb.net.Connection;
+import com.shadorc.shadbot.data.credential.Credential;
+import com.shadorc.shadbot.data.credential.Credentials;
 
 public abstract class DatabaseTable {
 
     private static final String DATABASE_NAME = "shadbot";
-    private static final String HOST = "localhost";
-    private static final int PORT = 28015;
 
     protected static final RethinkDB DB = RethinkDB.r;
-    protected static final Connection CONNECTION = DB.connection().hostname(HOST).port(PORT).db(DATABASE_NAME).connect();
+    protected static final Connection CONNECTION = DB.connection()
+            .hostname(Credentials.get(Credential.DATABASE_HOST))
+            .port(Integer.parseInt(Credentials.get(Credential.DATABASE_PORT)))
+            .user("admin", Credentials.get(Credential.DATABASE_PASSWORD))
+            .db(DATABASE_NAME)
+            .connect();
 
     protected final Table table;
 

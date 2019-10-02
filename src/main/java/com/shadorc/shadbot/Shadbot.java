@@ -50,17 +50,19 @@ import java.util.stream.Collectors;
 public class Shadbot {
 
     private static final Instant LAUNCH_TIME = Instant.now();
-    private static final AtomicLong OWNER_ID = new AtomicLong(0L);
-    private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger(0);
+    private static final AtomicLong OWNER_ID = new AtomicLong();
+    private static final AtomicInteger CONNECTED_SHARDS = new AtomicInteger();
     private static final Map<Integer, Shard> SHARDS = new ConcurrentHashMap<>();
 
     private static BotListStats botListStats;
 
     public static void main(String[] args) {
+        /*
         createDatabase();
         migrateGuild();
         migratePremium();
         migrateLottery();
+         */
 
         // Set default to Locale US
         Locale.setDefault(Locale.US);
