@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.data.premium;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.shadorc.shadbot.data.Data;
+import com.shadorc.shadbot.data.DatabaseTable;
 import com.shadorc.shadbot.data.premium.Relic.RelicType;
 import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.LogUtils;
@@ -9,8 +9,6 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,14 +16,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class PremiumManager extends Data {
+public class PremiumManager extends DatabaseTable {
 
     private static PremiumManager instance;
 
     static {
         try {
             PremiumManager.instance = new PremiumManager();
-        } catch (final IOException err) {
+        } catch (final Exception err) {
             LogUtils.error(err, String.format("An error occurred while initializing %s.", PremiumManager.class.getSimpleName()));
             System.exit(ExitCode.FATAL_ERROR.getValue());
         }
@@ -34,12 +32,14 @@ public class PremiumManager extends Data {
     private final List<Relic> relics;
 
     private PremiumManager() throws IOException {
-        super("premium_data.json", Duration.ofHours(1), Duration.ofHours(1));
+        super("premium");
 
         this.relics = new CopyOnWriteArrayList<>();
-        if (this.getFile().exists()) {
+
+        final String premiumJson = this.table.toJson().run(this.getConnection());
+        if (premiumJson != null) {
             final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Relic.class);
-            this.relics.addAll(Utils.MAPPER.readValue(this.getFile(), valueType));
+            this.relics.addAll(Utils.MAPPER.readValue(premiumJson, valueType));
         }
     }
 
@@ -70,11 +70,6 @@ public class PremiumManager extends Data {
     public boolean isUserPremium(Snowflake userId) {
         return this.getRelicsForUser(userId).stream()
                 .anyMatch(relic -> relic.getType().equals(RelicType.USER.toString()) && !relic.isExpired());
-    }
-
-    @Override
-    public Object getData() {
-        return Collections.unmodifiableList(this.relics);
     }
 
     public static PremiumManager getInstance() {

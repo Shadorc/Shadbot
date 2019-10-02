@@ -36,7 +36,7 @@ public class Player {
 
     public void lose(long coins) {
         this.getDBMember().addCoins(-coins);
-        LotteryManager.getInstance().getLottery().addToJackpot(coins);
+        LotteryManager.getInstance().addToJackpot(coins);
     }
 
 }

@@ -212,8 +212,6 @@ public class Shadbot {
     }
 
     private static void save() {
-        PremiumManager.getInstance().save();
-        LotteryManager.getInstance().save();
         StatsManager.getInstance().save();
     }
 
@@ -223,6 +221,8 @@ public class Shadbot {
         }
 
         DatabaseManager.getInstance().stop();
+        PremiumManager.getInstance().stop();
+        LotteryManager.getInstance().stop();
 
         return Flux.fromIterable(Shadbot.SHARDS.values())
                 .map(Shard::getClient)
