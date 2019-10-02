@@ -37,6 +37,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
+import java.net.ConnectException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
@@ -58,12 +59,17 @@ public class Shadbot {
     private static BotListStats botListStats;
 
     public static void main(String[] args) {
+        LogUtils.info("Starting Shadbot V%s", Config.VERSION);
+
         /*
         createDatabase();
         migrateGuild();
         migratePremium();
         migrateLottery();
          */
+
+        LogUtils.info("Connecting to database...");
+        Shadbot.connectToDatabase();
 
         // Set default to Locale US
         Locale.setDefault(Locale.US);
@@ -74,7 +80,7 @@ public class Shadbot {
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
 
-        LogUtils.info("Connecting...");
+        LogUtils.info("Connecting to Discord...");
         new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))
                 .setRouterOptions(RouterOptions.builder()
                         .onClientResponse(ResponseFunction.emptyIfNotFound())
@@ -208,6 +214,21 @@ public class Shadbot {
 
     public static DiscordClient getClient() {
         return Shadbot.SHARDS.values().stream().findAny().orElseThrow().getClient();
+    }
+
+    private static void connectToDatabase() {
+        try {
+            GuildManager.getInstance().connect();
+            PremiumManager.getInstance().connect();
+            LotteryManager.getInstance().connect();
+        } catch (final Exception err) {
+            if (err.getCause() != null && err.getCause() instanceof ConnectException) {
+                LogUtils.error("Database not connected. Exiting.");
+            } else {
+                LogUtils.error(err, "An error occurred while connecting to database. Exiting.");
+            }
+            Shadbot.quit(ExitCode.FATAL_ERROR).block();
+        }
     }
 
     public static Mono<Void> quit(ExitCode exitCode) {

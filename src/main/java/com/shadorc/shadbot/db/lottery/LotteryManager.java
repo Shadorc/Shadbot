@@ -5,7 +5,6 @@ import com.rethinkdb.net.Cursor;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseTable;
-import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
@@ -20,12 +19,7 @@ public class LotteryManager extends DatabaseTable {
     private static LotteryManager instance;
 
     static {
-        try {
-            LotteryManager.instance = new LotteryManager();
-        } catch (final Exception err) {
-            LogUtils.error(err, String.format("An error occurred while initializing %s.", LotteryManager.class.getSimpleName()));
-            System.exit(ExitCode.FATAL_ERROR.getValue());
-        }
+        LotteryManager.instance = new LotteryManager();
     }
 
     private LotteryManager() {

@@ -4,7 +4,6 @@ import com.rethinkdb.gen.ast.ReqlExpr;
 import com.rethinkdb.net.Cursor;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.db.DatabaseTable;
-import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
@@ -14,12 +13,7 @@ public class GuildManager extends DatabaseTable {
     private static GuildManager instance;
 
     static {
-        try {
-            GuildManager.instance = new GuildManager();
-        } catch (final Exception err) {
-            LogUtils.error(err, String.format("An error occurred while initializing %s.", GuildManager.class.getSimpleName()));
-            System.exit(ExitCode.FATAL_ERROR.getValue());
-        }
+        GuildManager.instance = new GuildManager();
     }
 
     public GuildManager() {

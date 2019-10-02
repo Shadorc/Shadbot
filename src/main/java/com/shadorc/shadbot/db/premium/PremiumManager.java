@@ -1,14 +1,9 @@
 package com.shadorc.shadbot.db.premium;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.shadorc.shadbot.db.DatabaseTable;
 import com.shadorc.shadbot.db.premium.Relic.RelicType;
-import com.shadorc.shadbot.utils.ExitCode;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,26 +16,23 @@ public class PremiumManager extends DatabaseTable {
     private static PremiumManager instance;
 
     static {
-        try {
-            PremiumManager.instance = new PremiumManager();
-        } catch (final Exception err) {
-            LogUtils.error(err, String.format("An error occurred while initializing %s.", PremiumManager.class.getSimpleName()));
-            System.exit(ExitCode.FATAL_ERROR.getValue());
-        }
+        PremiumManager.instance = new PremiumManager();
     }
 
     private final List<Relic> relics;
 
-    private PremiumManager() throws IOException {
+    private PremiumManager() {
         super("premium");
 
         this.relics = new CopyOnWriteArrayList<>();
 
+        /* TODO
         final String premiumJson = this.getTable().toJson().run(this.getConnection());
         if (premiumJson != null) {
             final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Relic.class);
             this.relics.addAll(Utils.MAPPER.readValue(premiumJson, valueType));
         }
+         */
     }
 
     public Relic generateRelic(RelicType type) {
