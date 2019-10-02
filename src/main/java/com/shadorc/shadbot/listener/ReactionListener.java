@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.command.admin.IamCmd;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.database.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.TemporaryMessage;
 import com.shadorc.shadbot.utils.StringUtils;

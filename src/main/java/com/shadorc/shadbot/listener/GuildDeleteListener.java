@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.database.DatabaseManager;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;

@@ -1,9 +1,9 @@
-package com.shadorc.shadbot.data.database;
+package com.shadorc.shadbot.db.database;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.shadorc.shadbot.Config;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.object.util.Snowflake;
 

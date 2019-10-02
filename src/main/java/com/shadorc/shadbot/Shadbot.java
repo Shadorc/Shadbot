@@ -4,16 +4,17 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.rethinkdb.RethinkDB;
 import com.rethinkdb.model.MapObject;
 import com.rethinkdb.net.Connection;
+import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.LotteryCmd;
 import com.shadorc.shadbot.core.shard.Shard;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.Credentials;
-import com.shadorc.shadbot.data.database.DBGuild;
-import com.shadorc.shadbot.data.database.DBMember;
-import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.lottery.LotteryManager;
-import com.shadorc.shadbot.data.premium.PremiumManager;
-import com.shadorc.shadbot.data.stats.StatsManager;
+import com.shadorc.shadbot.db.database.DBGuild;
+import com.shadorc.shadbot.db.database.DBMember;
+import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.lottery.LotteryManager;
+import com.shadorc.shadbot.db.premium.PremiumManager;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.LogUtils;
@@ -66,8 +67,6 @@ public class Shadbot {
 
         // Set default to Locale US
         Locale.setDefault(Locale.US);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(Shadbot::save));
 
         LogUtils.info("Next lottery draw in: %s", LotteryCmd.getDelay().toString());
         Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.elastic())
@@ -209,10 +208,6 @@ public class Shadbot {
 
     public static DiscordClient getClient() {
         return Shadbot.SHARDS.values().stream().findAny().orElseThrow().getClient();
-    }
-
-    private static void save() {
-        StatsManager.getInstance().save();
     }
 
     public static Mono<Void> quit(ExitCode exitCode) {

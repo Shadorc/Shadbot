@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.core.game.player;
 
-import com.shadorc.shadbot.data.database.DBMember;
-import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.lottery.LotteryManager;
+import com.shadorc.shadbot.db.database.DBMember;
+import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.lottery.LotteryManager;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;

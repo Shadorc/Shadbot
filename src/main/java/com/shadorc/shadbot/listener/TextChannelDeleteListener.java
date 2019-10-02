@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.data.database.DBGuild;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.database.DBGuild;
+import com.shadorc.shadbot.db.database.DatabaseManager;
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import reactor.core.publisher.Mono;
 

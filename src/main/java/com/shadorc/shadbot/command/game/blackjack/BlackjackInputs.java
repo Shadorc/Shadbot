@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.game.blackjack;
 
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.database.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.Inputs;
 import com.shadorc.shadbot.utils.DiscordUtils;

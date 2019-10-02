@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.owner;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.Shadbot;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Inputs;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;

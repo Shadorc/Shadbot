@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.data.premium;
+package com.shadorc.shadbot.db.premium;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;

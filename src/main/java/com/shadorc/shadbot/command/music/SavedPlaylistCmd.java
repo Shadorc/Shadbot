@@ -1,13 +1,13 @@
 package com.shadorc.shadbot.command.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.premium.PremiumManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.premium.PremiumManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;

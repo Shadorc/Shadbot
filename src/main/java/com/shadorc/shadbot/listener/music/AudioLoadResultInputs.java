@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.listener.music;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.CommandManager;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.database.DatabaseManager;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;

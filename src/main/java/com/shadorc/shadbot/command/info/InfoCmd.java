@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.info;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;

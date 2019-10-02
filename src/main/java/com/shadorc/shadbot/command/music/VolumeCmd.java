@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.command.music;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.premium.PremiumManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.premium.PremiumManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.TrackScheduler;

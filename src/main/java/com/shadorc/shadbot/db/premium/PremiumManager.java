@@ -1,8 +1,8 @@
-package com.shadorc.shadbot.data.premium;
+package com.shadorc.shadbot.db.premium;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.shadorc.shadbot.data.DatabaseTable;
-import com.shadorc.shadbot.data.premium.Relic.RelicType;
+import com.shadorc.shadbot.db.DatabaseTable;
+import com.shadorc.shadbot.db.premium.Relic.RelicType;
 import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;

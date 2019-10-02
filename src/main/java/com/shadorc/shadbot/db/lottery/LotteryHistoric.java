@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.data.lottery;
+package com.shadorc.shadbot.db.lottery;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;

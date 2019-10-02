@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.music;
 
-import com.shadorc.shadbot.Config;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.LogUtils;

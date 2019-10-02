@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.data;
+package com.shadorc.shadbot.db;
 
 import com.rethinkdb.RethinkDB;
 import com.rethinkdb.gen.ast.Table;

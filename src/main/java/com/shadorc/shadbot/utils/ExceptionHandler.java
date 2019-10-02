@@ -2,8 +2,6 @@ package com.shadorc.shadbot.utils;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.stats.StatsManager;
-import com.shadorc.shadbot.data.stats.enums.CommandEnum;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.exception.MissingPermissionException;
@@ -37,10 +35,10 @@ public class ExceptionHandler {
     }
 
     private static Mono<Void> onCommandException(CommandException err, BaseCmd cmd, Context context) {
-        return Mono.fromRunnable(() -> StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_ILLEGAL_ARG, cmd))
-                .and(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
-                                context.getUsername(), err.getMessage()), channel)));
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
+                        context.getUsername(), err.getMessage()), channel))
+                .then();
     }
 
     private static Mono<Void> onMissingPermissionException(MissingPermissionException err, Context context) {
@@ -53,10 +51,11 @@ public class ExceptionHandler {
     }
 
     private static Mono<Void> onMissingArgumentException(BaseCmd cmd, Context context) {
-        return Mono.fromRunnable(() -> StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_MISSING_ARG, cmd))
-                .and(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.", cmd.getHelp(context), channel)));
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.",
+                        cmd.getHelp(context), channel))
+                .then();
     }
 
     private static Mono<Void> onNoMusicException(Context context) {

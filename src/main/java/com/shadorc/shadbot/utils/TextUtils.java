@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.setting.Setting;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.object.Emoji;
 import discord4j.core.object.util.Permission;

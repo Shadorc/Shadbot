@@ -1,13 +1,13 @@
 package com.shadorc.shadbot.command.game;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.database.DBMember;
-import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.lottery.LotteryGambler;
-import com.shadorc.shadbot.data.lottery.LotteryManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.database.DBMember;
+import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.lottery.LotteryGambler;
+import com.shadorc.shadbot.db.lottery.LotteryManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;

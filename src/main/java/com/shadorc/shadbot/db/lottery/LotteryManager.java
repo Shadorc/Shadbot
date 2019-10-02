@@ -1,10 +1,10 @@
-package com.shadorc.shadbot.data.lottery;
+package com.shadorc.shadbot.db.lottery;
 
 import com.rethinkdb.gen.ast.ReqlExpr;
 import com.rethinkdb.net.Cursor;
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.data.DatabaseTable;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseTable;
 import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;

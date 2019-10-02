@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.hidden;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.premium.PremiumManager;
-import com.shadorc.shadbot.data.premium.Relic;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.premium.PremiumManager;
+import com.shadorc.shadbot.db.premium.Relic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;

@@ -1,6 +1,8 @@
-package com.shadorc.shadbot;
+package com.shadorc.shadbot.api;
 
+import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.shard.Shard;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.Credentials;
 import com.shadorc.shadbot.utils.ExceptionHandler;

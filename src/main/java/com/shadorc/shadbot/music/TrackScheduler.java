@@ -2,8 +2,6 @@ package com.shadorc.shadbot.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.shadorc.shadbot.data.stats.StatsManager;
-import com.shadorc.shadbot.data.stats.enums.VariousEnum;
 import com.shadorc.shadbot.utils.NumberUtils;
 
 import java.util.ArrayList;
@@ -36,8 +34,6 @@ public class TrackScheduler {
      * @return {@code true} if the track was started, {@code false} if it was added to the queue
      */
     public boolean startOrQueue(AudioTrack track, boolean first) {
-        StatsManager.VARIOUS_STATS.log(VariousEnum.MUSICS_LOADED);
-
         if (this.audioPlayer.startTrack(track.makeClone(), true)) {
             this.currentTrack = track;
             return true;

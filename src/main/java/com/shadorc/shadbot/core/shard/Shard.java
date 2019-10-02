@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.core.shard;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.Shadbot;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.TextUtils;

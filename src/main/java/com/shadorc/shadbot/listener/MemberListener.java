@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.data.database.DBGuild;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.database.DBGuild;
+import com.shadorc.shadbot.db.database.DatabaseManager;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
