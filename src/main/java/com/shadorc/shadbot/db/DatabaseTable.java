@@ -33,17 +33,15 @@ public class DatabaseTable {
         LogUtils.info("Connected to %s table.", this.tableName);
     }
 
-    // TODO: Set protected once migration is done
     public RethinkDB getDatabase() {
         return DB;
     }
 
-    // TODO: Set protected once migration is done
     public Connection getConnection() {
         return this.connection;
     }
 
-    protected Table getTable() {
+    public Table getTable() {
         return this.table;
     }
 

@@ -42,10 +42,19 @@ public class DBMember {
 
     public void addCoins(long gains) {
         this.coins.set((int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS));
+        this.saveCoins();
     }
 
     public void resetCoins() {
         this.coins.set(0);
+        this.saveCoins();
+    }
+
+    private void saveCoins() {
+        GuildManager.getInstance()
+                .requestMember(this.getGuildId(), this.getId())
+                .forEach(member -> member.getField("coins").default_(0).update(this.getCoins()))
+                .run(GuildManager.getInstance().getConnection());
     }
 
     @Override
