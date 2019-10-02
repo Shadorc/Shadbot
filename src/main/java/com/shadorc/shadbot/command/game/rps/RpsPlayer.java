@@ -11,7 +11,7 @@ public class RpsPlayer extends Player {
 
     public RpsPlayer(Snowflake guildId, Snowflake userId) {
         super(guildId, userId);
-        this.winStreak = new AtomicInteger(0);
+        this.winStreak = new AtomicInteger();
     }
 
     public AtomicInteger getWinStreak() {

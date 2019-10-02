@@ -40,7 +40,7 @@ public class DiabloCmd extends BaseCmd {
         super(CommandCategory.GAMESTATS, List.of("diablo"), "d3");
         this.setDefaultRateLimiter();
 
-        this.lastTokenGeneration = new AtomicLong(0);
+        this.lastTokenGeneration = new AtomicLong();
         this.token = null;
     }
 

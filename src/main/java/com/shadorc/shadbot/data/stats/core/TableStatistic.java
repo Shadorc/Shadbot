@@ -34,7 +34,7 @@ public class TableStatistic<E extends Enum<E>> extends Statistic<E> {
     public void log(E rowKey, String columnKey, long value) {
         synchronized (this.table) {
             if (!this.table.contains(rowKey.toString(), columnKey)) {
-                this.table.put(rowKey.toString(), columnKey, new AtomicLong(0));
+                this.table.put(rowKey.toString(), columnKey, new AtomicLong());
             }
             this.table.get(rowKey.toString(), columnKey).addAndGet(value);
         }

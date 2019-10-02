@@ -25,7 +25,7 @@ public class Lottery {
 
     public Lottery() {
         this.historic = null;
-        this.jackpot = new AtomicLong(0);
+        this.jackpot = new AtomicLong();
         this.gamblers = new CopyOnWriteArrayList<>();
     }
 

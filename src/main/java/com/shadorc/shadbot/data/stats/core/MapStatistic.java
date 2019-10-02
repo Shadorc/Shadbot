@@ -29,7 +29,7 @@ public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
     }
 
     public void log(E key) {
-        this.map.computeIfAbsent(key.toString(), ignored -> new AtomicLong(0)).incrementAndGet();
+        this.map.computeIfAbsent(key.toString(), ignored -> new AtomicLong()).incrementAndGet();
     }
 
     public Map<String, AtomicLong> getMap() {
@@ -37,7 +37,7 @@ public class MapStatistic<E extends Enum<E>> extends Statistic<E> {
     }
 
     public AtomicLong getValue(String key) {
-        return this.map.getOrDefault(key, new AtomicLong(0));
+        return this.map.getOrDefault(key, new AtomicLong());
     }
 
     @Override
