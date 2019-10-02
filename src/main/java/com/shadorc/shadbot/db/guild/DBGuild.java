@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.db.database;
+package com.shadorc.shadbot.db.guild;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;

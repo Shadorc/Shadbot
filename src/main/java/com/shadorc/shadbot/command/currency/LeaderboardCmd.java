@@ -3,8 +3,8 @@ package com.shadorc.shadbot.command.currency;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.database.DBMember;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.DBMember;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
@@ -27,7 +27,7 @@ public class LeaderboardCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        return Flux.fromIterable(DatabaseManager.getInstance().getDBGuild(context.getGuildId()).getMembers())
+        return Flux.fromIterable(GuildManager.getInstance().getDBGuild(context.getGuildId()).getMembers())
                 .filter(dbMember -> dbMember.getCoins() > 0)
                 .sort(Comparator.comparingInt(DBMember::getCoins).reversed())
                 .take(10)

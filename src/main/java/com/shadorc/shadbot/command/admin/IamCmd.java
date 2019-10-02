@@ -6,8 +6,8 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.db.database.DBGuild;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.DBGuild;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -78,7 +78,7 @@ public class IamCmd extends BaseCmd {
                             return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
                                     .send(embedConsumer)
                                     .doOnNext(message -> {
-                                        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
+                                        final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
                                         final Map<String, Long> setting = dbGuild.getIamMessages();
                                         roles.stream().map(Role::getId)
                                                 .forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));

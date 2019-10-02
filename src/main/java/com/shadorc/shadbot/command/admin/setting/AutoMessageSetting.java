@@ -3,8 +3,8 @@ package com.shadorc.shadbot.command.admin.setting;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.db.database.DBGuild;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.DBGuild;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.object.Emoji;
@@ -59,7 +59,7 @@ public class AutoMessageSetting extends BaseSetting {
     }
 
     private static Mono<Message> channel(Context context, Action action) {
-        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
         if (action == Action.DISABLE) {
             dbGuild.removeSetting(Setting.MESSAGE_CHANNEL_ID);
             return context.getChannel()
@@ -86,7 +86,7 @@ public class AutoMessageSetting extends BaseSetting {
     }
 
     private Mono<Message> updateMessage(Context context, Setting setting, Action action, List<String> args) {
-        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
         final StringBuilder strBuilder = new StringBuilder();
         if (action == Action.ENABLE) {
             if (args.size() < 4) {

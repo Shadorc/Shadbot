@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.command.admin.IamCmd;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.TemporaryMessage;
 import com.shadorc.shadbot.utils.StringUtils;
@@ -105,7 +105,7 @@ public class ReactionListener {
                 // If the bot is not the author of the message, this is not an Iam message
                 .filter(selfId -> message.getAuthor().map(User::getId).map(selfId::equals).orElse(false))
                 .flatMap(ignored -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
-                .flatMap(member -> Mono.justOrEmpty(DatabaseManager.getInstance()
+                .flatMap(member -> Mono.justOrEmpty(GuildManager.getInstance()
                         .getDBGuild(member.getGuildId())
                         .getIamMessages()
                         .get(message.getId().asString()))

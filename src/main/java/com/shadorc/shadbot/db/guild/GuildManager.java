@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.db.database;
+package com.shadorc.shadbot.db.guild;
 
 import com.rethinkdb.gen.ast.ReqlExpr;
 import com.rethinkdb.net.Cursor;
@@ -9,20 +9,20 @@ import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 
-public class DatabaseManager extends DatabaseTable {
+public class GuildManager extends DatabaseTable {
 
-    private static DatabaseManager instance;
+    private static GuildManager instance;
 
     static {
         try {
-            DatabaseManager.instance = new DatabaseManager();
+            GuildManager.instance = new GuildManager();
         } catch (final Exception err) {
-            LogUtils.error(err, String.format("An error occurred while initializing %s.", DatabaseManager.class.getSimpleName()));
+            LogUtils.error(err, String.format("An error occurred while initializing %s.", GuildManager.class.getSimpleName()));
             System.exit(ExitCode.FATAL_ERROR.getValue());
         }
     }
 
-    public DatabaseManager() {
+    public GuildManager() {
         super("guild");
     }
 
@@ -32,7 +32,7 @@ public class DatabaseManager extends DatabaseTable {
             if (cursor.hasNext()) {
                 return Utils.MAPPER.readValue(cursor.next(), DBGuild.class);
             } else {
-                this.table.insert(this.getDatabase().hashMap("id", guildId.asLong())).run(this.getConnection());
+                this.getTable().insert(this.getDatabase().hashMap("id", guildId.asLong())).run(this.getConnection());
                 return new DBGuild(guildId);
             }
 
@@ -75,19 +75,19 @@ public class DatabaseManager extends DatabaseTable {
     }
 
     private ReqlExpr requestGuild(Snowflake guildId) {
-        return this.table.filter(DB.hashMap("id", guildId.asLong()));
+        return this.getTable().filter(this.getDatabase().hashMap("id", guildId.asLong()));
     }
 
     private ReqlExpr requestMember(Snowflake guildId, Snowflake memberId) {
-        return this.table.filter(DB.hashMap("id", guildId.asLong()))
+        return this.getTable().filter(this.getDatabase().hashMap("id", guildId.asLong()))
                 .filter(guild -> guild.hasFields("members"))
                 .getField("members")
-                .filter(members -> members.contains(DB.hashMap("id", memberId.asLong())))
-                .getField(DB.hashMap("id", memberId.asLong()));
+                .filter(members -> members.contains(this.getDatabase().hashMap("id", memberId.asLong())))
+                .getField(this.getDatabase().hashMap("id", memberId.asLong()));
     }
 
-    public static DatabaseManager getInstance() {
-        return DatabaseManager.instance;
+    public static GuildManager getInstance() {
+        return GuildManager.instance;
     }
 
 }

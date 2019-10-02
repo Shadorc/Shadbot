@@ -10,9 +10,9 @@ import com.shadorc.shadbot.core.shard.Shard;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.Credentials;
-import com.shadorc.shadbot.db.database.DBGuild;
-import com.shadorc.shadbot.db.database.DBMember;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.DBGuild;
+import com.shadorc.shadbot.db.guild.DBMember;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.db.lottery.LotteryManager;
 import com.shadorc.shadbot.db.premium.PremiumManager;
 import com.shadorc.shadbot.utils.ExceptionHandler;
@@ -107,8 +107,8 @@ public class Shadbot {
     // TODO: Remove once migrated
     private static void createDatabase() {
         LogUtils.info("Creating database...");
-        final RethinkDB db = DatabaseManager.getInstance().getDatabase();
-        final Connection conn = DatabaseManager.getInstance().getConnection();
+        final RethinkDB db = GuildManager.getInstance().getDatabase();
+        final Connection conn = GuildManager.getInstance().getConnection();
         db.dbCreate("shadbot").run(conn);
         db.db("shadbot").tableCreate("guild").run(conn);
         db.db("shadbot").tableCreate("premium").run(conn);
@@ -118,8 +118,8 @@ public class Shadbot {
 
     private static void migrateGuild() {
         try {
-            final RethinkDB db = DatabaseManager.getInstance().getDatabase();
-            final Connection conn = DatabaseManager.getInstance().getConnection();
+            final RethinkDB db = GuildManager.getInstance().getDatabase();
+            final Connection conn = GuildManager.getInstance().getConnection();
 
             LogUtils.info("Connected to %s:%d", conn.hostname, conn.port);
 
@@ -215,7 +215,7 @@ public class Shadbot {
             Shadbot.botListStats.stop();
         }
 
-        DatabaseManager.getInstance().stop();
+        GuildManager.getInstance().stop();
         PremiumManager.getInstance().stop();
         LotteryManager.getInstance().stop();
 

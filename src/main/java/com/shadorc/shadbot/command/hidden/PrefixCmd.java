@@ -4,8 +4,8 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.database.DBGuild;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.DBGuild;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -24,7 +24,7 @@ public class PrefixCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(

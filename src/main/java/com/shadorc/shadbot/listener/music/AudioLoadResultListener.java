@@ -7,7 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.db.premium.PremiumManager;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
@@ -139,7 +139,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                 + "\nExample: 1,3,4"
                                 + "\n\n" + choices)
                         .setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-                                DatabaseManager.getInstance().getDBGuild(this.guildId).getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
+                                GuildManager.getInstance().getDBGuild(this.guildId).getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.shadorc.shadbot.utils;
 
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingPermissionException;
 import com.shadorc.shadbot.object.Emoji;
@@ -161,7 +161,7 @@ public class DiscordUtils {
                     final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
 
                     // If the user is in a voice channel but the bot is not allowed to join
-                    if (userVoiceChannelId.isPresent() && !DatabaseManager.getInstance().getDBGuild(context.getGuildId()).isVoiceChannelAllowed(userVoiceChannelId.get())) {
+                    if (userVoiceChannelId.isPresent() && !GuildManager.getInstance().getDBGuild(context.getGuildId()).isVoiceChannelAllowed(userVoiceChannelId.get())) {
                         throw new CommandException("I'm not allowed to join this voice channel.");
                     }
 

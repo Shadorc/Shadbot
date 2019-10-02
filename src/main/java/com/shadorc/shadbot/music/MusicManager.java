@@ -6,7 +6,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
 import com.shadorc.shadbot.utils.ExceptionHandler;
@@ -70,7 +70,7 @@ public class MusicManager {
             final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
             audioPlayer.addListener(new TrackEventListener(guildId));
 
-            final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, DatabaseManager.getInstance().getDBGuild(guildId).getDefaultVol());
+            final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, GuildManager.getInstance().getDBGuild(guildId).getDefaultVol());
             final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
             guildMusicConnection.setGuildMusic(guildMusic);
 

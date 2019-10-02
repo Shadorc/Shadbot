@@ -9,8 +9,8 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.database.DBGuild;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.DBGuild;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.object.Emoji;
@@ -90,7 +90,7 @@ public class SettingsCmd extends BaseCmd {
     }
 
     private static Mono<Consumer<EmbedCreateSpec>> show(Context context) {
-        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
         final StringBuilder settingsStr = new StringBuilder();
 
         if (!dbGuild.getPrefix().equals(Config.DEFAULT_PREFIX)) {

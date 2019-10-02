@@ -36,7 +36,7 @@ public class PremiumManager extends DatabaseTable {
 
         this.relics = new CopyOnWriteArrayList<>();
 
-        final String premiumJson = this.table.toJson().run(this.getConnection());
+        final String premiumJson = this.getTable().toJson().run(this.getConnection());
         if (premiumJson != null) {
             final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Relic.class);
             this.relics.addAll(Utils.MAPPER.readValue(premiumJson, valueType));

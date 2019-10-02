@@ -4,8 +4,8 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.database.DBMember;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.DBMember;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.db.lottery.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.LotteryManager;
 import com.shadorc.shadbot.exception.CommandException;
@@ -48,7 +48,7 @@ public class LotteryCmd extends BaseCmd {
 
         final String arg = context.requireArg();
 
-        final DBMember dbMember = DatabaseManager.getInstance().getDBMember(context.getGuildId(), context.getAuthorId());
+        final DBMember dbMember = GuildManager.getInstance().getDBMember(context.getGuildId(), context.getAuthorId());
         if (dbMember.getCoins() < PAID_COST) {
             return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
         }
@@ -150,7 +150,7 @@ public class LotteryCmd extends BaseCmd {
                 .flatMap(winner -> client.getMemberById(winner.getGuildId(), winner.getUserId()))
                 .flatMap(member -> {
                     final long coins = Math.min(LotteryManager.getInstance().getJackpot() / winners.size(), Config.MAX_COINS);
-                    DatabaseManager.getInstance().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
+                    GuildManager.getInstance().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
                     return member.getPrivateChannel()
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn **%s**.",

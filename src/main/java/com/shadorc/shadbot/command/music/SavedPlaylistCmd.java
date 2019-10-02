@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.db.premium.PremiumManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
@@ -55,7 +55,7 @@ public class SavedPlaylistCmd extends BaseCmd {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(0), FormatUtils.options(Action.class))));
 
-        final Map<String, List<String>> map = DatabaseManager.getInstance().getDBGuild(context.getGuildId()).getPlaylists();
+        final Map<String, List<String>> map = GuildManager.getInstance().getDBGuild(context.getGuildId()).getPlaylists();
 
         switch (action) {
             case SEE:
@@ -126,7 +126,7 @@ public class SavedPlaylistCmd extends BaseCmd {
                 .collect(Collectors.toList());
 
         map.put(playlistName, urls);
-        DatabaseManager.getInstance().getDBGuild(context.getGuildId()).setSetting(Setting.SAVED_PLAYLISTS, map);
+        GuildManager.getInstance().getDBGuild(context.getGuildId()).setSetting(Setting.SAVED_PLAYLISTS, map);
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
@@ -146,7 +146,7 @@ public class SavedPlaylistCmd extends BaseCmd {
         }
 
         map.remove(playlistName);
-        DatabaseManager.getInstance().getDBGuild(context.getGuildId()).setSetting(Setting.SAVED_PLAYLISTS, map);
+        GuildManager.getInstance().getDBGuild(context.getGuildId()).setSetting(Setting.SAVED_PLAYLISTS, map);
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(

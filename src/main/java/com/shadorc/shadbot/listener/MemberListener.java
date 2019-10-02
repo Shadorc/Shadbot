@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.db.database.DBGuild;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.DBGuild;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
@@ -28,7 +28,7 @@ public class MemberListener {
 
         @Override
         public Mono<Void> execute(MemberJoinEvent event) {
-            final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(event.getGuildId());
+            final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(event.getGuildId());
             return MemberListener.sendAutoMsg(event.getClient(), event.getMember(),
                     dbGuild.getMessageChannelId().orElse(null), dbGuild.getJoinMessage().orElse(null))
                     // Add auto-role(s) to the new member
@@ -53,9 +53,9 @@ public class MemberListener {
 
         @Override
         public Mono<Void> execute(MemberLeaveEvent event) {
-            final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(event.getGuildId());
+            final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(event.getGuildId());
             event.getMember()
-                    .ifPresent(member -> dbGuild.removeMember(DatabaseManager.getInstance().getDBMember(member.getGuildId(), member.getId())));
+                    .ifPresent(member -> dbGuild.removeMember(GuildManager.getInstance().getDBMember(member.getGuildId(), member.getId())));
             return MemberListener.sendAutoMsg(event.getClient(), event.getUser(),
                     dbGuild.getMessageChannelId().orElse(null), dbGuild.getLeaveMessage().orElse(null))
                     .then();

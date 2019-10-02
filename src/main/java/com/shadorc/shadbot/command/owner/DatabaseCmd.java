@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.database.DatabaseManager;
+import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -36,7 +36,7 @@ public class DatabaseCmd extends BaseCmd {
                 .switchIfEmpty(Mono.error(new CommandException("Guild not found.")))
                 .flatMap(guild -> {
                     if (args.size() == 1) {
-                        return Mono.just(DatabaseManager.getInstance().getDBGuild(guild.getId()).toString());
+                        return Mono.just(GuildManager.getInstance().getDBGuild(guild.getId()).toString());
                     }
 
                     final Long memberId = NumberUtils.toPositiveLongOrNull(args.get(1));
@@ -47,7 +47,7 @@ public class DatabaseCmd extends BaseCmd {
 
                     return context.getClient().getMemberById(Snowflake.of(guildId), Snowflake.of(memberId))
                             .switchIfEmpty(Mono.error(new CommandException("Member not found.")))
-                            .map(member -> DatabaseManager.getInstance().getDBMember(guild.getId(), member.getId()).toString());
+                            .map(member -> GuildManager.getInstance().getDBMember(guild.getId(), member.getId()).toString());
                 })
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
