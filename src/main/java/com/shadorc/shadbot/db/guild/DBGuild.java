@@ -3,9 +3,12 @@ package com.shadorc.shadbot.db.guild;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseEntity;
+import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
@@ -16,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
-public class DBGuild {
+public class DBGuild extends DatabaseEntity {
 
     @JsonProperty("id")
     private final long guildId;
@@ -25,13 +28,13 @@ public class DBGuild {
     @JsonProperty("settings")
     public final ConcurrentHashMap<String, Object> settings;
 
-    public DBGuild(Snowflake id) {
+    protected DBGuild(Snowflake id) {
         this.guildId = id.asLong();
         this.members = new CopyOnWriteArrayList<>();
         this.settings = new ConcurrentHashMap<>();
     }
 
-    public DBGuild() {
+    protected DBGuild() {
         this(Snowflake.of(0L));
     }
 
@@ -135,18 +138,51 @@ public class DBGuild {
 
     public void setSetting(Setting setting, Object value) {
         this.settings.put(setting.toString(), value);
+        this.update("settings", this.settings);
     }
 
     public void removeSetting(Setting setting) {
         this.settings.remove(setting.toString());
+        this.update("settings", this.settings);
     }
 
     public void addMember(DBMember dbMember) {
         this.members.add(dbMember);
+        this.update("members", this.members);
     }
 
     public void removeMember(DBMember dbMember) {
         this.members.remove(dbMember);
+        this.update("members", this.members);
+    }
+
+    @Override
+    protected void update(String field, Object value) {
+        try {
+            // TODO: What if the guild is not present ?
+            GuildManager.getInstance()
+                    .requestGuild(this.getId())
+                    .forEach(guild -> guild.update(GuildManager.getInstance().getDatabase().hashMap(value, field)))
+                    .run(GuildManager.getInstance().getConnection());
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while updating DBGuild with ID %d.", this.guildId));
+        }
+    }
+
+    // TODO: This method needs two accesses to the database, needs refactoring
+    @Override
+    public void delete() {
+        try {
+            // TODO: What if the guild is not present ?
+            GuildManager.getInstance()
+                    .requestGuild(this.getId())
+                    .delete()
+                    .run(GuildManager.getInstance().getConnection());
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while deleting DBGuild with ID %d.", this.guildId));
+        }
     }
 
     @Override

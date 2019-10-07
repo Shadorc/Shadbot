@@ -25,15 +25,12 @@ public class GuildManager extends DatabaseTable {
         try (final Cursor<String> cursor = this.requestGuild(guildId).map(ReqlExpr::toJson).run(this.getConnection())) {
             if (cursor.hasNext()) {
                 return Utils.MAPPER.readValue(cursor.next(), DBGuild.class);
-            } else {
-                this.getTable().insert(this.getDatabase().hashMap("id", guildId.asLong())).run(this.getConnection());
-                return new DBGuild(guildId);
             }
-
         } catch (final Exception err) {
-            LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting DBGuild.");
-            return new DBGuild(guildId);
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while getting DBGuild with ID %d.", guildId.asLong()));
         }
+        return new DBGuild(guildId);
     }
 
     // TODO: Reduce DB calls
@@ -41,35 +38,18 @@ public class GuildManager extends DatabaseTable {
         try (final Cursor<String> cursor = this.requestMember(guildId, memberId).map(ReqlExpr::toJson).run(this.getConnection())) {
             if (cursor.hasNext()) {
                 return Utils.MAPPER.readValue(cursor.next(), DBMember.class);
-            } else {
-                //TODO: Update or insert
-                return new DBMember(guildId, memberId);
             }
         } catch (final Exception err) {
-            LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting DBMember.");
-            return new DBMember(guildId, memberId);
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while getting DBMember with ID %d, guild ID %d.",
+                            memberId.asLong(), guildId.asLong()));
         }
-    }
-
-    public void deleteDBGuild(Snowflake guildId) {
-        try {
-            this.requestGuild(guildId).delete().run(this.getConnection());
-        } catch (final Exception err) {
-            LogUtils.error(Shadbot.getClient(), err, "An error occurred while deleting DBGuild.");
-        }
-    }
-
-    public void deleteDBMember(Snowflake guildId, Snowflake memberId) {
-        try {
-            // TODO: What if the member is not present ?
-            this.requestMember(guildId, memberId).delete().run(this.getConnection());
-        } catch (final Exception err) {
-            LogUtils.error(Shadbot.getClient(), err, "An error occurred while deleting DBMember.");
-        }
+        return new DBMember(guildId, memberId);
     }
 
     protected ReqlExpr requestGuild(Snowflake guildId) {
-        return this.getTable().filter(this.getDatabase().hashMap("id", guildId.asLong()));
+        return this.getTable()
+                .filter(this.getDatabase().hashMap("id", guildId.asLong()));
     }
 
     protected ReqlExpr requestMember(Snowflake guildId, Snowflake memberId) {
