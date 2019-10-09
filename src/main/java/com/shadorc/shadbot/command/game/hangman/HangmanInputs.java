@@ -41,7 +41,7 @@ public class HangmanInputs extends Inputs {
     public Mono<Void> processEvent(MessageCreateEvent event) {
         return this.game.isCancelMessage(event.getMessage())
                 .flatMap(isCancelMsg -> {
-                    final Member member = event.getMember().get();
+                    final Member member = event.getMember().orElseThrow();
                     if (isCancelMsg) {
                         return event.getMessage().getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
@@ -50,7 +50,7 @@ public class HangmanInputs extends Inputs {
                                 .then(Mono.fromRunnable(this.game::stop));
                     }
 
-                    final String content = event.getMessage().getContent().get().toLowerCase().trim();
+                    final String content = event.getMessage().getContent().orElseThrow().toLowerCase().trim();
 
                     // Check only if content is an unique word/letter
                     if (!content.matches("[a-z]+")) {

@@ -5,6 +5,7 @@ import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -32,6 +33,8 @@ public class EnableCommandCmd extends BaseCmd {
 
         final Boolean enabled = Boolean.parseBoolean(args.get(1));
         cmd.setEnabled(enabled);
+
+        LogUtils.info("Command %s %s.", cmd.getName(), enabled ? "enabled" : "disabled");
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command `%s` %s.",

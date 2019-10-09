@@ -43,7 +43,7 @@ public class DiscordUtils {
     }
 
     public static Mono<Message> sendMessage(Consumer<MessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
-        final Snowflake selfId = channel.getClient().getSelfId().get();
+        final Snowflake selfId = channel.getClient().getSelfId().orElseThrow();
         return Mono.zip(
                 DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
                 DiscordUtils.hasPermission(channel, selfId, Permission.EMBED_LINKS))
@@ -141,7 +141,7 @@ public class DiscordUtils {
 
     public static Mono<Void> requirePermissions(Channel channel, Permission... permissions) {
         return Flux.fromArray(permissions)
-                .flatMap(permission -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId().get(), permission)
+                .flatMap(permission -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId().orElseThrow(), permission)
                         .filter(Boolean.TRUE::equals)
                         .switchIfEmpty(Mono.error(new MissingPermissionException(permission))))
                 .then();
