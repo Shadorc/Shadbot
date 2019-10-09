@@ -61,8 +61,8 @@ public class RussianRouletteCmd extends BaseCmd {
         return new HelpBuilder(this, context)
                 .setDescription("Play Russian roulette.")
                 .addField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)
-                .addField("Gains", String.format("You have **1/6 chance** to randomly get between **%d and %d coins** and **5/6 " +
-                        "chances** to randomly get between **%d and %d coins**.", MIN_GAINS, MAX_GAINS, MIN_LOSE, MAX_LOSE), false)
+                .addField("Gains", String.format("You have **1/6 chance** to randomly lose between **%d and %d coins** and **5/6 " +
+                        "chances** to randomly get between **%d and %d coins**.", MIN_LOSE, MAX_LOSE, MIN_GAINS, MAX_GAINS), false)
                 .build();
     }
 }
