@@ -41,14 +41,14 @@ public class AudioLoadResultInputs extends Inputs {
     public Mono<Void> processEvent(MessageCreateEvent event) {
         final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
 
-        final String content = event.getMessage().getContent().get();
+        final String content = event.getMessage().getContent().orElseThrow();
         final String prefix = GuildManager.getInstance().getDBGuild(this.listener.getGuildId()).getPrefix();
         if (content.equals(String.format("%scancel", prefix))) {
             guildMusic.setWaitingForChoice(false);
             return guildMusic.getMessageChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
                             String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
-                                    event.getMember().get().getUsername()), channel))
+                                    event.getMember().orElseThrow().getUsername()), channel))
                     .then();
         }
 

@@ -52,7 +52,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                         player.win(gains);
                         return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains));
                     } else {
-                        return String.format("**%s** (Losses: **%s**)", username, this.bet);
+                        return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(this.bet));
                     }
 
                 })

@@ -59,7 +59,7 @@ public class ReactionListener {
 
     private static Mono<Boolean> canManageRole(Message message, Snowflake roleId) {
         return message.getGuild()
-                .flatMap(guild -> Mono.zip(guild.getMemberById(message.getClient().getSelfId().get()),
+                .flatMap(guild -> Mono.zip(guild.getMemberById(message.getClient().getSelfId().orElseThrow()),
                         guild.getRoleById(roleId)))
                 .flatMap(tuple -> {
                     final Member selfMember = tuple.getT1();

@@ -84,6 +84,15 @@ public class CommandProcessor {
             return Mono.empty();
         }
 
+        if (!command.isEnabled()) {
+            return context.getChannel()
+                    .flatMap(channel -> DiscordUtils.sendMessage(
+                            String.format(Emoji.ACCESS_DENIED + " (**%s**) Sorry, this command is temporary disabled. " +
+                                            "Do not hesitate to join the support server (<%s>) if you have any questions.",
+                                    context.getUsername(), Config.SUPPORT_SERVER_URL), channel))
+                    .then();
+        }
+
         return context.getPermissions()
                 .collectList()
                 // The author has the permission to execute this command

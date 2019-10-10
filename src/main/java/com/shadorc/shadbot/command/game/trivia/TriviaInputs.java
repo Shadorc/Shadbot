@@ -40,7 +40,7 @@ public class TriviaInputs extends Inputs {
     public Mono<Void> processEvent(MessageCreateEvent event) {
         return this.game.isCancelMessage(event.getMessage())
                 .flatMap(isCancelMsg -> {
-                    final Member member = event.getMember().get();
+                    final Member member = event.getMember().orElseThrow();
                     if (isCancelMsg) {
                         return event.getMessage().getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
@@ -50,7 +50,7 @@ public class TriviaInputs extends Inputs {
                     }
 
                     // It's a number or a text
-                    final String content = event.getMessage().getContent().get();
+                    final String content = event.getMessage().getContent().orElseThrow();
                     final Integer choice = NumberUtils.toIntBetweenOrNull(content, 1, this.game.getAnswers().size());
 
                     // Message is a text and doesn't match any answers, ignore it

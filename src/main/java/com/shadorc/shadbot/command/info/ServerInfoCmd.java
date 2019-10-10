@@ -56,7 +56,7 @@ public class ServerInfoCmd extends BaseCmd {
                         .addField("Creation date", creationDate, true)
                         .addField("Region", region.getName(), true)
                         .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), true)
-                        .addField("Members", Integer.toString(guild.getMemberCount().getAsInt()), true));
+                        .addField("Members", Integer.toString(guild.getMemberCount().orElseThrow()), true));
     }
 
     @Override

@@ -47,7 +47,7 @@ public class BlackjackInputs extends Inputs {
     public Mono<Void> processEvent(MessageCreateEvent event) {
         return this.game.isCancelMessage(event.getMessage())
                 .flatMap(isCancelMsg -> {
-                    final Member member = event.getMember().get();
+                    final Member member = event.getMember().orElseThrow();
                     if (isCancelMsg) {
                         this.game.getPlayers().values().forEach(BlackjackPlayer::cancelBet);
                         return event.getMessage().getChannel()

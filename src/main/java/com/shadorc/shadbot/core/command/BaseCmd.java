@@ -22,6 +22,7 @@ public abstract class BaseCmd {
 
     @Nullable
     private RateLimiter rateLimiter;
+    private boolean isEnabled;
 
     protected BaseCmd(CommandCategory category, CommandPermission permission, List<String> names, String alias) {
         this.category = category;
@@ -29,6 +30,7 @@ public abstract class BaseCmd {
         this.names = new ArrayList<>(names);
         this.alias = alias;
         this.rateLimiter = null;
+        this.isEnabled = true;
 
         if (this.alias != null) {
             this.names.add(this.alias);
@@ -75,6 +77,10 @@ public abstract class BaseCmd {
         return Optional.ofNullable(this.rateLimiter);
     }
 
+    public boolean isEnabled() {
+        return this.isEnabled;
+    }
+
     public void setRateLimiter(RateLimiter rateLimiter) {
         this.rateLimiter = rateLimiter;
     }
@@ -85,6 +91,10 @@ public abstract class BaseCmd {
 
     public void setGameRateLimiter() {
         this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(3)));
+    }
+
+    public void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
     }
 
 }

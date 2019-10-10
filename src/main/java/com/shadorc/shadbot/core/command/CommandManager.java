@@ -85,6 +85,7 @@ public class CommandManager {
                 // Owner Commands
                 new LoggerCmd(), new RestartCmd(), new LeaveCmd(),
                 new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(), new DatabaseCmd(),
+                new EnableCommandCmd(),
                 // Hidden Commands
                 new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd());
     }

@@ -26,7 +26,7 @@ public class GenerateRelicCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final Relic.RelicType type = Utils.parseEnum(Relic.RelicType.class, context.getArg().get(),
+        final Relic.RelicType type = Utils.parseEnum(Relic.RelicType.class, context.getArg().orElseThrow(),
                 new CommandException(String.format("`%s` in not a valid type. %s",
                         arg, FormatUtils.options(Relic.RelicType.class))));
 
