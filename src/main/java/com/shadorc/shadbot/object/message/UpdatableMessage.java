@@ -61,7 +61,7 @@ public class UpdatableMessage {
      * Delete the previous message sent, if present, then send a message with the provided content and embed.
      *
      * @param content - the content
-     * @param embed - the embed
+     * @param embed   - the embed
      */
     private Mono<Message> send(@Nullable String content, @Nullable Consumer<EmbedCreateSpec> embed) {
         final Consumer<MessageCreateSpec> consumer = spec -> {
