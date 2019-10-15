@@ -44,7 +44,7 @@ public class InfoCmd extends BaseCmd {
 
         return Mono.zip(context.getClient().getUserById(Shadbot.getOwnerId()),
                 context.getClient().getGuilds().count(),
-                context.getClient().getUsers().count(),
+                context.getClient().getUsers().distinct().count(),
                 context.getChannel())
                 .flatMap(tuple -> {
                     final User owner = tuple.getT1();
@@ -73,7 +73,7 @@ public class InfoCmd extends BaseCmd {
                                     + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
                                     + String.format("%nServers: %s", FormatUtils.number(guildCount))
                                     + String.format("%nVoice Channels: %d (GM: %d)", MusicManager.getInstance().getGuildIdsWithVoice().size(), MusicManager.getInstance().getGuildIdsWithGuildMusics().size())
-                                    + String.format("%nUsers: %s", FormatUtils.number(memberCount))
+                                    + String.format("%nUnique Users: %s", FormatUtils.number(memberCount))
                                     + "```")));
                 })
                 .then();
