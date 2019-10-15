@@ -93,7 +93,8 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                                 embed.setFooter("Finished.", null);
                             }
                         }))
-                .flatMap(this.updatableMessage::send)
+                .map(this.updatableMessage::setEmbed)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

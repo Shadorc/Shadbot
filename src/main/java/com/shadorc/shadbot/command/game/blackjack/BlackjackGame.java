@@ -134,7 +134,8 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                                 embed.addField(field.getName(), field.getValue(), field.isInline());
                             }
                         }))
-                .flatMap(this.updatableMessage::send)
+                .map(this.updatableMessage::setEmbed)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 

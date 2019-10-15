@@ -115,7 +115,8 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                                 embed.setFooter("Finished.", null);
                             }
                         }))
-                .flatMap(this.updatableMessage::send)
+                .map(this.updatableMessage::setEmbed)
+                .flatMap(UpdatableMessage::send)
                 .then();
     }
 
