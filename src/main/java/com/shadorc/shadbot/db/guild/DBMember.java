@@ -45,27 +45,17 @@ public class DBMember extends DatabaseEntity {
 
     public void addCoins(long gains) {
         this.coins.set((int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS));
-        this.update("coins", this.getCoins());
+        //TODO this.update("coins", this.getCoins());
     }
 
     public void resetCoins() {
         this.coins.set(0);
-        this.update("coins", this.getCoins());
+        //TODO this.update("coins", this.getCoins());
     }
 
     @Override
-    protected void update(String value, Object field) {
-        try {
-            // TODO: What if the member is not present ?
-            GuildManager.getInstance()
-                    .requestMember(this.getGuildId(), this.getId())
-                    .forEach(member -> member.update(GuildManager.getInstance().getDatabase().hashMap(value, field)))
-                    .run(GuildManager.getInstance().getConnection());
-        } catch (final Exception err) {
-            LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while updating DBMember with ID %d and Guild ID %d.",
-                            this.memberId, this.guildId));
-        }
+    public void insert() {
+
     }
 
     // TODO: This method needs two accesses to the database, needs refactoring

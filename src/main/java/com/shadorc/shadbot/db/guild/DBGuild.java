@@ -94,7 +94,7 @@ public class DBGuild extends DatabaseEntity {
 
     public Map<String, List<String>> getPlaylists() {
         return (Map<String, List<String>>) Optional.ofNullable(this.settings.get(Setting.SAVED_PLAYLISTS.toString()))
-                .orElse(new HashMap<>());
+                .orElse(new HashMap<String, Long>());
     }
 
     public String getPrefix() {
@@ -136,37 +136,55 @@ public class DBGuild extends DatabaseEntity {
         return allowedVoiceChannels.isEmpty() || allowedVoiceChannels.contains(channelId.asLong());
     }
 
+    // TODO: Guild exists: 2 requests (1 read, 1 write), guild does not exist: 3 requests (1 read, 2 writes)
     public void setSetting(Setting setting, Object value) {
         this.settings.put(setting.toString(), value);
-        this.update("settings", this.settings);
+
+        try {
+            final GuildManager gm = GuildManager.getInstance();
+            final boolean guildExists = gm.requestGuild(this.getId()).count().eq(1).run(gm.getConnection());
+            if (!guildExists) {
+                this.insert();
+            }
+
+            gm.requestGuild(this.getId())
+                    .update(gm.getDatabase().hashMap("settings", gm.getDatabase().hashMap(setting.toString(), value)))
+                    .run(gm.getConnection());
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while updating DBGuild with ID %d.", this.guildId));
+        }
     }
 
     public void removeSetting(Setting setting) {
         this.settings.remove(setting.toString());
-        this.update("settings", this.settings);
-    }
 
-    public void addMember(DBMember dbMember) {
-        this.members.add(dbMember);
-        this.update("members", this.members);
+        try {
+            final GuildManager gm = GuildManager.getInstance();
+            gm.requestGuild(this.getId())
+                    .replace(guild -> guild.without(gm.getDatabase().hashMap("settings", setting.toString())))
+                    .run(gm.getConnection());
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while updating DBGuild with ID %d.", this.guildId));
+        }
     }
 
     public void removeMember(DBMember dbMember) {
         this.members.remove(dbMember);
-        this.update("members", this.members);
+        //TODO this.update("members", this.members);
     }
 
     @Override
-    protected void update(String field, Object value) {
+    public void insert() {
         try {
-            // TODO: What if the guild is not present ?
             GuildManager.getInstance()
-                    .requestGuild(this.getId())
-                    .forEach(guild -> guild.update(GuildManager.getInstance().getDatabase().hashMap(value, field)))
+                    .getTable()
+                    .insert(GuildManager.getInstance().getDatabase().hashMap("id", this.guildId))
                     .run(GuildManager.getInstance().getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while updating DBGuild with ID %d.", this.guildId));
+                    String.format("An error occurred while inserting DBGuild with ID %d.", this.guildId));
         }
     }
 

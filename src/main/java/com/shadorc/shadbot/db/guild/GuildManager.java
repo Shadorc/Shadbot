@@ -47,12 +47,12 @@ public class GuildManager extends DatabaseTable {
         return new DBMember(guildId, memberId);
     }
 
-    protected ReqlExpr requestGuild(Snowflake guildId) {
+    public ReqlExpr requestGuild(Snowflake guildId) {
         return this.getTable()
                 .filter(this.getDatabase().hashMap("id", guildId.asLong()));
     }
 
-    protected ReqlExpr requestMember(Snowflake guildId, Snowflake memberId) {
+    public ReqlExpr requestMember(Snowflake guildId, Snowflake memberId) {
         return this.getTable()
                 .filter(this.getDatabase().hashMap("id", guildId.asLong()))
                 .filter(guild -> guild.hasFields("members"))
