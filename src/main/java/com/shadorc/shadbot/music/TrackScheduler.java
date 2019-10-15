@@ -56,10 +56,10 @@ public class TrackScheduler {
     public boolean nextTrack() {
         switch (this.repeatMode) {
             case PLAYLIST:
-                this.queue.offer(this.currentTrack.makeClone());
+                this.queue.offer(this.currentTrack);
             case NONE:
                 this.currentTrack = this.queue.poll();
-                return this.audioPlayer.startTrack(this.currentTrack, false);
+                return this.audioPlayer.startTrack(this.currentTrack.makeClone(), false);
             case SONG:
                 this.audioPlayer.playTrack(this.currentTrack.makeClone());
                 break;
