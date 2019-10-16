@@ -131,7 +131,7 @@
         <dependency>
             <groupId>com.sedmelluq</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>1.3.22</version>
+            <version>1.3.22.pbjtest3</version>
         </dependency>
         <dependency>
             <groupId>net.aksingh</groupId>
