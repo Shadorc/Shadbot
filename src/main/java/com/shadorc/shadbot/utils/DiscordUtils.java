@@ -3,8 +3,6 @@ package com.shadorc.shadbot.utils;
 import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.stats.StatsManager;
-import com.shadorc.shadbot.data.stats.enums.VariousEnum;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingPermissionException;
 import com.shadorc.shadbot.object.Emoji;
@@ -71,13 +69,7 @@ public class DiscordUtils {
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                 .retryWhen(Retry.onlyIf(err -> err.exception() instanceof PrematureCloseException || err.exception() instanceof Errors.NativeIoException)
                         .exponentialBackoff(Duration.ofSeconds(1), Duration.ofSeconds(5))
-                        .retryMax(3))
-                .doOnNext(message -> {
-                    if (hasEmbed) {
-                        StatsManager.VARIOUS_STATS.log(VariousEnum.EMBEDS_SENT);
-                    }
-                    StatsManager.VARIOUS_STATS.log(VariousEnum.MESSAGES_SENT);
-                });
+                        .retryMax(3));
     }
 
     /**

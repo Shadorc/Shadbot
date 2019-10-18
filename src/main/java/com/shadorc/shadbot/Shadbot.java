@@ -7,7 +7,6 @@ import com.shadorc.shadbot.data.credential.Credentials;
 import com.shadorc.shadbot.data.database.DatabaseManager;
 import com.shadorc.shadbot.data.lottery.LotteryManager;
 import com.shadorc.shadbot.data.premium.PremiumManager;
-import com.shadorc.shadbot.data.stats.StatsManager;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.LogUtils;
@@ -130,7 +129,6 @@ public class Shadbot {
         DatabaseManager.getInstance().save();
         PremiumManager.getInstance().save();
         LotteryManager.getInstance().save();
-        StatsManager.getInstance().save();
     }
 
     public static Mono<Void> quit(ExitCode exitCode) {

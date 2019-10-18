@@ -6,8 +6,6 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.stats.StatsManager;
-import com.shadorc.shadbot.data.stats.enums.CommandEnum;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.object.entity.Channel;
@@ -34,7 +32,6 @@ public class HelpCmd extends BaseCmd {
                 return Mono.empty();
             }
 
-            StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_HELPED, cmd);
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(cmd.getHelp(context), channel))
                     .then();

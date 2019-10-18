@@ -4,9 +4,6 @@ import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.database.DBGuild;
 import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.stats.StatsManager;
-import com.shadorc.shadbot.data.stats.enums.CommandEnum;
-import com.shadorc.shadbot.data.stats.enums.VariousEnum;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
@@ -78,11 +75,7 @@ public class CommandProcessor {
             return false;
         }
 
-        if (rateLimiter.get().isLimitedAndWarn(context.getChannelId(), context.getMember())) {
-            StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_LIMITED, cmd);
-            return true;
-        }
-        return false;
+        return rateLimiter.get().isLimitedAndWarn(context.getChannelId(), context.getMember());
     }
 
     private Mono<Void> executeCommand(Context context) {
@@ -115,16 +108,10 @@ public class CommandProcessor {
                 // The user is not rate limited
                 .filter(cmd -> !this.isRateLimited(context, cmd))
                 .flatMap(cmd -> cmd.execute(context))
-                .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context))
-                .doOnTerminate(() -> {
-                    StatsManager.COMMAND_STATS.log(CommandEnum.COMMAND_USED, command);
-                    StatsManager.VARIOUS_STATS.log(VariousEnum.COMMANDS_EXECUTED);
-                });
+                .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context));
     }
 
     private Mono<Void> processPrivateMessage(MessageCreateEvent event) {
-        StatsManager.VARIOUS_STATS.log(VariousEnum.PRIVATE_MESSAGES_RECEIVED);
-
         final String text = String.format("Hello !"
                         + "%nCommands only work in a server but you can see help using `%shelp`."
                         + "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
