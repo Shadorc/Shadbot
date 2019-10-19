@@ -67,6 +67,7 @@ public class GuildMusicConnection {
                             .switchIfEmpty(Mono.delay(Duration.ofSeconds(2), Schedulers.elastic())
                                     .then(Mono.fromRunnable(this::leaveVoiceChannel)));
                 })
+                .subscribeOn(Schedulers.elastic())
                 .onErrorResume(TimeoutException.class, err -> this.onVoiceConnectionTimeout())
                 .then();
     }
