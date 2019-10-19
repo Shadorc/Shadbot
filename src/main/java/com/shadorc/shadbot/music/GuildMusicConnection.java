@@ -53,7 +53,8 @@ public class GuildMusicConnection {
 
         return this.client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
-                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
+                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider))
+                        .publishOn(Schedulers.elastic()))
                 .timeout(Config.DEFAULT_TIMEOUT)
                 .flatMap(voiceConnection -> {
                     LogUtils.info("{Guild ID: %d} Voice channel joined.", this.guildId.asLong());
@@ -67,7 +68,6 @@ public class GuildMusicConnection {
                             .switchIfEmpty(Mono.delay(Duration.ofSeconds(2), Schedulers.elastic())
                                     .then(Mono.fromRunnable(this::leaveVoiceChannel)));
                 })
-                .subscribeOn(Schedulers.elastic())
                 .onErrorResume(TimeoutException.class, err -> this.onVoiceConnectionTimeout())
                 .then();
     }
