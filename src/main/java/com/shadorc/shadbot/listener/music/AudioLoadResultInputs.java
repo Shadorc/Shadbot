@@ -68,8 +68,7 @@ public class AudioLoadResultInputs extends Inputs {
             choices.add(num);
         }
 
-        choices
-                .forEach(choice -> this.listener.trackLoaded(this.listener.getResultTracks().get(choice - 1)));
+        choices.forEach(choice -> this.listener.trackLoaded(this.listener.getResultTracks().get(choice - 1)));
 
         guildMusic.setWaitingForChoice(false);
         return Mono.empty();

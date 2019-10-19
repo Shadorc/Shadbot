@@ -27,13 +27,14 @@ public class GuildMusicConnection {
     private final DiscordClient client;
     private final Snowflake guildId;
 
-    private AtomicReference<State> state;
-    private AtomicReference<VoiceConnection> voiceConnection;
-    private AtomicReference<GuildMusic> guildMusic;
+    private final AtomicReference<State> state;
+    private final AtomicReference<VoiceConnection> voiceConnection;
+    private final AtomicReference<GuildMusic> guildMusic;
 
     public GuildMusicConnection(DiscordClient client, Snowflake guildId) {
         this.client = client;
         this.guildId = guildId;
+
         this.state = new AtomicReference<>(State.DISCONNECTED);
         this.voiceConnection = new AtomicReference<>();
         this.guildMusic = new AtomicReference<>();

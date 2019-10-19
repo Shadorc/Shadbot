@@ -24,7 +24,7 @@ public abstract class BaseCmd {
     private RateLimiter rateLimiter;
     private boolean isEnabled;
 
-    protected BaseCmd(CommandCategory category, CommandPermission permission, List<String> names, String alias) {
+    protected BaseCmd(CommandCategory category, CommandPermission permission, List<String> names, @Nullable String alias) {
         this.category = category;
         this.permission = permission;
         this.names = new ArrayList<>(names);
@@ -81,7 +81,7 @@ public abstract class BaseCmd {
         return this.isEnabled;
     }
 
-    public void setRateLimiter(RateLimiter rateLimiter) {
+    public void setRateLimiter(@Nullable RateLimiter rateLimiter) {
         this.rateLimiter = rateLimiter;
     }
 
