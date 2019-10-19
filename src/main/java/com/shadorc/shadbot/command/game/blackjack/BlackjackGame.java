@@ -79,14 +79,12 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                             final long coins = Math.min(player.getBet(), Config.MAX_COINS);
                             player.win(coins);
                             return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(coins));
-                        case 0:
-                            player.draw();
-                            return String.format("**%s** (Draw)", username);
                         case -1:
                             return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet()));
+                        default:
+                            player.draw();
+                            return String.format("**%s** (Draw)", username);
                     }
-
-                    return null;
                 })
                 .collectList()
                 .flatMap(results -> this.getContext().getChannel()
