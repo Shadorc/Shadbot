@@ -65,8 +65,7 @@ public class GuildManager extends DatabaseTable {
                 .filter(this.getDatabase().hashMap("id", guildId.asLong()))
                 .filter(guild -> guild.hasFields("members"))
                 .getField("members")
-                .filter(members -> members.contains(this.getDatabase().hashMap("id", memberId.asLong())))
-                .getField(this.getDatabase().hashMap("id", memberId.asLong()));
+                .filter(this.getDatabase().hashMap("id", memberId.asLong()));
     }
 
     public static GuildManager getInstance() {

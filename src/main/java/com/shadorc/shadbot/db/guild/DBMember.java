@@ -43,23 +43,20 @@ public class DBMember extends DatabaseEntity {
         return this.coins;
     }
 
-    // TODO: Optimize
     public int addCoins(long gains) {
         final int coins = (int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
         try {
+            LOGGER.debug("[DBMember {} / {}] Updating coins {}", this.memberId, this.guildId, coins);
             final GuildManager gm = GuildManager.getInstance();
-            final boolean memberExists = gm.requestMember(this.getGuildId(), this.getId())
-                    .count().eq(1).run(gm.getConnection());
-            if (!memberExists) {
-                this.insert();
-            }
-
-            gm.requestMember(this.getGuildId(), this.getId())
-                    .update(gm.getDatabase().hashMap("coins", coins))
+            gm.getTable()
+                    .insert(gm.getDatabase().hashMap("id", this.guildId)
+                            .with("members", gm.getDatabase().hashMap("id", this.memberId)
+                                    .with("coins", coins)))
+                    .optArg("conflict", "update")
                     .run(gm.getConnection());
         } catch (final Exception err) {
-            LogUtils.error(Shadbot.getClient(), err,
+            LogUtils.error(/*Shadbot.getClient(), */err,
                     String.format("[DBMember %d / %d] An error occurred while updating coins.",
                             this.memberId, this.guildId));
         }
@@ -83,7 +80,19 @@ public class DBMember extends DatabaseEntity {
 
     @Override
     public void insert() {
-
+        try {
+            LOGGER.debug("[DBMember {} / {}] Inserting...", this.memberId, this.guildId);
+            final GuildManager gm = GuildManager.getInstance();
+            gm.getTable()
+                    .insert(gm.getDatabase().hashMap("id", this.guildId)
+                            .with("members", gm.getDatabase().hashMap("id", this.memberId)))
+                    .optArg("conflict", "update")
+                    .run(gm.getConnection());
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("[DBMember %d / %d] An error occurred during insertion.", this.memberId, this.guildId));
+        }
+        LOGGER.debug("[DBMember {} / {}] Inserted.", this.memberId, this.guildId);
     }
 
     @Override
@@ -96,7 +105,7 @@ public class DBMember extends DatabaseEntity {
                     .run(GuildManager.getInstance().getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("[DBMember {} / {}] An error occurred during deletion.",
+                    String.format("[DBMember %d / %d] An error occurred during deletion.",
                             this.memberId, this.guildId));
         }
         LOGGER.debug("[DBMember {} / {}] Deleted.", this.memberId, this.guildId);
