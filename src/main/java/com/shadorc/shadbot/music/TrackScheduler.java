@@ -52,10 +52,10 @@ public class TrackScheduler {
     public boolean nextTrack() {
         switch (this.repeatMode) {
             case PLAYLIST:
-                this.queue.offer(this.currentTrack.makeClone());
+                this.queue.offer(this.currentTrack);
             case NONE:
                 this.currentTrack = this.queue.poll();
-                return this.audioPlayer.startTrack(this.currentTrack, false);
+                return this.audioPlayer.startTrack(this.currentTrack == null ? null : this.currentTrack.makeClone(), false);
             case SONG:
                 this.audioPlayer.playTrack(this.currentTrack.makeClone());
                 break;
@@ -68,7 +68,7 @@ public class TrackScheduler {
         for (int i = 0; i < num; i++) {
             track = this.queue.poll();
         }
-        this.audioPlayer.playTrack(track.makeClone());
+        this.audioPlayer.playTrack(track == null ? null : track.makeClone());
         this.currentTrack = track;
     }
 

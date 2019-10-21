@@ -24,11 +24,11 @@ import java.util.Optional;
 
 public class Context {
 
-    @Nullable
-    private final String arg;
-    private final String cmdName;
     private final MessageCreateEvent event;
     private final String prefix;
+    private final String cmdName;
+    @Nullable
+    private final String arg;
 
     public Context(MessageCreateEvent event, String prefix) {
         this.event = event;

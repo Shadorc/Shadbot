@@ -12,6 +12,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,6 +35,7 @@ public class TrackEventListener extends AudioEventAdapter {
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(message, channel));
                 })
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -44,6 +46,7 @@ public class TrackEventListener extends AudioEventAdapter {
                 // Everything seems fine, reset error counter.
                 .doOnNext(ignored -> this.errorCount.set(0))
                 .flatMap(ignored -> this.nextOrEnd())
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -75,6 +78,7 @@ public class TrackEventListener extends AudioEventAdapter {
                             .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
                             .then(this.nextOrEnd());
                 })
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(null, thr -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), thr));
     }
 
@@ -86,6 +90,7 @@ public class TrackEventListener extends AudioEventAdapter {
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "
                         + "try to play the next available song.", channel))
                 .then(this.nextOrEnd())
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 

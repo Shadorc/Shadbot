@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
+import com.shadorc.shadbot.exception.MissingPermissionException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.StringUtils;
@@ -17,6 +18,8 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -78,6 +81,8 @@ public abstract class RemoveMemberCmd extends BaseCmd {
                                 context.getUsername(), this.conjugatedVerb,
                                 String.format("**%s**", tuple.getT4().getUsername())),
                                 tuple.getT2())))
+                .onErrorMap(err -> err instanceof ClientException && ((ClientException) err).getStatus().equals(HttpResponseStatus.FORBIDDEN),
+                        err -> new MissingPermissionException(this.permission))
                 .then();
     }
 

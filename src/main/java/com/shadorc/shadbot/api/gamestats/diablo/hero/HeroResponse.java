@@ -15,8 +15,6 @@ public class HeroResponse {
     private String name;
     @JsonProperty("class")
     private String className;
-    @JsonProperty("level")
-    private int level;
     @JsonProperty("stats")
     private HeroStats stats;
 
@@ -30,10 +28,6 @@ public class HeroResponse {
 
     public String getClassName() {
         return StringUtils.capitalize(this.className.replace("-", " "));
-    }
-
-    public int getLevel() {
-        return this.level;
     }
 
     public HeroStats getStats() {

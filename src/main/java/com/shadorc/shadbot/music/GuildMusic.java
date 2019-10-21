@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
@@ -23,20 +24,23 @@ public class GuildMusic {
     private final DiscordClient client;
     private final Snowflake guildId;
     private final TrackScheduler trackScheduler;
+
     private final Map<AudioLoadResultListener, Future<Void>> listeners;
     private final AtomicBoolean isWaitingForChoice;
     private final AtomicBoolean isLeavingScheduled;
-
-    private volatile Snowflake messageChannelId;
-    private volatile Snowflake djId;
+    private final AtomicLong messageChannelId;
+    private final AtomicLong djId;
 
     public GuildMusic(DiscordClient client, Snowflake guildId, TrackScheduler trackScheduler) {
         this.client = client;
         this.guildId = guildId;
         this.trackScheduler = trackScheduler;
+
         this.listeners = new ConcurrentHashMap<>();
         this.isWaitingForChoice = new AtomicBoolean(false);
         this.isLeavingScheduled = new AtomicBoolean(false);
+        this.messageChannelId = new AtomicLong();
+        this.djId = new AtomicLong();
     }
 
     /**
@@ -58,9 +62,11 @@ public class GuildMusic {
     }
 
     public Mono<Void> end() {
-        LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId.asLong());
-        MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel();
-        return this.getMessageChannel()
+        return Mono.fromRunnable(() -> {
+            LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId.asLong());
+            MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel();
+        })
+                .then(this.getMessageChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel))
                 .then();
     }
@@ -74,16 +80,16 @@ public class GuildMusic {
     }
 
     public Snowflake getMessageChannelId() {
-        return this.messageChannelId;
+        return Snowflake.of(this.messageChannelId.get());
     }
 
     public Mono<MessageChannel> getMessageChannel() {
-        return this.client.getChannelById(this.messageChannelId)
+        return this.client.getChannelById(this.getMessageChannelId())
                 .cast(MessageChannel.class);
     }
 
     public Snowflake getDjId() {
-        return this.djId;
+        return Snowflake.of(this.djId.get());
     }
 
     public boolean isWaitingForChoice() {
@@ -95,11 +101,11 @@ public class GuildMusic {
     }
 
     public void setMessageChannel(Snowflake messageChannelId) {
-        this.messageChannelId = messageChannelId;
+        this.messageChannelId.set(messageChannelId.asLong());
     }
 
     public void setDj(Snowflake djId) {
-        this.djId = djId;
+        this.djId.set(djId.asLong());
     }
 
     public void setWaitingForChoice(boolean isWaitingForChoice) {

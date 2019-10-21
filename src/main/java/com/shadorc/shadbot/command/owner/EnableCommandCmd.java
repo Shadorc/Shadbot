@@ -31,7 +31,7 @@ public class EnableCommandCmd extends BaseCmd {
             throw new CommandException(String.format("`%s` is not a correct value for a boolean.", args.get(1)));
         }
 
-        final Boolean enabled = Boolean.parseBoolean(args.get(1));
+        final boolean enabled = Boolean.parseBoolean(args.get(1));
         cmd.setEnabled(enabled);
 
         LogUtils.info("Command %s %s.", cmd.getName(), enabled ? "enabled" : "disabled");

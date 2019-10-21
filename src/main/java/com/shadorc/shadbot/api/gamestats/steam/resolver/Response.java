@@ -7,8 +7,8 @@ import java.util.Optional;
 
 public class Response {
 
-    @JsonProperty("steamid")
     @Nullable
+    @JsonProperty("steamid")
     private String steamId;
 
     public Optional<String> getSteamId() {

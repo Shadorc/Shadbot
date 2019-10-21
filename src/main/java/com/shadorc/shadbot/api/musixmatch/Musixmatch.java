@@ -24,7 +24,8 @@ public class Musixmatch {
     }
 
     public String getImageUrl() {
-        return "https:" + this.document.getElementsByClass("banner-album-image").select("img").first().attr("src");
+        return String.format("https:%s",
+                this.document.getElementsByClass("banner-album-image").select("img").first().attr("src"));
     }
 
     public String getLyrics() {

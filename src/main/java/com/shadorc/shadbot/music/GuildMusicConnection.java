@@ -14,6 +14,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GuildMusicConnection {
 
@@ -26,23 +27,24 @@ public class GuildMusicConnection {
     private final DiscordClient client;
     private final Snowflake guildId;
 
-    private volatile State state;
-    private volatile VoiceConnection voiceConnection;
-    private volatile GuildMusic guildMusic;
+    private final AtomicReference<State> state;
+    private final AtomicReference<VoiceConnection> voiceConnection;
+    private final AtomicReference<GuildMusic> guildMusic;
 
     public GuildMusicConnection(DiscordClient client, Snowflake guildId) {
         this.client = client;
         this.guildId = guildId;
-        this.state = State.DISCONNECTED;
-        this.voiceConnection = null;
-        this.guildMusic = null;
+
+        this.state = new AtomicReference<>(State.DISCONNECTED);
+        this.voiceConnection = new AtomicReference<>();
+        this.guildMusic = new AtomicReference<>();
     }
 
     /**
      * Requests to join a voice channel.
      */
     public Mono<Void> joinVoiceChannel(Snowflake voiceChannelId, AudioProvider audioProvider) {
-        if (this.state != State.DISCONNECTED) {
+        if (this.state.get() != State.DISCONNECTED) {
             return Mono.empty();
         }
 
@@ -51,17 +53,18 @@ public class GuildMusicConnection {
 
         return this.client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
-                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
+                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider))
+                        .publishOn(Schedulers.elastic()))
                 .timeout(Config.DEFAULT_TIMEOUT)
                 .flatMap(voiceConnection -> {
                     LogUtils.info("{Guild ID: %d} Voice channel joined.", this.guildId.asLong());
 
-                    this.voiceConnection = voiceConnection;
+                    this.voiceConnection.set(voiceConnection);
                     this.changeState(State.CONNECTED);
 
                     // If an error occurred while loading a track, the voice channel can be joined after
                     // the guild music is destroyed. The delay is needed to avoid transition error.
-                    return Mono.justOrEmpty(this.guildMusic)
+                    return Mono.justOrEmpty(this.getGuildMusic())
                             .switchIfEmpty(Mono.delay(Duration.ofSeconds(2), Schedulers.elastic())
                                     .then(Mono.fromRunnable(this::leaveVoiceChannel)));
                 })
@@ -70,9 +73,11 @@ public class GuildMusicConnection {
     }
 
     private <T> Mono<T> onVoiceConnectionTimeout() {
-        LogUtils.info("{Guild ID: %d} Voice connection timed out.", this.guildId.asLong());
-        this.changeState(State.DISCONNECTED);
-        return Mono.justOrEmpty(this.guildMusic)
+        return Mono.fromRunnable(() -> {
+            LogUtils.info("{Guild ID: %d} Voice connection timed out.", this.guildId.asLong());
+            this.changeState(State.DISCONNECTED);
+        })
+                .then(Mono.justOrEmpty(this.getGuildMusic()))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         Emoji.WARNING + " Sorry, I can't join this voice channel right now. "
@@ -84,35 +89,35 @@ public class GuildMusicConnection {
      * Leave the voice channel and destroy the {@link GuildMusic}.
      */
     public void leaveVoiceChannel() {
-        if (this.voiceConnection != null) {
-            this.voiceConnection.disconnect();
-            this.voiceConnection = null;
+        if (this.getVoiceConnection() != null) {
+            this.getVoiceConnection().disconnect();
+            this.voiceConnection.set(null);
             this.changeState(State.DISCONNECTED);
             MusicManager.LOGGER.info("{Guild ID: {}} Voice channel left.", this.guildId.asLong());
         }
 
-        if (this.guildMusic != null) {
-            this.guildMusic.destroy();
-            this.guildMusic = null;
+        if (this.getGuildMusic() != null) {
+            this.getGuildMusic().destroy();
+            this.setGuildMusic(null);
             MusicManager.LOGGER.debug("{Guild ID: {}} Guild music destroyed.", this.guildId.asLong());
         }
     }
 
     public VoiceConnection getVoiceConnection() {
-        return this.voiceConnection;
+        return this.voiceConnection.get();
     }
 
     public GuildMusic getGuildMusic() {
-        return this.guildMusic;
+        return this.guildMusic.get();
     }
 
     public void setGuildMusic(GuildMusic guildMusic) {
-        this.guildMusic = guildMusic;
+        this.guildMusic.set(guildMusic);
     }
 
     public void changeState(State state) {
         MusicManager.LOGGER.debug("{Guild ID: {}} Changing music state to {}.", this.guildId.asLong(), state.toString());
-        this.state = state;
+        this.state.set(state);
     }
 
 }

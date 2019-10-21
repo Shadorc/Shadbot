@@ -40,7 +40,6 @@ public class MusicManager {
         this.audioPlayerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         this.guildMusicConnections = new ConcurrentHashMap<>();
-
     }
 
     /**
@@ -88,10 +87,7 @@ public class MusicManager {
 
     public GuildMusic getMusic(Snowflake guildId) {
         final GuildMusicConnection guildMusicConnection = this.getConnection(guildId);
-        if (guildMusicConnection == null) {
-            return null;
-        }
-        return guildMusicConnection.getGuildMusic();
+        return guildMusicConnection == null ? null : guildMusicConnection.getGuildMusic();
     }
 
     public void removeConnection(Snowflake guildId) {

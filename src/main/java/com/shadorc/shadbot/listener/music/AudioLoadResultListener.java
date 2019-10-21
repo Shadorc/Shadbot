@@ -17,6 +17,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -53,6 +54,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
                         FormatUtils.trackName(track.getInfo())), channel))
                 .doOnTerminate(this::terminate)
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -94,6 +96,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                     .then(Mono.fromRunnable(() -> guildMusic.setWaitingForChoice(false))));
                 })
                 .doOnTerminate(this::terminate)
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -120,6 +123,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                             .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
                 })
                 .doOnTerminate(this::terminate)
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -154,6 +158,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                             errMessage.toLowerCase()), channel));
                 })
                 .doOnTerminate(this::terminate)
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(null, thr -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), thr));
     }
 
@@ -168,6 +173,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
                         StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
                 .doOnTerminate(this::terminate)
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 

@@ -33,7 +33,7 @@ public class UpdatableMessage {
     public UpdatableMessage(DiscordClient client, Snowflake channelId) {
         this.client = client;
         this.channelId = channelId;
-        this.messageId = new AtomicLong(-1);
+        this.messageId = new AtomicLong();
     }
 
     public UpdatableMessage setContent(String content) {
@@ -47,44 +47,46 @@ public class UpdatableMessage {
     }
 
     /**
-     * Send a message and delete the previous one
-     *
-     * @param embed - the embed to send
+     * Delete the previous message sent, if present, then send a message with the current content and embed set.
      */
-    public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
-        return Mono.just(Snowflake.of(this.messageId.get()))
-                .filter(messageId -> messageId.asLong() != -1)
-                .flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
-                .flatMap(Message::delete)
-                .then(this.client.getChannelById(this.channelId))
-                .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
-                .doOnNext(message -> this.messageId.set(message.getId().asLong()));
+    public Mono<Message> send() {
+        return this.send(this.content, this.embed)
+                .then(Mono.fromRunnable(() -> {
+                    this.content = null;
+                    this.embed = null;
+                }));
     }
 
-    public Mono<Message> send() {
+    /**
+     * Delete the previous message sent, if present, then send a message with the provided content and embed.
+     *
+     * @param content - the content
+     * @param embed   - the embed
+     */
+    private Mono<Message> send(@Nullable String content, @Nullable Consumer<EmbedCreateSpec> embed) {
         final Consumer<MessageCreateSpec> consumer = spec -> {
-            if (this.content != null) {
-                spec.setContent(this.content);
+            if (content != null) {
+                spec.setContent(content);
             }
-            if (this.embed != null) {
-                spec.setEmbed(this.embed);
+            if (embed != null) {
+                spec.setEmbed(embed);
             }
         };
 
-        return Mono.just(Snowflake.of(this.messageId.get()))
-                .filter(messageId -> messageId.asLong() != -1)
-                .flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
-                .flatMap(Message::delete)
+        return this.deleteMessage()
                 .then(this.client.getChannelById(this.channelId))
                 .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtils.sendMessage(consumer, channel, this.embed != null))
-                .doOnNext(message -> {
-                    this.messageId.set(message.getId().asLong());
-                    this.content = null;
-                    this.embed = null;
-                });
+                .flatMap(channel -> DiscordUtils.sendMessage(consumer, channel, embed != null))
+                .doOnNext(message -> this.messageId.set(message.getId().asLong()));
     }
 
-
+    /**
+     * Delete the previous message sent, if present.
+     */
+    public Mono<Void> deleteMessage() {
+        return Mono.just(Snowflake.of(this.messageId.get()))
+                .filter(messageId -> messageId.asLong() != 0)
+                .flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
+                .flatMap(Message::delete);
+    }
 }
