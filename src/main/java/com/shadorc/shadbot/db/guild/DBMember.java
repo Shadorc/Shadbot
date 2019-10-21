@@ -64,7 +64,6 @@ public class DBMember extends DatabaseEntity {
         }
     }
 
-    // TODO: Optimize
     public void resetCoins() {
         this.coins.set(0);
 

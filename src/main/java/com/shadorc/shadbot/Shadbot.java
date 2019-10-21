@@ -6,6 +6,7 @@ import com.rethinkdb.model.MapObject;
 import com.rethinkdb.net.Connection;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.LotteryCmd;
+import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.core.shard.Shard;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
@@ -40,10 +41,7 @@ import java.io.File;
 import java.net.ConnectException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -132,7 +130,7 @@ public class Shadbot {
             final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, DBGuild.class);
             final List<DBGuild> guilds = Utils.MAPPER.readValue(new File("./saves/database.json"), valueType);
             for (final DBGuild guild : guilds) {
-                if (guild.getMembers().isEmpty() && guild.settings == null) {
+                if (guild.getMembers().isEmpty() /*&& guild.settings == null*/) {
                     continue;
                 }
 

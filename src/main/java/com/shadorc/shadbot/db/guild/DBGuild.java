@@ -23,7 +23,7 @@ public class DBGuild extends DatabaseEntity {
     @JsonProperty("members")
     private final List<DBMember> members;
     @JsonProperty("settings")
-    /* TODO: private */ public final Settings settings;
+    private final Settings settings;
 
     protected DBGuild(Snowflake id) {
         this.guildId = id.asLong();
@@ -119,21 +119,17 @@ public class DBGuild extends DatabaseEntity {
         return allowedVoiceChannels.isEmpty() || allowedVoiceChannels.contains(channelId.asLong());
     }
 
-    // TODO: Guild exists: 2 requests (1 read, 1 write), guild does not exist: 3 requests (1 read, 2 writes)
-    public void setSetting(Setting setting, Object value) {
+    public <T> void setSetting(Setting setting, T value) {
         try {
             final GuildManager gm = GuildManager.getInstance();
-            final boolean guildExists = gm.requestGuild(this.getId()).count().eq(1).run(gm.getConnection());
-            if (!guildExists) {
-                this.insert();
-            }
-
-            gm.requestGuild(this.getId())
-                    .update(gm.getDatabase().hashMap("settings", gm.getDatabase().hashMap(setting.toString(), value)))
+            gm.getTable()
+                    .insert(gm.getDatabase().hashMap("id", this.guildId)
+                            .with("settings", gm.getDatabase().hashMap(setting.toString(), value)))
+                    .optArg("conflict", "update")
                     .run(gm.getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while updating DBGuild with ID %d.", this.guildId));
+                    String.format("An error occurred while updating setting DBGuild with ID %d.", this.guildId));
         }
     }
 
