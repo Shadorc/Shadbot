@@ -10,7 +10,7 @@ import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.object.util.Snowflake;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import static com.shadorc.shadbot.db.guild.GuildManager.LOGGER;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class DBMember extends DatabaseEntity {
@@ -19,12 +19,12 @@ public class DBMember extends DatabaseEntity {
     @JsonProperty("id")
     private final long memberId;
     @JsonProperty("coins")
-    private final AtomicInteger coins;
+    private final int coins;
 
     protected DBMember(Snowflake guildId, Snowflake id) {
         this.guildId = guildId.asLong();
         this.memberId = id.asLong();
-        this.coins = new AtomicInteger();
+        this.coins = 0;
     }
 
     protected DBMember() {
@@ -40,12 +40,12 @@ public class DBMember extends DatabaseEntity {
     }
 
     public int getCoins() {
-        return this.coins.get();
+        return this.coins;
     }
 
     // TODO: Optimize
-    public void addCoins(long gains) {
-        this.coins.set((int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS));
+    public int addCoins(long gains) {
+        final int coins = (int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
         try {
             final GuildManager gm = GuildManager.getInstance();
@@ -56,25 +56,28 @@ public class DBMember extends DatabaseEntity {
             }
 
             gm.requestMember(this.getGuildId(), this.getId())
-                    .update(gm.getDatabase().hashMap("coins", this.getCoins()))
+                    .update(gm.getDatabase().hashMap("coins", coins))
                     .run(gm.getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while adding coins DBMember with ID %d.", this.memberId));
+                    String.format("[DBMember %d / %d] An error occurred while updating coins.",
+                            this.memberId, this.guildId));
         }
+
+        return coins;
     }
 
     public void resetCoins() {
-        this.coins.set(0);
-
         try {
+            LOGGER.debug("[DBMember {} / {}] Resetting coins.", this.memberId, this.guildId);
             final GuildManager gm = GuildManager.getInstance();
             gm.requestMember(this.getGuildId(), this.getId())
                     .replace(member -> member.without("coins"))
                     .run(gm.getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while resetting coins DBMember with ID %d.", this.memberId));
+                    String.format("[DBMember %d / %d] An error occurred while resetting coins.",
+                            this.memberId, this.guildId));
         }
     }
 
@@ -86,15 +89,17 @@ public class DBMember extends DatabaseEntity {
     @Override
     public void delete() {
         try {
+            LOGGER.debug("[DBMember {} / {}] Deleting...", this.memberId, this.guildId);
             GuildManager.getInstance()
                     .requestMember(this.getGuildId(), this.getId())
                     .delete()
                     .run(GuildManager.getInstance().getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while deleting DBMember with ID %d and Guild ID %d.",
+                    String.format("[DBMember {} / {}] An error occurred during deletion.",
                             this.memberId, this.guildId));
         }
+        LOGGER.debug("[DBMember {} / {}] Deleted.", this.memberId, this.guildId);
     }
 
     @Override

@@ -156,7 +156,7 @@ public class DBGuild extends DatabaseEntity {
     @Override
     public void insert() {
         try {
-            LOGGER.debug("[Guild {}] Inserting...", this.guildId);
+            LOGGER.debug("[DBGuild {}] Inserting...", this.guildId);
             GuildManager.getInstance()
                     .getTable()
                     .insert(GuildManager.getInstance().getDatabase().hashMap("id", this.guildId))
@@ -165,22 +165,22 @@ public class DBGuild extends DatabaseEntity {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBGuild %d] An error occurred during insertion.", this.guildId));
         }
-        LOGGER.debug("[Guild {}] Inserted.", this.guildId);
+        LOGGER.debug("[DBGuild {}] Inserted.", this.guildId);
     }
 
     @Override
     public void delete() {
         try {
-            LOGGER.debug("[Guild {}] Deleting...", this.guildId);
+            LOGGER.debug("[DBGuild {}] Deleting...", this.guildId);
             GuildManager.getInstance()
                     .requestGuild(this.getId())
                     .delete()
                     .run(GuildManager.getInstance().getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("[Guild %d] An error occurred during deletion.", this.guildId));
+                    String.format("[DBGuild %d] An error occurred during deletion.", this.guildId));
         }
-        LOGGER.debug("[Guild {}] Deleted.", this.guildId);
+        LOGGER.debug("[DBGuild {}] Deleted.", this.guildId);
     }
 
     @Override
