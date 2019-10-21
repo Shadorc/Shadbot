@@ -43,14 +43,40 @@ public class DBMember extends DatabaseEntity {
         return this.coins.get();
     }
 
+    // TODO: Optimize
     public void addCoins(long gains) {
         this.coins.set((int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS));
-        //TODO this.update("coins", this.getCoins());
+
+        try {
+            final GuildManager gm = GuildManager.getInstance();
+            final boolean memberExists = gm.requestMember(this.getGuildId(), this.getId())
+                    .count().eq(1).run(gm.getConnection());
+            if (!memberExists) {
+                this.insert();
+            }
+
+            gm.requestMember(this.getGuildId(), this.getId())
+                    .update(gm.getDatabase().hashMap("coins", this.getCoins()))
+                    .run(gm.getConnection());
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while adding coins DBMember with ID %d.", this.memberId));
+        }
     }
 
+    // TODO: Optimize
     public void resetCoins() {
         this.coins.set(0);
-        //TODO this.update("coins", this.getCoins());
+
+        try {
+            final GuildManager gm = GuildManager.getInstance();
+            gm.requestMember(this.getGuildId(), this.getId())
+                    .replace(member -> member.without("coins"))
+                    .run(gm.getConnection());
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while resetting coins DBMember with ID %d.", this.memberId));
+        }
     }
 
     @Override
@@ -58,11 +84,9 @@ public class DBMember extends DatabaseEntity {
 
     }
 
-    // TODO: This method needs two accesses to the database, needs refactoring
     @Override
     public void delete() {
         try {
-            // TODO: What if the member is not present ?
             GuildManager.getInstance()
                     .requestMember(this.getGuildId(), this.getId())
                     .delete()
@@ -76,6 +100,7 @@ public class DBMember extends DatabaseEntity {
 
     @Override
     public String toString() {
-        return String.format("DBMember [guildId=%s, memberId=%s, coins=%s]", this.guildId, this.memberId, this.coins);
+        return String.format("DBMember [guildId=%s, memberId=%s, coins=%s]",
+                this.guildId, this.memberId, this.coins);
     }
 }

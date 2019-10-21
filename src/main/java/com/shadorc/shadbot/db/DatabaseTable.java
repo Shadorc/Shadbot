@@ -45,7 +45,7 @@ public class DatabaseTable {
         return this.table;
     }
 
-    public void stop() {
+    public void close() {
         if (this.connection != null && this.connection.isOpen()) {
             this.connection.close();
             LogUtils.info("Connection to %s:%d/%s closed.", this.connection.hostname, this.connection.port, this.tableName);

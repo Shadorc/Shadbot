@@ -14,9 +14,6 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class DBGuild extends DatabaseEntity {
@@ -24,14 +21,14 @@ public class DBGuild extends DatabaseEntity {
     @JsonProperty("id")
     private final long guildId;
     @JsonProperty("members")
-    private final CopyOnWriteArrayList<DBMember> members;
+    private final List<DBMember> members;
     @JsonProperty("settings")
-    public final ConcurrentHashMap<String, Object> settings;
+    /* TODO: private */ public final Settings settings;
 
     protected DBGuild(Snowflake id) {
         this.guildId = id.asLong();
-        this.members = new CopyOnWriteArrayList<>();
-        this.settings = new ConcurrentHashMap<>();
+        this.members = Collections.emptyList();
+        this.settings = new Settings();
     }
 
     protected DBGuild() {
@@ -47,68 +44,54 @@ public class DBGuild extends DatabaseEntity {
     }
 
     public List<Long> getAllowedTextChannels() {
-        return this.getListSetting(Setting.ALLOWED_TEXT_CHANNELS, Long.class);
+        return Objects.requireNonNullElse(this.settings.getAllowedTextChannels(), new ArrayList<>());
     }
 
     public List<Long> getAllowedVoiceChannels() {
-        return this.getListSetting(Setting.ALLOWED_VOICE_CHANNELS, Long.class);
+        return Objects.requireNonNullElse(this.settings.getAllowedVoiceChannels(), new ArrayList<>());
     }
 
     public List<Long> getAllowedRoles() {
-        return this.getListSetting(Setting.ALLOWED_ROLES, Long.class);
+        return Objects.requireNonNullElse(this.settings.getAllowedRoles(), new ArrayList<>());
     }
 
     public List<Long> getAutoRoles() {
-        return this.getListSetting(Setting.AUTO_ROLES, Long.class);
+        return Objects.requireNonNullElse(this.settings.getAutoRoles(), new ArrayList<>());
     }
 
     public List<String> getBlacklistedCmd() {
-        return this.getListSetting(Setting.BLACKLIST, String.class);
+        return Objects.requireNonNullElse(this.settings.getBlacklist(), new ArrayList<>());
     }
 
     public Integer getDefaultVol() {
-        return Integer.parseInt(Objects.toString(
-                this.settings.get(Setting.DEFAULT_VOLUME.toString()),
-                Integer.toString(Config.DEFAULT_VOLUME)));
+        return Objects.requireNonNullElse(this.settings.getDefaultVolume(), Config.DEFAULT_VOLUME);
     }
 
     /**
      * @return A map containing message's ID as key and role's ID as value
      */
     public Map<String, Long> getIamMessages() {
-        return (Map<String, Long>) Optional.ofNullable(this.settings.get(Setting.IAM_MESSAGES.toString()))
-                .orElse(new HashMap<String, Long>());
+        return Objects.requireNonNullElse(this.settings.getIamMessage(), new HashMap<>());
     }
 
     public Optional<String> getJoinMessage() {
-        return Optional.ofNullable((String) this.settings.get(Setting.JOIN_MESSAGE.toString()));
+        return Optional.ofNullable(this.settings.getJoinMessage());
     }
 
     public Optional<String> getLeaveMessage() {
-        return Optional.ofNullable((String) this.settings.get(Setting.LEAVE_MESSAGE.toString()));
+        return Optional.ofNullable(this.settings.getLeaveMessage());
     }
 
     public Optional<Long> getMessageChannelId() {
-        return Optional.ofNullable((Long) this.settings.get(Setting.MESSAGE_CHANNEL_ID.toString()));
+        return Optional.ofNullable(this.settings.getMessageChannelId());
     }
 
-    public Map<String, List<String>> getPlaylists() {
-        return (Map<String, List<String>>) Optional.ofNullable(this.settings.get(Setting.SAVED_PLAYLISTS.toString()))
-                .orElse(new HashMap<String, Long>());
+    public Map<String, List<String>> getSavedPlaylists() {
+        return Objects.requireNonNullElse(this.settings.getSavedPlaylists(), new HashMap<>());
     }
 
     public String getPrefix() {
-        return Objects.toString(
-                this.settings.get(Setting.PREFIX.toString()),
-                Config.DEFAULT_PREFIX);
-    }
-
-    private <T> List<T> getListSetting(Setting setting, Class<T> listClass) {
-        return Optional.ofNullable((List<?>) this.settings.get(setting.toString()))
-                .orElse(new ArrayList<>())
-                .stream()
-                .map(listClass::cast)
-                .collect(Collectors.toList());
+        return Objects.requireNonNullElse(this.settings.getPrefix(), Config.DEFAULT_PREFIX);
     }
 
     public boolean hasAllowedRole(List<Role> roles) {
@@ -138,8 +121,6 @@ public class DBGuild extends DatabaseEntity {
 
     // TODO: Guild exists: 2 requests (1 read, 1 write), guild does not exist: 3 requests (1 read, 2 writes)
     public void setSetting(Setting setting, Object value) {
-        this.settings.put(setting.toString(), value);
-
         try {
             final GuildManager gm = GuildManager.getInstance();
             final boolean guildExists = gm.requestGuild(this.getId()).count().eq(1).run(gm.getConnection());
@@ -157,8 +138,6 @@ public class DBGuild extends DatabaseEntity {
     }
 
     public void removeSetting(Setting setting) {
-        this.settings.remove(setting.toString());
-
         try {
             final GuildManager gm = GuildManager.getInstance();
             gm.requestGuild(this.getId())
@@ -171,7 +150,6 @@ public class DBGuild extends DatabaseEntity {
     }
 
     public void removeMember(DBMember dbMember) {
-        this.members.remove(dbMember);
         //TODO this.update("members", this.members);
     }
 
@@ -188,11 +166,9 @@ public class DBGuild extends DatabaseEntity {
         }
     }
 
-    // TODO: This method needs two accesses to the database, needs refactoring
     @Override
     public void delete() {
         try {
-            // TODO: What if the guild is not present ?
             GuildManager.getInstance()
                     .requestGuild(this.getId())
                     .delete()

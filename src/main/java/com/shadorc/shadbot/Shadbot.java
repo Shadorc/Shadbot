@@ -132,7 +132,7 @@ public class Shadbot {
             final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, DBGuild.class);
             final List<DBGuild> guilds = Utils.MAPPER.readValue(new File("./saves/database.json"), valueType);
             for (final DBGuild guild : guilds) {
-                if (guild.getMembers().isEmpty() && guild.settings.isEmpty()) {
+                if (guild.getMembers().isEmpty() && guild.settings == null) {
                     continue;
                 }
 
@@ -153,7 +153,9 @@ public class Shadbot {
                             .run(conn);
                 }
 
-                if (!guild.settings.isEmpty()) {
+                // TODO
+                /*
+                 if (guild.settings. != null) {
                     MapObject settings = db.hashMap();
                     for (final Map.Entry<String, Object> setting : guild.settings.entrySet()) {
                         settings = settings.with(setting.getKey(), setting.getValue());
@@ -162,6 +164,7 @@ public class Shadbot {
                             db.hashMap("settings", settings))
                             .run(conn);
                 }
+                 */
             }
 
             LogUtils.info("Guild migration done.");
@@ -236,9 +239,9 @@ public class Shadbot {
             Shadbot.botListStats.stop();
         }
 
-        GuildManager.getInstance().stop();
-        PremiumManager.getInstance().stop();
-        LotteryManager.getInstance().stop();
+        GuildManager.getInstance().close();
+        PremiumManager.getInstance().close();
+        LotteryManager.getInstance().close();
 
         return Flux.fromIterable(Shadbot.SHARDS.values())
                 .map(Shard::getClient)
