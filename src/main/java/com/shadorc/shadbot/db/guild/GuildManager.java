@@ -7,8 +7,12 @@ import com.shadorc.shadbot.db.DatabaseTable;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 public class GuildManager extends DatabaseTable {
+
+    public static final Logger LOGGER = Loggers.getLogger("shadbot.database.guild");
 
     private static GuildManager instance;
 
@@ -20,30 +24,34 @@ public class GuildManager extends DatabaseTable {
         super("guild");
     }
 
-    // TODO: Reduce DB calls
     public DBGuild getDBGuild(Snowflake guildId) {
+        LOGGER.debug("Requesting DBGuild with ID {}.", guildId.asLong());
         try (final Cursor<String> cursor = this.requestGuild(guildId).map(ReqlExpr::toJson).run(this.getConnection())) {
             if (cursor.hasNext()) {
+                LOGGER.debug("DBGuild with ID {} found.", guildId.asLong());
                 return Utils.MAPPER.readValue(cursor.next(), DBGuild.class);
             }
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while getting DBGuild with ID %d.", guildId.asLong()));
+                    String.format("An error occurred while requesting DBGuild with ID %d.", guildId.asLong()));
         }
+        LOGGER.debug("DBGuild with ID {} not found.", guildId.asLong());
         return new DBGuild(guildId);
     }
 
-    // TODO: Reduce DB calls
     public DBMember getDBMember(Snowflake guildId, Snowflake memberId) {
+        LOGGER.debug("Requesting DBMember with ID {}.", memberId.asLong());
         try (final Cursor<String> cursor = this.requestMember(guildId, memberId).map(ReqlExpr::toJson).run(this.getConnection())) {
             if (cursor.hasNext()) {
+                LOGGER.debug("DBMember with ID {} found.", memberId.asLong());
                 return Utils.MAPPER.readValue(cursor.next(), DBMember.class);
             }
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while getting DBMember with ID %d, guild ID %d.",
+                    String.format("An error occurred while requesting DBMember with ID %d, guild ID %d.",
                             memberId.asLong(), guildId.asLong()));
         }
+        LOGGER.debug("DBMember with ID {} not found.", memberId.asLong());
         return new DBMember(guildId, memberId);
     }
 

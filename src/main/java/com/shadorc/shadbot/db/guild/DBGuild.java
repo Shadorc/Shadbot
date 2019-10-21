@@ -15,6 +15,8 @@ import discord4j.core.object.util.Snowflake;
 
 import java.util.*;
 
+import static com.shadorc.shadbot.db.guild.GuildManager.LOGGER;
+
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class DBGuild extends DatabaseEntity {
 
@@ -121,6 +123,7 @@ public class DBGuild extends DatabaseEntity {
 
     public <T> void setSetting(Setting setting, T value) {
         try {
+            LOGGER.debug("[DBGuild {}] Updating setting {}: {}", this.guildId, setting, value);
             final GuildManager gm = GuildManager.getInstance();
             gm.getTable()
                     .insert(gm.getDatabase().hashMap("id", this.guildId)
@@ -129,50 +132,55 @@ public class DBGuild extends DatabaseEntity {
                     .run(gm.getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while updating setting DBGuild with ID %d.", this.guildId));
+                    String.format("[DBGuild %d] An error occurred while updating setting.", this.guildId));
         }
     }
 
     public void removeSetting(Setting setting) {
         try {
+            LOGGER.debug("[DBGuild {}] Removing setting {}", this.guildId, setting);
             final GuildManager gm = GuildManager.getInstance();
             gm.requestGuild(this.getId())
                     .replace(guild -> guild.without(gm.getDatabase().hashMap("settings", setting.toString())))
                     .run(gm.getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while updating DBGuild with ID %d.", this.guildId));
+                    String.format("[DBGuild %d] An error occurred while removing setting.", this.guildId));
         }
     }
 
     public void removeMember(DBMember dbMember) {
-        //TODO this.update("members", this.members);
+        //TODO
     }
 
     @Override
     public void insert() {
         try {
+            LOGGER.debug("[Guild {}] Inserting...", this.guildId);
             GuildManager.getInstance()
                     .getTable()
                     .insert(GuildManager.getInstance().getDatabase().hashMap("id", this.guildId))
                     .run(GuildManager.getInstance().getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while inserting DBGuild with ID %d.", this.guildId));
+                    String.format("[DBGuild %d] An error occurred during insertion.", this.guildId));
         }
+        LOGGER.debug("[Guild {}] Inserted.", this.guildId);
     }
 
     @Override
     public void delete() {
         try {
+            LOGGER.debug("[Guild {}] Deleting...", this.guildId);
             GuildManager.getInstance()
                     .requestGuild(this.getId())
                     .delete()
                     .run(GuildManager.getInstance().getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
-                    String.format("An error occurred while deleting DBGuild with ID %d.", this.guildId));
+                    String.format("[Guild %d] An error occurred during deletion.", this.guildId));
         }
+        LOGGER.debug("[Guild {}] Deleted.", this.guildId);
     }
 
     @Override
