@@ -34,13 +34,11 @@ public class LotteryManager extends DatabaseTable {
         try (final Cursor<String> cursor = request.run(this.getConnection())) {
             if (cursor.hasNext()) {
                 return Optional.of(Utils.MAPPER.readValue(cursor.next(), LotteryHistoric.class));
-            } else {
-                return Optional.empty();
             }
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery historic.");
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     public long getJackpot() {
@@ -48,11 +46,13 @@ public class LotteryManager extends DatabaseTable {
                 .filter(lottery -> lottery.hasFields("jackpot"));
 
         try (final Cursor<Long> cursor = request.run(this.getConnection())) {
-            return cursor.hasNext() ? cursor.next() : 0;
+            if (cursor.hasNext()) {
+                return cursor.next();
+            }
         } catch (final Exception err) {
-            LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery historic.");
-            return 0;
+            LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery jackpot.");
         }
+        return 0;
     }
 
     public void addToJackpot(long coins) {
