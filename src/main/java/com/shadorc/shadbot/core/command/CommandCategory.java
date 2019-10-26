@@ -11,7 +11,6 @@ public enum CommandCategory {
     MUSIC("Music"),
     GAMESTATS("Game Stats"),
     INFO("Info"),
-    FRENCH("French"),
     ADMIN("Admin"),
     OWNER("Owner");
 
