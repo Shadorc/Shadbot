@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.french;
+package com.shadorc.shadbot.command.fun;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.shadorc.shadbot.api.dtc.Quote;
@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 public class DtcCmd extends BaseCmd {
 
     public DtcCmd() {
-        super(CommandCategory.FRENCH, List.of("dtc"));
+        super(CommandCategory.FUN, List.of("dtc"));
         this.setDefaultRateLimiter();
     }
 

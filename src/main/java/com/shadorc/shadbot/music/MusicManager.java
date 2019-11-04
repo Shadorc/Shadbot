@@ -9,10 +9,10 @@ import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
-import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -57,7 +57,7 @@ public class MusicManager {
      * a new one is created and a request to join the {@link VoiceChannel} corresponding to the provided
      * {@code voiceChannelId} is sent.
      */
-    public GuildMusic getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
+    public Mono<GuildMusic> getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
         final GuildMusicConnection guildMusicConnection = this.guildMusicConnections.computeIfAbsent(guildId,
                 ignored -> {
                     LOGGER.debug("{Guild ID: {}} Creating guild music connection.", guildId.asLong());
@@ -74,11 +74,11 @@ public class MusicManager {
             guildMusicConnection.setGuildMusic(guildMusic);
 
             final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
-            guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
-                    .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+            return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
+                    .thenReturn(guildMusicConnection.getGuildMusic());
         }
 
-        return guildMusicConnection.getGuildMusic();
+        return Mono.just(guildMusicConnection.getGuildMusic());
     }
 
     public GuildMusicConnection getConnection(Snowflake guildId) {

@@ -10,11 +10,7 @@ import com.shadorc.shadbot.command.admin.member.SoftBanCmd;
 import com.shadorc.shadbot.command.currency.CoinsCmd;
 import com.shadorc.shadbot.command.currency.LeaderboardCmd;
 import com.shadorc.shadbot.command.currency.TransferCoinsCmd;
-import com.shadorc.shadbot.command.french.DtcCmd;
-import com.shadorc.shadbot.command.french.JokeCmd;
-import com.shadorc.shadbot.command.fun.ChatCmd;
-import com.shadorc.shadbot.command.fun.LeetCmd;
-import com.shadorc.shadbot.command.fun.ThisDayCmd;
+import com.shadorc.shadbot.command.fun.*;
 import com.shadorc.shadbot.command.game.LotteryCmd;
 import com.shadorc.shadbot.command.game.RussianRouletteCmd;
 import com.shadorc.shadbot.command.game.blackjack.BlackjackCmd;
@@ -58,7 +54,7 @@ public class CommandManager {
                 new WeatherCmd(), new CalcCmd(), new TranslateCmd(), new WikiCmd(), new PollCmd(),
                 new UrbanCmd(), new LyricsCmd(),
                 // Fun Commands
-                new ChatCmd(), new ThisDayCmd(), new LeetCmd(),
+                new ChatCmd(), new ThisDayCmd(), new LeetCmd(), new JokeCmd(), new DtcCmd(),
                 // Image Commands
                 new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(),
                 new Rule34Cmd(),
@@ -77,8 +73,6 @@ public class CommandManager {
                 // Info Commands
                 new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
                 new RolelistCmd(), new FeedbackCmd(),
-                // French Commands
-                new JokeCmd(), new DtcCmd(),
                 // Admin Commands
                 new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
                 new IamCmd(), new SettingsCmd(),
