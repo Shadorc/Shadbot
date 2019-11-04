@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.db.guild;
+package com.shadorc.shadbot.db.guild.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

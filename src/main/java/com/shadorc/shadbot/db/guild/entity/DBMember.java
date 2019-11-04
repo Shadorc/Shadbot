@@ -1,8 +1,10 @@
-package com.shadorc.shadbot.db.guild;
+package com.shadorc.shadbot.db.guild.entity;
 
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseEntity;
+import com.shadorc.shadbot.db.guild.GuildManager;
+import com.shadorc.shadbot.db.guild.bean.DBMemberBean;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.object.util.Snowflake;

@@ -9,7 +9,7 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.guild.DBGuild;
+import com.shadorc.shadbot.db.guild.entity.DBGuild;
 import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;

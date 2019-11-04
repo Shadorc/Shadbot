@@ -5,7 +5,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
-import com.shadorc.shadbot.db.guild.DBGuild;
+import com.shadorc.shadbot.db.guild.entity.DBGuild;
 import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;

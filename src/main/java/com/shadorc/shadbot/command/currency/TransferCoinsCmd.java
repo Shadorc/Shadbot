@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.guild.DBMember;
+import com.shadorc.shadbot.db.guild.entity.DBMember;
 import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;

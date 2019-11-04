@@ -1,7 +1,8 @@
-package com.shadorc.shadbot.db.guild;
+package com.shadorc.shadbot.db.guild.entity;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.guild.bean.SettingsBean;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
