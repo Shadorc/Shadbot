@@ -29,7 +29,7 @@ public class Credentials {
         // Check if all API keys are present
         for (final Credential key : Credential.values()) {
             if (Credentials.get(key) == null) {
-                LOGGER.warn("Property {} not found, the associated command / service may not work properly.", key);
+                LOGGER.warn("Credential {} not found, the associated command / service may not work properly.", key);
             }
         }
     }
