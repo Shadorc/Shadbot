@@ -79,7 +79,7 @@ public class IamCmd extends BaseCmd {
                                     .send(embedConsumer)
                                     .doOnNext(message -> {
                                         final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
-                                        final Map<String, Long> setting = dbGuild.getIamMessages();
+                                        final Map<String, Long> setting = dbGuild.getSettings().getIamMessages();
                                         roles.stream().map(Role::getId)
                                                 .forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));
                                         dbGuild.setSetting(Setting.IAM_MESSAGES, setting);

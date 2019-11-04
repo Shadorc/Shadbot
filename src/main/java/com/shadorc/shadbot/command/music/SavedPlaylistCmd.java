@@ -55,7 +55,7 @@ public class SavedPlaylistCmd extends BaseCmd {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(0), FormatUtils.options(Action.class))));
 
-        final Map<String, List<String>> map = GuildManager.getInstance().getDBGuild(context.getGuildId()).getSavedPlaylists();
+        final Map<String, List<String>> map = GuildManager.getInstance().getDBGuild(context.getGuildId()).getSettings().getSavedPlaylists();
 
         switch (action) {
             case SEE:

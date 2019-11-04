@@ -48,11 +48,11 @@ public class CommandProcessor {
                 .flatMap(member -> member.getRoles().collectList())
                 .zipWith(event.getGuild().map(Guild::getOwnerId))
                 // The role is allowed or the author is the guild's owner
-                .filter(tuple -> dbGuild.hasAllowedRole(tuple.getT1())
+                .filter(tuple -> dbGuild.getSettings().hasAllowedRole(tuple.getT1())
                         || event.getMessage().getAuthor().map(User::getId).map(tuple.getT2()::equals).orElse(false))
                 // The channel is allowed
                 .flatMap(ignored -> event.getMessage().getChannel())
-                .filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
+                .filter(channel -> dbGuild.getSettings().isTextChannelAllowed(channel.getId()))
                 // The message starts with the correct prefix
                 .flatMap(ignored -> this.checkPrefix(dbGuild, content))
                 // Execute the command
@@ -60,8 +60,9 @@ public class CommandProcessor {
     }
 
     private Mono<String> checkPrefix(DBGuild dbGuild, String content) {
-        if (content.startsWith(dbGuild.getPrefix())) {
-            return Mono.just(dbGuild.getPrefix());
+        final String prefix = dbGuild.getSettings().getPrefix();
+        if (content.startsWith(prefix)) {
+            return Mono.just(prefix);
         }
         if (content.equalsIgnoreCase(String.format("%sprefix", Config.DEFAULT_PREFIX))) {
             return Mono.just(Config.DEFAULT_PREFIX);
@@ -104,7 +105,7 @@ public class CommandProcessor {
                                 .then(Mono.empty())))
                 .flatMap(perm -> Mono.just(command))
                 // The command is allowed in the guild
-                .filter(cmd -> GuildManager.getInstance().getDBGuild(context.getGuildId()).isCommandAllowed(cmd))
+                .filter(cmd -> GuildManager.getInstance().getDBGuild(context.getGuildId()).getSettings().isCommandAllowed(cmd))
                 // The user is not rate limited
                 .filter(cmd -> !this.isRateLimited(context, cmd))
                 .flatMap(cmd -> cmd.execute(context))

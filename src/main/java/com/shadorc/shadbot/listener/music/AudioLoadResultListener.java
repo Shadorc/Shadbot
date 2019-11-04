@@ -143,7 +143,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                 + "\nExample: 1,3,4"
                                 + "\n\n" + choices)
                         .setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-                                GuildManager.getInstance().getDBGuild(this.guildId).getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
+                                GuildManager.getInstance().getDBGuild(this.guildId).getSettings().getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
     }
 
     @Override

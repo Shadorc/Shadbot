@@ -19,7 +19,7 @@ public class TextChannelDeleteListener implements EventListener<TextChannelDelet
     public Mono<Void> execute(TextChannelDeleteEvent event) {
         return Mono.fromRunnable(() -> {
             final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(event.getChannel().getGuildId());
-            final List<Long> allowedTextChannelIds = dbGuild.getAllowedTextChannels();
+            final List<Long> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannels();
             // If the channel was an allowed channel...
             if (allowedTextChannelIds.remove(event.getChannel().getId().asLong())) {
                 // ...update settings to remove the deleted one

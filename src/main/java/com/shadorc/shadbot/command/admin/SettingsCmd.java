@@ -93,32 +93,32 @@ public class SettingsCmd extends BaseCmd {
         final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
         final StringBuilder settingsStr = new StringBuilder();
 
-        if (!dbGuild.getPrefix().equals(Config.DEFAULT_PREFIX)) {
+        if (!dbGuild.getSettings().getPrefix().equals(Config.DEFAULT_PREFIX)) {
             settingsStr.append(String.format("**Prefix:** %s", context.getPrefix()));
         }
 
-        if (dbGuild.getDefaultVol() != Config.DEFAULT_VOLUME) {
-            settingsStr.append(String.format("%n**Default volume:** %d%%", dbGuild.getDefaultVol()));
+        if (dbGuild.getSettings().getDefaultVol() != Config.DEFAULT_VOLUME) {
+            settingsStr.append(String.format("%n**Default volume:** %d%%", dbGuild.getSettings().getDefaultVol()));
         }
 
-        if (!dbGuild.getBlacklistedCmd().isEmpty()) {
+        if (!dbGuild.getSettings().getBlacklistedCmd().isEmpty()) {
             settingsStr.append(String.format("%n**Blacklisted commands:**%n\t%s",
-                    String.join("\n\t", dbGuild.getBlacklistedCmd())));
+                    String.join("\n\t", dbGuild.getSettings().getBlacklistedCmd())));
         }
 
-        dbGuild.getJoinMessage()
+        dbGuild.getSettings().getJoinMessage()
                 .ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:**%n%s", joinMessage)));
-        dbGuild.getLeaveMessage()
+        dbGuild.getSettings().getLeaveMessage()
                 .ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
 
-        final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getMessageChannelId())
+        final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getSettings().getMessageChannelId())
                 .map(Snowflake::of)
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
                 .map(channel -> settingsStr.append(String.format("%n**Auto message channel:** %s", channel)))
                 .then();
 
-        final Mono<Void> allowedTextChannelsStr = Flux.fromIterable(dbGuild.getAllowedTextChannels())
+        final Mono<Void> allowedTextChannelsStr = Flux.fromIterable(dbGuild.getSettings().getAllowedTextChannels())
                 .map(Snowflake::of)
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
@@ -127,7 +127,7 @@ public class SettingsCmd extends BaseCmd {
                 .map(channels -> settingsStr.append(String.format("%n**Allowed text channels:**%n\t%s", String.join("\n\t", channels))))
                 .then();
 
-        final Mono<Void> allowedVoiceChannelsStr = Flux.fromIterable(dbGuild.getAllowedVoiceChannels())
+        final Mono<Void> allowedVoiceChannelsStr = Flux.fromIterable(dbGuild.getSettings().getAllowedVoiceChannels())
                 .map(Snowflake::of)
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
@@ -136,7 +136,7 @@ public class SettingsCmd extends BaseCmd {
                 .map(channels -> settingsStr.append(String.format("%n**Allowed voice channels:**%n\t%s", String.join("\n\t", channels))))
                 .then();
 
-        final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getAutoRoles())
+        final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getSettings().getAutoRoles())
                 .map(Snowflake::of)
                 .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
                 .map(Role::getMention)
@@ -145,7 +145,7 @@ public class SettingsCmd extends BaseCmd {
                 .map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n\t%s", String.join("\n\t", roles))))
                 .then();
 
-        final Mono<Void> allowedRolesStr = Flux.fromIterable(dbGuild.getAllowedRoles())
+        final Mono<Void> allowedRolesStr = Flux.fromIterable(dbGuild.getSettings().getAllowedRoles())
                 .map(Snowflake::of)
                 .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
                 .map(Role::getMention)

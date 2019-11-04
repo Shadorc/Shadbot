@@ -48,8 +48,8 @@ public class AllowedChannelsSetting extends BaseSetting {
                     }
 
                     final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
-                    final List<Long> allowedTextChannels = dbGuild.getAllowedTextChannels();
-                    final List<Long> allowedVoiceChannels = dbGuild.getAllowedVoiceChannels();
+                    final List<Long> allowedTextChannels = dbGuild.getSettings().getAllowedTextChannels();
+                    final List<Long> allowedVoiceChannels = dbGuild.getSettings().getAllowedVoiceChannels();
 
                     final List<Long> mentionedVoiceChannelIds = mentionedChannels.stream()
                             .filter(channel -> channel.getType() == Type.GUILD_VOICE)

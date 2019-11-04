@@ -56,7 +56,7 @@ public class BlacklistSettingCmd extends BaseSetting {
         }
 
         final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
-        final List<String> blacklist = dbGuild.getBlacklistedCmd();
+        final List<String> blacklist = dbGuild.getSettings().getBlacklistedCmd();
 
         final String actionVerbose;
         if (action == Action.ADD) {

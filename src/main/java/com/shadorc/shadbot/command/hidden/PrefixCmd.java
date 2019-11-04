@@ -25,11 +25,12 @@ public class PrefixCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
+        final String prefix = dbGuild.getSettings().getPrefix();
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.INFO + " The prefix for this server is `%s`. For example: `%shelp`",
-                                dbGuild.getPrefix(), dbGuild.getPrefix()), channel))
+                                prefix, prefix), channel))
                 .then();
     }
 

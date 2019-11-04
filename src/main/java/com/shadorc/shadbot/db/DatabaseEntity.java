@@ -1,9 +1,13 @@
 package com.shadorc.shadbot.db;
 
-public abstract class DatabaseEntity {
+import java.io.IOException;
 
-    public abstract void insert();
+public interface DatabaseEntity {
 
-    public abstract void delete();
+    void readValue(String content) throws IOException;
+
+    void insert();
+
+    void delete();
 
 }

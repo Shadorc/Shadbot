@@ -47,7 +47,7 @@ public class AllowedRolesSetting extends BaseSetting {
                     }
 
                     final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
-                    final List<Long> allowedRoles = dbGuild.getAllowedRoles();
+                    final List<Long> allowedRoles = dbGuild.getSettings().getAllowedRoles();
                     final List<Long> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
                             .map(Snowflake::asLong)

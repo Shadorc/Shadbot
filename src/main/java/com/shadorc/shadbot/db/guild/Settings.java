@@ -1,107 +1,97 @@
 package com.shadorc.shadbot.db.guild;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import reactor.util.annotation.Nullable;
+import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.data.Config;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.Snowflake;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Settings {
 
-    @Nullable
-    @JsonProperty("allowed_text_channels")
-    private List<Long> allowedTextChannels;
-    @Nullable
-    @JsonProperty("allowed_voice_channels")
-    private List<Long> allowedVoiceChannels;
-    @Nullable
-    @JsonProperty("allowed_roles")
-    private List<Long> allowedRoles;
-    @Nullable
-    @JsonProperty("auto_roles")
-    private List<Long> autoRoles;
-    @Nullable
-    @JsonProperty("blacklist")
-    private List<String> blacklist;
-    @Nullable
-    @JsonProperty("default_volume")
-    private Integer defaultVolume;
-    @Nullable
-    @JsonProperty("iam_message")
-    private Map<String, Long> iamMessage;
-    @Nullable
-    @JsonProperty("join_message")
-    private String joinMessage;
-    @Nullable
-    @JsonProperty("leave_message")
-    private String leaveMessage;
-    @Nullable
-    @JsonProperty("message_channel_id")
-    private Long messageChannelId;
-    @Nullable
-    @JsonProperty("saved_playlists")
-    private Map<String, List<String>> savedPlaylists;
-    @Nullable
-    @JsonProperty("prefix")
-    private String prefix;
+    private final SettingsBean bean;
 
-    @Nullable
+    protected Settings(SettingsBean bean) {
+        this.bean = bean;
+    }
+
+    public boolean hasAllowedRole(List<Role> roles) {
+        // If the user is an administrator OR no permissions have been set OR the role is allowed
+        return this.getAllowedRoles().isEmpty()
+                || roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
+                || roles.stream().anyMatch(role -> this.getAllowedRoles().contains(role.getId().asLong()));
+    }
+
+    public boolean isCommandAllowed(BaseCmd cmd) {
+        return cmd.getNames().stream().noneMatch(this.getBlacklistedCmd()::contains);
+    }
+
+    public boolean isTextChannelAllowed(Snowflake channelId) {
+        // If no permission has been set OR the text channel is allowed
+        return this.getAllowedTextChannels().isEmpty() || this.getAllowedTextChannels().contains(channelId.asLong());
+    }
+
+    public boolean isVoiceChannelAllowed(Snowflake channelId) {
+        // If no permission has been set OR the voice channel is allowed
+        return this.getAllowedVoiceChannels().isEmpty() || this.getAllowedVoiceChannels().contains(channelId.asLong());
+    }
+
     public List<Long> getAllowedTextChannels() {
-        return this.allowedTextChannels;
+        return Objects.requireNonNullElse(this.bean.getAllowedTextChannels(), new ArrayList<>());
     }
 
-    @Nullable
     public List<Long> getAllowedVoiceChannels() {
-        return this.allowedVoiceChannels;
+        return Objects.requireNonNullElse(this.bean.getAllowedVoiceChannels(), new ArrayList<>());
     }
 
-    @Nullable
     public List<Long> getAllowedRoles() {
-        return this.allowedRoles;
+        return Objects.requireNonNullElse(this.bean.getAllowedRoles(), new ArrayList<>());
     }
 
-    @Nullable
     public List<Long> getAutoRoles() {
-        return this.autoRoles;
+        return Objects.requireNonNullElse(this.bean.getAutoRoles(), new ArrayList<>());
     }
 
-    @Nullable
-    public List<String> getBlacklist() {
-        return this.blacklist;
+    public List<String> getBlacklistedCmd() {
+        return Objects.requireNonNullElse(this.bean.getBlacklist(), new ArrayList<>());
     }
 
-    @Nullable
-    public Integer getDefaultVolume() {
-        return this.defaultVolume;
+    public Integer getDefaultVol() {
+        return Objects.requireNonNullElse(this.bean.getDefaultVolume(), Config.DEFAULT_VOLUME);
     }
 
-    @Nullable
-    public Map<String, Long> getIamMessage() {
-        return this.iamMessage;
+    /**
+     * @return A map containing message's ID as key and role's ID as value
+     */
+    public Map<String, Long> getIamMessages() {
+        return Objects.requireNonNullElse(this.bean.getIamMessage(), new HashMap<>());
     }
 
-    @Nullable
-    public String getJoinMessage() {
-        return this.joinMessage;
+    public Optional<String> getJoinMessage() {
+        return Optional.ofNullable(this.bean.getJoinMessage());
     }
 
-    @Nullable
-    public String getLeaveMessage() {
-        return this.leaveMessage;
+    public Optional<String> getLeaveMessage() {
+        return Optional.ofNullable(this.bean.getLeaveMessage());
     }
 
-    @Nullable
-    public Long getMessageChannelId() {
-        return this.messageChannelId;
+    public Optional<Long> getMessageChannelId() {
+        return Optional.ofNullable(this.bean.getMessageChannelId());
     }
 
-    @Nullable
     public Map<String, List<String>> getSavedPlaylists() {
-        return this.savedPlaylists;
+        return Objects.requireNonNullElse(this.bean.getSavedPlaylists(), new HashMap<>());
     }
 
-    @Nullable
     public String getPrefix() {
-        return this.prefix;
+        return Objects.requireNonNullElse(this.bean.getPrefix(), Config.DEFAULT_PREFIX);
+    }
+
+    @Override
+    public String toString() {
+        return "Settings{" +
+                "bean=" + this.bean +
+                '}';
     }
 }

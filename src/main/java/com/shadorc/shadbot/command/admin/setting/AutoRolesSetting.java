@@ -38,7 +38,7 @@ public class AutoRolesSetting extends BaseSetting {
                         args.get(1), FormatUtils.options(Action.class))));
 
         final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
-        final List<Long> autoRoles = dbGuild.getAutoRoles();
+        final List<Long> autoRoles = dbGuild.getSettings().getAutoRoles();
 
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(2)))

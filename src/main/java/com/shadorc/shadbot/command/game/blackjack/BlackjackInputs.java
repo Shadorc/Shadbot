@@ -67,7 +67,7 @@ public class BlackjackInputs extends Inputs {
                                 .then();
                     }
 
-                    final String prefix = GuildManager.getInstance().getDBGuild(member.getGuildId()).getPrefix();
+                    final String prefix = GuildManager.getInstance().getDBGuild(member.getGuildId()).getSettings().getPrefix();
                     final String content = event.getMessage().getContent().orElse("").replace(prefix, "").toLowerCase().trim();
                     if ("double down".equals(content) && player.getHand().count() != 2) {
                         return this.game.getContext().getChannel()

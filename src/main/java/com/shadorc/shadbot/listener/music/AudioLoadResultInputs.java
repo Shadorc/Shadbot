@@ -42,7 +42,7 @@ public class AudioLoadResultInputs extends Inputs {
         final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
 
         final String content = event.getMessage().getContent().orElseThrow();
-        final String prefix = GuildManager.getInstance().getDBGuild(this.listener.getGuildId()).getPrefix();
+        final String prefix = GuildManager.getInstance().getDBGuild(this.listener.getGuildId()).getSettings().getPrefix();
         if (content.equals(String.format("%scancel", prefix))) {
             guildMusic.setWaitingForChoice(false);
             return guildMusic.getMessageChannel()

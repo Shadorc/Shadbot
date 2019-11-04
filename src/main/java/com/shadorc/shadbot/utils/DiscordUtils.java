@@ -161,7 +161,8 @@ public class DiscordUtils {
                     final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
 
                     // If the user is in a voice channel but the bot is not allowed to join
-                    if (userVoiceChannelId.isPresent() && !GuildManager.getInstance().getDBGuild(context.getGuildId()).isVoiceChannelAllowed(userVoiceChannelId.get())) {
+                    if (userVoiceChannelId.isPresent()
+                            && !GuildManager.getInstance().getDBGuild(context.getGuildId()).getSettings().isVoiceChannelAllowed(userVoiceChannelId.get())) {
                         throw new CommandException("I'm not allowed to join this voice channel.");
                     }
 

@@ -95,7 +95,7 @@ public class AutoMessageSetting extends BaseSetting {
             final String message = args.get(3);
             dbGuild.setSetting(setting, message);
 
-            if (dbGuild.getMessageChannelId().isEmpty()) {
+            if (dbGuild.getSettings().getMessageChannelId().isEmpty()) {
                 strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
                                 + "in which to send the auto-messages. Use `%s%s %s %s <#channel>`%n",
                         context.getPrefix(), this.getCommandName(), Action.ENABLE.toString().toLowerCase(), Type.CHANNEL.toString().toLowerCase()));

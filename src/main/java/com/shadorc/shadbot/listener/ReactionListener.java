@@ -107,6 +107,7 @@ public class ReactionListener {
                 .flatMap(ignored -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
                 .flatMap(member -> Mono.justOrEmpty(GuildManager.getInstance()
                         .getDBGuild(member.getGuildId())
+                        .getSettings()
                         .getIamMessages()
                         .get(message.getId().asString()))
                         .map(Snowflake::of)
