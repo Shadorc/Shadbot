@@ -2,8 +2,8 @@ package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.guild.entity.DBGuild;
 import com.shadorc.shadbot.db.guild.GuildManager;
+import com.shadorc.shadbot.db.guild.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;

@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.core.game.player;
 
-import com.shadorc.shadbot.db.guild.entity.DBMember;
 import com.shadorc.shadbot.db.guild.GuildManager;
+import com.shadorc.shadbot.db.guild.entity.DBMember;
 import com.shadorc.shadbot.db.lottery.LotteryManager;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.User;

@@ -20,10 +20,6 @@ public class LotteryHistoric {
         this.number = number;
     }
 
-    public LotteryHistoric() {
-        this(0, 0, 0);
-    }
-
     public long getJackpot() {
         return this.jackpot;
     }

@@ -4,7 +4,8 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.premium.PremiumManager;
-import com.shadorc.shadbot.db.premium.Relic;
+import com.shadorc.shadbot.db.premium.RelicType;
+import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -27,7 +28,7 @@ public class ActivateRelicCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final Optional<Relic> relicOpt = PremiumManager.getInstance().getRelic(arg);
+        final Optional<Relic> relicOpt = PremiumManager.getInstance().getRelicById(arg);
 
         if (relicOpt.isEmpty()) {
             return context.getChannel()
@@ -38,7 +39,7 @@ public class ActivateRelicCmd extends BaseCmd {
 
         final Relic relic = relicOpt.get();
 
-        if (relic.isActivated()) {
+        if (relic.getActivation().isPresent()) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
                             String.format(Emoji.GREY_EXCLAMATION + " (**%s**) This Relic is already activated.", context.getUsername()), channel))
@@ -47,7 +48,7 @@ public class ActivateRelicCmd extends BaseCmd {
 
         relic.activate(context.getAuthorId());
 
-        if (relic.getType().equals(Relic.RelicType.GUILD.toString())) {
+        if (relic.getType().equals(RelicType.GUILD.toString())) {
             relic.setGuildId(context.getGuildId().asLong());
         }
 

@@ -21,10 +21,6 @@ public class LotteryGambler {
         this.number = number;
     }
 
-    public LotteryGambler() {
-        this(Snowflake.of(0L), Snowflake.of(0L), 0);
-    }
-
     public Snowflake getGuildId() {
         return Snowflake.of(this.guildId);
     }
