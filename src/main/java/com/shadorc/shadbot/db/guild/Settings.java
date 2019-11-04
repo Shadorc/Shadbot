@@ -5,15 +5,21 @@ import com.shadorc.shadbot.data.Config;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import reactor.util.annotation.Nullable;
 
 import java.util.*;
 
 public class Settings {
 
+    @Nullable
     private final SettingsBean bean;
 
-    protected Settings(SettingsBean bean) {
+    protected Settings(@Nullable SettingsBean bean) {
         this.bean = bean;
+    }
+
+    protected Settings() {
+        this(null);
     }
 
     public boolean hasAllowedRole(List<Role> roles) {
@@ -38,54 +44,75 @@ public class Settings {
     }
 
     public List<Long> getAllowedTextChannels() {
-        return Objects.requireNonNullElse(this.bean.getAllowedTextChannels(), new ArrayList<>());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getAllowedTextChannels)
+                .orElse(new ArrayList<>());
     }
 
     public List<Long> getAllowedVoiceChannels() {
-        return Objects.requireNonNullElse(this.bean.getAllowedVoiceChannels(), new ArrayList<>());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getAllowedVoiceChannels)
+                .orElse(new ArrayList<>());
     }
 
     public List<Long> getAllowedRoles() {
-        return Objects.requireNonNullElse(this.bean.getAllowedRoles(), new ArrayList<>());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getAllowedRoles)
+                .orElse(new ArrayList<>());
     }
 
     public List<Long> getAutoRoles() {
-        return Objects.requireNonNullElse(this.bean.getAutoRoles(), new ArrayList<>());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getAutoRoles)
+                .orElse(new ArrayList<>());
     }
 
     public List<String> getBlacklistedCmd() {
-        return Objects.requireNonNullElse(this.bean.getBlacklist(), new ArrayList<>());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getBlacklist)
+                .orElse(new ArrayList<>());
     }
 
     public Integer getDefaultVol() {
-        return Objects.requireNonNullElse(this.bean.getDefaultVolume(), Config.DEFAULT_VOLUME);
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getDefaultVolume)
+                .orElse(Config.DEFAULT_VOLUME);
     }
 
     /**
      * @return A map containing message's ID as key and role's ID as value
      */
     public Map<String, Long> getIamMessages() {
-        return Objects.requireNonNullElse(this.bean.getIamMessage(), new HashMap<>());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getIamMessage)
+                .orElse(new HashMap<>());
     }
 
     public Optional<String> getJoinMessage() {
-        return Optional.ofNullable(this.bean.getJoinMessage());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getJoinMessage);
     }
 
     public Optional<String> getLeaveMessage() {
-        return Optional.ofNullable(this.bean.getLeaveMessage());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getLeaveMessage);
     }
 
     public Optional<Long> getMessageChannelId() {
-        return Optional.ofNullable(this.bean.getMessageChannelId());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getMessageChannelId);
     }
 
     public Map<String, List<String>> getSavedPlaylists() {
-        return Objects.requireNonNullElse(this.bean.getSavedPlaylists(), new HashMap<>());
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getSavedPlaylists)
+                .orElse(new HashMap<>());
     }
 
     public String getPrefix() {
-        return Objects.requireNonNullElse(this.bean.getPrefix(), Config.DEFAULT_PREFIX);
+        return Optional.ofNullable(this.bean)
+                .map(SettingsBean::getPrefix)
+                .orElse(Config.DEFAULT_PREFIX);
     }
 
     @Override

@@ -9,7 +9,7 @@ public class DBGuildBean {
     @JsonProperty("id")
     private long id;
     @JsonProperty("members")
-    private List<DBMember> members;
+    private List<DBMemberBean> members;
     @JsonProperty("settings")
     private SettingsBean settingsBean;
 
@@ -17,7 +17,7 @@ public class DBGuildBean {
         return this.id;
     }
 
-    public List<DBMember> getMembers() {
+    public List<DBMemberBean> getMembers() {
         return this.members;
     }
 

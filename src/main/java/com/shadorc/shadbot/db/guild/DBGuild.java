@@ -4,24 +4,32 @@ import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.shadorc.shadbot.db.guild.GuildManager.LOGGER;
 
 public class DBGuild implements DatabaseEntity {
 
-    private long id;
-    private List<DBMember> members;
-    private Settings settings;
+    private final long id;
+    private final List<DBMember> members;
+    private final Settings settings;
+
+    public DBGuild(DBGuildBean bean) {
+        this.id = bean.getId();
+        this.members = bean.getMembers().stream()
+                .map(memberBean -> new DBMember(this.getId(), memberBean))
+                .collect(Collectors.toList());
+        this.settings = new Settings(bean.getSettingsBean());
+    }
 
     public DBGuild(Snowflake id) {
         this.id = id.asLong();
+        this.members = new ArrayList<>();
+        this.settings = new Settings();
     }
 
     public Snowflake getId() {
@@ -70,15 +78,6 @@ public class DBGuild implements DatabaseEntity {
 
     public void removeMember(DBMember dbMember) {
         //TODO
-    }
-
-    @Override
-    public void readValue(String content) throws IOException {
-        final DBGuildBean bean = Utils.MAPPER.readValue(content, DBGuildBean.class);
-
-        this.id = bean.getId();
-        this.members = Objects.requireNonNullElse(bean.getMembers(), new ArrayList<>());
-        this.settings = new Settings(Objects.requireNonNullElse(bean.getSettingsBean(), new SettingsBean()));
     }
 
     @Override

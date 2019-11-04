@@ -5,6 +5,7 @@ import com.rethinkdb.net.Cursor;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.db.DatabaseTable;
 import com.shadorc.shadbot.utils.LogUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 import reactor.util.Logger;
 import reactor.util.Loggers;
@@ -26,30 +27,26 @@ public class GuildManager extends DatabaseTable {
     public DBGuild getDBGuild(Snowflake guildId) {
         LOGGER.debug("Requesting DBGuild with ID {}.", guildId.asLong());
 
-        final DBGuild dbGuild = new DBGuild(guildId);
         try (final Cursor<String> cursor = this.requestGuild(guildId).map(ReqlExpr::toJson).run(this.getConnection())) {
             if (cursor.hasNext()) {
                 LOGGER.debug("DBGuild with ID {} found.", guildId.asLong());
-                dbGuild.readValue(cursor.next());
-                return dbGuild;
+                return new DBGuild(Utils.MAPPER.readValue(cursor.next(), DBGuildBean.class));
             }
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("An error occurred while requesting DBGuild with ID %d.", guildId.asLong()));
         }
         LOGGER.debug("DBGuild with ID {} not found.", guildId.asLong());
-        return dbGuild;
+        return new DBGuild(guildId);
     }
 
     public DBMember getDBMember(Snowflake guildId, Snowflake memberId) {
         LOGGER.debug("Requesting DBMember with ID {}.", memberId.asLong());
 
-        final DBMember dbMember = new DBMember(guildId, memberId);
         try (final Cursor<String> cursor = this.requestMember(guildId, memberId).map(ReqlExpr::toJson).run(this.getConnection())) {
             if (cursor.hasNext()) {
                 LOGGER.debug("DBMember with ID {} found.", memberId.asLong());
-                dbMember.readValue(cursor.next());
-                return dbMember;
+                return new DBMember(guildId, Utils.MAPPER.readValue(cursor.next(), DBMemberBean.class));
             }
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
@@ -57,7 +54,7 @@ public class GuildManager extends DatabaseTable {
                             memberId.asLong(), guildId.asLong()));
         }
         LOGGER.debug("DBMember with ID {} not found.", memberId.asLong());
-        return dbMember;
+        return new DBMember(guildId, memberId);
     }
 
     public ReqlExpr requestGuild(Snowflake guildId) {
