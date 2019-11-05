@@ -1,16 +1,24 @@
 package com.shadorc.shadbot.db.premium;
 
+import com.rethinkdb.gen.ast.ReqlExpr;
+import com.rethinkdb.net.Cursor;
+import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.db.DatabaseTable;
-import com.shadorc.shadbot.db.premium.entity.GuildRelic;
-import com.shadorc.shadbot.db.premium.entity.Relic;
-import com.shadorc.shadbot.db.premium.entity.UserRelic;
+import com.shadorc.shadbot.utils.LogUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class PremiumManager extends DatabaseTable {
+
+    public static final Logger LOGGER = Loggers.getLogger("shadbot.database.premium");
 
     private static PremiumManager instance;
 
@@ -22,36 +30,79 @@ public class PremiumManager extends DatabaseTable {
         super("premium");
     }
 
-    public Relic getRelicById(String relicId) {
-        // TODO
-        return null;
+    public ReqlExpr requestRelic(String id) {
+        return this.getTable()
+                .filter(this.getDatabase().hashMap("id", id));
+    }
+
+    public Optional<Relic> getRelicById(String relicId) {
+        LOGGER.debug("Requesting Relic with ID {}.", relicId);
+
+        try (final Cursor<String> cursor = this.requestRelic(relicId).map(ReqlExpr::toJson).run(this.getConnection())) {
+            if (cursor.hasNext()) {
+                LOGGER.debug("Relic with ID {} found.", relicId);
+                return Optional.of(new Relic(Utils.MAPPER.readValue(cursor.next(), RelicBean.class)));
+            }
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while requesting Relic with ID %s.", relicId));
+        }
+        LOGGER.debug("Relic with ID {} not found.", relicId);
+        return Optional.empty();
     }
 
     public List<Relic> getRelicsByUser(Snowflake userId) {
-        // TODO
-        return null;
+        LOGGER.debug("Requesting Relics for user ID {}.", userId.asLong());
+
+        final List<Relic> relics = new ArrayList<>();
+        final ReqlExpr request = this.getTable()
+                .filter(this.getDatabase().hashMap("user_id", userId.asLong()))
+                .map(ReqlExpr::toJson);
+
+        try (final Cursor<String> cursor = request.run(this.getConnection())) {
+            while (cursor.hasNext()) {
+                relics.add(new Relic(Utils.MAPPER.readValue(cursor.next(), RelicBean.class)));
+            }
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while requesting Relic for user ID %d.", userId.asLong()));
+        }
+
+        return relics;
     }
 
-    public UserRelic generateUserRelic(Snowflake userId) {
-        final UserRelic relic = new UserRelic(userId, UUID.randomUUID().toString(), TimeUnit.DAYS.toMillis(180));
-        // TODO: save
-        return relic;
+    public List<Relic> getRelicsByGuild(Snowflake guildId) {
+        LOGGER.debug("Requesting Relics for guild ID {}.", guildId.asLong());
+
+        final List<Relic> relics = new ArrayList<>();
+        final ReqlExpr request = this.getTable()
+                .filter(this.getDatabase().hashMap("guild_id", guildId.asLong()))
+                .map(ReqlExpr::toJson);
+
+        try (final Cursor<String> cursor = request.run(this.getConnection())) {
+            while (cursor.hasNext()) {
+                relics.add(new Relic(Utils.MAPPER.readValue(cursor.next(), RelicBean.class)));
+            }
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while requesting Relic for guild ID %d.", guildId.asLong()));
+        }
+
+        return relics;
     }
 
-    public GuildRelic generateGuildRelic(Snowflake guildId) {
-        final GuildRelic relic = new GuildRelic(guildId, UUID.randomUUID().toString(), TimeUnit.DAYS.toMillis(180));
-        // TODO: save
+    public Relic generateRelic(RelicType type) {
+        final Relic relic = new Relic(UUID.randomUUID().toString(), type, TimeUnit.DAYS.toMillis(180));
+        relic.insert();
         return relic;
     }
 
     public boolean isUserPremium(Snowflake userId) {
-        // TODO
-        return false;
+        return !this.getRelicsByUser(userId).isEmpty();
     }
 
     public boolean isGuildPremium(Snowflake guildId) {
-        // TODO
-        return false;
+        return !this.getRelicsByGuild(guildId).isEmpty();
     }
 
     public static PremiumManager getInstance() {

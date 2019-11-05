@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.db.premium.bean;
+package com.shadorc.shadbot.db.premium;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import reactor.util.annotation.Nullable;
@@ -14,6 +14,12 @@ public class RelicBean {
     @Nullable
     @JsonProperty("activation")
     private Long activation;
+    @Nullable
+    @JsonProperty("guild_id")
+    private Long guildId;
+    @Nullable
+    @JsonProperty("user_id")
+    private Long userId;
 
     public String getId() {
         return this.id;
@@ -32,13 +38,26 @@ public class RelicBean {
         return this.activation;
     }
 
+    @Nullable
+    public Long getGuildId() {
+        return this.guildId;
+    }
+
+    @Nullable
+    public Long getUserId() {
+        return this.userId;
+    }
+
     @Override
     public String toString() {
-        return "BaseRelic{" +
-                "id='" + id + '\'' +
-                ", type='" + type + '\'' +
-                ", duration=" + duration +
-                ", activation=" + activation +
+        return "RelicBean{" +
+                "id='" + this.id + '\'' +
+                ", type='" + this.type + '\'' +
+                ", duration=" + this.duration +
+                ", activation=" + this.activation +
+                ", guildId=" + this.guildId +
+                ", userId=" + this.userId +
                 '}';
     }
+
 }

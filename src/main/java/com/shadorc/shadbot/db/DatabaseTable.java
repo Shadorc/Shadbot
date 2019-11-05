@@ -27,7 +27,7 @@ public class DatabaseTable {
         this.connection = DB.connection()
                 .hostname(Credentials.get(Credential.DATABASE_HOST))
                 .port(Integer.parseInt(Credentials.get(Credential.DATABASE_PORT)))
-                .user("admin", Credentials.get(Credential.DATABASE_PASSWORD))
+                .user(Credentials.get(Credential.DATABASE_USER), Credentials.get(Credential.DATABASE_PASSWORD))
                 .db(DATABASE_NAME)
                 .connect();
         LogUtils.info("Connected to %s table.", this.tableName);

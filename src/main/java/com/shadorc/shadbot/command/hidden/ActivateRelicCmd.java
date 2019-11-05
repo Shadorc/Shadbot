@@ -4,8 +4,8 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.premium.PremiumManager;
+import com.shadorc.shadbot.db.premium.Relic;
 import com.shadorc.shadbot.db.premium.RelicType;
-import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -46,11 +46,7 @@ public class ActivateRelicCmd extends BaseCmd {
                     .then();
         }
 
-        relic.activate(context.getAuthorId());
-
-        if (relic.getType().equals(RelicType.GUILD.toString())) {
-            relic.setGuildId(context.getGuildId().asLong());
-        }
+        relic.activate(context.getAuthorId(), relic.getType().equals(RelicType.GUILD) ? context.getGuildId() : null);
 
         LogUtils.info("{User ID: %d} Relic activated. ID: %s", context.getAuthorId().asLong(), arg);
         return context.getChannel()

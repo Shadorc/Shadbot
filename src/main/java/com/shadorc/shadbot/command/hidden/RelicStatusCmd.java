@@ -5,8 +5,8 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.premium.PremiumManager;
+import com.shadorc.shadbot.db.premium.Relic;
 import com.shadorc.shadbot.db.premium.RelicType;
-import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -55,7 +55,7 @@ public class RelicStatusCmd extends BaseCmd {
                     }
 
                     final StringBuilder titleBld = new StringBuilder();
-                    if (relic.getType().equals(RelicType.GUILD.toString())) {
+                    if (relic.getType().equals(RelicType.GUILD)) {
                         titleBld.append("Legendary ");
                     }
                     titleBld.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));

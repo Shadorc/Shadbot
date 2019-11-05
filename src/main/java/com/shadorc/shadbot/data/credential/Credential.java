@@ -20,5 +20,6 @@ public enum Credential {
     FORTNITE_API_KEY,
     DATABASE_HOST,
     DATABASE_PORT,
+    DATABASE_USER,
     DATABASE_PASSWORD;
 }
