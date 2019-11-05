@@ -1,8 +1,11 @@
-package com.shadorc.shadbot.db.premium;
+package com.shadorc.shadbot.db.premium.entity;
 
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.guild.GuildManager;
+import com.shadorc.shadbot.db.premium.PremiumManager;
+import com.shadorc.shadbot.db.premium.RelicType;
+import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.util.Snowflake;

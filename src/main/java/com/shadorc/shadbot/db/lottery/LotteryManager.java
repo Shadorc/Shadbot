@@ -5,6 +5,10 @@ import com.rethinkdb.net.Cursor;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseTable;
+import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
+import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
+import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
+import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
@@ -33,7 +37,7 @@ public class LotteryManager extends DatabaseTable {
 
         try (final Cursor<String> cursor = request.run(this.getConnection())) {
             if (cursor.hasNext()) {
-                return Optional.of(Utils.MAPPER.readValue(cursor.next(), LotteryHistoric.class));
+                return Optional.of(new LotteryHistoric(Utils.MAPPER.readValue(cursor.next(), LotteryHistoricBean.class)));
             }
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery historic.");
@@ -84,7 +88,7 @@ public class LotteryManager extends DatabaseTable {
         final List<LotteryGambler> gamblers = new ArrayList<>();
         try (final Cursor<String> cursor = request.run(this.getConnection())) {
             while (cursor.hasNext()) {
-                gamblers.add(Utils.MAPPER.readValue(cursor.next(), LotteryGambler.class));
+                gamblers.add(new LotteryGambler(Utils.MAPPER.readValue(cursor.next(), LotteryGamblerBean.class)));
             }
 
         } catch (final Exception err) {

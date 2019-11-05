@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.db.premium;
+package com.shadorc.shadbot.db.premium.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import reactor.util.annotation.Nullable;

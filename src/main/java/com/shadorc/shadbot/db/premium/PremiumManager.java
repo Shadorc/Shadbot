@@ -4,6 +4,8 @@ import com.rethinkdb.gen.ast.ReqlExpr;
 import com.rethinkdb.net.Cursor;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.db.DatabaseTable;
+import com.shadorc.shadbot.db.premium.bean.RelicBean;
+import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
