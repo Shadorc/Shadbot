@@ -7,7 +7,6 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.db.guild.entity.DBMember;
 import com.shadorc.shadbot.db.lottery.LotteryManager;
-import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;

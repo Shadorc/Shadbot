@@ -30,6 +30,17 @@ public class LotteryManager extends DatabaseTable {
         super("lottery");
     }
 
+    public ReqlExpr requestGambler(Snowflake guildId, Snowflake userId) {
+        return this.getTable()
+                .filter(this.getDatabase().hashMap("guild_id", guildId.asLong())
+                        .with("user_id", userId.asLong()));
+    }
+
+    public ReqlExpr requestHistoric() {
+        // TODO
+        return this.getTable();
+    }
+
     public Optional<LotteryHistoric> getHistoric() {
         final ReqlExpr request = this.getTable()
                 .filter(lottery -> lottery.hasFields("historic"))
