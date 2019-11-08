@@ -15,6 +15,7 @@ import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
+import reactor.util.annotation.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-public class MusicManager {
+public final class MusicManager {
 
     private static MusicManager instance;
 
@@ -86,6 +87,7 @@ public class MusicManager {
         return this.guildMusicConnections.get(guildId);
     }
 
+    @Nullable
     public GuildMusic getMusic(Snowflake guildId) {
         final GuildMusicConnection guildMusicConnection = this.getConnection(guildId);
         return guildMusicConnection == null ? null : guildMusicConnection.getGuildMusic();

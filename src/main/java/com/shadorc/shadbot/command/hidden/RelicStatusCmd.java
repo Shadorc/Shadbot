@@ -55,7 +55,7 @@ public class RelicStatusCmd extends BaseCmd {
                     }
 
                     final StringBuilder titleBld = new StringBuilder();
-                    if (relic.getType().equals(RelicType.GUILD)) {
+                    if (relic.getType() == RelicType.GUILD) {
                         titleBld.append("Legendary ");
                     }
                     titleBld.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));

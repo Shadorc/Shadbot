@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.utils;
 
 public enum ExitCode {
-    UNKNWON(-1),
+    UNKNOWN(-1),
     NORMAL(0),
     RESTART(1),
     FATAL_ERROR(2);
@@ -18,7 +18,7 @@ public enum ExitCode {
                 return exitCode;
             }
         }
-        return ExitCode.UNKNWON;
+        return ExitCode.UNKNOWN;
     }
 
     public int getValue() {

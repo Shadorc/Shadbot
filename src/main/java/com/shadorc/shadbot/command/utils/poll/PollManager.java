@@ -61,7 +61,7 @@ public class PollManager {
                 .andThen(embed -> embed.setAuthor(String.format("Poll by %s", this.context.getUsername()),
                         null, this.context.getAvatarUrl())
                         .setDescription(String.format("Vote by clicking on the corresponding number.%n%n__**%s**__%s",
-                                this.spec.getQuestion(), representation.toString()))
+                                this.spec.getQuestion(), representation))
                         .setFooter(String.format("You have %s to vote.",
                                 FormatUtils.shortDuration(this.spec.getDuration().toMillis())),
                                 "https://i.imgur.com/jcrUDLY.png"));
@@ -112,7 +112,7 @@ public class PollManager {
         final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Poll results (Author: %s)", this.context.getUsername()),
                         null, this.context.getAvatarUrl())
-                        .setDescription(String.format("__**%s**__%s", this.spec.getQuestion(), representation.toString())));
+                        .setDescription(String.format("__**%s**__%s", this.spec.getQuestion(), representation)));
 
         return this.context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel));

@@ -65,7 +65,8 @@ public class ManageCoinsCmd extends BaseCmd {
                             members.forEach(user -> GuildManager.getInstance().getDBMember(context.getGuildId(), user.getId()).resetCoins());
                             return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, members.size() == 1 ? "his" : "their");
                         default:
-                            return null;
+                            throw new CommandException(String.format("`%s` is not a valid action. %s",
+                                    args.get(0), FormatUtils.options(Action.class)));
                     }
                 })
                 .flatMap(text -> context.getChannel()

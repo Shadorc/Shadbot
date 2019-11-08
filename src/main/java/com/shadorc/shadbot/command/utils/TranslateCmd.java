@@ -53,17 +53,17 @@ public class TranslateCmd extends BaseCmd {
             return Mono.error(new CommandException(String.format("The text to translate cannot exceed %d characters.", CHARACTERS_LIMIT)));
         }
 
-        final List<String> langs = StringUtils.split(StringUtils.remove(arg, sourceText, "\""));
-        if (langs.isEmpty()) {
+        final List<String> languages = StringUtils.split(StringUtils.remove(arg, sourceText, "\""));
+        if (languages.isEmpty()) {
             return Mono.error(new MissingArgumentException());
         }
 
-        if (langs.size() == 1) {
-            langs.add(0, AUTO);
+        if (languages.size() == 1) {
+            languages.add(0, AUTO);
         }
 
-        final String langFrom = this.toISO(langs.get(0));
-        final String langTo = this.toISO(langs.get(1));
+        final String langFrom = this.toISO(languages.get(0));
+        final String langTo = this.toISO(languages.get(1));
 
         if (langTo != null && Objects.equals(langFrom, langTo)) {
             return Mono.error(new CommandException("The destination language must be different from the source one."));
@@ -106,7 +106,7 @@ public class TranslateCmd extends BaseCmd {
                             .andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
                                     .setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
                                             StringUtils.capitalize(this.langIsoMap.inverse().get(langFrom)), sourceText,
-                                            StringUtils.capitalize(this.langIsoMap.inverse().get(langTo)), translatedText.toString()))));
+                                            StringUtils.capitalize(this.langIsoMap.inverse().get(langTo)), translatedText))));
 
                 })
                 .flatMap(UpdatableMessage::send)

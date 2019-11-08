@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class PremiumManager extends DatabaseTable {
+public final class PremiumManager extends DatabaseTable {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.premium");
 

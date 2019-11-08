@@ -11,7 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class StringUtils {
+public final class StringUtils {
+
+    private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
     /**
      * @param str - the string to capitalize, may be null
@@ -28,6 +30,7 @@ public class StringUtils {
      * @param enumeration - the enumeration to format, may be null
      * @return The enumeration converted as a capitalized string with underscores replaced with spaces
      */
+    @Nullable
     public static <E extends Enum<E>> String capitalizeEnum(@Nullable E enumeration) {
         if (enumeration == null) {
             return null;
@@ -63,7 +66,7 @@ public class StringUtils {
         if (str == null || str.isEmpty()) {
             return str;
         }
-        return str.trim().replaceAll(" +", " ");
+        return SPACES_PATTERN.matcher(str.trim()).replaceAll(" ");
     }
 
     /**
@@ -71,6 +74,7 @@ public class StringUtils {
      * @param str   - the string to get plural from, may be null
      * @return {@code String.format("%d %ss", count, str)} if count > 1, String.format("%d %s", count, str) otherwise
      */
+    @Nullable
     public static String pluralOf(long count, @Nullable String str) {
         if (str == null || str.isBlank()) {
             return null;
@@ -87,7 +91,7 @@ public class StringUtils {
      * @return The resulting string
      */
     public static String remove(@Nullable String str, @NonNull List<String> toRemove) {
-        return StringUtils.remove(str, toRemove.toArray(new String[toRemove.size()]));
+        return StringUtils.remove(str, toRemove.toArray(new String[0]));
     }
 
     /**
@@ -95,6 +99,7 @@ public class StringUtils {
      * @param toRemove - the strings to be substituted for each match
      * @return The resulting string
      */
+    @Nullable
     public static String remove(@Nullable String str, @NonNull String... toRemove) {
         if (str == null) {
             return null;

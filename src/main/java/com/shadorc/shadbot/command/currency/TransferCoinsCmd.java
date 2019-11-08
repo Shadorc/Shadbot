@@ -72,7 +72,7 @@ public class TransferCoinsCmd extends BaseCmd {
         return context.getClient().getUserById(receiverUserId).map(User::getMention)
                 .flatMap(receiverMention -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.BANK + " %s has transfered **%s** to %s",
+                                String.format(Emoji.BANK + " %s has transferred **%s** to %s",
                                         context.getAuthor().getMention(), FormatUtils.coins(coins), receiverMention), channel)))
                 .then();
     }

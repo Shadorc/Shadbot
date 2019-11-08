@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class LotteryManager extends DatabaseTable {
+public final class LotteryManager extends DatabaseTable {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.lottery");
 

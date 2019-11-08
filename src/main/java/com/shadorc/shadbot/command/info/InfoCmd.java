@@ -27,7 +27,7 @@ public class InfoCmd extends BaseCmd {
 
     private static final String D4J_NAME = GitProperties.getProperties().getProperty(GitProperties.APPLICATION_NAME);
     private static final String D4J_VERSION = GitProperties.getProperties().getProperty(GitProperties.APPLICATION_VERSION);
-    private static final int MB_UNIT = 1024 * 1024;
+    private static final int MB_UNIT = 1024 << 10;
 
     public InfoCmd() {
         super(CommandCategory.INFO, List.of("info"));

@@ -2,6 +2,7 @@ package com.shadorc.shadbot.db.guild.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 public class DBGuildBean {
@@ -18,7 +19,7 @@ public class DBGuildBean {
     }
 
     public List<DBMemberBean> getMembers() {
-        return this.members;
+        return Collections.unmodifiableList(this.members);
     }
 
     public SettingsBean getSettingsBean() {

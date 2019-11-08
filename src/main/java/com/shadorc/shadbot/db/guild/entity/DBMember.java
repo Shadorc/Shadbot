@@ -57,7 +57,7 @@ public class DBMember implements DatabaseEntity {
 
             LOGGER.debug("[DBMember {} / {}] {}", this.getId().asLong(), this.getGuildId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBMember %d / %d] An error occurred while updating coins.",
                             this.getId().asLong(), this.getGuildId().asLong()));
@@ -76,7 +76,7 @@ public class DBMember implements DatabaseEntity {
 
             LOGGER.debug("[DBMember {} / {}] {}.", this.getId().asLong(), this.getGuildId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBMember %d / %d] An error occurred while resetting coins.",
                             this.getId().asLong(), this.getGuildId().asLong()));
@@ -97,7 +97,7 @@ public class DBMember implements DatabaseEntity {
 
             LOGGER.debug("[DBMember {} / {}] {}", this.getId().asLong(), this.getGuildId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBMember %d / %d] An error occurred during insertion.",
                             this.getId().asLong(), this.getGuildId().asLong()));
@@ -115,7 +115,7 @@ public class DBMember implements DatabaseEntity {
 
             LOGGER.debug("[DBMember {} / {}] {}", this.getId().asLong(), this.getGuildId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBMember %d / %d] An error occurred during deletion.",
                             this.getId().asLong(), this.getGuildId().asLong()));

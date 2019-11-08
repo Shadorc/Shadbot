@@ -68,7 +68,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                     }
                 })
                 .collectSortedList()
-                .map(list -> this.results = String.join(", ", list))
+                .doOnNext(list -> this.results = String.join(", ", list))
                 .then(this.getContext().getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
                         winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"), channel))

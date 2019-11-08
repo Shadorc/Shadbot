@@ -53,7 +53,7 @@ public class LotteryHistoric implements DatabaseEntity {
 
             LOGGER.debug("[LotteryHistoric] {}", response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err, "[LotteryHistoric] An error occurred during insertion.");
         }
     }
@@ -69,7 +69,7 @@ public class LotteryHistoric implements DatabaseEntity {
 
             LOGGER.debug("[LotteryHistoric] {}", response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err, "[LotteryHistoric] An error occurred during deletion.");
         }
     }

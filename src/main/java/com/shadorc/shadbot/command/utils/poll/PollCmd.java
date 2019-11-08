@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class PollCmd extends BaseCmd {
@@ -35,6 +36,7 @@ public class PollCmd extends BaseCmd {
     private static final int MAX_CHOICES_NUM = 10;
     private static final int MIN_DURATION = 10;
     private static final int MAX_DURATION = 3600;
+    private static final Pattern CANCEL_PATTERN = Pattern.compile("stop|cancel");
 
     private final Map<Snowflake, PollManager> managers;
 
@@ -71,7 +73,7 @@ public class PollCmd extends BaseCmd {
     private static boolean isCancelMsg(Context context, List<CommandPermission> permissions, PollManager pollManager) {
         final boolean isAuthor = context.getAuthorId().equals(pollManager.getContext().getAuthorId());
         final boolean isAdmin = permissions.contains(CommandPermission.ADMIN);
-        final boolean isCancelMsg = context.getArg().map(arg -> arg.matches("stop|cancel")).orElse(false);
+        final boolean isCancelMsg = context.getArg().map(arg -> CANCEL_PATTERN.matcher(arg).matches()).orElse(false);
         return isCancelMsg && (isAuthor || isAdmin);
     }
 

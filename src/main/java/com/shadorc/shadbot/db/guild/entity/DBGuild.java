@@ -9,6 +9,7 @@ import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.object.util.Snowflake;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class DBGuild implements DatabaseEntity {
     }
 
     public List<DBMember> getMembers() {
-        return this.members;
+        return Collections.unmodifiableList(this.members);
     }
 
     public Settings getSettings() {
@@ -59,7 +60,7 @@ public class DBGuild implements DatabaseEntity {
 
             LOGGER.debug("[DBGuild {}] {}", this.getId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBGuild %d] An error occurred while updating setting.", this.getId().asLong()));
         }
@@ -76,7 +77,7 @@ public class DBGuild implements DatabaseEntity {
 
             LOGGER.debug("[DBGuild {}] {}", this.getId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBGuild %d] An error occurred while removing setting.", this.getId().asLong()));
         }
@@ -102,7 +103,7 @@ public class DBGuild implements DatabaseEntity {
 
             LOGGER.debug("[DBGuild {}] {}", this.getId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBGuild %d] An error occurred during insertion.", this.getId().asLong()));
         }
@@ -120,7 +121,7 @@ public class DBGuild implements DatabaseEntity {
 
             LOGGER.debug("[DBGuild {}] {}", this.getId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBGuild %d] An error occurred during deletion.", this.getId().asLong()));
         }

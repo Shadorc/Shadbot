@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.Optional;
 
-public class CommandProcessor {
+public final class CommandProcessor {
 
     private static CommandProcessor instance;
 

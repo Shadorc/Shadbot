@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-public class Config {
+public final class Config {
 
     private static final Logger LOGGER = Loggers.getLogger(Config.class);
 

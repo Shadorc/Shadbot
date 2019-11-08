@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Properties;
 
-public class Credentials {
+public final class Credentials {
 
     private static final Logger LOGGER = Loggers.getLogger(Credentials.class);
     private static final Properties CREDENTIALS_PROPERTIES = new Properties();

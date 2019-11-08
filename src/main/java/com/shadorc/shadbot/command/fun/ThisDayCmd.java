@@ -19,11 +19,13 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ThisDayCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://www.onthisday.com/";
+    private static final Pattern TAG_PATTERN = Pattern.compile("<a href=\"/events/date/[0-9]+\" class=\"date\">");
 
     public ThisDayCmd() {
         super(CommandCategory.FUN, List.of("this_day", "this-day", "thisday"), "td");
@@ -49,8 +51,8 @@ public class ThisDayCmd extends BaseCmd {
 
                     final String events = eventsElmt.stream()
                             .map(Element::html)
-                            .map(html -> html.replaceFirst("<a href=\"/events/date/[0-9]+\" class=\"date\">", "**"))
-                            .map(html -> html.replaceFirst("</a>", "**"))
+                            .map(html -> TAG_PATTERN.matcher(html).replaceFirst("**"))
+                            .map(html -> html.replaceFirst(Pattern.quote("</a>"), "**"))
                             .map(Jsoup::parse)
                             .map(Document::text)
                             .collect(Collectors.joining("\n\n"));

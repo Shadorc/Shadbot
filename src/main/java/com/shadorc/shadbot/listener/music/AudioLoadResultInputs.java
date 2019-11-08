@@ -30,11 +30,10 @@ public class AudioLoadResultInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
-        return Mono.just(guildMusic != null
-                && event.getMessage().getContent().isPresent()
-                && event.getMessage().getChannelId().equals(guildMusic.getMessageChannelId())
-                && event.getMember().map(User::getId).map(guildMusic.getDjId()::equals).orElse(false));
+        return Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.listener.getGuildId()))
+                .map(guildMusic -> event.getMessage().getContent().isPresent()
+                        && event.getMessage().getChannelId().equals(guildMusic.getMessageChannelId())
+                        && event.getMember().map(User::getId).map(guildMusic.getDjId()::equals).orElse(false));
     }
 
     @Override
@@ -75,7 +74,7 @@ public class AudioLoadResultInputs extends Inputs {
     }
 
     @Override
-    public boolean takeEventWile(MessageCreateEvent ignored) {
+    public boolean takeEventWile(MessageCreateEvent event) {
         final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
         return guildMusic != null && guildMusic.isWaitingForChoice();
     }

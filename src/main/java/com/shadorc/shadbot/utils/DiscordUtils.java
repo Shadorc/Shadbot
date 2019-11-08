@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class DiscordUtils {
+public final class DiscordUtils {
 
     public static Mono<Message> sendMessage(String content, MessageChannel channel) {
         return DiscordUtils.sendMessage(spec -> spec.setContent(content), channel, false);

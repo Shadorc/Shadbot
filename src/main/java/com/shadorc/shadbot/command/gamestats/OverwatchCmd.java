@@ -63,7 +63,7 @@ public class OverwatchCmd extends BaseCmd {
                                     .setDescription(String.format("Stats for user **%s**", profile.getUsername()))
                                     .addField("Level", profile.getLevel(), true)
                                     .addField("Time played", profile.getQuickplayPlaytime(), true)
-                                    .addField("Games won", profile.getGames().getQuickplayWon(), true)
+                                    .addField("Games won", FormatUtils.number(profile.getGames().getQuickplayWon()), true)
                                     .addField("Competitive ranks", profile.formatCompetitive(), true)
                                     .addField("Top hero (Time played)", topHeroes.getPlayed(), true)
                                     .addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true)));

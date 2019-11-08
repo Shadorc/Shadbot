@@ -12,9 +12,9 @@ import static com.shadorc.shadbot.db.lottery.LotteryManager.LOGGER;
 
 public class LotteryGambler implements DatabaseEntity {
 
-    private long guildId;
-    private long userId;
-    private int number;
+    private final long guildId;
+    private final long userId;
+    private final int number;
 
     public LotteryGambler(LotteryGamblerBean bean) {
         this.guildId = bean.getGuildId();
@@ -37,7 +37,7 @@ public class LotteryGambler implements DatabaseEntity {
     }
 
     public int getNumber() {
-        return number;
+        return this.number;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class LotteryGambler implements DatabaseEntity {
 
             LOGGER.debug("[LotteryGambler {} / {}] {}", this.getUserId().asLong(), this.getGuildId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[LotteryGambler %d / %d] An error occurred during insertion.", this.getUserId().asLong(), this.getGuildId().asLong()));
         }
@@ -78,7 +78,7 @@ public class LotteryGambler implements DatabaseEntity {
 
             LOGGER.debug("[LotteryGambler {} / {}] {}", this.getUserId().asLong(), this.getGuildId().asLong(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[LotteryGambler %d / %d] An error occurred during deletion.", this.getUserId().asLong(), this.getGuildId().asLong()));
         }

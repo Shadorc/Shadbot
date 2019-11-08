@@ -46,7 +46,7 @@ public class ActivateRelicCmd extends BaseCmd {
                     .then();
         }
 
-        relic.activate(context.getAuthorId(), relic.getType().equals(RelicType.GUILD) ? context.getGuildId() : null);
+        relic.activate(context.getAuthorId(), relic.getType() == RelicType.GUILD ? context.getGuildId() : null);
 
         LogUtils.info("{User ID: %d} Relic activated. ID: %s", context.getAuthorId().asLong(), arg);
         return context.getChannel()

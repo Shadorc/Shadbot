@@ -57,7 +57,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
 
                 })
                 .collectList()
-                .map(list -> this.results = String.join("\n", list))
+                .doOnNext(list -> this.results = String.join("\n", list))
                 .then(this.getContext().getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
                 .then(this.show())

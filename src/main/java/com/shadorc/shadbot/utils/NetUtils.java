@@ -19,7 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public class NetUtils {
+public final class NetUtils {
 
     private static final HttpClient HTTP_CLIENT = HttpClient.create();
 
@@ -35,7 +35,7 @@ public class NetUtils {
         document.outputSettings(new Document.OutputSettings().prettyPrint(false));// makes html() preserve linebreak and spacing
         document.select("br").append("\\n");
         document.select("p").prepend("\\n\\n");
-        final String str = document.html().replaceAll("\\\\n", "\n");
+        final String str = document.html().replace("\\\\n", "\n");
         return Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
     }
 

@@ -11,7 +11,7 @@ import reactor.util.annotation.NonNull;
 
 import java.util.List;
 
-public class TextUtils {
+public final class TextUtils {
 
     public static final String NOT_ENOUGH_COINS =
             "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";

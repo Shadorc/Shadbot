@@ -96,7 +96,7 @@ public class Relic implements DatabaseEntity {
 
             LOGGER.debug("[Relic {}] {}", this.getId(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[Relic %s] An error occurred during activation.", this.getId()));
         }
@@ -120,7 +120,7 @@ public class Relic implements DatabaseEntity {
 
             LOGGER.debug("[Relic {}] {}", this.getId(), response);
 
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[Relic %s] An error occurred during insertion.", this.getId()));
         }
@@ -137,7 +137,7 @@ public class Relic implements DatabaseEntity {
                     .toString();
 
             LOGGER.debug("[Relic {}] {}", this.getId(), response);
-        } catch (final Exception err) {
+        } catch (final RuntimeException err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[Relic %s] An error occurred during deletion.", this.getId()));
         }

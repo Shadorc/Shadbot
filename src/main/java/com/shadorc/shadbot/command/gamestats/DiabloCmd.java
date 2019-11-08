@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 public class DiabloCmd extends BaseCmd {
 
-    private final static String ACCESS_TOKEN_URL = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
+    private static final String ACCESS_TOKEN_URL = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
             Credentials.get(Credential.BLIZZARD_CLIENT_ID), Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
 
     private enum Region {
@@ -54,7 +54,7 @@ public class DiabloCmd extends BaseCmd {
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final String battletag = args.get(1).replaceAll("#", "-");
+        final String battletag = args.get(1).replace("#", "-");
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Diablo III stats...", context.getUsername()))
                 .send()

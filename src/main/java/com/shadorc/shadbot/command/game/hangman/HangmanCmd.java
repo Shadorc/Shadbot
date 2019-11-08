@@ -21,9 +21,6 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
         EASY, HARD;
     }
 
-    protected static final int MIN_WORD_LENGTH = 5;
-    protected static final int MAX_WORD_LENGTH = 10;
-
     private final WordsList easyWords;
     private final WordsList hardWords;
 
@@ -75,7 +72,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
             case HARD:
                 return this.hardWords.getRandomWord();
             default:
-                throw new RuntimeException(String.format("Unknown difficulty: %s", difficulty.toString()));
+                throw new RuntimeException(String.format("Unknown difficulty: %s", difficulty));
         }
     }
 

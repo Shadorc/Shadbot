@@ -8,7 +8,11 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
 
+import java.util.regex.Pattern;
+
 public class HangmanInputs extends Inputs {
+
+    private static final Pattern WORD_PATTERN = Pattern.compile("[a-z]+");
 
     private final HangmanGame game;
 
@@ -33,7 +37,7 @@ public class HangmanInputs extends Inputs {
     }
 
     @Override
-    public boolean takeEventWile(MessageCreateEvent ignored) {
+    public boolean takeEventWile(MessageCreateEvent event) {
         return this.game.isScheduled();
     }
 
@@ -53,7 +57,7 @@ public class HangmanInputs extends Inputs {
                     final String content = event.getMessage().getContent().orElseThrow().toLowerCase().trim();
 
                     // Check only if content is an unique word/letter
-                    if (!content.matches("[a-z]+")) {
+                    if (!WORD_PATTERN.matcher(content).matches()) {
                         return Mono.empty();
                     }
 

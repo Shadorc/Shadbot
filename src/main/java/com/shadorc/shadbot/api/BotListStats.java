@@ -132,7 +132,7 @@ public class BotListStats {
                     final JSONObject content = new JSONObject()
                             .put("shardId", client.getConfig().getShardIndex())
                             .put("shardCount", client.getConfig().getShardCount())
-                            .put("guildCount", (int) (guildCount / client.getConfig().getShardCount()));
+                            .put("guildCount", guildCount / client.getConfig().getShardCount());
                     final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", this.selfId);
                     return this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
                 });
@@ -149,7 +149,7 @@ public class BotListStats {
                     final JSONObject content = new JSONObject()
                             .put("shard_id", client.getConfig().getShardIndex())
                             .put("shard_count", client.getConfig().getShardCount())
-                            .put("server_count", (int) (guildCount / client.getConfig().getShardCount()));
+                            .put("server_count", guildCount / client.getConfig().getShardCount());
                     final String url = String.format("https://discordbots.org/api/bots/%d/stats", this.selfId);
                     return this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
                 });
