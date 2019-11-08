@@ -10,6 +10,7 @@ import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -45,12 +46,12 @@ public class RelicStatusCmd extends BaseCmd {
 
                     relic.getGuildId().ifPresent(guildId -> contentBld.append(String.format("%n**Guild ID:** %d", guildId.asLong())));
 
-                    contentBld.append(String.format("%n**Duration:** %d days", relic.getDuration().toDays()));
+                    contentBld.append(String.format("%n**Duration:** %s", FormatUtils.customDate(relic.getDuration())));
                     if (!relic.isExpired()) {
                         relic.getActivation()
                                 .ifPresent(activation -> {
                                     final Duration durationLeft = relic.getDuration().minusMillis(TimeUtils.getMillisUntil(activation.toEpochMilli()));
-                                    contentBld.append(String.format("%n**Expires in:** %d days", durationLeft.toDays()));
+                                    contentBld.append(String.format("%n**Expires in:** %s", FormatUtils.customDate(durationLeft)));
                                 });
                     }
 

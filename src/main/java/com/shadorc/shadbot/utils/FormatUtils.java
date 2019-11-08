@@ -41,10 +41,19 @@ public final class FormatUtils {
         final long minutes = duration.toMinutesPart();
         final long hours = duration.toHoursPart();
         final long days = duration.toDaysPart();
-        return String.format("%s%s%s",
-                days > 0 ? StringUtils.pluralOf(days, "day") + " " : "",
-                hours > 0 ? StringUtils.pluralOf(hours, "hour") + " and " : "",
-                StringUtils.pluralOf(minutes, "minute"));
+
+        final StringBuilder strBuilder = new StringBuilder();
+        if (days > 0) {
+            strBuilder.append(String.format("%s ", StringUtils.pluralOf(days, "day")));
+        }
+        if (hours > 0) {
+            strBuilder.append(String.format("%s ", StringUtils.pluralOf(hours, "hour")));
+        }
+        if (minutes > 0 || days == 0 && hours == 0) {
+            strBuilder.append(StringUtils.pluralOf(minutes, "minute"));
+        }
+
+        return strBuilder.toString();
     }
 
     public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
