@@ -3,6 +3,7 @@ package com.shadorc.shadbot.db.premium;
 import com.rethinkdb.gen.ast.ReqlExpr;
 import com.rethinkdb.net.Cursor;
 import com.shadorc.shadbot.Shadbot;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseTable;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.db.premium.entity.Relic;
@@ -12,11 +13,11 @@ import discord4j.core.object.util.Snowflake;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class PremiumManager extends DatabaseTable {
 
@@ -94,7 +95,7 @@ public class PremiumManager extends DatabaseTable {
     }
 
     public Relic generateRelic(RelicType type) {
-        final Relic relic = new Relic(UUID.randomUUID().toString(), type, TimeUnit.DAYS.toMillis(180));
+        final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.DEFAULT_RELIC_DURATION));
         relic.insert();
         return relic;
     }

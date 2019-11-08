@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.db.lottery.entity;
 
+import com.rethinkdb.model.MapObject;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.lottery.LotteryManager;
@@ -7,7 +8,7 @@ import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.object.util.Snowflake;
 
-import static com.shadorc.shadbot.db.premium.PremiumManager.LOGGER;
+import static com.shadorc.shadbot.db.lottery.LotteryManager.LOGGER;
 
 public class LotteryGambler implements DatabaseEntity {
 
@@ -41,43 +42,54 @@ public class LotteryGambler implements DatabaseEntity {
 
     @Override
     public void insert() {
+        LOGGER.debug("[LotteryGambler {} / {}] Inserting...", this.getUserId().asLong(), this.getGuildId().asLong());
         try {
-            LOGGER.debug("[LotteryGambler {} / {}] Inserting...", this.getUserId().asLong(), this.getGuildId().asLong());
             final LotteryManager lm = LotteryManager.getInstance();
-            lm.getTable()
-                    .insert(lm.getDatabase()
-                            .hashMap("guild_id", this.guildId)
-                            .with("user_id", this.userId)
-                            .with("number", this.number))
-                    .run(LotteryManager.getInstance().getConnection());
+
+            final MapObject gambler = lm.getDatabase()
+                    .hashMap("guild_id", this.guildId)
+                    .with("user_id", this.userId)
+                    .with("number", this.number);
+
+            final String response = lm.getTable()
+                    .update(row -> lm.getDatabase().hashMap("gamblers", row.getField("gamblers")
+                            .default_(lm.getDatabase().array())
+                            .append(gambler)))
+                    .run(lm.getConnection())
+                    .toString();
+
+            LOGGER.debug("[LotteryGambler {} / {}] {}", this.getUserId().asLong(), this.getGuildId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[LotteryGambler %d / %d] An error occurred during insertion.", this.getUserId().asLong(), this.getGuildId().asLong()));
         }
-        LOGGER.debug("[LotteryGambler {} / {}] Inserted.", this.getUserId().asLong(), this.getGuildId().asLong());
     }
 
     @Override
     public void delete() {
+        LOGGER.debug("[LotteryGambler {} / {}] Deleting...", this.getUserId().asLong(), this.getGuildId().asLong());
         try {
-            LOGGER.debug("[LotteryGambler {} / {}] Deleting...", this.getUserId().asLong(), this.getGuildId().asLong());
-            LotteryManager.getInstance()
-                    .requestGambler(this.getGuildId(), this.getUserId())
+            final LotteryManager lm = LotteryManager.getInstance();
+            final String response = lm.requestGambler(this.getGuildId(), this.getUserId())
                     .delete()
-                    .run(LotteryManager.getInstance().getConnection());
+                    .run(lm.getConnection())
+                    .toString();
+
+            LOGGER.debug("[LotteryGambler {} / {}] {}", this.getUserId().asLong(), this.getGuildId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[LotteryGambler %d / %d] An error occurred during deletion.", this.getUserId().asLong(), this.getGuildId().asLong()));
         }
-        LOGGER.debug("[LotteryGambler {} / {}] Deleted.", this.getUserId().asLong(), this.getGuildId().asLong());
     }
 
     @Override
     public String toString() {
         return "LotteryGambler{" +
-                "guildId=" + guildId +
-                ", userId=" + userId +
-                ", number=" + number +
+                "guildId=" + this.guildId +
+                ", userId=" + this.userId +
+                ", number=" + this.number +
                 '}';
     }
 

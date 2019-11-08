@@ -40,33 +40,38 @@ public class LotteryHistoric implements DatabaseEntity {
 
     @Override
     public void insert() {
+        LOGGER.debug("[LotteryHistoric] Inserting...");
         try {
-            LOGGER.debug("[LotteryHistoric] Inserting...");
             final LotteryManager lm = LotteryManager.getInstance();
-            lm.getTable()
-                    .insert(lm.getDatabase()
+            final String response = lm.requestHistoric()
+                    .replace(lm.getDatabase()
                             .hashMap("jackpot", this.jackpot)
                             .with("winner_count", this.winnerCount)
                             .with("number", this.number))
-                    .run(LotteryManager.getInstance().getConnection());
+                    .run(lm.getConnection())
+                    .toString();
+
+            LOGGER.debug("[LotteryHistoric] {}", response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "[LotteryHistoric] An error occurred during insertion.");
         }
-        LOGGER.debug("[LotteryHistoric] Inserted.");
     }
 
     @Override
     public void delete() {
+        LOGGER.debug("[LotteryHistoric] Deleting...");
         try {
-            LOGGER.debug("[LotteryHistoric] Deleting...");
-            LotteryManager.getInstance()
-                    .requestHistoric()
+            final LotteryManager lm = LotteryManager.getInstance();
+            final String response = lm.requestHistoric()
                     .delete()
-                    .run(LotteryManager.getInstance().getConnection());
+                    .run(lm.getConnection());
+
+            LOGGER.debug("[LotteryHistoric] {}", response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "[LotteryHistoric] An error occurred during deletion.");
         }
-        LOGGER.debug("[LotteryHistoric] Deleted.");
     }
 
     @Override

@@ -25,6 +25,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -53,12 +54,11 @@ public class LotteryCmd extends BaseCmd {
             return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
         }
 
-        final LotteryGambler gambler = LotteryManager.getInstance().getGamblers().stream()
+        final Optional<LotteryGambler> gambler = LotteryManager.getInstance().getGamblers().stream()
                 .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
-                .findAny()
-                .orElse(null);
+                .findAny();
 
-        if (gambler != null) {
+        if (gambler.isPresent()) {
             return Mono.error(new CommandException("You're already participating."));
         }
 
@@ -70,7 +70,8 @@ public class LotteryCmd extends BaseCmd {
 
         dbMember.addCoins(-PAID_COST);
 
-        LotteryManager.getInstance().addGambler(context.getGuildId(), context.getAuthorId(), num);
+        new LotteryGambler(context.getGuildId(), context.getAuthorId(), num)
+                .insert();
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
@@ -94,8 +95,9 @@ public class LotteryCmd extends BaseCmd {
 
                     gamblers.stream()
                             .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
-                            .findAny().ifPresent(gambler -> embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
-                            "https://i.imgur.com/btJAaAt.png"));
+                            .findAny()
+                            .ifPresent(gambler -> embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
+                                    "https://i.imgur.com/btJAaAt.png"));
 
                     LotteryManager.getInstance().getHistoric().ifPresent(historic -> {
                         final String people;

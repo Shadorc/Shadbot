@@ -47,14 +47,18 @@ public class DBGuild implements DatabaseEntity {
     }
 
     public <T> void setSetting(Setting setting, T value) {
+        LOGGER.debug("[DBGuild {}] Updating setting {}: {}", this.getId().asLong(), setting, value);
         try {
-            LOGGER.debug("[DBGuild {}] Updating setting {}: {}", this.getId().asLong(), setting, value);
             final GuildManager gm = GuildManager.getInstance();
-            gm.getTable()
+            final String response = gm.getTable()
                     .insert(gm.getDatabase().hashMap("id", this.getId().asLong())
                             .with("settings", gm.getDatabase().hashMap(setting.toString(), value)))
                     .optArg("conflict", "update")
-                    .run(gm.getConnection());
+                    .run(gm.getConnection())
+                    .toString();
+
+            LOGGER.debug("[DBGuild {}] {}", this.getId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBGuild %d] An error occurred while updating setting.", this.getId().asLong()));
@@ -62,12 +66,16 @@ public class DBGuild implements DatabaseEntity {
     }
 
     public void removeSetting(Setting setting) {
+        LOGGER.debug("[DBGuild {}] Removing setting {}", this.getId().asLong(), setting);
         try {
-            LOGGER.debug("[DBGuild {}] Removing setting {}", this.getId().asLong(), setting);
             final GuildManager gm = GuildManager.getInstance();
-            gm.requestGuild(this.getId())
+            final String response = gm.requestGuild(this.getId())
                     .replace(guild -> guild.without(gm.getDatabase().hashMap("settings", setting.toString())))
-                    .run(gm.getConnection());
+                    .run(gm.getConnection())
+                    .toString();
+
+            LOGGER.debug("[DBGuild {}] {}", this.getId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBGuild %d] An error occurred while removing setting.", this.getId().asLong()));
@@ -86,30 +94,36 @@ public class DBGuild implements DatabaseEntity {
     public void insert() {
         try {
             LOGGER.debug("[DBGuild {}] Inserting...", this.getId().asLong());
-            GuildManager.getInstance()
-                    .getTable()
-                    .insert(GuildManager.getInstance().getDatabase().hashMap("id", this.getId().asLong()))
-                    .run(GuildManager.getInstance().getConnection());
+
+            final GuildManager gm = GuildManager.getInstance();
+            final String response = gm.getTable()
+                    .insert(gm.getDatabase().hashMap("id", this.getId().asLong()))
+                    .run(gm.getConnection());
+
+            LOGGER.debug("[DBGuild {}] {}", this.getId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBGuild %d] An error occurred during insertion.", this.getId().asLong()));
         }
-        LOGGER.debug("[DBGuild {}] Inserted.", this.getId().asLong());
     }
 
     @Override
     public void delete() {
         try {
             LOGGER.debug("[DBGuild {}] Deleting...", this.getId().asLong());
-            GuildManager.getInstance()
-                    .requestGuild(this.getId())
+
+            final GuildManager gm = GuildManager.getInstance();
+            final String response = gm.requestGuild(this.getId())
                     .delete()
-                    .run(GuildManager.getInstance().getConnection());
+                    .run(gm.getConnection());
+
+            LOGGER.debug("[DBGuild {}] {}", this.getId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBGuild %d] An error occurred during deletion.", this.getId().asLong()));
         }
-        LOGGER.debug("[DBGuild {}] Deleted.", this.getId().asLong());
     }
 
     @Override

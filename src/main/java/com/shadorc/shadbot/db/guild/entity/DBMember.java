@@ -44,15 +44,19 @@ public class DBMember implements DatabaseEntity {
     public int addCoins(long gains) {
         final int coins = (int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
+        LOGGER.debug("[DBMember {} / {}] Updating coins {}", this.getId().asLong(), this.getGuildId().asLong(), coins);
         try {
-            LOGGER.debug("[DBMember {} / {}] Updating coins {}", this.getId().asLong(), this.getGuildId().asLong(), coins);
             final GuildManager gm = GuildManager.getInstance();
-            gm.getTable()
+            final String response = gm.getTable()
                     .insert(gm.getDatabase().hashMap("id", this.getGuildId().asLong())
                             .with("members", gm.getDatabase().hashMap("id", this.getId().asLong())
                                     .with("coins", coins)))
                     .optArg("conflict", "update")
-                    .run(gm.getConnection());
+                    .run(gm.getConnection())
+                    .toString();
+
+            LOGGER.debug("[DBMember {} / {}] {}", this.getId().asLong(), this.getGuildId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBMember %d / %d] An error occurred while updating coins.",
@@ -63,12 +67,15 @@ public class DBMember implements DatabaseEntity {
     }
 
     public void resetCoins() {
+        LOGGER.debug("[DBMember {} / {}] Resetting coins.", this.getId().asLong(), this.getGuildId().asLong());
         try {
-            LOGGER.debug("[DBMember {} / {}] Resetting coins.", this.getId().asLong(), this.getGuildId().asLong());
             final GuildManager gm = GuildManager.getInstance();
-            gm.requestMember(this.getGuildId(), this.getId())
+            final String response = gm.requestMember(this.getGuildId(), this.getId())
                     .replace(member -> member.without("coins"))
                     .run(gm.getConnection());
+
+            LOGGER.debug("[DBMember {} / {}] {}.", this.getId().asLong(), this.getGuildId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBMember %d / %d] An error occurred while resetting coins.",
@@ -78,36 +85,41 @@ public class DBMember implements DatabaseEntity {
 
     @Override
     public void insert() {
+        LOGGER.debug("[DBMember {} / {}] Inserting...", this.getId().asLong(), this.getGuildId().asLong());
         try {
-            LOGGER.debug("[DBMember {} / {}] Inserting...", this.getId().asLong(), this.getGuildId().asLong());
             final GuildManager gm = GuildManager.getInstance();
-            gm.getTable()
+            final String response = gm.getTable()
                     .insert(gm.getDatabase().hashMap("id", this.getGuildId().asLong())
                             .with("members", gm.getDatabase().hashMap("id", this.getId().asLong())))
                     .optArg("conflict", "update")
-                    .run(gm.getConnection());
+                    .run(gm.getConnection())
+                    .toString();
+
+            LOGGER.debug("[DBMember {} / {}] {}", this.getId().asLong(), this.getGuildId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBMember %d / %d] An error occurred during insertion.",
                             this.getId().asLong(), this.getGuildId().asLong()));
         }
-        LOGGER.debug("[DBMember {} / {}] Inserted.", this.getId().asLong(), this.getGuildId().asLong());
     }
 
     @Override
     public void delete() {
+        LOGGER.debug("[DBMember {} / {}] Deleting...", this.getId().asLong(), this.getGuildId().asLong());
         try {
-            LOGGER.debug("[DBMember {} / {}] Deleting...", this.getId().asLong(), this.getGuildId().asLong());
-            GuildManager.getInstance()
-                    .requestMember(this.getGuildId(), this.getId())
+            final GuildManager gm = GuildManager.getInstance();
+            final String response = gm.requestMember(this.getGuildId(), this.getId())
                     .delete()
-                    .run(GuildManager.getInstance().getConnection());
+                    .run(gm.getConnection());
+
+            LOGGER.debug("[DBMember {} / {}] {}", this.getId().asLong(), this.getGuildId().asLong(), response);
+
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err,
                     String.format("[DBMember %d / %d] An error occurred during deletion.",
                             this.getId().asLong(), this.getGuildId().asLong()));
         }
-        LOGGER.debug("[DBMember {} / {}] Deleted.", this.getId().asLong(), this.getGuildId().asLong());
     }
 
     @Override
