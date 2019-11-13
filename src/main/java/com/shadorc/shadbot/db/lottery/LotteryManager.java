@@ -54,11 +54,13 @@ public final class LotteryManager extends DatabaseTable {
 
         try (final Cursor<String> cursor = request.run(this.getConnection())) {
             if (cursor.hasNext()) {
+                LOGGER.debug("Lottery historic found.");
                 return Optional.of(new LotteryHistoric(Utils.MAPPER.readValue(cursor.next(), LotteryHistoricBean.class)));
             }
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery historic.");
         }
+        LOGGER.debug("Lottery historic not found.");
         return Optional.empty();
     }
 
@@ -70,11 +72,13 @@ public final class LotteryManager extends DatabaseTable {
 
         try (final Cursor<Long> cursor = request.run(this.getConnection())) {
             if (cursor.hasNext()) {
+                LOGGER.debug("Lottery jackpot found.");
                 return cursor.next();
             }
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery jackpot.");
         }
+        LOGGER.debug("Lottery jackpot not found.");
         return 0;
     }
 
