@@ -103,7 +103,7 @@
             <dependency>
                 <groupId>com.discord4j</groupId>
                 <artifactId>bom</artifactId>
-                <version>3.0.10</version>
+                <version>3.0.11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
