@@ -52,9 +52,7 @@ public class LotteryGambler implements DatabaseEntity {
                     .with("number", this.number);
 
             final String response = lm.getTable()
-                    .update(row -> lm.getDatabase().hashMap("gamblers", row.getField("gamblers")
-                            .default_(lm.getDatabase().array())
-                            .append(gambler)))
+                    .insert(gambler)
                     .run(lm.getConnection())
                     .toString();
 
