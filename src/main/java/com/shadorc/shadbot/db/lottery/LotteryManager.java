@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.db.lottery;
 
 import com.rethinkdb.gen.ast.ReqlExpr;
-import com.rethinkdb.net.Cursor;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseTable;
@@ -16,7 +15,11 @@ import discord4j.core.object.util.Snowflake;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class LotteryManager extends DatabaseTable {
 
@@ -37,22 +40,21 @@ public final class LotteryManager extends DatabaseTable {
 
         final ReqlExpr request = this.getTable()
                 .get("gamblers")
+                .default_(this.getDatabase().hashMap("gamblers", this.getDatabase().array()))
                 .getField("gamblers")
                 .map(ReqlExpr::toJson);
 
-        final List<LotteryGambler> gamblers = new ArrayList<>();
-        try (final Cursor<String> cursor = request.run(this.getConnection())) {
-            if (cursor.hasNext()) {
-                Arrays.stream(Utils.MAPPER.readValue(cursor.next(), LotteryGamblerBean[].class))
-                        .map(LotteryGambler::new)
-                        .forEach(gamblers::add);
-            }
+        try {
+            final String json = request.run(this.getConnection()).toString();
+            return Arrays.stream(Utils.MAPPER.readValue(json, LotteryGamblerBean[].class))
+                    .map(LotteryGambler::new)
+                    .collect(Collectors.toUnmodifiableList());
 
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting gamblers.");
         }
 
-        return Collections.unmodifiableList(gamblers);
+        return Collections.emptyList();
     }
 
     public Optional<LotteryHistoric> getHistoric() {
@@ -60,17 +62,22 @@ public final class LotteryManager extends DatabaseTable {
 
         final ReqlExpr request = this.getTable()
                 .get("historic")
+                .default_(this.getDatabase().hashMap("historic", null))
                 .getField("historic")
                 .map(ReqlExpr::toJson);
 
-        try (final Cursor<String> cursor = request.run(this.getConnection())) {
-            if (cursor.hasNext()) {
-                LOGGER.debug("Lottery historic found.");
-                return Optional.of(new LotteryHistoric(Utils.MAPPER.readValue(cursor.next(), LotteryHistoricBean.class)));
+        try {
+            final String json = request.run(this.getConnection());
+            if (json == null) {
+                return Optional.empty();
             }
+
+            return Optional.of(Utils.MAPPER.readValue(json, LotteryHistoricBean.class))
+                    .map(LotteryHistoric::new);
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery historic.");
         }
+
         LOGGER.debug("Lottery historic not found.");
         return Optional.empty();
     }
@@ -83,14 +90,12 @@ public final class LotteryManager extends DatabaseTable {
                 .getField("jackpot")
                 .default_(0);
 
-        try (final Cursor<Long> cursor = request.run(this.getConnection())) {
-            if (cursor.hasNext()) {
-                LOGGER.debug("Lottery jackpot found.");
-                return cursor.next();
-            }
+        try {
+            return request.run(this.getConnection());
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery jackpot.");
         }
+
         LOGGER.debug("Lottery jackpot not found.");
         return 0;
     }
@@ -101,6 +106,7 @@ public final class LotteryManager extends DatabaseTable {
         try {
             return this.getTable()
                     .get("gamblers")
+                    .default_(this.getDatabase().hashMap("gamblers", this.getDatabase().array()))
                     .getField("gamblers")
                     .filter(this.getDatabase().hashMap("user_id", userId.asLong()))
                     .contains()
@@ -118,7 +124,7 @@ public final class LotteryManager extends DatabaseTable {
 
         try {
             final String response = this.getTable()
-                    .get("gambblers")
+                    .get("gamblers")
                     .delete()
                     .run(this.getConnection());
 
