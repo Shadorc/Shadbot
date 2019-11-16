@@ -43,6 +43,28 @@ public final class LotteryManager extends DatabaseTable {
                 .getField("historic");
     }
 
+    public List<LotteryGambler> getGamblers() {
+        LOGGER.debug("Requesting Lottery gamblers.");
+
+        final ReqlExpr request = this.getTable()
+                .filter(row -> row.hasFields("guild_id", "user_id", "number"))
+                .map(ReqlExpr::toJson);
+
+        final List<LotteryGambler> gamblers = new ArrayList<>();
+        try (final Cursor<String> cursor = request.run(this.getConnection())) {
+            if (cursor.hasNext()) {
+                Arrays.stream(Utils.MAPPER.readValue(cursor.next(), LotteryGamblerBean[].class))
+                        .map(LotteryGambler::new)
+                        .forEach(gamblers::add);
+            }
+
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting gamblers.");
+        }
+
+        return Collections.unmodifiableList(gamblers);
+    }
+
     public Optional<LotteryHistoric> getHistoric() {
         LOGGER.debug("Requesting Lottery historic.");
 
@@ -78,6 +100,37 @@ public final class LotteryManager extends DatabaseTable {
         return 0;
     }
 
+    public boolean isGambler(Snowflake userId) {
+        LOGGER.debug("Checking if user with ID {} is a gambler.", userId.asLong());
+
+        try {
+            return this.getTable()
+                    .get("gamblers")
+                    .getField("gamblers")
+                    .filter(this.getDatabase().hashMap("user_id", userId.asLong()))
+                    .contains()
+                    .run(this.getConnection());
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err,
+                    String.format("An error occurred while checking if user ID %d is a gambler.", userId.asLong()));
+        }
+
+        return false;
+    }
+
+    public void resetGamblers() {
+        LOGGER.debug("Resetting Lottery gamblers.");
+
+        try {
+            this.getTable()
+                    .filter(row -> row.hasFields("guild_id", "user_id", "number"))
+                    .delete()
+                    .run(this.getConnection());
+        } catch (final Exception err) {
+            LogUtils.error(Shadbot.getClient(), err, "An error occurred while resetting gamblers.");
+        }
+    }
+
     public void addToJackpot(long coins) {
         final int value = (int) Math.min(Math.ceil(coins / 100.0f), Config.MAX_COINS);
 
@@ -108,41 +161,6 @@ public final class LotteryManager extends DatabaseTable {
             LOGGER.debug("Lottery jackpot reset response: {}", response);
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while resetting jackpot.");
-        }
-    }
-
-    public List<LotteryGambler> getGamblers() {
-        LOGGER.debug("Requesting Lottery gamblers.");
-
-        final ReqlExpr request = this.getTable()
-                .filter(row -> row.hasFields("guild_id", "user_id", "number"))
-                .map(ReqlExpr::toJson);
-
-        final List<LotteryGambler> gamblers = new ArrayList<>();
-        try (final Cursor<String> cursor = request.run(this.getConnection())) {
-            if (cursor.hasNext()) {
-                Arrays.stream(Utils.MAPPER.readValue(cursor.next(), LotteryGamblerBean[].class))
-                        .map(LotteryGambler::new)
-                        .forEach(gamblers::add);
-            }
-
-        } catch (final Exception err) {
-            LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting gamblers.");
-        }
-
-        return Collections.unmodifiableList(gamblers);
-    }
-
-    public void resetGamblers() {
-        LOGGER.debug("Resetting Lottery gamblers.");
-
-        try {
-            this.getTable()
-                    .filter(row -> row.hasFields("guild_id", "user_id", "number"))
-                    .delete()
-                    .run(this.getConnection());
-        } catch (final Exception err) {
-            LogUtils.error(Shadbot.getClient(), err, "An error occurred while resetting gamblers.");
         }
     }
 

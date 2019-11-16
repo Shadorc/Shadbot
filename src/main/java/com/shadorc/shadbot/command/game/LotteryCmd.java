@@ -54,11 +54,7 @@ public class LotteryCmd extends BaseCmd {
             return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
         }
 
-        final Optional<LotteryGambler> gambler = LotteryManager.getInstance().getGamblers().stream()
-                .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
-                .findAny();
-
-        if (gambler.isPresent()) {
+        if (LotteryManager.getInstance().isGambler(context.getAuthorId())) {
             return Mono.error(new CommandException("You're already participating."));
         }
 
