@@ -64,8 +64,6 @@ public final class Shadbot {
         /*
         createDatabase();
         migrateGuild();
-        migratePremium();
-        migrateLottery();
          */
 
         LogUtils.info("Connecting to database...");
@@ -113,8 +111,12 @@ public final class Shadbot {
     // TODO: Remove once migrated
     private static void createDatabase() {
         LogUtils.info("Creating database...");
-        final RethinkDB db = GuildManager.getInstance().getDatabase();
-        final Connection conn = GuildManager.getInstance().getConnection();
+        final RethinkDB db = RethinkDB.r;
+        final Connection conn = RethinkDB.r.connection()
+                .hostname(Credentials.get(Credential.DATABASE_HOST))
+                .port(Integer.parseInt(Credentials.get(Credential.DATABASE_PORT)))
+                .user(Credentials.get(Credential.DATABASE_USER), Credentials.get(Credential.DATABASE_PASSWORD))
+                .connect();
         db.dbCreate("shadbot").run(conn);
         db.db("shadbot").tableCreate("guild").run(conn);
         db.db("shadbot").tableCreate("premium").run(conn);
@@ -171,14 +173,6 @@ public final class Shadbot {
         } catch (final Exception err) {
             LogUtils.error(err, "An error occurred while migrating guilds.");
         }
-    }
-
-    private static void migratePremium() {
-
-    }
-
-    private static void migrateLottery() {
-
     }
 
     /**
