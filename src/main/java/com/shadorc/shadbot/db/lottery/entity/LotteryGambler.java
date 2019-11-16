@@ -52,7 +52,11 @@ public class LotteryGambler implements DatabaseEntity {
                     .with("number", this.number);
 
             final String response = lm.getTable()
-                    .insert(gambler)
+                    .insert(lm.getDatabase().hashMap("id", "gamblers")
+                            .with("gamblers", lm.getDatabase().array(gambler)))
+                    .optArg("conflict", (id, oldDoc, newDoc) -> newDoc.merge(
+                            lm.getDatabase().hashMap("gamblers", oldDoc.g("gamblers").append(gambler))
+                    ))
                     .run(lm.getConnection())
                     .toString();
 
@@ -69,7 +73,11 @@ public class LotteryGambler implements DatabaseEntity {
         LOGGER.debug("[LotteryGambler {} / {}] Deleting...", this.getUserId().asLong(), this.getGuildId().asLong());
         try {
             final LotteryManager lm = LotteryManager.getInstance();
-            final String response = lm.requestGambler(this.getGuildId(), this.getUserId())
+            final String response = lm.getTable()
+                    .get("gamblers")
+                    .getField("gamblers")
+                    .filter(lm.getDatabase().hashMap("guild_id", this.getGuildId().asLong())
+                            .with("user_id", this.getUserId().asLong()))
                     .delete()
                     .run(lm.getConnection())
                     .toString();

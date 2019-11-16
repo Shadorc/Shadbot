@@ -83,14 +83,6 @@ public class DBGuild implements DatabaseEntity {
         }
     }
 
-    public void addMember(DBMember member) {
-        // TODO
-    }
-
-    public void removeMember(DBMember dbMember) {
-        //TODO
-    }
-
     @Override
     public void insert() {
         try {

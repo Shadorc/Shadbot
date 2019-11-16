@@ -32,22 +32,12 @@ public final class LotteryManager extends DatabaseTable {
         super("lottery");
     }
 
-    public ReqlExpr requestGambler(Snowflake guildId, Snowflake userId) {
-        return this.getTable()
-                .filter(this.getDatabase().hashMap("guild_id", guildId.asLong())
-                        .with("user_id", userId.asLong()));
-    }
-
-    public ReqlExpr requestHistoric() {
-        return this.getTable()
-                .getField("historic");
-    }
-
     public List<LotteryGambler> getGamblers() {
         LOGGER.debug("Requesting Lottery gamblers.");
 
         final ReqlExpr request = this.getTable()
-                .filter(row -> row.hasFields("guild_id", "user_id", "number"))
+                .get("gamblers")
+                .getField("gamblers")
                 .map(ReqlExpr::toJson);
 
         final List<LotteryGambler> gamblers = new ArrayList<>();
@@ -68,7 +58,10 @@ public final class LotteryManager extends DatabaseTable {
     public Optional<LotteryHistoric> getHistoric() {
         LOGGER.debug("Requesting Lottery historic.");
 
-        final ReqlExpr request = this.requestHistoric().map(ReqlExpr::toJson);
+        final ReqlExpr request = this.getTable()
+                .get("historic")
+                .getField("historic")
+                .map(ReqlExpr::toJson);
 
         try (final Cursor<String> cursor = request.run(this.getConnection())) {
             if (cursor.hasNext()) {
@@ -86,7 +79,9 @@ public final class LotteryManager extends DatabaseTable {
         LOGGER.debug("Requesting Lottery jackpot.");
 
         final ReqlExpr request = this.getTable()
-                .getField("jackpot");
+                .get("jackpot")
+                .getField("jackpot")
+                .default_(0);
 
         try (final Cursor<Long> cursor = request.run(this.getConnection())) {
             if (cursor.hasNext()) {
@@ -122,10 +117,12 @@ public final class LotteryManager extends DatabaseTable {
         LOGGER.debug("Resetting Lottery gamblers.");
 
         try {
-            this.getTable()
-                    .filter(row -> row.hasFields("guild_id", "user_id", "number"))
+            final String response = this.getTable()
+                    .get("gambblers")
                     .delete()
                     .run(this.getConnection());
+
+            LOGGER.debug("Lottery gamblers reset response: {}", response);
         } catch (final Exception err) {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while resetting gamblers.");
         }
@@ -137,7 +134,8 @@ public final class LotteryManager extends DatabaseTable {
         LOGGER.debug("Adding {} to Lottery jackpot.", FormatUtils.coins(value));
         try {
             final String response = this.getTable()
-                    .insert(this.getDatabase().hashMap("id", "jackpot").with("jackpot", value))
+                    .insert(this.getDatabase().hashMap("id", "jackpot")
+                            .with("jackpot", value))
                     .optArg("conflict", (id, oldDoc, newDoc) -> newDoc.merge(
                             this.getDatabase().hashMap("jackpot", oldDoc.g("jackpot").add(value))))
                     .run(this.getConnection())
@@ -154,7 +152,8 @@ public final class LotteryManager extends DatabaseTable {
 
         try {
             final String response = this.getTable()
-                    .replace(this.getDatabase().hashMap("id", "jackpot").with("jackpot", 0))
+                    .get("jackpot")
+                    .delete()
                     .run(this.getConnection())
                     .toString();
 

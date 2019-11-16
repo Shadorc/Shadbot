@@ -8,6 +8,7 @@ import com.shadorc.shadbot.db.guild.GuildManager;
 import com.shadorc.shadbot.db.guild.entity.DBMember;
 import com.shadorc.shadbot.db.lottery.LotteryManager;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
+import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -25,7 +26,6 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -144,10 +144,11 @@ public class LotteryCmd extends BaseCmd {
         LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
                 winningNum, winners.size(), LotteryManager.getInstance().getJackpot());
 
+        final long jackpot = LotteryManager.getInstance().getJackpot();
         return Flux.fromIterable(winners)
                 .flatMap(winner -> client.getMemberById(winner.getGuildId(), winner.getUserId()))
                 .flatMap(member -> {
-                    final long coins = Math.min(LotteryManager.getInstance().getJackpot() / winners.size(), Config.MAX_COINS);
+                    final long coins = Math.min(jackpot / winners.size(), Config.MAX_COINS);
                     GuildManager.getInstance().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
                     return member.getPrivateChannel()
                             .cast(MessageChannel.class)
@@ -156,10 +157,12 @@ public class LotteryCmd extends BaseCmd {
                             .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty());
                 })
                 .then(Mono.fromRunnable(() -> {
-                    // TODO LotteryManager.getInstance().setHistoric(new LotteryHistoric(LotteryManager.getInstance().getJackpot(), winners.size(), winningNum));
-                    LotteryManager.getInstance().resetGamblers();
+                    final LotteryManager lottery = LotteryManager.getInstance();
+
+                    new LotteryHistoric(jackpot, winners.size(), winningNum).insert();
+                    lottery.resetGamblers();
                     if (!winners.isEmpty()) {
-                        LotteryManager.getInstance().resetJackpot();
+                        lottery.resetJackpot();
                     }
                 }));
     }

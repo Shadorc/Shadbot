@@ -43,11 +43,12 @@ public class LotteryHistoric implements DatabaseEntity {
         LOGGER.debug("[LotteryHistoric] Inserting...");
         try {
             final LotteryManager lm = LotteryManager.getInstance();
-            final String response = lm.requestHistoric()
-                    .replace(lm.getDatabase()
-                            .hashMap("jackpot", this.jackpot)
+            final String response = lm.getTable()
+                    .insert(lm.getDatabase().hashMap("id", "historic")
+                            .with("jackpot", this.jackpot)
                             .with("winner_count", this.winnerCount)
                             .with("number", this.number))
+                    .optArg("conflict", "replace")
                     .run(lm.getConnection())
                     .toString();
 
@@ -63,7 +64,8 @@ public class LotteryHistoric implements DatabaseEntity {
         LOGGER.debug("[LotteryHistoric] Deleting...");
         try {
             final LotteryManager lm = LotteryManager.getInstance();
-            final String response = lm.requestHistoric()
+            final String response = lm.getTable()
+                    .get("historic")
                     .delete()
                     .run(lm.getConnection());
 

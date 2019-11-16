@@ -62,7 +62,7 @@ public class MemberListener {
             final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(event.getGuildId());
 
             event.getMember()
-                    .ifPresent(member -> dbGuild.removeMember(GuildManager.getInstance().getDBMember(member.getGuildId(), member.getId())));
+                    .ifPresent(member -> GuildManager.getInstance().getDBMember(member.getGuildId(), member.getId()).delete());
 
             final Mono<Message> sendLeaveMessage = Mono.zip(
                     Mono.justOrEmpty(dbGuild.getSettings().getMessageChannelId()),
