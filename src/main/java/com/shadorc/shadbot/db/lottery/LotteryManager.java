@@ -40,9 +40,9 @@ public final class LotteryManager extends DatabaseTable {
 
         final ReqlExpr request = this.getTable()
                 .get("gamblers")
-                .default_(this.getDatabase().hashMap("gamblers", this.getDatabase().array()))
                 .getField("gamblers")
-                .map(ReqlExpr::toJson);
+                .map(ReqlExpr::toJson)
+                .default_(this.getDatabase().array());
 
         try {
             final String json = request.run(this.getConnection()).toString();
@@ -62,13 +62,13 @@ public final class LotteryManager extends DatabaseTable {
 
         final ReqlExpr request = this.getTable()
                 .get("historic")
-                .default_(this.getDatabase().hashMap("historic", null))
                 .getField("historic")
-                .map(ReqlExpr::toJson);
+                .map(ReqlExpr::toJson)
+                .default_("");
 
         try {
-            final String json = request.run(this.getConnection());
-            if (json == null) {
+            final String json = request.run(this.getConnection()).toString();
+            if (json.isEmpty()) {
                 return Optional.empty();
             }
 
@@ -78,7 +78,6 @@ public final class LotteryManager extends DatabaseTable {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery historic.");
         }
 
-        LOGGER.debug("Lottery historic not found.");
         return Optional.empty();
     }
 
@@ -96,7 +95,6 @@ public final class LotteryManager extends DatabaseTable {
             LogUtils.error(Shadbot.getClient(), err, "An error occurred while getting lottery jackpot.");
         }
 
-        LOGGER.debug("Lottery jackpot not found.");
         return 0;
     }
 
@@ -106,8 +104,8 @@ public final class LotteryManager extends DatabaseTable {
         try {
             return this.getTable()
                     .get("gamblers")
-                    .default_(this.getDatabase().hashMap("gamblers", this.getDatabase().array()))
                     .getField("gamblers")
+                    .default_(this.getDatabase().array())
                     .filter(this.getDatabase().hashMap("user_id", userId.asLong()))
                     .contains()
                     .run(this.getConnection());
@@ -126,7 +124,8 @@ public final class LotteryManager extends DatabaseTable {
             final String response = this.getTable()
                     .get("gamblers")
                     .delete()
-                    .run(this.getConnection());
+                    .run(this.getConnection())
+                    .toString();
 
             LOGGER.debug("Lottery gamblers reset response: {}", response);
         } catch (final Exception err) {
