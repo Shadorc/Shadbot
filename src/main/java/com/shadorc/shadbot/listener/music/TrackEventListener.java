@@ -60,6 +60,10 @@ public class TrackEventListener extends AudioEventAdapter {
                     LogUtils.info("{Guild ID: %d} %sTrack exception: %s", this.guildId.asLong(),
                             this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
 
+                    if("Received unexpected response from YouTube.".equals(errMessage)) {
+                        LogUtils.warn(guildMusic.getClient(), "Received unexpected response from YouTube. IP rotation is probably needed.");
+                    }
+
                     final StringBuilder strBuilder = new StringBuilder();
                     if (this.errorCount.get() <= 3) {
                         strBuilder.append(String.format(Emoji.RED_CROSS + " Sorry, %s. I'll try to play "
