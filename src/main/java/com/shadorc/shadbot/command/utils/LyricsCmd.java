@@ -104,7 +104,7 @@ public class LyricsCmd extends BaseCmd {
         return NetUtils.request(HttpMethod.GET, url)
                 .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8)
                         .map(body -> Tuples.of(res, body)))
-                .timeout(Config.DEFAULT_TIMEOUT)
+                .timeout(Config.TIMEOUT)
                 .flatMap(responseSingle -> {
                     if (url.endsWith(responseSingle.getT1().uri())) {
                         return Mono.just(Jsoup.parse(responseSingle.getT2()));

@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Inputs;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -26,7 +25,7 @@ public class ConfirmInputs extends Inputs {
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getMessage().getAuthor())
                 .map(User::getId)
-                .filter(authorId -> authorId.equals(Shadbot.getOwnerId()) || Config.ADDITIONAL_OWNERS.contains(authorId))
+                .filter(Shadbot.getOwnerId()::equals)
                 .map(ignored -> event.getMessage().getContent())
                 .flatMap(Mono::justOrEmpty)
                 .map(content -> {

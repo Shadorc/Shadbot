@@ -86,7 +86,7 @@ public final class PremiumCollection extends DatabaseCollection {
     }
 
     public Relic generateRelic(RelicType type) {
-        final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.DEFAULT_RELIC_DURATION));
+        final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.RELIC_DURATION));
         relic.insert();
         return relic;
     }

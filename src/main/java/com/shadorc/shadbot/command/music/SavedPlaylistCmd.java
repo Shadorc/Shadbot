@@ -102,9 +102,9 @@ public class SavedPlaylistCmd extends BaseCmd {
             return Mono.error(new MissingArgumentException());
         }
 
-        if (map.size() >= Config.DEFAULT_SAVED_PLAYLIST_SIZE) {
+        if (map.size() >= Config.SAVED_PLAYLIST_SIZE) {
             return Mono.error(new CommandException(String.format("You cannot save more than %d playlists.",
-                    Config.DEFAULT_SAVED_PLAYLIST_SIZE)));
+                    Config.SAVED_PLAYLIST_SIZE)));
         }
 
         final String playlistName = args.get(1);
@@ -185,7 +185,7 @@ public class SavedPlaylistCmd extends BaseCmd {
                 .setDescription("Display, save, delete or load saved playlists.")
                 .addArg("action", FormatUtils.format(Action.class, "/"), false)
                 .addArg("name", "playlist name, must be specified to save, delete or load a playlist", true)
-                .addField("Info", String.format("You can save up to %d playlist.", Config.DEFAULT_SAVED_PLAYLIST_SIZE), false)
+                .addField("Info", String.format("You can save up to %d playlist.", Config.SAVED_PLAYLIST_SIZE), false)
                 .build();
     }
 }

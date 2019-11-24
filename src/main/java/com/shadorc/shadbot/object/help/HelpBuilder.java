@@ -38,7 +38,7 @@ public class HelpBuilder {
         this.cmd = cmd;
         this.args = new ArrayList<>();
         this.fields = new ArrayList<>();
-        this.delimiter = Config.DEFAULT_COMMAND_DELIMITER;
+        this.delimiter = Config.COMMAND_DELIMITER;
     }
 
     public HelpBuilder setThumbnail(String thumbnail) {

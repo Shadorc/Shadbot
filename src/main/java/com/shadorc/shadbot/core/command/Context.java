@@ -94,7 +94,7 @@ public class Context {
     public Flux<CommandPermission> getPermissions() {
         // The author is a bot's owner
         final Mono<CommandPermission> ownerPerm = Mono.just(this.getAuthorId())
-                .filter(authorId -> Shadbot.getOwnerId().equals(authorId) || Config.ADDITIONAL_OWNERS.contains(authorId))
+                .filter(Shadbot.getOwnerId()::equals)
                 .map(ignored -> CommandPermission.OWNER);
 
         // The member is an administrator or it's a private message
@@ -151,7 +151,7 @@ public class Context {
     }
 
     public List<String> requireArgs(int min, int max) {
-        return this.requireArgs(min, max, Config.DEFAULT_COMMAND_DELIMITER);
+        return this.requireArgs(min, max, Config.COMMAND_DELIMITER);
     }
 
     public List<String> requireArgs(int min, int max, String delimiter) {
