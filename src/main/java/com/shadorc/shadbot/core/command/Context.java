@@ -39,6 +39,10 @@ public class Context {
         this.arg = splittedMsg.size() > 1 ? splittedMsg.get(1).trim() : null;
     }
 
+    public MessageCreateEvent getEvent() {
+        return this.event;
+    }
+
     public Optional<String> getArg() {
         return Optional.ofNullable(this.arg);
     }
