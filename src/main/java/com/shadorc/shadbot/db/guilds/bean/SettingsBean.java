@@ -45,26 +45,6 @@ public class SettingsBean {
     @JsonProperty("prefix")
     private String prefix;
 
-    // TODO: Remove once migrated
-    public SettingsBean(@Nullable List<String> allowedTextChannelIds, @Nullable List<String> allowedVoiceChannelIds,
-                        @Nullable List<String> allowedRoleIds, @Nullable List<String> autoRoleIds, @Nullable List<String> blacklist,
-                        @Nullable Integer defaultVolume, @Nullable Map<String, String> iamMessage, @Nullable String joinMessage,
-                        @Nullable String leaveMessage, @Nullable String messageChannelId, @Nullable Map<String, List<String>> savedPlaylists,
-                        @Nullable String prefix) {
-        this.allowedTextChannelIds = allowedTextChannelIds;
-        this.allowedVoiceChannelIds = allowedVoiceChannelIds;
-        this.allowedRoleIds = allowedRoleIds;
-        this.autoRoleIds = autoRoleIds;
-        this.blacklist = blacklist;
-        this.defaultVolume = defaultVolume;
-        this.iamMessage = iamMessage;
-        this.joinMessage = joinMessage;
-        this.leaveMessage = leaveMessage;
-        this.messageChannelId = messageChannelId;
-        this.savedPlaylists = savedPlaylists;
-        this.prefix = prefix;
-    }
-
     @Nullable
     public List<String> getAllowedTextChannelIds() {
         return this.allowedTextChannelIds;
