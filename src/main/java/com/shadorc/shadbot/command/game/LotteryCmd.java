@@ -1,14 +1,14 @@
 package com.shadorc.shadbot.command.game;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.database.DBMember;
-import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.lottery.LotteryGambler;
-import com.shadorc.shadbot.data.lottery.LotteryHistoric;
-import com.shadorc.shadbot.data.lottery.LotteryManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBMember;
+import com.shadorc.shadbot.db.lottery.LotteryCollection;
+import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
+import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -49,17 +49,12 @@ public class LotteryCmd extends BaseCmd {
 
         final String arg = context.requireArg();
 
-        final DBMember dbMember = DatabaseManager.getInstance().getDBMember(context.getGuildId(), context.getAuthorId());
+        final DBMember dbMember = DatabaseManager.getGuilds().getDBMember(context.getGuildId(), context.getAuthorId());
         if (dbMember.getCoins() < PAID_COST) {
             return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
         }
 
-        final LotteryGambler gambler = LotteryManager.getInstance().getLottery().getGamblers().stream()
-                .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
-                .findAny()
-                .orElse(null);
-
-        if (gambler != null) {
+        if (DatabaseManager.getLottery().isGambler(context.getAuthorId())) {
             return Mono.error(new CommandException("You're already participating."));
         }
 
@@ -71,7 +66,8 @@ public class LotteryCmd extends BaseCmd {
 
         dbMember.addCoins(-PAID_COST);
 
-        LotteryManager.getInstance().getLottery().addGambler(context.getGuildId(), context.getAuthorId(), num);
+        new LotteryGambler(context.getGuildId(), context.getAuthorId(), num)
+                .insert();
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet on number **%d**. Good luck ! "
@@ -81,7 +77,7 @@ public class LotteryCmd extends BaseCmd {
     }
 
     private Mono<Message> show(Context context) {
-        final List<LotteryGambler> gamblers = LotteryManager.getInstance().getLottery().getGamblers();
+        final List<LotteryGambler> gamblers = DatabaseManager.getLottery().getGamblers();
 
         final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
@@ -91,15 +87,15 @@ public class LotteryCmd extends BaseCmd {
                                     FormatUtils.customDate(LotteryCmd.getDelay()),
                                     context.getPrefix(), this.getName(), MIN_NUM, MAX_NUM))
                             .addField("Number of participants", Integer.toString(gamblers.size()), false)
-                            .addField("Prize pool", FormatUtils.coins(LotteryManager.getInstance().getLottery().getJackpot()), false);
+                            .addField("Prize pool", FormatUtils.coins(DatabaseManager.getLottery().getJackpot()), false);
 
                     gamblers.stream()
                             .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
-                            .findAny().ifPresent(gambler -> embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
-                            "https://i.imgur.com/btJAaAt.png"));
+                            .findAny()
+                            .ifPresent(gambler -> embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
+                                    "https://i.imgur.com/btJAaAt.png"));
 
-                    final LotteryHistoric historic = LotteryManager.getInstance().getLottery().getHistoric();
-                    if (historic != null) {
+                    DatabaseManager.getLottery().getHistoric().ifPresent(historic -> {
                         final String people;
                         switch (historic.getWinnerCount()) {
                             case 0:
@@ -117,7 +113,7 @@ public class LotteryCmd extends BaseCmd {
                                 String.format("Last week, the prize pool contained **%s**, the winning number was **%d** and **%s won**.",
                                         FormatUtils.coins(historic.getJackpot()), historic.getNumber(), people),
                                 false);
-                    }
+                    });
                 });
 
         return context.getChannel()
@@ -141,18 +137,19 @@ public class LotteryCmd extends BaseCmd {
         LogUtils.info("Lottery draw started...");
         final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
-        final List<LotteryGambler> winners = LotteryManager.getInstance().getLottery().getGamblers().stream()
+        final List<LotteryGambler> winners = DatabaseManager.getLottery().getGamblers().stream()
                 .filter(gambler -> gambler.getNumber() == winningNum)
                 .collect(Collectors.toList());
 
         LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
-                winningNum, winners.size(), LotteryManager.getInstance().getLottery().getJackpot());
+                winningNum, winners.size(), DatabaseManager.getLottery().getJackpot());
 
+        final long jackpot = DatabaseManager.getLottery().getJackpot();
         return Flux.fromIterable(winners)
                 .flatMap(winner -> client.getMemberById(winner.getGuildId(), winner.getUserId()))
                 .flatMap(member -> {
-                    final long coins = Math.min(LotteryManager.getInstance().getLottery().getJackpot() / winners.size(), Config.MAX_COINS);
-                    DatabaseManager.getInstance().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
+                    final long coins = Math.min(jackpot / winners.size(), Config.MAX_COINS);
+                    DatabaseManager.getGuilds().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
                     return member.getPrivateChannel()
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn **%s**.",
@@ -160,10 +157,12 @@ public class LotteryCmd extends BaseCmd {
                             .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty());
                 })
                 .then(Mono.fromRunnable(() -> {
-                    LotteryManager.getInstance().getLottery().setHistoric(new LotteryHistoric(LotteryManager.getInstance().getLottery().getJackpot(), winners.size(), winningNum));
-                    LotteryManager.getInstance().getLottery().resetGamblers();
+                    final LotteryCollection lottery = DatabaseManager.getLottery();
+
+                    new LotteryHistoric(jackpot, winners.size(), winningNum).insert();
+                    lottery.resetGamblers();
                     if (!winners.isEmpty()) {
-                        LotteryManager.getInstance().getLottery().resetJackpot();
+                        lottery.resetJackpot();
                     }
                 }));
     }

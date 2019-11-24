@@ -5,7 +5,8 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
 import discord4j.core.DiscordClient;
@@ -14,6 +15,7 @@ import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
+import reactor.util.annotation.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-public class MusicManager {
+public final class MusicManager {
 
     private static MusicManager instance;
 
@@ -68,7 +70,8 @@ public class MusicManager {
             final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
             audioPlayer.addListener(new TrackEventListener(guildId));
 
-            final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, DatabaseManager.getInstance().getDBGuild(guildId).getDefaultVol());
+            final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(guildId);
+            final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, dbGuild.getSettings().getDefaultVol());
             final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
             guildMusicConnection.setGuildMusic(guildMusic);
 
@@ -84,6 +87,7 @@ public class MusicManager {
         return this.guildMusicConnections.get(guildId);
     }
 
+    @Nullable
     public GuildMusic getMusic(Snowflake guildId) {
         final GuildMusicConnection guildMusicConnection = this.getConnection(guildId);
         return guildMusicConnection == null ? null : guildMusicConnection.getGuildMusic();

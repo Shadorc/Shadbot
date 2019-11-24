@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -56,16 +56,17 @@ public class ManageCoinsCmd extends BaseCmd {
                     final String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(members, User::getUsername, ", ");
                     switch (action) {
                         case ADD:
-                            members.forEach(user -> DatabaseManager.getInstance().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
+                            members.forEach(user -> DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
                             return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.coins(coins));
                         case REMOVE:
-                            members.forEach(user -> DatabaseManager.getInstance().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
+                            members.forEach(user -> DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
                             return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.coins(coins));
                         case RESET:
-                            members.forEach(user -> DatabaseManager.getInstance().getDBMember(context.getGuildId(), user.getId()).resetCoins());
+                            members.forEach(user -> DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId()).resetCoins());
                             return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, members.size() == 1 ? "his" : "their");
                         default:
-                            return null;
+                            throw new CommandException(String.format("`%s` is not a valid action. %s",
+                                    args.get(0), FormatUtils.options(Action.class)));
                     }
                 })
                 .flatMap(text -> context.getChannel()

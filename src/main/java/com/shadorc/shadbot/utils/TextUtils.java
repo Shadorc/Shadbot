@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.setting.Setting;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.object.Emoji;
 import discord4j.core.object.util.Permission;
@@ -11,7 +11,7 @@ import reactor.util.annotation.NonNull;
 
 import java.util.List;
 
-public class TextUtils {
+public final class TextUtils {
 
     public static final String NOT_ENOUGH_COINS =
             "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";

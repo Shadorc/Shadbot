@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Properties;
 
-public class Credentials {
+public final class Credentials {
 
     private static final Logger LOGGER = Loggers.getLogger(Credentials.class);
     private static final Properties CREDENTIALS_PROPERTIES = new Properties();
@@ -29,7 +29,7 @@ public class Credentials {
         // Check if all API keys are present
         for (final Credential key : Credential.values()) {
             if (Credentials.get(key) == null) {
-                LOGGER.warn("Property {} not found, the associated command / service may not work properly.", key);
+                LOGGER.warn("Credential {} not found, the associated command / service may not work properly.", key);
             }
         }
     }

@@ -51,16 +51,16 @@ public class TrackEventListener extends AudioEventAdapter {
     }
 
     @Override
-    public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException err) {
+    public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     this.errorCount.incrementAndGet();
 
-                    final String errMessage = TextUtils.cleanLavaplayerErr(err);
+                    final String errMessage = TextUtils.cleanLavaplayerErr(exception);
                     LogUtils.info("{Guild ID: %d} %sTrack exception: %s", this.guildId.asLong(),
                             this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
 
-                    if(errMessage.contains("Received unexpected response from YouTube")) {
+                    if (errMessage.contains("Received unexpected response from YouTube")) {
                         LogUtils.warn(guildMusic.getClient(), "Received unexpected response from YouTube. IP rotation is probably needed.");
                     }
 

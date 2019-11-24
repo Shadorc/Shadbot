@@ -3,8 +3,8 @@ package com.shadorc.shadbot.command.admin.setting;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.data.database.DBGuild;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -47,36 +47,34 @@ public class AllowedChannelsSetting extends BaseSetting {
                         throw new CommandException(String.format("Channel `%s` not found.", args.get(2)));
                     }
 
-                    final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
-                    final List<Long> allowedTextChannels = dbGuild.getAllowedTextChannels();
-                    final List<Long> allowedVoiceChannels = dbGuild.getAllowedVoiceChannels();
+                    final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+                    final List<Snowflake> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannelIds();
+                    final List<Snowflake> allowedVoiceChannelIds = dbGuild.getSettings().getAllowedVoiceChannelIds();
 
-                    final List<Long> mentionedVoiceChannelIds = mentionedChannels.stream()
+                    final List<Snowflake> mentionedVoiceChannelIds = mentionedChannels.stream()
                             .filter(channel -> channel.getType() == Type.GUILD_VOICE)
                             .map(Channel::getId)
-                            .map(Snowflake::asLong)
                             .collect(Collectors.toList());
 
-                    final List<Long> mentionedTextChannelIds = mentionedChannels.stream()
+                    final List<Snowflake> mentionedTextChannelIds = mentionedChannels.stream()
                             .filter(channel -> channel.getType() == Type.GUILD_TEXT)
                             .map(Channel::getId)
-                            .map(Snowflake::asLong)
                             .collect(Collectors.toList());
 
                     final StringBuilder strBuilder = new StringBuilder();
                     if (action == Action.ADD) {
-                        if (allowedTextChannels.isEmpty() && !mentionedTextChannelIds.isEmpty()
-                                && mentionedTextChannelIds.stream().noneMatch(channelId -> channelId.equals(context.getChannelId().asLong()))) {
+                        if (allowedTextChannelIds.isEmpty() && !mentionedTextChannelIds.isEmpty()
+                                && mentionedTextChannelIds.stream().noneMatch(channelId -> channelId.equals(context.getChannelId()))) {
                             strBuilder.append(Emoji.WARNING + " You did not mentioned this channel. "
                                     + "I will not reply here until this channel is added to the list of allowed channels.\n");
                         }
 
                         for (final Channel channel : mentionedChannels) {
-                            final long channelId = channel.getId().asLong();
-                            if (channel.getType() == Type.GUILD_TEXT && !allowedTextChannels.contains(channelId)) {
-                                allowedTextChannels.add(channelId);
-                            } else if (channel.getType() == Type.GUILD_VOICE && !allowedVoiceChannels.contains(channelId)) {
-                                allowedVoiceChannels.add(channelId);
+                            final Snowflake channelId = channel.getId();
+                            if (channel.getType() == Type.GUILD_TEXT && !allowedTextChannelIds.contains(channelId)) {
+                                allowedTextChannelIds.add(channelId);
+                            } else if (channel.getType() == Type.GUILD_VOICE && !allowedVoiceChannelIds.contains(channelId)) {
+                                allowedVoiceChannelIds.add(channelId);
                             }
                         }
 
@@ -84,21 +82,21 @@ public class AllowedChannelsSetting extends BaseSetting {
                                 FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
 
                     } else {
-                        allowedTextChannels.removeAll(mentionedTextChannelIds);
-                        allowedVoiceChannels.removeAll(mentionedVoiceChannelIds);
+                        allowedTextChannelIds.removeAll(mentionedTextChannelIds);
+                        allowedVoiceChannelIds.removeAll(mentionedVoiceChannelIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s removed from allowed channels.",
                                 FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
 
-                        if (!mentionedTextChannelIds.isEmpty() && allowedTextChannels.isEmpty()) {
+                        if (!mentionedTextChannelIds.isEmpty() && allowedTextChannelIds.isEmpty()) {
                             strBuilder.append("\n" + Emoji.INFO + " There are no more allowed text channels set, I can now speak in all the text channels.");
                         }
-                        if (!mentionedVoiceChannelIds.isEmpty() && allowedVoiceChannels.isEmpty()) {
+                        if (!mentionedVoiceChannelIds.isEmpty() && allowedVoiceChannelIds.isEmpty()) {
                             strBuilder.append("\n" + Emoji.INFO + " There are no more allowed voice channels set, I can now connect to all voice channels.");
                         }
                     }
 
-                    dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannels);
-                    dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannels);
+                    dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
+                    dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds);
 
                     return strBuilder.toString();
                 })
@@ -110,11 +108,13 @@ public class AllowedChannelsSetting extends BaseSetting {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <#channel(s)>`", context.getPrefix(), this.getCommandName()), false)
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <#channel(s)>`",
+                        context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s%n**channel(s)** - the (voice) channel(s) to %s",
                                 FormatUtils.format(Action.class, "/"),
                                 FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s add #general`", context.getPrefix(), this.getCommandName()), false));
+                        .addField("Example", String.format("`%s%s add #general`",
+                                context.getPrefix(), this.getCommandName()), false));
     }
 
 }

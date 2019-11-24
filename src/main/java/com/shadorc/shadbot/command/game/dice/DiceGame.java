@@ -1,9 +1,9 @@
 package com.shadorc.shadbot.command.game.dice;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -57,7 +57,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
 
                 })
                 .collectList()
-                .map(list -> this.results = String.join("\n", list))
+                .doOnNext(list -> this.results = String.join("\n", list))
                 .then(this.getContext().getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
                 .then(this.show())

@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.command.game.blackjack;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.casino.Deck;
 import com.shadorc.shadbot.object.casino.Hand;

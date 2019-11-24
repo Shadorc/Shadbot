@@ -5,10 +5,9 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.premium.PremiumManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -46,35 +45,35 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     @Override
-    public void trackLoaded(AudioTrack track) {
+    public void trackLoaded(AudioTrack audioTrack) {
         Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
-                .filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(track, this.insertFirst))
+                .filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(audioTrack, this.insertFirst))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(
                         Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-                        FormatUtils.trackName(track.getInfo())), channel))
+                        FormatUtils.trackName(audioTrack.getInfo())), channel))
                 .doOnTerminate(this::terminate)
                 .subscribeOn(Schedulers.elastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
     @Override
-    public void playlistLoaded(AudioPlaylist playlist) {
+    public void playlistLoaded(AudioPlaylist audioPlaylist) {
         // SoundCloud returns an empty playlist when no results where found
-        if (playlist.getTracks().isEmpty()) {
+        if (audioPlaylist.getTracks().isEmpty()) {
             this.onNoMatches();
         }
         // If a track is specifically selected
-        else if (playlist.getSelectedTrack() != null) {
-            this.trackLoaded(playlist.getSelectedTrack());
+        else if (audioPlaylist.getSelectedTrack() != null) {
+            this.trackLoaded(audioPlaylist.getSelectedTrack());
         }
         // The user is searching something
-        else if (playlist.isSearchResult()) {
-            this.onSearchResult(playlist);
+        else if (audioPlaylist.isSearchResult()) {
+            this.onSearchResult(audioPlaylist);
         }
         // The user loads a full playlist
         else {
-            this.onPlaylistLoaded(playlist);
+            this.onPlaylistLoaded(audioPlaylist);
         }
     }
 
@@ -111,8 +110,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         musicsAdded++;
                         // The playlist limit is reached and the user / guild is not premium
                         if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-                                && !PremiumManager.getInstance().isGuildPremium(this.guildId)
-                                && !PremiumManager.getInstance().isUserPremium(this.djId)) {
+                                && !DatabaseManager.getPremium().isGuildPremium(this.guildId)
+                                && !DatabaseManager.getPremium().isUserPremium(this.djId)) {
                             strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
                             break;
                         }
@@ -143,14 +142,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                 + "\nExample: 1,3,4"
                                 + "\n\n" + choices)
                         .setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-                                DatabaseManager.getInstance().getDBGuild(this.guildId).getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
+                                DatabaseManager.getGuilds().getDBGuild(this.guildId).getSettings().getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
     }
 
     @Override
-    public void loadFailed(FriendlyException err) {
+    public void loadFailed(FriendlyException e) {
         Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
                 .flatMap(guildMusic -> {
-                    final String errMessage = TextUtils.cleanLavaplayerErr(err);
+                    final String errMessage = TextUtils.cleanLavaplayerErr(e);
                     LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildId.asLong(), errMessage);
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(

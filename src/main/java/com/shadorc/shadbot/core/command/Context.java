@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.core.command;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.Shadbot;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.exception.NoMusicException;
 import com.shadorc.shadbot.music.GuildMusic;

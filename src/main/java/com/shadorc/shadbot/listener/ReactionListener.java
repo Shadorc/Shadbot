@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.command.admin.IamCmd;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.TemporaryMessage;
 import com.shadorc.shadbot.utils.StringUtils;
@@ -105,11 +105,11 @@ public class ReactionListener {
                 // If the bot is not the author of the message, this is not an Iam message
                 .filter(selfId -> message.getAuthor().map(User::getId).map(selfId::equals).orElse(false))
                 .flatMap(ignored -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
-                .flatMap(member -> Mono.justOrEmpty(DatabaseManager.getInstance()
+                .flatMap(member -> Mono.justOrEmpty(DatabaseManager.getGuilds()
                         .getDBGuild(member.getGuildId())
+                        .getSettings()
                         .getIamMessages()
-                        .get(message.getId().asString()))
-                        .map(Snowflake::of)
+                        .get(message.getId()))
                         // If the bot can manage the role
                         .filterWhen(roleId -> ReactionListener.canManageRole(message, roleId))
                         .flatMap(roleId -> action == Action.ADD ? member.addRole(roleId) : member.removeRole(roleId)));

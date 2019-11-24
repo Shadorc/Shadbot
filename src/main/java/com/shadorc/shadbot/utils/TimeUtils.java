@@ -12,7 +12,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TimeUtils {
+public final class TimeUtils {
+
+    private static final Pattern LETTER_PATTERN = Pattern.compile("[a-z]");
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("[0-9]");
 
     /**
      * @param instant - the instant to get milliseconds from
@@ -32,13 +35,13 @@ public class TimeUtils {
 
     /**
      * Convert a string, case insensitive, representing time (example: 1m03s) into seconds. <br>
-     * Supported units: s (second), m (minut), h (hour)
+     * Supported units: s (second), m (minute), h (hour)
      *
      * @param str - the text to parse
      * @return The amount of seconds corresponding to the {@code str} format
      */
     public static long parseTime(@NonNull String str) {
-        final String normalizedText = str.replaceAll(" ", "").toLowerCase();
+        final String normalizedText = str.replace(" ", "").toLowerCase();
 
         final Pattern pattern = Pattern.compile("[0-9]+[a-z]");
         final Matcher matcher = pattern.matcher(normalizedText);
@@ -55,8 +58,8 @@ public class TimeUtils {
         long seconds = 0;
 
         for (final String match : matches) {
-            final long time = Long.parseLong(match.replaceAll("[a-z]", ""));
-            final String unit = match.replaceAll("[0-9]", "");
+            final long time = Long.parseLong(LETTER_PATTERN.matcher(match).replaceAll(""));
+            final String unit = NUMBER_PATTERN.matcher(match).replaceAll("");
             switch (unit) {
                 case "s":
                     seconds += TimeUnit.SECONDS.toSeconds(time);

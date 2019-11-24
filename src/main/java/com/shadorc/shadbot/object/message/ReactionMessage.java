@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.function.Consumer;
 
 public class ReactionMessage {
@@ -24,7 +25,7 @@ public class ReactionMessage {
                            Collection<ReactionEmoji> reactions) {
         this.client = client;
         this.channelId = channelId;
-        this.reactions = reactions;
+        this.reactions = Collections.unmodifiableCollection(reactions);
     }
 
     /**

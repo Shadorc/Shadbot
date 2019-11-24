@@ -88,10 +88,10 @@ public class CounterStrikeCmd extends BaseCmd {
                                                             context.getAvatarUrl())
                                                             .setThumbnail(player.getAvatarFull())
                                                             .setDescription(String.format("Stats for **%s**", player.getPersonaName()))
-                                                            .addField("Kills", statsMap.get("total_kills").toString(), true)
-                                                            .addField("Deaths", statsMap.get("total_deaths").toString(), true)
-                                                            .addField("Total wins", statsMap.get("total_wins").toString(), true)
-                                                            .addField("Total MVP", statsMap.get("total_mvps").toString(), true)
+                                                            .addField("Kills", FormatUtils.number(statsMap.get("total_kills")), true)
+                                                            .addField("Deaths", FormatUtils.number(statsMap.get("total_deaths")), true)
+                                                            .addField("Total wins", FormatUtils.number(statsMap.get("total_wins")), true)
+                                                            .addField("Total MVP", FormatUtils.number(statsMap.get("total_mvps")), true)
                                                             .addField("Ratio", String.format("%.2f", (float) statsMap.get("total_kills") / statsMap.get("total_deaths")), false)));
                                         });
                             });

@@ -12,6 +12,9 @@ import java.util.List;
 
 public class WordsList {
 
+    private static final int MIN_WORD_LENGTH = 5;
+    private static final int MAX_WORD_LENGTH = 10;
+
     private final String url;
     private final List<String> words;
 
@@ -25,7 +28,7 @@ public class WordsList {
             return NetUtils.get(this.url)
                     .map(str -> StringUtils.split(str, "\n"))
                     .flatMapMany(Flux::fromIterable)
-                    .filter(word -> NumberUtils.isBetween(word.length(), HangmanCmd.MIN_WORD_LENGTH, HangmanCmd.MAX_WORD_LENGTH))
+                    .filter(word -> NumberUtils.isBetween(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
                     .take(500)
                     .collectList()
                     .doOnNext(this.words::addAll)

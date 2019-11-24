@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.object.help;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import discord4j.common.json.EmbedFieldEntity;
@@ -75,13 +75,13 @@ public class HelpBuilder {
         return this;
     }
 
-    public HelpBuilder addArg(String name, String desc, boolean isFacultative) {
-        this.args.add(new Argument(name, desc, isFacultative));
+    public HelpBuilder addArg(String name, String desc, boolean isOptional) {
+        this.args.add(new Argument(name, desc, isOptional));
         return this;
     }
 
-    public HelpBuilder addArg(String name, boolean isFacultative) {
-        return this.addArg(name, null, isFacultative);
+    public HelpBuilder addArg(String name, boolean isOptional) {
+        return this.addArg(name, null, isOptional);
     }
 
     public HelpBuilder addField(String name, String value, boolean inline) {
@@ -133,13 +133,13 @@ public class HelpBuilder {
 
         return String.format("`%s%s %s`",
                 this.context.getPrefix(), this.cmd.getName(),
-                FormatUtils.format(this.args, arg -> String.format(arg.isFacultative() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
+                FormatUtils.format(this.args, arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
     }
 
     private String getArguments() {
         return this.args.stream()
                 .filter(arg -> arg.getDescription() != null && !arg.getDescription().isBlank())
-                .map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isFacultative() ? "[optional] " : "", arg.getDescription()))
+                .map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isOptional() ? "[optional] " : "", arg.getDescription()))
                 .collect(Collectors.joining());
     }
 }

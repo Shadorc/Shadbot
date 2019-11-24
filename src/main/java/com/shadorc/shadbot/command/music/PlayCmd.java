@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.command.music;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.premium.PremiumManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.music.MusicManager;
@@ -63,8 +63,8 @@ public class PlayCmd extends BaseCmd {
                                         }
 
                                         if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-                                                && !PremiumManager.getInstance().isGuildPremium(guildId)
-                                                && !PremiumManager.getInstance().isUserPremium(context.getAuthorId())) {
+                                                && !DatabaseManager.getPremium().isGuildPremium(guildId)
+                                                && !DatabaseManager.getPremium().isUserPremium(context.getAuthorId())) {
                                             return DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel).then();
                                         }
 

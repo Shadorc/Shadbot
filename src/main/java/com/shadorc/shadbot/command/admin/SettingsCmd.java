@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.command.admin;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.command.admin.setting.*;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
@@ -9,8 +8,9 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.data.database.DBGuild;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.object.Emoji;
@@ -20,7 +20,6 @@ import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -90,36 +89,34 @@ public class SettingsCmd extends BaseCmd {
     }
 
     private static Mono<Consumer<EmbedCreateSpec>> show(Context context) {
-        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
         final StringBuilder settingsStr = new StringBuilder();
 
-        if (!dbGuild.getPrefix().equals(Config.DEFAULT_PREFIX)) {
+        if (!dbGuild.getSettings().getPrefix().equals(Config.DEFAULT_PREFIX)) {
             settingsStr.append(String.format("**Prefix:** %s", context.getPrefix()));
         }
 
-        if (dbGuild.getDefaultVol() != Config.DEFAULT_VOLUME) {
-            settingsStr.append(String.format("%n**Default volume:** %d%%", dbGuild.getDefaultVol()));
+        if (dbGuild.getSettings().getDefaultVol() != Config.DEFAULT_VOLUME) {
+            settingsStr.append(String.format("%n**Default volume:** %d%%", dbGuild.getSettings().getDefaultVol()));
         }
 
-        if (!dbGuild.getBlacklistedCmd().isEmpty()) {
+        if (!dbGuild.getSettings().getBlacklistedCmd().isEmpty()) {
             settingsStr.append(String.format("%n**Blacklisted commands:**%n\t%s",
-                    String.join("\n\t", dbGuild.getBlacklistedCmd())));
+                    String.join("\n\t", dbGuild.getSettings().getBlacklistedCmd())));
         }
 
-        dbGuild.getJoinMessage()
+        dbGuild.getSettings().getJoinMessage()
                 .ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:**%n%s", joinMessage)));
-        dbGuild.getLeaveMessage()
+        dbGuild.getSettings().getLeaveMessage()
                 .ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
 
-        final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getMessageChannelId())
-                .map(Snowflake::of)
+        final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getSettings().getMessageChannelId())
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
                 .map(channel -> settingsStr.append(String.format("%n**Auto message channel:** %s", channel)))
                 .then();
 
-        final Mono<Void> allowedTextChannelsStr = Flux.fromIterable(dbGuild.getAllowedTextChannels())
-                .map(Snowflake::of)
+        final Mono<Void> allowedTextChannelsStr = Flux.fromIterable(dbGuild.getSettings().getAllowedTextChannelIds())
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
                 .collectList()
@@ -127,8 +124,7 @@ public class SettingsCmd extends BaseCmd {
                 .map(channels -> settingsStr.append(String.format("%n**Allowed text channels:**%n\t%s", String.join("\n\t", channels))))
                 .then();
 
-        final Mono<Void> allowedVoiceChannelsStr = Flux.fromIterable(dbGuild.getAllowedVoiceChannels())
-                .map(Snowflake::of)
+        final Mono<Void> allowedVoiceChannelsStr = Flux.fromIterable(dbGuild.getSettings().getAllowedVoiceChannelIds())
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
                 .collectList()
@@ -136,8 +132,7 @@ public class SettingsCmd extends BaseCmd {
                 .map(channels -> settingsStr.append(String.format("%n**Allowed voice channels:**%n\t%s", String.join("\n\t", channels))))
                 .then();
 
-        final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getAutoRoles())
-                .map(Snowflake::of)
+        final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getSettings().getAutoRoleIds())
                 .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
                 .map(Role::getMention)
                 .collectList()
@@ -145,8 +140,7 @@ public class SettingsCmd extends BaseCmd {
                 .map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n\t%s", String.join("\n\t", roles))))
                 .then();
 
-        final Mono<Void> allowedRolesStr = Flux.fromIterable(dbGuild.getAllowedRoles())
-                .map(Snowflake::of)
+        final Mono<Void> allowedRolesStr = Flux.fromIterable(dbGuild.getSettings().getAllowedRoleIds())
                 .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
                 .map(Role::getMention)
                 .collectList()

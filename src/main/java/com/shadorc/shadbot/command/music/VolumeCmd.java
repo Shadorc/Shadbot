@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.command.music;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.premium.PremiumManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.TrackScheduler;
@@ -44,8 +44,8 @@ public class VolumeCmd extends BaseCmd {
                         return Mono.error(new CommandException(String.format("`%s` is not a valid volume.", arg)));
                     }
 
-                    if (volume > Config.DEFAULT_MAX_VOLUME && !PremiumManager.getInstance().isGuildPremium(context.getGuildId())
-                            && !PremiumManager.getInstance().isUserPremium(context.getAuthorId())) {
+                    if (volume > Config.DEFAULT_MAX_VOLUME && !DatabaseManager.getPremium().isGuildPremium(context.getGuildId())
+                            && !DatabaseManager.getPremium().isUserPremium(context.getAuthorId())) {
                         return Mono.error(new CommandException(String.format("You cannot set the volume higher than %d%%. " +
                                         "You can set the volume **up to %d%% and gain other advantage** by contributing " +
                                         "to Shadbot. More info here: <%s>",

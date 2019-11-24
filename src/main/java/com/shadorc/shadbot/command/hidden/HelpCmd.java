@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.hidden;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.object.entity.Channel;
@@ -43,7 +43,8 @@ public class HelpCmd extends BaseCmd {
                         .distinct()
                         .filter(cmd -> authorPerms.contains(cmd.getPermission()))
                         .filterWhen(cmd -> context.getChannel().map(Channel::getType)
-                                .map(type -> type == Type.DM || DatabaseManager.getInstance().getDBGuild(context.getGuildId()).isCommandAllowed(cmd)))
+                                .map(type -> type == Type.DM
+                                        || DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).getSettings().isCommandAllowed(cmd)))
                         .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
                 .map(map -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
@@ -55,7 +56,7 @@ public class HelpCmd extends BaseCmd {
 
                             for (final CommandCategory category : CommandCategory.values()) {
                                 if (map.get(category) != null && !map.get(category).isEmpty() && category != CommandCategory.HIDDEN) {
-                                    embed.addField(String.format("%s Commands", category.toString()), String.join(" ", map.get(category)), false);
+                                    embed.addField(String.format("%s Commands", category), String.join(" ", map.get(category)), false);
                                 }
                             }
                         }))

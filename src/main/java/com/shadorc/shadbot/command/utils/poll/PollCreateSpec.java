@@ -16,7 +16,7 @@ public class PollCreateSpec {
     public PollCreateSpec(Duration duration, String question, Map<String, ReactionEmoji> choices) {
         this.duration = duration;
         this.question = question;
-        this.choices = choices;
+        this.choices = Collections.unmodifiableMap(choices);
     }
 
     public Duration getDuration() {

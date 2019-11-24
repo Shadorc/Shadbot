@@ -3,8 +3,8 @@ package com.shadorc.shadbot.command.admin.setting;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.data.database.DBGuild;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.object.Emoji;
@@ -59,7 +59,7 @@ public class AutoMessageSetting extends BaseSetting {
     }
 
     private static Mono<Message> channel(Context context, Action action) {
-        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
         if (action == Action.DISABLE) {
             dbGuild.removeSetting(Setting.MESSAGE_CHANNEL_ID);
             return context.getChannel()
@@ -86,7 +86,7 @@ public class AutoMessageSetting extends BaseSetting {
     }
 
     private Mono<Message> updateMessage(Context context, Setting setting, Action action, List<String> args) {
-        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
         final StringBuilder strBuilder = new StringBuilder();
         if (action == Action.ENABLE) {
             if (args.size() < 4) {
@@ -95,7 +95,7 @@ public class AutoMessageSetting extends BaseSetting {
             final String message = args.get(3);
             dbGuild.setSetting(setting, message);
 
-            if (dbGuild.getMessageChannelId().isEmpty()) {
+            if (dbGuild.getSettings().getMessageChannelId().isEmpty()) {
                 strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
                                 + "in which to send the auto-messages. Use `%s%s %s %s <#channel>`%n",
                         context.getPrefix(), this.getCommandName(), Action.ENABLE.toString().toLowerCase(), Type.CHANNEL.toString().toLowerCase()));

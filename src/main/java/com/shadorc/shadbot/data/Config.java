@@ -1,4 +1,4 @@
-package com.shadorc.shadbot;
+package com.shadorc.shadbot.data;
 
 import com.shadorc.shadbot.utils.ExitCode;
 import discord4j.core.object.util.Snowflake;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-public class Config {
+public final class Config {
 
     private static final Logger LOGGER = Loggers.getLogger(Config.class);
 
@@ -32,6 +32,7 @@ public class Config {
     public static final Integer PREMIUM_MAX_VOLUME = Integer.parseInt(PROPERTIES.getProperty("premium.max.volume"));
     public static final Integer DEFAULT_MAX_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.max.volume"));
     public static final String DEFAULT_PREFIX = PROPERTIES.getProperty("default.prefix");
+    public static final int DEFAULT_RELIC_DURATION = Integer.parseInt(PROPERTIES.getProperty("default.relic.duration"));
     public static final int DEFAULT_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.volume"));
     public static final int DEFAULT_PLAYLIST_SIZE = Integer.parseInt(PROPERTIES.getProperty("default.playlist.size"));
     public static final int DEFAULT_SAVED_PLAYLIST_SIZE = Integer.parseInt(PROPERTIES.getProperty("default.saved.playlist.size"));

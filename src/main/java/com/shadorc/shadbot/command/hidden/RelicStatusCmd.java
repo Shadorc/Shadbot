@@ -1,14 +1,16 @@
 package com.shadorc.shadbot.command.hidden;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.premium.PremiumManager;
-import com.shadorc.shadbot.data.premium.Relic;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.premium.RelicType;
+import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -28,7 +30,7 @@ public class RelicStatusCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final List<Relic> relics = PremiumManager.getInstance().getRelicsForUser(context.getAuthorId());
+        final List<Relic> relics = DatabaseManager.getPremium().getRelicsByUser(context.getAuthorId());
         if (relics.isEmpty()) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
@@ -44,14 +46,17 @@ public class RelicStatusCmd extends BaseCmd {
 
                     relic.getGuildId().ifPresent(guildId -> contentBld.append(String.format("%n**Guild ID:** %d", guildId.asLong())));
 
-                    contentBld.append(String.format("%n**Duration:** %d days", relic.getDuration().toDays()));
-                    if (!relic.isExpired() && relic.getActivationInstant().isPresent()) {
-                        final Duration durationLeft = relic.getDuration().minusMillis(TimeUtils.getMillisUntil(relic.getActivationInstant().get().toEpochMilli()));
-                        contentBld.append(String.format("%n**Expires in:** %d days", durationLeft.toDays()));
+                    contentBld.append(String.format("%n**Duration:** %s", FormatUtils.customDate(relic.getDuration())));
+                    if (!relic.isExpired()) {
+                        relic.getActivation()
+                                .ifPresent(activation -> {
+                                    final Duration durationLeft = relic.getDuration().minusMillis(TimeUtils.getMillisUntil(activation.toEpochMilli()));
+                                    contentBld.append(String.format("%n**Expires in:** %s", FormatUtils.customDate(durationLeft)));
+                                });
                     }
 
                     final StringBuilder titleBld = new StringBuilder();
-                    if (relic.getType().equals(Relic.RelicType.GUILD.toString())) {
+                    if (relic.getType() == RelicType.GUILD) {
                         titleBld.append("Legendary ");
                     }
                     titleBld.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));

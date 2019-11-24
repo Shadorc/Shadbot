@@ -1,9 +1,9 @@
 package com.shadorc.shadbot.core.command;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import com.shadorc.shadbot.data.database.DBGuild;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.Optional;
 
-public class CommandProcessor {
+public final class CommandProcessor {
 
     private static CommandProcessor instance;
 
@@ -41,18 +41,18 @@ public class CommandProcessor {
 
         final String content = event.getMessage().getContent().get();
         final Snowflake guildId = event.getGuildId().get();
-        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(guildId);
+        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(guildId);
         return Mono.justOrEmpty(event.getMember())
                 // The author is not a bot
                 .filter(member -> !member.isBot())
                 .flatMap(member -> member.getRoles().collectList())
                 .zipWith(event.getGuild().map(Guild::getOwnerId))
                 // The role is allowed or the author is the guild's owner
-                .filter(tuple -> dbGuild.hasAllowedRole(tuple.getT1())
+                .filter(tuple -> dbGuild.getSettings().hasAllowedRole(tuple.getT1())
                         || event.getMessage().getAuthor().map(User::getId).map(tuple.getT2()::equals).orElse(false))
                 // The channel is allowed
                 .flatMap(ignored -> event.getMessage().getChannel())
-                .filter(channel -> dbGuild.isTextChannelAllowed(channel.getId()))
+                .filter(channel -> dbGuild.getSettings().isTextChannelAllowed(channel.getId()))
                 // The message starts with the correct prefix
                 .flatMap(ignored -> this.checkPrefix(dbGuild, content))
                 // Execute the command
@@ -60,8 +60,9 @@ public class CommandProcessor {
     }
 
     private Mono<String> checkPrefix(DBGuild dbGuild, String content) {
-        if (content.startsWith(dbGuild.getPrefix())) {
-            return Mono.just(dbGuild.getPrefix());
+        final String prefix = dbGuild.getSettings().getPrefix();
+        if (content.startsWith(prefix)) {
+            return Mono.just(prefix);
         }
         if (content.equalsIgnoreCase(String.format("%sprefix", Config.DEFAULT_PREFIX))) {
             return Mono.just(Config.DEFAULT_PREFIX);
@@ -104,7 +105,7 @@ public class CommandProcessor {
                                 .then(Mono.empty())))
                 .flatMap(perm -> Mono.just(command))
                 // The command is allowed in the guild
-                .filter(cmd -> DatabaseManager.getInstance().getDBGuild(context.getGuildId()).isCommandAllowed(cmd))
+                .filter(cmd -> DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).getSettings().isCommandAllowed(cmd))
                 // The user is not rate limited
                 .filter(cmd -> !this.isRateLimited(context, cmd))
                 .flatMap(cmd -> cmd.execute(context))

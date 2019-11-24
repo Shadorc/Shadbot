@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.listener.music;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.CommandManager;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -30,11 +30,10 @@ public class AudioLoadResultInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
-        return Mono.just(guildMusic != null
-                && event.getMessage().getContent().isPresent()
-                && event.getMessage().getChannelId().equals(guildMusic.getMessageChannelId())
-                && event.getMember().map(User::getId).map(guildMusic.getDjId()::equals).orElse(false));
+        return Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.listener.getGuildId()))
+                .map(guildMusic -> event.getMessage().getContent().isPresent()
+                        && event.getMessage().getChannelId().equals(guildMusic.getMessageChannelId())
+                        && event.getMember().map(User::getId).map(guildMusic.getDjId()::equals).orElse(false));
     }
 
     @Override
@@ -42,7 +41,7 @@ public class AudioLoadResultInputs extends Inputs {
         final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
 
         final String content = event.getMessage().getContent().orElseThrow();
-        final String prefix = DatabaseManager.getInstance().getDBGuild(this.listener.getGuildId()).getPrefix();
+        final String prefix = DatabaseManager.getGuilds().getDBGuild(this.listener.getGuildId()).getSettings().getPrefix();
         if (content.equals(String.format("%scancel", prefix))) {
             guildMusic.setWaitingForChoice(false);
             return guildMusic.getMessageChannel()
@@ -75,7 +74,7 @@ public class AudioLoadResultInputs extends Inputs {
     }
 
     @Override
-    public boolean takeEventWile(MessageCreateEvent ignored) {
+    public boolean takeEventWile(MessageCreateEvent event) {
         final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
         return guildMusic != null && guildMusic.isWaitingForChoice();
     }

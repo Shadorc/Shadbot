@@ -26,6 +26,4 @@ Thumbs.db
 
 # Project Files
 *.log
-saves/
-stats/
 credentials.properties

@@ -32,7 +32,7 @@ public class TriviaInputs extends Inputs {
     }
 
     @Override
-    public boolean takeEventWile(MessageCreateEvent ignored) {
+    public boolean takeEventWile(MessageCreateEvent event) {
         return this.game.isScheduled();
     }
 

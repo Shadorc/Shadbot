@@ -15,8 +15,8 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
+import discord4j.core.object.entity.GuildMessageChannel;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
@@ -85,9 +85,9 @@ public class PruneCmd extends BaseCmd {
                         })
                         .map(Message::getId)
                         .collectList()
-                        .flatMap(messageIds -> ((TextChannel) channel).bulkDelete(Flux.fromIterable(messageIds))
+                        .flatMap(messageIds -> ((GuildMessageChannel) channel).bulkDelete(Flux.fromIterable(messageIds))
                                 .count()
-                                .map(messagesNotDeleted -> (int) (messageIds.size() - messagesNotDeleted)))
+                                .map(messagesNotDeleted -> messageIds.size() - messagesNotDeleted))
                         .map(deletedMessages -> String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
                                 context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
                 .map(updatableMsg::setContent)

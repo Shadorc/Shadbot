@@ -2,11 +2,11 @@ package com.shadorc.shadbot.command.utils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.api.musixmatch.Musixmatch;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
@@ -32,13 +32,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 public class LyricsCmd extends BaseCmd {
 
-    // Make html() preserve linebreaks and spacing
-    private static final OutputSettings PRESERVE_FORMAT = new Document.OutputSettings().prettyPrint(false);
+    // Make html() preserve linebreak and spacing
+    private static final OutputSettings PRESERVE_FORMAT = new OutputSettings().prettyPrint(false);
     private static final String HOME_URL = "https://www.musixmatch.com";
     private static final int MAX_RETRY = 5;
+    private static final Pattern PATTERN = Pattern.compile("(?i)official|officiel|clip|video|music|\\[|]|\\(|\\)");
 
     public LyricsCmd() {
         super(CommandCategory.UTILS, List.of("lyrics"));
@@ -92,7 +94,7 @@ public class LyricsCmd extends BaseCmd {
                     }
                     final AudioTrackInfo info = track.getInfo();
                     // Remove from title (case insensitive): official, video, music, [, ], (, )
-                    return info.title.replaceAll("(?i)official|officiel|clip|video|music|\\[|]|\\(|\\)", "").trim();
+                    return PATTERN.matcher(info.title).replaceAll("").trim();
                 });
     }
 
@@ -109,7 +111,7 @@ public class LyricsCmd extends BaseCmd {
                     }
                     return Mono.error(new IOException("Musixmatch redirected to wrong page."));
                 })
-                .retry(MAX_RETRY, err -> err.getMessage().equals("Musixmatch redirected to wrong page."))
+                .retry(MAX_RETRY, err -> "Musixmatch redirected to wrong page.".equals(err.getMessage()))
                 .onErrorMap(IOException.class, err -> {
                     LogUtils.warn(client, String.format("[%s] Too many retries, abort attempt to reload page.",
                             this.getClass().getSimpleName()));

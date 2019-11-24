@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.command.admin.setting;
 
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -34,7 +34,7 @@ public class VolumeSetting extends BaseSetting {
                     args.get(1), MIN_VOLUME, MAX_VOLUME)));
         }
 
-        DatabaseManager.getInstance().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), volume);
+        DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), volume);
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), channel))
                 .then();

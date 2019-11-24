@@ -32,7 +32,7 @@ public class ImageCmd extends BaseCmd {
         super(CommandCategory.IMAGE, List.of("image"));
         this.setDefaultRateLimiter();
 
-        this.lastTokenGeneration = new AtomicLong(0);
+        this.lastTokenGeneration = new AtomicLong();
         this.token = null;
     }
 

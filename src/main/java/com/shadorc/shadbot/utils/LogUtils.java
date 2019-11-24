@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.utils;
 
-import com.shadorc.shadbot.Config;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.LogBuilder;
 import com.shadorc.shadbot.object.LogBuilder.LogType;
 import discord4j.core.DiscordClient;
@@ -8,7 +8,7 @@ import discord4j.core.object.entity.MessageChannel;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-public class LogUtils {
+public final class LogUtils {
 
     private static final Logger LOGGER = Loggers.getLogger("shadbot");
 

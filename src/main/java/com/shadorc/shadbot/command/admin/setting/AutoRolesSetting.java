@@ -3,8 +3,8 @@ package com.shadorc.shadbot.command.admin.setting;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.data.database.DBGuild;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -37,8 +37,8 @@ public class AutoRolesSetting extends BaseSetting {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(1), FormatUtils.options(Action.class))));
 
-        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
-        final List<Long> autoRoles = dbGuild.getAutoRoles();
+        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+        final List<Snowflake> autoRoles = dbGuild.getSettings().getAutoRoleIds();
 
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(2)))
@@ -49,9 +49,8 @@ public class AutoRolesSetting extends BaseSetting {
                         throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
                     }
 
-                    final List<Long> mentionedRoleIds = mentionedRoles.stream()
+                    final List<Snowflake> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
-                            .map(Snowflake::asLong)
                             .collect(Collectors.toList());
 
                     final StringBuilder strBuilder = new StringBuilder();

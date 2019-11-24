@@ -4,12 +4,12 @@ public class Argument {
 
     private final String name;
     private final String description;
-    private final boolean isFacultative;
+    private final boolean isOptional;
 
-    protected Argument(String name, String description, boolean isFacultative) {
+    protected Argument(String name, String description, boolean isOptional) {
         this.name = name;
         this.description = description;
-        this.isFacultative = isFacultative;
+        this.isOptional = isOptional;
     }
 
     protected String getName() {
@@ -20,8 +20,8 @@ public class Argument {
         return this.description;
     }
 
-    protected boolean isFacultative() {
-        return this.isFacultative;
+    protected boolean isOptional() {
+        return this.isOptional;
     }
 
 }

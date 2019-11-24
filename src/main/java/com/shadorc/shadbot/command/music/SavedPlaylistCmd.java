@@ -1,13 +1,12 @@
 package com.shadorc.shadbot.command.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.shadorc.shadbot.Config;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.data.database.DatabaseManager;
-import com.shadorc.shadbot.data.premium.PremiumManager;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
@@ -41,7 +40,7 @@ public class SavedPlaylistCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        if (!PremiumManager.getInstance().isGuildPremium(context.getGuildId())) {
+        if (!DatabaseManager.getPremium().isGuildPremium(context.getGuildId())) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.LOCK + "  This server is not premium. " +
                             "You can **unlock this feature for this server and gain other advantage** by contributing " +
@@ -55,7 +54,7 @@ public class SavedPlaylistCmd extends BaseCmd {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(0), FormatUtils.options(Action.class))));
 
-        final Map<String, List<String>> map = DatabaseManager.getInstance().getDBGuild(context.getGuildId()).getPlaylists();
+        final Map<String, List<String>> map = DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).getSettings().getSavedPlaylists();
 
         switch (action) {
             case SEE:
@@ -126,7 +125,7 @@ public class SavedPlaylistCmd extends BaseCmd {
                 .collect(Collectors.toList());
 
         map.put(playlistName, urls);
-        DatabaseManager.getInstance().getDBGuild(context.getGuildId()).setSetting(Setting.SAVED_PLAYLISTS, map);
+        DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).setSetting(Setting.SAVED_PLAYLISTS, map);
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
@@ -146,7 +145,7 @@ public class SavedPlaylistCmd extends BaseCmd {
         }
 
         map.remove(playlistName);
-        DatabaseManager.getInstance().getDBGuild(context.getGuildId()).setSetting(Setting.SAVED_PLAYLISTS, map);
+        DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).setSetting(Setting.SAVED_PLAYLISTS, map);
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(

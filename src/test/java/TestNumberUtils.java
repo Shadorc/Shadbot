@@ -12,7 +12,7 @@ public class TestNumberUtils {
         assertEquals(Integer.valueOf(0), NumberUtils.toIntOrNull("0"));
         assertEquals(Integer.valueOf(-14), NumberUtils.toIntOrNull("-14"));
         assertEquals(Integer.valueOf(-14), NumberUtils.toIntOrNull("  -14   "));
-        assertNull(NumberUtils.toIntOrNull("quatorze"));
+        assertNull(NumberUtils.toIntOrNull("fourteen"));
         assertNull(NumberUtils.toIntOrNull(null));
         assertNull(NumberUtils.toIntOrNull("9223372036854775807"));
     }
@@ -24,7 +24,7 @@ public class TestNumberUtils {
         assertNull(NumberUtils.toPositiveIntOrNull("0"));
         assertNull(NumberUtils.toPositiveIntOrNull("-14"));
         assertNull(NumberUtils.toPositiveIntOrNull("  -14   "));
-        assertNull(NumberUtils.toPositiveIntOrNull("quatorze"));
+        assertNull(NumberUtils.toPositiveIntOrNull("fourteen"));
         assertNull(NumberUtils.toPositiveIntOrNull(null));
         assertNull(NumberUtils.toPositiveIntOrNull("9223372036854775807"));
     }
@@ -48,7 +48,7 @@ public class TestNumberUtils {
         assertEquals(Long.valueOf(0), NumberUtils.toLongOrNull("0"));
         assertEquals(Long.valueOf(-14), NumberUtils.toLongOrNull("-14"));
         assertEquals(Long.valueOf(-14), NumberUtils.toLongOrNull("  -14   "));
-        assertNull(NumberUtils.toLongOrNull("quatorze"));
+        assertNull(NumberUtils.toLongOrNull("fourteen"));
         assertNull(NumberUtils.toLongOrNull(null));
         assertEquals(Long.MAX_VALUE, NumberUtils.toLongOrNull("9223372036854775807"));
     }
@@ -60,7 +60,7 @@ public class TestNumberUtils {
         assertNull(NumberUtils.toPositiveLongOrNull("0"));
         assertNull(NumberUtils.toPositiveLongOrNull("-14"));
         assertNull(NumberUtils.toPositiveLongOrNull("  -14   "));
-        assertNull(NumberUtils.toPositiveLongOrNull("quatorze"));
+        assertNull(NumberUtils.toPositiveLongOrNull("fourteen"));
         assertNull(NumberUtils.toPositiveLongOrNull(null));
         assertEquals(Long.MAX_VALUE, NumberUtils.toPositiveLongOrNull("9223372036854775807"));
     }
@@ -72,7 +72,7 @@ public class TestNumberUtils {
         assertFalse(NumberUtils.isPositiveLong("0"));
         assertFalse(NumberUtils.isPositiveLong("-14"));
         assertFalse(NumberUtils.isPositiveLong("  -14   "));
-        assertFalse(NumberUtils.isPositiveLong("quatorze"));
+        assertFalse(NumberUtils.isPositiveLong("fourteen"));
         assertFalse(NumberUtils.isPositiveLong(null));
         assertTrue(NumberUtils.isPositiveLong("9223372036854775807"));
     }

@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.HashBasedTable;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.exception.CommandException;
 import discord4j.core.object.entity.Member;
+import reactor.util.annotation.Nullable;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;
@@ -16,7 +17,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public class Utils {
+public final class Utils {
 
     public static final ObjectMapper MAPPER = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -30,6 +31,7 @@ public class Utils {
      * @param value     - the string representing the enumeration, case insensitive
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass} or null if it does not exist
      */
+    @Nullable
     public static <T extends Enum<T>> T parseEnum(Class<T> enumClass, String value) {
         for (final T enumeration : enumClass.getEnumConstants()) {
             if (enumeration.toString().equalsIgnoreCase(value)) {
@@ -83,8 +85,9 @@ public class Utils {
 
     /**
      * @param list - the list from which to take a random element
-     * @return A random element from the list
+     * @return A random element from the list or {@code null} if the list is empty
      */
+    @Nullable
     public static <T> T randValue(List<T> list) {
         if (list.isEmpty()) {
             return null;
@@ -94,8 +97,9 @@ public class Utils {
 
     /**
      * @param array - the array from which to take a random element
-     * @return A random element from the array
+     * @return A random element from the array or {@code null} if the array is empty
      */
+    @Nullable
     public static <T> T randValue(T[] array) {
         return Utils.randValue(Arrays.asList(array));
     }
@@ -143,7 +147,7 @@ public class Utils {
             throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
         }
 
-        if (DatabaseManager.getInstance().getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
+        if (DatabaseManager.getGuilds().getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
             throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
         }
 

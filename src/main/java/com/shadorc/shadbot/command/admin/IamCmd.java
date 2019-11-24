@@ -6,8 +6,8 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.data.database.DBGuild;
-import com.shadorc.shadbot.data.database.DatabaseManager;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -19,6 +19,7 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
 import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -78,10 +79,10 @@ public class IamCmd extends BaseCmd {
                             return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
                                     .send(embedConsumer)
                                     .doOnNext(message -> {
-                                        final DBGuild dbGuild = DatabaseManager.getInstance().getDBGuild(context.getGuildId());
-                                        final Map<String, Long> setting = dbGuild.getIamMessages();
+                                        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+                                        final Map<Snowflake, Snowflake> setting = dbGuild.getSettings().getIamMessages();
                                         roles.stream().map(Role::getId)
-                                                .forEach(roleId -> setting.put(message.getId().asString(), roleId.asLong()));
+                                                .forEach(roleId -> setting.put(message.getId(), roleId));
                                         dbGuild.setSetting(Setting.IAM_MESSAGES, setting);
                                     });
                         }))

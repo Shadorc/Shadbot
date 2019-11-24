@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CommandManager {
+public final class CommandManager {
 
     private static CommandManager instance;
 
@@ -78,8 +78,8 @@ public class CommandManager {
                 new IamCmd(), new SettingsCmd(),
                 // Owner Commands
                 new LoggerCmd(), new RestartCmd(), new LeaveCmd(),
-                new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(), new DatabaseCmd(),
-                new CleanDatabaseCmd(), new EnableCommandCmd(),
+                new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(),
+                new EnableCommandCmd(),
                 // Hidden Commands
                 new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd());
     }

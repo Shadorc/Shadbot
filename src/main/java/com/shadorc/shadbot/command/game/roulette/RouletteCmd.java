@@ -13,8 +13,12 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 public class RouletteCmd extends GameCmd<RouletteGame> {
+
+    // Match [1-36]
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("^([1-9]|1[0-9]|2[0-9]|3[0-6])$");
 
     public enum Place {
         RED, BLACK, ODD, EVEN, LOW, HIGH;
@@ -32,7 +36,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
         final String place = args.get(1).toLowerCase();
 
         // Match [1-36], red, black, odd, even, high or low
-        if (!place.matches("^([1-9]|1[0-9]|2[0-9]|3[0-6])$") && Utils.parseEnum(Place.class, place) == null) {
+        if (!NUMBER_PATTERN.matcher(place).matches() && Utils.parseEnum(Place.class, place) == null) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
                     place, FormatUtils.format(Place.values(), value -> String.format("**%s**", value.toString().toLowerCase()), ", "))));
         }
