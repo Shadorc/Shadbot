@@ -34,7 +34,7 @@ public class DatabaseCmd extends BaseCmd {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    strBuilder.append(line);
+                    strBuilder.append(String.format("%s\n", line));
                 }
             }
         } catch (final IOException err) {
