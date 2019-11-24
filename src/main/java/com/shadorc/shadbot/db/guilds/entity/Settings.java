@@ -25,12 +25,6 @@ public class Settings {
         this(null);
     }
 
-    // TODO: Remove once migrated
-    @Nullable
-    public SettingsBean getBean() {
-        return this.bean;
-    }
-
     public boolean hasAllowedRole(List<Role> roles) {
         // If the user is an administrator OR no permissions have been set OR the role is allowed
         return this.getAllowedRoleIds().isEmpty()
