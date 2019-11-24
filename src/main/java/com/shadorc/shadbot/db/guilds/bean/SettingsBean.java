@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.db.guild.bean;
+package com.shadorc.shadbot.db.guilds.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import reactor.util.annotation.Nullable;
@@ -10,16 +10,16 @@ public class SettingsBean {
 
     @Nullable
     @JsonProperty("allowed_text_channels")
-    private List<Long> allowedTextChannels;
+    private List<String> allowedTextChannelIds;
     @Nullable
     @JsonProperty("allowed_voice_channels")
-    private List<Long> allowedVoiceChannels;
+    private List<String> allowedVoiceChannelIds;
     @Nullable
     @JsonProperty("allowed_roles")
-    private List<Long> allowedRoles;
+    private List<String> allowedRoleIds;
     @Nullable
     @JsonProperty("auto_roles")
-    private List<Long> autoRoles;
+    private List<String> autoRoleIds;
     @Nullable
     @JsonProperty("blacklist")
     private List<String> blacklist;
@@ -28,7 +28,7 @@ public class SettingsBean {
     private Integer defaultVolume;
     @Nullable
     @JsonProperty("iam_message")
-    private Map<String, Long> iamMessage;
+    private Map<String, String> iamMessage;
     @Nullable
     @JsonProperty("join_message")
     private String joinMessage;
@@ -37,7 +37,7 @@ public class SettingsBean {
     private String leaveMessage;
     @Nullable
     @JsonProperty("message_channel_id")
-    private Long messageChannelId;
+    private String messageChannelId;
     @Nullable
     @JsonProperty("saved_playlists")
     private Map<String, List<String>> savedPlaylists;
@@ -45,24 +45,44 @@ public class SettingsBean {
     @JsonProperty("prefix")
     private String prefix;
 
-    @Nullable
-    public List<Long> getAllowedTextChannels() {
-        return this.allowedTextChannels;
+    // TODO: Remove once migrated
+    public SettingsBean(@Nullable List<String> allowedTextChannelIds, @Nullable List<String> allowedVoiceChannelIds,
+                        @Nullable List<String> allowedRoleIds, @Nullable List<String> autoRoleIds, @Nullable List<String> blacklist,
+                        @Nullable Integer defaultVolume, @Nullable Map<String, String> iamMessage, @Nullable String joinMessage,
+                        @Nullable String leaveMessage, @Nullable String messageChannelId, @Nullable Map<String, List<String>> savedPlaylists,
+                        @Nullable String prefix) {
+        this.allowedTextChannelIds = allowedTextChannelIds;
+        this.allowedVoiceChannelIds = allowedVoiceChannelIds;
+        this.allowedRoleIds = allowedRoleIds;
+        this.autoRoleIds = autoRoleIds;
+        this.blacklist = blacklist;
+        this.defaultVolume = defaultVolume;
+        this.iamMessage = iamMessage;
+        this.joinMessage = joinMessage;
+        this.leaveMessage = leaveMessage;
+        this.messageChannelId = messageChannelId;
+        this.savedPlaylists = savedPlaylists;
+        this.prefix = prefix;
     }
 
     @Nullable
-    public List<Long> getAllowedVoiceChannels() {
-        return this.allowedVoiceChannels;
+    public List<String> getAllowedTextChannelIds() {
+        return this.allowedTextChannelIds;
     }
 
     @Nullable
-    public List<Long> getAllowedRoles() {
-        return this.allowedRoles;
+    public List<String> getAllowedVoiceChannelIds() {
+        return this.allowedVoiceChannelIds;
     }
 
     @Nullable
-    public List<Long> getAutoRoles() {
-        return this.autoRoles;
+    public List<String> getAllowedRoleIds() {
+        return this.allowedRoleIds;
+    }
+
+    @Nullable
+    public List<String> getAutoRoleIds() {
+        return this.autoRoleIds;
     }
 
     @Nullable
@@ -76,7 +96,7 @@ public class SettingsBean {
     }
 
     @Nullable
-    public Map<String, Long> getIamMessage() {
+    public Map<String, String> getIamMessage() {
         return this.iamMessage;
     }
 
@@ -91,7 +111,7 @@ public class SettingsBean {
     }
 
     @Nullable
-    public Long getMessageChannelId() {
+    public String getMessageChannelId() {
         return this.messageChannelId;
     }
 
@@ -108,16 +128,16 @@ public class SettingsBean {
     @Override
     public String toString() {
         return "SettingsBean{" +
-                "allowedTextChannels=" + this.allowedTextChannels +
-                ", allowedVoiceChannels=" + this.allowedVoiceChannels +
-                ", allowedRoles=" + this.allowedRoles +
-                ", autoRoles=" + this.autoRoles +
+                "allowedTextChannelIds=" + this.allowedTextChannelIds +
+                ", allowedVoiceChannelIds=" + this.allowedVoiceChannelIds +
+                ", allowedRoleIds=" + this.allowedRoleIds +
+                ", autoRoleIds=" + this.autoRoleIds +
                 ", blacklist=" + this.blacklist +
                 ", defaultVolume=" + this.defaultVolume +
                 ", iamMessage=" + this.iamMessage +
                 ", joinMessage='" + this.joinMessage + '\'' +
                 ", leaveMessage='" + this.leaveMessage + '\'' +
-                ", messageChannelId=" + this.messageChannelId +
+                ", messageChannelId='" + this.messageChannelId + '\'' +
                 ", savedPlaylists=" + this.savedPlaylists +
                 ", prefix='" + this.prefix + '\'' +
                 '}';

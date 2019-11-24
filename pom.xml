@@ -172,9 +172,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.rethinkdb</groupId>
-            <artifactId>rethinkdb-driver</artifactId>
-            <version>2.3.3</version>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>3.11.2</version>
         </dependency>
     </dependencies>
 </project>

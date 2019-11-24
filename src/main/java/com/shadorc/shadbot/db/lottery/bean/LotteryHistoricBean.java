@@ -11,6 +11,15 @@ public class LotteryHistoricBean {
     @JsonProperty("number")
     private int number;
 
+    public LotteryHistoricBean(long jackpot, int winnerCount, int number) {
+        this.jackpot = jackpot;
+        this.winnerCount = winnerCount;
+        this.number = number;
+    }
+
+    public LotteryHistoricBean() {
+    }
+
     public long getJackpot() {
         return this.jackpot;
     }

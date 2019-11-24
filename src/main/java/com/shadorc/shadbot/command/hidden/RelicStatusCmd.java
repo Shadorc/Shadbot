@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.premium.PremiumManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
@@ -30,7 +30,7 @@ public class RelicStatusCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final List<Relic> relics = PremiumManager.getInstance().getRelicsByUser(context.getAuthorId());
+        final List<Relic> relics = DatabaseManager.getPremium().getRelicsByUser(context.getAuthorId());
         if (relics.isEmpty()) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "

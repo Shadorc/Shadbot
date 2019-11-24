@@ -1,14 +1,16 @@
-package com.shadorc.shadbot.db.guild.entity;
+package com.shadorc.shadbot.db.guilds.entity;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.guild.bean.SettingsBean;
+import com.shadorc.shadbot.db.guilds.bean.SettingsBean;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import reactor.util.annotation.Nullable;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Settings {
 
@@ -23,11 +25,17 @@ public class Settings {
         this(null);
     }
 
+    // TODO: Remove once migrated
+    @Nullable
+    public SettingsBean getBean() {
+        return this.bean;
+    }
+
     public boolean hasAllowedRole(List<Role> roles) {
         // If the user is an administrator OR no permissions have been set OR the role is allowed
-        return this.getAllowedRoles().isEmpty()
+        return this.getAllowedRoleIds().isEmpty()
                 || roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
-                || roles.stream().anyMatch(role -> this.getAllowedRoles().contains(role.getId().asLong()));
+                || roles.stream().anyMatch(role -> this.getAllowedRoleIds().contains(role.getId()));
     }
 
     public boolean isCommandAllowed(BaseCmd cmd) {
@@ -36,36 +44,28 @@ public class Settings {
 
     public boolean isTextChannelAllowed(Snowflake channelId) {
         // If no permission has been set OR the text channel is allowed
-        return this.getAllowedTextChannels().isEmpty() || this.getAllowedTextChannels().contains(channelId.asLong());
+        return this.getAllowedTextChannelIds().isEmpty() || this.getAllowedTextChannelIds().contains(channelId);
     }
 
     public boolean isVoiceChannelAllowed(Snowflake channelId) {
         // If no permission has been set OR the voice channel is allowed
-        return this.getAllowedVoiceChannels().isEmpty() || this.getAllowedVoiceChannels().contains(channelId.asLong());
+        return this.getAllowedVoiceChannelIds().isEmpty() || this.getAllowedVoiceChannelIds().contains(channelId);
     }
 
-    public List<Long> getAllowedTextChannels() {
-        return Optional.ofNullable(this.bean)
-                .map(SettingsBean::getAllowedTextChannels)
-                .orElse(new ArrayList<>());
+    public List<Snowflake> getAllowedTextChannelIds() {
+        return this.toSnowflakeList(SettingsBean::getAllowedTextChannelIds);
     }
 
-    public List<Long> getAllowedVoiceChannels() {
-        return Optional.ofNullable(this.bean)
-                .map(SettingsBean::getAllowedVoiceChannels)
-                .orElse(new ArrayList<>());
+    public List<Snowflake> getAllowedVoiceChannelIds() {
+        return this.toSnowflakeList(SettingsBean::getAllowedVoiceChannelIds);
     }
 
-    public List<Long> getAllowedRoles() {
-        return Optional.ofNullable(this.bean)
-                .map(SettingsBean::getAllowedRoles)
-                .orElse(new ArrayList<>());
+    public List<Snowflake> getAllowedRoleIds() {
+        return this.toSnowflakeList(SettingsBean::getAllowedRoleIds);
     }
 
-    public List<Long> getAutoRoles() {
-        return Optional.ofNullable(this.bean)
-                .map(SettingsBean::getAutoRoles)
-                .orElse(new ArrayList<>());
+    public List<Snowflake> getAutoRoleIds() {
+        return this.toSnowflakeList(SettingsBean::getAutoRoleIds);
     }
 
     public List<String> getBlacklistedCmd() {
@@ -81,12 +81,17 @@ public class Settings {
     }
 
     /**
-     * @return A map containing message's ID as key and role's ID as value
+     * @return A map containing message IDs as key and role IDs as value
      */
-    public Map<String, Long> getIamMessages() {
+    public Map<Snowflake, Snowflake> getIamMessages() {
         return Optional.ofNullable(this.bean)
                 .map(SettingsBean::getIamMessage)
-                .orElse(new HashMap<>());
+                .orElse(new HashMap<>())
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        entry -> Snowflake.of(entry.getKey()),
+                        entry -> Snowflake.of(entry.getValue())));
     }
 
     public Optional<String> getJoinMessage() {
@@ -99,9 +104,10 @@ public class Settings {
                 .map(SettingsBean::getLeaveMessage);
     }
 
-    public Optional<Long> getMessageChannelId() {
+    public Optional<Snowflake> getMessageChannelId() {
         return Optional.ofNullable(this.bean)
-                .map(SettingsBean::getMessageChannelId);
+                .map(SettingsBean::getMessageChannelId)
+                .map(Snowflake::of);
     }
 
     public Map<String, List<String>> getSavedPlaylists() {
@@ -114,6 +120,15 @@ public class Settings {
         return Optional.ofNullable(this.bean)
                 .map(SettingsBean::getPrefix)
                 .orElse(Config.DEFAULT_PREFIX);
+    }
+
+    private List<Snowflake> toSnowflakeList(Function<SettingsBean, List<String>> mapper) {
+        return Optional.ofNullable(this.bean)
+                .map(mapper)
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(Snowflake::of)
+                .collect(Collectors.toList());
     }
 
     @Override

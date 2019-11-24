@@ -3,8 +3,8 @@ package com.shadorc.shadbot.command.currency;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.guild.GuildManager;
-import com.shadorc.shadbot.db.guild.entity.DBMember;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -29,7 +29,7 @@ public class CoinsCmd extends BaseCmd {
                 .switchIfEmpty(Mono.just(context.getAuthor()))
                 .next()
                 .map(user -> {
-                    final DBMember dbMember = GuildManager.getInstance().getDBMember(context.getGuildId(), user.getId());
+                    final DBMember dbMember = DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId());
                     final String coins = FormatUtils.coins(dbMember.getCoins());
                     if (user.getId().equals(context.getAuthorId())) {
                         return String.format("(**%s**) You have **%s**.", user.getUsername(), coins);

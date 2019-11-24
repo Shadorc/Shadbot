@@ -3,8 +3,8 @@ package com.shadorc.shadbot.command.admin.setting;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.db.guild.GuildManager;
-import com.shadorc.shadbot.db.guild.entity.DBGuild;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -46,11 +46,10 @@ public class AllowedRolesSetting extends BaseSetting {
                         throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
                     }
 
-                    final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
-                    final List<Long> allowedRoles = dbGuild.getSettings().getAllowedRoles();
-                    final List<Long> mentionedRoleIds = mentionedRoles.stream()
+                    final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+                    final List<Snowflake> allowedRoles = dbGuild.getSettings().getAllowedRoleIds();
+                    final List<Snowflake> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
-                            .map(Snowflake::asLong)
                             .collect(Collectors.toList());
 
                     final StringBuilder strBuilder = new StringBuilder();

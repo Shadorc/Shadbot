@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.guild.GuildManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.object.entity.Channel;
@@ -44,7 +44,7 @@ public class HelpCmd extends BaseCmd {
                         .filter(cmd -> authorPerms.contains(cmd.getPermission()))
                         .filterWhen(cmd -> context.getChannel().map(Channel::getType)
                                 .map(type -> type == Type.DM
-                                        || GuildManager.getInstance().getDBGuild(context.getGuildId()).getSettings().isCommandAllowed(cmd)))
+                                        || DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).getSettings().isCommandAllowed(cmd)))
                         .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
                 .map(map -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {

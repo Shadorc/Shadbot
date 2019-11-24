@@ -3,7 +3,7 @@ package com.shadorc.shadbot.command.hidden;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.premium.PremiumManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
@@ -28,7 +28,7 @@ public class ActivateRelicCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final Optional<Relic> relicOpt = PremiumManager.getInstance().getRelicById(arg);
+        final Optional<Relic> relicOpt = DatabaseManager.getPremium().getRelicById(arg);
 
         if (relicOpt.isEmpty()) {
             return context.getChannel()

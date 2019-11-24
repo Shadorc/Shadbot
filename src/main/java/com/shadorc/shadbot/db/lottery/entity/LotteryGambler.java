@@ -1,102 +1,77 @@
 package com.shadorc.shadbot.db.lottery.entity;
 
-import com.rethinkdb.model.MapObject;
-import com.shadorc.shadbot.Shadbot;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import com.shadorc.shadbot.db.DatabaseEntity;
-import com.shadorc.shadbot.db.lottery.LotteryManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
-import com.shadorc.shadbot.utils.LogUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
+import org.bson.Document;
 
-import static com.shadorc.shadbot.db.lottery.LotteryManager.LOGGER;
+import static com.shadorc.shadbot.db.lottery.LotteryCollection.LOGGER;
 
 public class LotteryGambler implements DatabaseEntity {
 
-    private final long guildId;
-    private final long userId;
-    private final int number;
+    private final LotteryGamblerBean bean;
 
     public LotteryGambler(LotteryGamblerBean bean) {
-        this.guildId = bean.getGuildId();
-        this.userId = bean.getUserId();
-        this.number = bean.getNumber();
+        this.bean = bean;
     }
 
     public LotteryGambler(Snowflake guildId, Snowflake userId, int number) {
-        this.guildId = guildId.asLong();
-        this.userId = userId.asLong();
-        this.number = number;
+        this.bean = new LotteryGamblerBean(guildId.asString(), userId.asString(), number);
     }
 
     public Snowflake getGuildId() {
-        return Snowflake.of(this.guildId);
+        return Snowflake.of(this.bean.getGuildId());
     }
 
     public Snowflake getUserId() {
-        return Snowflake.of(this.userId);
+        return Snowflake.of(this.bean.getUserId());
     }
 
     public int getNumber() {
-        return this.number;
+        return this.bean.getNumber();
     }
 
     @Override
     public void insert() {
-        LOGGER.debug("[LotteryGambler {} / {}] Inserting...", this.getUserId().asLong(), this.getGuildId().asLong());
+        LOGGER.debug("[LotteryGambler {} / {}] Insertion", this.getUserId().asLong(), this.getGuildId().asLong());
+
         try {
-            final LotteryManager lm = LotteryManager.getInstance();
-
-            final MapObject gambler = lm.getDatabase()
-                    .hashMap("guild_id", this.guildId)
-                    .with("user_id", this.userId)
-                    .with("number", this.number);
-
-            final String response = lm.getTable()
-                    .insert(lm.getDatabase().hashMap("id", "gamblers")
-                            .with("gamblers", lm.getDatabase().array(gambler)))
-                    .optArg("conflict", (id, oldDoc, newDoc) -> newDoc.merge(
-                            lm.getDatabase().hashMap("gamblers", oldDoc.g("gamblers").append(gambler))
-                    ))
-                    .run(lm.getConnection())
-                    .toString();
-
-            LOGGER.debug("[LotteryGambler {} / {}] {}", this.getUserId().asLong(), this.getGuildId().asLong(), response);
-
-        } catch (final RuntimeException err) {
-            LogUtils.error(Shadbot.getClient(), err,
-                    String.format("[LotteryGambler %d / %d] An error occurred during insertion.", this.getUserId().asLong(), this.getGuildId().asLong()));
+            DatabaseManager.getLottery()
+                    .getCollection()
+                    .updateOne(Filters.eq("_id", "gamblers"),
+                            Updates.push("gamblers", this.toDocument()),
+                            new UpdateOptions().upsert(true));
+        } catch (final JsonProcessingException err) {
+            throw new RuntimeException(err);
         }
     }
 
     @Override
     public void delete() {
-        LOGGER.debug("[LotteryGambler {} / {}] Deleting...", this.getUserId().asLong(), this.getGuildId().asLong());
-        try {
-            final LotteryManager lm = LotteryManager.getInstance();
-            final String response = lm.getTable()
-                    .get("gamblers")
-                    .getField("gamblers")
-                    .filter(lm.getDatabase().hashMap("guild_id", this.getGuildId().asLong())
-                            .with("user_id", this.getUserId().asLong()))
-                    .delete()
-                    .run(lm.getConnection())
-                    .toString();
+        LOGGER.debug("[LotteryGambler {} / {}] Deletion", this.getUserId().asLong(), this.getGuildId().asLong());
 
-            LOGGER.debug("[LotteryGambler {} / {}] {}", this.getUserId().asLong(), this.getGuildId().asLong(), response);
+        DatabaseManager.getLottery()
+                .getCollection()
+                .deleteOne(Filters.and(Filters.eq("_id", "gamblers"),
+                        Filters.eq("gamblers.guild_id", this.getGuildId().asString()),
+                        Filters.eq("gamblers.user_id", this.getUserId().asString())));
+    }
 
-        } catch (final RuntimeException err) {
-            LogUtils.error(Shadbot.getClient(), err,
-                    String.format("[LotteryGambler %d / %d] An error occurred during deletion.", this.getUserId().asLong(), this.getGuildId().asLong()));
-        }
+    @Override
+    public Document toDocument() throws JsonProcessingException {
+        return Document.parse(Utils.MAPPER.writeValueAsString(this.bean));
     }
 
     @Override
     public String toString() {
         return "LotteryGambler{" +
-                "guildId=" + this.guildId +
-                ", userId=" + this.userId +
-                ", number=" + this.number +
+                "bean=" + this.bean +
                 '}';
     }
-
 }

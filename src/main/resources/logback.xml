@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <configuration scan="true">
 
-    <logger name="shadbot.database.lottery" level="DEBUG"/>
+    <logger name="shadbot.database" level="DEBUG"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

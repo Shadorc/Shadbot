@@ -7,8 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.guild.GuildManager;
-import com.shadorc.shadbot.db.premium.PremiumManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -111,8 +110,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         musicsAdded++;
                         // The playlist limit is reached and the user / guild is not premium
                         if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
-                                && !PremiumManager.getInstance().isGuildPremium(this.guildId)
-                                && !PremiumManager.getInstance().isUserPremium(this.djId)) {
+                                && !DatabaseManager.getPremium().isGuildPremium(this.guildId)
+                                && !DatabaseManager.getPremium().isUserPremium(this.djId)) {
                             strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
                             break;
                         }
@@ -143,7 +142,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                 + "\nExample: 1,3,4"
                                 + "\n\n" + choices)
                         .setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-                                GuildManager.getInstance().getDBGuild(this.guildId).getSettings().getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
+                                DatabaseManager.getGuilds().getDBGuild(this.guildId).getSettings().getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
     }
 
     @Override

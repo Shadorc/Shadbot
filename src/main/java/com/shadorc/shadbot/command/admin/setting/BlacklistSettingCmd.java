@@ -4,8 +4,8 @@ import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.db.guild.GuildManager;
-import com.shadorc.shadbot.db.guild.entity.DBGuild;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -55,7 +55,7 @@ public class BlacklistSettingCmd extends BaseSetting {
             }
         }
 
-        final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(context.getGuildId());
+        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
         final List<String> blacklist = dbGuild.getSettings().getBlacklistedCmd();
 
         final String actionVerbose;

@@ -2,8 +2,8 @@ package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.guild.GuildManager;
-import com.shadorc.shadbot.db.guild.entity.DBGuild;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
@@ -41,7 +41,7 @@ public final class CommandProcessor {
 
         final String content = event.getMessage().getContent().get();
         final Snowflake guildId = event.getGuildId().get();
-        final DBGuild dbGuild = GuildManager.getInstance().getDBGuild(guildId);
+        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(guildId);
         return Mono.justOrEmpty(event.getMember())
                 // The author is not a bot
                 .filter(member -> !member.isBot())
@@ -105,7 +105,7 @@ public final class CommandProcessor {
                                 .then(Mono.empty())))
                 .flatMap(perm -> Mono.just(command))
                 // The command is allowed in the guild
-                .filter(cmd -> GuildManager.getInstance().getDBGuild(context.getGuildId()).getSettings().isCommandAllowed(cmd))
+                .filter(cmd -> DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).getSettings().isCommandAllowed(cmd))
                 // The user is not rate limited
                 .filter(cmd -> !this.isRateLimited(context, cmd))
                 .flatMap(cmd -> cmd.execute(context))

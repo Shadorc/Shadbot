@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.game.blackjack;
 
-import com.shadorc.shadbot.db.guild.GuildManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.Inputs;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -67,7 +67,7 @@ public class BlackjackInputs extends Inputs {
                                 .then();
                     }
 
-                    final String prefix = GuildManager.getInstance().getDBGuild(member.getGuildId()).getSettings().getPrefix();
+                    final String prefix = DatabaseManager.getGuilds().getDBGuild(member.getGuildId()).getSettings().getPrefix();
                     final String content = event.getMessage().getContent().orElse("").replace(prefix, "").toLowerCase().trim();
                     if ("double down".equals(content) && player.getHand().count() != 2) {
                         return this.game.getContext().getChannel()

@@ -5,17 +5,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class LotteryGamblerBean {
 
     @JsonProperty("guild_id")
-    private long guildId;
+    private String guildId;
     @JsonProperty("user_id")
-    private long userId;
+    private String userId;
     @JsonProperty("number")
     private int number;
 
-    public long getGuildId() {
+    public LotteryGamblerBean(String guildId, String userId, int number) {
+        this.guildId = guildId;
+        this.userId = userId;
+        this.number = number;
+    }
+
+    public LotteryGamblerBean() {
+    }
+
+    public String getGuildId() {
         return this.guildId;
     }
 
-    public long getUserId() {
+    public String getUserId() {
         return this.userId;
     }
 

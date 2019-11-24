@@ -1,13 +1,16 @@
 package com.shadorc.shadbot.db.premium.entity;
 
-import com.shadorc.shadbot.Shadbot;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import com.shadorc.shadbot.db.DatabaseEntity;
-import com.shadorc.shadbot.db.premium.PremiumManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
-import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
+import org.bson.Document;
 import reactor.util.annotation.Nullable;
 
 import java.time.Duration;
@@ -15,62 +18,44 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.shadorc.shadbot.db.premium.PremiumManager.LOGGER;
+import static com.shadorc.shadbot.db.premium.PremiumCollection.LOGGER;
 
 public class Relic implements DatabaseEntity {
 
-    private final String id;
-    private final String type;
-    private final long duration;
-    @Nullable
-    private final Long activation;
-    @Nullable
-    private final Long userId;
-    @Nullable
-    private final Long guildId;
+    private final RelicBean bean;
 
     public Relic(RelicBean bean) {
-        this.id = bean.getId();
-        this.type = bean.getType();
-        this.duration = bean.getDuration();
-        this.activation = bean.getActivation();
-        this.userId = bean.getUserId();
-        this.guildId = bean.getGuildId();
+        this.bean = bean;
     }
 
     public Relic(UUID id, RelicType type, Duration duration) {
-        this.id = id.toString();
-        this.type = type.toString();
-        this.duration = duration.toMillis();
-        this.activation = null;
-        this.userId = null;
-        this.guildId = null;
+        this.bean = new RelicBean(id.toString(), type.toString(), duration.toMillis(), null, null, null);
     }
 
     public String getId() {
-        return this.id;
+        return this.bean.getId();
     }
 
     public RelicType getType() {
-        return RelicType.valueOf(this.type);
+        return RelicType.valueOf(this.bean.getType());
     }
 
     public Duration getDuration() {
-        return Duration.ofMillis(this.duration);
+        return Duration.ofMillis(this.bean.getDuration());
     }
 
     public Optional<Instant> getActivation() {
-        return Optional.ofNullable(this.activation)
+        return Optional.ofNullable(this.bean.getActivation())
                 .map(Instant::ofEpochMilli);
     }
 
     public Optional<Snowflake> getUserId() {
-        return Optional.ofNullable(this.userId)
+        return Optional.ofNullable(this.bean.getUserId())
                 .map(Snowflake::of);
     }
 
     public Optional<Snowflake> getGuildId() {
-        return Optional.ofNullable(this.guildId)
+        return Optional.ofNullable(this.bean.getGuildId())
                 .map(Snowflake::of);
     }
 
@@ -82,65 +67,48 @@ public class Relic implements DatabaseEntity {
     }
 
     public void activate(Snowflake userId, @Nullable Snowflake guildId) {
-        LOGGER.debug("[Relic {}] Activation...", this.getId());
-        try {
-            final PremiumManager pm = PremiumManager.getInstance();
-            final String response = pm.getTable()
-                    .insert(pm.getDatabase().hashMap("id", this.getId())
-                            .with("user_id", userId.asLong())
-                            .with("guild_id", guildId == null ? null : guildId.asLong())
-                            .with("activation", System.currentTimeMillis()))
-                    .optArg("conflict", "update")
-                    .run(pm.getConnection())
-                    .toString();
+        LOGGER.debug("[Relic {}] Activation", this.getId());
 
-            LOGGER.debug("[Relic {}] {}", this.getId(), response);
-
-        } catch (final RuntimeException err) {
-            LogUtils.error(Shadbot.getClient(), err,
-                    String.format("[Relic %s] An error occurred during activation.", this.getId()));
-        }
+        DatabaseManager.getPremium()
+                .getCollection()
+                .updateOne(Filters.eq("_id", this.getId()),
+                        Updates.combine(
+                                Updates.set("user_id", userId.asString()),
+                                Updates.set("guild_id", guildId == null ? null : guildId.asString()),
+                                Updates.set("activation", Instant.now().toEpochMilli())));
     }
 
     @Override
     public void insert() {
-        LOGGER.debug("[Relic {}] Inserting...", this.getId());
+        LOGGER.debug("[Relic {}] Insertion", this.getId());
+
         try {
-            final PremiumManager pm = PremiumManager.getInstance();
-            final String response = pm.getTable()
-                    .insert(pm.getDatabase()
-                            .hashMap("id", this.id)
-                            .with("type", this.type)
-                            .with("duration", this.duration)
-                            .with("activation", this.activation)
-                            .with("user_id", this.userId)
-                            .with("guild_id", this.guildId))
-                    .run(pm.getConnection())
-                    .toString();
-
-            LOGGER.debug("[Relic {}] {}", this.getId(), response);
-
-        } catch (final RuntimeException err) {
-            LogUtils.error(Shadbot.getClient(), err,
-                    String.format("[Relic %s] An error occurred during insertion.", this.getId()));
+            DatabaseManager.getPremium()
+                    .getCollection()
+                    .insertOne(this.toDocument());
+        } catch (final JsonProcessingException err) {
+            throw new RuntimeException(err);
         }
     }
 
     @Override
     public void delete() {
-        LOGGER.debug("[Relic {}] Deleting...", this.getId());
-        try {
-            final PremiumManager pm = PremiumManager.getInstance();
-            final String response = pm.requestRelic(this.getId())
-                    .delete()
-                    .run(pm.getConnection())
-                    .toString();
+        LOGGER.debug("[Relic {}] Deletion", this.getId());
 
-            LOGGER.debug("[Relic {}] {}", this.getId(), response);
-        } catch (final RuntimeException err) {
-            LogUtils.error(Shadbot.getClient(), err,
-                    String.format("[Relic %s] An error occurred during deletion.", this.getId()));
-        }
+        DatabaseManager.getPremium()
+                .getCollection()
+                .deleteOne(Filters.eq("_id", this.getId()));
     }
 
+    @Override
+    public Document toDocument() throws JsonProcessingException {
+        return Document.parse(Utils.MAPPER.writeValueAsString(this.bean));
+    }
+
+    @Override
+    public String toString() {
+        return "Relic{" +
+                "bean=" + this.bean +
+                '}';
+    }
 }

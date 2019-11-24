@@ -5,7 +5,7 @@ import reactor.util.annotation.Nullable;
 
 public class RelicBean {
 
-    @JsonProperty("id")
+    @JsonProperty("_id")
     private String id;
     @JsonProperty("type")
     private String type;
@@ -16,10 +16,22 @@ public class RelicBean {
     private Long activation;
     @Nullable
     @JsonProperty("guild_id")
-    private Long guildId;
+    private String guildId;
     @Nullable
     @JsonProperty("user_id")
-    private Long userId;
+    private String userId;
+
+    public RelicBean(String id, String type, long duration, @Nullable Long activation, @Nullable String guildId, @Nullable String userId) {
+        this.id = id;
+        this.type = type;
+        this.duration = duration;
+        this.activation = activation;
+        this.guildId = guildId;
+        this.userId = userId;
+    }
+
+    public RelicBean() {
+    }
 
     public String getId() {
         return this.id;
@@ -39,12 +51,12 @@ public class RelicBean {
     }
 
     @Nullable
-    public Long getGuildId() {
+    public String getGuildId() {
         return this.guildId;
     }
 
     @Nullable
-    public Long getUserId() {
+    public String getUserId() {
         return this.userId;
     }
 

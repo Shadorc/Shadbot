@@ -1,15 +1,23 @@
-package com.shadorc.shadbot.db.guild.bean;
+package com.shadorc.shadbot.db.guilds.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DBMemberBean {
 
-    @JsonProperty("id")
-    private long id;
+    @JsonProperty("_id")
+    private String id;
     @JsonProperty("coins")
     private int coins;
 
-    public long getId() {
+    public DBMemberBean(String id, int coins) {
+        this.id = id;
+        this.coins = coins;
+    }
+
+    public DBMemberBean() {
+    }
+
+    public String getId() {
         return this.id;
     }
 

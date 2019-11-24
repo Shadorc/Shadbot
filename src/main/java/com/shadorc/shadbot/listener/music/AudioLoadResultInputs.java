@@ -2,7 +2,7 @@ package com.shadorc.shadbot.listener.music;
 
 import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.guild.GuildManager;
+import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -41,7 +41,7 @@ public class AudioLoadResultInputs extends Inputs {
         final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
 
         final String content = event.getMessage().getContent().orElseThrow();
-        final String prefix = GuildManager.getInstance().getDBGuild(this.listener.getGuildId()).getSettings().getPrefix();
+        final String prefix = DatabaseManager.getGuilds().getDBGuild(this.listener.getGuildId()).getSettings().getPrefix();
         if (content.equals(String.format("%scancel", prefix))) {
             guildMusic.setWaitingForChoice(false);
             return guildMusic.getMessageChannel()

@@ -4,8 +4,8 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.guild.GuildManager;
-import com.shadorc.shadbot.db.guild.entity.DBMember;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.object.Emoji;
@@ -50,12 +50,12 @@ public class TransferCoinsCmd extends BaseCmd {
                     args.get(0))));
         }
 
-        final DBMember dbSender = GuildManager.getInstance().getDBMember(context.getGuildId(), senderUserId);
+        final DBMember dbSender = DatabaseManager.getGuilds().getDBMember(context.getGuildId(), senderUserId);
         if (dbSender.getCoins() < coins) {
             return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
         }
 
-        final DBMember dbReceiver = GuildManager.getInstance().getDBMember(context.getGuildId(), receiverUserId);
+        final DBMember dbReceiver = DatabaseManager.getGuilds().getDBMember(context.getGuildId(), receiverUserId);
         if (dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
             return context.getClient().getUserById(receiverUserId)
                     .map(User::getUsername)
