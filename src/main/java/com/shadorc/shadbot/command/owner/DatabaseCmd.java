@@ -4,6 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -29,7 +30,7 @@ public class DatabaseCmd extends BaseCmd {
 
         final StringBuilder strBuilder = new StringBuilder();
         try {
-            final Process process = Runtime.getRuntime().exec(new String[]{"mongo", DatabaseManager.DATABASE_NAME, "--eval", arg});
+            final Process process = Runtime.getRuntime().exec(new String[]{"mongo", Config.DATABASE_NAME, "--eval", arg});
             try (final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 
                 String line;

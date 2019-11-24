@@ -3,13 +3,12 @@ package com.shadorc.shadbot.db;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
 
 public class DatabaseManager {
-
-    public static final String DATABASE_NAME = "shadbot";
 
     private static DatabaseManager instance;
 
@@ -26,7 +25,7 @@ public class DatabaseManager {
 
     private DatabaseManager() {
         this.client = MongoClients.create();
-        this.database = this.client.getDatabase(DATABASE_NAME);
+        this.database = this.client.getDatabase(Config.DATABASE_NAME);
 
         this.premiumCollection = new PremiumCollection(this.database);
         this.guildsCollection = new GuildsCollection(this.database);

@@ -40,6 +40,7 @@ public final class Config {
     public static final Duration TIMEOUT = Duration.ofMillis(Long.parseLong(PROPERTIES.getProperty("timeout")));
     public static final int RELIC_DURATION = Integer.parseInt(PROPERTIES.getProperty("relic.duration"));
     public static final long MAX_COINS = Long.parseLong(PROPERTIES.getProperty("coins.max"));
+    public static final String DATABASE_NAME = PROPERTIES.getProperty("database.name");
 
     private static Properties getProperties() {
         final Properties properties = new Properties();
