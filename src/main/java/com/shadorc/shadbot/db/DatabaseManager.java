@@ -9,7 +9,7 @@ import com.shadorc.shadbot.db.premium.PremiumCollection;
 
 public class DatabaseManager {
 
-    private static final String DATABASE_NAME = "shadbot";
+    public static final String DATABASE_NAME = "shadbot";
 
     private static DatabaseManager instance;
 
