@@ -65,6 +65,10 @@ public class SettingsBean {
         this.prefix = prefix;
     }
 
+    public SettingsBean() {
+
+    }
+
     @Nullable
     public List<String> getAllowedTextChannelIds() {
         return this.allowedTextChannelIds;
