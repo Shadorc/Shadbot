@@ -42,7 +42,7 @@ public class DBMember implements DatabaseEntity {
         return this.bean.getCoins();
     }
 
-    public int addCoins(long gains) {
+    public void addCoins(long gains) {
         final int coins = (int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
         LOGGER.debug("[DBMember {} / {}] Updating coins {}", this.getId().asLong(), this.getGuildId().asLong(), coins);
@@ -66,7 +66,6 @@ public class DBMember implements DatabaseEntity {
             }
         }
 
-        return coins;
     }
 
     // Note: If one day, a member contains more data than just coins, this method will need to be updated

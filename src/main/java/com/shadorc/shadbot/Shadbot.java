@@ -56,7 +56,6 @@ public final class Shadbot {
 
     public static void main(String[] args) {
         Shadbot.migrateGuilds();
-        System.exit(0);
 
         LogUtils.info("Starting Shadbot V%s", Config.VERSION);
 
