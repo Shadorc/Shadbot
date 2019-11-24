@@ -109,7 +109,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         guildMusic.getTrackScheduler().startOrQueue(track, this.insertFirst);
                         musicsAdded++;
                         // The playlist limit is reached and the user / guild is not premium
-                        if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.DEFAULT_PLAYLIST_SIZE - 1
+                        if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.PLAYLIST_SIZE - 1
                                 && !DatabaseManager.getPremium().isGuildPremium(this.guildId)
                                 && !DatabaseManager.getPremium().isUserPremium(this.djId)) {
                             strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");

@@ -45,6 +45,10 @@ public class SettingsBean {
     @JsonProperty("prefix")
     private String prefix;
 
+    public SettingsBean() {
+
+    }
+
     @Nullable
     public List<String> getAllowedTextChannelIds() {
         return this.allowedTextChannelIds;

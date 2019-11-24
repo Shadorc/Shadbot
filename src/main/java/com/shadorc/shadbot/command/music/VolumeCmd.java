@@ -44,15 +44,15 @@ public class VolumeCmd extends BaseCmd {
                         return Mono.error(new CommandException(String.format("`%s` is not a valid volume.", arg)));
                     }
 
-                    if (volume > Config.DEFAULT_MAX_VOLUME && !DatabaseManager.getPremium().isGuildPremium(context.getGuildId())
+                    if (volume > Config.VOLUME_MAX && !DatabaseManager.getPremium().isGuildPremium(context.getGuildId())
                             && !DatabaseManager.getPremium().isUserPremium(context.getAuthorId())) {
                         return Mono.error(new CommandException(String.format("You cannot set the volume higher than %d%%. " +
                                         "You can set the volume **up to %d%% and gain other advantage** by contributing " +
                                         "to Shadbot. More info here: <%s>",
-                                Config.DEFAULT_MAX_VOLUME, Config.PREMIUM_MAX_VOLUME, Config.PATREON_URL)));
+                                Config.VOLUME_MAX, Config.VOLUME_MAX_PREMIUM, Config.PATREON_URL)));
                     }
 
-                    scheduler.setVolume(volume > Config.PREMIUM_MAX_VOLUME ? Config.PREMIUM_MAX_VOLUME : volume);
+                    scheduler.setVolume(volume > Config.VOLUME_MAX_PREMIUM ? Config.VOLUME_MAX_PREMIUM : volume);
                     return context.getChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
                                     scheduler.getAudioPlayer().getVolume(), context.getUsername()),
@@ -65,8 +65,8 @@ public class VolumeCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
                 .setDescription("Show or change current volume level.")
-                .addArg("volume", String.format("must be between 0%% and %d%%", Config.DEFAULT_MAX_VOLUME), true)
-                .addField("Premium", String.format("Premium users and servers can set the volume up to %d%%", Config.PREMIUM_MAX_VOLUME), false)
+                .addArg("volume", String.format("must be between 0%% and %d%%", Config.VOLUME_MAX), true)
+                .addField("Premium", String.format("Premium users and servers can set the volume up to %d%%", Config.VOLUME_MAX_PREMIUM), false)
                 .build();
     }
 }

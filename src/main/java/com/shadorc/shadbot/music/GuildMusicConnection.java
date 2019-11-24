@@ -55,7 +55,7 @@ public class GuildMusicConnection {
                 .cast(VoiceChannel.class)
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider))
                         .publishOn(Schedulers.elastic()))
-                .timeout(Config.DEFAULT_TIMEOUT)
+                .timeout(Config.TIMEOUT)
                 .flatMap(voiceConnection -> {
                     LogUtils.info("{Guild ID: %d} Voice channel joined.", this.guildId.asLong());
 

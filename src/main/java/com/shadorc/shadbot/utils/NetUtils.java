@@ -63,7 +63,7 @@ public final class NetUtils {
 
         return NetUtils.request(HttpMethod.GET, urlString)
                 .response()
-                .timeout(Config.DEFAULT_TIMEOUT)
+                .timeout(Config.TIMEOUT)
                 .map(HttpClientResponse::status)
                 .map(HttpResponseStatus::code)
                 .map(statusCode -> statusCode >= 100 && statusCode < 400)
@@ -102,7 +102,7 @@ public final class NetUtils {
     public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, JavaType type) {
         return NetUtils.request(headerBuilder, HttpMethod.GET, url)
                 .<T>responseSingle((resp, body) -> NetUtils.handleResponse(resp, body, type))
-                .timeout(Config.DEFAULT_TIMEOUT);
+                .timeout(Config.TIMEOUT);
     }
 
     public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, Class<? extends T> type) {
@@ -121,7 +121,7 @@ public final class NetUtils {
     public static Mono<String> get(String url) {
         return NetUtils.request(HttpMethod.GET, url)
                 .responseSingle((resp, body) -> body.asString(StandardCharsets.UTF_8))
-                .timeout(Config.DEFAULT_TIMEOUT);
+                .timeout(Config.TIMEOUT);
     }
 
 }

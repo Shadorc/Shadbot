@@ -60,7 +60,7 @@ public class BotListStats {
                 .uri(url)
                 .send((req, res) -> res.sendString(Mono.just(content.toString()), StandardCharsets.UTF_8))
                 .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8))
-                .timeout(Config.DEFAULT_TIMEOUT)
+                .timeout(Config.TIMEOUT)
                 .onErrorResume(err -> {
                     if (err instanceof TimeoutException) {
                         return Mono.fromRunnable(() -> LogUtils.warn(
