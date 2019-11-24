@@ -27,6 +27,7 @@
         <li><a href="https://bitbucket.org/aksinghnet/owm-japis">OWM-JAPIs</a>
         <li><a href="https://github.com/vladimir-bukhtoyarov/bucket4j">Bucket4J</a>
         <li><a href="http://javaluator.sourceforge.net/en/home/">javaluator</a>
+        <li><a href="https://github.com/mongodb/mongo-java-driver">MongoDB-java</a>
     </ul>
     <hr>
     <h2>Getting Started</h2>
@@ -35,9 +36,10 @@
     <br>3. Clone your forked repository, ie. <code>git clone http://github.com/&lt;YOUR-USERNAME&gt;/shadbot.git</code>
     <br>4. Read this: https://github.com/Shadorc/Shadbot/wiki/Build-Shadbot
     <br>5. Run <code>mvn build</code>.
-    <br>6. Locate the <code>shadbot-&lt;VERSION&gt;.jar</code>.  
-    <br>7. Open command prompt and run <code>java -jar shadbot-&lt;VERSION&gt;.jar</code>.
-    <br>8. You're done!
+    <br>6. Start MongoDB service.
+    <br>7. Locate the <code>shadbot-&lt;VERSION&gt;.jar</code>.  
+    <br>8. Open command prompt and run <code>java -jar shadbot-&lt;VERSION&gt;.jar</code>.
+    <br>9. You're done!
     <h2>Licence</h2>
     <p>Copyright (C) 2019 <b>Shadorc</b>
         <pre>
