@@ -6,7 +6,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
 import discord4j.core.DiscordClient;
@@ -59,28 +59,29 @@ public final class MusicManager {
      * {@code voiceChannelId} is sent.
      */
     public Mono<GuildMusic> getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
-        final GuildMusicConnection guildMusicConnection = this.guildMusicConnections.computeIfAbsent(guildId,
+        return Mono.just(this.guildMusicConnections.computeIfAbsent(guildId,
                 ignored -> {
                     LOGGER.debug("{Guild ID: {}} Creating guild music connection.", guildId.asLong());
                     return new GuildMusicConnection(client, guildId);
+                }))
+                .flatMap(guildMusicConnection -> {
+                    if (guildMusicConnection.getGuildMusic() == null) {
+                        LOGGER.debug("{Guild ID: {}} Creating guild music.", guildId.asLong());
+                        final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
+                        audioPlayer.addListener(new TrackEventListener(guildId));
+
+                        final Settings settings = DatabaseManager.getGuilds().getDBGuild(guildId).getSettings();
+                        final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, settings.getDefaultVol());
+                        final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
+                        guildMusicConnection.setGuildMusic(guildMusic);
+
+                        final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
+                        return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
+                                .thenReturn(guildMusicConnection.getGuildMusic());
+                    }
+
+                    return Mono.just(guildMusicConnection.getGuildMusic());
                 });
-
-        if (guildMusicConnection.getGuildMusic() == null) {
-            LOGGER.debug("{Guild ID: {}} Creating guild music.", guildId.asLong());
-            final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
-            audioPlayer.addListener(new TrackEventListener(guildId));
-
-            final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(guildId);
-            final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, dbGuild.getSettings().getDefaultVol());
-            final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
-            guildMusicConnection.setGuildMusic(guildMusic);
-
-            final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
-            return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
-                    .thenReturn(guildMusicConnection.getGuildMusic());
-        }
-
-        return Mono.just(guildMusicConnection.getGuildMusic());
     }
 
     public GuildMusicConnection getConnection(Snowflake guildId) {

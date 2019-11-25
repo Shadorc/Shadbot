@@ -14,7 +14,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class TrackScheduler {
 
     public enum RepeatMode {
-        NONE, SONG, PLAYLIST;
+        NONE,
+        SONG,
+        PLAYLIST
     }
 
     private final AudioPlayer audioPlayer;

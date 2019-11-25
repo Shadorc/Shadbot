@@ -7,6 +7,7 @@ import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Snowflake;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
@@ -27,9 +29,9 @@ public class GuildMusic {
 
     private final Map<AudioLoadResultListener, Future<Void>> listeners;
     private final AtomicBoolean isWaitingForChoice;
-    private final AtomicBoolean isLeavingScheduled;
     private final AtomicLong messageChannelId;
     private final AtomicLong djId;
+    private final AtomicReference<Disposable> leavingTask;
 
     public GuildMusic(DiscordClient client, Snowflake guildId, TrackScheduler trackScheduler) {
         this.client = client;
@@ -38,9 +40,9 @@ public class GuildMusic {
 
         this.listeners = new ConcurrentHashMap<>();
         this.isWaitingForChoice = new AtomicBoolean(false);
-        this.isLeavingScheduled = new AtomicBoolean(false);
         this.messageChannelId = new AtomicLong();
         this.djId = new AtomicLong();
+        this.leavingTask = new AtomicReference<>();
     }
 
     /**
@@ -48,25 +50,24 @@ public class GuildMusic {
      */
     public void scheduleLeave() {
         LOGGER.debug("{Guild ID: {}} Scheduling auto-leave.", this.guildId.asLong());
-        Mono.delay(Duration.ofMinutes(1), Schedulers.elastic())
+        this.leavingTask.set(Mono.delay(Duration.ofMinutes(1), Schedulers.elastic())
                 .filter(ignored -> this.isLeavingScheduled())
                 .doOnNext(ignored -> MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel())
-                .doOnSubscribe(ignored -> this.isLeavingScheduled.set(true))
-                .doOnTerminate(() -> this.isLeavingScheduled.set(false))
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
+                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err)));
     }
 
     public void cancelLeave() {
-        LOGGER.debug("{Guild ID: {}} Cancelling auto-leave.", this.guildId.asLong());
-        this.isLeavingScheduled.set(false);
+        if (this.isLeavingScheduled()) {
+            LOGGER.debug("{Guild ID: {}} Cancelling auto-leave.", this.guildId.asLong());
+            this.leavingTask.get().dispose();
+            this.leavingTask.set(null);
+        }
     }
 
     public Mono<Void> end() {
-        return Mono.fromRunnable(() -> {
-            LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId.asLong());
-            MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel();
-        })
-                .then(this.getMessageChannel())
+        LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId.asLong());
+        MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel();
+        return this.getMessageChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel))
                 .then();
     }
@@ -97,7 +98,7 @@ public class GuildMusic {
     }
 
     public boolean isLeavingScheduled() {
-        return this.isLeavingScheduled.get();
+        return this.leavingTask.get() != null && !this.leavingTask.get().isDisposed();
     }
 
     public void setMessageChannel(Snowflake messageChannelId) {

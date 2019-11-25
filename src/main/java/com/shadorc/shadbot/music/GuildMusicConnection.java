@@ -16,12 +16,14 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.shadorc.shadbot.music.MusicManager.LOGGER;
+
 public class GuildMusicConnection {
 
     public enum State {
         DISCONNECTED,
         CONNECTING,
-        CONNECTED;
+        CONNECTED
     }
 
     private final DiscordClient client;
@@ -49,7 +51,7 @@ public class GuildMusicConnection {
         }
 
         this.changeState(State.CONNECTING);
-        MusicManager.LOGGER.debug("{Guild ID: {}} Joining voice channel...", this.guildId.asLong());
+        LOGGER.debug("{Guild ID: {}} Joining voice channel...", this.guildId.asLong());
 
         return this.client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
@@ -65,24 +67,22 @@ public class GuildMusicConnection {
                     // If an error occurred while loading a track, the voice channel can be joined after
                     // the guild music is destroyed. The delay is needed to avoid transition error.
                     return Mono.justOrEmpty(this.getGuildMusic())
-                            .switchIfEmpty(Mono.delay(Duration.ofSeconds(2), Schedulers.elastic())
+                            .switchIfEmpty(Mono.delay(Duration.ofSeconds(3), Schedulers.elastic())
                                     .then(Mono.fromRunnable(this::leaveVoiceChannel)));
                 })
-                .onErrorResume(TimeoutException.class, err -> this.onVoiceConnectionTimeout())
-                .then();
+                .then()
+                .onErrorResume(TimeoutException.class, err -> this.onVoiceConnectionTimeout());
     }
 
-    private <T> Mono<T> onVoiceConnectionTimeout() {
-        return Mono.fromRunnable(() -> {
-            LogUtils.info("{Guild ID: %d} Voice connection timed out.", this.guildId.asLong());
-            this.changeState(State.DISCONNECTED);
-        })
-                .then(Mono.justOrEmpty(this.getGuildMusic()))
+    private Mono<Void> onVoiceConnectionTimeout() {
+        LogUtils.info("{Guild ID: %d} Voice connection timed out.", this.guildId.asLong());
+        this.changeState(State.DISCONNECTED);
+        return Mono.justOrEmpty(this.getGuildMusic())
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         Emoji.WARNING + " Sorry, I can't join this voice channel right now. "
                                 + "Please, try again in a few seconds or with another voice channel.", channel))
-                .then(Mono.fromRunnable(this::leaveVoiceChannel));
+                .and(Mono.fromRunnable(this::leaveVoiceChannel));
     }
 
     /**
