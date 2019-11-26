@@ -23,6 +23,7 @@ import discord4j.rest.response.ResponseFunction;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.caffeine.CaffeineStoreService;
 import discord4j.store.jdk.JdkStoreService;
+import reactor.blockhound.BlockHound;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -56,6 +57,10 @@ public final class Shadbot {
                 .flatMap(ignored -> LotteryCmd.draw(Shadbot.getClient()))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+
+        BlockHound.builder()
+                .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
+                .install();
 
         LogUtils.info("Connecting to Discord...");
         new ShardingClientBuilder(Credentials.get(Credential.DISCORD_TOKEN))

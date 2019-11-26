@@ -176,5 +176,10 @@
             <artifactId>mongodb-driver-sync</artifactId>
             <version>3.11.2</version>
         </dependency>
+        <dependency>
+            <groupId>io.projectreactor.tools</groupId>
+            <artifactId>blockhound</artifactId>
+            <version>1.0.1.RELEASE</version>
+        </dependency>
     </dependencies>
 </project>
