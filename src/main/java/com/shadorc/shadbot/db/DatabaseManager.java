@@ -1,5 +1,7 @@
 package com.shadorc.shadbot.db;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -7,6 +9,8 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
+import com.shadorc.shadbot.db.serializer.SnowflakeSerializer;
+import discord4j.core.object.util.Snowflake;
 
 public class DatabaseManager {
 
@@ -18,6 +22,7 @@ public class DatabaseManager {
 
     private final MongoClient client;
     private final MongoDatabase database;
+    private final Gson gson;
 
     private final PremiumCollection premiumCollection;
     private final GuildsCollection guildsCollection;
@@ -30,6 +35,10 @@ public class DatabaseManager {
         this.premiumCollection = new PremiumCollection(this.database);
         this.guildsCollection = new GuildsCollection(this.database);
         this.lotteryCollection = new LotteryCollection(this.database);
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Snowflake.class, new SnowflakeSerializer());
+        this.gson = gsonBuilder.create();
     }
 
     public static PremiumCollection getPremium() {
@@ -42,6 +51,10 @@ public class DatabaseManager {
 
     public static LotteryCollection getLottery() {
         return DatabaseManager.instance.lotteryCollection;
+    }
+
+    public Gson getGson() {
+        return this.gson;
     }
 
     public void close() {
