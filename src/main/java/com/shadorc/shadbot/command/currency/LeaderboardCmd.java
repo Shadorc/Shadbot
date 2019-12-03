@@ -29,7 +29,7 @@ public class LeaderboardCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         return Flux.fromIterable(DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).getMembers())
                 .filter(dbMember -> dbMember.getCoins() > 0)
-                .sort(Comparator.comparingInt(DBMember::getCoins).reversed())
+                .sort(Comparator.comparingLong(DBMember::getCoins).reversed())
                 .take(10)
                 .flatMap(dbMember -> Mono.zip(context.getClient().getUserById(dbMember.getId()).map(User::getUsername), Mono.just(dbMember.getCoins())))
                 .collectList()
@@ -39,7 +39,7 @@ public class LeaderboardCmd extends BaseCmd {
                     }
                     return FormatUtils.numberedList(10, list.size(),
                             count -> {
-                                final Tuple2<String, Integer> tuple = list.get(count - 1);
+                                final Tuple2<String, Long> tuple = list.get(count - 1);
                                 return String.format("%d. **%s** - %s", count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
                             });
                 })

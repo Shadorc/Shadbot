@@ -83,8 +83,9 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                 .addArg("categoryID", "the category ID of the question", true)
                 .addField("Category", String.format("Use `%s%s categories` to see the list of categories",
                         context.getPrefix(), this.getName()), false)
-                .addField("Gains", String.format("The winner gets **%d coins** plus a bonus (**%d coins max.**) depending on his speed to answer.",
-                        TriviaGame.MIN_GAINS, TriviaGame.MAX_BONUS), false)
+                .addField("Gains", String.format("The winner gets **%s** plus a bonus (**%s max.**) depending " +
+                                "on his speed to answer.",
+                        FormatUtils.coins(TriviaGame.MIN_GAINS), FormatUtils.coins(TriviaGame.MAX_BONUS)), false)
                 .build();
     }
 }

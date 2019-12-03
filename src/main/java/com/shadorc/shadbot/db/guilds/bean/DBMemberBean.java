@@ -7,9 +7,9 @@ public class DBMemberBean {
     @JsonProperty("_id")
     private String id;
     @JsonProperty("coins")
-    private int coins;
+    private long coins;
 
-    public DBMemberBean(String id, int coins) {
+    public DBMemberBean(String id, long coins) {
         this.id = id;
         this.coins = coins;
     }
@@ -21,7 +21,7 @@ public class DBMemberBean {
         return this.id;
     }
 
-    public int getCoins() {
+    public long getCoins() {
         return this.coins;
     }
 

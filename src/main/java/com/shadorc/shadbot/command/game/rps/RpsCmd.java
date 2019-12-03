@@ -52,8 +52,8 @@ public class RpsCmd extends BaseCmd {
             final int winStreak = player.getWinStreak().incrementAndGet();
             final long gains = Math.min((long) GAINS * winStreak, Config.MAX_COINS);
             player.win(gains);
-            strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you win **%d coins** (Win Streak x%d)!",
-                    context.getUsername(), gains, player.getWinStreak().get()));
+            strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you win **%s** (Win Streak x%d)!",
+                    context.getUsername(), FormatUtils.coins(gains), player.getWinStreak().get()));
         } else if (userHandsign == botHandsign) {
             player.getWinStreak().set(0);
             strBuilder.append("It's a draw.");
@@ -77,7 +77,8 @@ public class RpsCmd extends BaseCmd {
         return new HelpBuilder(this, context)
                 .setDescription("Play a Rock–paper–scissors game.")
                 .addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)
-                .addField("Gains", String.format("The winner gets **%d coins** multiplied by his win-streak.", GAINS), false)
+                .addField("Gains", String.format("The winner gets **%s** multiplied by his win-streak.",
+                        FormatUtils.coins(GAINS)), false)
                 .build();
     }
 

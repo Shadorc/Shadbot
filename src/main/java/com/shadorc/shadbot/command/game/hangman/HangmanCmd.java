@@ -80,9 +80,12 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
                 .setDescription("Start a Hangman game.")
-                .addArg("difficulty", String.format("%s. The difficulty of the word to find", FormatUtils.format(Difficulty.class, "/")), true)
-                .addField("Gains", String.format("The winner gets **%d coins** plus a bonus (**%d coins max.**) depending on his number of errors.",
-                        HangmanGame.MIN_GAINS, HangmanGame.MAX_BONUS), false)
+                .addArg("difficulty", String.format("%s. The difficulty of the word to find",
+                        FormatUtils.format(Difficulty.class, "/")), true)
+                .addField("Gains", String.format("The winner gets **%s** plus a bonus (**%s max.**) depending " +
+                                "on his number of errors.",
+                        FormatUtils.coins(HangmanGame.MIN_GAINS),
+                        FormatUtils.coins(HangmanGame.MAX_BONUS)), false)
                 .build();
     }
 }

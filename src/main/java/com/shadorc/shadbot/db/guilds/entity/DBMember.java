@@ -38,12 +38,12 @@ public class DBMember implements DatabaseEntity {
         return Snowflake.of(this.bean.getId());
     }
 
-    public int getCoins() {
+    public long getCoins() {
         return this.bean.getCoins();
     }
 
     public void addCoins(long gains) {
-        final int coins = (int) NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
+        final long coins = NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
         LOGGER.debug("[DBMember {} / {}] Updating coins {}", this.getId().asLong(), this.getGuildId().asLong(), coins);
 

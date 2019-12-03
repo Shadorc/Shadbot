@@ -85,13 +85,13 @@ public class SlotMachineCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new HelpBuilder(this, context)
                 .setDescription("Play slot machine.")
-                .addField("Cost", String.format("A game costs **%d coins**.", PAID_COST), false)
-                .addField("Gains", String.format("%s: **%d coins**, %s: **%d coins**, %s: **%d coins**, %s: **%d coins**. " +
+                .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(PAID_COST)), false)
+                .addField("Gains", String.format("%s: **%s**, %s: **%s**, %s: **%s**, %s: **%s**. " +
                                 "You also gain a small random bonus.",
-                        StringUtils.capitalizeEnum(SlotOptions.APPLE), SlotOptions.APPLE.getGains(),
-                        StringUtils.capitalizeEnum(SlotOptions.CHERRIES), SlotOptions.CHERRIES.getGains(),
-                        StringUtils.capitalizeEnum(SlotOptions.BELL), SlotOptions.BELL.getGains(),
-                        StringUtils.capitalizeEnum(SlotOptions.GIFT), SlotOptions.GIFT.getGains()), false)
+                        StringUtils.capitalizeEnum(SlotOptions.APPLE), FormatUtils.coins(SlotOptions.APPLE.getGains()),
+                        StringUtils.capitalizeEnum(SlotOptions.CHERRIES), FormatUtils.coins(SlotOptions.CHERRIES.getGains()),
+                        StringUtils.capitalizeEnum(SlotOptions.BELL), FormatUtils.coins(SlotOptions.BELL.getGains()),
+                        StringUtils.capitalizeEnum(SlotOptions.GIFT), FormatUtils.coins(SlotOptions.GIFT.getGains())), false)
                 .build();
     }
 

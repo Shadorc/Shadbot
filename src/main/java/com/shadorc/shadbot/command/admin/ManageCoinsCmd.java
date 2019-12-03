@@ -5,6 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
@@ -40,10 +41,15 @@ public class ManageCoinsCmd extends BaseCmd {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(0), FormatUtils.options(Action.class))));
 
-        final Integer coins = NumberUtils.toIntOrNull(args.get(1));
+        final Long coins = NumberUtils.toLongOrNull(args.get(1));
         if (coins == null && action != Action.RESET) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.",
                     args.get(1))));
+        }
+
+        if (coins != null && coins > Config.MAX_COINS) {
+            return Mono.error(new CommandException(String.format("You cannot transfer more than %s.",
+                    FormatUtils.coins(Config.MAX_COINS))));
         }
 
         return DiscordUtils.getMembersFrom(context.getMessage())

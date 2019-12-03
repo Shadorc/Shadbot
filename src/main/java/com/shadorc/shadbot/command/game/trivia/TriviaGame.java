@@ -100,16 +100,16 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
     }
 
     protected Mono<Message> win(Member member) {
-        final float coinsPerSec = (float) MAX_BONUS / this.getDuration().toSeconds();
+        final double coinsPerSec = (double) MAX_BONUS / this.getDuration().toSeconds();
         final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-        final int gains = (int) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
+        final long gains = (long) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
 
         new Player(this.getContext().getGuildId(), member.getId()).win(gains);
 
         this.stop();
         return this.getContext().getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won **%d coins**.",
-                        member.getUsername(), gains), channel));
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won " +
+                        "**%s**.", member.getUsername(), FormatUtils.coins(gains)), channel));
     }
 
     public void hasAnswered(Snowflake userId) {
