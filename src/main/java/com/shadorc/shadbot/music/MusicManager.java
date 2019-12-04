@@ -35,11 +35,11 @@ public final class MusicManager {
 
     private static MusicManager instance;
 
+    public static final Logger LOGGER = Loggers.getLogger("shadbot.music");
+
     static {
         MusicManager.instance = new MusicManager();
     }
-
-    public static final Logger LOGGER = Loggers.getLogger("shadbot.music");
 
     private final AudioPlayerManager audioPlayerManager;
     private final Map<Snowflake, GuildMusicConnection> guildMusicConnections;
