@@ -60,8 +60,8 @@ public class TrackEventListener extends AudioEventAdapter {
                     LogUtils.info("{Guild ID: %d} %sTrack exception: %s", this.guildId.asLong(),
                             this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
 
-                    if (errMessage.contains("Received unexpected response from YouTube")) {
-                        LogUtils.warn(guildMusic.getClient(), "Received unexpected response from YouTube. IP rotation is probably needed.");
+                    if (this.isRateLimitException(exception)) {
+                        LogUtils.warn(guildMusic.getClient(), "YouTube is rate limited, IP rotation needed.");
                     }
 
                     final StringBuilder strBuilder = new StringBuilder();
@@ -108,5 +108,15 @@ public class TrackEventListener extends AudioEventAdapter {
                 // If the next track could not be started
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().nextTrack())
                 .flatMap(GuildMusic::end);
+    }
+
+    private boolean isRateLimitException(Throwable err) {
+        // YouTube returned captcha HTML page
+        if (err.getMessage().contains("Received unexpected response from YouTube")) {
+            return true;
+        }
+        // YouTube has explicitly rate limited the IP
+        return err.getCause() != null
+                && err.getCause().getMessage().contains("Invalid status code for video page response: 429");
     }
 }
