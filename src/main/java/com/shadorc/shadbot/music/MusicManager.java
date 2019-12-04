@@ -4,7 +4,14 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
+import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
+import com.sedmelluq.lava.extensions.youtuberotator.planner.AbstractRoutePlanner;
+import com.sedmelluq.lava.extensions.youtuberotator.planner.RotatingNanoIpRoutePlanner;
+import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.IpBlock;
+import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
@@ -17,6 +24,7 @@ import reactor.util.Logger;
 import reactor.util.Loggers;
 import reactor.util.annotation.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,11 +35,11 @@ public final class MusicManager {
 
     private static MusicManager instance;
 
+    public static final Logger LOGGER = Loggers.getLogger("shadbot.music");
+
     static {
         MusicManager.instance = new MusicManager();
     }
-
-    public static final Logger LOGGER = Loggers.getLogger("shadbot.music");
 
     private final AudioPlayerManager audioPlayerManager;
     private final Map<Snowflake, GuildMusicConnection> guildMusicConnections;
@@ -41,6 +49,17 @@ public final class MusicManager {
         this.audioPlayerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         this.guildMusicConnections = new ConcurrentHashMap<>();
+
+        //IPv6 rotation config
+        if (Config.IPV6_BLOCK != null && !Config.IPV6_BLOCK.isEmpty()) {
+            LOGGER.info("Configuring YouTube IP rotator.");
+            final List<IpBlock> blocks = Collections.singletonList(new Ipv6Block(Config.IPV6_BLOCK));
+            final AbstractRoutePlanner planner = new RotatingNanoIpRoutePlanner(blocks);
+
+            new YoutubeIpRotatorSetup(planner)
+                    .forSource(this.audioPlayerManager.source(YoutubeAudioSourceManager.class))
+                    .setup();
+        }
     }
 
     /**
