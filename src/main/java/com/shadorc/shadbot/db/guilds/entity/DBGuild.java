@@ -12,8 +12,10 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 import org.bson.Document;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;
@@ -52,12 +54,34 @@ public class DBGuild implements DatabaseEntity {
     public <T> void setSetting(Setting setting, T value) {
         LOGGER.debug("[DBGuild {}] Updating setting {}: {}", this.getId().asLong(), setting, value);
 
+        // TODO: Map Snowflake to String into MongoDB
+        Object obj = value;
+
+        // Convert List<Snowflake> to List<String>
+        if (value instanceof List && !((List<?>) value).isEmpty() && (((List<?>) value).get(0) instanceof Snowflake)) {
+            obj = ((List<Snowflake>) value).stream()
+                    .map(Snowflake::asString)
+                    .collect(Collectors.toUnmodifiableList());
+        }
+
+        // Convert Map<Snowflake, Snowflake> to Map<String, String>
+        if (value instanceof Map && !((Map<?, ?>) value).isEmpty()) {
+            final List<?> entries = new ArrayList<>(((Map<?, ?>) value).entrySet());
+            final List<?> values = new ArrayList<>(((Map<?, ?>) value).values());
+            if (entries.get(0) instanceof Snowflake && values.get(0) instanceof Snowflake) {
+                obj = ((Map<Snowflake, Snowflake>) value).entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                entry -> entry.getKey().asString(),
+                                entry -> entry.getValue().asString()));
+            }
+        }
+
         DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
-                        Updates.set(String.format("settings.%s", setting.toString()),
-                                DatabaseManager.getInstance().getGson().toJson(value)),
+                        Updates.set(String.format("settings.%s", setting.toString()), obj),
                         new UpdateOptions().upsert(true));
     }
 
