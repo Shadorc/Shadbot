@@ -89,7 +89,7 @@ public class WallpaperCmd extends BaseCmd {
                     final List<String> args = StringUtils.split(context.getArg().orElse(""));
                     return new DefaultParser().parse(this.options, args.toArray(new String[0]));
                 }))
-                .onErrorMap(err -> err instanceof UnrecognizedOptionException || err instanceof org.apache.commons.cli.MissingArgumentException,
+                .onErrorMap(err -> err instanceof UnrecognizedOptionException || err instanceof MissingArgumentException,
                         err -> new CommandException(String.format("%s. Use `%shelp %s` for more information.",
                                 err.getMessage(), context.getPrefix(), this.getName())))
                 .zipWith(context.isChannelNsfw())

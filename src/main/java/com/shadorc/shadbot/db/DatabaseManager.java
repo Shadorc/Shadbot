@@ -17,7 +17,6 @@ public class DatabaseManager {
     }
 
     private final MongoClient client;
-    private final MongoDatabase database;
 
     private final PremiumCollection premiumCollection;
     private final GuildsCollection guildsCollection;
@@ -25,11 +24,11 @@ public class DatabaseManager {
 
     private DatabaseManager() {
         this.client = MongoClients.create();
-        this.database = this.client.getDatabase(Config.DATABASE_NAME);
 
-        this.premiumCollection = new PremiumCollection(this.database);
-        this.guildsCollection = new GuildsCollection(this.database);
-        this.lotteryCollection = new LotteryCollection(this.database);
+        final MongoDatabase database = this.client.getDatabase(Config.DATABASE_NAME);
+        this.premiumCollection = new PremiumCollection(database);
+        this.guildsCollection = new GuildsCollection(database);
+        this.lotteryCollection = new LotteryCollection(database);
     }
 
     public static PremiumCollection getPremium() {

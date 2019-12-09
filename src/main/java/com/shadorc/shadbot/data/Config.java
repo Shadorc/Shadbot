@@ -5,7 +5,7 @@ import discord4j.core.object.util.Snowflake;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;

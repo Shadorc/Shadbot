@@ -17,7 +17,7 @@ public final class ExceptionHandler {
 
     public static Mono<Void> handleCommandError(Throwable err, BaseCmd cmd, Context context) {
         if (err instanceof CommandException) {
-            return ExceptionHandler.onCommandException((CommandException) err, cmd, context);
+            return ExceptionHandler.onCommandException((CommandException) err, context);
         }
         if (err instanceof MissingPermissionException) {
             return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, context);
@@ -34,7 +34,7 @@ public final class ExceptionHandler {
         return ExceptionHandler.onUnknown(err, cmd, context);
     }
 
-    private static Mono<Void> onCommandException(CommandException err, BaseCmd cmd, Context context) {
+    private static Mono<Void> onCommandException(CommandException err, Context context) {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
                         context.getUsername(), err.getMessage()), channel))

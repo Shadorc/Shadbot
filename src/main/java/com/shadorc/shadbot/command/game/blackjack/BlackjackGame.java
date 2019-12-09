@@ -72,7 +72,6 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                     final int dealerValue = this.dealerHand.getValue();
                     final int playerValue = player.getHand().getValue();
 
-                    final StringBuilder text = new StringBuilder();
                     switch (BlackjackGame.getResult(playerValue, dealerValue)) {
                         case 1:
                             player.cancelBet();
