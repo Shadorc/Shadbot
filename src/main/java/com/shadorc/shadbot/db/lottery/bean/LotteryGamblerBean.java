@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.db.lottery.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.shadorc.shadbot.db.Bean;
 
-public class LotteryGamblerBean {
+public class LotteryGamblerBean implements Bean {
 
     @JsonProperty("guild_id")
     private String guildId;

@@ -36,7 +36,7 @@ public class GuildsCollection extends DatabaseCollection {
         } else {
             LOGGER.debug("[DBGuild {}] Found.", guildId.asLong());
             try {
-                return new DBGuild(Utils.MAPPER.readValue(document.toJson(), DBGuildBean.class));
+                return new DBGuild(Utils.MAPPER.readValue(document.toJson(Utils.JSON_WRITER_SETTINGS), DBGuildBean.class));
             } catch (final JsonProcessingException err) {
                 throw new RuntimeException(err);
             }

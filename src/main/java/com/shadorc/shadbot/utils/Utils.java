@@ -5,9 +5,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.HashBasedTable;
+import com.mongodb.MongoClientSettings;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.codec.LongCodec;
+import com.shadorc.shadbot.db.codec.SnowflakeCodec;
 import com.shadorc.shadbot.exception.CommandException;
 import discord4j.core.object.entity.Member;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.json.JsonWriterSettings;
 import reactor.util.annotation.Nullable;
 
 import javax.management.*;
@@ -19,6 +25,14 @@ import java.util.stream.Collectors;
 
 public final class Utils {
 
+    public static final JsonWriterSettings JSON_WRITER_SETTINGS = JsonWriterSettings.builder()
+            .int64Converter((value, writer) -> writer.writeNumber(value.toString()))
+            .build();
+
+    public static final CodecRegistry CODEC_REGISTRY = CodecRegistries.fromRegistries(
+            CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec()),
+            MongoClientSettings.getDefaultCodecRegistry());
+
     public static final ObjectMapper MAPPER = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
@@ -28,7 +42,7 @@ public final class Utils {
 
     /**
      * @param enumClass - the {@link Enum} class
-     * @param value     - the string representing the enumeration, case insensitive
+     * @param value - the string representing the enumeration, case insensitive
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass} or null if it does not exist
      */
     @Nullable
@@ -43,7 +57,7 @@ public final class Utils {
 
     /**
      * @param enumClass - the {@link Enum} class
-     * @param value     - the string representing the enumeration, case insensitive
+     * @param value - the string representing the enumeration, case insensitive
      * @param exception - the exception to be thrown
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass}
      * @throws X - if the value is null
@@ -105,9 +119,10 @@ public final class Utils {
     }
 
     /**
-     * @param map        - the map to sort
+     * @param map - the map to sort
      * @param comparator - a {@link Comparator} to be used to compare stream elements
-     * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code comparator}
+     * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code
+     * comparator}
      */
     public static <K, V> Map<K, V> sortByValue(Map<K, V> map, Comparator<? super Entry<K, V>> comparator) {
         return map.entrySet()
@@ -139,7 +154,7 @@ public final class Utils {
      * @param betStr - the string representing the bet
      * @return A long representing {@code betStr} converted as an int
      * @throws CommandException - thrown if {@code betStr} cannot be casted to an long
-     *                          or if the {@code user} does not have enough coins.
+     * or if the {@code user} does not have enough coins.
      */
     public static long requireValidBet(Member member, String betStr) {
         final Long bet = NumberUtils.toPositiveLongOrNull(betStr);

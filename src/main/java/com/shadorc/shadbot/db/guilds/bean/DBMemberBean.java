@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.db.guilds.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.shadorc.shadbot.db.Bean;
 
-public class DBMemberBean {
+public class DBMemberBean implements Bean {
 
     @JsonProperty("_id")
     private String id;

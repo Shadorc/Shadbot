@@ -1,11 +1,12 @@
 package com.shadorc.shadbot.db.guilds.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.shadorc.shadbot.db.Bean;
 import reactor.util.annotation.Nullable;
 
 import java.util.List;
 
-public class DBGuildBean {
+public class DBGuildBean implements Bean {
 
     @JsonProperty("_id")
     private String id;

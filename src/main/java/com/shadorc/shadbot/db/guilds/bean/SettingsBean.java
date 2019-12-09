@@ -6,7 +6,7 @@ import reactor.util.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
-public class SettingsBean {
+public class SettingsBean implements Bean {
 
     @Nullable
     @JsonProperty("allowed_text_channels")

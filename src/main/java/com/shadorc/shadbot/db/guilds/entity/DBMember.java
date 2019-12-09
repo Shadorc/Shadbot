@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.db.guilds.entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
@@ -9,25 +8,22 @@ import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.bean.DBMemberBean;
 import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
-import org.bson.Document;
 
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;
 
-public class DBMember implements DatabaseEntity {
+public class DBMember extends DatabaseEntity<DBMemberBean> {
 
     private final String guildId;
-    private final DBMemberBean bean;
 
     public DBMember(Snowflake guildId, DBMemberBean bean) {
+        super(bean);
         this.guildId = guildId.asString();
-        this.bean = bean;
     }
 
     public DBMember(Snowflake guildId, Snowflake id) {
+        super(new DBMemberBean(id.asString(), 0));
         this.guildId = guildId.asString();
-        this.bean = new DBMemberBean(id.asString(), 0);
     }
 
     public Snowflake getGuildId() {
@@ -35,11 +31,11 @@ public class DBMember implements DatabaseEntity {
     }
 
     public Snowflake getId() {
-        return Snowflake.of(this.bean.getId());
+        return Snowflake.of(this.getBean().getId());
     }
 
     public long getCoins() {
-        return this.bean.getCoins();
+        return this.getBean().getCoins();
     }
 
     public void addCoins(long gains) {
@@ -55,15 +51,11 @@ public class DBMember implements DatabaseEntity {
                 .getModifiedCount();
 
         if (modifiedCount == 0) {
-            try {
-                DatabaseManager.getGuilds()
-                        .getCollection()
-                        .updateOne(Filters.eq("_id", this.getGuildId().asString()),
-                                Updates.push("members", this.toDocument().append("coins", coins)),
-                                new UpdateOptions().upsert(true));
-            } catch (final JsonProcessingException err) {
-                throw new RuntimeException(err);
-            }
+            DatabaseManager.getGuilds()
+                    .getCollection()
+                    .updateOne(Filters.eq("_id", this.getGuildId().asString()),
+                            Updates.push("members", this.toDocument().append("coins", coins)),
+                            new UpdateOptions().upsert(true));
         }
 
     }
@@ -78,15 +70,11 @@ public class DBMember implements DatabaseEntity {
     public void insert() {
         LOGGER.debug("[DBMember {} / {}] Insertion", this.getId().asLong(), this.getGuildId().asLong());
 
-        try {
-            DatabaseManager.getGuilds()
-                    .getCollection()
-                    .updateOne(Filters.eq("_id", this.getGuildId().asString()),
-                            Updates.push("members", this.toDocument()),
-                            new UpdateOptions().upsert(true));
-        } catch (final JsonProcessingException err) {
-            throw new RuntimeException(err);
-        }
+        DatabaseManager.getGuilds()
+                .getCollection()
+                .updateOne(Filters.eq("_id", this.getGuildId().asString()),
+                        Updates.push("members", this.toDocument()),
+                        new UpdateOptions().upsert(true));
     }
 
     @Override
@@ -100,15 +88,10 @@ public class DBMember implements DatabaseEntity {
     }
 
     @Override
-    public Document toDocument() throws JsonProcessingException {
-        return Document.parse(Utils.MAPPER.writeValueAsString(this.bean));
-    }
-
-    @Override
     public String toString() {
         return "DBMember{" +
                 "guildId='" + this.guildId + '\'' +
-                ", bean=" + this.bean +
+                ", bean=" + this.getBean() +
                 '}';
     }
 }
