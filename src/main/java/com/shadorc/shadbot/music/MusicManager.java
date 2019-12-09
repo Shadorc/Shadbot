@@ -50,6 +50,7 @@ public final class MusicManager {
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         this.guildMusicConnections = new ConcurrentHashMap<>();
 
+        /*
         //IPv6 rotation config
         if (Config.IPV6_BLOCK != null && !Config.IPV6_BLOCK.isEmpty()) {
             LOGGER.info("Configuring YouTube IP rotator.");
@@ -60,6 +61,7 @@ public final class MusicManager {
                     .forSource(this.audioPlayerManager.source(YoutubeAudioSourceManager.class))
                     .setup();
         }
+        */
     }
 
     /**
