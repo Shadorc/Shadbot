@@ -13,7 +13,7 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_capitalize() {
+    public void testCapitalize() {
         assertEquals("", StringUtils.capitalize(""));
         assertEquals("F", StringUtils.capitalize("f"));
         assertEquals("Fo", StringUtils.capitalize("fo"));
@@ -24,7 +24,7 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_capitalizeEnum() {
+    public void testCapitalizeEnum() {
         assertEquals("Test one", StringUtils.capitalizeEnum(TestEnum.TEST_ONE));
         assertEquals("Test two", StringUtils.capitalizeEnum(TestEnum.test_Two));
         assertEquals("Testthree", StringUtils.capitalizeEnum(TestEnum.testThree));
@@ -32,7 +32,7 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_getQuotedElements() {
+    public void testGetQuotedElements() {
         assertEquals(List.of("hello"), StringUtils.getQuotedElements("\"hello\""));
         assertEquals(List.of("hello", "hi"), StringUtils.getQuotedElements("\"hello\" \"hi\""));
         assertEquals(List.of("hello", "hi"), StringUtils.getQuotedElements("\"hello\" foo \"hi\""));
@@ -44,14 +44,14 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_normalizeSpace() {
+    public void testNormalizeSpace() {
         assertEquals("hello", StringUtils.normalizeSpace("   hello      "));
         assertEquals("he llo", StringUtils.normalizeSpace("   he   llo      "));
         assertNull(StringUtils.normalizeSpace(null));
     }
 
     @Test
-    public void test_pluralOf() {
+    public void testPluralOf() {
         assertEquals("-2 coin", StringUtils.pluralOf(-2, "coin"));
         assertEquals("-1 coin", StringUtils.pluralOf(-1, "coin"));
         assertEquals("0 coin", StringUtils.pluralOf(0, "coin"));
@@ -63,7 +63,7 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_remove_list() {
+    public void testRemoveList() {
         assertEquals("bar", StringUtils.remove("foo bar", List.of("foo ")));
         assertEquals(" ", StringUtils.remove("foo bar", List.of("foo", "bar")));
         assertEquals("foo bar", StringUtils.remove("foo bar", Collections.emptyList()));
@@ -73,7 +73,7 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_remove_array() {
+    public void testRemoveArray() {
         assertEquals("bar", StringUtils.remove("foo bar", "foo "));
         assertEquals(" ", StringUtils.remove("foo bar", "foo", "bar"));
         assertEquals("foo bar", StringUtils.remove("foo bar"));
@@ -83,7 +83,7 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_split() {
+    public void testSplit() {
         assertEquals(List.of("foo", "bar", "hi"), StringUtils.split("foo bar hi"));
         assertEquals(List.of("foo", "bar", "hi"), StringUtils.split("foo bar hi "));
         assertEquals(List.of("foo"), StringUtils.split("foo"));
@@ -92,7 +92,7 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_split_limit() {
+    public void testSplitLimit() {
         assertEquals(List.of("foo", "bar", "hi"), StringUtils.split("foo bar hi", -1));
         assertEquals(List.of("foo", "bar", "hi"), StringUtils.split("foo bar hi", 0));
         assertEquals(List.of("foo bar hi"), StringUtils.split("foo bar hi", 1));
@@ -106,7 +106,7 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_split_limitAndDelimiter() {
+    public void testSplitLimitAndDelimiter() {
         assertEquals(List.of("foo", "bar", "hi"), StringUtils.split("foo-bar-hi", -1, "-"));
         assertEquals(List.of("foo", "bar", "hi"), StringUtils.split("foo-bar-hi", 0, "-"));
         assertEquals(List.of("foo-bar-hi"), StringUtils.split("foo-bar-hi", 1, "-"));
@@ -121,7 +121,7 @@ public class TestStringUtils {
     }
 
     @Test
-    public void test_split_delimiter() {
+    public void testSplitDelimiter() {
         assertEquals(List.of("foo", "bar", "hi"), StringUtils.split("foo-bar-hi", "-"));
         assertEquals(List.of("foo", "bar", "hi"), StringUtils.split("foo-bar-hi-", "-"));
         assertEquals(List.of("foo"), StringUtils.split("foo", "-"));

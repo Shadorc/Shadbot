@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TestTextUtils {
 
     @Test
-    public void test_cleanLavaplayerErr() {
+    public void testCleanLavaplayerErr() {
         final FriendlyException err = new FriendlyException("<url src=\"youtube\">Watch on YouTube</url>Error", FriendlyException.Severity.COMMON, null);
         assertEquals("Error", TextUtils.cleanLavaplayerErr(err));
         assertThrows(NullPointerException.class, () -> TextUtils.cleanLavaplayerErr(null));

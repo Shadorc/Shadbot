@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestNumberUtils {
 
     @Test
-    public void test_toIntOrNull() {
+    public void testToIntOrNull() {
         assertEquals(Integer.valueOf(14), NumberUtils.toIntOrNull("14"));
         assertEquals(Integer.valueOf(14), NumberUtils.toIntOrNull("  14   "));
         assertEquals(Integer.valueOf(0), NumberUtils.toIntOrNull("0"));
@@ -18,7 +18,7 @@ public class TestNumberUtils {
     }
 
     @Test
-    public void test_toPositiveIntOrNull() {
+    public void testToPositiveIntOrNull() {
         assertEquals(Integer.valueOf(14), NumberUtils.toPositiveIntOrNull("14"));
         assertEquals(Integer.valueOf(14), NumberUtils.toPositiveIntOrNull("  14   "));
         assertNull(NumberUtils.toPositiveIntOrNull("0"));
@@ -30,7 +30,7 @@ public class TestNumberUtils {
     }
 
     @Test
-    public void test_toIntBetweenOrNull() {
+    public void testToIntBetweenOrNull() {
         assertEquals(14, NumberUtils.toIntBetweenOrNull("14", 10, 20));
         assertNull(NumberUtils.toIntBetweenOrNull("4", 10, 20));
         assertNull(NumberUtils.toIntBetweenOrNull("24", 10, 20));
@@ -42,7 +42,7 @@ public class TestNumberUtils {
     }
 
     @Test
-    public void test_toLongOrNull() {
+    public void testToLongOrNull() {
         assertEquals(Long.valueOf(14), NumberUtils.toLongOrNull("14"));
         assertEquals(Long.valueOf(14), NumberUtils.toLongOrNull("  14   "));
         assertEquals(Long.valueOf(0), NumberUtils.toLongOrNull("0"));
@@ -54,7 +54,7 @@ public class TestNumberUtils {
     }
 
     @Test
-    public void test_toPositiveLongOrNull() {
+    public void testToPositiveLongOrNull() {
         assertEquals(Long.valueOf(14), NumberUtils.toPositiveLongOrNull("14"));
         assertEquals(Long.valueOf(14), NumberUtils.toPositiveLongOrNull("  14   "));
         assertNull(NumberUtils.toPositiveLongOrNull("0"));
@@ -66,7 +66,7 @@ public class TestNumberUtils {
     }
 
     @Test
-    public void test_isPositiveLong() {
+    public void testIsPositiveLong() {
         assertTrue(NumberUtils.isPositiveLong("14"));
         assertTrue(NumberUtils.isPositiveLong("  14   "));
         assertFalse(NumberUtils.isPositiveLong("0"));
@@ -78,7 +78,7 @@ public class TestNumberUtils {
     }
 
     @Test
-    public void test_truncateBetween() {
+    public void testTruncateBetween() {
         assertEquals(14, NumberUtils.truncateBetween(14, 10, 20));
         assertEquals(10, NumberUtils.truncateBetween(4, 10, 20));
         assertEquals(20, NumberUtils.truncateBetween(24, 10, 20));
@@ -87,7 +87,7 @@ public class TestNumberUtils {
     }
 
     @Test
-    public void test_isBetween() {
+    public void testIsBetween() {
         assertTrue(NumberUtils.isBetween(14, 10, 20));
         assertFalse(NumberUtils.isBetween(4, 10, 20));
         assertFalse(NumberUtils.isBetween(24, 10, 20));

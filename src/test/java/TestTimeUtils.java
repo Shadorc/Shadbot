@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestTimeUtils {
 
     @Test
-    public void test_getMillisUntil_instant() {
+    public void testGetMillisUntilInstant() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
         final long elapsed = TimeUtils.getMillisUntil(Instant.now().minusMillis(millis));
@@ -20,7 +20,7 @@ public class TestTimeUtils {
     }
 
     @Test
-    public void test_getMillisUntil_long() {
+    public void testGetMillisUntilLong() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
         final long elapsed = TimeUtils.getMillisUntil(Instant.now().minusMillis(millis).toEpochMilli());
@@ -29,7 +29,7 @@ public class TestTimeUtils {
     }
 
     @Test
-    public void test_parseTime() {
+    public void testParseTime() {
         assertEquals(60, TimeUtils.parseTime("1m"));
         assertEquals(60, TimeUtils.parseTime("1m 00s"));
         assertEquals(3600 + 10 * 60 + 6, TimeUtils.parseTime("01h10m6s"));
@@ -40,7 +40,7 @@ public class TestTimeUtils {
     }
 
     @Test
-    public void test_toLocalDate() {
+    public void testToLocalDate() {
         final Instant now = Instant.now();
         assertEquals(LocalDateTime.ofInstant(now, ZoneId.systemDefault()), TimeUtils.toLocalDate(now));
         assertThrows(NullPointerException.class, () -> TimeUtils.toLocalDate(null));
