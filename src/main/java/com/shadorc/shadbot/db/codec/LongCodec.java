@@ -10,12 +10,12 @@ public class LongCodec implements Codec<Long> {
 
     @Override
     public Long decode(BsonReader reader, DecoderContext decoderContext) {
-        return Long.valueOf(reader.readString());
+        return reader.readInt64();
     }
 
     @Override
     public void encode(BsonWriter writer, Long value, EncoderContext encoderContext) {
-        writer.writeString(value.toString());
+        writer.writeInt64(value);
     }
 
     @Override

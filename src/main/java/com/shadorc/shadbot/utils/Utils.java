@@ -30,8 +30,8 @@ public final class Utils {
             .build();
 
     public static final CodecRegistry CODEC_REGISTRY = CodecRegistries.fromRegistries(
-            CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec()),
-            MongoClientSettings.getDefaultCodecRegistry());
+            MongoClientSettings.getDefaultCodecRegistry(),
+            CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec()));
 
     public static final ObjectMapper MAPPER = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -42,7 +42,7 @@ public final class Utils {
 
     /**
      * @param enumClass - the {@link Enum} class
-     * @param value - the string representing the enumeration, case insensitive
+     * @param value     - the string representing the enumeration, case insensitive
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass} or null if it does not exist
      */
     @Nullable
@@ -57,7 +57,7 @@ public final class Utils {
 
     /**
      * @param enumClass - the {@link Enum} class
-     * @param value - the string representing the enumeration, case insensitive
+     * @param value     - the string representing the enumeration, case insensitive
      * @param exception - the exception to be thrown
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass}
      * @throws X - if the value is null
@@ -119,7 +119,7 @@ public final class Utils {
     }
 
     /**
-     * @param map - the map to sort
+     * @param map        - the map to sort
      * @param comparator - a {@link Comparator} to be used to compare stream elements
      * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code
      * comparator}
@@ -154,7 +154,7 @@ public final class Utils {
      * @param betStr - the string representing the bet
      * @return A long representing {@code betStr} converted as an int
      * @throws CommandException - thrown if {@code betStr} cannot be casted to an long
-     * or if the {@code user} does not have enough coins.
+     *                          or if the {@code user} does not have enough coins.
      */
     public static long requireValidBet(Member member, String betStr) {
         final Long bet = NumberUtils.toPositiveLongOrNull(betStr);

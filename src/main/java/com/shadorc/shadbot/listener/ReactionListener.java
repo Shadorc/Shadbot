@@ -11,11 +11,13 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -93,6 +95,19 @@ public class ReactionListener {
                 });
     }
 
+    private static Mono<Void> execute(Message message, Member member, Action action) {
+        return Mono.justOrEmpty(DatabaseManager.getGuilds()
+                .getDBGuild(member.getGuildId())
+                .getSettings()
+                .getIam())
+                .flatMapMany(Flux::fromIterable)
+                .filter(iam -> iam.getMessageId().equals(message.getId()))
+                // If the bot can manage the role
+                .filterWhen(iam -> ReactionListener.canManageRole(message, iam.getRoleId()))
+                .flatMap(iam -> action == Action.ADD ? member.addRole(iam.getRoleId()) : member.removeRole(iam.getRoleId()))
+                .then();
+    }
+
     private static Mono<Void> iam(Message message, Snowflake userId, ReactionEmoji emoji, Action action) {
         // If this is the correct reaction
         if (!emoji.equals(IamCmd.REACTION)) {
@@ -105,14 +120,7 @@ public class ReactionListener {
                 // If the bot is not the author of the message, this is not an Iam message
                 .filter(selfId -> message.getAuthor().map(User::getId).map(selfId::equals).orElse(false))
                 .flatMap(ignored -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
-                .flatMap(member -> Mono.justOrEmpty(DatabaseManager.getGuilds()
-                        .getDBGuild(member.getGuildId())
-                        .getSettings()
-                        .getIamMessages()
-                        .get(message.getId()))
-                        // If the bot can manage the role
-                        .filterWhen(roleId -> ReactionListener.canManageRole(message, roleId))
-                        .flatMap(roleId -> action == Action.ADD ? member.addRole(roleId) : member.removeRole(roleId)));
+                .flatMap(member -> ReactionListener.execute(message, member, action));
     }
 
 }

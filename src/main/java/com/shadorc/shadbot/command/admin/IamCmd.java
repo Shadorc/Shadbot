@@ -7,7 +7,9 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.bean.setting.IamBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.setting.Iam;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -19,14 +21,13 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
 import discord4j.core.object.util.Permission;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class IamCmd extends BaseCmd {
 
@@ -80,9 +81,21 @@ public class IamCmd extends BaseCmd {
                                     .send(embedConsumer)
                                     .doOnNext(message -> {
                                         final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
-                                        final Map<Snowflake, Snowflake> setting = dbGuild.getSettings().getIamMessages();
-                                        roles.stream().map(Role::getId)
-                                                .forEach(roleId -> setting.put(message.getId(), roleId));
+
+                                        // Converts the new message to an IamBean
+                                        final List<IamBean> setting = roles.stream()
+                                                .map(Role::getId)
+                                                .map(roleId -> new Iam(message.getId(), roleId))
+                                                .map(Iam::getBean)
+                                                .collect(Collectors.toList());
+
+                                        // Add previous Iam to the new one
+                                        setting.addAll(dbGuild.getSettings()
+                                                .getIam()
+                                                .stream()
+                                                .map(Iam::getBean)
+                                                .collect(Collectors.toList()));
+
                                         dbGuild.setSetting(Setting.IAM_MESSAGES, setting);
                                     });
                         }))

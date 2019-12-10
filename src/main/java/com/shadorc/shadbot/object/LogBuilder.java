@@ -7,7 +7,7 @@ import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.util.annotation.Nullable;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.function.Consumer;
 
 public class LogBuilder {

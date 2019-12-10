@@ -3,6 +3,8 @@ package com.shadorc.shadbot.db.guilds.entity;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.guilds.bean.SettingsBean;
+import com.shadorc.shadbot.db.guilds.bean.setting.IamBean;
+import com.shadorc.shadbot.db.guilds.entity.setting.Iam;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
@@ -74,18 +76,12 @@ public class Settings {
                 .orElse(Config.DEFAULT_VOLUME);
     }
 
-    /**
-     * @return A map containing message IDs as key and role IDs as value
-     */
-    public Map<Snowflake, Snowflake> getIamMessages() {
+    public List<Iam> getIam() {
         return Optional.ofNullable(this.bean)
-                .map(SettingsBean::getIamMessage)
-                .orElse(new HashMap<>())
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        entry -> Snowflake.of(entry.getKey()),
-                        entry -> Snowflake.of(entry.getValue())));
+                .map(SettingsBean::getIam)
+                .orElse(new ArrayList<>())
+                .stream().map(Iam::new)
+                .collect(Collectors.toList());
     }
 
     public Optional<String> getJoinMessage() {
