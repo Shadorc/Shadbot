@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.db;
 
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -7,6 +8,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
+import com.shadorc.shadbot.utils.Utils;
 
 public class DatabaseManager {
 
@@ -23,7 +25,11 @@ public class DatabaseManager {
     private final LotteryCollection lotteryCollection;
 
     private DatabaseManager() {
-        this.client = MongoClients.create();
+        final MongoClientSettings settings = MongoClientSettings.builder()
+                .codecRegistry(Utils.CODEC_REGISTRY)
+                .build();
+
+        this.client = MongoClients.create(settings);
 
         final MongoDatabase database = this.client.getDatabase(Config.DATABASE_NAME);
         this.premiumCollection = new PremiumCollection(database);

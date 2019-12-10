@@ -1,12 +1,14 @@
 package com.shadorc.shadbot.db.guilds.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.shadorc.shadbot.db.Bean;
+import com.shadorc.shadbot.db.guilds.bean.setting.IamBean;
 import reactor.util.annotation.Nullable;
 
 import java.util.List;
 import java.util.Map;
 
-public class SettingsBean {
+public class SettingsBean implements Bean {
 
     @Nullable
     @JsonProperty("allowed_text_channels")
@@ -27,8 +29,8 @@ public class SettingsBean {
     @JsonProperty("default_volume")
     private Integer defaultVolume;
     @Nullable
-    @JsonProperty("iam_message")
-    private Map<String, String> iamMessage;
+    @JsonProperty("iam")
+    private List<IamBean> iam;
     @Nullable
     @JsonProperty("join_message")
     private String joinMessage;
@@ -80,8 +82,8 @@ public class SettingsBean {
     }
 
     @Nullable
-    public Map<String, String> getIamMessage() {
-        return this.iamMessage;
+    public List<IamBean> getIam() {
+        return this.iam;
     }
 
     @Nullable
@@ -118,7 +120,7 @@ public class SettingsBean {
                 ", autoRoleIds=" + this.autoRoleIds +
                 ", blacklist=" + this.blacklist +
                 ", defaultVolume=" + this.defaultVolume +
-                ", iamMessage=" + this.iamMessage +
+                ", iamMessage=" + this.iam +
                 ", joinMessage='" + this.joinMessage + '\'' +
                 ", leaveMessage='" + this.leaveMessage + '\'' +
                 ", messageChannelId='" + this.messageChannelId + '\'' +

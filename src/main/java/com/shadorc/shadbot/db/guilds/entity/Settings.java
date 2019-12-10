@@ -2,27 +2,25 @@ package com.shadorc.shadbot.db.guilds.entity;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.SettingsBean;
+import com.shadorc.shadbot.db.guilds.entity.setting.Iam;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
-import reactor.util.annotation.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Settings {
+public class Settings extends SerializableEntity<SettingsBean> {
 
-    @Nullable
-    private final SettingsBean bean;
-
-    protected Settings(@Nullable SettingsBean bean) {
-        this.bean = bean;
+    protected Settings(SettingsBean bean) {
+        super(bean);
     }
 
     protected Settings() {
-        this(null);
+        super(new SettingsBean());
     }
 
     public boolean hasAllowedRole(List<Role> roles) {
@@ -63,61 +61,56 @@ public class Settings {
     }
 
     public List<String> getBlacklistedCmd() {
-        return Optional.ofNullable(this.bean)
+        return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getBlacklist)
                 .orElse(new ArrayList<>());
     }
 
     public Integer getDefaultVol() {
-        return Optional.ofNullable(this.bean)
+        return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getDefaultVolume)
                 .orElse(Config.DEFAULT_VOLUME);
     }
 
-    /**
-     * @return A map containing message IDs as key and role IDs as value
-     */
-    public Map<Snowflake, Snowflake> getIamMessages() {
-        return Optional.ofNullable(this.bean)
-                .map(SettingsBean::getIamMessage)
-                .orElse(new HashMap<>())
-                .entrySet()
+    public List<Iam> getIam() {
+        return Optional.ofNullable(this.getBean())
+                .map(SettingsBean::getIam)
+                .orElse(new ArrayList<>())
                 .stream()
-                .collect(Collectors.toMap(
-                        entry -> Snowflake.of(entry.getKey()),
-                        entry -> Snowflake.of(entry.getValue())));
+                .map(Iam::new)
+                .collect(Collectors.toList());
     }
 
     public Optional<String> getJoinMessage() {
-        return Optional.ofNullable(this.bean)
+        return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getJoinMessage);
     }
 
     public Optional<String> getLeaveMessage() {
-        return Optional.ofNullable(this.bean)
+        return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getLeaveMessage);
     }
 
     public Optional<Snowflake> getMessageChannelId() {
-        return Optional.ofNullable(this.bean)
+        return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getMessageChannelId)
                 .map(Snowflake::of);
     }
 
     public Map<String, List<String>> getSavedPlaylists() {
-        return Optional.ofNullable(this.bean)
+        return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getSavedPlaylists)
                 .orElse(new HashMap<>());
     }
 
     public String getPrefix() {
-        return Optional.ofNullable(this.bean)
+        return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getPrefix)
                 .orElse(Config.DEFAULT_PREFIX);
     }
 
     private List<Snowflake> toSnowflakeList(Function<SettingsBean, List<String>> mapper) {
-        return Optional.ofNullable(this.bean)
+        return Optional.ofNullable(this.getBean())
                 .map(mapper)
                 .orElse(new ArrayList<>())
                 .stream()
@@ -128,7 +121,7 @@ public class Settings {
     @Override
     public String toString() {
         return "Settings{" +
-                "bean=" + this.bean +
+                "bean=" + this.getBean() +
                 '}';
     }
 }

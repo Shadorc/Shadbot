@@ -5,9 +5,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.HashBasedTable;
+import com.mongodb.MongoClientSettings;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.codec.LongCodec;
+import com.shadorc.shadbot.db.codec.SnowflakeCodec;
 import com.shadorc.shadbot.exception.CommandException;
 import discord4j.core.object.entity.Member;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.json.JsonWriterSettings;
 import reactor.util.annotation.Nullable;
 
 import javax.management.*;
@@ -18,6 +24,14 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public final class Utils {
+
+    public static final JsonWriterSettings JSON_WRITER_SETTINGS = JsonWriterSettings.builder()
+            .int64Converter((value, writer) -> writer.writeNumber(value.toString()))
+            .build();
+
+    public static final CodecRegistry CODEC_REGISTRY = CodecRegistries.fromRegistries(
+            MongoClientSettings.getDefaultCodecRegistry(),
+            CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec()));
 
     public static final ObjectMapper MAPPER = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -107,7 +121,8 @@ public final class Utils {
     /**
      * @param map        - the map to sort
      * @param comparator - a {@link Comparator} to be used to compare stream elements
-     * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code comparator}
+     * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code
+     * comparator}
      */
     public static <K, V> Map<K, V> sortByValue(Map<K, V> map, Comparator<? super Entry<K, V>> comparator) {
         return map.entrySet()

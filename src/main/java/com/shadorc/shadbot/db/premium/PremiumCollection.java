@@ -11,7 +11,6 @@ import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 import org.bson.Document;
-import org.bson.json.JsonWriterSettings;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -24,10 +23,6 @@ import java.util.stream.Collectors;
 public final class PremiumCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.premium");
-
-    private static final JsonWriterSettings SETTINGS = JsonWriterSettings.builder()
-            .int64Converter((value, writer) -> writer.writeNumber(value.toString()))
-            .build();
 
     public PremiumCollection(MongoDatabase database) {
         super(database.getCollection("premium"));
@@ -46,7 +41,7 @@ public final class PremiumCollection extends DatabaseCollection {
         } else {
             LOGGER.debug("[Relic {}] Found.", relicId);
             return Optional.of(document)
-                    .map(doc -> doc.toJson(SETTINGS))
+                    .map(doc -> doc.toJson(Utils.JSON_WRITER_SETTINGS))
                     .map(json -> {
                         try {
                             return Utils.MAPPER.readValue(json, RelicBean.class);
@@ -73,7 +68,7 @@ public final class PremiumCollection extends DatabaseCollection {
                 .find(Filters.eq(key, id.asString()))
                 .iterator())
                 .stream()
-                .map(doc -> doc.toJson(SETTINGS))
+                .map(doc -> doc.toJson(Utils.JSON_WRITER_SETTINGS))
                 .map(json -> {
                     try {
                         return Utils.MAPPER.readValue(json, RelicBean.class);

@@ -1,16 +1,14 @@
 package com.shadorc.shadbot.db.premium.entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.utils.TimeUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
-import org.bson.Document;
 import reactor.util.annotation.Nullable;
 
 import java.time.Duration;
@@ -20,42 +18,40 @@ import java.util.UUID;
 
 import static com.shadorc.shadbot.db.premium.PremiumCollection.LOGGER;
 
-public class Relic implements DatabaseEntity {
-
-    private final RelicBean bean;
+public class Relic extends SerializableEntity<RelicBean> implements DatabaseEntity {
 
     public Relic(RelicBean bean) {
-        this.bean = bean;
+        super(bean);
     }
 
     public Relic(UUID id, RelicType type, Duration duration) {
-        this.bean = new RelicBean(id.toString(), type.toString(), duration.toMillis(), null, null, null);
+        super(new RelicBean(id.toString(), type.toString(), duration.toMillis(), null, null, null));
     }
 
     public String getId() {
-        return this.bean.getId();
+        return this.getBean().getId();
     }
 
     public RelicType getType() {
-        return RelicType.valueOf(this.bean.getType());
+        return RelicType.valueOf(this.getBean().getType());
     }
 
     public Duration getDuration() {
-        return Duration.ofMillis(this.bean.getDuration());
+        return Duration.ofMillis(this.getBean().getDuration());
     }
 
     public Optional<Instant> getActivation() {
-        return Optional.ofNullable(this.bean.getActivation())
+        return Optional.ofNullable(this.getBean().getActivation())
                 .map(Instant::ofEpochMilli);
     }
 
     public Optional<Snowflake> getUserId() {
-        return Optional.ofNullable(this.bean.getUserId())
+        return Optional.ofNullable(this.getBean().getUserId())
                 .map(Snowflake::of);
     }
 
     public Optional<Snowflake> getGuildId() {
-        return Optional.ofNullable(this.bean.getGuildId())
+        return Optional.ofNullable(this.getBean().getGuildId())
                 .map(Snowflake::of);
     }
 
@@ -82,13 +78,9 @@ public class Relic implements DatabaseEntity {
     public void insert() {
         LOGGER.debug("[Relic {}] Insertion", this.getId());
 
-        try {
-            DatabaseManager.getPremium()
-                    .getCollection()
-                    .insertOne(this.toDocument());
-        } catch (final JsonProcessingException err) {
-            throw new RuntimeException(err);
-        }
+        DatabaseManager.getPremium()
+                .getCollection()
+                .insertOne(this.toDocument());
     }
 
     @Override
@@ -101,14 +93,9 @@ public class Relic implements DatabaseEntity {
     }
 
     @Override
-    public Document toDocument() throws JsonProcessingException {
-        return Document.parse(Utils.MAPPER.writeValueAsString(this.bean));
-    }
-
-    @Override
     public String toString() {
         return "Relic{" +
-                "bean=" + this.bean +
+                "bean=" + this.getBean() +
                 '}';
     }
 }

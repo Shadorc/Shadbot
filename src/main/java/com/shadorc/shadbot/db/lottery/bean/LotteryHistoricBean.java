@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.db.lottery.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.shadorc.shadbot.db.Bean;
 
-public class LotteryHistoricBean {
+public class LotteryHistoricBean implements Bean {
 
     @JsonProperty("jackpot")
     private long jackpot;

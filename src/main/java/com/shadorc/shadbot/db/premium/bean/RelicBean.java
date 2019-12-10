@@ -1,9 +1,10 @@
 package com.shadorc.shadbot.db.premium.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.shadorc.shadbot.db.Bean;
 import reactor.util.annotation.Nullable;
 
-public class RelicBean {
+public class RelicBean implements Bean {
 
     @JsonProperty("_id")
     private String id;
