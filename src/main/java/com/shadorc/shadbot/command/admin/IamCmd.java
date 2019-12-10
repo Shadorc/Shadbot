@@ -17,6 +17,7 @@ import com.shadorc.shadbot.object.message.ReactionMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
@@ -79,24 +80,25 @@ public class IamCmd extends BaseCmd {
 
                             return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
                                     .send(embedConsumer)
-                                    .doOnNext(message -> {
+                                    .flatMap(message -> {
                                         final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
 
                                         // Converts the new message to an IamBean
-                                        final List<IamBean> setting = roles.stream()
+                                        final List<IamBean> iamList = roles.stream()
                                                 .map(Role::getId)
                                                 .map(roleId -> new Iam(message.getId(), roleId))
                                                 .map(Iam::getBean)
                                                 .collect(Collectors.toList());
 
                                         // Add previous Iam to the new one
-                                        setting.addAll(dbGuild.getSettings()
+                                        iamList.addAll(dbGuild.getSettings()
                                                 .getIam()
                                                 .stream()
                                                 .map(Iam::getBean)
                                                 .collect(Collectors.toList()));
 
-                                        dbGuild.setSetting(Setting.IAM_MESSAGES, setting);
+                                        return Mono.fromCallable(() -> Utils.MAPPER.writeValueAsString(iamList))
+                                                .doOnNext(setting -> dbGuild.setSetting(Setting.IAM_MESSAGES, setting));
                                     });
                         }))
                 .then();

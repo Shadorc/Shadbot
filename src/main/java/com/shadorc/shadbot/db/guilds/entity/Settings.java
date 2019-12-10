@@ -76,7 +76,8 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getIam)
                 .orElse(new ArrayList<>())
-                .stream().map(Iam::new)
+                .stream()
+                .map(Iam::new)
                 .collect(Collectors.toList());
     }
 
