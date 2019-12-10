@@ -6,6 +6,7 @@ import com.mongodb.client.model.Updates;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import discord4j.core.object.util.Snowflake;
 
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;
 
-public class DBGuild extends DatabaseEntity<DBGuildBean> {
+public class DBGuild extends SerializableEntity<DBGuildBean> implements DatabaseEntity {
 
     public DBGuild(DBGuildBean bean) {
         super(bean);
@@ -44,6 +45,9 @@ public class DBGuild extends DatabaseEntity<DBGuildBean> {
         return new Settings(this.getBean().getSettingsBean());
     }
 
+    /**
+     * @Note: {@code value} must be serializable or serialized.
+     */
     public <T> void setSetting(Setting setting, T value) {
         LOGGER.debug("[DBGuild {}] Updating setting {}: {}", this.getId().asLong(), setting, value);
 

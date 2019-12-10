@@ -5,12 +5,13 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import discord4j.core.object.util.Snowflake;
 
 import static com.shadorc.shadbot.db.lottery.LotteryCollection.LOGGER;
 
-public class LotteryGambler extends DatabaseEntity<LotteryGamblerBean> {
+public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> implements DatabaseEntity {
 
     public LotteryGambler(LotteryGamblerBean bean) {
         super(bean);

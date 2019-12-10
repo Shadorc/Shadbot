@@ -6,13 +6,14 @@ import com.mongodb.client.model.Updates;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.DBMemberBean;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.object.util.Snowflake;
 
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;
 
-public class DBMember extends DatabaseEntity<DBMemberBean> {
+public class DBMember extends SerializableEntity<DBMemberBean> implements DatabaseEntity {
 
     private final String guildId;
 

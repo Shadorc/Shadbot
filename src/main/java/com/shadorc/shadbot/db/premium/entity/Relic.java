@@ -4,6 +4,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.utils.TimeUtils;
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 import static com.shadorc.shadbot.db.premium.PremiumCollection.LOGGER;
 
-public class Relic extends DatabaseEntity<RelicBean> {
+public class Relic extends SerializableEntity<RelicBean> implements DatabaseEntity {
 
     public Relic(RelicBean bean) {
         super(bean);

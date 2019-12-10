@@ -4,11 +4,12 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
 
 import static com.shadorc.shadbot.db.premium.PremiumCollection.LOGGER;
 
-public class LotteryHistoric extends DatabaseEntity<LotteryHistoricBean> {
+public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> implements DatabaseEntity {
 
     public LotteryHistoric(LotteryHistoricBean bean) {
         super(bean);
