@@ -109,7 +109,7 @@ public class OverwatchCmd extends BaseCmd {
                 .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")), true)
                 .addArg("username", "case sensitive", false)
                 .addField("Info", "**platform** is automatically detected if nothing is specified.", false)
-                .setExample(String.format("%s%s pc Shadorc#2503", context.getPrefix(), context.getCommandName()))
+                .setExample(String.format("%s%s pc Shadorc#2503", context.getPrefix(), this.getName()))
                 .build();
     }
 
