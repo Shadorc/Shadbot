@@ -8,7 +8,9 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.BufferedReader;
@@ -18,6 +20,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class DatabaseCmd extends BaseCmd {
+
+    private final static int MAX_WIDTH = Message.MAX_CONTENT_LENGTH * 3 / 4;
 
     public DatabaseCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("database"), "db");
@@ -42,7 +46,7 @@ public class DatabaseCmd extends BaseCmd {
         }
 
         return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(StringUtils.abbreviate(strBuilder.toString(), MAX_WIDTH), channel))
                 .then();
     }
 
