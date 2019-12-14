@@ -29,7 +29,7 @@ public class SettingsBean implements Bean {
     @JsonProperty("default_volume")
     private Integer defaultVolume;
     @Nullable
-    @JsonProperty("iam")
+    @JsonProperty("iam_messages")
     private List<IamBean> iam;
     @Nullable
     @JsonProperty("join_message")

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.HashBasedTable;
 import com.mongodb.MongoClientSettings;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.codec.IamCodec;
 import com.shadorc.shadbot.db.codec.LongCodec;
 import com.shadorc.shadbot.db.codec.SnowflakeCodec;
 import com.shadorc.shadbot.exception.CommandException;
@@ -31,7 +32,7 @@ public final class Utils {
 
     public static final CodecRegistry CODEC_REGISTRY = CodecRegistries.fromRegistries(
             MongoClientSettings.getDefaultCodecRegistry(),
-            CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec()));
+            CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec(), new IamCodec()));
 
     public static final ObjectMapper MAPPER = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

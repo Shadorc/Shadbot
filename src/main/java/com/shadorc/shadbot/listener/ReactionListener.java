@@ -84,7 +84,8 @@ public class ReactionListener {
                                 if (!hasHigherRoles) {
                                     return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
                                             .send(String.format(Emoji.ACCESS_DENIED +
-                                                            " I can't add/remove role `%s` because I'm lower in the role hierarchy than this role.",
+                                                            " I can't add/remove role `%s` because I'm lower or " +
+                                                            "at the same level in the role hierarchy than this role.",
                                                     role.getName()))
                                             .thenReturn(false);
                                 }
