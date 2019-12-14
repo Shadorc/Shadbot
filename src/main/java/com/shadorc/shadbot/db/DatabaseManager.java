@@ -10,7 +10,7 @@ import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
 import com.shadorc.shadbot.utils.Utils;
 
-public class DatabaseManager {
+public final class DatabaseManager {
 
     private static DatabaseManager instance;
 

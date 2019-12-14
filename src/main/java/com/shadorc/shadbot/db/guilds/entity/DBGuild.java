@@ -55,7 +55,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
-                        Updates.set(String.format("settings.%s", setting.toString()), value),
+                        Updates.set(String.format("settings.%s", setting), value),
                         new UpdateOptions().upsert(true));
     }
 
@@ -66,7 +66,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
-                        Updates.unset(String.format("settings.%s", setting.toString())));
+                        Updates.unset(String.format("settings.%s", setting)));
     }
 
     @Override

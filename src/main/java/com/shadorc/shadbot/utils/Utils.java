@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.collect.HashBasedTable;
 import com.mongodb.MongoClientSettings;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.codec.IamCodec;
@@ -134,20 +133,6 @@ public final class Utils {
                         Map.Entry::getValue,
                         (value1, value2) -> value1,
                         LinkedHashMap::new));
-    }
-
-    /**
-     * @param map - the {@link Map} to convert
-     * @return A {@link HashBasedTable} based on {@code map}
-     */
-    public static <R, C, V> HashBasedTable<R, C, V> toTable(Map<R, Map<C, V>> map) {
-        final HashBasedTable<R, C, V> table = HashBasedTable.create();
-        for (final Entry<R, Map<C, V>> rowEntry : map.entrySet()) {
-            for (final Entry<C, V> columnEntry : rowEntry.getValue().entrySet()) {
-                table.put(rowEntry.getKey(), columnEntry.getKey(), columnEntry.getValue());
-            }
-        }
-        return table;
     }
 
     /**
