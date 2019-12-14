@@ -42,16 +42,22 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
     public void addCoins(long gains) {
         final long coins = NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
+        // The user has already exceeded the maximum number of coins, no need to update him
+        if(coins == Config.MAX_COINS) {
+            return;
+        }
+
         LOGGER.debug("[DBMember {} / {}] Updating coins {}", this.getId().asLong(), this.getGuildId().asLong(), coins);
 
-        final long modifiedCount = DatabaseManager.getGuilds()
+        final long matchedCount = DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.eq("members._id", this.getId().asString()),
                         Updates.set("members.$.coins", coins))
-                .getModifiedCount();
+                .getMatchedCount();
 
-        if (modifiedCount == 0) {
+        // Member was not find, insert it
+        if (matchedCount == 0) {
             DatabaseManager.getGuilds()
                     .getCollection()
                     .updateOne(Filters.eq("_id", this.getGuildId().asString()),
