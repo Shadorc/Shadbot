@@ -43,7 +43,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
         final long coins = NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
         // The user has already exceeded the maximum number of coins, no need to update him
-        if(coins == Config.MAX_COINS) {
+        if (coins == Config.MAX_COINS) {
             return;
         }
 
