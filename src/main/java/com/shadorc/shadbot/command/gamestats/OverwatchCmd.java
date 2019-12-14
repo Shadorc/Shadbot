@@ -24,6 +24,8 @@ import java.util.function.Consumer;
 
 public class OverwatchCmd extends BaseCmd {
 
+    private static final String HOME_URL = "https://owapi.io";
+
     private enum Platform {
         PC, PSN, XBL;
     }
@@ -99,7 +101,7 @@ public class OverwatchCmd extends BaseCmd {
     }
 
     private static String getUrl(String endpoint, Platform platform, String username) {
-        return String.format("http://overwatchy.com/%s/%s/global/%s", endpoint, platform.toString().toLowerCase(), username);
+        return String.format("%s/%s/%s/global/%s", HOME_URL, endpoint, platform.toString().toLowerCase(), username);
     }
 
     @Override
