@@ -45,6 +45,7 @@ public class GifCmd extends BaseCmd {
                             .andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl())));
                 })
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

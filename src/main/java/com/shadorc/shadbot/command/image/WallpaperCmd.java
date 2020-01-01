@@ -150,6 +150,7 @@ public class WallpaperCmd extends BaseCmd {
                 .onErrorResume(err -> "Must be NSFW".equals(err.getMessage()),
                         err -> Mono.just(updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()))))
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

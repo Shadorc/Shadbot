@@ -85,6 +85,7 @@ public class FortniteCmd extends BaseCmd {
                                                 " Please make sure your spelling is correct, or follow this guide if you play on Console: <https://fortnitetracker.com/profile/search>",
                                         context.getUsername()))))
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

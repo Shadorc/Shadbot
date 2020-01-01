@@ -92,6 +92,7 @@ public class PruneCmd extends BaseCmd {
                                 context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
                 .map(updatableMsg::setContent)
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

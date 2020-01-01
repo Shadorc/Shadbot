@@ -71,6 +71,7 @@ public class OverwatchCmd extends BaseCmd {
                                     .addField("Top hero (Eliminations per life)", topHeroes.getEliminationsPerLife(), true)));
                 })
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

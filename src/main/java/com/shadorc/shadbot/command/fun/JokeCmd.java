@@ -36,6 +36,7 @@ public class JokeCmd extends BaseCmd {
                         .andThen(embed -> embed.setAuthor("Joke", HOME_URL, context.getAvatarUrl())
                                 .setDescription(response.getJoke()))))
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

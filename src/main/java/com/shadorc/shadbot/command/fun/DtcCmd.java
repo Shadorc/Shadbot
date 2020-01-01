@@ -56,6 +56,7 @@ public class DtcCmd extends BaseCmd {
                                     .setDescription(FormatUtils.format(content.split("\n"), DtcCmd::format, "\n"))));
                 })
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

@@ -100,6 +100,7 @@ public class CounterStrikeCmd extends BaseCmd {
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.",
                                 context.getUsername())))))
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

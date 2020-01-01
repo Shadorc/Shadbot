@@ -72,6 +72,7 @@ public class WikiCmd extends BaseCmd {
                                     .setDescription(extract)));
                 })
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

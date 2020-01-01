@@ -77,6 +77,7 @@ public class LyricsCmd extends BaseCmd {
                 .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
                         context.getUsername(), search)))))
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

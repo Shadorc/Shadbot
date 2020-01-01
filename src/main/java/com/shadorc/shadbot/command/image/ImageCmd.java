@@ -61,6 +61,7 @@ public class ImageCmd extends BaseCmd {
                                     .setImage(image.getContent().map(Content::getSource).get())));
                 })
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

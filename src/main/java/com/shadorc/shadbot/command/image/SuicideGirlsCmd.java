@@ -51,6 +51,7 @@ public class SuicideGirlsCmd extends BaseCmd {
                             });
                 })
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 

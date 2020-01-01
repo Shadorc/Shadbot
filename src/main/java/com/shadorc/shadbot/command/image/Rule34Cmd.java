@@ -81,6 +81,7 @@ public class Rule34Cmd extends BaseCmd {
                             });
                 })
                 .flatMap(UpdatableMessage::send)
+                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 
