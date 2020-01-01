@@ -83,13 +83,17 @@ public class TranslateCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading translation...", context.getUsername()))
                 .send()
                 .then(NetUtils.get(url))
-                .map(JSONArray::new)
-                .map(result -> {
-                    if (langFrom == null || langTo == null || !(result.get(0) instanceof JSONArray)) {
+                .map(body -> {
+                    if (langFrom == null || langTo == null
+                            // The body is an error 400 if one of the specified language exists but is not supported
+                            // by Google translator
+                            || !body.startsWith("[")
+                            || !(new JSONArray(body).get(0) instanceof JSONArray)) {
                         throw new CommandException(String.format("One of the specified language isn't supported. "
                                 + "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
                     }
 
+                    final JSONArray result = new JSONArray(body);
                     final StringBuilder translatedText = new StringBuilder();
                     final JSONArray translations = result.getJSONArray(0);
                     for (int i = 0; i < translations.length(); i++) {
