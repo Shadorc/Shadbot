@@ -14,9 +14,12 @@ import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TrackEventListener extends AudioEventAdapter {
+
+    private static final AtomicBoolean WARNING_SENT = new AtomicBoolean(false);
 
     private final Snowflake guildId;
     private final AtomicInteger errorCount;
@@ -60,7 +63,8 @@ public class TrackEventListener extends AudioEventAdapter {
                     LogUtils.info("{Guild ID: %d} %sTrack exception: %s", this.guildId.asLong(),
                             this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
 
-                    if (this.isRateLimitException(exception)) {
+                    if (!WARNING_SENT.get() && this.isRateLimitException(exception)) {
+                        WARNING_SENT.set(true);
                         LogUtils.warn(guildMusic.getClient(), "YouTube is rate limited, IP rotation needed.");
                     }
 
