@@ -109,7 +109,7 @@
             <dependency>
                 <groupId>com.discord4j</groupId>
                 <artifactId>bom</artifactId>
-                <version>3.0.11</version>
+                <version>3.0.12</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -169,7 +169,7 @@
         <dependency>
             <groupId>com.github.vladimir-bukhtoyarov</groupId>
             <artifactId>bucket4j-core</artifactId>
-            <version>4.6.0</version>
+            <version>4.7.0</version>
         </dependency>
         <dependency>
             <groupId>com.fathzer</groupId>
