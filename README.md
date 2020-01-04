@@ -41,7 +41,7 @@
     <br>8. Open command prompt and run <code>java -jar shadbot-&lt;VERSION&gt;.jar</code>.
     <br>9. You're done!
     <h2>Licence</h2>
-    <p>Copyright (C) 2019 <b>Shadorc</b>
+    <p>Copyright (C) 2020 <b>Shadorc</b>
         <pre>
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
