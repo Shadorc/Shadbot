@@ -104,7 +104,7 @@ public class IamCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription(String.format("Send a message with a reaction, users will be able to get the role(s) "
                         + "associated with the message by clicking on %s", REACTION.getRaw()))
                 .addArg("@role(s)", false)

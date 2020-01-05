@@ -4,18 +4,19 @@ import discord4j.core.event.domain.lifecycle.*;
 import discord4j.gateway.retry.GatewayStateChange;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
+import reactor.util.Loggers;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GatewayLifecycleListener implements EventListener<GatewayLifecycleEvent> {
 
-    private final Logger logger;
+    private static final Logger LOGGER = Loggers.getLogger(GatewayLifecycleListener.class);
+
     private final AtomicBoolean isFullyReady;
     private volatile GatewayStateChange.State state;
 
-    public GatewayLifecycleListener(Logger logger, AtomicBoolean isFullyReady) {
-        this.logger = logger;
-        this.isFullyReady = isFullyReady;
+    public GatewayLifecycleListener() {
+        this.isFullyReady = new AtomicBoolean(true);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class GatewayLifecycleListener implements EventListener<GatewayLifecycleE
 
             this.isFullyReady.set(this.state == GatewayStateChange.State.RETRY_SUCCEEDED);
 
-            this.logger.info("New event: {} / fully ready: {}.",
+            LOGGER.info("New event: {} / fully ready: {}.",
                     event.getClass().getSimpleName(), this.isFullyReady.get());
         });
     }

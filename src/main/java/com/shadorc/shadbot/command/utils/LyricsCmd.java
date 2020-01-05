@@ -16,7 +16,7 @@ import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpMethod;
 import org.apache.http.HttpStatus;
@@ -99,7 +99,7 @@ public class LyricsCmd extends BaseCmd {
                 });
     }
 
-    private Mono<Document> getLyricsDocument(DiscordClient client, String url) {
+    private Mono<Document> getLyricsDocument(GatewayDiscordClient client, String url) {
         // Sometimes Musixmatch redirects to a wrong page
         // If the response URL and the requested URL are different, retry
         return NetUtils.request(HttpMethod.GET, url)
@@ -134,7 +134,7 @@ public class LyricsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show lyrics for a song."
                         + "\nCan also be used without argument when a music is being played to find corresponding lyrics.")
                 .addArg("search", true)

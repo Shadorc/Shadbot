@@ -9,10 +9,15 @@ import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Channel.Type;
-import discord4j.core.object.entity.*;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Flux;
@@ -67,7 +72,7 @@ public class Context {
         return this.getMessage().getChannelId();
     }
 
-    public DiscordClient getClient() {
+    public GatewayDiscordClient getClient() {
         return this.event.getClient();
     }
 
@@ -104,7 +109,7 @@ public class Context {
         // The member is an administrator or it's a private message
         final Mono<CommandPermission> adminPerm = this.getChannel()
                 .filterWhen(channel -> DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR)
-                        .map(isAdmin -> isAdmin || channel.getType() == Type.DM))
+                        .map(isAdmin -> isAdmin || channel.getType() == Channel.Type.DM))
                 .map(ignored -> CommandPermission.ADMIN);
 
         return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER));
@@ -118,20 +123,20 @@ public class Context {
         return this.getClient().getSelf();
     }
 
+    public Snowflake getSelfId() {
+        return Shadbot.getSelfId();
+    }
+
     public Mono<Member> getSelfAsMember() {
         return this.getSelf().flatMap(self -> self.asMember(this.getGuildId()));
     }
 
-    public Snowflake getSelfId() {
-        return this.getClient().getSelfId().orElseThrow();
-    }
-
     public int getShardCount() {
-        return this.getClient().getConfig().getShardCount();
+        return this.getEvent().getShardInfo().getCount();
     }
 
     public int getShardIndex() {
-        return this.getClient().getConfig().getShardIndex();
+        return this.getEvent().getShardInfo().getIndex();
     }
 
     public String getUsername() {

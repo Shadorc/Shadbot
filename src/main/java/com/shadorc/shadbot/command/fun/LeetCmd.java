@@ -48,7 +48,7 @@ public class LeetCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Leetify a text.")
                 .addArg("text", false)
                 .build();

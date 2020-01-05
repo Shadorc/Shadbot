@@ -53,7 +53,7 @@ public class DatabaseCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Evaluate a query with the MongoDB shell.")
                 .addArg("query", false)
                 .build();

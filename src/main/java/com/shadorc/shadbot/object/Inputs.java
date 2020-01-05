@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.object;
 
 import com.shadorc.shadbot.utils.ExceptionHandler;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -10,10 +10,10 @@ import java.time.Duration;
 
 public abstract class Inputs {
 
-    private final DiscordClient client;
+    private final GatewayDiscordClient client;
     private final Duration timeout;
 
-    protected Inputs(DiscordClient client, Duration timeout) {
+    protected Inputs(GatewayDiscordClient client, Duration timeout) {
         this.client = client;
         this.timeout = timeout;
     }

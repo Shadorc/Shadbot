@@ -1,9 +1,9 @@
 package com.shadorc.shadbot.object.message;
 
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Snowflake;
@@ -17,11 +17,11 @@ import java.util.function.Consumer;
 
 public class ReactionMessage {
 
-    private final DiscordClient client;
+    private final GatewayDiscordClient client;
     private final Snowflake channelId;
     private final Collection<ReactionEmoji> reactions;
 
-    public ReactionMessage(DiscordClient client, Snowflake channelId,
+    public ReactionMessage(GatewayDiscordClient client, Snowflake channelId,
                            Collection<ReactionEmoji> reactions) {
         this.client = client;
         this.channelId = channelId;

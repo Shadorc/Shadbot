@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.gamestats;
 
-import com.shadorc.shadbot.api.gamestats.fortnite.FortniteResponse;
-import com.shadorc.shadbot.api.gamestats.fortnite.Stats;
+import com.shadorc.shadbot.api.json.gamestats.fortnite.FortniteResponse;
+import com.shadorc.shadbot.api.json.gamestats.fortnite.Stats;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -91,7 +91,7 @@ public class FortniteCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show player's stats for Fortnite.")
                 .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")),
                         false)

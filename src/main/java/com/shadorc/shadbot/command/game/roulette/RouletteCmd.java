@@ -65,7 +65,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Play a roulette game in which everyone can participate.")
                 .addArg("bet", false)
                 .addArg("place", String.format("number between 1 and 36, %s", FormatUtils.format(Place.class, ", ")), false)

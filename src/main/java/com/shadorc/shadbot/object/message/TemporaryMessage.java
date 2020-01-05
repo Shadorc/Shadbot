@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.object.message;
 
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -11,7 +11,7 @@ import java.time.Duration;
 
 public class TemporaryMessage {
 
-    private final DiscordClient client;
+    private final GatewayDiscordClient client;
     private final Snowflake channelId;
     private final Duration duration;
 
@@ -20,7 +20,7 @@ public class TemporaryMessage {
      * @param channelId - the Channel ID in which to send the message
      * @param duration  - the delay to wait before deleting the message
      */
-    public TemporaryMessage(DiscordClient client, Snowflake channelId, Duration duration) {
+    public TemporaryMessage(GatewayDiscordClient client, Snowflake channelId, Duration duration) {
         this.client = client;
         this.channelId = channelId;
         this.duration = duration;

@@ -101,7 +101,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Start a dice game with a common bet.")
                 .addArg("num", "number between 1 and 6\nYou can't bet on a number that has already been chosen by another player.", false)
                 .addArg("bet", false)

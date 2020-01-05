@@ -7,7 +7,7 @@ import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.exception.MissingPermissionException;
 import com.shadorc.shadbot.exception.NoMusicException;
 import com.shadorc.shadbot.object.Emoji;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -87,7 +87,7 @@ public final class ExceptionHandler {
                                         context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
     }
 
-    public static void handleUnknownError(DiscordClient client, Throwable err) {
+    public static void handleUnknownError(GatewayDiscordClient client, Throwable err) {
         LogUtils.error(client, err, "An unknown error occurred.");
     }
 

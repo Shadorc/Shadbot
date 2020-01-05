@@ -124,7 +124,7 @@ public class TranslateCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Translate a text from a language to another.")
                 .addArg("fromLang", "source language, by leaving it blank the language will be automatically detected", true)
                 .addArg("toLang", "destination language", false)

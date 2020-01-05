@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.fun;
 
-import com.shadorc.shadbot.api.pandorabots.ChatBotResponse;
+import com.shadorc.shadbot.api.json.pandorabots.ChatBotResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -76,7 +76,7 @@ public class ChatCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Chat with an artificial intelligence.")
                 .addArg("message", String.format("must not exceed %d characters", MAX_CHARACTERS), false)
                 .setSource("https://www.pandorabots.com/"

@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.game.trivia;
 
-import com.shadorc.shadbot.api.trivia.TriviaResponse;
-import com.shadorc.shadbot.api.trivia.TriviaResult;
+import com.shadorc.shadbot.api.json.trivia.TriviaResponse;
+import com.shadorc.shadbot.api.json.trivia.TriviaResult;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;

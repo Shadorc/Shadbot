@@ -129,7 +129,7 @@ public class PollCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Create a poll.")
                 .addArg("duration", false)
                 .addArg("\"question\"", false)

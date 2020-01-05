@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.command.gamestats;
 
-import com.shadorc.shadbot.api.TokenResponse;
-import com.shadorc.shadbot.api.gamestats.diablo.hero.HeroResponse;
-import com.shadorc.shadbot.api.gamestats.diablo.profile.ProfileResponse;
+import com.shadorc.shadbot.api.json.TokenResponse;
+import com.shadorc.shadbot.api.json.gamestats.diablo.hero.HeroResponse;
+import com.shadorc.shadbot.api.json.gamestats.diablo.profile.ProfileResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -119,7 +119,7 @@ public class DiabloCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show player's stats for Diablo 3.")
                 .addArg("region", String.format("user's region (%s)", FormatUtils.format(Region.class, ", ")), false)
                 .addArg("battletag#0000", false)

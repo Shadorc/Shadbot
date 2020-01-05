@@ -5,7 +5,7 @@ import com.shadorc.shadbot.object.message.TemporaryMessage;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TextUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
@@ -48,7 +48,7 @@ public class RateLimiter {
         return false;
     }
 
-    private void sendWarningMessage(DiscordClient client, Snowflake channelId, Snowflake userId) {
+    private void sendWarningMessage(GatewayDiscordClient client, Snowflake channelId, Snowflake userId) {
         client.getUserById(userId)
                 .map(author -> {
                     final String username = author.getUsername();

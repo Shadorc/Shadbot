@@ -24,8 +24,12 @@ public class LogBuilder {
     @Nullable
     private String input;
 
-    public LogBuilder(LogType type) {
+    private LogBuilder(LogType type) {
         this.type = type;
+    }
+
+    public static LogBuilder create(LogType type) {
+        return new LogBuilder(type);
     }
 
     public LogBuilder setMessage(String message) {
@@ -46,10 +50,12 @@ public class LogBuilder {
     public Consumer<EmbedCreateSpec> build() {
         return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
-                    embed.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeEnum(this.type), Config.VERSION), null, null);
+                    embed.setAuthor(String.format("%s (Version: %s)", StringUtils.capitalizeEnum(this.type),
+                            Config.VERSION), null, null);
 
                     if (this.message != null && !this.message.isBlank()) {
-                        embed.setDescription(org.apache.commons.lang3.StringUtils.abbreviate(this.message, Embed.MAX_DESCRIPTION_LENGTH));
+                        embed.setDescription(org.apache.commons.lang3.StringUtils.abbreviate(this.message,
+                                Embed.MAX_DESCRIPTION_LENGTH));
                     }
 
                     switch (this.type) {
@@ -70,12 +76,14 @@ public class LogBuilder {
                     if (this.error != null) {
                         embed.addField("Error type", this.error.getClass().getSimpleName(), false);
                         if (this.error.getMessage() != null && !this.error.getMessage().isBlank()) {
-                            embed.addField("Error message", org.apache.commons.lang3.StringUtils.abbreviate(this.error.getMessage(), Embed.Field.MAX_VALUE_LENGTH), false);
+                            embed.addField("Error message", org.apache.commons.lang3.StringUtils.abbreviate(
+                                    this.error.getMessage(), Embed.Field.MAX_VALUE_LENGTH), false);
                         }
                     }
 
                     if (this.input != null && !this.input.isBlank()) {
-                        embed.addField("Input", org.apache.commons.lang3.StringUtils.abbreviate(this.input, Embed.Field.MAX_VALUE_LENGTH), false);
+                        embed.addField("Input", org.apache.commons.lang3.StringUtils.abbreviate(
+                                this.input, Embed.Field.MAX_VALUE_LENGTH), false);
                     }
                 });
     }

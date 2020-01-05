@@ -84,7 +84,7 @@ public class TransferCoinsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Transfer coins to the mentioned user.")
                 .addArg("coins", false)
                 .addArg("@user", false)

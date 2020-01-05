@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.game.trivia;
 
-import com.shadorc.shadbot.api.trivia.category.TriviaCategoriesResponse;
+import com.shadorc.shadbot.api.json.trivia.category.TriviaCategoriesResponse;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.exception.CommandException;
@@ -78,7 +78,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Start a Trivia game in which everyone can participate.")
                 .addArg("categoryID", "the category ID of the question", true)
                 .addField("Category", String.format("Use `%s%s categories` to see the list of categories",

@@ -1,13 +1,13 @@
 package com.shadorc.shadbot.command.gamestats;
 
-import com.shadorc.shadbot.api.gamestats.steam.player.PlayerSummaries;
-import com.shadorc.shadbot.api.gamestats.steam.player.PlayerSummariesResponse;
-import com.shadorc.shadbot.api.gamestats.steam.player.PlayerSummary;
-import com.shadorc.shadbot.api.gamestats.steam.resolver.ResolveVanityUrlResponse;
-import com.shadorc.shadbot.api.gamestats.steam.resolver.Response;
-import com.shadorc.shadbot.api.gamestats.steam.stats.PlayerStats;
-import com.shadorc.shadbot.api.gamestats.steam.stats.Stats;
-import com.shadorc.shadbot.api.gamestats.steam.stats.UserStatsForGameResponse;
+import com.shadorc.shadbot.api.json.gamestats.steam.player.PlayerSummaries;
+import com.shadorc.shadbot.api.json.gamestats.steam.player.PlayerSummariesResponse;
+import com.shadorc.shadbot.api.json.gamestats.steam.player.PlayerSummary;
+import com.shadorc.shadbot.api.json.gamestats.steam.resolver.ResolveVanityUrlResponse;
+import com.shadorc.shadbot.api.json.gamestats.steam.resolver.Response;
+import com.shadorc.shadbot.api.json.gamestats.steam.stats.PlayerStats;
+import com.shadorc.shadbot.api.json.gamestats.steam.stats.Stats;
+import com.shadorc.shadbot.api.json.gamestats.steam.stats.UserStatsForGameResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -139,7 +139,7 @@ public class CounterStrikeCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show player's stats for Counter-Strike: Global Offensive.")
                 .addArg("steamID", "steam ID, custom ID or profile URL", false)
                 .build();

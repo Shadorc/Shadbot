@@ -40,7 +40,7 @@ public class PauseCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Pause current music. Use this command again to resume.")
                 .build();
     }

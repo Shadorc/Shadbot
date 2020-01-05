@@ -131,7 +131,7 @@ public class WeatherCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show weather report for a city.")
                 .setDelimiter(", ")
                 .addArg("city", false)

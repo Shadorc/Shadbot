@@ -98,7 +98,7 @@ public class PlayCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Play the music(s) from the url, search terms or playlist.")
                 .setFullUsage(String.format("%s%s[first] [soundcloud] <url>", context.getPrefix(), this.getName()))
                 .addArg("first", "add the song at the top of the playlist", true)

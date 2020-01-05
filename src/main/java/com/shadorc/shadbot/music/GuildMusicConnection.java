@@ -4,8 +4,8 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.LogUtils;
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.VoiceChannel;
+import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
@@ -26,14 +26,14 @@ public class GuildMusicConnection {
         CONNECTED
     }
 
-    private final DiscordClient client;
+    private final GatewayDiscordClient client;
     private final Snowflake guildId;
 
     private final AtomicReference<State> state;
     private final AtomicReference<VoiceConnection> voiceConnection;
     private final AtomicReference<GuildMusic> guildMusic;
 
-    public GuildMusicConnection(DiscordClient client, Snowflake guildId) {
+    public GuildMusicConnection(GatewayDiscordClient client, Snowflake guildId) {
         this.client = client;
         this.guildId = guildId;
 

@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.command.gamestats;
 
-import com.shadorc.shadbot.api.gamestats.overwatch.profile.ProfileResponse;
-import com.shadorc.shadbot.api.gamestats.overwatch.stats.Quickplay;
-import com.shadorc.shadbot.api.gamestats.overwatch.stats.StatsResponse;
+import com.shadorc.shadbot.api.json.gamestats.overwatch.profile.ProfileResponse;
+import com.shadorc.shadbot.api.json.gamestats.overwatch.stats.Quickplay;
+import com.shadorc.shadbot.api.json.gamestats.overwatch.stats.StatsResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -107,7 +107,7 @@ public class OverwatchCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show player's stats for Overwatch.")
                 .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")), true)
                 .addArg("username", "case sensitive", false)

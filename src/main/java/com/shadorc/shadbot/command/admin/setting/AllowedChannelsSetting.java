@@ -10,8 +10,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.core.object.entity.Channel;
-import discord4j.core.object.entity.Channel.Type;
+import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -52,12 +51,12 @@ public class AllowedChannelsSetting extends BaseSetting {
                     final List<Snowflake> allowedVoiceChannelIds = dbGuild.getSettings().getAllowedVoiceChannelIds();
 
                     final List<Snowflake> mentionedVoiceChannelIds = mentionedChannels.stream()
-                            .filter(channel -> channel.getType() == Type.GUILD_VOICE)
+                            .filter(channel -> channel.getType() == Channel.Type.GUILD_VOICE)
                             .map(Channel::getId)
                             .collect(Collectors.toList());
 
                     final List<Snowflake> mentionedTextChannelIds = mentionedChannels.stream()
-                            .filter(channel -> channel.getType() == Type.GUILD_TEXT)
+                            .filter(channel -> channel.getType() == Channel.Type.GUILD_TEXT)
                             .map(Channel::getId)
                             .collect(Collectors.toList());
 
@@ -71,9 +70,9 @@ public class AllowedChannelsSetting extends BaseSetting {
 
                         for (final Channel channel : mentionedChannels) {
                             final Snowflake channelId = channel.getId();
-                            if (channel.getType() == Type.GUILD_TEXT && !allowedTextChannelIds.contains(channelId)) {
+                            if (channel.getType() == Channel.Type.GUILD_TEXT && !allowedTextChannelIds.contains(channelId)) {
                                 allowedTextChannelIds.add(channelId);
-                            } else if (channel.getType() == Type.GUILD_VOICE && !allowedVoiceChannelIds.contains(channelId)) {
+                            } else if (channel.getType() == Channel.Type.GUILD_VOICE && !allowedVoiceChannelIds.contains(channelId)) {
                                 allowedVoiceChannelIds.add(channelId);
                             }
                         }

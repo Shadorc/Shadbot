@@ -14,8 +14,8 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.GitProperties;
-import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import reactor.core.publisher.Mono;
@@ -36,11 +36,16 @@ public class InfoCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final long uptime = TimeUtils.getMillisUntil(Shadbot.getLaunchTime());
-
         final Runtime runtime = Runtime.getRuntime();
         final long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / MB_UNIT;
         final long maxMemory = runtime.maxMemory() / MB_UNIT;
+
+        final long gatewayLatency = context.getClient().getGatewayClientGroup()
+                .find(context.getEvent().getShardInfo().getIndex()).orElseThrow().getResponseTime().toMillis();
+        final String uptime = DurationFormatUtils.formatDuration(TimeUtils.getMillisUntil(Shadbot.getLaunchTime()),
+                "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true);
+        final long voiceChannelCount = MusicManager.getInstance().getGuildIdsWithVoice().size();
+        final long guildManagerCount = MusicManager.getInstance().getGuildIdsWithGuildMusics().size();
 
         return Mono.zip(context.getClient().getUserById(Shadbot.getOwnerId()),
                 context.getClient().getGuilds().count(),
@@ -66,13 +71,13 @@ public class InfoCmd extends BaseCmd {
                                     + String.format("%nThreads: %s", FormatUtils.number(Thread.activeCount()))
                                     + String.format("%n%n-= Internet =-")
                                     + String.format("%nPing: %dms", TimeUtils.getMillisUntil(start))
-                                    + String.format("%nGateway Latency: %dms", context.getClient().getResponseTime())
+                                    + String.format("%nGateway Latency: %dms", gatewayLatency)
                                     + String.format("%n%n-= Shadbot =-")
-                                    + String.format("%nUptime: %s", DurationFormatUtils.formatDuration(uptime, "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true))
+                                    + String.format("%nUptime: %s", uptime)
                                     + String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
                                     + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
                                     + String.format("%nServers: %s", FormatUtils.number(guildCount))
-                                    + String.format("%nVoice Channels: %d (GM: %d)", MusicManager.getInstance().getGuildIdsWithVoice().size(), MusicManager.getInstance().getGuildIdsWithGuildMusics().size())
+                                    + String.format("%nVoice Channels: %d (GM: %d)", voiceChannelCount, guildManagerCount)
                                     + String.format("%nUnique Users: %s", FormatUtils.number(memberCount))
                                     + "```")));
                 })
@@ -81,7 +86,7 @@ public class InfoCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show Shadbot's info.")
                 .build();
     }

@@ -74,7 +74,7 @@ public class RpsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Play a Rock–paper–scissors game.")
                 .addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)
                 .addField("Gains", String.format("The winner gets **%s** multiplied by his win-streak.",

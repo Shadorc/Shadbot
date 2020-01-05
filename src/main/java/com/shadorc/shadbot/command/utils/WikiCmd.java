@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.utils;
 
-import com.shadorc.shadbot.api.wikipedia.WikipediaPage;
-import com.shadorc.shadbot.api.wikipedia.WikipediaResponse;
+import com.shadorc.shadbot.api.json.wikipedia.WikipediaPage;
+import com.shadorc.shadbot.api.json.wikipedia.WikipediaResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -78,7 +78,7 @@ public class WikiCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show Wikipedia description for a search.")
                 .addArg("search", false)
                 .build();

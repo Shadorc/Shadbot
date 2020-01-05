@@ -15,9 +15,9 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
-import discord4j.core.object.entity.GuildMessageChannel;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.GuildMessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -110,7 +110,7 @@ public class PruneCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Delete messages (include embeds).")
                 .addArg("@user(s)", "from these users", true)
                 .addArg("\"words\"", "containing these words", true)

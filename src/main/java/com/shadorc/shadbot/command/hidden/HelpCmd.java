@@ -10,8 +10,7 @@ import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.object.entity.Channel;
-import discord4j.core.object.entity.Channel.Type;
+import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,7 +49,7 @@ public class HelpCmd extends BaseCmd {
                         .distinct()
                         .filter(cmd -> authorPerms.contains(cmd.getPermission()))
                         .filterWhen(cmd -> context.getChannel().map(Channel::getType)
-                                .map(type -> type == Type.DM || settings.map(it -> it.isCommandAllowed(cmd)).orElse(false)))
+                                .map(type -> type == Channel.Type.DM || settings.map(it -> it.isCommandAllowed(cmd)).orElse(false)))
                         .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
                 .map(map -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
@@ -73,7 +72,7 @@ public class HelpCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show the list of available commands.")
                 .build();
     }

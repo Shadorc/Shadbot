@@ -52,7 +52,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Start or join a blackjack game.")
                 .addArg("bet", false)
                 .addField("Info", "**double down** - increase the initial bet by 100% in exchange for committing to stand"

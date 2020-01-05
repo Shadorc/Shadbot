@@ -61,7 +61,7 @@ public class RepeatCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Toggle song/playlist repetition.")
                 .setUsage("[song/playlist]")
                 .addArg("song/playlist", "repeat the current song/playlist", true)

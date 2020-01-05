@@ -50,7 +50,7 @@ public class LoggerCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Change the level of a logger.")
                 .addArg("name", false)
                 .addArg("level", false)

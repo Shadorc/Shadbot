@@ -18,8 +18,8 @@ import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -167,7 +167,7 @@ public class SettingsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        final HelpBuilder embed = new HelpBuilder(this, context)
+        final HelpBuilder embed = HelpBuilder.create(this, context)
                 .setThumbnail("https://i.imgur.com/QA2PUjM.png")
                 .setDescription("Change Shadbot's settings for this server.")
                 .addArg("name", false)

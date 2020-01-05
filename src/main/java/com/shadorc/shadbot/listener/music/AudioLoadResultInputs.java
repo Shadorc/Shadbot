@@ -10,7 +10,7 @@ import com.shadorc.shadbot.object.Inputs;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 import reactor.core.publisher.Mono;
@@ -23,7 +23,7 @@ public class AudioLoadResultInputs extends Inputs {
 
     private final AudioLoadResultListener listener;
 
-    public AudioLoadResultInputs(DiscordClient client, Duration timeout, AudioLoadResultListener listener) {
+    public AudioLoadResultInputs(GatewayDiscordClient client, Duration timeout, AudioLoadResultListener listener) {
         super(client, timeout);
         this.listener = listener;
     }

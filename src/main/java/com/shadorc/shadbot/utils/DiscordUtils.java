@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.utils;
 
+import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
@@ -7,7 +8,14 @@ import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingPermissionException;
 import com.shadorc.shadbot.object.Emoji;
 import discord4j.core.object.VoiceState;
-import discord4j.core.object.entity.*;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.GuildChannel;
+import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.object.entity.channel.PrivateChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -41,10 +49,9 @@ public final class DiscordUtils {
     }
 
     public static Mono<Message> sendMessage(Consumer<MessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
-        final Snowflake selfId = channel.getClient().getSelfId().orElseThrow();
         return Mono.zip(
-                DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
-                DiscordUtils.hasPermission(channel, selfId, Permission.EMBED_LINKS))
+                DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), Permission.SEND_MESSAGES),
+                DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), Permission.EMBED_LINKS))
                 .flatMap(tuple -> {
                     final boolean canSendMessage = tuple.getT1();
                     final boolean canSendEmbed = tuple.getT2();
@@ -133,7 +140,7 @@ public final class DiscordUtils {
 
     public static Mono<Void> requirePermissions(Channel channel, Permission... permissions) {
         return Flux.fromArray(permissions)
-                .flatMap(permission -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId().orElseThrow(), permission)
+                .flatMap(permission -> DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), permission)
                         .filter(Boolean.TRUE::equals)
                         .switchIfEmpty(Mono.error(new MissingPermissionException(permission))))
                 .then();

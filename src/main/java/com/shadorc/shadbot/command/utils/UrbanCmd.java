@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.utils;
 
-import com.shadorc.shadbot.api.urbandictionary.UrbanDefinition;
-import com.shadorc.shadbot.api.urbandictionary.UrbanDictionaryResponse;
+import com.shadorc.shadbot.api.json.urbandictionary.UrbanDefinition;
+import com.shadorc.shadbot.api.json.urbandictionary.UrbanDictionaryResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -64,7 +64,7 @@ public class UrbanCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show Urban Dictionary definition for a search.")
                 .addArg("search", false)
                 .build();

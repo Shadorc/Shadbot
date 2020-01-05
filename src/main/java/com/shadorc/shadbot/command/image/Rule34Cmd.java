@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.command.image;
 
-import com.shadorc.shadbot.api.image.r34.R34Post;
-import com.shadorc.shadbot.api.image.r34.R34Posts;
-import com.shadorc.shadbot.api.image.r34.R34Response;
+import com.shadorc.shadbot.api.json.image.r34.R34Post;
+import com.shadorc.shadbot.api.json.image.r34.R34Posts;
+import com.shadorc.shadbot.api.json.image.r34.R34Response;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -87,7 +87,7 @@ public class Rule34Cmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show a random image corresponding to a tag from Rule34 website.")
                 .setSource("https://www.rule34.xxx/")
                 .addArg("tag", false)

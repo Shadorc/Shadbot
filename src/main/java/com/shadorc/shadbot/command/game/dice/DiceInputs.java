@@ -3,7 +3,7 @@ package com.shadorc.shadbot.command.game.dice;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.Inputs;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
@@ -12,7 +12,7 @@ public class DiceInputs extends Inputs {
 
     private final DiceGame game;
 
-    public DiceInputs(DiscordClient client, DiceGame game) {
+    public DiceInputs(GatewayDiscordClient client, DiceGame game) {
         super(client, game.getDuration());
         this.game = game;
     }

@@ -30,7 +30,7 @@ public class ClearCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Clear current playlist.")
                 .build();
     }

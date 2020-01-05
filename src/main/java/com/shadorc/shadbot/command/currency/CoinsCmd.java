@@ -44,7 +44,7 @@ public class CoinsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show how many coins an user has.")
                 .addArg("@user", "if not specified, it will show your coins", true)
                 .build();

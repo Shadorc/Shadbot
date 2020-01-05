@@ -3,7 +3,7 @@ package com.shadorc.shadbot.command.game.roulette;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.Inputs;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
@@ -12,7 +12,7 @@ public class RouletteInputs extends Inputs {
 
     private final RouletteGame game;
 
-    public RouletteInputs(DiscordClient client, RouletteGame game) {
+    public RouletteInputs(GatewayDiscordClient client, RouletteGame game) {
         super(client, game.getDuration());
         this.game = game;
     }

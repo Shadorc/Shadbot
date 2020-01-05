@@ -36,7 +36,7 @@ public class PrefixCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show the current prefix for this server.")
                 .setFullUsage(String.format("%s%s", Config.DEFAULT_PREFIX, this.getName()))
                 .build();

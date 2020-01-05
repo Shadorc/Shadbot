@@ -79,7 +79,7 @@ public class UserInfoCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show info about an user.")
                 .addArg("@user", true)
                 .build();

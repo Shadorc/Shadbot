@@ -4,8 +4,8 @@ import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
@@ -23,7 +23,7 @@ import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
 public class GuildMusic {
 
-    private final DiscordClient client;
+    private final GatewayDiscordClient client;
     private final Snowflake guildId;
     private final TrackScheduler trackScheduler;
 
@@ -33,7 +33,7 @@ public class GuildMusic {
     private final AtomicLong djId;
     private final AtomicReference<Disposable> leavingTask;
 
-    public GuildMusic(DiscordClient client, Snowflake guildId, TrackScheduler trackScheduler) {
+    public GuildMusic(GatewayDiscordClient client, Snowflake guildId, TrackScheduler trackScheduler) {
         this.client = client;
         this.guildId = guildId;
         this.trackScheduler = trackScheduler;
@@ -72,7 +72,7 @@ public class GuildMusic {
                 .then();
     }
 
-    public DiscordClient getClient() {
+    public GatewayDiscordClient getClient() {
         return this.client;
     }
 

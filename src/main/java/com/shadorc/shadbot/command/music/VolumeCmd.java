@@ -63,7 +63,7 @@ public class VolumeCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show or change current volume level.")
                 .addArg("volume", String.format("must be between 0%% and %d%%", Config.VOLUME_MAX), true)
                 .addField("Premium", String.format("Premium users and servers can set the volume up to %d%%", Config.VOLUME_MAX_PREMIUM), false)

@@ -71,7 +71,7 @@ public class RolelistCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show a list of members with specific role(s).")
                 .addArg("@role(s)", false)
                 .build();

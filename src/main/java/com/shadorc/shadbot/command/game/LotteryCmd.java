@@ -13,9 +13,9 @@ import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.*;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -133,7 +133,7 @@ public class LotteryCmd extends BaseCmd {
         return Duration.ofMillis(TimeUtils.getMillisUntil(nextDate.toInstant()));
     }
 
-    public static Mono<Void> draw(DiscordClient client) {
+    public static Mono<Void> draw(GatewayDiscordClient client) {
         LogUtils.info("Lottery draw started...");
         final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
@@ -152,7 +152,8 @@ public class LotteryCmd extends BaseCmd {
                     DatabaseManager.getGuilds().getDBMember(member.getGuildId(), member.getId()).addCoins(coins);
                     return member.getPrivateChannel()
                             .cast(MessageChannel.class)
-                            .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you have the winning lottery number! You earn **%s**.",
+                            .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you " +
+                                            "have the winning lottery number! You earn **%s**.",
                                     FormatUtils.coins(coins)), privateChannel))
                             .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty());
                 })
@@ -169,7 +170,7 @@ public class LotteryCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Buy a ticket for the lottery or display the current lottery status.")
                 .addArg("num", String.format("must be between %d and %d", MIN_NUM, MAX_NUM), true)
                 .addField("Info", "One winner is randomly drawn every Sunday at noon (English time)."

@@ -54,7 +54,7 @@ public class BackwardCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Fast backward current song a specified amount of time.")
                 .addArg("time", "can be seconds or time (e.g. 72 or 1m12s)", false)
                 .build();

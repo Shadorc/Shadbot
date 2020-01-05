@@ -57,7 +57,7 @@ public class SuicideGirlsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show a random Suicide Girl image.")
                 .setSource("https://www.suicidegirls.com/")
                 .build();

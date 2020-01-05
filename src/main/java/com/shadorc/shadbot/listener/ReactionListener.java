@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.listener;
 
+import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.command.admin.IamCmd;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -20,7 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.List;
+import java.util.Set;
 
 public class ReactionListener {
 
@@ -60,14 +61,14 @@ public class ReactionListener {
 
     private static Mono<Boolean> canManageRole(Message message, Snowflake roleId) {
         return message.getGuild()
-                .flatMap(guild -> Mono.zip(guild.getMemberById(message.getClient().getSelfId().orElseThrow()),
+                .flatMap(guild -> Mono.zip(guild.getMemberById(Shadbot.getSelfId()),
                         guild.getRoleById(roleId)))
                 .flatMap(tuple -> {
                     final Member selfMember = tuple.getT1();
                     final Role role = tuple.getT2();
 
                     return Mono.zip(selfMember.getBasePermissions().map(set -> set.contains(Permission.MANAGE_ROLES)),
-                            selfMember.hasHigherRoles(List.of(role)))
+                            selfMember.hasHigherRoles(Set.of(role.getId())))
                             .flatMap(tuple2 -> {
                                 final boolean canManageRoles = tuple2.getT1();
                                 final boolean hasHigherRoles = tuple2.getT2();
@@ -114,7 +115,8 @@ public class ReactionListener {
             return Mono.empty();
         }
 
-        return Mono.justOrEmpty(message.getClient().getSelfId())
+        return message.getClient()
+                .getSelfId()
                 // It wasn't the bot that reacted
                 .filter(selfId -> !userId.equals(selfId))
                 // If the bot is not the author of the message, this is not an Iam message

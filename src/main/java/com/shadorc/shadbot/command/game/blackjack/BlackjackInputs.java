@@ -4,7 +4,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.Inputs;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
@@ -15,7 +15,7 @@ public class BlackjackInputs extends Inputs {
 
     private final BlackjackGame game;
 
-    public BlackjackInputs(DiscordClient client, BlackjackGame game) {
+    public BlackjackInputs(GatewayDiscordClient client, BlackjackGame game) {
         super(client, game.getDuration());
         this.game = game;
     }

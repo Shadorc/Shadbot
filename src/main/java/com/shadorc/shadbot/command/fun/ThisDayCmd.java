@@ -69,7 +69,7 @@ public class ThisDayCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show significant events of the day.")
                 .setSource(HOME_URL)
                 .build();

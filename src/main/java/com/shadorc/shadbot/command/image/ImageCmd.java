@@ -1,9 +1,9 @@
 package com.shadorc.shadbot.command.image;
 
-import com.shadorc.shadbot.api.TokenResponse;
-import com.shadorc.shadbot.api.image.deviantart.Content;
-import com.shadorc.shadbot.api.image.deviantart.DeviantArtResponse;
-import com.shadorc.shadbot.api.image.deviantart.Image;
+import com.shadorc.shadbot.api.json.TokenResponse;
+import com.shadorc.shadbot.api.json.image.deviantart.Content;
+import com.shadorc.shadbot.api.json.image.deviantart.DeviantArtResponse;
+import com.shadorc.shadbot.api.json.image.deviantart.Image;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -100,7 +100,7 @@ public class ImageCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Search for a random image on DeviantArt.")
                 .addArg("search", false)
                 .setSource("https://www.deviantart.com/")

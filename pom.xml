@@ -103,13 +103,21 @@
             <id>sedmelluq</id>
             <url>https://dl.bintray.com/sedmelluq/com.sedmelluq</url>
         </repository>
+        <!-- Discord4J Snapshot -->
+        <repository>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.discord4j</groupId>
                 <artifactId>bom</artifactId>
-                <version>3.0.12</version>
+                <version>3.1.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

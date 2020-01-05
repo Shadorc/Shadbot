@@ -181,7 +181,7 @@ public class SavedPlaylistCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Display, save, delete or load saved playlists.")
                 .addArg("action", FormatUtils.format(Action.class, "/"), false)
                 .addArg("name", "playlist name, must be specified to save, delete or load a playlist", true)

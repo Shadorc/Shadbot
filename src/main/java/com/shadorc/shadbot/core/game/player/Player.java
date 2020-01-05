@@ -2,7 +2,7 @@ package com.shadorc.shadbot.core.game.player;
 
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
@@ -21,7 +21,7 @@ public class Player {
         return this.userId;
     }
 
-    public Mono<String> getUsername(DiscordClient client) {
+    public Mono<String> getUsername(GatewayDiscordClient client) {
         return client.getUserById(this.userId).map(User::getUsername);
     }
 

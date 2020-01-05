@@ -78,7 +78,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Start a Hangman game.")
                 .addArg("difficulty", String.format("%s. The difficulty of the word to find",
                         FormatUtils.format(Difficulty.class, "/")), true)

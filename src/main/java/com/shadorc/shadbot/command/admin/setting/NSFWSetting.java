@@ -8,7 +8,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;

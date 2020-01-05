@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.fun;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.shadorc.shadbot.api.dtc.Quote;
+import com.shadorc.shadbot.api.json.dtc.Quote;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -71,7 +71,7 @@ public class DtcCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show a random quote from DansTonChat.com")
                 .setSource("https://www.danstonchat.com/")
                 .build();

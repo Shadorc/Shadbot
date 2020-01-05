@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.image;
 
-import com.shadorc.shadbot.api.image.wallhaven.WallhavenResponse;
-import com.shadorc.shadbot.api.image.wallhaven.Wallpaper;
+import com.shadorc.shadbot.api.json.image.wallhaven.WallhavenResponse;
+import com.shadorc.shadbot.api.json.image.wallhaven.Wallpaper;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -169,7 +169,7 @@ public class WallpaperCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Search for a wallpaper.")
                 .setUsage(String.format("[-p %s] [-c %s] [-rat %s] [-res %s] [-k %s]", PURITY, CATEGORY, RATIO, RESOLUTION, KEYWORD))
                 .addArg(PURITY, FormatUtils.format(Purity.class, ", "), true)

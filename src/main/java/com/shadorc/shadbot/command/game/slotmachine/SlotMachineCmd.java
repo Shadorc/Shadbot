@@ -83,7 +83,7 @@ public class SlotMachineCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Play slot machine.")
                 .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(PAID_COST)), false)
                 .addField("Gains", String.format("%s: **%s**, %s: **%s**, %s: **%s**, %s: **%s**. " +

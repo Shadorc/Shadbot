@@ -42,7 +42,7 @@ public class CalcCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Calculate an expression.")
                 .addArg("expression", false)
                 .setExample(String.format("`%s%s 3+3*3+3`%n`%s%s 2*cos(pi)`",

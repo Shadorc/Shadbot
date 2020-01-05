@@ -9,8 +9,8 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.VoiceChannel;
+import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
@@ -71,7 +71,7 @@ public final class MusicManager {
      * a new one is created and a request to join the {@link VoiceChannel} corresponding to the provided
      * {@code voiceChannelId} is sent.
      */
-    public Mono<GuildMusic> getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
+    public Mono<GuildMusic> getOrCreate(GatewayDiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
         return Mono.just(this.guildMusicConnections.computeIfAbsent(guildId,
                 ignored -> {
                     LOGGER.debug("{Guild ID: {}} Creating guild music connection.", guildId.asLong());

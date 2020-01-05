@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.image;
 
-import com.shadorc.shadbot.api.image.giphy.GiphyResponse;
+import com.shadorc.shadbot.api.json.image.giphy.GiphyResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -51,7 +51,7 @@ public class GifCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show a random gif")
                 .addArg("tag", "the tag to search", true)
                 .setSource("https://www.giphy.com/")
