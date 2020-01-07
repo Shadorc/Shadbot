@@ -6,12 +6,9 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -39,16 +36,14 @@ public class UserInfoCmd extends BaseCmd {
                 .next()
                 .flatMap(user -> user.asMember(context.getGuildId()));
 
-        return Mono.zip(getMember,
-                getMember.flatMap(Member::getPresence),
-                getMember.flatMapMany(Member::getRoles).collectList())
-                .map(tuple -> this.getEmbed(tuple.getT1(), tuple.getT2(), tuple.getT3(), context.getAvatarUrl()))
+        return Mono.zip(getMember, getMember.flatMapMany(Member::getRoles).collectList())
+                .map(tuple -> this.getEmbed(tuple.getT1(), tuple.getT2(), context.getAvatarUrl()))
                 .flatMap(embed -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                 .then();
     }
 
-    private Consumer<EmbedCreateSpec> getEmbed(Member member, Presence presence, List<Role> roles, String avatarUrl) {
+    private Consumer<EmbedCreateSpec> getEmbed(Member member, List<Role> roles, String avatarUrl) {
         final String creationDate = String.format("%s%n(%s)",
                 TimeUtils.toLocalDate(member.getId().getTimestamp()).format(this.dateFormatter),
                 FormatUtils.longDuration(member.getId().getTimestamp()));
@@ -57,23 +52,26 @@ public class UserInfoCmd extends BaseCmd {
                 TimeUtils.toLocalDate(member.getJoinTime()).format(this.dateFormatter),
                 FormatUtils.longDuration(member.getJoinTime()));
 
+        final StringBuilder usernameBuilder = new StringBuilder(member.getUsername());
+        if (member.isBot()) {
+            usernameBuilder.append(" (Bot)");
+        }
+        if (member.getPremiumTime().isPresent()) {
+            usernameBuilder.append(" (Booster)");
+        }
+
         return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
-                    embed.setAuthor(String.format("User Info: %s%s", member.getUsername(), member.isBot() ? " (Bot)" : ""), null, avatarUrl)
+                    embed.setAuthor(String.format("User Info: %s", usernameBuilder), null, avatarUrl)
                             .setThumbnail(member.getAvatarUrl())
-                            .addField("Display name", member.getDisplayName(), true)
-                            .addField("User ID", member.getId().asString(), true)
-                            .addField("Creation date", creationDate, true)
-                            .addField("Join date", joinDate, true);
+                            .addField("Display name", member.getDisplayName(), false)
+                            .addField("User ID", member.getId().asString(), false)
+                            .addField("Creation date", creationDate, false)
+                            .addField("Join date", joinDate, false);
 
                     if (!roles.isEmpty()) {
                         embed.addField("Roles", FormatUtils.format(roles, Role::getMention, "\n"), true);
                     }
-
-                    embed.addField("Status", StringUtils.capitalize(presence.getStatus().getValue()), true);
-                    presence.getActivity()
-                            .map(Activity::getName)
-                            .ifPresent(details -> embed.addField("Playing text", details, true));
                 });
     }
 
