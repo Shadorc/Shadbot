@@ -81,6 +81,7 @@ public class WikiCmd extends BaseCmd {
         return HelpBuilder.create(this, context)
                 .setDescription("Show Wikipedia description for a search.")
                 .addArg("search", false)
+                .setSource("https://www.wikipedia.org/")
                 .build();
     }
 
