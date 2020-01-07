@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public final class Credentials {
 
-    private static final Logger LOGGER = Loggers.getLogger(Credentials.class);
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.credentials");
     private static final Properties CREDENTIALS_PROPERTIES = new Properties();
     private static final File CREDENTIALS_FILE = new File("credentials.properties");
 

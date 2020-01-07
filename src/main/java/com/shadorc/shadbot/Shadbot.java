@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public final class Shadbot {
 
-    private static final Logger LOGGER = Loggers.getLogger(Shadbot.class);
+    private static final Logger LOGGER = Loggers.getLogger("shadbot");
 
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
@@ -46,19 +46,18 @@ public final class Shadbot {
     private static BotListStats botListStats;
 
     public static void main(String[] args) {
-        LogUtils.info("Starting Shadbot V%s", Config.VERSION);
+        LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
         // Set default to Locale US
         Locale.setDefault(Locale.US);
 
+        // BlockHound is used to detect blocking actions in non-blocking threads
         BlockHound.builder()
                 .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
                 .install();
 
-        LogUtils.info("Connecting to Discord...");
-
-        // TODO: This is ugly
-        client = DiscordClient.builder(Credentials.get(Credential.DISCORD_TOKEN))
+        LOGGER.info("Connecting to Discord...");
+        Shadbot.client = DiscordClient.builder(Credentials.get(Credential.DISCORD_TOKEN))
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build()
                 .gateway()
@@ -70,15 +69,13 @@ public final class Shadbot {
                 .blockOptional()
                 .orElseThrow(RuntimeException::new);
 
-        LogUtils.info("Shadbot is connected to all shards.");
-
-        LogUtils.info("Next lottery draw in: %s", LotteryCmd.getDelay().toString());
+        LOGGER.info("Next lottery draw in: {}", LotteryCmd.getDelay().toString());
         Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.elastic())
                 .flatMap(ignored -> LotteryCmd.draw(client))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(client, err))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 
-        LogUtils.info("Scheduling presence updates.");
+        LOGGER.info("Scheduling presence updates.");
         Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.elastic())
                 .flatMap(ignored -> {
                     final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
@@ -88,7 +85,7 @@ public final class Shadbot {
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(client, err))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 
-        LogUtils.info("Starting bot list stats scheduler.");
+        LOGGER.info("Starting bot list stats scheduler.");
         Shadbot.botListStats = new BotListStats();
 
         final Mono<Long> getOwnerId = Shadbot.client.getApplicationInfo()

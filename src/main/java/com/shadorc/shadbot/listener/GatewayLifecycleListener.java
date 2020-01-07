@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GatewayLifecycleListener implements EventListener<GatewayLifecycleEvent> {
 
-    private static final Logger LOGGER = Loggers.getLogger(GatewayLifecycleListener.class);
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.gateway.lifecycle");
 
     private final AtomicBoolean isFullyReady;
     private volatile GatewayStateChange.State state;
