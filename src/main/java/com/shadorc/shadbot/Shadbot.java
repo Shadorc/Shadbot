@@ -113,7 +113,6 @@ public final class Shadbot {
                 .block();
 
         LOGGER.info("Listeners registration.");
-        Shadbot.register(Shadbot.client, new GatewayLifecycleListener());
         Shadbot.register(Shadbot.client, new TextChannelDeleteListener());
         Shadbot.register(Shadbot.client, new GuildCreateListener());
         Shadbot.register(Shadbot.client, new GuildDeleteListener());
