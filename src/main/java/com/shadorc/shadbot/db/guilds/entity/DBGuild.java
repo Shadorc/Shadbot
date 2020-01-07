@@ -46,7 +46,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     }
 
     /**
-     * @Note: {@code value} must be serializable or serialized.
+     * {@code value} must be serializable or serialized.
      */
     public <T> void setSetting(Setting setting, T value) {
         LOGGER.debug("[DBGuild {}] Updating setting {}: {}", this.getId().asLong(), setting, value);
