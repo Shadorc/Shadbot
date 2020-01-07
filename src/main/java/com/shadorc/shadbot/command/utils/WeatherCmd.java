@@ -73,7 +73,7 @@ public class WeatherCmd extends BaseCmd {
 
                     return updatableMessage.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
-                                    String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
+                                    String.format("https://openweathermap.org/city/%d", currentWeather.getCityId()),
                                     context.getAvatarUrl())
                                     .setThumbnail(weather.getIconLink())
                                     .setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
@@ -136,7 +136,7 @@ public class WeatherCmd extends BaseCmd {
                 .setDelimiter(", ")
                 .addArg("city", false)
                 .addArg("country", true)
-                .setSource("http://openweathermap.org/")
+                .setSource("https://openweathermap.org/")
                 .build();
     }
 }
