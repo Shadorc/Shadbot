@@ -105,7 +105,8 @@ public class PollManager {
         final StringBuilder representation = new StringBuilder();
         int count = 1;
         for (final String key : Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue())).keySet()) {
-            representation.append(String.format("%n\t**%d.** %s (Votes: %d)", count, key, choicesVotes.get(key)));
+            representation.append(String.format("%n\t**%d.** %s (%s)", count, key,
+                    StringUtils.pluralOf(count, "vote")));
             count++;
         }
 
