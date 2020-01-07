@@ -22,6 +22,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
     @Override
     public Mono<Void> execute(VoiceStateUpdateEvent event) {
         return event.getClient().getSelfId()
+                // Ignore voice state updates from the bot
                 .filter(selfId -> !event.getCurrent().getUserId().equals(selfId))
                 .flatMap(selfId -> VoiceStateUpdateListener.onUserEvent(event));
     }
