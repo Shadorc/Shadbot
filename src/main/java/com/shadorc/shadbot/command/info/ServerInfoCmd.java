@@ -55,12 +55,12 @@ public class ServerInfoCmd extends BaseCmd {
         return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
                         .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
-                        .addField("Owner", owner.getUsername(), true)
-                        .addField("Server ID", guild.getId().asString(), true)
-                        .addField("Creation date", creationDate, true)
-                        .addField("Region", region.getName(), true)
-                        .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), true)
-                        .addField("Members", Integer.toString(guild.getMemberCount().orElseThrow()), true));
+                        .addField("Owner", owner.getUsername(), false)
+                        .addField("Server ID", guild.getId().asString(), false)
+                        .addField("Creation date", creationDate, false)
+                        .addField("Region", region.getName(), false)
+                        .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), false)
+                        .addField("Members", Integer.toString(guild.getMemberCount().orElseThrow()), false));
     }
 
     @Override
