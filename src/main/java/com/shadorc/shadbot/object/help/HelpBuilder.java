@@ -135,10 +135,13 @@ public class HelpBuilder {
             return String.format("`%s`", this.usage);
         }
 
+        if(this.args.isEmpty()) {
+            return String.format("`%s%s`", this.context.getPrefix(), this.cmd.getName());
+        }
+
         return String.format("`%s%s %s`", this.context.getPrefix(), this.cmd.getName(),
                 FormatUtils.format(this.args,
-                        arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter))
-                .trim();
+                        arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
     }
 
     private String getArguments() {
