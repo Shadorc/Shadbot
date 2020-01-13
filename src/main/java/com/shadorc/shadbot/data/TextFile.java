@@ -27,7 +27,7 @@ public class TextFile {
         }
     }
 
-    public String getText() {
+    public String getRandomText() {
         return Utils.randValue(this.texts);
     }
 

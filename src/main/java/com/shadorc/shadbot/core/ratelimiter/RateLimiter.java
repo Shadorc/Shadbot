@@ -64,7 +64,7 @@ public class RateLimiter {
         client.getUserById(userId)
                 .map(author -> {
                     final String username = author.getUsername();
-                    final String message = TextUtils.SPAMS.getText();
+                    final String message = TextUtils.SPAMS.getRandomText();
                     final String maxNum = StringUtils.pluralOf(this.bandwidth.getCapacity(), "time");
                     final String durationStr = DurationFormatUtils.formatDurationWords(
                             this.bandwidth.getRefillPeriodNanos() / 1_000_000, true, true);
