@@ -5,7 +5,7 @@ import discord4j.core.object.util.Snowflake;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
@@ -15,7 +15,7 @@ public final class Config {
 
     private static final Logger LOGGER = Loggers.getLogger("shadbot.config");
 
-    private static final Properties PROPERTIES = Config.getProperties();
+    private static final Properties PROPERTIES = Config.loadProperties();
 
     public static final String VERSION = PROPERTIES.getProperty("version");
     public static final boolean IS_SNAPSHOT = VERSION.endsWith("SNAPSHOT");
@@ -43,9 +43,10 @@ public final class Config {
     public static final String DATABASE_NAME = PROPERTIES.getProperty("database.name");
     public static final String IPV6_BLOCK = PROPERTIES.getProperty("ipv6.block");
 
-    private static Properties getProperties() {
+    private static Properties loadProperties() {
         final Properties properties = new Properties();
-        try (final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("project.properties")) {
+        try (final InputStream inputStream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("project.properties")) {
             if (inputStream != null) {
                 properties.load(inputStream);
             }
