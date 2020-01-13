@@ -16,8 +16,6 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.json.JsonWriterSettings;
 import reactor.util.annotation.Nullable;
 
-import javax.management.*;
-import java.lang.management.ManagementFactory;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
@@ -68,32 +66,6 @@ public final class Utils {
             return enumValue;
         } else {
             throw exception;
-        }
-    }
-
-    /**
-     * @return The percentage of CPU used or {@link Double#NaN} if the value could not be found
-     */
-    public static double getProcessCpuLoad() {
-        try {
-            final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            final ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
-            final AttributeList list = mbs.getAttributes(name, new String[]{"ProcessCpuLoad"});
-
-            if (list.isEmpty()) {
-                return Double.NaN;
-            }
-
-            final Attribute att = (Attribute) list.get(0);
-            final Double value = (Double) att.getValue();
-
-            if (value < 0) {
-                return Double.NaN;
-            }
-
-            return value * 100.0d;
-        } catch (final InstanceNotFoundException | ReflectionException | MalformedObjectNameException err) {
-            return Double.NaN;
         }
     }
 
