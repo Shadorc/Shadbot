@@ -27,7 +27,7 @@ public class BotListStats {
 
     public BotListStats() {
         this.httpClient = HttpClient.create();
-        this.postingTask = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), Schedulers.elastic())
+        this.postingTask = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), Schedulers.boundedElastic())
                 .flatMap(ignored -> this.postStats())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
@@ -38,13 +38,12 @@ public class BotListStats {
                 .getGuilds()
                 .count()
                 .flatMap(guildCount -> this.postOnBotListDotSpace(guildCount)
-                        .then(this.postOnBotsOnDiscordXyz(guildCount))
-                        .then(this.postOnDivineDiscordBotsDotCom(guildCount))
-                        .thenMany(this.postOnDiscordBotListDotCom(guildCount))
-                        .thenMany(this.postOnDiscordBotsDotGg(guildCount))
-                        .thenMany(this.postOnDiscordBotsDotOrg(guildCount))
-                        .then())
-                .then(Mono.fromRunnable(() -> LogUtils.info("Statistics posted.")));
+                        .and(this.postOnBotsOnDiscordXyz(guildCount))
+                        .and(this.postOnDivineDiscordBotsDotCom(guildCount))
+                        .and(this.postOnDiscordBotListDotCom(guildCount))
+                        .and(this.postOnDiscordBotsDotGg(guildCount))
+                        .and(this.postOnDiscordBotsDotOrg(guildCount)))
+                .doOnSuccess(ignored -> LogUtils.info("Statistics posted."));
     }
 
     private Mono<String> post(String url, String authorization, JSONObject content) {
