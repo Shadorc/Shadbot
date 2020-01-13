@@ -7,7 +7,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 public class DiabloCmd extends BaseCmd {
 
     private static final String ACCESS_TOKEN_URL = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-            Credentials.get(Credential.BLIZZARD_CLIENT_ID), Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
+            CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_ID), CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_SECRET));
 
     private enum Region {
         EU, US, TW, KR;

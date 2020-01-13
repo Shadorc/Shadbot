@@ -4,7 +4,7 @@ import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.LotteryCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.utils.*;
@@ -57,7 +57,7 @@ public final class Shadbot {
                 .install();
 
         LOGGER.info("Connecting to Discord...");
-        Shadbot.client = DiscordClient.builder(Credentials.get(Credential.DISCORD_TOKEN))
+        Shadbot.client = DiscordClient.builder(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build()
                 .gateway()

@@ -8,7 +8,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
@@ -82,8 +82,8 @@ public class ImageCmd extends BaseCmd {
 
     private Mono<TokenResponse> generateAccessToken() {
         return Mono.just(String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
-                Credentials.get(Credential.DEVIANTART_CLIENT_ID),
-                Credentials.get(Credential.DEVIANTART_API_SECRET)))
+                CredentialManager.getInstance().get(Credential.DEVIANTART_CLIENT_ID),
+                CredentialManager.getInstance().get(Credential.DEVIANTART_API_SECRET)))
                 .filter(url -> this.isTokenExpired())
                 .flatMap(url -> NetUtils.get(url, TokenResponse.class))
                 .doOnNext(token -> {

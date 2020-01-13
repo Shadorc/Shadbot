@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -50,7 +50,7 @@ public class FortniteCmd extends BaseCmd {
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final Consumer<HttpHeaders> headerBuilder = header -> header.add("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY));
+        final Consumer<HttpHeaders> headerBuilder = header -> header.add("TRN-Api-Key", CredentialManager.getInstance().get(Credential.FORTNITE_API_KEY));
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Fortnite stats...", context.getUsername()))
                 .send()
                 .then(NetUtils.get(headerBuilder, url, FortniteResponse.class))

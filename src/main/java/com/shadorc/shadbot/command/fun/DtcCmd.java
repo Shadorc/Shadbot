@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
@@ -32,7 +32,7 @@ public class DtcCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         final String url = String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
-                Credentials.get(Credential.DTC_API_KEY));
+                CredentialManager.getInstance().get(Credential.DTC_API_KEY));
 
         final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))

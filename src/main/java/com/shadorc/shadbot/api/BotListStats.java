@@ -3,7 +3,7 @@ package com.shadorc.shadbot.api;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.LogUtils;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -74,7 +74,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://api.botlist.space/v1/bots/%d", Shadbot.getSelfId().asLong());
-        return this.post(url, Credentials.get(Credential.BOT_LIST_DOT_SPACE), content);
+        return this.post(url, CredentialManager.getInstance().get(Credential.BOT_LIST_DOT_SPACE), content);
     }
 
     /**
@@ -85,7 +85,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
         final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", Shadbot.getSelfId().asLong());
-        return this.post(url, Credentials.get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
+        return this.post(url, CredentialManager.getInstance().get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
     }
 
     /**
@@ -96,7 +96,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://divinediscordbots.com/bot/%d/stats", Shadbot.getSelfId().asLong());
-        return this.post(url, Credentials.get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
+        return this.post(url, CredentialManager.getInstance().get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
     }
 
     /**
@@ -111,7 +111,7 @@ public class BotListStats {
                             .put("shard_id", shardId)
                             .put("guilds ", guildCount / shardCount);
                     final String url = String.format("https://discordbotlist.com/api/bots/%d/stats", Shadbot.getSelfId().asLong());
-                    return this.post(url, String.format("Bot %s", Credentials.get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
+                    return this.post(url, String.format("Bot %s", CredentialManager.getInstance().get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
                 });
     }
 
@@ -128,7 +128,7 @@ public class BotListStats {
                             .put("shardCount", shardCount)
                             .put("guildCount", guildCount / shardCount);
                     final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", Shadbot.getSelfId().asLong());
-                    return this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
+                    return this.post(url, CredentialManager.getInstance().get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
                 });
     }
 
@@ -145,7 +145,7 @@ public class BotListStats {
                             .put("shard_count", shardCount)
                             .put("server_count", guildCount / shardCount);
                     final String url = String.format("https://discordbots.org/api/bots/%d/stats", Shadbot.getSelfId().asLong());
-                    return this.post(url, Credentials.get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
+                    return this.post(url, CredentialManager.getInstance().get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
                 });
     }
 

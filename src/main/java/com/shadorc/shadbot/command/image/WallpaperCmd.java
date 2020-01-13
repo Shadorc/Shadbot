@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -98,7 +98,7 @@ public class WallpaperCmd extends BaseCmd {
                     final boolean isNsfw = tuple.getT2();
 
                     final StringBuilder urlBuilder = new StringBuilder(HOME_URL);
-                    urlBuilder.append(String.format("?apikey=%s", Credentials.get(Credential.WALLHAVEN_API_KEY)));
+                    urlBuilder.append(String.format("?apikey=%s", CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY)));
 
                     if (cmdLine.hasOption(PURITY)) {
                         final Purity purity = this.parseEnum(context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));

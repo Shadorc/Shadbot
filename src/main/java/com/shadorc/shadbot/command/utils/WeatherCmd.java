@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
@@ -48,7 +48,7 @@ public class WeatherCmd extends BaseCmd {
         return updatableMessage.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading weather...", context.getUsername()))
                 .send()
                 .then(Mono.fromCallable(() -> {
-                    final OWM owm = new OWM(Credentials.get(Credential.OPENWEATHERMAP_API_KEY));
+                    final OWM owm = new OWM(CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY));
                     owm.setUnit(Unit.METRIC);
 
                     CurrentWeather currentWeather;

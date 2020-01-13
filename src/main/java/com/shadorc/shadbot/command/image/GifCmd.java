@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
@@ -30,7 +30,7 @@ public class GifCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         final String url = String.format("%s?api_key=%s&tag=%s",
-                HOME_URl, Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
+                HOME_URl, CredentialManager.getInstance().get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getUsername()))
                 .send()

@@ -12,7 +12,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
@@ -44,7 +44,7 @@ public class CounterStrikeCmd extends BaseCmd {
                 .then(Mono.just(this.getIdentificator(arg)))
                 .flatMap(this::getSteamId)
                 .map(steamId -> String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
-                        Credentials.get(Credential.STEAM_API_KEY), steamId))
+                        CredentialManager.getInstance().get(Credential.STEAM_API_KEY), steamId))
                 .flatMap(url -> NetUtils.get(url, PlayerSummariesResponse.class))
                 .map(PlayerSummariesResponse::getResponse)
                 // Search users matching the steamId
@@ -59,7 +59,7 @@ public class CounterStrikeCmd extends BaseCmd {
                     }
 
                     final String userStatsUrl = String.format("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=%s&steamid=%s",
-                            Credentials.get(Credential.STEAM_API_KEY), player.getSteamId());
+                            CredentialManager.getInstance().get(Credential.STEAM_API_KEY), player.getSteamId());
 
                     return NetUtils.get(userStatsUrl)
                             .flatMap(body -> {
@@ -129,7 +129,7 @@ public class CounterStrikeCmd extends BaseCmd {
         // The user provided a pseudo
         else {
             final String url = String.format("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s",
-                    Credentials.get(Credential.STEAM_API_KEY), NetUtils.encode(identificator));
+                    CredentialManager.getInstance().get(Credential.STEAM_API_KEY), NetUtils.encode(identificator));
             return NetUtils.get(url, ResolveVanityUrlResponse.class)
                     .map(ResolveVanityUrlResponse::getResponse)
                     .map(Response::getSteamId)
