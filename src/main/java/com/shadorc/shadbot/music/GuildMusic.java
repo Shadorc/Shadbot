@@ -50,7 +50,7 @@ public class GuildMusic {
      */
     public void scheduleLeave() {
         LOGGER.debug("{Guild ID: {}} Scheduling auto-leave.", this.guildId.asLong());
-        this.leavingTask.set(Mono.delay(Duration.ofMinutes(1), Schedulers.elastic())
+        this.leavingTask.set(Mono.delay(Duration.ofMinutes(1), Schedulers.boundedElastic())
                 .filter(ignored -> this.isLeavingScheduled())
                 .doOnNext(ignored -> MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err)));

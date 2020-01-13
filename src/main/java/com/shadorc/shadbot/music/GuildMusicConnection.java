@@ -56,7 +56,7 @@ public class GuildMusicConnection {
         return this.client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider))
-                        .publishOn(Schedulers.elastic()))
+                        .publishOn(Schedulers.boundedElastic()))
                 .timeout(Config.TIMEOUT)
                 .flatMap(voiceConnection -> {
                     LogUtils.info("{Guild ID: %d} Voice channel joined.", this.guildId.asLong());
@@ -67,7 +67,7 @@ public class GuildMusicConnection {
                     // If an error occurred while loading a track, the voice channel can be joined after
                     // the guild music is destroyed. The delay is needed to avoid transition error.
                     return Mono.justOrEmpty(this.getGuildMusic())
-                            .switchIfEmpty(Mono.delay(Duration.ofSeconds(3), Schedulers.elastic())
+                            .switchIfEmpty(Mono.delay(Duration.ofSeconds(3), Schedulers.boundedElastic())
                                     .then(Mono.fromRunnable(this::leaveVoiceChannel)));
                 })
                 .then()

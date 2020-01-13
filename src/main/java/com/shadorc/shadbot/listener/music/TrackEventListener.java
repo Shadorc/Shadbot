@@ -38,7 +38,7 @@ public class TrackEventListener extends AudioEventAdapter {
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(message, channel));
                 })
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -49,7 +49,7 @@ public class TrackEventListener extends AudioEventAdapter {
                 // Everything seems fine, reset error counter.
                 .doOnNext(ignored -> this.errorCount.set(0))
                 .flatMap(ignored -> this.nextOrEnd())
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -86,7 +86,7 @@ public class TrackEventListener extends AudioEventAdapter {
                             .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
                             .then(this.nextOrEnd());
                 })
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, thr -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), thr));
     }
 
@@ -98,7 +98,7 @@ public class TrackEventListener extends AudioEventAdapter {
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "
                         + "try to play the next available song.", channel))
                 .then(this.nextOrEnd())
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 

@@ -36,7 +36,7 @@ public class TemporaryMessage {
         return this.client.getChannelById(this.channelId)
                 .cast(MessageChannel.class)
                 .flatMap(channel -> DiscordUtils.sendMessage(content, channel))
-                .flatMap(message -> Mono.delay(this.duration, Schedulers.elastic())
+                .flatMap(message -> Mono.delay(this.duration, Schedulers.boundedElastic())
                         .then(message.delete()));
     }
 

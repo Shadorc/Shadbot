@@ -64,7 +64,7 @@ public class PollManager {
                                 "https://i.imgur.com/jcrUDLY.png"));
 
         return this.voteMessage.send(embedConsumer)
-                .flatMap(message -> Mono.delay(this.spec.getDuration(), Schedulers.elastic())
+                .flatMap(message -> Mono.delay(this.spec.getDuration(), Schedulers.boundedElastic())
                         .thenReturn(message.getId()))
                 .flatMap(messageId -> this.context.getClient().getMessageById(this.context.getChannelId(), messageId))
                 .map(Message::getReactions)
@@ -74,7 +74,7 @@ public class PollManager {
 
     private <T> void schedule(Mono<T> mono, Duration duration) {
         this.cancelScheduledTask();
-        this.scheduledTask = Mono.delay(duration, Schedulers.elastic())
+        this.scheduledTask = Mono.delay(duration, Schedulers.boundedElastic())
                 .then(mono)
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.context.getClient(), err));
     }

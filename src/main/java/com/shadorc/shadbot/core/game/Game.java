@@ -47,7 +47,7 @@ public abstract class Game {
     protected <T> void schedule(Mono<T> mono) {
         this.cancelScheduledTask();
         this.isScheduled.set(true);
-        this.scheduledTask = Mono.delay(this.duration, Schedulers.elastic())
+        this.scheduledTask = Mono.delay(this.duration, Schedulers.boundedElastic())
                 .doOnNext(ignored -> this.isScheduled.set(false))
                 .then(mono)
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.context.getClient(), err));

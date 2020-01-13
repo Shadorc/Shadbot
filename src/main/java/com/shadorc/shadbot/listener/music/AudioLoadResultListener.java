@@ -53,7 +53,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
                         FormatUtils.trackName(audioTrack.getInfo())), channel))
                 .doOnTerminate(this::terminate)
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -95,7 +95,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                     .then(Mono.fromRunnable(() -> guildMusic.setWaitingForChoice(false))));
                 })
                 .doOnTerminate(this::terminate)
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -122,7 +122,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                             .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
                 })
                 .doOnTerminate(this::terminate)
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 
@@ -157,7 +157,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                             errMessage.toLowerCase()), channel));
                 })
                 .doOnTerminate(this::terminate)
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, thr -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), thr));
     }
 
@@ -172,7 +172,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
                         StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
                 .doOnTerminate(this::terminate)
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
     }
 

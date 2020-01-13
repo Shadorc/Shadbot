@@ -70,13 +70,13 @@ public final class Shadbot {
                 .orElseThrow(RuntimeException::new);
 
         LOGGER.info("Next lottery draw in: {}", LotteryCmd.getDelay().toString());
-        Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.elastic())
+        Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.boundedElastic())
                 .flatMap(ignored -> LotteryCmd.draw(client))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(client, err))
                 .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
 
         LOGGER.info("Scheduling presence updates.");
-        Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.elastic())
+        Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.boundedElastic())
                 .flatMap(ignored -> {
                     final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
                             Utils.randValue(TextUtils.TIP_MESSAGES));
