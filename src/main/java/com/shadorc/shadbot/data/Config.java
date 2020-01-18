@@ -35,7 +35,6 @@ public final class Config {
     public static final int MUSIC_SEARCHES = Integer.parseInt(PROPERTIES.getProperty("music.searches"));
     public static final int MUSIC_CHOICE_DURATION = Integer.parseInt(PROPERTIES.getProperty("music.choice.duration"));
 
-    public static final Snowflake LOGS_CHANNEL_ID = Snowflake.of(PROPERTIES.getProperty("log.channel.id"));
     public static final Color BOT_COLOR = Color.decode(PROPERTIES.getProperty("embed.color"));
     public static final Duration TIMEOUT = Duration.ofMillis(Long.parseLong(PROPERTIES.getProperty("timeout")));
     public static final int RELIC_DURATION = Integer.parseInt(PROPERTIES.getProperty("relic.duration"));

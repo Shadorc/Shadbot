@@ -7,10 +7,7 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
-import com.shadorc.shadbot.utils.ExceptionHandler;
-import com.shadorc.shadbot.utils.ExitCode;
-import com.shadorc.shadbot.utils.TextUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.*;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
@@ -52,13 +49,14 @@ public final class Shadbot {
     public static void main(String[] args) {
         LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
-        // Initializing Sentry
+        LOGGER.info("Initializing Sentry...");
         Sentry.init();
 
         // Set default to Locale US
         Locale.setDefault(Locale.US);
 
         // BlockHound is used to detect blocking actions in non-blocking threads
+        LOGGER.info("Initializing BlockHound...");
         BlockHound.builder()
                 .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
                 .install();
@@ -83,7 +81,7 @@ public final class Shadbot {
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
-        LOGGER.info("Scheduling presence updates.");
+        LOGGER.info("Scheduling presence updates...");
         Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.boundedElastic())
                 .flatMap(ignored -> {
                     final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
@@ -93,7 +91,7 @@ public final class Shadbot {
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
-        LOGGER.info("Starting bot list stats scheduler.");
+        LOGGER.info("Starting bot list stats scheduler...");
         Shadbot.botListStats = new BotListStats();
 
         final Mono<Long> getOwnerId = Shadbot.client.getApplicationInfo()
@@ -120,7 +118,7 @@ public final class Shadbot {
                 })
                 .block();
 
-        LOGGER.info("Listeners registration.");
+        LOGGER.info("Registering listeners....");
         Shadbot.register(Shadbot.client, new TextChannelDeleteListener());
         Shadbot.register(Shadbot.client, new GuildCreateListener());
         Shadbot.register(Shadbot.client, new GuildDeleteListener());
