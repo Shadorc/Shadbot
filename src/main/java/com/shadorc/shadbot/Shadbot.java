@@ -62,6 +62,7 @@ public final class Shadbot {
                 .build()
                 .gateway()
                 .setStoreService(MappingStoreService.create()
+                        // Don't store messages
                         .setMapping(new NoOpStoreService(), MessageBean.class)
                         .setFallback(new JdkStoreService()))
                 .setInitialPresence(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
