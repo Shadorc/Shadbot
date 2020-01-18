@@ -29,8 +29,8 @@ public abstract class Inputs {
 
     public void subscribe() {
         this.waitForInputs()
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(this.client, err))
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err));
+                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     /**

@@ -114,8 +114,7 @@ public class LyricsCmd extends BaseCmd {
                 })
                 .retry(MAX_RETRY, err -> "Musixmatch redirected to wrong page.".equals(err.getMessage()))
                 .onErrorMap(IOException.class, err -> {
-                    LogUtils.warn(client, String.format("[%s] Too many retries, abort attempt to reload page.",
-                            this.getClass().getSimpleName()));
+                    LogUtils.warn("[%s] Too many retries, abort attempt to reload page.", this.getClass().getSimpleName());
                     return new HttpStatusException("Musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
                 });
     }

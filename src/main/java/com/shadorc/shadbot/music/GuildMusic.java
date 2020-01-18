@@ -53,7 +53,7 @@ public class GuildMusic {
         this.leavingTask.set(Mono.delay(Duration.ofMinutes(1), Schedulers.boundedElastic())
                 .filter(ignored -> this.isLeavingScheduled())
                 .doOnNext(ignored -> MusicManager.getInstance().getConnection(this.guildId).leaveVoiceChannel())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.client, err)));
+                .subscribe(null, ExceptionHandler::handleUnknownError));
     }
 
     public void cancelLeave() {

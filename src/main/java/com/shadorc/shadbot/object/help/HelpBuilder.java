@@ -135,7 +135,7 @@ public class HelpBuilder {
             return String.format("`%s`", this.usage);
         }
 
-        if(this.args.isEmpty()) {
+        if (this.args.isEmpty()) {
             return String.format("`%s%s`", this.context.getPrefix(), this.cmd.getName());
         }
 

@@ -29,7 +29,7 @@ public class BotListStats {
         this.httpClient = HttpClient.create();
         this.postingTask = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), Schedulers.boundedElastic())
                 .flatMap(ignored -> this.postStats())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     private Mono<Void> postStats() {
@@ -57,12 +57,12 @@ public class BotListStats {
                 .timeout(Config.TIMEOUT)
                 .onErrorResume(err -> {
                     if (err instanceof TimeoutException) {
-                        return Mono.fromRunnable(() -> LogUtils.warn(
-                                String.format("A timeout occurred while posting statistics on %s", url)));
+                        return Mono.fromRunnable(() ->
+                                LogUtils.warn("A timeout occurred while posting statistics on %s", url));
 
                     }
-                    return Mono.fromRunnable(() -> LogUtils.warn(Shadbot.getClient(),
-                            String.format("An error occurred while posting statistics on %s: %s", url, err.getMessage())));
+                    return Mono.fromRunnable(() ->
+                            LogUtils.warn("An error occurred while posting statistics on %s: %s", url, err.getMessage()));
                 });
     }
 

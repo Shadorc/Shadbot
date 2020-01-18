@@ -25,7 +25,7 @@ public class RateLimiter {
      * Specifies simple limitation {@code capacity} tokens per {@code period} time window.
      *
      * @param capacity - maximum amount of tokens
-     * @param period - the period within tokens will be fully regenerated
+     * @param period   - the period within tokens will be fully regenerated
      */
     public RateLimiter(int capacity, Duration period) {
         this(Bandwidth.classic(capacity, Refill.intervally(capacity, period)));
@@ -72,7 +72,7 @@ public class RateLimiter {
                             username, message, maxNum, durationStr);
                 })
                 .flatMap(new TemporaryMessage(client, channelId, Duration.ofSeconds(10))::send)
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
 }

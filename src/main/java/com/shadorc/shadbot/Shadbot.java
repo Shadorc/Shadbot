@@ -7,7 +7,10 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.ExceptionHandler;
+import com.shadorc.shadbot.utils.ExitCode;
+import com.shadorc.shadbot.utils.TextUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
@@ -22,6 +25,7 @@ import discord4j.rest.response.ResponseFunction;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.api.noop.NoOpStoreService;
 import discord4j.store.jdk.JdkStoreService;
+import io.sentry.Sentry;
 import reactor.blockhound.BlockHound;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -48,6 +52,9 @@ public final class Shadbot {
     public static void main(String[] args) {
         LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
+        // Initializing Sentry
+        Sentry.init();
+
         // Set default to Locale US
         Locale.setDefault(Locale.US);
 
@@ -73,8 +80,8 @@ public final class Shadbot {
         LOGGER.info("Next lottery draw in: {}", LotteryCmd.getDelay().toString());
         Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.boundedElastic())
                 .flatMap(ignored -> LotteryCmd.draw(client))
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(client, err))
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
+                .subscribe(null, ExceptionHandler::handleUnknownError);
 
         LOGGER.info("Scheduling presence updates.");
         Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.boundedElastic())
@@ -83,8 +90,8 @@ public final class Shadbot {
                             Utils.randValue(TextUtils.TIP_MESSAGES));
                     return client.updatePresence(Presence.online(Activity.playing(presence)));
                 })
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(client, err))
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
+                .subscribe(null, ExceptionHandler::handleUnknownError);
 
         LOGGER.info("Starting bot list stats scheduler.");
         Shadbot.botListStats = new BotListStats();
@@ -143,8 +150,8 @@ public final class Shadbot {
                                 LOGGER.warn("{} took a long time to be processed ({}ms).", tuple.getT2(), tuple.getT1());
                             }
                         })
-                        .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(client, err))))
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+                        .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     /**

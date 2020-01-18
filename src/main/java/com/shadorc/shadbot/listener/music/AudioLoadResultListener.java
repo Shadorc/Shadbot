@@ -5,7 +5,6 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.music.GuildMusic;
@@ -54,7 +53,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         FormatUtils.trackName(audioTrack.getInfo())), channel))
                 .doOnTerminate(this::terminate)
                 .subscribeOn(Schedulers.boundedElastic())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     @Override
@@ -96,7 +95,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 })
                 .doOnTerminate(this::terminate)
                 .subscribeOn(Schedulers.boundedElastic())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     private void onPlaylistLoaded(AudioPlaylist playlist) {
@@ -123,7 +122,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 })
                 .doOnTerminate(this::terminate)
                 .subscribeOn(Schedulers.boundedElastic())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     private Consumer<EmbedCreateSpec> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
@@ -158,7 +157,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 })
                 .doOnTerminate(this::terminate)
                 .subscribeOn(Schedulers.boundedElastic())
-                .subscribe(null, thr -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), thr));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     @Override
@@ -173,7 +172,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
                 .doOnTerminate(this::terminate)
                 .subscribeOn(Schedulers.boundedElastic())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     private void terminate() {

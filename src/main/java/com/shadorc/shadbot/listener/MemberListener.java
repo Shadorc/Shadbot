@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.GatewayDiscordClient;

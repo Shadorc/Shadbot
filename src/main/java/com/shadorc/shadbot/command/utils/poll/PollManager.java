@@ -40,7 +40,7 @@ public class PollManager {
     public void start() {
         this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration());
         this.show()
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.context.getClient(), err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     public void stop() {
@@ -76,7 +76,7 @@ public class PollManager {
         this.cancelScheduledTask();
         this.scheduledTask = Mono.delay(duration, Schedulers.boundedElastic())
                 .then(mono)
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.context.getClient(), err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     private void cancelScheduledTask() {

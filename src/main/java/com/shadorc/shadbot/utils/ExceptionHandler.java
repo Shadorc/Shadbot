@@ -7,7 +7,6 @@ import com.shadorc.shadbot.exception.MissingArgumentException;
 import com.shadorc.shadbot.exception.MissingPermissionException;
 import com.shadorc.shadbot.exception.NoMusicException;
 import com.shadorc.shadbot.object.Emoji;
-import discord4j.core.GatewayDiscordClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -67,29 +66,28 @@ public final class ExceptionHandler {
 
     private static Mono<Void> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {
         final Throwable cause = err.getCause() != null ? err.getCause() : err;
-        return Mono.fromRunnable(() -> LogUtils.warn(context.getClient(),
-                String.format("{Guild ID: %d} [%s] Server access error on input '%s'. %s: %s",
-                        context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent(),
-                        cause.getClass().getName(), cause.getMessage())))
+        return Mono.fromRunnable(() -> LogUtils.warn("{Guild ID: %d} [%s] Server access error on input '%s'. %s: %s",
+                context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent(),
+                cause.getClass().getName(), cause.getMessage()))
                 .and(context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(String.format(
-                                Emoji.RED_FLAG + " (**%s**) Mmmh... The web service related to the `%s%s` command is not available right now... "
-                                        + "This is not my fault, I promise ! Try again later.",
+                                Emoji.RED_FLAG + " (**%s**) Mmmh... The web service related to the `%s%s` command is " +
+                                        "not available right now... This is not my fault, I promise ! Try again later.",
                                 context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
     }
 
     private static Mono<Void> onUnknown(Throwable err, BaseCmd cmd, Context context) {
-        return Mono.fromRunnable(() -> LogUtils.error(context.getClient(), err,
-                String.format("{Guild ID: %d} [%s] An unknown error occurred.", context.getGuildId().asLong(), cmd.getClass().getSimpleName()),
-                context.getContent()))
+        return Mono.fromRunnable(() -> LogUtils.error(err, String.format("{Guild ID: %d} [%s] An unknown error occurred.",
+                context.getGuildId().asLong(), cmd.getClass().getSimpleName()), context.getContent()))
                 .and(context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while executing `%s%s`. My developer has been warned.",
+                                String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while " +
+                                                "executing `%s%s`. My developer has been warned.",
                                         context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
     }
 
-    public static void handleUnknownError(GatewayDiscordClient client, Throwable err) {
-        LogUtils.error(client, err, "An unknown error occurred.");
+    public static void handleUnknownError(Throwable err) {
+        LogUtils.error(err, "An unknown error occurred.");
     }
 
 }
