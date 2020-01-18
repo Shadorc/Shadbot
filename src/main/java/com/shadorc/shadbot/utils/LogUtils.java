@@ -6,15 +6,66 @@ import reactor.util.Loggers;
 
 public final class LogUtils {
 
+    private enum TagName {
+        EXCEPTION_CLASS("exception_class"),
+        EXCEPTION_MESSAGE("exception_message"),
+        TYPE("type");
+
+        private final String name;
+
+        TagName(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
+    }
+
+    private enum ExtraName {
+        MESSAGE("message"),
+        INPUT("input");
+
+        private final String name;
+
+        ExtraName(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
+    }
+
+    private enum TagValue {
+        WARN("warn"),
+        ERROR("error");
+
+        private final String value;
+
+        TagValue(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+    }
+
     private static final Logger LOGGER = Loggers.getLogger("shadbot");
 
     public static void error(Throwable error, String message, String input) {
         LOGGER.error(String.format("%s (Input: %s)", message, input), error);
 
         Sentry.getContext().clear();
-        Sentry.getContext().addTag("type", "error");
-        Sentry.getContext().addExtra("message", message);
-        Sentry.getContext().addExtra("input", input);
+        Sentry.getContext().addTag(TagName.TYPE.toString(), TagValue.ERROR.toString());
+        Sentry.getContext().addTag(TagName.EXCEPTION_CLASS.toString(), error.getClass().getSimpleName());
+        Sentry.getContext().addTag(TagName.EXCEPTION_MESSAGE.toString(), error.getMessage());
+        Sentry.getContext().addExtra(ExtraName.MESSAGE.toString(), message);
+        Sentry.getContext().addExtra(ExtraName.INPUT.toString(), input);
         Sentry.capture(error);
     }
 
@@ -22,8 +73,10 @@ public final class LogUtils {
         LOGGER.error(message, error);
 
         Sentry.getContext().clear();
-        Sentry.getContext().addTag("type", "error");
-        Sentry.getContext().addExtra("message", message);
+        Sentry.getContext().addTag(TagName.TYPE.toString(), TagValue.ERROR.toString());
+        Sentry.getContext().addTag(TagName.EXCEPTION_CLASS.toString(), error.getClass().getSimpleName());
+        Sentry.getContext().addTag(TagName.EXCEPTION_MESSAGE.toString(), error.getMessage());
+        Sentry.getContext().addExtra(ExtraName.MESSAGE.toString(), message);
         Sentry.capture(error);
     }
 
@@ -31,7 +84,7 @@ public final class LogUtils {
         LOGGER.error(message);
 
         Sentry.getContext().clear();
-        Sentry.getContext().addTag("type", "error");
+        Sentry.getContext().addTag(TagName.TYPE.toString(), TagValue.ERROR.toString());
         Sentry.capture(message);
     }
 
@@ -39,7 +92,7 @@ public final class LogUtils {
         LOGGER.warn(String.format(format, args));
 
         Sentry.getContext().clear();
-        Sentry.getContext().addTag("type", "warn");
+        Sentry.getContext().addTag(TagName.TYPE.toString(), TagValue.WARN.toString());
         Sentry.capture(String.format(format, args));
     }
 
