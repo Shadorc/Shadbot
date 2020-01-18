@@ -41,19 +41,6 @@ public final class MusicManager {
         this.audioPlayerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         this.guildMusicConnections = new ConcurrentHashMap<>();
-
-        /*
-        //IPv6 rotation config
-        if (Config.IPV6_BLOCK != null && !Config.IPV6_BLOCK.isEmpty()) {
-            LOGGER.info("Configuring YouTube IP rotator.");
-            final List<IpBlock> blocks = Collections.singletonList(new Ipv6Block(Config.IPV6_BLOCK));
-            final AbstractRoutePlanner planner = new RotatingNanoIpRoutePlanner(blocks);
-
-            new YoutubeIpRotatorSetup(planner)
-                    .forSource(this.audioPlayerManager.source(YoutubeAudioSourceManager.class))
-                    .setup();
-        }
-        */
     }
 
     /**

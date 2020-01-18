@@ -41,7 +41,6 @@ public final class Config {
     public static final int RELIC_DURATION = Integer.parseInt(PROPERTIES.getProperty("relic.duration"));
     public static final long MAX_COINS = Long.parseLong(PROPERTIES.getProperty("coins.max"));
     public static final String DATABASE_NAME = PROPERTIES.getProperty("database.name");
-    public static final String IPV6_BLOCK = PROPERTIES.getProperty("ipv6.block");
 
     private static Properties loadProperties() {
         final Properties properties = new Properties();
