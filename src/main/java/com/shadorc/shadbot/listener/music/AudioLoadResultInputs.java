@@ -3,6 +3,8 @@ package com.shadorc.shadbot.listener.music;
 import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -38,39 +40,54 @@ public class AudioLoadResultInputs extends Inputs {
 
     @Override
     public Mono<Void> processEvent(MessageCreateEvent event) {
-        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
+        final Mono<GuildMusic> getGuildMusic = Mono.justOrEmpty(MusicManager.getInstance()
+                .getMusic(this.listener.getGuildId()));
 
-        final String content = event.getMessage().getContent().orElseThrow();
-        final String prefix = DatabaseManager.getGuilds().getDBGuild(this.listener.getGuildId()).getSettings().getPrefix();
-        if (content.equals(String.format("%scancel", prefix))) {
-            guildMusic.setWaitingForChoice(false);
-            return guildMusic.getMessageChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(
-                            String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
-                                    event.getMember().orElseThrow().getUsername()), channel))
-                    .then();
-        }
+        final Mono<String> getPrefix = DatabaseManager.getGuilds()
+                .getDBGuild(this.listener.getGuildId())
+                .map(DBGuild::getSettings)
+                .map(Settings::getPrefix);
 
-        // Remove prefix and command names from message content
-        String contentCleaned = StringUtils.remove(content, prefix);
-        contentCleaned = StringUtils.remove(contentCleaned, CommandManager.getInstance()
-                .getCommand("play").getNames().toArray(new String[0]));
+        return Mono.zip(getGuildMusic, Mono.justOrEmpty(event.getMessage().getContent()), getPrefix)
+                .flatMap(tuple -> {
+                    final GuildMusic guildMusic = tuple.getT1();
+                    final String content = tuple.getT2();
+                    final String prefix = tuple.getT3();
 
-        final Set<Integer> choices = new HashSet<>();
-        for (final String choice : contentCleaned.split(",")) {
-            // If the choice is not valid, ignore the message
-            final Integer num = NumberUtils.toIntBetweenOrNull(choice.trim(), 1, Math.min(Config.MUSIC_SEARCHES, this.listener.getResultTracks().size()));
-            if (num == null) {
-                return Mono.empty();
-            }
+                    if (content.equals(String.format("%scancel", prefix))) {
+                        guildMusic.setWaitingForChoice(false);
+                        return guildMusic.getMessageChannel()
+                                .flatMap(channel -> DiscordUtils.sendMessage(
+                                        String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
+                                                event.getMember().orElseThrow().getUsername()), channel))
+                                .then(Mono.empty());
+                    }
 
-            choices.add(num);
-        }
+                    final String[] playCmdNames = CommandManager.getInstance()
+                            .getCommand("play")
+                            .getNames()
+                            .toArray(new String[0]);
 
-        choices.forEach(choice -> this.listener.trackLoaded(this.listener.getResultTracks().get(choice - 1)));
+                    // Remove prefix and command names from message content
+                    String contentCleaned = StringUtils.remove(content, prefix);
+                    contentCleaned = StringUtils.remove(contentCleaned, playCmdNames);
 
-        guildMusic.setWaitingForChoice(false);
-        return Mono.empty();
+                    final Set<Integer> choices = new HashSet<>();
+                    for (final String choice : contentCleaned.split(",")) {
+                        // If the choice is not valid, ignore the message
+                        final Integer num = NumberUtils.toIntBetweenOrNull(choice.trim(), 1,
+                                Math.min(Config.MUSIC_SEARCHES, this.listener.getResultTracks().size()));
+                        if (num == null) {
+                            return Mono.empty();
+                        }
+
+                        choices.add(num);
+                    }
+
+                    choices.forEach(choice -> this.listener.trackLoaded(this.listener.getResultTracks().get(choice - 1)));
+                    guildMusic.setWaitingForChoice(false);
+                    return Mono.empty();
+                });
     }
 
     @Override
