@@ -9,6 +9,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
+import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.object.entity.User;
@@ -16,6 +17,7 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -100,17 +102,23 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     private void onPlaylistLoaded(AudioPlaylist playlist) {
         Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
-                .flatMap(guildMusic -> {
+                // Request to determine if the guild or the user is premium
+                .zipWith(Mono.zip(DatabaseManager.getPremium().isGuildPremium(this.guildId),
+                        DatabaseManager.getPremium().isUserPremium(this.djId))
+                        .map(tuple -> tuple.getT1() || tuple.getT2()))
+                .flatMap(tuple -> {
+                    final GuildMusic guildMusic = tuple.getT1();
+                    final boolean isPremium = tuple.getT2();
+
+                    final TrackScheduler trackScheduler = guildMusic.getTrackScheduler();
                     final StringBuilder strBuilder = new StringBuilder();
 
                     int musicsAdded = 0;
                     for (final AudioTrack track : playlist.getTracks()) {
-                        guildMusic.getTrackScheduler().startOrQueue(track, this.insertFirst);
+                        trackScheduler.startOrQueue(track, this.insertFirst);
                         musicsAdded++;
                         // The playlist limit is reached and the user / guild is not premium
-                        if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.PLAYLIST_SIZE - 1
-                                && !DatabaseManager.getPremium().isGuildPremium(this.guildId)
-                                && !DatabaseManager.getPremium().isUserPremium(this.djId)) {
+                        if (trackScheduler.getPlaylist().size() >= Config.PLAYLIST_SIZE - 1 && !isPremium) {
                             strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
                             break;
                         }
