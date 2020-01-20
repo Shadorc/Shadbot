@@ -7,6 +7,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.music.TrackScheduler;
@@ -17,7 +19,6 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -89,8 +90,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
                     return guildMusic.getClient().getUserById(guildMusic.getDjId())
                             .map(User::getAvatarUrl)
-                            .flatMap(avatarUrl -> guildMusic.getMessageChannel()
-                                    .flatMap(channel -> DiscordUtils.sendMessage(this.getPlaylistEmbed(playlist, avatarUrl), channel)))
+                            .flatMap(avatarUrl -> this.getPlaylistEmbed(playlist, avatarUrl))
+                            .flatMap(embed -> guildMusic.getMessageChannel()
+                                    .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                             .flatMapMany(ignored -> new AudioLoadResultInputs(guildMusic.getClient(), Duration.ofSeconds(30), this)
                                     .waitForInputs()
                                     .then(Mono.fromRunnable(() -> guildMusic.setWaitingForChoice(false))));
@@ -133,7 +135,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    private Consumer<EmbedCreateSpec> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
+    private Mono<Consumer<EmbedCreateSpec>> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
         final String choices = FormatUtils.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
                 count -> {
                     final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
@@ -141,15 +143,19 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 });
 
         final String playlistName = org.apache.commons.lang3.StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
-                        .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
-                        .setDescription("**Select a music by typing the corresponding number.**"
-                                + "\nYou can choose several musics by separating them with a comma."
-                                + "\nExample: 1,3,4"
-                                + "\n\n" + choices)
-                        .setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-                                DatabaseManager.getGuilds().getDBGuild(this.guildId).getSettings().getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
+        return DatabaseManager.getGuilds()
+                .getDBGuild(this.guildId)
+                .map(DBGuild::getSettings)
+                .map(Settings::getPrefix)
+                .map(prefix -> DiscordUtils.getDefaultEmbed()
+                        .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
+                                .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
+                                .setDescription("**Select a music by typing the corresponding number.**"
+                                        + "\nYou can choose several musics by separating them with a comma."
+                                        + "\nExample: 1,3,4"
+                                        + "\n\n" + choices)
+                                .setFooter(String.format("Use %scancel to cancel the selection (Automatically " +
+                                                "canceled in %ds).", prefix, Config.MUSIC_CHOICE_DURATION), null)));
     }
 
     @Override
