@@ -1,7 +1,8 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.Settings;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
@@ -27,19 +28,25 @@ public class MemberListener {
 
         @Override
         public Mono<Void> execute(MemberJoinEvent event) {
-            final Settings settings = DatabaseManager.getGuilds().getDBGuild(event.getGuildId()).getSettings();
-
-            final Mono<Message> sendWelcomeMessage = Mono.zip(
-                    Mono.justOrEmpty(settings.getMessageChannelId()),
-                    Mono.justOrEmpty(settings.getJoinMessage()))
+            // Send an automatic join message if one was configured
+            final Mono<Message> sendWelcomeMessage = DatabaseManager.getGuilds()
+                    .getDBGuild(event.getGuildId())
+                    .map(DBGuild::getSettings)
+                    .flatMap(settings -> Mono.zip(
+                            Mono.justOrEmpty(settings.getMessageChannelId()),
+                            Mono.justOrEmpty(settings.getJoinMessage())))
                     .flatMap(tuple -> MemberListener.sendAutoMessage(event.getClient(), event.getMember(),
                             tuple.getT1(), tuple.getT2()));
 
+            // Add auto-roles when an user joins if they are configured
             final Flux<Void> addAutoRoles = Mono.zip(event.getGuild(), event.getClient().getSelfId())
                     .flatMap(tuple -> tuple.getT1().getMemberById(tuple.getT2()))
                     .flatMapMany(self -> self.getBasePermissions()
                             .filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
-                            .flatMapMany(ignored -> Flux.fromIterable(settings.getAutoRoleIds())
+                            .flatMap(ignored -> DatabaseManager.getGuilds()
+                                    .getDBGuild(event.getGuildId())
+                                    .map(DBGuild::getSettings))
+                            .flatMapMany(settings -> Flux.fromIterable(settings.getAutoRoleIds())
                                     .flatMap(roleId -> event.getClient().getRoleById(event.getGuildId(), roleId))
                                     .filterWhen(role -> self.hasHigherRoles(Set.of(role.getId())))
                                     .flatMap(role -> event.getMember().addRole(role.getId()))));
@@ -57,21 +64,23 @@ public class MemberListener {
 
         @Override
         public Mono<Void> execute(MemberLeaveEvent event) {
-            final Settings settings = DatabaseManager.getGuilds().getDBGuild(event.getGuildId()).getSettings();
-
             // Delete the member from the database
-            event.getMember()
-                    .ifPresent(member -> DatabaseManager.getGuilds()
-                            .getDBMember(member.getGuildId(), member.getId())
-                            .delete());
+            final Mono<Void> deleteMember = Mono.justOrEmpty(event.getMember())
+                    .flatMap(member -> DatabaseManager.getGuilds()
+                            .getDBMember(member.getGuildId(), member.getId()))
+                    .flatMap(DBMember::delete);
 
-            final Mono<Message> sendLeaveMessage = Mono.zip(
-                    Mono.justOrEmpty(settings.getMessageChannelId()),
-                    Mono.justOrEmpty(settings.getLeaveMessage()))
+            // Send an automatic leave message if one was configured
+            final Mono<Message> sendLeaveMessage = DatabaseManager.getGuilds()
+                    .getDBGuild(event.getGuildId())
+                    .map(DBGuild::getSettings)
+                    .flatMap(settings -> Mono.zip(
+                            Mono.justOrEmpty(settings.getMessageChannelId()),
+                            Mono.justOrEmpty(settings.getLeaveMessage())))
                     .flatMap(tuple -> MemberListener.sendAutoMessage(event.getClient(), event.getUser(),
                             tuple.getT1(), tuple.getT2()));
 
-            return sendLeaveMessage.then();
+            return deleteMember.and(sendLeaveMessage);
         }
     }
 

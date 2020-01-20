@@ -9,11 +9,13 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.codec.IamCodec;
 import com.shadorc.shadbot.db.codec.LongCodec;
 import com.shadorc.shadbot.db.codec.SnowflakeCodec;
+import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.exception.CommandException;
 import discord4j.core.object.entity.Member;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.json.JsonWriterSettings;
+import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
 import java.util.*;
@@ -110,21 +112,25 @@ public final class Utils {
     /**
      * @param member - the member who bets
      * @param betStr - the string representing the bet
-     * @return A long representing {@code betStr} converted as an int
+     * @return A long representing {@code betStr} converted as a long
      * @throws CommandException - thrown if {@code betStr} cannot be casted to an long
      *                          or if the {@code user} does not have enough coins.
      */
-    public static long requireValidBet(Member member, String betStr) {
+    public static Mono<Long> requireValidBet(Member member, String betStr) {
         final Long bet = NumberUtils.toPositiveLongOrNull(betStr);
         if (bet == null) {
             throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
         }
 
-        if (DatabaseManager.getGuilds().getDBMember(member.getGuildId(), member.getId()).getCoins() < bet) {
-            throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
-        }
-
-        return bet;
+        return DatabaseManager.getGuilds()
+                .getDBMember(member.getGuildId(), member.getId())
+                .map(DBMember::getCoins)
+                .map(coins -> {
+                    if (coins < bet) {
+                        throw new CommandException(TextUtils.NOT_ENOUGH_COINS);
+                    }
+                    return bet;
+                });
     }
 
 }
