@@ -15,6 +15,10 @@ import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class GuildsCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.guilds");
@@ -42,19 +46,26 @@ public class GuildsCollection extends DatabaseCollection {
     }
 
     public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {
-        LOGGER.debug("[DBMember {} / {}] Request.", memberId.asLong(), guildId.asLong());
+        return this.getDBMembers(guildId, memberId)
+                .filter(dbMember -> dbMember.getId().equals(memberId))
+                .next();
+    }
+
+    public Flux<DBMember> getDBMembers(Snowflake guildId, Snowflake... memberIds) {
+        LOGGER.debug("[DBMember {} / {}] Request.", Arrays.toString(memberIds), guildId.asLong());
 
         return this.getDBGuild(guildId)
                 .map(DBGuild::getMembers)
                 .flatMapMany(Flux::fromIterable)
-                .filter(dbMember -> dbMember.getId().equals(memberId))
-                .next()
-                .doOnSuccess(consumer -> {
-                    if(consumer == null) {
-                        LOGGER.debug("[DBMember {} / {}] Not found.", memberId.asLong(), guildId.asLong());
+                .collectMap(DBMember::getId)
+                .map(dbMembers -> {
+                    final List<DBMember> list = new ArrayList<>();
+                    for (final Snowflake memberId : memberIds) {
+                        list.add(dbMembers.computeIfAbsent(memberId, id -> new DBMember(guildId, id)));
                     }
+                    return list;
                 })
-                .defaultIfEmpty(new DBMember(guildId, memberId));
+                .flatMapMany(Flux::fromIterable);
     }
 
 }
