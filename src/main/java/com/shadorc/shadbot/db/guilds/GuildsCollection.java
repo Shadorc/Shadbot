@@ -38,7 +38,7 @@ public class GuildsCollection extends DatabaseCollection {
                 .flatMap(document -> Mono.fromCallable(() ->
                         new DBGuild(Utils.MAPPER.readValue(document.toJson(Utils.JSON_WRITER_SETTINGS), DBGuildBean.class))))
                 .doOnSuccess(consumer -> {
-                    if(consumer == null) {
+                    if (consumer == null) {
                         LOGGER.debug("[DBGuild {}] Not found.", guildId.asLong());
                     }
                 })

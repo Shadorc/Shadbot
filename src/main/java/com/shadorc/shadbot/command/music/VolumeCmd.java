@@ -55,7 +55,7 @@ public class VolumeCmd extends BaseCmd {
                                                             "You can set the volume **up to %d%% and gain other " +
                                                             "advantage** by contributing " +
                                                             "to Shadbot. More info here: <%s>",
-                                            Config.VOLUME_MAX, Config.VOLUME_MAX_PREMIUM, Config.PATREON_URL)));
+                                                    Config.VOLUME_MAX, Config.VOLUME_MAX_PREMIUM, Config.PATREON_URL)));
                                 }
 
                                 scheduler.setVolume(volume > Config.VOLUME_MAX_PREMIUM ? Config.VOLUME_MAX_PREMIUM : volume);

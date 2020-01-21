@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.data;
 
 import com.shadorc.shadbot.utils.ExitCode;
-import discord4j.core.object.util.Snowflake;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 

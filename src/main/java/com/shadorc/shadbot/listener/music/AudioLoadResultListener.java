@@ -155,7 +155,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                         + "\nExample: 1,3,4"
                                         + "\n\n" + choices)
                                 .setFooter(String.format("Use %scancel to cancel the selection (Automatically " +
-                                                "canceled in %ds).", prefix, Config.MUSIC_CHOICE_DURATION), null)));
+                                        "canceled in %ds).", prefix, Config.MUSIC_CHOICE_DURATION), null)));
     }
 
     @Override

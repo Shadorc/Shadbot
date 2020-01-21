@@ -3,7 +3,6 @@ package com.shadorc.shadbot.api.html.thisday;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
