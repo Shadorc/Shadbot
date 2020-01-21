@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.api.musixmatch;
+package com.shadorc.shadbot.api.html.musixmatch;
 
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.object.Embed;
