@@ -34,8 +34,9 @@ public class VolumeCmd extends BaseCmd {
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     if (context.getArg().isEmpty()) {
                         return context.getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SOUND + " (**%s**) Current volume level: **%d%%**",
-                                        context.getUsername(), scheduler.getAudioPlayer().getVolume()), channel));
+                                .flatMap(channel -> DiscordUtils.sendMessage(
+                                        String.format(Emoji.SOUND + " (**%s**) Current volume level: **%d%%**",
+                                                context.getUsername(), scheduler.getAudioPlayer().getVolume()), channel));
                     }
 
                     final String arg = context.getArg().get();
@@ -44,19 +45,25 @@ public class VolumeCmd extends BaseCmd {
                         return Mono.error(new CommandException(String.format("`%s` is not a valid volume.", arg)));
                     }
 
-                    if (volume > Config.VOLUME_MAX && !DatabaseManager.getPremium().isGuildPremium(context.getGuildId())
-                            && !DatabaseManager.getPremium().isUserPremium(context.getAuthorId())) {
-                        return Mono.error(new CommandException(String.format("You cannot set the volume higher than %d%%. " +
-                                        "You can set the volume **up to %d%% and gain other advantage** by contributing " +
-                                        "to Shadbot. More info here: <%s>",
-                                Config.VOLUME_MAX, Config.VOLUME_MAX_PREMIUM, Config.PATREON_URL)));
-                    }
+                    return Mono.zip(DatabaseManager.getPremium().isGuildPremium(context.getGuildId()),
+                            DatabaseManager.getPremium().isUserPremium(context.getAuthorId()))
+                            .map(tuple -> tuple.getT1() || tuple.getT2())
+                            .flatMap(isPremium -> {
+                                if (volume > Config.VOLUME_MAX && !isPremium) {
+                                    return Mono.error(new CommandException(
+                                            String.format("You cannot set the volume higher than %d%%. " +
+                                                            "You can set the volume **up to %d%% and gain other " +
+                                                            "advantage** by contributing " +
+                                                            "to Shadbot. More info here: <%s>",
+                                            Config.VOLUME_MAX, Config.VOLUME_MAX_PREMIUM, Config.PATREON_URL)));
+                                }
 
-                    scheduler.setVolume(volume > Config.VOLUME_MAX_PREMIUM ? Config.VOLUME_MAX_PREMIUM : volume);
-                    return context.getChannel()
-                            .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
-                                    scheduler.getAudioPlayer().getVolume(), context.getUsername()),
-                                    channel));
+                                scheduler.setVolume(volume > Config.VOLUME_MAX_PREMIUM ? Config.VOLUME_MAX_PREMIUM : volume);
+                                return context.getChannel()
+                                        .flatMap(channel -> DiscordUtils.sendMessage(
+                                                String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
+                                                        scheduler.getAudioPlayer().getVolume(), context.getUsername()), channel));
+                            });
                 })
                 .then();
     }

@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -24,13 +25,14 @@ public class PrefixCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
-        final String prefix = dbGuild.getSettings().getPrefix();
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(
+        return DatabaseManager.getGuilds()
+                .getDBGuild(context.getGuildId())
+                .map(DBGuild::getSettings)
+                .map(Settings::getPrefix)
+                .zipWith(context.getChannel())
+                .flatMap(tuple -> DiscordUtils.sendMessage(
                         String.format(Emoji.INFO + " The prefix for this server is `%s`. For example: `%shelp`",
-                                prefix, prefix), channel))
+                                tuple.getT1(), tuple.getT1()), tuple.getT2()))
                 .then();
     }
 
