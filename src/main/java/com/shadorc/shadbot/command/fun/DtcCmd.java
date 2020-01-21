@@ -22,6 +22,8 @@ import java.util.function.Consumer;
 
 public class DtcCmd extends BaseCmd {
 
+    private static final String HOME_URL = "https://api.danstonchat.com/0.3/view/random";
+
     public DtcCmd() {
         super(CommandCategory.FUN, List.of("dtc"));
         this.setDefaultRateLimiter();
@@ -31,8 +33,8 @@ public class DtcCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final String url = String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
-                CredentialManager.getInstance().get(Credential.DTC_API_KEY));
+        final String url = String.format("%s?key=%s&format=json",
+                HOME_URL, CredentialManager.getInstance().get(Credential.DTC_API_KEY));
 
         final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))

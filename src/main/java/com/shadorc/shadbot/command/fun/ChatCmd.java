@@ -25,8 +25,10 @@ import java.util.function.Consumer;
 public class ChatCmd extends BaseCmd {
 
     private static final String HOME_URl = "https://www.pandorabots.com/pandora/talk-xml";
-    private static final Map<String, String> BOTS = Map.of("Marvin", "efc39100ce34d038", "Chomsky", "b0dafd24ee35a477",
-            "R.I.V.K.A", "ea373c261e3458c6", "Lisa", "b0a6a41a5e345c23");
+    private static final Map<String, String> BOTS = Map.of("Marvin", "efc39100ce34d038",
+            "Chomsky", "b0dafd24ee35a477",
+            "R.I.V.K.A", "ea373c261e3458c6",
+            "Lisa", "b0a6a41a5e345c23");
     private static final int MAX_CHARACTERS = 250;
 
     private final Map<Snowflake, String> channelsCustid;
