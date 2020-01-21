@@ -65,12 +65,13 @@ public final class PremiumCollection extends DatabaseCollection {
         return relic;
     }
 
-    public Mono<Boolean> isUserPremium(Snowflake userId) {
-        return this.getRelicsByUser(userId).hasElements();
-    }
+    public Mono<Boolean> isPremium(Snowflake guildId, Snowflake userId) {
+        final Publisher<Document> request = this.getCollection()
+                .find(Filters.or(
+                        Filters.eq("user_id", userId.asString()),
+                        Filters.eq("guild_id", guildId.asString())));
 
-    public Mono<Boolean> isGuildPremium(Snowflake guildId) {
-        return this.getRelicsByGuild(guildId).hasElements();
+        return Flux.from(request).hasElements();
     }
 
 }
