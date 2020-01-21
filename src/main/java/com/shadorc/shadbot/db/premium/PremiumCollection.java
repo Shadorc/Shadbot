@@ -59,13 +59,15 @@ public final class PremiumCollection extends DatabaseCollection {
                 .map(Relic::new);
     }
 
-    public Relic generateRelic(RelicType type) {
+    public Mono<Relic> generateRelic(RelicType type) {
         final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.RELIC_DURATION));
-        relic.insert();
-        return relic;
+        return relic.insert()
+                .thenReturn(relic);
     }
 
     public Mono<Boolean> isPremium(Snowflake guildId, Snowflake userId) {
+        LOGGER.debug("[Is premium {} / {}] Request.", guildId.asLong(), userId.asLong());
+
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.or(
                         Filters.eq("user_id", userId.asString()),
