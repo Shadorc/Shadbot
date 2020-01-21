@@ -53,7 +53,8 @@ public class PruneCmd extends BaseCmd {
                             final List<String> quotedElements = StringUtils.getQuotedElements(arg);
 
                             if (arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
-                                return Flux.error(new CommandException("You have forgotten a quote or have specified several quotes in quotation marks."));
+                                return Flux.error(new CommandException("You have forgotten a quote or have specified " +
+                                        "several quotes in quotation marks."));
                             }
 
                             final String words = quotedElements.isEmpty() ? null : quotedElements.get(0);
@@ -66,8 +67,9 @@ public class PruneCmd extends BaseCmd {
 
                             Integer count = NumberUtils.toPositiveIntOrNull(argCleaned);
                             if (!argCleaned.isEmpty() && count == null) {
-                                return Flux.error(new CommandException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
-                                                + "please include them in quotation marks. See `%shelp %s` for more information.",
+                                return Flux.error(new CommandException(String.format("`%s` is not a valid number. " +
+                                                "If you want to specify a word or a sentence, please include them " +
+                                                "in quotation marks. See `%shelp %s` for more information.",
                                         argCleaned, context.getPrefix(), this.getName())));
                             }
 
