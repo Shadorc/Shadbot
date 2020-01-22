@@ -34,8 +34,8 @@ public final class FormatUtils {
     }
 
     /**
-     * @param duration - the duration to format
-     * @return The formatted duration, not null, as D days and H hours and S minutes
+     * @param duration the duration to format
+     * @return The formatted duration as D days H hours S minutes.
      */
     public static String customDate(Duration duration) {
         final long minutes = duration.toMinutesPart();
@@ -56,6 +56,30 @@ public final class FormatUtils {
         return strBuilder.toString();
     }
 
+    /**
+     * @param instant the instant to format
+     * @return The formatted instant (e.g X days, Y hours, Z seconds).
+     */
+    public static String longDuration(Instant instant) {
+        final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
+        final String str = period.getUnits().stream()
+                .filter(unit -> period.get(unit) != 0)
+                .map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
+                .collect(Collectors.joining(", "));
+        return str.isEmpty() ? FormatUtils.shortDuration(instant.toEpochMilli()) : str;
+    }
+
+    /**
+     * @param durationMillis the duration to format (in milliseconds)
+     * @return The formatted duration as H:mm:ss.
+     */
+    public static String shortDuration(long durationMillis) {
+        if (TimeUnit.MILLISECONDS.toHours(durationMillis) > 0) {
+            return DurationFormatUtils.formatDuration(durationMillis, "H:mm:ss", true);
+        }
+        return DurationFormatUtils.formatDuration(durationMillis, "m:ss", true);
+    }
+
     public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
         return FormatUtils.format(enumClass.getEnumConstants(), value -> value.toString().toLowerCase(), delimiter);
     }
@@ -72,18 +96,9 @@ public final class FormatUtils {
         return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
     }
 
-    public static String longDuration(Instant instant) {
-        final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
-        final String str = period.getUnits().stream()
-                .filter(unit -> period.get(unit) != 0)
-                .map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
-                .collect(Collectors.joining(", "));
-        return str.isEmpty() ? FormatUtils.shortDuration(instant.toEpochMilli()) : str;
-    }
-
     /**
      * @param number the double number to format
-     * @return the formatted String using English locale
+     * @return The formatted number as a string using English locale.
      */
     public static String number(double number) {
         return NumberFormat.getNumberInstance(Locale.ENGLISH).format(number);
@@ -100,17 +115,6 @@ public final class FormatUtils {
     public static <E extends Enum<E>> String options(Class<E> enumClass) {
         return String.format("Options: %s",
                 FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
-    }
-
-    /**
-     * @param durationMillis - the duration to format in milliseconds
-     * @return The formatted duration, not null, as H:mm:ss
-     */
-    public static String shortDuration(long durationMillis) {
-        if (TimeUnit.MILLISECONDS.toHours(durationMillis) > 0) {
-            return DurationFormatUtils.formatDuration(durationMillis, "H:mm:ss", true);
-        }
-        return DurationFormatUtils.formatDuration(durationMillis, "m:ss", true);
     }
 
     public static String trackName(AudioTrackInfo info) {
