@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.core.game.player;
 
 import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Mono;
 
 public class GamblerPlayer extends Player {
 
@@ -15,16 +16,16 @@ public class GamblerPlayer extends Player {
         return this.bet;
     }
 
-    public void bet() {
-        this.lose(this.bet);
+    public Mono<Void> bet() {
+        return this.lose(this.bet);
     }
 
-    public void cancelBet() {
-        this.win(this.bet);
+    public Mono<Void> cancelBet() {
+        return this.win(this.bet);
     }
 
-    public void draw() {
-        this.cancelBet();
+    public Mono<Void> draw() {
+        return this.cancelBet();
     }
 
 }

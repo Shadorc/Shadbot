@@ -74,12 +74,15 @@ public class DiceCmd extends GameCmd<DiceGame> {
                         .then();
             }
 
-            final long bet = Utils.requireValidBet(context.getMember(), Long.toString(diceManager.getBet()));
-            final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(), bet, number);
-            if (diceManager.addPlayerIfAbsent(player)) {
-                player.bet();
-            }
-            return diceManager.show();
+            return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), diceManager.getBet())
+                    .flatMap(bet -> {
+                        final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(), bet, number);
+                        if (diceManager.addPlayerIfAbsent(player)) {
+                            return player.bet().then(diceManager.show());
+                        } else {
+                            return diceManager.show();
+                        }
+                    });
         }
         // A game is not already started...
         else {
@@ -88,14 +91,21 @@ public class DiceCmd extends GameCmd<DiceGame> {
                 return Mono.error(new MissingArgumentException());
             }
 
-            final long bet = Utils.requireValidBet(context.getMember(), args.get(1));
-            final DiceGame diceManager = this.getManagers().computeIfAbsent(context.getChannelId(),
-                    ignored -> new DiceGame(this, context, bet));
-            final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(), diceManager.getBet(), number);
-            if (diceManager.addPlayerIfAbsent(player)) {
-                player.bet();
-            }
-            return diceManager.start().then(diceManager.show());
+            return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), args.get(1))
+                    .map(bet -> this.getManagers().computeIfAbsent(context.getChannelId(),
+                            ignored -> new DiceGame(this, context, bet)))
+                    .flatMap(diceManager -> {
+                        final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(),
+                                diceManager.getBet(), number);
+                        if (diceManager.addPlayerIfAbsent(player)) {
+                            return player.bet()
+                                    .then(diceManager.start())
+                                    .then(diceManager.show());
+                        } else {
+                            return diceManager.start()
+                                    .then(diceManager.show());
+                        }
+                    });
         }
     }
 
@@ -103,9 +113,11 @@ public class DiceCmd extends GameCmd<DiceGame> {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
                 .setDescription("Start a dice game with a common bet.")
-                .addArg("num", "number between 1 and 6\nYou can't bet on a number that has already been chosen by another player.", false)
+                .addArg("num", "number between 1 and 6\nYou can't bet on a number that has already " +
+                        "been chosen by another player.", false)
                 .addArg("bet", false)
-                .addField("Gains", String.format("The winner gets the prize pool plus **%.1f times** his bet.", MULTIPLIER), false)
+                .addField("Gains", String.format("The winner gets the prize pool plus **%.1f times** " +
+                        "his bet.", MULTIPLIER), false)
                 .build();
     }
 }

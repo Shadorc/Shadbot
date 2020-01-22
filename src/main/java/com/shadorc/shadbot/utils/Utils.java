@@ -11,7 +11,9 @@ import com.shadorc.shadbot.db.codec.LongCodec;
 import com.shadorc.shadbot.db.codec.SnowflakeCodec;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.exception.CommandException;
-import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.json.JsonWriterSettings;
@@ -110,20 +112,30 @@ public final class Utils {
     }
 
     /**
-     * @param member - the member who bets
+     * @param guildId - the {@link Snowflake} ID of the {@link Guild} in which the {@link User} made the bet
+     * @param userId - the {@link Snowflake} ID of the {@link User} who made the bet
      * @param betStr - the string representing the bet
-     * @return A long representing {@code betStr} converted as a long
-     * @throws CommandException - thrown if {@code betStr} cannot be casted to an long
-     *                          or if the {@code user} does not have enough coins.
+     * @return A long representing {@code betStr}
+     * @throws CommandException - thrown if {@code betStr} cannot be casted to a long or if the user does not have enough coins.
      */
-    public static Mono<Long> requireValidBet(Member member, String betStr) {
+    public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, String betStr) {
         final Long bet = NumberUtils.toPositiveLongOrNull(betStr);
         if (bet == null) {
             throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
         }
+        return Utils.requireValidBet(guildId, userId, bet);
+    }
 
+    /**
+     * @param guildId - the {@link Snowflake} ID of the {@link Guild} in which the {@link User} made the bet
+     * @param userId - the {@link Snowflake} ID of the {@link User} who made the bet
+     * @param bet - the bet
+     * @return The bet.
+     * @throws CommandException - thrown if the user does not have enough coins.
+     */
+    public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, long bet) {
         return DatabaseManager.getGuilds()
-                .getDBMember(member.getGuildId(), member.getId())
+                .getDBMember(guildId, userId)
                 .map(DBMember::getCoins)
                 .map(coins -> {
                     if (coins < bet) {

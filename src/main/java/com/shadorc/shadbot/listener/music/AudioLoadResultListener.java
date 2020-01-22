@@ -104,10 +104,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     private void onPlaylistLoaded(AudioPlaylist playlist) {
         Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
-                // Request to determine if the guild or the user is premium
-                .zipWith(Mono.zip(DatabaseManager.getPremium().isGuildPremium(this.guildId),
-                        DatabaseManager.getPremium().isUserPremium(this.djId))
-                        .map(tuple -> tuple.getT1() || tuple.getT2()))
+                .zipWith(DatabaseManager.getPremium().isPremium(this.guildId, this.djId))
                 .flatMap(tuple -> {
                     final GuildMusic guildMusic = tuple.getT1();
                     final boolean isPremium = tuple.getT2();

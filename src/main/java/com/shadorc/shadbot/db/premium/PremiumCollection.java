@@ -8,6 +8,8 @@ import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.User;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -26,6 +28,10 @@ public final class PremiumCollection extends DatabaseCollection {
         super(database.getCollection("premium"));
     }
 
+    /**
+     * @param relicId - the ID of the {@link Relic} to get
+     * @return The {@link Relic} corresponding to the provided {@code relicId}.
+     */
     public Mono<Relic> getRelicById(String relicId) {
         LOGGER.debug("[Relic {}] Request.", relicId);
 
@@ -39,11 +45,19 @@ public final class PremiumCollection extends DatabaseCollection {
                 .map(Relic::new);
     }
 
+    /**
+     * @param userId - the {@link Snowflake} ID of the {@link User}
+     * @return A {@link Flux} containing the {@link Relic} possessed by an {@link User}.
+     */
     public Flux<Relic> getRelicsByUser(Snowflake userId) {
         LOGGER.debug("[Relics by user {}] Request.", userId.asLong());
         return this.getRelicsBy("user_id", userId);
     }
 
+    /**
+     * @param guildId - the {@link Snowflake} ID of the {@link Guild}
+     * @return A {@link Flux} containing the {@link Relic} possessed by a {@link Guild}.
+     */
     public Flux<Relic> getRelicsByGuild(Snowflake guildId) {
         LOGGER.debug("[Relics by guild {}] Request.", guildId.asLong());
         return this.getRelicsBy("guild_id", guildId);
@@ -59,12 +73,23 @@ public final class PremiumCollection extends DatabaseCollection {
                 .map(Relic::new);
     }
 
+    /**
+     * @param type - the {@link RelicType} type of the {@link Relic} to generate.
+     * @return The generated {@link Relic} inserted in the database.
+     */
     public Mono<Relic> generateRelic(RelicType type) {
         final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.RELIC_DURATION));
         return relic.insert()
                 .thenReturn(relic);
     }
 
+    /**
+     * Requests to determine if a {@link Guild} or a {@link User} are premium.
+     *
+     * @param guildId - the {@link Snowflake} ID of the {@link Guild} to check
+     * @param userId - the {@link Snowflake} ID of the {@link User} to check
+     * @return {@code true} if the {@link Guild} or the {@link User} is premium, {@code false} otherwise.
+     */
     public Mono<Boolean> isPremium(Snowflake guildId, Snowflake userId) {
         LOGGER.debug("[Is premium {} / {}] Request.", guildId.asLong(), userId.asLong());
 
