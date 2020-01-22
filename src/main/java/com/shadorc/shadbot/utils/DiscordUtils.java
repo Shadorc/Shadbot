@@ -114,7 +114,7 @@ public final class DiscordUtils {
 
     /**
      * @param message the message
-     * @return The members mentioned in a {@link Message}.
+     * @return A {@link Flux} of {@link Member} mentioned in a {@link Message}.
      */
     public static Flux<Member> getMembersFrom(Message message) {
         if (message.mentionsEveryone()) {
@@ -130,7 +130,7 @@ public final class DiscordUtils {
      * @param channel the channel
      * @param userId the user ID
      * @param permission the permission
-     * @return Return true if the user has the permission in the channel, false otherwise.
+     * @return {@code true} if the user has the permission in the channel, {@code false} otherwise.
      */
     public static Mono<Boolean> hasPermission(Channel channel, Snowflake userId, Permission permission) {
         // An user has all the permissions in a private channel
@@ -151,9 +151,8 @@ public final class DiscordUtils {
 
     /**
      * @param context the context
-     * @return The user voice channel ID if the user is in a voice channel and the bot is allowed to join or if the
-     * user is in a voice channel or if the
-     * user and the bot are in the same voice channel.
+     * @return The user voice channel ID if the user is in a voice channel <b>AND</b> the bot is allowed to join
+     * <b>OR</b> if the user and the bot are in the same voice channel.
      */
     public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
         final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getSelfAsMember()
