@@ -44,7 +44,7 @@ public final class Utils {
 
     /**
      * @param enumClass the {@link Enum} class
-     * @param value     the string representing the enumeration, case insensitive
+     * @param value the string representing the enumeration, case insensitive
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass} or null if it does not exist.
      */
     @Nullable
@@ -59,7 +59,7 @@ public final class Utils {
 
     /**
      * @param enumClass the {@link Enum} class
-     * @param value     the string representing the enumeration, case insensitive
+     * @param value the string representing the enumeration, case insensitive
      * @param exception the exception to be thrown
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass}.
      * @throws X - if the value is null
@@ -95,7 +95,7 @@ public final class Utils {
     }
 
     /**
-     * @param map        the map to sort
+     * @param map the map to sort
      * @param comparator a {@link Comparator} to be used to compare stream elements
      * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code
      * comparator}.
@@ -116,7 +116,8 @@ public final class Utils {
      * @param userId the {@link Snowflake} ID of the {@link User} who made the bet
      * @param betStr the string representing the bet
      * @return A long representing {@code betStr}.
-     * @throws CommandException - thrown if {@code betStr} cannot be casted to a long or if the user does not have enough coins.
+     * @throws CommandException - thrown if {@code betStr} cannot be casted to a long or if the user does not have
+     * enough coins.
      */
     public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, String betStr) {
         final Long bet = NumberUtils.toPositiveLongOrNull(betStr);

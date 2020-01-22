@@ -6,7 +6,8 @@ public final class NumberUtils {
 
     /**
      * @param str the string to parse as an integer number, may be {@code null}
-     * @return The string parsed as an Integer number or {@code null} if the string is not a valid representation of a number.
+     * @return The string parsed as an Integer number or {@code null} if the string is not a valid representation of
+     * a number.
      */
     @Nullable
     public static Integer toIntOrNull(@Nullable String str) {
@@ -53,7 +54,8 @@ public final class NumberUtils {
 
     /**
      * @param str the string to parse as a long number, may be {@code null}
-     * @return The string parsed as a Long number or {@code null} if the string is not a valid representation of a number.
+     * @return The string parsed as a Long number or {@code null} if the string is not a valid representation of a
+     * number.
      */
     @Nullable
     public static Long toLongOrNull(@Nullable String str) {

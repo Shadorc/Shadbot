@@ -7,17 +7,20 @@ import reactor.util.Loggers;
 public final class LogUtils {
 
     private static final class TagName {
+
         public static final String EXCEPTION_CLASS = "exception_class";
         public static final String EXCEPTION_MESSAGE = "exception_message";
         public static final String TYPE = "type";
     }
 
     private static final class ExtraName {
+
         public static final String MESSAGE = "message";
         public static final String INPUT = "input";
     }
 
     private static final class TagValue {
+
         public static final String WARN = "warn";
         public static final String ERROR = "error";
     }

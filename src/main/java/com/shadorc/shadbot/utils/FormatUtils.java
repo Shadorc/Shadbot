@@ -114,7 +114,8 @@ public final class FormatUtils {
 
     public static <E extends Enum<E>> String options(Class<E> enumClass) {
         return String.format("Options: %s",
-                FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
+                FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`",
+                        value.toString().toLowerCase()), ", "));
     }
 
     public static String trackName(AudioTrackInfo info) {

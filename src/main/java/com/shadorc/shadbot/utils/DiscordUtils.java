@@ -84,7 +84,7 @@ public final class DiscordUtils {
 
     /**
      * @param guild a {@link Guild} containing the channels to extract
-     * @param str   a string containing channels mentions / names
+     * @param str a string containing channels mentions / names
      * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels.
      */
     public static Flux<Snowflake> extractChannels(Guild guild, String str) {
@@ -99,7 +99,7 @@ public final class DiscordUtils {
 
     /**
      * @param guild a {@link Guild} containing the roles to extract
-     * @param str   a string containing role mentions / names
+     * @param str a string containing role mentions / names
      * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles.
      */
     public static Flux<Snowflake> extractRoles(Guild guild, String str) {
@@ -127,8 +127,8 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param channel    the channel
-     * @param userId     the user ID
+     * @param channel the channel
+     * @param userId the user ID
      * @param permission the permission
      * @return Return true if the user has the permission in the channel, false otherwise.
      */
@@ -151,7 +151,8 @@ public final class DiscordUtils {
 
     /**
      * @param context the context
-     * @return The user voice channel ID if the user is in a voice channel and the bot is allowed to join or if the user is in a voice channel or if the
+     * @return The user voice channel ID if the user is in a voice channel and the bot is allowed to join or if the
+     * user is in a voice channel or if the
      * user and the bot are in the same voice channel.
      */
     public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
