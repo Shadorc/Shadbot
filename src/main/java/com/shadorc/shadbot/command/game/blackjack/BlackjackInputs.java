@@ -67,7 +67,7 @@ public class BlackjackInputs extends Inputs {
                         return this.game.getContext().getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
                                         String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't " +
-                                                        "play anymore.", member.getUsername()), channel))
+                                                "play anymore.", member.getUsername()), channel))
                                 .then();
                     }
 

@@ -6,11 +6,10 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.db.premium.entity.Relic;
-import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -89,7 +88,7 @@ public final class PremiumCollection extends DatabaseCollection {
      * Requests to determine if a {@link Guild} or a {@link User} are premium.
      *
      * @param guildId - the {@link Snowflake} ID of the {@link Guild} to check
-     * @param userId - the {@link Snowflake} ID of the {@link User} to check
+     * @param userId  - the {@link Snowflake} ID of the {@link User} to check
      * @return {@code true} if the {@link Guild} or the {@link User} is premium, {@code false} otherwise.
      */
     public Mono<Boolean> isPremium(Snowflake guildId, Snowflake userId) {

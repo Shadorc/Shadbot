@@ -83,7 +83,7 @@ public class AutoMessageSetting extends BaseSetting {
                     final Channel channel = mentionedChannels.get(0);
                     return dbGuild.setSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong())
                             .thenReturn(String.format(Emoji.CHECK_MARK + " %s is now the default channel for " +
-                                            "join/leave messages.", channel.getMention()));
+                                    "join/leave messages.", channel.getMention()));
                 })
                 .flatMap(message -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(message, channel)));
