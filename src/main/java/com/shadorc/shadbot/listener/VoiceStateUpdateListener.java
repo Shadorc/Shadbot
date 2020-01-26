@@ -46,7 +46,8 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                     if (memberCount == 1 && !guildMusic.isLeavingScheduled()) {
                         guildMusic.getTrackScheduler().getAudioPlayer().setPaused(true);
                         guildMusic.scheduleLeave();
-                        return Mono.just(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the voice channel in 1 minute.");
+                        return Mono.just(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the " +
+                                "voice channel in 1 minute.");
                     }
                     // The bot is no more alone: unpause, cancel leave and warn users
                     else if (memberCount != 1 && guildMusic.isLeavingScheduled()) {

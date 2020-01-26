@@ -37,9 +37,6 @@ public class AutoRolesSetting extends BaseSetting {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(1), FormatUtils.options(Action.class))));
 
-        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
-        final List<Snowflake> autoRoles = dbGuild.getSettings().getAutoRoleIds();
-
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(2)))
                 .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
@@ -48,24 +45,32 @@ public class AutoRolesSetting extends BaseSetting {
                     if (mentionedRoles.isEmpty()) {
                         throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
                     }
+                    return mentionedRoles;
+                })
+                .zipWith(DatabaseManager.getGuilds()
+                        .getDBGuild(context.getGuildId()))
+                .flatMap(tuple -> {
+                    final List<Role> mentionedRoles = tuple.getT1();
+                    final DBGuild dbGuild = tuple.getT2();
 
                     final List<Snowflake> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
                             .collect(Collectors.toList());
+                    final List<Snowflake> autoRoleIds = dbGuild.getSettings().getAutoRoleIds();
 
                     final StringBuilder strBuilder = new StringBuilder();
                     if (action == Action.ADD) {
-                        autoRoles.addAll(mentionedRoleIds);
+                        autoRoleIds.addAll(mentionedRoleIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s added to auto-assigned roles.",
                                 FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
                     } else {
-                        autoRoles.removeAll(mentionedRoleIds);
+                        autoRoleIds.removeAll(mentionedRoleIds);
                         strBuilder.append(String.format(Emoji.CHECK_MARK + " %s removed from auto-assigned roles.",
                                 FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
                     }
 
-                    dbGuild.setSetting(this.getSetting(), autoRoles);
-                    return strBuilder.toString();
+                    return dbGuild.setSetting(this.getSetting(), autoRoleIds)
+                            .thenReturn(strBuilder.toString());
                 })
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))

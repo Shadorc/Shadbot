@@ -45,9 +45,7 @@ public class VolumeCmd extends BaseCmd {
                         return Mono.error(new CommandException(String.format("`%s` is not a valid volume.", arg)));
                     }
 
-                    return Mono.zip(DatabaseManager.getPremium().isGuildPremium(context.getGuildId()),
-                            DatabaseManager.getPremium().isUserPremium(context.getAuthorId()))
-                            .map(tuple -> tuple.getT1() || tuple.getT2())
+                    return DatabaseManager.getPremium().isPremium(context.getGuildId(), context.getAuthorId())
                             .flatMap(isPremium -> {
                                 if (volume > Config.VOLUME_MAX && !isPremium) {
                                     return Mono.error(new CommandException(
