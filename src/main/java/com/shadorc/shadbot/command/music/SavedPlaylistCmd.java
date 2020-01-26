@@ -76,7 +76,8 @@ public class SavedPlaylistCmd extends BaseCmd {
                     .flatMap(channel -> DiscordUtils.sendMessage(
                             String.format(Emoji.INFO + " (**%s**) There are no playlists saved. To save a playlist," +
                                             " use `%s%s %s` while listening to music.",
-                                    context.getUsername(), context.getPrefix(), this.getName(), Action.SAVE.toString().toLowerCase()), channel))
+                                    context.getUsername(), context.getPrefix(), this.getName(),
+                                    Action.SAVE.toString().toLowerCase()), channel))
                     .then();
         }
 

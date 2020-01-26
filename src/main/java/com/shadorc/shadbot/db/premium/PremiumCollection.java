@@ -6,6 +6,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.db.premium.entity.Relic;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.object.entity.Guild;
@@ -79,6 +80,7 @@ public final class PremiumCollection extends DatabaseCollection {
      */
     public Mono<Relic> generateRelic(RelicType type) {
         final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.RELIC_DURATION));
+        LOGGER.info("Relic generated. Type: %s, ID: %s", relic.getType(), relic.getId());
         return relic.insert()
                 .thenReturn(relic);
     }
@@ -97,6 +99,21 @@ public final class PremiumCollection extends DatabaseCollection {
                 .find(Filters.or(
                         Filters.eq("user_id", userId.asString()),
                         Filters.eq("guild_id", guildId.asString())));
+
+        return Flux.from(request).hasElements();
+    }
+
+    /**
+     * Requests to determine if a {@link Guild} is premium.
+     *
+     * @param guildId - the {@link Snowflake} ID of the {@link Guild} to check
+     * @return {@code true} if the {@link Guild} is premium, {@code false} otherwise.
+     */
+    public Mono<Boolean> isGuildPremium(Snowflake guildId) {
+        LOGGER.debug("[Is premium {}] Request.", guildId.asLong());
+
+        final Publisher<Document> request = this.getCollection()
+                .find(Filters.eq("guild_id", guildId.asString()));
 
         return Flux.from(request).hasElements();
     }
