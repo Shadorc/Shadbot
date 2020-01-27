@@ -105,7 +105,7 @@ public class CounterStrikeCmd extends BaseCmd {
     }
 
     /**
-     * @return - The identificator, either directly provided or extracted from an URL.
+     * @return The identificator, either directly provided or extracted from an URL.
      */
     private String getIdentificator(String arg) {
         // The user provided an URL that can contains a pseudo or an ID
@@ -119,7 +119,7 @@ public class CounterStrikeCmd extends BaseCmd {
     }
 
     /**
-     * @return - The identificator converted as an ID or empty if not found.
+     * @return The identificator converted as an ID or empty if not found.
      */
     private Mono<String> getSteamId(String identificator) {
         // The user directly provided the ID

@@ -62,7 +62,7 @@ public final class Utils {
      * @param value     the string representing the enumeration, case insensitive
      * @param exception the exception to be thrown
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass}.
-     * @throws X - if the value is null
+     * @throws X if the value is null
      */
     public static <T extends Enum<T>, X extends Throwable> T parseEnum(Class<T> enumClass, String value, X exception) throws X {
         final T enumValue = Utils.parseEnum(enumClass, value);
@@ -116,7 +116,7 @@ public final class Utils {
      * @param userId  the {@link Snowflake} ID of the {@link User} who made the bet
      * @param betStr  the string representing the bet
      * @return A long representing {@code betStr}.
-     * @throws CommandException - thrown if {@code betStr} cannot be casted to a long or if the user does not have
+     * @throws CommandException thrown if {@code betStr} cannot be casted to a long or if the user does not have
      *                          enough coins.
      */
     public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, String betStr) {
@@ -132,7 +132,7 @@ public final class Utils {
      * @param userId  the {@link Snowflake} ID of the {@link User} who made the bet
      * @param bet     the bet
      * @return The bet.
-     * @throws CommandException - thrown if the user does not have enough coins.
+     * @throws CommandException thrown if the user does not have enough coins.
      */
     public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, long bet) {
         return DatabaseManager.getGuilds()
