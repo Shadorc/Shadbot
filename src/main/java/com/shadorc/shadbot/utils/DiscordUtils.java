@@ -84,7 +84,7 @@ public final class DiscordUtils {
 
     /**
      * @param guild a {@link Guild} containing the channels to extract
-     * @param str   a string containing channels mentions / names
+     * @param str   a string containing channels mentions and / or names
      * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels.
      */
     public static Flux<Snowflake> extractChannels(Guild guild, String str) {
@@ -99,7 +99,7 @@ public final class DiscordUtils {
 
     /**
      * @param guild a {@link Guild} containing the roles to extract
-     * @param str   a string containing role mentions / names
+     * @param str   a string containing role mentions and / or names
      * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles.
      */
     public static Flux<Snowflake> extractRoles(Guild guild, String str) {
@@ -113,8 +113,8 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param message the message
-     * @return A {@link Flux} of {@link Member} mentioned in a {@link Message}.
+     * @param message the {@link Message} containing the members to extract
+     * @return A {@link Member} {@link Flux} mentioned in the {@link Message}.
      */
     public static Flux<Member> getMembersFrom(Message message) {
         if (message.mentionsEveryone()) {

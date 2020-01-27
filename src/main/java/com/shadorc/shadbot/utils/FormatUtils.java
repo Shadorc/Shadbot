@@ -22,6 +22,10 @@ import java.util.stream.Stream;
 
 public final class FormatUtils {
 
+    /**
+     * @param coins the number of coins to format
+     * @return {@code X coin(s)} where {@code X} is the number of coins formatted using English locale.
+     */
     public static String coins(long coins) {
         return String.format("%s coin%s", FormatUtils.number(coins), Math.abs(coins) > 1 ? "s" : "");
     }
