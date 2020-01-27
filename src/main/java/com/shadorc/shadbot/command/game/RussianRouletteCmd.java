@@ -33,7 +33,7 @@ public class RussianRouletteCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        Utils.requireValidBet(context.getMember(), Integer.toString(PAID_COST));
+        Utils.requireValidBet(context.getMember(), PAID_COST);
 
         final StringBuilder strBuilder = new StringBuilder(
                 String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", context.getUsername()));

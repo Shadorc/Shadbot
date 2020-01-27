@@ -56,29 +56,30 @@ public class SlotMachineCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        Utils.requireValidBet(context.getMember(), Integer.toString(PAID_COST));
+        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), PAID_COST)
+                .flatMap(ignored -> {
+                    final GamblerPlayer player = new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST);
+                    player.bet();
 
-        final GamblerPlayer player = new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST);
-        player.bet();
+                    final List<SlotOptions> slots = SlotMachineCmd.randSlots();
 
-        final List<SlotOptions> slots = SlotMachineCmd.randSlots();
+                    final StringBuilder text = new StringBuilder(String.format("%s%n%s (**%s**) ",
+                            FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername()));
 
-        final StringBuilder text = new StringBuilder(String.format("%s%n%s (**%s**) ",
-                FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername()));
+                    if (slots.stream().distinct().count() == 1) {
+                        final int slotGains = slots.get(0).getGains();
+                        final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
+                                (int) (slotGains * (RAND_FACTOR + 1)));
+                        player.win(gains);
+                        text.append(String.format("You win **%s** !", FormatUtils.coins(gains)));
+                    } else {
+                        text.append(String.format("You lose **%s** !", FormatUtils.coins(PAID_COST)));
+                    }
 
-        if (slots.stream().distinct().count() == 1) {
-            final int slotGains = slots.get(0).getGains();
-            final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
-                    (int) (slotGains * (RAND_FACTOR + 1)));
-            player.win(gains);
-            text.append(String.format("You win **%s** !", FormatUtils.coins(gains)));
-        } else {
-            text.append(String.format("You lose **%s** !", FormatUtils.coins(PAID_COST)));
-        }
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(text.toString(), channel))
-                .then();
+                    return context.getChannel()
+                            .flatMap(channel -> DiscordUtils.sendMessage(text.toString(), channel))
+                            .then();
+                });
     }
 
     @Override
