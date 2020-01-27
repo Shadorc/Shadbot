@@ -29,7 +29,7 @@ public final class PremiumCollection extends DatabaseCollection {
     }
 
     /**
-     * @param relicId - the ID of the {@link Relic} to get
+     * @param relicId the ID of the {@link Relic} to get
      * @return The {@link Relic} corresponding to the provided {@code relicId}.
      */
     public Mono<Relic> getRelicById(String relicId) {
@@ -46,7 +46,7 @@ public final class PremiumCollection extends DatabaseCollection {
     }
 
     /**
-     * @param userId - the {@link Snowflake} ID of the {@link User}
+     * @param userId the {@link Snowflake} ID of the {@link User}
      * @return A {@link Flux} containing the {@link Relic} possessed by an {@link User}.
      */
     public Flux<Relic> getRelicsByUser(Snowflake userId) {
@@ -55,7 +55,7 @@ public final class PremiumCollection extends DatabaseCollection {
     }
 
     /**
-     * @param guildId - the {@link Snowflake} ID of the {@link Guild}
+     * @param guildId the {@link Snowflake} ID of the {@link Guild}
      * @return A {@link Flux} containing the {@link Relic} possessed by a {@link Guild}.
      */
     public Flux<Relic> getRelicsByGuild(Snowflake guildId) {
@@ -74,7 +74,7 @@ public final class PremiumCollection extends DatabaseCollection {
     }
 
     /**
-     * @param type - the {@link RelicType} type of the {@link Relic} to generate.
+     * @param type the {@link RelicType} type of the {@link Relic} to generate.
      * @return The generated {@link Relic} inserted in the database.
      */
     public Mono<Relic> generateRelic(RelicType type) {
@@ -87,8 +87,8 @@ public final class PremiumCollection extends DatabaseCollection {
     /**
      * Requests to determine if a {@link Guild} or a {@link User} are premium.
      *
-     * @param guildId - the {@link Snowflake} ID of the {@link Guild} to check
-     * @param userId  - the {@link Snowflake} ID of the {@link User} to check
+     * @param guildId the {@link Snowflake} ID of the {@link Guild} to check
+     * @param userId  the {@link Snowflake} ID of the {@link User} to check
      * @return {@code true} if the {@link Guild} or the {@link User} is premium, {@code false} otherwise.
      */
     public Mono<Boolean> isPremium(Snowflake guildId, Snowflake userId) {
@@ -105,7 +105,7 @@ public final class PremiumCollection extends DatabaseCollection {
     /**
      * Requests to determine if a {@link Guild} is premium.
      *
-     * @param guildId - the {@link Snowflake} ID of the {@link Guild} to check
+     * @param guildId the {@link Snowflake} ID of the {@link Guild} to check
      * @return {@code true} if the {@link Guild} is premium, {@code false} otherwise.
      */
     public Mono<Boolean> isGuildPremium(Snowflake guildId) {
