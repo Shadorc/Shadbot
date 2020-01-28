@@ -1,7 +1,7 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
-import com.shadorc.shadbot.command.game.LotteryCmd;
+import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
