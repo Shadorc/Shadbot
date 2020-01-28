@@ -91,8 +91,7 @@ public class LotteryCmd extends BaseCmd {
 
                     gamblers.stream()
                             .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
-                            .findAny()
-                            .ifPresent(gambler -> embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
+                            .forEach(gambler -> embed.setFooter(String.format("You bet on number %d.", gambler.getNumber()),
                                     "https://i.imgur.com/btJAaAt.png"));
 
                     DatabaseManager.getLottery().getHistoric().ifPresent(historic -> {

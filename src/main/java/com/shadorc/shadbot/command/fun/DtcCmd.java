@@ -39,8 +39,7 @@ public class DtcCmd extends BaseCmd {
         final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))
                 .send()
-                .then(NetUtils.get(url, valueType))
-                .cast((Class<List<Quote>>) (Object) List.class)
+                .<List<Quote>>then(NetUtils.get(url, valueType))
                 .map(quotes -> {
                     Quote quote;
                     do {
