@@ -6,7 +6,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.premium.RelicType;
-import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -14,7 +13,6 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -33,12 +31,12 @@ public class RelicStatusCmd extends BaseCmd {
         return DatabaseManager.getPremium()
                 .getRelicsByUser(context.getAuthorId())
                 .switchIfEmpty(context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(
-                            String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
-                                    + "you can help me keep it alive by making a donation on <%s>."
-                                    + "%nAll donations are important and really help me %s",
-                            context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), channel))
-                    .then(Mono.empty()))
+                        .flatMap(channel -> DiscordUtils.sendMessage(
+                                String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
+                                                + "you can help me keep it alive by making a donation on <%s>."
+                                                + "%nAll donations are important and really help me %s",
+                                        context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), channel))
+                        .then(Mono.empty()))
                 .map(relic -> {
                     final StringBuilder contentBld = new StringBuilder(String.format("**ID:** %s", relic.getId()));
 
