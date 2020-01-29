@@ -2,6 +2,7 @@ package com.shadorc.shadbot.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.shadorc.shadbot.utils.NumberUtils;
 import reactor.util.annotation.Nullable;
 
@@ -94,7 +95,7 @@ public class TrackScheduler {
     }
 
     public void destroy() {
-        if (this.currentTrack != null) {
+        if (this.currentTrack != null && this.currentTrack.getState() == AudioTrackState.PLAYING) {
             this.currentTrack.stop();
         }
         this.audioPlayer.destroy();
