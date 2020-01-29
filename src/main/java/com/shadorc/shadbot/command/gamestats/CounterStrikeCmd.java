@@ -41,7 +41,7 @@ public class CounterStrikeCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading CS:GO stats...", context.getUsername()))
                 .send()
-                .then(Mono.just(this.getIdentificator(arg)))
+                .thenReturn(this.getIdentificator(arg))
                 .flatMap(this::getSteamId)
                 .map(steamId -> String.format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s",
                         CredentialManager.getInstance().get(Credential.STEAM_API_KEY), steamId))

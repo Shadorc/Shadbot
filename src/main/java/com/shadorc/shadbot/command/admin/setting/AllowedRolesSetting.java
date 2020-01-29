@@ -43,13 +43,13 @@ public class AllowedRolesSetting extends BaseSetting {
                 .collectList()
                 .flatMap(mentionedRoles -> {
                     if (mentionedRoles.isEmpty()) {
-                        throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
+                        return Mono.error(new CommandException(String.format("Role `%s` not found.", args.get(2))));
                     }
 
                     return Mono.zip(Mono.just(mentionedRoles),
                             DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
                 })
-                .map(tuple -> {
+                .flatMap(tuple -> {
                     final List<Role> mentionedRoles = tuple.getT1();
                     final DBGuild dbGuild = tuple.getT2();
 
@@ -73,9 +73,10 @@ public class AllowedRolesSetting extends BaseSetting {
                         }
                     }
 
-                    dbGuild.setSetting(this.getSetting(), allowedRoles);
-                    return strBuilder.toString();
+                    return dbGuild.setSetting(this.getSetting(), allowedRoles)
+                            .thenReturn(strBuilder);
                 })
+                .map(StringBuilder::toString)
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();

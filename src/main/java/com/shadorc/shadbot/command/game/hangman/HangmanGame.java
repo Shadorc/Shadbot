@@ -62,25 +62,29 @@ public class HangmanGame extends Game {
 
     @Override
     public Mono<Void> end() {
-        final StringBuilder strBuilder = new StringBuilder();
-        if (this.failCount == IMG_LIST.size()) {
-            strBuilder.append(String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
-                    this.getContext().getUsername(), this.word));
-        } else {
-            final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
-            final float imagesRemaining = IMG_LIST.size() - this.failCount;
-            final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
+        return Mono.just(new StringBuilder())
+                .flatMap(strBuilder -> {
+                    if (this.failCount == IMG_LIST.size()) {
+                        return Mono.just(strBuilder.append(
+                                String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
+                                        this.getContext().getUsername(), this.word)));
+                    } else {
+                        final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
+                        final float imagesRemaining = IMG_LIST.size() - this.failCount;
+                        final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
 
-            new Player(this.getContext().getGuildId(), this.getContext().getAuthorId()).win(gains);
-
-            strBuilder.append(String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
-                    this.getContext().getUsername(), FormatUtils.coins(gains)));
-        }
-
-        return this.show()
-                .then(this.getContext().getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
-                .then(Mono.fromRunnable(this::stop));
+                        return new Player(this.getContext().getGuildId(), this.getContext().getAuthorId())
+                                .win(gains)
+                                .thenReturn(strBuilder.append(
+                                        String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
+                                                this.getContext().getUsername(), FormatUtils.coins(gains))));
+                    }
+                })
+                .map(StringBuilder::toString)
+                .flatMap(text -> this.show()
+                        .then(this.getContext().getChannel())
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
+                        .then(Mono.fromRunnable(this::stop)));
     }
 
     @Override

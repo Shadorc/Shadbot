@@ -54,15 +54,6 @@ public final class PremiumCollection extends DatabaseCollection {
         return this.getRelicsBy("user_id", userId);
     }
 
-    /**
-     * @param guildId the {@link Snowflake} ID of the {@link Guild}
-     * @return A {@link Flux} containing the {@link Relic} possessed by a {@link Guild}.
-     */
-    public Flux<Relic> getRelicsByGuild(Snowflake guildId) {
-        LOGGER.debug("[Relics by guild {}] Request.", guildId.asLong());
-        return this.getRelicsBy("guild_id", guildId);
-    }
-
     private Flux<Relic> getRelicsBy(String key, Snowflake id) {
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq(key, id.asString()));
@@ -98,21 +89,6 @@ public final class PremiumCollection extends DatabaseCollection {
                 .find(Filters.or(
                         Filters.eq("user_id", userId.asString()),
                         Filters.eq("guild_id", guildId.asString())));
-
-        return Flux.from(request).hasElements();
-    }
-
-    /**
-     * Requests to determine if a {@link Guild} is premium.
-     *
-     * @param guildId the {@link Snowflake} ID of the {@link Guild} to check
-     * @return {@code true} if the {@link Guild} is premium, {@code false} otherwise.
-     */
-    public Mono<Boolean> isGuildPremium(Snowflake guildId) {
-        LOGGER.debug("[Is premium {}] Request.", guildId.asLong());
-
-        final Publisher<Document> request = this.getCollection()
-                .find(Filters.eq("guild_id", guildId.asString()));
 
         return Flux.from(request).hasElements();
     }

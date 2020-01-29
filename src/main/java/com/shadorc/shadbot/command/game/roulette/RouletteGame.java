@@ -53,7 +53,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
         final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
-                .map(tuple -> {
+                .flatMap(tuple -> {
                     final RoulettePlayer player = tuple.getT1();
                     final String username = tuple.getT2();
                     final Place place = Utils.parseEnum(Place.class, player.getPlace());
@@ -61,10 +61,10 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                     final int multiplier = RouletteGame.getMultiplier(player, place, winningPlace);
                     if (multiplier > 0) {
                         final long gains = Math.min(player.getBet() * multiplier, Config.MAX_COINS);
-                        player.win(gains);
-                        return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains));
+                        return player.win(gains)
+                                .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));
                     } else {
-                        return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet()));
+                        return Mono.just(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet())));
                     }
                 })
                 .collectSortedList()

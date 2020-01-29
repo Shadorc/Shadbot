@@ -76,10 +76,10 @@ public class BlackjackInputs extends Inputs {
                             .map(DBGuild::getSettings)
                             .map(Settings::getPrefix)
                             .map(prefix -> event.getMessage().getContent()
-                                    .map(str -> str.replace(prefix, "")))
-                            .map(opt -> opt.orElse(""))
-                            .map(String::toLowerCase)
-                            .map(String::trim)
+                                    .map(str -> str.replace(prefix, ""))
+                                    .orElse("")
+                                    .toLowerCase()
+                                    .trim())
                             .flatMap(content -> {
                                 if ("double down".equals(content) && player.getHand().count() != 2) {
                                     return this.game.getContext().getChannel()

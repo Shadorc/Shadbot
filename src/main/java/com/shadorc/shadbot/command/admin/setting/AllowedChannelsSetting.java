@@ -43,13 +43,13 @@ public class AllowedChannelsSetting extends BaseSetting {
                 .collectList()
                 .flatMap(mentionedChannels -> {
                     if (mentionedChannels.isEmpty()) {
-                        throw new CommandException(String.format("Channel `%s` not found.", args.get(2)));
+                        return Mono.error(new CommandException(String.format("Channel `%s` not found.", args.get(2))));
                     }
 
                     return Mono.zip(Mono.just(mentionedChannels),
                             DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
                 })
-                .map(tuple -> {
+                .flatMap(tuple -> {
                     final List<Channel> mentionedChannels = tuple.getT1();
                     final DBGuild dbGuild = tuple.getT2();
 
@@ -100,11 +100,11 @@ public class AllowedChannelsSetting extends BaseSetting {
                         }
                     }
 
-                    dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
-                    dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds);
-
-                    return strBuilder.toString();
+                    return dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds)
+                            .then(dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds))
+                            .thenReturn(strBuilder);
                 })
+                .map(StringBuilder::toString)
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();

@@ -61,7 +61,7 @@ public class ManageCoinsCmd extends BaseCmd {
                 // List<Tuple<Username, DBMember>>
                 .flatMap(members -> {
                     if (members.isEmpty()) {
-                        throw new CommandException("You must specify at least one user / role.");
+                        return Mono.error(new CommandException("You must specify at least one user / role."));
                     }
 
                     final String mentionsStr = context.getMessage().mentionsEveryone()
@@ -86,8 +86,8 @@ public class ManageCoinsCmd extends BaseCmd {
                                     .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.",
                                             mentionsStr, members.size() == 1 ? "his" : "their")));
                         default:
-                            throw new CommandException(String.format("`%s` is not a valid action. %s",
-                                    args.get(0), FormatUtils.options(Action.class)));
+                            return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s",
+                                    args.get(0), FormatUtils.options(Action.class))));
                     }
                 })
                 .flatMap(text -> context.getChannel()

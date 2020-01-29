@@ -77,7 +77,7 @@ public class AutoMessageSetting extends BaseSetting {
                 .collectList()
                 .flatMap(mentionedChannels -> {
                     if (mentionedChannels.size() != 1) {
-                        throw new MissingArgumentException();
+                        return Mono.error(new MissingArgumentException());
                     }
 
                     final Channel channel = mentionedChannels.get(0);
@@ -90,34 +90,42 @@ public class AutoMessageSetting extends BaseSetting {
     }
 
     private Mono<Message> updateMessage(Context context, DBGuild dbGuild, Setting setting, Action action, List<String> args) {
-        final StringBuilder strBuilder = new StringBuilder();
-        if (action == Action.ENABLE) {
-            if (args.size() < 4) {
-                return Mono.error(new MissingArgumentException());
-            }
-            final String message = args.get(3);
-            dbGuild.setSetting(setting, message);
+        return Mono.just(new StringBuilder())
+                .flatMap(strBuilder -> {
+                    if (action == Action.ENABLE) {
+                        if (args.size() < 4) {
+                            return Mono.error(new MissingArgumentException());
+                        }
 
-            if (dbGuild.getSettings().getMessageChannelId().isEmpty()) {
-                strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
-                                + "in which to send the auto-messages. Use `%s%s %s %s <#channel>`%n",
-                        context.getPrefix(), this.getCommandName(), Action.ENABLE.toString().toLowerCase(), Type.CHANNEL.toString().toLowerCase()));
-            }
-            strBuilder.append(String.format(Emoji.CHECK_MARK + " %s set to `%s`", StringUtils.capitalizeEnum(setting), message));
+                        final String message = args.get(3);
+                        return dbGuild.setSetting(setting, message)
+                                .then(Mono.fromCallable(() -> {
+                                    if (dbGuild.getSettings().getMessageChannelId().isEmpty()) {
+                                        strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
+                                                        + "in which to send the auto-messages. Use `%s%s %s %s <#channel>`%n",
+                                                context.getPrefix(), this.getCommandName(), Action.ENABLE.toString().toLowerCase(),
+                                                Type.CHANNEL.toString().toLowerCase()));
+                                    }
+                                    return strBuilder.append(String.format(Emoji.CHECK_MARK + " %s set to `%s`",
+                                            StringUtils.capitalizeEnum(setting), message));
+                                }));
 
-        } else {
-            dbGuild.removeSetting(setting);
-            strBuilder.append(String.format(Emoji.CHECK_MARK + " %s disabled.", StringUtils.capitalizeEnum(setting)));
-        }
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
+                    } else {
+                        return dbGuild.removeSetting(setting)
+                                .thenReturn(strBuilder.append(
+                                        String.format(Emoji.CHECK_MARK + " %s disabled.", StringUtils.capitalizeEnum(setting))));
+                    }
+                })
+                .map(StringBuilder::toString)
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)));
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", context.getPrefix(), this.getCommandName()), false)
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <type> [<value>]`",
+                        context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s"
                                         + "%n**type** - %s"
                                         + "%n**value** - a message for *%s* and *%s* or a #channel for *%s*",

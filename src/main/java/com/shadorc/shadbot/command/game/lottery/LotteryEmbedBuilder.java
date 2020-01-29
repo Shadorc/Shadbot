@@ -17,14 +17,13 @@ public class LotteryEmbedBuilder {
 
     private LotteryEmbedBuilder(Context context) {
         this.context = context;
-        this.embedConsumer = DiscordUtils.getDefaultEmbed().andThen(embed -> {
-            embed.setAuthor("Lottery", null, context.getAvatarUrl())
-                    .setThumbnail("https://i.imgur.com/peLGtkS.png")
-                    .setDescription(String.format("The next draw will take place in **%s**%nTo " +
-                                    "participate, type: `%s%s %d-%d`",
-                            FormatUtils.customDate(LotteryCmd.getDelay()),
-                            context.getPrefix(), context.getCommandName(), LotteryCmd.MIN_NUM, LotteryCmd.MAX_NUM));
-        });
+        this.embedConsumer = DiscordUtils.getDefaultEmbed().andThen(embed ->
+                embed.setAuthor("Lottery", null, context.getAvatarUrl())
+                        .setThumbnail("https://i.imgur.com/peLGtkS.png")
+                        .setDescription(String.format("The next draw will take place in **%s**%nTo " +
+                                        "participate, type: `%s%s %d-%d`",
+                                FormatUtils.customDate(LotteryCmd.getDelay()),
+                                context.getPrefix(), context.getCommandName(), LotteryCmd.MIN_NUM, LotteryCmd.MAX_NUM)));
     }
 
     public static LotteryEmbedBuilder create(Context context) {
@@ -36,7 +35,7 @@ public class LotteryEmbedBuilder {
                 Integer.toString(gamblers.size()), false));
 
         gamblers.stream()
-                .filter(lotteryGambler -> lotteryGambler.getUserId().equals(context.getAuthorId()))
+                .filter(lotteryGambler -> lotteryGambler.getUserId().equals(this.context.getAuthorId()))
                 .findFirst()
                 .ifPresent(gambler -> this.embedConsumer = this.embedConsumer.andThen(embed -> embed.setFooter(
                         String.format("You bet on number %d.", gambler.getNumber()),
