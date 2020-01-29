@@ -1,10 +1,11 @@
 package com.shadorc.shadbot.db.lottery;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
+import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
@@ -14,13 +15,11 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 import org.bson.Document;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public final class LotteryCollection extends DatabaseCollection {
 
@@ -30,108 +29,81 @@ public final class LotteryCollection extends DatabaseCollection {
         super(database.getCollection("lottery"));
     }
 
-    public List<LotteryGambler> getGamblers() {
+    public Flux<LotteryGambler> getGamblers() {
         LOGGER.debug("[Lottery gamblers] Request.");
 
-        final Document document = this.getCollection()
+        final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", "gamblers"))
                 .first();
 
-        if (document == null) {
-            LOGGER.debug("[Lottery gamblers] Not found.");
-            return Collections.emptyList();
-        } else {
-            LOGGER.debug("[Lottery gamblers] Found.");
-            return document.getList("gamblers", Document.class)
-                    .stream()
-                    .map(Document::toJson)
-                    .map(json -> {
-                        try {
-                            return Utils.MAPPER.readValue(json, LotteryGamblerBean.class);
-                        } catch (final JsonProcessingException err) {
-                            throw new RuntimeException(err);
-                        }
-                    })
-                    .map(LotteryGambler::new)
-                    .collect(Collectors.toUnmodifiableList());
-        }
+        return Mono.from(request)
+                .map(document -> document.getList("gamblers", Document.class))
+                .flatMapMany(Flux::fromIterable)
+                .map(Document::toJson)
+                .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, LotteryGamblerBean.class)))
+                .map(LotteryGambler::new);
     }
 
-    public Optional<LotteryHistoric> getHistoric() {
+    public Mono<LotteryHistoric> getHistoric() {
         LOGGER.debug("[Lottery historic] Request.");
 
-        final Document document = this.getCollection()
+        final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", "historic"))
                 .first();
 
-        if (document == null) {
-            LOGGER.debug("[Lottery historic] Not found.");
-            return Optional.empty();
-        } else {
-            LOGGER.debug("[Lottery historic] Found.");
-            return Optional.of(document)
-                    .map(Document::toJson)
-                    .map(json -> {
-                        try {
-                            return Utils.MAPPER.readValue(json, LotteryHistoricBean.class);
-                        } catch (final JsonProcessingException err) {
-                            throw new RuntimeException(err);
-                        }
-                    })
-                    .map(LotteryHistoric::new);
-        }
+        return Mono.from(request)
+                .map(Document::toJson)
+                .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, LotteryHistoricBean.class)))
+                .map(LotteryHistoric::new);
     }
 
-    public long getJackpot() {
+    public Mono<Long> getJackpot() {
         LOGGER.debug("[Lottery jackpot] Request.");
 
-        final Document document = this.getCollection()
+        final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", "jackpot"))
                 .first();
 
-        if (document == null) {
-            LOGGER.debug("[Lottery jackpot] Not found.");
-            return 0;
-        } else {
-            LOGGER.debug("[Lottery jackpot] Found.");
-            return document.getLong("jackpot");
-        }
+        return Mono.from(request)
+                .map(document -> document.getLong("jackpot"))
+                .defaultIfEmpty(0L);
     }
 
-    public boolean isGambler(Snowflake userId) {
+    public Mono<Boolean> isGambler(Snowflake userId) {
         LOGGER.debug("[Gambler {}] Checking if user exist.", userId.asLong());
 
-        final Document document = this.getCollection()
+        final Publisher<Document> request = this.getCollection()
                 .find(Filters.and(Filters.eq("_id", "gamblers"),
                         Filters.eq("gamblers.user_id", userId.asString())))
                 .first();
 
-        return document != null;
+        return Mono.from(request)
+                .hasElement();
     }
 
-    public void resetGamblers() {
+    public Mono<DeleteResult> resetGamblers() {
         LOGGER.debug("[Lottery gamblers] Reset.");
 
-        this.getCollection()
-                .deleteOne(Filters.eq("_id", "gamblers"));
+        return Mono.from(this.getCollection()
+                .deleteOne(Filters.eq("_id", "gamblers")));
     }
 
-    public void addToJackpot(long coins) {
+    public Mono<UpdateResult> addToJackpot(long coins) {
         final long value = (long) Math.ceil(coins / 100.0f);
 
         LOGGER.debug("[Lottery jackpot] Adding {}.", FormatUtils.coins(value));
 
-        this.getCollection()
+        return Mono.from(this.getCollection()
                 .updateOne(Filters.eq("_id", "jackpot"),
                         Updates.inc("jackpot", value),
-                        new UpdateOptions().upsert(true));
+                        new UpdateOptions().upsert(true)));
     }
 
-    public void resetJackpot() {
+    public Mono<DeleteResult> resetJackpot() {
         LOGGER.debug("[Lottery jackpot] Reset.");
 
-        this.getCollection()
-                .deleteOne(Filters.eq("_id", "jackpot"));
+        return Mono.from(this.getCollection()
+                .deleteOne(Filters.eq("_id", "jackpot")));
     }
 
 }

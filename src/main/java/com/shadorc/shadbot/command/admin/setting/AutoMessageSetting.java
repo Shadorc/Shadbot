@@ -46,75 +46,86 @@ public class AutoMessageSetting extends BaseSetting {
                 new CommandException(String.format("`%s` is not a valid type. %s",
                         args.get(2), FormatUtils.options(Type.class))));
 
-        switch (type) {
-            case CHANNEL:
-                return AutoMessageSetting.channel(context, action).then();
-            case JOIN_MESSAGE:
-                return this.updateMessage(context, Setting.JOIN_MESSAGE, action, args).then();
-            case LEAVE_MESSAGE:
-                return this.updateMessage(context, Setting.LEAVE_MESSAGE, action, args).then();
-            default:
-                return Mono.empty();
-        }
+        return DatabaseManager.getGuilds()
+                .getDBGuild(context.getGuildId())
+                .flatMap(dbGuild -> {
+                    switch (type) {
+                        case CHANNEL:
+                            return AutoMessageSetting.channel(context, dbGuild, action);
+                        case JOIN_MESSAGE:
+                            return this.updateMessage(context, dbGuild, Setting.JOIN_MESSAGE, action, args);
+                        case LEAVE_MESSAGE:
+                            return this.updateMessage(context, dbGuild, Setting.LEAVE_MESSAGE, action, args);
+                        default:
+                            return Mono.empty();
+                    }
+                })
+                .then();
     }
 
-    private static Mono<Message> channel(Context context, Action action) {
-        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+    private static Mono<Message> channel(Context context, DBGuild dbGuild, Action action) {
         if (action == Action.DISABLE) {
-            dbGuild.removeSetting(Setting.MESSAGE_CHANNEL_ID);
-            return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Auto-messages disabled. I will no longer send auto-messages "
-                            + "until a new channel is defined.", channel));
+            return dbGuild.removeSetting(Setting.MESSAGE_CHANNEL_ID)
+                    .then(context.getChannel())
+                    .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Auto-messages disabled. " +
+                            "I will no longer send auto-messages until a new channel is defined.", channel));
         }
 
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractChannels(guild, context.getContent()))
                 .flatMap(channelId -> context.getClient().getChannelById(channelId))
                 .collectList()
-                .map(mentionedChannels -> {
+                .flatMap(mentionedChannels -> {
                     if (mentionedChannels.size() != 1) {
-                        throw new MissingArgumentException();
+                        return Mono.error(new MissingArgumentException());
                     }
 
                     final Channel channel = mentionedChannels.get(0);
-                    dbGuild.setSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong());
-                    return String.format(Emoji.CHECK_MARK + " %s is now the default channel for join/leave messages.",
-                            channel.getMention());
+                    return dbGuild.setSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong())
+                            .thenReturn(String.format(Emoji.CHECK_MARK + " %s is now the default channel for " +
+                                    "join/leave messages.", channel.getMention()));
                 })
                 .flatMap(message -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(message, channel)));
     }
 
-    private Mono<Message> updateMessage(Context context, Setting setting, Action action, List<String> args) {
-        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
-        final StringBuilder strBuilder = new StringBuilder();
-        if (action == Action.ENABLE) {
-            if (args.size() < 4) {
-                return Mono.error(new MissingArgumentException());
-            }
-            final String message = args.get(3);
-            dbGuild.setSetting(setting, message);
+    private Mono<Message> updateMessage(Context context, DBGuild dbGuild, Setting setting, Action action, List<String> args) {
+        return Mono.just(new StringBuilder())
+                .flatMap(strBuilder -> {
+                    if (action == Action.ENABLE) {
+                        if (args.size() < 4) {
+                            return Mono.error(new MissingArgumentException());
+                        }
 
-            if (dbGuild.getSettings().getMessageChannelId().isEmpty()) {
-                strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
-                                + "in which to send the auto-messages. Use `%s%s %s %s <#channel>`%n",
-                        context.getPrefix(), this.getCommandName(), Action.ENABLE.toString().toLowerCase(), Type.CHANNEL.toString().toLowerCase()));
-            }
-            strBuilder.append(String.format(Emoji.CHECK_MARK + " %s set to `%s`", StringUtils.capitalizeEnum(setting), message));
+                        final String message = args.get(3);
+                        return dbGuild.setSetting(setting, message)
+                                .then(Mono.fromCallable(() -> {
+                                    if (dbGuild.getSettings().getMessageChannelId().isEmpty()) {
+                                        strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
+                                                        + "in which to send the auto-messages. Use `%s%s %s %s <#channel>`%n",
+                                                context.getPrefix(), this.getCommandName(), Action.ENABLE.toString().toLowerCase(),
+                                                Type.CHANNEL.toString().toLowerCase()));
+                                    }
+                                    return strBuilder.append(String.format(Emoji.CHECK_MARK + " %s set to `%s`",
+                                            StringUtils.capitalizeEnum(setting), message));
+                                }));
 
-        } else {
-            dbGuild.removeSetting(setting);
-            strBuilder.append(String.format(Emoji.CHECK_MARK + " %s disabled.", StringUtils.capitalizeEnum(setting)));
-        }
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
+                    } else {
+                        return dbGuild.removeSetting(setting)
+                                .thenReturn(strBuilder.append(
+                                        String.format(Emoji.CHECK_MARK + " %s disabled.", StringUtils.capitalizeEnum(setting))));
+                    }
+                })
+                .map(StringBuilder::toString)
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)));
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <type> [<value>]`", context.getPrefix(), this.getCommandName()), false)
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <type> [<value>]`",
+                        context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s"
                                         + "%n**type** - %s"
                                         + "%n**value** - a message for *%s* and *%s* or a #channel for *%s*",

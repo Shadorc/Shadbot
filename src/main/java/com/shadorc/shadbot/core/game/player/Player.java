@@ -25,17 +25,20 @@ public class Player {
         return client.getUserById(this.userId).map(User::getUsername);
     }
 
-    public DBMember getDBMember() {
+    public Mono<DBMember> getDBMember() {
         return DatabaseManager.getGuilds().getDBMember(this.guildId, this.userId);
     }
 
-    public void win(long coins) {
-        this.getDBMember().addCoins(coins);
+    public Mono<Void> win(long coins) {
+        return this.getDBMember()
+                .flatMap(dbMember -> dbMember.addCoins(coins))
+                .then();
     }
 
-    public void lose(long coins) {
-        this.getDBMember().addCoins(-coins);
-        DatabaseManager.getLottery().addToJackpot(coins);
+    public Mono<Void> lose(long coins) {
+        return this.getDBMember()
+                .flatMap(dbMember -> dbMember.addCoins(-coins))
+                .and(DatabaseManager.getLottery().addToJackpot(coins));
     }
 
 }

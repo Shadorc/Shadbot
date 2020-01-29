@@ -11,11 +11,11 @@ import com.shadorc.shadbot.command.currency.CoinsCmd;
 import com.shadorc.shadbot.command.currency.LeaderboardCmd;
 import com.shadorc.shadbot.command.currency.TransferCoinsCmd;
 import com.shadorc.shadbot.command.fun.*;
-import com.shadorc.shadbot.command.game.LotteryCmd;
 import com.shadorc.shadbot.command.game.RussianRouletteCmd;
 import com.shadorc.shadbot.command.game.blackjack.BlackjackCmd;
 import com.shadorc.shadbot.command.game.dice.DiceCmd;
 import com.shadorc.shadbot.command.game.hangman.HangmanCmd;
+import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.command.game.roulette.RouletteCmd;
 import com.shadorc.shadbot.command.game.rps.RpsCmd;
 import com.shadorc.shadbot.command.game.slotmachine.SlotMachineCmd;
@@ -67,7 +67,7 @@ public final class CommandManager {
                 // Music Commands
                 new PlayCmd(), new PauseCmd(), new StopCmd(), new SkipCmd(), new RepeatCmd(),
                 new BackwardCmd(), new ForwardCmd(), new VolumeCmd(), new NameCmd(),
-                new PlaylistCmd(), new ShuffleCmd(), new ClearCmd(), new SavedPlaylistCmd(),
+                new PlaylistCmd(), new ShuffleCmd(), new ClearCmd(),
                 // Game Stats Commands
                 new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
                 // Info Commands

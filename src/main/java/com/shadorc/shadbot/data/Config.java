@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.data;
 
 import com.shadorc.shadbot.utils.ExitCode;
-import discord4j.core.object.util.Snowflake;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -28,10 +27,8 @@ public final class Config {
     public static final String COMMAND_DELIMITER = PROPERTIES.getProperty("command.delimiter");
 
     public static final int DEFAULT_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.volume"));
-    public static final int VOLUME_MAX_PREMIUM = Integer.parseInt(PROPERTIES.getProperty("volume.max.premium"));
     public static final int VOLUME_MAX = Integer.parseInt(PROPERTIES.getProperty("volume.max"));
     public static final int PLAYLIST_SIZE = Integer.parseInt(PROPERTIES.getProperty("playlist.size"));
-    public static final int SAVED_PLAYLIST_SIZE = Integer.parseInt(PROPERTIES.getProperty("saved.playlist.size"));
     public static final int MUSIC_SEARCHES = Integer.parseInt(PROPERTIES.getProperty("music.searches"));
     public static final int MUSIC_CHOICE_DURATION = Integer.parseInt(PROPERTIES.getProperty("music.choice.duration"));
 

@@ -44,17 +44,16 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
         final int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
-                .map(tuple -> {
+                .flatMap(tuple -> {
                     final DicePlayer player = tuple.getT1();
                     final String username = tuple.getT2();
                     if (player.getNumber() == winningNum) {
                         long gains = Math.min((long) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER)), Config.MAX_COINS);
-                        player.win(gains);
-                        return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains));
+                        return player.win(gains)
+                                .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));
                     } else {
-                        return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(this.bet));
+                        return Mono.just(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(this.bet)));
                     }
-
                 })
                 .collectList()
                 .doOnNext(list -> this.results = String.join("\n", list))

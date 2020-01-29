@@ -24,19 +24,16 @@ public class MessageProcessor {
     }
 
     public Mono<Void> processMessage() {
-        // This is not a private channel
-        if (this.event.getGuildId().isEmpty()) {
-            return this.processPrivateMessage();
-        }
+        return Mono.justOrEmpty(this.event.getGuildId())
+                .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId))
+                // This is a private channel, there is no guild ID
+                .switchIfEmpty(this.processPrivateMessage().then(Mono.empty()))
+                // The content is not a Webhook
+                .zipWith(Mono.justOrEmpty(this.event.getMessage().getContent()))
+                .flatMap(tuple -> this.processCommand(tuple.getT1(), tuple.getT2()));
+    }
 
-        // The content is not a Webhook
-        if (this.event.getMessage().getContent().isEmpty()) {
-            return Mono.empty();
-        }
-
-        final String content = this.event.getMessage().getContent().get();
-        final Snowflake guildId = this.event.getGuildId().get();
-        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(guildId);
+    private Mono<Void> processCommand(DBGuild dbGuild, String content) {
         return Mono.justOrEmpty(this.event.getMember())
                 // The author is not a bot
                 .filter(member -> !member.isBot())

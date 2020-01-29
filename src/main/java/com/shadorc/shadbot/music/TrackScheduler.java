@@ -33,7 +33,7 @@ public class TrackScheduler {
     }
 
     /**
-     * @return {@code true} if the track was started, {@code false} if it was added to the queue
+     * @return {@code true} if the track was started, {@code false} if it was added to the queue.
      */
     public boolean startOrQueue(AudioTrack track, boolean first) {
         if (this.audioPlayer.startTrack(track.makeClone(), true)) {
@@ -49,7 +49,7 @@ public class TrackScheduler {
     }
 
     /**
-     * @return {@code true} if the track was started, {@code false} otherwise
+     * @return {@code true} if the track was started, {@code false} otherwise.
      */
     public boolean nextTrack() {
         switch (this.repeatMode) {

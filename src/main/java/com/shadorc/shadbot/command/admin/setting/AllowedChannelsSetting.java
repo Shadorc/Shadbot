@@ -41,12 +41,18 @@ public class AllowedChannelsSetting extends BaseSetting {
                 .flatMapMany(guild -> DiscordUtils.extractChannels(guild, args.get(2)))
                 .flatMap(channelId -> context.getClient().getChannelById(channelId))
                 .collectList()
-                .map(mentionedChannels -> {
+                .flatMap(mentionedChannels -> {
                     if (mentionedChannels.isEmpty()) {
-                        throw new CommandException(String.format("Channel `%s` not found.", args.get(2)));
+                        return Mono.error(new CommandException(String.format("Channel `%s` not found.", args.get(2))));
                     }
 
-                    final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+                    return Mono.zip(Mono.just(mentionedChannels),
+                            DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
+                })
+                .flatMap(tuple -> {
+                    final List<Channel> mentionedChannels = tuple.getT1();
+                    final DBGuild dbGuild = tuple.getT2();
+
                     final List<Snowflake> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannelIds();
                     final List<Snowflake> allowedVoiceChannelIds = dbGuild.getSettings().getAllowedVoiceChannelIds();
 
@@ -94,11 +100,11 @@ public class AllowedChannelsSetting extends BaseSetting {
                         }
                     }
 
-                    dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
-                    dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds);
-
-                    return strBuilder.toString();
+                    return dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds)
+                            .then(dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds))
+                            .thenReturn(strBuilder);
                 })
+                .map(StringBuilder::toString)
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();

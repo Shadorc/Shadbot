@@ -33,26 +33,34 @@ public class RussianRouletteCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        Utils.requireValidBet(context.getMember(), Integer.toString(PAID_COST));
+        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), PAID_COST)
+                .flatMap(ignored -> {
+                    final GamblerPlayer player = new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST);
+                    return player.bet()
+                            .thenReturn(player);
+                })
+                .flatMap(player -> {
+                    final StringBuilder strBuilder = new StringBuilder(
+                            String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ",
+                                    context.getUsername()));
 
-        final StringBuilder strBuilder = new StringBuilder(
-                String.format(Emoji.DICE + " (**%s**) You break a sweat, you pull the trigger... ", context.getUsername()));
-
-        final GamblerPlayer player = new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST);
-        player.bet();
-
-        if (ThreadLocalRandom.current().nextInt(6) == 0) {
-            final long coins = ThreadLocalRandom.current().nextInt(MIN_LOSE, MAX_LOSE + 1);
-            player.lose(coins);
-            strBuilder.append(String.format("**PAN** ... Sorry, you died.%nYou lose **%s**.", FormatUtils.coins(coins)));
-        } else {
-            final long coins = ThreadLocalRandom.current().nextInt(MIN_GAINS, MAX_GAINS + 1);
-            player.win(coins);
-            strBuilder.append(String.format("**click** ... Phew, you are still alive !%nYou get **%s**.", FormatUtils.coins(coins)));
-        }
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
+                    if (ThreadLocalRandom.current().nextInt(6) == 0) {
+                        final long coins = ThreadLocalRandom.current().nextInt(MIN_LOSE, MAX_LOSE + 1);
+                        return player.lose(coins)
+                                .thenReturn(strBuilder.append(
+                                        String.format("**PAN** ... Sorry, you died.%nYou lose **%s**.",
+                                                FormatUtils.coins(coins))));
+                    } else {
+                        final long coins = ThreadLocalRandom.current().nextInt(MIN_GAINS, MAX_GAINS + 1);
+                        return player.win(coins)
+                                .thenReturn(strBuilder.append(
+                                        String.format("**click** ... Phew, you are still alive !%nYou get **%s**.",
+                                                FormatUtils.coins(coins))));
+                    }
+                })
+                .map(StringBuilder::toString)
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();
     }
 

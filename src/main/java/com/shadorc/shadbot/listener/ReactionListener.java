@@ -3,6 +3,8 @@ package com.shadorc.shadbot.listener;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.command.admin.IamCmd;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.TemporaryMessage;
 import com.shadorc.shadbot.utils.StringUtils;
@@ -96,10 +98,10 @@ public class ReactionListener {
     }
 
     private static Mono<Void> execute(Message message, Member member, Action action) {
-        return Mono.justOrEmpty(DatabaseManager.getGuilds()
+        return DatabaseManager.getGuilds()
                 .getDBGuild(member.getGuildId())
-                .getSettings()
-                .getIam())
+                .map(DBGuild::getSettings)
+                .map(Settings::getIam)
                 .flatMapMany(Flux::fromIterable)
                 .filter(iam -> iam.getMessageId().equals(message.getId()))
                 // If the bot can manage the role

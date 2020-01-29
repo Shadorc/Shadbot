@@ -42,7 +42,7 @@ public abstract class Game {
     /**
      * Schedule a {@link Mono} that will be triggered when the game duration is elapsed.
      *
-     * @param mono - The {@link Mono} to trigger after the game duration has elapsed.
+     * @param mono The {@link Mono} to trigger after the game duration has elapsed.
      */
     protected <T> void schedule(Mono<T> mono) {
         this.cancelScheduledTask();
@@ -64,7 +64,7 @@ public abstract class Game {
     }
 
     /**
-     * @param message - the {@link Message} to check
+     * @param message the {@link Message} to check
      * @return A {@link Mono} that returns {@code true} if the {@link Message} is a valid
      * cancel command, {@code false} otherwise.
      */

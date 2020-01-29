@@ -1,8 +1,7 @@
 package com.shadorc.shadbot.db.guilds;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
@@ -10,10 +9,15 @@ import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.util.Snowflake;
 import org.bson.Document;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GuildsCollection extends DatabaseCollection {
 
@@ -23,43 +27,45 @@ public class GuildsCollection extends DatabaseCollection {
         super(database.getCollection("guilds"));
     }
 
-    public DBGuild getDBGuild(Snowflake guildId) {
+    public Mono<DBGuild> getDBGuild(Snowflake guildId) {
         LOGGER.debug("[DBGuild {}] Request", guildId.asLong());
 
-        final Document document = this.getCollection()
+        final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", guildId.asString()))
                 .first();
 
-        if (document == null) {
-            LOGGER.debug("[DBGuild {}] Not found.", guildId.asLong());
-            return new DBGuild(guildId);
-        } else {
-            LOGGER.debug("[DBGuild {}] Found.", guildId.asLong());
-            try {
-                return new DBGuild(Utils.MAPPER.readValue(document.toJson(Utils.JSON_WRITER_SETTINGS), DBGuildBean.class));
-            } catch (final JsonProcessingException err) {
-                throw new RuntimeException(err);
-            }
-        }
+        return Mono.from(request)
+                .flatMap(document -> Mono.fromCallable(() ->
+                        new DBGuild(Utils.MAPPER.readValue(document.toJson(Utils.JSON_WRITER_SETTINGS), DBGuildBean.class))))
+                .doOnSuccess(consumer -> {
+                    if (consumer == null) {
+                        LOGGER.debug("[DBGuild {}] Not found.", guildId.asLong());
+                    }
+                })
+                .defaultIfEmpty(new DBGuild(guildId));
     }
 
-    public DBMember getDBMember(Snowflake guildId, Snowflake memberId) {
-        LOGGER.debug("[DBMember {} / {}] Request.", memberId.asLong(), guildId.asLong());
-
-        final Optional<DBMember> member = this.getDBGuild(guildId)
-                .getMembers()
-                .stream()
+    public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {
+        return this.getDBMembers(guildId, memberId)
                 .filter(dbMember -> dbMember.getId().equals(memberId))
-                .findFirst();
+                .next();
+    }
 
-        if (member.isEmpty()) {
-            LOGGER.debug("[DBMember {} / {}] Not found.", memberId.asLong(), guildId.asLong());
-            return new DBMember(guildId, memberId);
-        } else {
-            LOGGER.debug("[DBMember {} / {}] Found.", memberId.asLong(), guildId.asLong());
-            return member.get();
-        }
+    public Flux<DBMember> getDBMembers(Snowflake guildId, Snowflake... memberIds) {
+        LOGGER.debug("[DBMember {} / {}] Request.", Arrays.toString(memberIds), guildId.asLong());
 
+        return this.getDBGuild(guildId)
+                .map(DBGuild::getMembers)
+                .flatMapMany(Flux::fromIterable)
+                .collectMap(DBMember::getId)
+                .map(dbMembers -> {
+                    final List<DBMember> list = new ArrayList<>();
+                    for (final Snowflake memberId : memberIds) {
+                        list.add(dbMembers.computeIfAbsent(memberId, id -> new DBMember(guildId, id)));
+                    }
+                    return list;
+                })
+                .flatMapMany(Flux::fromIterable);
     }
 
 }

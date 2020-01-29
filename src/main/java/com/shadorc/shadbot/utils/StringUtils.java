@@ -16,8 +16,8 @@ public final class StringUtils {
     private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
     /**
-     * @param str - the string to capitalize, may be null
-     * @return The capitalized string or null if null string input
+     * @param str the string to capitalize, may be null
+     * @return The capitalized string or null if null string input.
      */
     public static String capitalize(@Nullable String str) {
         if (str == null || str.isBlank()) {
@@ -27,8 +27,8 @@ public final class StringUtils {
     }
 
     /**
-     * @param enumeration - the enumeration to format, may be null
-     * @return The enumeration converted as a capitalized string with underscores replaced with spaces
+     * @param enumeration the enumeration to format, may be null
+     * @return The enumeration converted as a capitalized string with underscores replaced with spaces.
      */
     @Nullable
     public static <E extends Enum<E>> String capitalizeEnum(@Nullable E enumeration) {
@@ -39,8 +39,8 @@ public final class StringUtils {
     }
 
     /**
-     * @param text - the string
-     * @return A {@link List} containing the quoted elements from {@code text}
+     * @param text the string
+     * @return A {@link List} containing the quoted elements from {@code text}.
      */
     public static List<String> getQuotedElements(@Nullable String text) {
         final List<String> matches = new ArrayList<>();
@@ -56,11 +56,11 @@ public final class StringUtils {
     }
 
     /**
-     * The function returns the argument string with whitespace normalized by using {@link String#trim()} to remove leading and trailing whitespace and
-     * then replacing sequences of whitespace characters by a single space.
+     * The function returns the argument string with whitespace normalized by using {@link String#trim()} to remove
+     * leading and trailing whitespace and then replacing sequences of whitespace characters by a single space.
      *
-     * @param str - the source string to normalize whitespaces from, may be null
-     * @return the modified string with whitespace normalized or {@code null} if null string input
+     * @param str the source string to normalize whitespaces from, may be null
+     * @return the modified string with whitespace normalized or {@code null} if null string input.
      */
     public static String normalizeSpace(@Nullable String str) {
         if (str == null || str.isEmpty()) {
@@ -70,9 +70,9 @@ public final class StringUtils {
     }
 
     /**
-     * @param count - the number of elements
-     * @param str   - the string to get plural from, may be null
-     * @return {@code String.format("%d %ss", count, str)} if count > 1, String.format("%d %s", count, str) otherwise
+     * @param count the number of elements
+     * @param str   the string to get plural from, may be null
+     * @return {@code String.format("%d %ss", count, str)} if count > 1, String.format("%d %s", count, str) otherwise.
      */
     @Nullable
     public static String pluralOf(long count, @Nullable String str) {
@@ -86,18 +86,18 @@ public final class StringUtils {
     }
 
     /**
-     * @param str      - the string from which to remove patterns, may be null
-     * @param toRemove - the strings to be substituted for each match
-     * @return The resulting string
+     * @param str      the string from which to remove patterns, may be null
+     * @param toRemove the strings to be substituted for each match
+     * @return The resulting string.
      */
     public static String remove(@Nullable String str, @NonNull List<String> toRemove) {
         return StringUtils.remove(str, toRemove.toArray(new String[0]));
     }
 
     /**
-     * @param str      - the string from which to remove patterns, may be null
-     * @param toRemove - the strings to be substituted for each match
-     * @return The resulting string
+     * @param str      the string from which to remove patterns, may be null
+     * @param toRemove the strings to be substituted for each match
+     * @return The resulting string.
      */
     @Nullable
     public static String remove(@Nullable String str, @NonNull String... toRemove) {
@@ -111,28 +111,30 @@ public final class StringUtils {
     }
 
     /**
-     * @param str - the string to split, may be null
-     * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding empty results
+     * @param str the string to split, may be null
+     * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding
+     * empty results.
      */
     public static List<String> split(@Nullable String str) {
         return StringUtils.split(str, -1);
     }
 
     /**
-     * @param str   - the string to split, may be null
-     * @param limit - the result threshold
-     * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding empty results
+     * @param str   the string to split, may be null
+     * @param limit the result threshold
+     * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding
+     * empty results.
      */
     public static List<String> split(@Nullable String str, int limit) {
         return StringUtils.split(str, limit, " ");
     }
 
     /**
-     * @param str       - the string to split, may be null
-     * @param limit     - the result threshold
-     * @param delimiter - the delimiting regular expression
-     * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted using {@code delimiter} excluding
-     * empty results
+     * @param str       the string to split, may be null
+     * @param limit     the result threshold
+     * @param delimiter the delimiting regular expression
+     * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted
+     * using {@code delimiter} excluding empty results.
      */
     public static List<String> split(@Nullable String str, int limit, @NonNull String delimiter) {
         if (str == null) {
@@ -145,9 +147,10 @@ public final class StringUtils {
     }
 
     /**
-     * @param str       - the string to split
-     * @param delimiter - the delimiting regular expression
-     * @return A endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding empty results
+     * @param str       the string to split
+     * @param delimiter the delimiting regular expression
+     * @return A endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding
+     * empty results.
      */
     public static List<String> split(@Nullable String str, @NonNull String delimiter) {
         return StringUtils.split(str, -1, delimiter);

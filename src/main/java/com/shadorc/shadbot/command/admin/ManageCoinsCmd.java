@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -14,9 +15,10 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.time.Duration;
 import java.util.List;
@@ -53,26 +55,39 @@ public class ManageCoinsCmd extends BaseCmd {
         }
 
         return DiscordUtils.getMembersFrom(context.getMessage())
+                .flatMap(member -> Mono.zip(Mono.just(member.getUsername()),
+                        DatabaseManager.getGuilds().getDBMember(member.getGuildId(), member.getId())))
                 .collectList()
-                .map(members -> {
+                // List<Tuple<Username, DBMember>>
+                .flatMap(members -> {
                     if (members.isEmpty()) {
-                        throw new CommandException("You must specify at least one user / role.");
+                        return Mono.error(new CommandException("You must specify at least one user / role."));
                     }
 
-                    final String mentionsStr = context.getMessage().mentionsEveryone() ? "Everyone" : FormatUtils.format(members, User::getUsername, ", ");
+                    final String mentionsStr = context.getMessage().mentionsEveryone()
+                            ? "Everyone" : FormatUtils.format(members, Tuple2::getT1, ", ");
                     switch (action) {
                         case ADD:
-                            members.forEach(user -> DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId()).addCoins(coins));
-                            return String.format(Emoji.MONEY_BAG + " **%s** received **%s**.", mentionsStr, FormatUtils.coins(coins));
+                            return Flux.fromIterable(members)
+                                    .map(Tuple2::getT2)
+                                    .flatMap(dbMember -> dbMember.addCoins(coins))
+                                    .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** received **%s**.",
+                                            mentionsStr, FormatUtils.coins(coins))));
                         case REMOVE:
-                            members.forEach(user -> DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId()).addCoins(-coins));
-                            return String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.", mentionsStr, FormatUtils.coins(coins));
+                            return Flux.fromIterable(members)
+                                    .map(Tuple2::getT2)
+                                    .flatMap(dbMember -> dbMember.addCoins(-coins))
+                                    .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.",
+                                            mentionsStr, FormatUtils.coins(coins))));
                         case RESET:
-                            members.forEach(user -> DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId()).resetCoins());
-                            return String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.", mentionsStr, members.size() == 1 ? "his" : "their");
+                            return Flux.fromIterable(members)
+                                    .map(Tuple2::getT2)
+                                    .flatMap(DBMember::resetCoins)
+                                    .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.",
+                                            mentionsStr, members.size() == 1 ? "his" : "their")));
                         default:
-                            throw new CommandException(String.format("`%s` is not a valid action. %s",
-                                    args.get(0), FormatUtils.options(Action.class)));
+                            return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s",
+                                    args.get(0), FormatUtils.options(Action.class))));
                     }
                 })
                 .flatMap(text -> context.getChannel()

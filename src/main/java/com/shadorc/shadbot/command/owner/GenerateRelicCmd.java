@@ -6,11 +6,13 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.premium.RelicType;
-import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -31,11 +33,12 @@ public class GenerateRelicCmd extends BaseCmd {
                 new CommandException(String.format("`%s` in not a valid type. %s",
                         arg, FormatUtils.options(RelicType.class))));
 
-        final Relic relic = DatabaseManager.getPremium().generateRelic(type);
-        LogUtils.info("Relic generated. Type: %s, ID: %s", relic.getType(), relic.getId());
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-                        StringUtils.capitalize(type.toString()), relic.getId()), channel))
+        return DatabaseManager.getPremium()
+                .generateRelic(type)
+                .flatMap(relic -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(
+                                String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
+                                        StringUtils.capitalize(type.toString()), relic.getId()), channel)))
                 .then();
     }
 

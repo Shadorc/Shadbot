@@ -18,16 +18,16 @@ public final class TimeUtils {
     private static final Pattern NUMBER_PATTERN = Pattern.compile("[0-9]");
 
     /**
-     * @param instant - the instant to get milliseconds from
-     * @return The amount of milliseconds elapsed since {@code instant}
+     * @param instant the instant to get milliseconds from
+     * @return The amount of milliseconds elapsed since {@code instant}.
      */
     public static long getMillisUntil(@NonNull Instant instant) {
         return Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), TimeUtils.toLocalDate(instant)));
     }
 
     /**
-     * @param epochMilli - the epoch milliseconds
-     * @return The amount of milliseconds elapsed since {@code epochMillis}
+     * @param epochMilli the epoch milliseconds
+     * @return The amount of milliseconds elapsed since {@code epochMillis}.
      */
     public static long getMillisUntil(long epochMilli) {
         return TimeUtils.getMillisUntil(Instant.ofEpochMilli(epochMilli));
@@ -37,8 +37,8 @@ public final class TimeUtils {
      * Convert a string, case insensitive, representing time (example: 1m03s) into seconds. <br>
      * Supported units: s (second), m (minute), h (hour)
      *
-     * @param str - the text to parse
-     * @return The amount of seconds corresponding to the {@code str} format
+     * @param str the text to parse
+     * @return The amount of seconds corresponding to the {@code str} format.
      */
     public static long parseTime(@NonNull String str) {
         final String normalizedText = str.replace(" ", "").toLowerCase();
@@ -79,8 +79,8 @@ public final class TimeUtils {
     }
 
     /**
-     * @param instant - the instant to create the date-time from
-     * @return {@code instant} converted as a {@link LocalDateTime} using the {@code ZoneId.systemDefault()} time-zone
+     * @param instant the instant to create the date-time from
+     * @return {@code instant} converted as a {@link LocalDateTime} using the {@code ZoneId.systemDefault()} time-zone.
      */
     public static LocalDateTime toLocalDate(@NonNull Instant instant) {
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());

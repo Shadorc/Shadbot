@@ -65,7 +65,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
     public Mono<Void> end() {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
-                .map(tuple -> {
+                .flatMap(tuple -> {
                     final BlackjackPlayer player = tuple.getT1();
                     final String username = tuple.getT2();
 
@@ -74,15 +74,16 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
 
                     switch (BlackjackGame.getResult(playerValue, dealerValue)) {
                         case 1:
-                            player.cancelBet();
                             final long coins = Math.min(player.getBet(), Config.MAX_COINS);
-                            player.win(coins);
-                            return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(coins));
+                            return player.cancelBet()
+                                    .then(player.win(coins))
+                                    .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(coins)));
                         case -1:
-                            return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet()));
+                            return Mono.just(String.format("**%s** (Losses: **%s**)",
+                                    username, FormatUtils.coins(player.getBet())));
                         default:
-                            player.draw();
-                            return String.format("**%s** (Draw)", username);
+                            return player.draw()
+                                    .thenReturn(String.format("**%s** (Draw)", username));
                     }
                 })
                 .collectList()

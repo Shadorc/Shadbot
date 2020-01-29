@@ -58,7 +58,9 @@ public class SettingsCmd extends BaseCmd {
         final List<String> args = context.requireArgs(1, Integer.MAX_VALUE);
 
         if ("show".equals(args.get(0))) {
-            return SettingsCmd.show(context)
+            return DatabaseManager.getGuilds()
+                    .getDBGuild(context.getGuildId())
+                    .flatMap(dbGuild -> SettingsCmd.show(context, dbGuild))
                     .flatMap(embed -> context.getChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                     .then();
@@ -67,8 +69,8 @@ public class SettingsCmd extends BaseCmd {
         final Setting settingEnum = Utils.parseEnum(Setting.class, args.get(0));
         final BaseSetting setting = this.settingsMap.get(settingEnum);
         if (setting == null) {
-            return Mono.error(new CommandException(String.format("Setting `%s` does not exist. Use `%shelp %s` to see all available settings.",
-                    args.get(0), context.getPrefix(), this.getName())));
+            return Mono.error(new CommandException(String.format("Setting `%s` does not exist. Use `%shelp %s` " +
+                    "to see all available settings.", args.get(0), context.getPrefix(), this.getName())));
         }
 
         final String arg = args.size() == 2 ? args.get(1) : null;
@@ -83,13 +85,13 @@ public class SettingsCmd extends BaseCmd {
         } catch (final MissingArgumentException err) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
-                            Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.", SettingsCmd.getHelp(context, setting), channel))
+                            Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.",
+                            SettingsCmd.getHelp(context, setting), channel))
                     .then();
         }
     }
 
-    private static Mono<Consumer<EmbedCreateSpec>> show(Context context) {
-        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+    private static Mono<Consumer<EmbedCreateSpec>> show(Context context, DBGuild dbGuild) {
         final StringBuilder settingsStr = new StringBuilder();
 
         if (!dbGuild.getSettings().getPrefix().equals(Config.DEFAULT_PREFIX)) {
@@ -121,7 +123,8 @@ public class SettingsCmd extends BaseCmd {
                 .map(Channel::getMention)
                 .collectList()
                 .filter(channels -> !channels.isEmpty())
-                .map(channels -> settingsStr.append(String.format("%n**Allowed text channels:**%n\t%s", String.join("\n\t", channels))))
+                .map(channels -> settingsStr.append(String.format("%n**Allowed text channels:**%n\t%s",
+                        String.join("\n\t", channels))))
                 .then();
 
         final Mono<Void> allowedVoiceChannelsStr = Flux.fromIterable(dbGuild.getSettings().getAllowedVoiceChannelIds())
@@ -129,7 +132,8 @@ public class SettingsCmd extends BaseCmd {
                 .map(Channel::getMention)
                 .collectList()
                 .filter(channels -> !channels.isEmpty())
-                .map(channels -> settingsStr.append(String.format("%n**Allowed voice channels:**%n\t%s", String.join("\n\t", channels))))
+                .map(channels -> settingsStr.append(String.format("%n**Allowed voice channels:**%n\t%s",
+                        String.join("\n\t", channels))))
                 .then();
 
         final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getSettings().getAutoRoleIds())
@@ -137,7 +141,8 @@ public class SettingsCmd extends BaseCmd {
                 .map(Role::getMention)
                 .collectList()
                 .filter(roles -> !roles.isEmpty())
-                .map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n\t%s", String.join("\n\t", roles))))
+                .map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n\t%s",
+                        String.join("\n\t", roles))))
                 .then();
 
         final Mono<Void> allowedRolesStr = Flux.fromIterable(dbGuild.getSettings().getAllowedRoleIds())
@@ -145,7 +150,8 @@ public class SettingsCmd extends BaseCmd {
                 .map(Role::getMention)
                 .collectList()
                 .filter(roles -> !roles.isEmpty())
-                .map(roles -> settingsStr.append(String.format("%n**Allowed roles:**%n\t%s", String.join("\n\t", roles))))
+                .map(roles -> settingsStr.append(String.format("%n**Allowed roles:**%n\t%s",
+                        String.join("\n\t", roles))))
                 .then();
 
         return autoMessageChannelStr
@@ -156,7 +162,8 @@ public class SettingsCmd extends BaseCmd {
                 .thenReturn(DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Settings", null, context.getAvatarUrl())
                                 .setDescription(
-                                        settingsStr.length() == 0 ? "There is no custom settings for this server." : settingsStr.toString())));
+                                        settingsStr.length() == 0 ? "There is no custom settings for this server." :
+                                                settingsStr.toString())));
     }
 
     private static Consumer<EmbedCreateSpec> getHelp(Context context, BaseSetting setting) {

@@ -104,10 +104,11 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
         final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
         final long gains = (long) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
 
-        new Player(this.getContext().getGuildId(), member.getId()).win(gains);
-
         this.stop();
-        return this.getContext().getChannel()
+
+        return new Player(this.getContext().getGuildId(), member.getId())
+                .win(gains)
+                .then(this.getContext().getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won " +
                         "**%s**.", member.getUsername(), FormatUtils.coins(gains)), channel));
     }

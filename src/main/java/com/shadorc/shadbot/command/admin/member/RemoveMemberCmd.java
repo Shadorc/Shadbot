@@ -91,13 +91,15 @@ public abstract class RemoveMemberCmd extends BaseCmd {
                 .flatMap(tuple -> {
                     if (!tuple.getT1()) {
                         return DiscordUtils.sendMessage(
-                                String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in the role hierarchy than me.",
+                                String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in " +
+                                                "the role hierarchy than me.",
                                         author.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
                                 .thenReturn(false);
                     }
                     if (!tuple.getT2()) {
                         return DiscordUtils.sendMessage(
-                                String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher in the role hierarchy than you.",
+                                String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher " +
+                                                "in the role hierarchy than you.",
                                         author.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
                                 .thenReturn(false);
                     }

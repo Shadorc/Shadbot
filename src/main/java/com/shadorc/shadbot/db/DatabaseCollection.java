@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.db;
 
-import com.mongodb.client.MongoCollection;
+import com.mongodb.reactivestreams.client.MongoCollection;
 import org.bson.Document;
 
 public class DatabaseCollection {

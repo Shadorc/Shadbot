@@ -4,6 +4,8 @@ import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingPermissionException;
 import com.shadorc.shadbot.object.Emoji;
@@ -65,7 +67,8 @@ public final class DiscordUtils {
                     if (!canSendEmbed && hasEmbed) {
                         LogUtils.info("{Channel ID: %d} Missing permission: %s",
                                 channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS));
-                        return DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed links.%nPlease, check my permissions "
+                        return DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed" +
+                                        " links.%nPlease, check my permissions "
                                         + "and channel-specific ones to verify that **%s** is checked.",
                                 StringUtils.capitalizeEnum(Permission.EMBED_LINKS)), channel);
                     }
@@ -80,9 +83,9 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param guild - a {@link Guild} containing the channels to extract
-     * @param str   - a string containing channels mentions / names
-     * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels
+     * @param guild a {@link Guild} containing the channels to extract
+     * @param str   a string containing channels mentions and / or names
+     * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels.
      */
     public static Flux<Snowflake> extractChannels(Guild guild, String str) {
         final List<String> words = StringUtils.split(str);
@@ -95,9 +98,9 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param guild - a {@link Guild} containing the roles to extract
-     * @param str   - a string containing role mentions / names
-     * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles
+     * @param guild a {@link Guild} containing the roles to extract
+     * @param str   a string containing role mentions and / or names
+     * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles.
      */
     public static Flux<Snowflake> extractRoles(Guild guild, String str) {
         final List<String> words = StringUtils.split(str);
@@ -110,8 +113,8 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param message - the message
-     * @return The members mentioned in a {@link Message}
+     * @param message the {@link Message} containing the members to extract
+     * @return A {@link Member} {@link Flux} mentioned in the {@link Message}.
      */
     public static Flux<Member> getMembersFrom(Message message) {
         if (message.mentionsEveryone()) {
@@ -124,10 +127,10 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param channel    - the channel
-     * @param userId     - the user ID
-     * @param permission - the permission
-     * @return Return true if the user has the permission in the channel, false otherwise
+     * @param channel    the channel
+     * @param userId     the user ID
+     * @param permission the permission
+     * @return {@code true} if the user has the permission in the channel, {@code false} otherwise.
      */
     public static Mono<Boolean> hasPermission(Channel channel, Snowflake userId, Permission permission) {
         // An user has all the permissions in a private channel
@@ -147,9 +150,9 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param context - the context
-     * @return The user voice channel ID if the user is in a voice channel and the bot is allowed to join or if the user is in a voice channel or if the
-     * user and the bot are in the same voice channel
+     * @param context the context
+     * @return The user voice channel ID if the user is in a voice channel <b>AND</b> the bot is allowed to join
+     * <b>OR</b> if the user and the bot are in the same voice channel.
      */
     public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
         final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getSelfAsMember()
@@ -162,14 +165,19 @@ public final class DiscordUtils {
                 .map(VoiceState::getChannelId)
                 .defaultIfEmpty(Optional.empty());
 
-        return Mono.zip(getBotVoiceChannelId, getUserVoiceChannelId)
+        final Mono<Settings> getSetting = DatabaseManager.getGuilds()
+                .getDBGuild(context.getGuildId())
+                .map(DBGuild::getSettings);
+
+        return Mono.zip(getBotVoiceChannelId, getUserVoiceChannelId, getSetting)
                 .map(tuple -> {
                     final Optional<Snowflake> botVoiceChannelId = tuple.getT1();
                     final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
+                    final Settings settings = tuple.getT3();
 
                     // If the user is in a voice channel but the bot is not allowed to join
                     if (userVoiceChannelId.isPresent()
-                            && !DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).getSettings().isVoiceChannelAllowed(userVoiceChannelId.get())) {
+                            && !settings.isVoiceChannelAllowed(userVoiceChannelId.get())) {
                         throw new CommandException("I'm not allowed to join this voice channel.");
                     }
 

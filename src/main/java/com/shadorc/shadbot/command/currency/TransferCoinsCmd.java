@@ -55,31 +55,39 @@ public class TransferCoinsCmd extends BaseCmd {
                     FormatUtils.coins(Config.MAX_COINS))));
         }
 
-        final DBMember dbSender = DatabaseManager.getGuilds().getDBMember(context.getGuildId(), senderUserId);
-        if (dbSender.getCoins() < coins) {
-            return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
-        }
+        return DatabaseManager.getGuilds()
+                .getDBMembers(context.getGuildId(), senderUserId, receiverUserId)
+                .collectMap(DBMember::getId)
+                .flatMap(dbMembers -> {
+                    final DBMember dbSender = dbMembers.get(senderUserId);
+                    if (dbSender.getCoins() < coins) {
+                        return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
+                    }
 
-        final DBMember dbReceiver = DatabaseManager.getGuilds().getDBMember(context.getGuildId(), receiverUserId);
-        if (dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
-            return context.getClient().getUserById(receiverUserId)
-                    .map(User::getUsername)
-                    .flatMap(username -> context.getChannel()
-                            .flatMap(channel -> DiscordUtils.sendMessage(String.format(
-                                    Emoji.BANK + " (**%s**) This transfer cannot be done because %s would exceed the maximum coins cap.",
-                                    context.getUsername(), username), channel)))
-                    .then();
-        }
+                    final DBMember dbReceiver = dbMembers.get(receiverUserId);
+                    if (dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
+                        return context.getClient()
+                                .getUserById(receiverUserId)
+                                .map(User::getUsername)
+                                .flatMap(username -> context.getChannel()
+                                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(
+                                                Emoji.BANK + " (**%s**) This transfer cannot be done because %s would " +
+                                                        "exceed the maximum coins cap.",
+                                                context.getUsername(), username), channel)))
+                                .then();
+                    }
 
-        dbSender.addCoins(-coins);
-        dbReceiver.addCoins(coins);
-
-        return context.getClient().getUserById(receiverUserId).map(User::getMention)
-                .flatMap(receiverMention -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.BANK + " %s has transferred **%s** to %s",
-                                        context.getAuthor().getMention(), FormatUtils.coins(coins), receiverMention), channel)))
-                .then();
+                    return dbSender.addCoins(-coins)
+                            .and(dbReceiver.addCoins(coins))
+                            .then(context.getClient().getUserById(receiverUserId))
+                            .map(User::getMention)
+                            .flatMap(receiverMention -> context.getChannel()
+                                    .flatMap(channel -> DiscordUtils.sendMessage(
+                                            String.format(Emoji.BANK + " %s has transferred **%s** to %s",
+                                                    context.getAuthor().getMention(), FormatUtils.coins(coins),
+                                                    receiverMention), channel)))
+                            .then();
+                });
     }
 
     @Override

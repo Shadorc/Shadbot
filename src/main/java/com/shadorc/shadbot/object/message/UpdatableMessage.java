@@ -25,10 +25,10 @@ public class UpdatableMessage {
     private Consumer<EmbedCreateSpec> embed;
 
     /**
-     * Sends a message that will be deleted each time the {@code send} method is called
+     * Sends a message that will be deleted each time the {@code send} method is called.
      *
-     * @param client    - the Discord client
-     * @param channelId - the Channel ID in which to send the message
+     * @param client    the Discord client
+     * @param channelId the Channel ID in which to send the message.
      */
     public UpdatableMessage(GatewayDiscordClient client, Snowflake channelId) {
         this.client = client;
@@ -60,8 +60,8 @@ public class UpdatableMessage {
     /**
      * Delete the previous message sent, if present, then send a message with the provided content and embed.
      *
-     * @param content - the content
-     * @param embed   - the embed
+     * @param content the content
+     * @param embed   the embed
      */
     private Mono<Message> send(@Nullable String content, @Nullable Consumer<EmbedCreateSpec> embed) {
         final Consumer<MessageCreateSpec> consumer = spec -> {

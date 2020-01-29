@@ -7,8 +7,11 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
+import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.object.entity.User;
@@ -87,8 +90,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
                     return guildMusic.getClient().getUserById(guildMusic.getDjId())
                             .map(User::getAvatarUrl)
-                            .flatMap(avatarUrl -> guildMusic.getMessageChannel()
-                                    .flatMap(channel -> DiscordUtils.sendMessage(this.getPlaylistEmbed(playlist, avatarUrl), channel)))
+                            .flatMap(avatarUrl -> this.getPlaylistEmbed(playlist, avatarUrl))
+                            .flatMap(embed -> guildMusic.getMessageChannel()
+                                    .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                             .flatMapMany(ignored -> new AudioLoadResultInputs(guildMusic.getClient(), Duration.ofSeconds(30), this)
                                     .waitForInputs()
                                     .then(Mono.fromRunnable(() -> guildMusic.setWaitingForChoice(false))));
@@ -100,17 +104,20 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     private void onPlaylistLoaded(AudioPlaylist playlist) {
         Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
-                .flatMap(guildMusic -> {
+                .zipWith(DatabaseManager.getPremium().isPremium(this.guildId, this.djId))
+                .flatMap(tuple -> {
+                    final GuildMusic guildMusic = tuple.getT1();
+                    final boolean isPremium = tuple.getT2();
+
+                    final TrackScheduler trackScheduler = guildMusic.getTrackScheduler();
                     final StringBuilder strBuilder = new StringBuilder();
 
                     int musicsAdded = 0;
                     for (final AudioTrack track : playlist.getTracks()) {
-                        guildMusic.getTrackScheduler().startOrQueue(track, this.insertFirst);
+                        trackScheduler.startOrQueue(track, this.insertFirst);
                         musicsAdded++;
                         // The playlist limit is reached and the user / guild is not premium
-                        if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.PLAYLIST_SIZE - 1
-                                && !DatabaseManager.getPremium().isGuildPremium(this.guildId)
-                                && !DatabaseManager.getPremium().isUserPremium(this.djId)) {
+                        if (trackScheduler.getPlaylist().size() >= Config.PLAYLIST_SIZE - 1 && !isPremium) {
                             strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
                             break;
                         }
@@ -125,7 +132,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    private Consumer<EmbedCreateSpec> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
+    private Mono<Consumer<EmbedCreateSpec>> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
         final String choices = FormatUtils.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
                 count -> {
                     final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
@@ -133,15 +140,19 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 });
 
         final String playlistName = org.apache.commons.lang3.StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
-                        .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
-                        .setDescription("**Select a music by typing the corresponding number.**"
-                                + "\nYou can choose several musics by separating them with a comma."
-                                + "\nExample: 1,3,4"
-                                + "\n\n" + choices)
-                        .setFooter(String.format("Use %scancel to cancel the selection (Automatically canceled in %ds).",
-                                DatabaseManager.getGuilds().getDBGuild(this.guildId).getSettings().getPrefix(), Config.MUSIC_CHOICE_DURATION), null));
+        return DatabaseManager.getGuilds()
+                .getDBGuild(this.guildId)
+                .map(DBGuild::getSettings)
+                .map(Settings::getPrefix)
+                .map(prefix -> DiscordUtils.getDefaultEmbed()
+                        .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
+                                .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
+                                .setDescription("**Select a music by typing the corresponding number.**"
+                                        + "\nYou can choose several musics by separating them with a comma."
+                                        + "\nExample: 1,3,4"
+                                        + "\n\n" + choices)
+                                .setFooter(String.format("Use %scancel to cancel the selection (Automatically " +
+                                        "canceled in %ds).", prefix, Config.MUSIC_CHOICE_DURATION), null)));
     }
 
     @Override

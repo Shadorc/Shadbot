@@ -5,7 +5,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -55,23 +54,27 @@ public class BlacklistSettingCmd extends BaseSetting {
             }
         }
 
-        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
-        final List<String> blacklist = dbGuild.getSettings().getBlacklistedCmd();
+        return DatabaseManager.getGuilds()
+                .getDBGuild(context.getGuildId())
+                .flatMap(dbGuild -> {
+                    final List<String> blacklist = dbGuild.getSettings().getBlacklistedCmd();
 
-        final String actionVerbose;
-        if (action == Action.ADD) {
-            blacklist.addAll(commands);
-            actionVerbose = "added";
-        } else {
-            blacklist.removeAll(commands);
-            actionVerbose = "removed";
-        }
+                    final String actionVerbose;
+                    if (action == Action.ADD) {
+                        blacklist.addAll(commands);
+                        actionVerbose = "added";
+                    } else {
+                        blacklist.removeAll(commands);
+                        actionVerbose = "removed";
+                    }
 
-        dbGuild.setSetting(this.getSetting(), blacklist);
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) %s %s to the blacklist.",
-                        FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "), actionVerbose),
-                        channel))
+                    return dbGuild.setSetting(this.getSetting(), blacklist)
+                            .then(context.getChannel())
+                            .flatMap(channel -> DiscordUtils.sendMessage(
+                                    String.format(Emoji.CHECK_MARK + " Command(s) %s %s to the blacklist.",
+                                            FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "), actionVerbose),
+                                    channel));
+                })
                 .then();
     }
 
