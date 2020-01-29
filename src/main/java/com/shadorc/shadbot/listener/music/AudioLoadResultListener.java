@@ -54,7 +54,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(
                         Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
                         FormatUtils.trackName(audioTrack.getInfo())), channel))
-                .doOnTerminate(this::terminate)
+                .then(this.terminate())
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
@@ -97,7 +97,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                     .waitForInputs()
                                     .then(Mono.fromRunnable(() -> guildMusic.setWaitingForChoice(false))));
                 })
-                .doOnTerminate(this::terminate)
+                .then(this.terminate())
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
@@ -127,7 +127,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
                 })
-                .doOnTerminate(this::terminate)
+                .then(this.terminate())
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
@@ -166,7 +166,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                     String.format(Emoji.RED_CROSS + " Something went wrong while loading the track: %s",
                                             errMessage.toLowerCase()), channel));
                 })
-                .doOnTerminate(this::terminate)
+                .then(this.terminate())
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
@@ -181,16 +181,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
                         StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
-                .doOnTerminate(this::terminate)
+                .then(this.terminate())
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    private void terminate() {
-        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.guildId);
-        if (guildMusic != null) {
-            guildMusic.removeAudioLoadResultListener(this);
-        }
+    private Mono<Void> terminate() {
+        return Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))
+                .flatMap(guildMusic -> guildMusic.removeAudioLoadResultListener(this));
     }
 
     public Snowflake getGuildId() {

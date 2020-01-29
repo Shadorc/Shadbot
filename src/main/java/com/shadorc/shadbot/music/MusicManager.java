@@ -68,6 +68,7 @@ public final class MusicManager {
                 .flatMap(guildMusicConnection -> {
                     if (guildMusicConnection.getGuildMusic() == null) {
                         LOGGER.debug("{Guild ID: {}} Creating guild music.", guildId.asLong());
+
                         final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
                         audioPlayer.addListener(new TrackEventListener(guildId));
 
@@ -84,9 +85,9 @@ public final class MusicManager {
                                     return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
                                             .thenReturn(guildMusicConnection.getGuildMusic());
                                 });
+                    } else {
+                        return Mono.just(guildMusicConnection.getGuildMusic());
                     }
-
-                    return Mono.just(guildMusicConnection.getGuildMusic());
                 });
     }
 
@@ -100,11 +101,9 @@ public final class MusicManager {
         return guildMusicConnection == null ? null : guildMusicConnection.getGuildMusic();
     }
 
-    public void removeConnection(Snowflake guildId) {
-        final GuildMusicConnection guildMusicConnection = this.guildMusicConnections.remove(guildId);
-        if (guildMusicConnection != null) {
-            guildMusicConnection.leaveVoiceChannel();
-        }
+    public Mono<Void> removeConnection(Snowflake guildId) {
+        return Mono.justOrEmpty(this.guildMusicConnections.remove(guildId))
+                .flatMap(GuildMusicConnection::leaveVoiceChannel);
     }
 
     public List<Snowflake> getGuildIdsWithGuildMusics() {
