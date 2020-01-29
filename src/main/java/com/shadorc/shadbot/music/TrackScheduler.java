@@ -3,6 +3,7 @@ package com.shadorc.shadbot.music;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.shadorc.shadbot.utils.NumberUtils;
+import reactor.util.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +37,7 @@ public class TrackScheduler {
      * @return {@code true} if the track was started, {@code false} if it was added to the queue.
      */
     public boolean startOrQueue(AudioTrack track, boolean first) {
-        if (this.audioPlayer.startTrack(track.makeClone(), true)) {
+        if (this.audioPlayer.startTrack(this.makeClone(track), true)) {
             this.currentTrack = track;
             return true;
         } else if (first) {
@@ -57,9 +58,9 @@ public class TrackScheduler {
                 this.queue.offer(this.currentTrack);
             case NONE:
                 this.currentTrack = this.queue.poll();
-                return this.audioPlayer.startTrack(this.currentTrack == null ? null : this.currentTrack.makeClone(), false);
+                return this.audioPlayer.startTrack(this.makeClone(this.currentTrack), false);
             case SONG:
-                this.audioPlayer.playTrack(this.currentTrack.makeClone());
+                this.audioPlayer.playTrack(this.makeClone(this.currentTrack));
                 break;
         }
         return true;
@@ -70,7 +71,7 @@ public class TrackScheduler {
         for (int i = 0; i < num; i++) {
             track = this.queue.poll();
         }
-        this.audioPlayer.playTrack(track == null ? null : track.makeClone());
+        this.audioPlayer.playTrack(this.makeClone(track));
         this.currentTrack = track;
     }
 
@@ -93,8 +94,20 @@ public class TrackScheduler {
     }
 
     public void destroy() {
+        if (this.currentTrack != null) {
+            this.currentTrack.stop();
+        }
         this.audioPlayer.destroy();
         this.clearPlaylist();
+    }
+
+    /**
+     * @param track The {@link AudioTrack} to clone.
+     * @return A clone of the provided track or null if null input track.
+     */
+    @Nullable
+    private AudioTrack makeClone(AudioTrack track) {
+        return track == null ? null : track.makeClone();
     }
 
     public AudioPlayer getAudioPlayer() {
