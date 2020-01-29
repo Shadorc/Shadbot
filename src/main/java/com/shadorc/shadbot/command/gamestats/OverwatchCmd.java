@@ -27,7 +27,21 @@ public class OverwatchCmd extends BaseCmd {
     private static final String HOME_URL = "https://owapi.io";
 
     private enum Platform {
-        PC, PSN, XBL;
+        PC("pc"),
+        PSN("psn"),
+        XBL("xbl"),
+        SWITCH("nintendo-switch");
+
+        private String value;
+
+        Platform(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
     }
 
     public OverwatchCmd() {
@@ -59,8 +73,9 @@ public class OverwatchCmd extends BaseCmd {
                     }
 
                     return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)", String.format("https://playoverwatch.com/en-gb/career/%s/%s",
-                                    platform.toString().toLowerCase(), profile.getUsername()), context.getAvatarUrl())
+                            .andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)",
+                                    String.format("https://playoverwatch.com/en-gb/career/%s/%s",
+                                            platform.toString().toLowerCase(), profile.getUsername()), context.getAvatarUrl())
                                     .setThumbnail(profile.getPortrait())
                                     .setDescription(String.format("Stats for user **%s**", profile.getUsername()))
                                     .addField("Level", profile.getLevel(), true)
