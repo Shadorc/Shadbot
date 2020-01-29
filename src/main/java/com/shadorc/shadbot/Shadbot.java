@@ -185,10 +185,11 @@ public final class Shadbot {
             Shadbot.botListStats.stop();
         }
 
-        DatabaseManager.getInstance().close();
-
         return Shadbot.client.logout()
-                .then(Mono.fromRunnable(() -> System.exit(exitCode.getValue())));
+                .then(Mono.fromRunnable(() -> {
+                    DatabaseManager.getInstance().close();
+                    System.exit(exitCode.getValue());
+                }));
     }
 
 }
