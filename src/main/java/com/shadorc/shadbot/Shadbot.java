@@ -53,7 +53,7 @@ public final class Shadbot {
         LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
         LOGGER.info("Initializing Sentry...");
-        Sentry.init();
+        Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
 
         // Set default to Locale US
         Locale.setDefault(Locale.US);
