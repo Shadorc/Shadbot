@@ -17,6 +17,7 @@ import com.shadorc.shadbot.object.message.ReactionMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
@@ -79,8 +80,10 @@ public class IamCmd extends BaseCmd {
 
                             return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
                                     .send(embedConsumer)
-                                    .doOnNext(message -> {
-                                        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+                                    .zipWith(DatabaseManager.getGuilds().getDBGuild(context.getGuildId()))
+                                    .flatMap(tuple -> {
+                                        final Message message = tuple.getT1();
+                                        final DBGuild dbGuild = tuple.getT2();
 
                                         // Converts the new message to an IamBean
                                         final List<IamBean> iamList = roles.stream()
@@ -96,7 +99,7 @@ public class IamCmd extends BaseCmd {
                                                 .map(Iam::getBean)
                                                 .collect(Collectors.toList()));
 
-                                        dbGuild.setSetting(Setting.IAM_MESSAGES, iamList);
+                                        return dbGuild.setSetting(Setting.IAM_MESSAGES, iamList);
                                     });
                         }))
                 .then();

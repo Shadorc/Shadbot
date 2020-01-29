@@ -24,8 +24,8 @@ public final class NetUtils {
     private static final HttpClient HTTP_CLIENT = HttpClient.create();
 
     /**
-     * @param html - The HTML to convert to text
-     * @return html converted to text with new lines preserved
+     * @param html the HTML to convert to text
+     * @return {@code html} converted to text with new lines preserved.
      */
     public static String br2nl(String html) {
         if (html == null || html.isBlank()) {
@@ -40,8 +40,8 @@ public final class NetUtils {
     }
 
     /**
-     * @param str - the string to encode as UTF-8
-     * @return The string encoded as UTF-8
+     * @param str the string to encode as UTF-8
+     * @return The string encoded as UTF-8.
      */
     public static String encode(String str) {
         if (str == null || str.isEmpty()) {
@@ -51,17 +51,17 @@ public final class NetUtils {
     }
 
     /**
-     * @param urlString - a string representing an URL to check
-     * @return true if the string is a valid and reachable URL, false otherwise
+     * @param url a string representing an URL to check
+     * @return {@code true} if the string is a valid and reachable URL, {@code false} otherwise.
      */
-    public static Mono<Boolean> isValidUrl(String urlString) {
+    public static Mono<Boolean> isValidUrl(String url) {
         try {
-            new URL(urlString).toURI();
+            new URL(url).toURI();
         } catch (final Exception ignored) {
             return Mono.just(false);
         }
 
-        return NetUtils.request(HttpMethod.GET, urlString)
+        return NetUtils.request(HttpMethod.GET, url)
                 .response()
                 .timeout(Config.TIMEOUT)
                 .map(HttpClientResponse::status)

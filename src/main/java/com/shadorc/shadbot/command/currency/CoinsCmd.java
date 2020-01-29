@@ -9,6 +9,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -26,10 +27,14 @@ public class CoinsCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         return context.getMessage()
                 .getUserMentions()
-                .switchIfEmpty(Mono.just(context.getAuthor()))
+                .defaultIfEmpty(context.getAuthor())
                 .next()
-                .map(user -> {
-                    final DBMember dbMember = DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId());
+                .flatMap(user -> Mono.zip(Mono.just(user),
+                        DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId())))
+                .map(tuple -> {
+                    final User user = tuple.getT1();
+                    final DBMember dbMember = tuple.getT2();
+
                     final String coins = FormatUtils.coins(dbMember.getCoins());
                     if (user.getId().equals(context.getAuthorId())) {
                         return String.format("(**%s**) You have **%s**.", user.getUsername(), coins);

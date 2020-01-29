@@ -29,7 +29,7 @@ public class ReactionMessage {
     }
 
     /**
-     * @param embed - the embed to send
+     * @param embed the embed to send
      * @return A {@link Mono} containing a {@link Message} with {@link Reaction} added.
      */
     public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {

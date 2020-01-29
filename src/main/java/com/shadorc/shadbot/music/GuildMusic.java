@@ -46,7 +46,7 @@ public class GuildMusic {
     }
 
     /**
-     * Schedule to leave the voice channel in 1 minute
+     * Schedule to leave the voice channel in 1 minute.
      */
     public void scheduleLeave() {
         LOGGER.debug("{Guild ID: {}} Scheduling auto-leave.", this.guildId.asLong());

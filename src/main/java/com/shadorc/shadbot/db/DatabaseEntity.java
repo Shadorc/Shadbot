@@ -1,9 +1,11 @@
 package com.shadorc.shadbot.db;
 
+import reactor.core.publisher.Mono;
+
 public interface DatabaseEntity {
 
-    void insert();
+    Mono<Void> insert();
 
-    void delete();
+    Mono<Void> delete();
 
 }

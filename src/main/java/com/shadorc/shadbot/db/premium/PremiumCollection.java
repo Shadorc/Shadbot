@@ -1,24 +1,24 @@
 package com.shadorc.shadbot.db.premium;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.collect.Lists;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.utils.Utils;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import org.bson.Document;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public final class PremiumCollection extends DatabaseCollection {
 
@@ -28,70 +28,69 @@ public final class PremiumCollection extends DatabaseCollection {
         super(database.getCollection("premium"));
     }
 
-    public Optional<Relic> getRelicById(String relicId) {
+    /**
+     * @param relicId the ID of the {@link Relic} to get
+     * @return The {@link Relic} corresponding to the provided {@code relicId}.
+     */
+    public Mono<Relic> getRelicById(String relicId) {
         LOGGER.debug("[Relic {}] Request.", relicId);
 
-        final Document document = this.getCollection()
+        final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", relicId))
                 .first();
 
-        if (document == null) {
-            LOGGER.debug("[Relic {}] Not found.", relicId);
-            return Optional.empty();
-        } else {
-            LOGGER.debug("[Relic {}] Found.", relicId);
-            return Optional.of(document)
-                    .map(doc -> doc.toJson(Utils.JSON_WRITER_SETTINGS))
-                    .map(json -> {
-                        try {
-                            return Utils.MAPPER.readValue(json, RelicBean.class);
-                        } catch (final JsonProcessingException err) {
-                            throw new RuntimeException(err);
-                        }
-                    })
-                    .map(Relic::new);
-        }
+        return Mono.from(request)
+                .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
+                .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, RelicBean.class)))
+                .map(Relic::new);
     }
 
-    public List<Relic> getRelicsByUser(Snowflake userId) {
+    /**
+     * @param userId the {@link Snowflake} ID of the {@link User}
+     * @return A {@link Flux} containing the {@link Relic} possessed by an {@link User}.
+     */
+    public Flux<Relic> getRelicsByUser(Snowflake userId) {
         LOGGER.debug("[Relics by user {}] Request.", userId.asLong());
         return this.getRelicsBy("user_id", userId);
     }
 
-    public List<Relic> getRelicsByGuild(Snowflake guildId) {
-        LOGGER.debug("[Relics by guild {}] Request.", guildId.asLong());
-        return this.getRelicsBy("guild_id", guildId);
+    private Flux<Relic> getRelicsBy(String key, Snowflake id) {
+        final Publisher<Document> request = this.getCollection()
+                .find(Filters.eq(key, id.asString()));
+
+        return Flux.from(request)
+                .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
+                .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, RelicBean.class)))
+                .map(Relic::new);
     }
 
-    private List<Relic> getRelicsBy(String key, Snowflake id) {
-        return Lists.newArrayList(this.getCollection()
-                .find(Filters.eq(key, id.asString()))
-                .iterator())
-                .stream()
-                .map(doc -> doc.toJson(Utils.JSON_WRITER_SETTINGS))
-                .map(json -> {
-                    try {
-                        return Utils.MAPPER.readValue(json, RelicBean.class);
-                    } catch (final JsonProcessingException err) {
-                        throw new RuntimeException(err);
-                    }
-                })
-                .map(Relic::new)
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    public Relic generateRelic(RelicType type) {
+    /**
+     * @param type the {@link RelicType} type of the {@link Relic} to generate.
+     * @return The generated {@link Relic} inserted in the database.
+     */
+    public Mono<Relic> generateRelic(RelicType type) {
         final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.RELIC_DURATION));
-        relic.insert();
-        return relic;
+        LOGGER.info("Relic generated. Type: %s, ID: %s", relic.getType(), relic.getId());
+        return relic.insert()
+                .thenReturn(relic);
     }
 
-    public boolean isUserPremium(Snowflake userId) {
-        return !this.getRelicsByUser(userId).isEmpty();
-    }
+    /**
+     * Requests to determine if a {@link Guild} or a {@link User} are premium.
+     *
+     * @param guildId the {@link Snowflake} ID of the {@link Guild} to check
+     * @param userId  the {@link Snowflake} ID of the {@link User} to check
+     * @return {@code true} if the {@link Guild} or the {@link User} is premium, {@code false} otherwise.
+     */
+    public Mono<Boolean> isPremium(Snowflake guildId, Snowflake userId) {
+        LOGGER.debug("[Is premium {} / {}] Request.", guildId.asLong(), userId.asLong());
 
-    public boolean isGuildPremium(Snowflake guildId) {
-        return !this.getRelicsByGuild(guildId).isEmpty();
+        final Publisher<Document> request = this.getCollection()
+                .find(Filters.or(
+                        Filters.eq("user_id", userId.asString()),
+                        Filters.eq("guild_id", guildId.asString())));
+
+        return Flux.from(request).hasElements();
     }
 
 }

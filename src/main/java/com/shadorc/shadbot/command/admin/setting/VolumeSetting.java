@@ -34,19 +34,24 @@ public class VolumeSetting extends BaseSetting {
                     args.get(1), MIN_VOLUME, MAX_VOLUME)));
         }
 
-        DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), volume);
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), channel))
+        return DatabaseManager.getGuilds()
+                .getDBGuild(context.getGuildId())
+                .flatMap(dbGuild -> dbGuild.setSetting(this.getSetting(), volume))
+                .then(context.getChannel())
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), channel))
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <volume>`", context.getPrefix(), this.getCommandName()), false)
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <volume>`", context.getPrefix(),
+                        this.getCommandName()), false)
                         .addField("Argument", String.format("**volume** - min: %d / max: %d / default: %d",
                                 MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME), false)
-                        .addField("Example", String.format("`%s%s 42`", context.getPrefix(), this.getCommandName()), false));
+                        .addField("Example", String.format("`%s%s 42`", context.getPrefix(), this.getCommandName()),
+                                false));
     }
 
 }

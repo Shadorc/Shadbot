@@ -18,8 +18,8 @@ public final class TextUtils {
 
     public static final String PLAYLIST_LIMIT_REACHED =
             String.format(Emoji.LOCK + " You've reached the maximum number of tracks (%d) in a playlist. "
-                            + "You can **remove this limit and gain other advantage** by contributing to Shadbot. More info here: <%s>",
-                    Config.PLAYLIST_SIZE, Config.PATREON_URL);
+                    + "You can **remove this limit and gain other advantage** by contributing to Shadbot. "
+                    + "More info here: <%s>", Config.PLAYLIST_SIZE, Config.PATREON_URL);
 
     public static final TextFile SPAMS = new TextFile("texts/spam.txt");
 
@@ -32,8 +32,8 @@ public final class TextUtils {
             "The Baguette is a Lie");
 
     /**
-     * @param err - the exception containing the error message to clean
-     * @return The error message trimmed, without HTML tags nor YouTube links
+     * @param err the exception containing the error message to clean
+     * @return The error message trimmed, without HTML tags nor YouTube links.
      */
     public static String cleanLavaplayerErr(@NonNull FriendlyException err) {
         return Jsoup.parse(StringUtils.remove(err.getMessage(), "Watch on YouTube")).text().trim();

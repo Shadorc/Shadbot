@@ -1,13 +1,16 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
-import com.shadorc.shadbot.command.game.LotteryCmd;
+import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.ExceptionHandler;
+import com.shadorc.shadbot.utils.ExitCode;
+import com.shadorc.shadbot.utils.TextUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;

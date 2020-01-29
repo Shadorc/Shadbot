@@ -90,7 +90,8 @@ public class GuildMusicConnection {
      */
     public void leaveVoiceChannel() {
         if (this.getVoiceConnection() != null) {
-            this.getVoiceConnection().disconnect();
+            // TODO
+            this.getVoiceConnection().disconnect().block();
             this.voiceConnection.set(null);
             this.changeState(State.DISCONNECTED);
             MusicManager.LOGGER.info("{Guild ID: {}} Voice channel left.", this.guildId.asLong());

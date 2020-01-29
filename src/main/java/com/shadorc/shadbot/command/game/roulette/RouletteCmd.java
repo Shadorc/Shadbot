@@ -10,6 +10,7 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -32,34 +33,38 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(2);
 
-        final long bet = Utils.requireValidBet(context.getMember(), args.get(0));
         final String place = args.get(1).toLowerCase();
-
-        // Match [1-36], red, black, odd, even, high or low
-        if (!NUMBER_PATTERN.matcher(place).matches() && Utils.parseEnum(Place.class, place) == null) {
-            return Mono.error(new CommandException(String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
-                    place, FormatUtils.format(Place.values(), value -> String.format("**%s**", value.toString().toLowerCase()), ", "))));
-        }
-
-        return Mono.defer(() -> {
-            if (this.getManagers().containsKey(context.getChannelId())) {
-                return Mono.just(this.getManagers().get(context.getChannelId()));
-            } else {
-                final RouletteGame game = new RouletteGame(this, context);
-                this.getManagers().put(context.getChannelId(), game);
-                return game.start().thenReturn(game);
-            }
-        })
-                .flatMap(rouletteManager -> {
-                    final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet, place);
-                    if (rouletteManager.addPlayerIfAbsent(player)) {
-                        player.bet();
-                        return rouletteManager.show();
+        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), args.get(0))
+                .flatMap(bet -> {
+                    // Match [1-36], red, black, odd, even, high or low
+                    if (!NUMBER_PATTERN.matcher(place).matches() && Utils.parseEnum(Place.class, place) == null) {
+                        return Mono.error(new CommandException(String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
+                                place, FormatUtils.format(Place.values(), value -> String.format("**%s**", value.toString().toLowerCase()), ", "))));
                     }
-                    return context.getChannel()
-                            .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) You're already participating.",
-                                    context.getUsername()), channel))
-                            .then();
+
+                    if (this.getManagers().containsKey(context.getChannelId())) {
+                        return Mono.just(Tuples.of(this.getManagers().get(context.getChannelId()), bet));
+                    } else {
+                        final RouletteGame game = new RouletteGame(this, context);
+                        this.getManagers().put(context.getChannelId(), game);
+                        return game.start()
+                                .thenReturn(Tuples.of(game, bet));
+                    }
+                })
+                .flatMap(tuple -> {
+                    final RouletteGame rouletteGame = tuple.getT1();
+                    final long bet = tuple.getT2();
+
+                    final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet, place);
+                    if (rouletteGame.addPlayerIfAbsent(player)) {
+                        return player.bet().then(rouletteGame.show());
+                    } else {
+                        return context.getChannel()
+                                .flatMap(channel -> DiscordUtils.sendMessage(
+                                        String.format(Emoji.INFO + " (**%s**) You're already participating.",
+                                                context.getUsername()), channel))
+                                .then();
+                    }
                 });
     }
 

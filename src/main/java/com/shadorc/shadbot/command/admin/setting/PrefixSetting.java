@@ -34,18 +34,24 @@ public class PrefixSetting extends BaseSetting {
             return Mono.error(new CommandException("Prefix cannot contain spaces."));
         }
 
-        DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).setSetting(this.getSetting(), args.get(1));
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`", args.get(1)), channel))
+        return DatabaseManager.getGuilds()
+                .getDBGuild(context.getGuildId())
+                .flatMap(dbGuild -> dbGuild.setSetting(this.getSetting(), args.get(1)))
+                .then(context.getChannel())
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`",
+                        args.get(1)), channel))
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <prefix>`", context.getPrefix(), this.getCommandName()), false)
-                        .addField("Argument", "**prefix** - Max length: 5, must not contain spaces", false)
-                        .addField("Example", String.format("`%s%s !`", context.getPrefix(), this.getCommandName()), false));
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <prefix>`", context.getPrefix(),
+                        this.getCommandName()), false)
+                        .addField("Argument", "**prefix** - Max length: 5, must not contain spaces",
+                                false)
+                        .addField("Example", String.format("`%s%s !`", context.getPrefix(), this.getCommandName()),
+                                false));
     }
 
 }

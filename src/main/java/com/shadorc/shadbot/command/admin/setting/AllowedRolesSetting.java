@@ -41,12 +41,18 @@ public class AllowedRolesSetting extends BaseSetting {
                 .flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(2)))
                 .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
                 .collectList()
-                .map(mentionedRoles -> {
+                .flatMap(mentionedRoles -> {
                     if (mentionedRoles.isEmpty()) {
-                        throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
+                        return Mono.error(new CommandException(String.format("Role `%s` not found.", args.get(2))));
                     }
 
-                    final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+                    return Mono.zip(Mono.just(mentionedRoles),
+                            DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
+                })
+                .flatMap(tuple -> {
+                    final List<Role> mentionedRoles = tuple.getT1();
+                    final DBGuild dbGuild = tuple.getT2();
+
                     final List<Snowflake> allowedRoles = dbGuild.getSettings().getAllowedRoleIds();
                     final List<Snowflake> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
@@ -67,9 +73,10 @@ public class AllowedRolesSetting extends BaseSetting {
                         }
                     }
 
-                    dbGuild.setSetting(this.getSetting(), allowedRoles);
-                    return strBuilder.toString();
+                    return dbGuild.setSetting(this.getSetting(), allowedRoles)
+                            .thenReturn(strBuilder);
                 })
+                .map(StringBuilder::toString)
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();

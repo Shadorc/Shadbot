@@ -2,7 +2,7 @@ package com.shadorc.shadbot.command.utils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.shadorc.shadbot.api.musixmatch.Musixmatch;
+import com.shadorc.shadbot.api.html.musixmatch.Musixmatch;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;

@@ -1,13 +1,14 @@
 package com.shadorc.shadbot.music;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
-import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.VoiceChannel;
@@ -49,7 +50,7 @@ public final class MusicManager {
      *
      * @return A future for this operation
      */
-    public Future<Void> loadItemOrdered(Snowflake guildId, String identifier, AudioLoadResultListener listener) {
+    public Future<Void> loadItemOrdered(Snowflake guildId, String identifier, AudioLoadResultHandler listener) {
         return this.audioPlayerManager.loadItemOrdered(guildId, identifier, listener);
     }
 
@@ -70,14 +71,19 @@ public final class MusicManager {
                         final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
                         audioPlayer.addListener(new TrackEventListener(guildId));
 
-                        final Settings settings = DatabaseManager.getGuilds().getDBGuild(guildId).getSettings();
-                        final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, settings.getDefaultVol());
-                        final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
-                        guildMusicConnection.setGuildMusic(guildMusic);
+                        return DatabaseManager.getGuilds()
+                                .getDBGuild(guildId)
+                                .map(DBGuild::getSettings)
+                                .map(Settings::getDefaultVol)
+                                .flatMap(volume -> {
+                                    final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, volume);
+                                    final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
+                                    guildMusicConnection.setGuildMusic(guildMusic);
 
-                        final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
-                        return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
-                                .thenReturn(guildMusicConnection.getGuildMusic());
+                                    final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
+                                    return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
+                                            .thenReturn(guildMusicConnection.getGuildMusic());
+                                });
                     }
 
                     return Mono.just(guildMusicConnection.getGuildMusic());
