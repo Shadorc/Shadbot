@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public final class FormatUtils {
 
     /**
-     * @param coins the number of coins to format
+     * @param coins The number of coins to format.
      * @return {@code X coin(s)} where {@code X} is the number of coins formatted using English locale.
      */
     public static String coins(long coins) {
@@ -38,7 +38,7 @@ public final class FormatUtils {
     }
 
     /**
-     * @param duration the duration to format
+     * @param duration The duration to format.
      * @return The formatted duration as D days H hours S minutes.
      */
     public static String customDate(Duration duration) {
@@ -61,7 +61,7 @@ public final class FormatUtils {
     }
 
     /**
-     * @param instant the instant to format
+     * @param instant The instant to format.
      * @return The formatted instant (e.g X days, Y hours, Z seconds).
      */
     public static String longDuration(Instant instant) {
@@ -74,7 +74,7 @@ public final class FormatUtils {
     }
 
     /**
-     * @param durationMillis the duration to format (in milliseconds)
+     * @param durationMillis The duration to format (in milliseconds).
      * @return The formatted duration as H:mm:ss.
      */
     public static String shortDuration(long durationMillis) {
@@ -101,7 +101,7 @@ public final class FormatUtils {
     }
 
     /**
-     * @param number the double number to format
+     * @param number The double number to format.
      * @return The formatted number as a string using English locale.
      */
     public static String number(double number) {
@@ -122,6 +122,10 @@ public final class FormatUtils {
                         value.toString().toLowerCase()), ", "));
     }
 
+    /**
+     * @param info The {@link AudioTrackInfo} to format.
+     * @return A string representing the provided info formatted.
+     */
     public static String trackName(AudioTrackInfo info) {
         final StringBuilder strBuilder = new StringBuilder();
         if ("Unknown artist".equals(info.author)) {

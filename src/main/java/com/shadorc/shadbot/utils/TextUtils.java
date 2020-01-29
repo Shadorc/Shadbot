@@ -32,7 +32,7 @@ public final class TextUtils {
             "The Baguette is a Lie");
 
     /**
-     * @param err the exception containing the error message to clean
+     * @param err The exception containing the error message to clean.
      * @return The error message trimmed, without HTML tags nor YouTube links.
      */
     public static String cleanLavaplayerErr(@NonNull FriendlyException err) {

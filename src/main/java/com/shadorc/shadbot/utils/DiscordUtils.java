@@ -38,18 +38,44 @@ import java.util.function.Consumer;
 
 public final class DiscordUtils {
 
+    /**
+     * @param content The string to send.
+     * @param channel The {@link MessageChannel} in which to send the message.
+     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
+     * it is emitted through the Mono.
+     */
     public static Mono<Message> sendMessage(String content, MessageChannel channel) {
         return DiscordUtils.sendMessage(spec -> spec.setContent(content), channel, false);
     }
 
+    /**
+     * @param embed The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
+     * @param channel The {@link MessageChannel} in which to send the message.
+     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
+     * it is emitted through the Mono.
+     */
     public static Mono<Message> sendMessage(Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
         return DiscordUtils.sendMessage(spec -> spec.setEmbed(embed), channel, true);
     }
 
+    /**
+     * @param content The string to send.
+     * @param embed The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
+     * @param channel The {@link MessageChannel} in which to send the message.
+     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
+     * it is emitted through the Mono.
+     */
     public static Mono<Message> sendMessage(String content, Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
         return DiscordUtils.sendMessage(spec -> spec.setContent(content).setEmbed(embed), channel, true);
     }
 
+    /**
+     * @param spec A {@link Consumer} that provides a "blank" {@link MessageCreateSpec} to be operated on.
+     * @param channel The {@link MessageChannel} in which to send the message.
+     * @param hasEmbed Wether or not the spec contains an embed.
+     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
+     * it is emitted through the Mono.
+     */
     public static Mono<Message> sendMessage(Consumer<MessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
         return Mono.zip(
                 DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), Permission.SEND_MESSAGES),
@@ -83,8 +109,8 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param guild a {@link Guild} containing the channels to extract
-     * @param str   a string containing channels mentions and / or names
+     * @param guild The {@link Guild} containing the channels to extract.
+     * @param str The string containing channels mentions and / or names.
      * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels.
      */
     public static Flux<Snowflake> extractChannels(Guild guild, String str) {
@@ -98,8 +124,8 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param guild a {@link Guild} containing the roles to extract
-     * @param str   a string containing role mentions and / or names
+     * @param guild The {@link Guild} containing the roles to extract.
+     * @param str The string containing role mentions and / or names.
      * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles.
      */
     public static Flux<Snowflake> extractRoles(Guild guild, String str) {
@@ -113,7 +139,7 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param message the {@link Message} containing the members to extract
+     * @param message The {@link Message} containing the members to extract.
      * @return A {@link Member} {@link Flux} mentioned in the {@link Message}.
      */
     public static Flux<Member> getMembersFrom(Message message) {
@@ -127,10 +153,10 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param channel    the channel
-     * @param userId     the user ID
-     * @param permission the permission
-     * @return {@code true} if the user has the permission in the channel, {@code false} otherwise.
+     * @param channel The channel in which the permission has to be checked.
+     * @param userId The ID of the user to check permissions for.
+     * @param permission The permission to check.
+     * @return {@code true} if the user has the permission in the provided channel, {@code false} otherwise.
      */
     public static Mono<Boolean> hasPermission(Channel channel, Snowflake userId, Permission permission) {
         // An user has all the permissions in a private channel
@@ -141,6 +167,12 @@ public final class DiscordUtils {
                 .map(permissions -> permissions.contains(permission));
     }
 
+    /**
+     * @param channel The channel in which the permissions have to be checked.
+     * @param permissions The permissions to check.
+     * @return A {@link Mono} containing a {@link MissingPermissionException} if the bot does not have the provided
+     * permissions in the provided channel or an empty Mono otherwise.
+     */
     public static Mono<Void> requirePermissions(Channel channel, Permission... permissions) {
         return Flux.fromArray(permissions)
                 .flatMap(permission -> DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), permission)
@@ -150,7 +182,7 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param context the context
+     * @param context The context.
      * @return The user voice channel ID if the user is in a voice channel <b>AND</b> the bot is allowed to join
      * <b>OR</b> if the user and the bot are in the same voice channel.
      */
@@ -189,13 +221,17 @@ public final class DiscordUtils {
                     // If the user and the bot are not in the same voice channel
                     if (botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
                         throw new CommandException(String.format("I'm currently playing music in voice channel <#%d>"
-                                + ", join me before using this command.", botVoiceChannelId.map(Snowflake::asLong).get()));
+                                        + ", join me before using this command.",
+                                botVoiceChannelId.map(Snowflake::asLong).get()));
                     }
 
                     return userVoiceChannelId.get();
                 });
     }
 
+    /**
+     * @return A default {@link EmbedCreateSpec} with the default color set.
+     */
     public static Consumer<EmbedCreateSpec> getDefaultEmbed() {
         return spec -> spec.setColor(Config.BOT_COLOR);
     }

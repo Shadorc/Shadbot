@@ -24,8 +24,8 @@ public final class NetUtils {
     private static final HttpClient HTTP_CLIENT = HttpClient.create();
 
     /**
-     * @param html the HTML to convert to text
-     * @return {@code html} converted to text with new lines preserved.
+     * @param html The HTML to convert to text.
+     * @return The provided HTML converted to text with new lines preserved.
      */
     public static String br2nl(String html) {
         if (html == null || html.isBlank()) {
@@ -40,7 +40,7 @@ public final class NetUtils {
     }
 
     /**
-     * @param str the string to encode as UTF-8
+     * @param str The string to encode as UTF-8.
      * @return The string encoded as UTF-8.
      */
     public static String encode(String str) {
@@ -51,7 +51,7 @@ public final class NetUtils {
     }
 
     /**
-     * @param url a string representing an URL to check
+     * @param url The string representing an URL to check.
      * @return {@code true} if the string is a valid and reachable URL, {@code false} otherwise.
      */
     public static Mono<Boolean> isValidUrl(String url) {

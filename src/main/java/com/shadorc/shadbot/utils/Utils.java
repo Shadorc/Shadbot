@@ -43,8 +43,8 @@ public final class Utils {
             .setSerializationInclusion(Include.NON_EMPTY);
 
     /**
-     * @param enumClass the {@link Enum} class
-     * @param value     the string representing the enumeration, case insensitive
+     * @param enumClass The {@link Enum} class.
+     * @param value The string representing the enumeration, case insensitive.
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass} or null if it does not exist.
      */
     @Nullable
@@ -58,11 +58,11 @@ public final class Utils {
     }
 
     /**
-     * @param enumClass the {@link Enum} class
-     * @param value     the string representing the enumeration, case insensitive
-     * @param exception the exception to be thrown
+     * @param enumClass The {@link Enum} class.
+     * @param value The string representing the enumeration, case insensitive.
+     * @param exception The exception to be thrown.
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass}.
-     * @throws X if the value is null
+     * @throws X if the value is null.
      */
     public static <T extends Enum<T>, X extends Throwable> T parseEnum(Class<T> enumClass, String value, X exception) throws X {
         final T enumValue = Utils.parseEnum(enumClass, value);
@@ -74,7 +74,7 @@ public final class Utils {
     }
 
     /**
-     * @param list the list from which to take a random element
+     * @param list The list from which to take a random element.
      * @return A random element from the list or {@code null} if the list is empty.
      */
     @Nullable
@@ -86,7 +86,7 @@ public final class Utils {
     }
 
     /**
-     * @param array the array from which to take a random element
+     * @param array The array from which to take a random element.
      * @return A random element from the array or {@code null} if the array is empty.
      */
     @Nullable
@@ -95,8 +95,8 @@ public final class Utils {
     }
 
     /**
-     * @param map        the map to sort
-     * @param comparator a {@link Comparator} to be used to compare stream elements
+     * @param map The map to sort.
+     * @param comparator The {@link Comparator} to be used to compare stream elements.
      * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code
      * comparator}.
      */
@@ -112,9 +112,9 @@ public final class Utils {
     }
 
     /**
-     * @param guildId the {@link Snowflake} ID of the {@link Guild} in which the {@link User} made the bet
-     * @param userId  the {@link Snowflake} ID of the {@link User} who made the bet
-     * @param betStr  the string representing the bet
+     * @param guildId The {@link Snowflake} ID of the {@link Guild} in which the {@link User} made the bet.
+     * @param userId The {@link Snowflake} ID of the {@link User} who made the bet.
+     * @param betStr The string representing the bet.
      * @return A long representing {@code betStr}.
      * @throws CommandException thrown if {@code betStr} cannot be casted to a long or if the user does not have
      *                          enough coins.
@@ -128,9 +128,9 @@ public final class Utils {
     }
 
     /**
-     * @param guildId the {@link Snowflake} ID of the {@link Guild} in which the {@link User} made the bet
-     * @param userId  the {@link Snowflake} ID of the {@link User} who made the bet
-     * @param bet     the bet
+     * @param guildId The {@link Snowflake} ID of the {@link Guild} in which the {@link User} made the bet.
+     * @param userId The {@link Snowflake} ID of the {@link User} who made the bet.
+     * @param bet The bet.
      * @return The bet.
      * @throws CommandException thrown if the user does not have enough coins.
      */

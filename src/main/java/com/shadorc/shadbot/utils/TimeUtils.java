@@ -18,7 +18,7 @@ public final class TimeUtils {
     private static final Pattern NUMBER_PATTERN = Pattern.compile("[0-9]");
 
     /**
-     * @param instant the instant to get milliseconds from
+     * @param instant The instant to get milliseconds from.
      * @return The amount of milliseconds elapsed since {@code instant}.
      */
     public static long getMillisUntil(@NonNull Instant instant) {
@@ -26,7 +26,7 @@ public final class TimeUtils {
     }
 
     /**
-     * @param epochMilli the epoch milliseconds
+     * @param epochMilli The epoch milliseconds.
      * @return The amount of milliseconds elapsed since {@code epochMillis}.
      */
     public static long getMillisUntil(long epochMilli) {
@@ -37,7 +37,7 @@ public final class TimeUtils {
      * Convert a string, case insensitive, representing time (example: 1m03s) into seconds. <br>
      * Supported units: s (second), m (minute), h (hour)
      *
-     * @param str the text to parse
+     * @param str The text to parse.
      * @return The amount of seconds corresponding to the {@code str} format.
      */
     public static long parseTime(@NonNull String str) {
@@ -79,7 +79,7 @@ public final class TimeUtils {
     }
 
     /**
-     * @param instant the instant to create the date-time from
+     * @param instant The instant to create the date-time from.
      * @return {@code instant} converted as a {@link LocalDateTime} using the {@code ZoneId.systemDefault()} time-zone.
      */
     public static LocalDateTime toLocalDate(@NonNull Instant instant) {

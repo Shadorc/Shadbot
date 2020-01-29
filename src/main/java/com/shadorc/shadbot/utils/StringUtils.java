@@ -16,8 +16,8 @@ public final class StringUtils {
     private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
     /**
-     * @param str the string to capitalize, may be null
-     * @return The capitalized string or null if null string input.
+     * @param str The string to capitalize, may be null.
+     * @return The capitalized string.
      */
     public static String capitalize(@Nullable String str) {
         if (str == null || str.isBlank()) {
@@ -27,7 +27,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param enumeration the enumeration to format, may be null
+     * @param enumeration The enumeration to format, may be null.
      * @return The enumeration converted as a capitalized string with underscores replaced with spaces.
      */
     @Nullable
@@ -39,8 +39,8 @@ public final class StringUtils {
     }
 
     /**
-     * @param text the string
-     * @return A {@link List} containing the quoted elements from {@code text}.
+     * @param text The string to get quoted elements from.
+     * @return A {@link List} containing the quoted elements from the provided text.
      */
     public static List<String> getQuotedElements(@Nullable String text) {
         final List<String> matches = new ArrayList<>();
@@ -59,8 +59,8 @@ public final class StringUtils {
      * The function returns the argument string with whitespace normalized by using {@link String#trim()} to remove
      * leading and trailing whitespace and then replacing sequences of whitespace characters by a single space.
      *
-     * @param str the source string to normalize whitespaces from, may be null
-     * @return the modified string with whitespace normalized or {@code null} if null string input.
+     * @param str The source string to normalize whitespaces from, may be null.
+     * @return The modified string with whitespace normalized or {@code null} if null string input.
      */
     public static String normalizeSpace(@Nullable String str) {
         if (str == null || str.isEmpty()) {
@@ -70,8 +70,8 @@ public final class StringUtils {
     }
 
     /**
-     * @param count the number of elements
-     * @param str   the string to get plural from, may be null
+     * @param count The number of elements.
+     * @param str The string to get plural from, may be null.
      * @return {@code String.format("%d %ss", count, str)} if count > 1, String.format("%d %s", count, str) otherwise.
      */
     @Nullable
@@ -86,8 +86,8 @@ public final class StringUtils {
     }
 
     /**
-     * @param str      the string from which to remove patterns, may be null
-     * @param toRemove the strings to be substituted for each match
+     * @param str The string from which to remove patterns, may be null.
+     * @param toRemove The strings to be substituted for each match.
      * @return The resulting string.
      */
     public static String remove(@Nullable String str, @NonNull List<String> toRemove) {
@@ -95,8 +95,8 @@ public final class StringUtils {
     }
 
     /**
-     * @param str      the string from which to remove patterns, may be null
-     * @param toRemove the strings to be substituted for each match
+     * @param str The string from which to remove patterns, may be null.
+     * @param toRemove The strings to be substituted for each match.
      * @return The resulting string.
      */
     @Nullable
@@ -111,7 +111,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param str the string to split, may be null
+     * @param str The string to split, may be null.
      * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding
      * empty results.
      */
@@ -120,8 +120,8 @@ public final class StringUtils {
     }
 
     /**
-     * @param str   the string to split, may be null
-     * @param limit the result threshold
+     * @param str The string to split, may be null.
+     * @param limit The result threshold.
      * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding
      * empty results.
      */
@@ -130,9 +130,9 @@ public final class StringUtils {
     }
 
     /**
-     * @param str       the string to split, may be null
-     * @param limit     the result threshold
-     * @param delimiter the delimiting regular expression
+     * @param str The string to split, may be null.
+     * @param limit The result threshold.
+     * @param delimiter The delimiting regular expression.
      * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted
      * using {@code delimiter} excluding empty results.
      */
@@ -147,8 +147,8 @@ public final class StringUtils {
     }
 
     /**
-     * @param str       the string to split
-     * @param delimiter the delimiting regular expression
+     * @param str The string to split, may be null.
+     * @param delimiter The delimiting regular expression.
      * @return A endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding
      * empty results.
      */
