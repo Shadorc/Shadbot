@@ -71,7 +71,7 @@ public final class StringUtils {
 
     /**
      * @param count The number of elements.
-     * @param str The string to get plural from, may be null.
+     * @param str   The string to get plural from, may be null.
      * @return {@code String.format("%d %ss", count, str)} if count > 1, String.format("%d %s", count, str) otherwise.
      */
     @Nullable
@@ -86,7 +86,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param str The string from which to remove patterns, may be null.
+     * @param str      The string from which to remove patterns, may be null.
      * @param toRemove The strings to be substituted for each match.
      * @return The resulting string.
      */
@@ -95,7 +95,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param str The string from which to remove patterns, may be null.
+     * @param str      The string from which to remove patterns, may be null.
      * @param toRemove The strings to be substituted for each match.
      * @return The resulting string.
      */
@@ -120,7 +120,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param str The string to split, may be null.
+     * @param str   The string to split, may be null.
      * @param limit The result threshold.
      * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding
      * empty results.
@@ -130,8 +130,8 @@ public final class StringUtils {
     }
 
     /**
-     * @param str The string to split, may be null.
-     * @param limit The result threshold.
+     * @param str       The string to split, may be null.
+     * @param limit     The result threshold.
      * @param delimiter The delimiting regular expression.
      * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted
      * using {@code delimiter} excluding empty results.
@@ -147,7 +147,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param str The string to split, may be null.
+     * @param str       The string to split, may be null.
      * @param delimiter The delimiting regular expression.
      * @return A endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding
      * empty results.

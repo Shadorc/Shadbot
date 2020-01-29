@@ -44,7 +44,7 @@ public final class Utils {
 
     /**
      * @param enumClass The {@link Enum} class.
-     * @param value The string representing the enumeration, case insensitive.
+     * @param value     The string representing the enumeration, case insensitive.
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass} or null if it does not exist.
      */
     @Nullable
@@ -59,7 +59,7 @@ public final class Utils {
 
     /**
      * @param enumClass The {@link Enum} class.
-     * @param value The string representing the enumeration, case insensitive.
+     * @param value     The string representing the enumeration, case insensitive.
      * @param exception The exception to be thrown.
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass}.
      * @throws X if the value is null.
@@ -95,7 +95,7 @@ public final class Utils {
     }
 
     /**
-     * @param map The map to sort.
+     * @param map        The map to sort.
      * @param comparator The {@link Comparator} to be used to compare stream elements.
      * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code
      * comparator}.
@@ -113,8 +113,8 @@ public final class Utils {
 
     /**
      * @param guildId The {@link Snowflake} ID of the {@link Guild} in which the {@link User} made the bet.
-     * @param userId The {@link Snowflake} ID of the {@link User} who made the bet.
-     * @param betStr The string representing the bet.
+     * @param userId  The {@link Snowflake} ID of the {@link User} who made the bet.
+     * @param betStr  The string representing the bet.
      * @return A long representing {@code betStr}.
      * @throws CommandException thrown if {@code betStr} cannot be casted to a long or if the user does not have
      *                          enough coins.
@@ -129,8 +129,8 @@ public final class Utils {
 
     /**
      * @param guildId The {@link Snowflake} ID of the {@link Guild} in which the {@link User} made the bet.
-     * @param userId The {@link Snowflake} ID of the {@link User} who made the bet.
-     * @param bet The bet.
+     * @param userId  The {@link Snowflake} ID of the {@link User} who made the bet.
+     * @param bet     The bet.
      * @return The bet.
      * @throws CommandException thrown if the user does not have enough coins.
      */
