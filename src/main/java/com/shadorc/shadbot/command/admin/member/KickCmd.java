@@ -23,7 +23,7 @@ public class KickCmd extends RemoveMemberCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
-                .setDescription("Kick user.")
+                .setDescription("Kick a user.")
                 .addArg("@user", false)
                 .addArg("reason", true)
                 .build();
