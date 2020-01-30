@@ -26,48 +26,56 @@ public final class LogUtils {
     public static void error(Throwable error, String message, String input) {
         LOGGER.error(String.format("%s (Input: %s)", message, input), error);
 
-        Sentry.capture(new EventBuilder()
-                .withRelease(Config.VERSION)
-                .withLevel(Event.Level.ERROR)
-                .withSentryInterface(new ExceptionInterface(error))
-                .withMessage(message)
-                .withTag(TagName.EXCEPTION_CLASS, error.getClass().getSimpleName())
-                .withTag(TagName.EXCEPTION_MESSAGE, error.getMessage())
-                .withExtra(ExtraName.INPUT, input)
-                .build());
+        if (!Config.IS_SNAPSHOT) {
+            Sentry.capture(new EventBuilder()
+                    .withRelease(Config.VERSION)
+                    .withLevel(Event.Level.ERROR)
+                    .withSentryInterface(new ExceptionInterface(error))
+                    .withMessage(message)
+                    .withTag(TagName.EXCEPTION_CLASS, error.getClass().getSimpleName())
+                    .withTag(TagName.EXCEPTION_MESSAGE, error.getMessage())
+                    .withExtra(ExtraName.INPUT, input)
+                    .build());
+        }
     }
 
     public static void error(Throwable error, String message) {
         LOGGER.error(message, error);
 
-        Sentry.capture(new EventBuilder()
-                .withRelease(Config.VERSION)
-                .withLevel(Event.Level.ERROR)
-                .withSentryInterface(new ExceptionInterface(error))
-                .withMessage(message)
-                .withTag(TagName.EXCEPTION_CLASS, error.getClass().getSimpleName())
-                .withTag(TagName.EXCEPTION_MESSAGE, error.getMessage())
-                .build());
+        if (!Config.IS_SNAPSHOT) {
+            Sentry.capture(new EventBuilder()
+                    .withRelease(Config.VERSION)
+                    .withLevel(Event.Level.ERROR)
+                    .withSentryInterface(new ExceptionInterface(error))
+                    .withMessage(message)
+                    .withTag(TagName.EXCEPTION_CLASS, error.getClass().getSimpleName())
+                    .withTag(TagName.EXCEPTION_MESSAGE, error.getMessage())
+                    .build());
+        }
     }
 
     public static void error(String message) {
         LOGGER.error(message);
 
-        Sentry.capture(new EventBuilder()
-                .withRelease(Config.VERSION)
-                .withLevel(Event.Level.ERROR)
-                .withMessage(message)
-                .build());
+        if (!Config.IS_SNAPSHOT) {
+            Sentry.capture(new EventBuilder()
+                    .withRelease(Config.VERSION)
+                    .withLevel(Event.Level.ERROR)
+                    .withMessage(message)
+                    .build());
+        }
     }
 
     public static void warn(String format, Object... args) {
         LOGGER.warn(String.format(format, args));
 
-        Sentry.capture(new EventBuilder()
-                .withRelease(Config.VERSION)
-                .withLevel(Event.Level.WARNING)
-                .withMessage(String.format(format, args))
-                .build());
+        if (!Config.IS_SNAPSHOT) {
+            Sentry.capture(new EventBuilder()
+                    .withRelease(Config.VERSION)
+                    .withLevel(Event.Level.WARNING)
+                    .withMessage(String.format(format, args))
+                    .build());
+        }
     }
 
     public static void info(String format, Object... args) {
