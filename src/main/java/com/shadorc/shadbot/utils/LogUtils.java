@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.utils;
 
+import com.shadorc.shadbot.data.Config;
 import io.sentry.Sentry;
 import io.sentry.event.Event;
 import io.sentry.event.EventBuilder;
@@ -26,6 +27,7 @@ public final class LogUtils {
         LOGGER.error(String.format("%s (Input: %s)", message, input), error);
 
         Sentry.capture(new EventBuilder()
+                .withRelease(Config.VERSION)
                 .withLevel(Event.Level.ERROR)
                 .withSentryInterface(new ExceptionInterface(error))
                 .withMessage(message)
@@ -39,6 +41,7 @@ public final class LogUtils {
         LOGGER.error(message, error);
 
         Sentry.capture(new EventBuilder()
+                .withRelease(Config.VERSION)
                 .withLevel(Event.Level.ERROR)
                 .withSentryInterface(new ExceptionInterface(error))
                 .withMessage(message)
@@ -51,6 +54,7 @@ public final class LogUtils {
         LOGGER.error(message);
 
         Sentry.capture(new EventBuilder()
+                .withRelease(Config.VERSION)
                 .withLevel(Event.Level.ERROR)
                 .withMessage(message)
                 .build());
@@ -60,6 +64,7 @@ public final class LogUtils {
         LOGGER.warn(String.format(format, args));
 
         Sentry.capture(new EventBuilder()
+                .withRelease(Config.VERSION)
                 .withLevel(Event.Level.WARNING)
                 .withMessage(String.format(format, args))
                 .build());
