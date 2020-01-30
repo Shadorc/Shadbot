@@ -1,13 +1,13 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.MessageUpdateEvent;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
 
 public class MessageUpdateListener implements EventListener<MessageUpdateEvent> {
 
@@ -18,22 +18,26 @@ public class MessageUpdateListener implements EventListener<MessageUpdateEvent> 
 
     @Override
     public Mono<Void> execute(MessageUpdateEvent event) {
-        if (!event.isContentChanged() || event.getOld().isEmpty() || event.getGuildId().isEmpty()) {
+        if (!event.isContentChanged()) {
             return Mono.empty();
         }
 
-        // If the message has been sent more than 30 seconds ago, ignore it
-        final Message oldMessage = event.getOld().get();
-        if (TimeUtils.getMillisUntil(oldMessage.getTimestamp()) > TimeUnit.SECONDS.toMillis(30)) {
-            return Mono.empty();
-        }
+        // The member can be empty if the message has been edited in a private channel
+        final Mono<Optional<Member>> getMember = event.getMessage()
+                .flatMap(Message::getAuthorAsMember)
+                .map(Optional::of)
+                .defaultIfEmpty(Optional.empty());
 
-        final Snowflake guildId = event.getGuildId().get();
-        return Mono.zip(event.getMessage(), event.getMessage().flatMap(Message::getAuthorAsMember))
+        // The guild ID can be null if the message has been edited in a private channel
+        final Long guildId = event.getGuildId()
+                .map(Snowflake::asLong)
+                .orElse(null);
+
+        return Mono.zip(event.getMessage(), getMember)
                 .doOnNext(tuple -> event.getClient()
                         .getEventDispatcher()
                         .publish(new MessageCreateEvent(event.getClient(), event.getShardInfo(), tuple.getT1(),
-                                guildId.asLong(), tuple.getT2())))
+                                guildId, tuple.getT2().orElse(null))))
                 .then();
     }
 
