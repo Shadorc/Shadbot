@@ -73,7 +73,6 @@ public class AutoMessageSetting extends BaseSetting {
 
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractChannels(guild, context.getContent()))
-                .flatMap(channelId -> context.getClient().getChannelById(channelId))
                 .collectList()
                 .flatMap(mentionedChannels -> {
                     if (mentionedChannels.size() != 1) {

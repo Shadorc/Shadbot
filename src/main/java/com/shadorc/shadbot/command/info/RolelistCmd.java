@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.info;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.db.codec.SnowflakeCodec;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -10,6 +11,7 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class RolelistCmd extends BaseCmd {
 
@@ -32,14 +35,15 @@ public class RolelistCmd extends BaseCmd {
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractRoles(guild, arg))
                 .collectList()
-                .flatMap(mentionedRoleIds -> {
-                    if (mentionedRoleIds.isEmpty()) {
+                .flatMap(mentionedRoles -> {
+                    if (mentionedRoles.isEmpty()) {
                         return Mono.error(new CommandException(String.format("Role `%s` not found.", arg)));
                     }
 
-                    final Mono<List<Role>> mentionedRoles = Flux.fromIterable(mentionedRoleIds)
-                            .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-                            .collectList();
+                    final List<Snowflake> mentionedRoleIds = mentionedRoles
+                            .stream()
+                            .map(Role::getId)
+                            .collect(Collectors.toList());
 
                     final Mono<List<String>> usernames = context.getGuild()
                             .flatMapMany(Guild::getMembers)
@@ -48,7 +52,7 @@ public class RolelistCmd extends BaseCmd {
                             .distinct()
                             .collectList();
 
-                    return Mono.zip(mentionedRoles, usernames);
+                    return Mono.zip(Mono.just(mentionedRoles), usernames);
                 })
                 .map(tuple -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {

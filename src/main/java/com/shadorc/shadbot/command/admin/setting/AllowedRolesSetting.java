@@ -39,7 +39,6 @@ public class AllowedRolesSetting extends BaseSetting {
 
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(2)))
-                .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
                 .collectList()
                 .flatMap(mentionedRoles -> {
                     if (mentionedRoles.isEmpty()) {

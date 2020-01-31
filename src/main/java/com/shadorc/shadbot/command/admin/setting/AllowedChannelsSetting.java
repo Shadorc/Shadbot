@@ -11,6 +11,7 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -39,7 +40,6 @@ public class AllowedChannelsSetting extends BaseSetting {
 
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractChannels(guild, args.get(2)))
-                .flatMap(channelId -> context.getClient().getChannelById(channelId))
                 .collectList()
                 .flatMap(mentionedChannels -> {
                     if (mentionedChannels.isEmpty()) {
@@ -50,7 +50,7 @@ public class AllowedChannelsSetting extends BaseSetting {
                             DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
                 })
                 .flatMap(tuple -> {
-                    final List<Channel> mentionedChannels = tuple.getT1();
+                    final List<GuildChannel> mentionedChannels = tuple.getT1();
                     final DBGuild dbGuild = tuple.getT2();
 
                     final List<Snowflake> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannelIds();

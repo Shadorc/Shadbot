@@ -23,6 +23,7 @@ import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
 import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -51,14 +52,12 @@ public class IamCmd extends BaseCmd {
             return Mono.error(new CommandException("You should specify only one text in quotation marks."));
         }
 
-        final Mono<List<Role>> getRoles = context.getGuild()
-                .flatMapMany(guild -> DiscordUtils.extractRoles(guild, StringUtils.remove(arg, quotedElements)))
-                .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-                .collectList();
+        final Flux<Role> getRoles = context.getGuild()
+                .flatMapMany(guild -> DiscordUtils.extractRoles(guild, StringUtils.remove(arg, quotedElements)));
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_ROLES, Permission.ADD_REACTIONS)
-                        .then(getRoles)
+                        .then(getRoles.collectList())
                         .flatMap(roles -> {
                             if (roles.isEmpty()) {
                                 return Mono.error(new MissingArgumentException());

@@ -110,33 +110,45 @@ public final class DiscordUtils {
     }
 
     /**
+     * @param guild The {@link Guild} containing the members to extract.
+     * @param str   The string containing members mentions and / or names.
+     * @return A {@link Member} {@link Flux} containing the extracted members.
+     */
+    public static Flux<Member> extractMembers(Guild guild, String str) {
+        final List<String> words = StringUtils.split(str);
+        return guild.getMembers()
+                .filter(member -> words.contains(member.getDisplayName())
+                        || words.contains(String.format("@%s", member.getDisplayName()))
+                        || words.contains(member.getMention())
+                        || words.contains(member.getUsername())
+                        || words.contains(String.format("@%s", member.getUsername()))
+                        || words.contains(member.getNicknameMention()));
+    }
+
+    /**
      * @param guild The {@link Guild} containing the channels to extract.
      * @param str   The string containing channels mentions and / or names.
-     * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels.
+     * @return A {@link GuildChannel} {@link Flux} containing the extracted channels.
      */
-    public static Flux<Snowflake> extractChannels(Guild guild, String str) {
+    public static Flux<GuildChannel> extractChannels(Guild guild, String str) {
         final List<String> words = StringUtils.split(str);
         return guild.getChannels()
-                .filter(channel -> words.contains(String.format("%s", channel.getName()))
+                .filter(channel -> words.contains(channel.getName())
                         || words.contains(String.format("#%s", channel.getName()))
-                        || words.contains(channel.getMention()))
-                .map(GuildChannel::getId)
-                .distinct();
+                        || words.contains(channel.getMention()));
     }
 
     /**
      * @param guild The {@link Guild} containing the roles to extract.
      * @param str   The string containing role mentions and / or names.
-     * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles.
+     * @return A {@link Role} {@link Flux} containing the extracted roles.
      */
-    public static Flux<Snowflake> extractRoles(Guild guild, String str) {
+    public static Flux<Role> extractRoles(Guild guild, String str) {
         final List<String> words = StringUtils.split(str);
         return guild.getRoles()
-                .filter(role -> words.contains(String.format("%s", role.getName()))
+                .filter(role -> words.contains(role.getName())
                         || words.contains(String.format("@%s", role.getName()))
-                        || words.contains(role.getMention()))
-                .map(Role::getId)
-                .distinct();
+                        || words.contains(role.getMention()));
     }
 
     /**
