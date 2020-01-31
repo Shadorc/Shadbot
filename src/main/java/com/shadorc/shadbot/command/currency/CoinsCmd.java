@@ -25,10 +25,7 @@ public class CoinsCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        return context.getMessage()
-                .getUserMentions()
-                .defaultIfEmpty(context.getAuthor())
-                .next()
+        return this.getMentionedUser(context)
                 .flatMap(user -> Mono.zip(Mono.just(user),
                         DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId())))
                 .map(tuple -> {
@@ -45,6 +42,15 @@ public class CoinsCmd extends BaseCmd {
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(Emoji.PURSE + " " + text, channel)))
                 .then();
+    }
+
+    private Mono<User> getMentionedUser(Context context) {
+        return context.getMessage()
+                .getUserMentions()
+                .switchIfEmpty(context.getGuild()
+                        .flatMapMany(guild -> DiscordUtils.extractMembers(guild, context.getContent())))
+                .defaultIfEmpty(context.getAuthor())
+                .next();
     }
 
     @Override
