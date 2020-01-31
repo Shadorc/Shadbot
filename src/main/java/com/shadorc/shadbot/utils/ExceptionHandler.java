@@ -42,11 +42,14 @@ public final class ExceptionHandler {
 
     private static Mono<Void> onMissingPermissionException(MissingPermissionException err, Context context) {
         final String missingPerm = StringUtils.capitalizeEnum(err.getPermission());
-        return Mono.fromRunnable(() -> LogUtils.info("{Guild ID: %d} Missing permission: %s",
-                context.getGuildId().asLong(), missingPerm))
-                .and(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                TextUtils.missingPermission(context.getUsername(), err.getPermission()), channel)));
+        LogUtils.info("{Guild ID: %d} Missing permission: %s", context.getGuildId().asLong(), missingPerm);
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of "
+                                        + "permission.%nPlease, check my permissions and channel-specific "
+                                        + "ones to verify that %s is checked.", context.getUsername(),
+                                String.format("**%s**", StringUtils.capitalizeEnum(err.getPermission()))), channel))
+                .then();
     }
 
     private static Mono<Void> onMissingArgumentException(BaseCmd cmd, Context context) {
@@ -59,31 +62,35 @@ public final class ExceptionHandler {
 
     private static Mono<Void> onNoMusicException(Context context) {
         return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
-                        context.getUsername()), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
+                                context.getUsername()), channel))
                 .then();
     }
 
     private static Mono<Void> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {
         final Throwable cause = err.getCause() != null ? err.getCause() : err;
-        return Mono.fromRunnable(() -> LogUtils.warn("{Guild ID: %d} [%s] Server access error on input '%s'. %s: %s",
+        LogUtils.warn("{Guild ID: %d} [%s] Server access error on input '%s'. %s: %s",
                 context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent(),
-                cause.getClass().getName(), cause.getMessage()))
-                .and(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(
-                                Emoji.RED_FLAG + " (**%s**) Mmmh... The web service related to the `%s%s` command is " +
-                                        "not available right now... This is not my fault, I promise ! Try again later.",
-                                context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
+                cause.getClass().getName(), cause.getMessage());
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... The web service related to the `%s%s` "
+                                        + "command is not available right now... This is not my fault, I promise !"
+                                        + " Try again later.",
+                                context.getUsername(), context.getPrefix(), context.getCommandName()), channel))
+                .then();
     }
 
     private static Mono<Void> onUnknown(Throwable err, BaseCmd cmd, Context context) {
-        return Mono.fromRunnable(() -> LogUtils.error(err, String.format("{Guild ID: %d} [%s] An unknown error occurred.",
-                context.getGuildId().asLong(), cmd.getClass().getSimpleName()), context.getContent()))
-                .and(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while " +
-                                                "executing `%s%s`. My developer has been warned.",
-                                        context.getUsername(), context.getPrefix(), context.getCommandName()), channel)));
+        LogUtils.error(err, String.format("{Guild ID: %d} [%s] An unknown error occurred.",
+                context.getGuildId().asLong(), cmd.getClass().getSimpleName()), context.getContent());
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while " +
+                                        "executing `%s%s`. My developer has been warned.",
+                                context.getUsername(), context.getPrefix(), context.getCommandName()), channel))
+                .then();
     }
 
     public static void handleUnknownError(Throwable err) {

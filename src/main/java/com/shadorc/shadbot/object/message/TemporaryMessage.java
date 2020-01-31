@@ -16,9 +16,9 @@ public class TemporaryMessage {
     private final Duration duration;
 
     /**
-     * @param client    the Discord client
-     * @param channelId the Channel ID in which to send the message
-     * @param duration  the delay to wait before deleting the message
+     * @param client    The Discord client.
+     * @param channelId The Channel ID in which to send the message.
+     * @param duration  The delay to wait before deleting the message.
      */
     public TemporaryMessage(GatewayDiscordClient client, Snowflake channelId, Duration duration) {
         this.client = client;
@@ -29,7 +29,7 @@ public class TemporaryMessage {
     /**
      * Send a message and then wait {@code delay} {@code unit} to delete it.
      *
-     * @param content the message's content
+     * @param content The message's content.
      * @return A {@link Mono} representing the message sent.
      */
     public Mono<Void> send(String content) {

@@ -32,7 +32,7 @@ public class OverwatchCmd extends BaseCmd {
         XBL("xbl"),
         SWITCH("nintendo-switch");
 
-        private String value;
+        private final String value;
 
         Platform(String value) {
             this.value = value;

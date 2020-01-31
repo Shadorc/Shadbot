@@ -10,7 +10,6 @@ import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.TextUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
@@ -88,7 +87,7 @@ public final class Shadbot {
         Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.boundedElastic())
                 .flatMap(ignored -> {
                     final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
-                            Utils.randValue(TextUtils.TIP_MESSAGES));
+                            TextUtils.TIPS.getRandomTextFormatted());
                     return client.updatePresence(Presence.online(Activity.playing(presence)));
                 })
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))

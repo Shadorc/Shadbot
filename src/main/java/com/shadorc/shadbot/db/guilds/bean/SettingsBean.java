@@ -6,7 +6,6 @@ import com.shadorc.shadbot.db.guilds.bean.setting.IamBean;
 import reactor.util.annotation.Nullable;
 
 import java.util.List;
-import java.util.Map;
 
 public class SettingsBean implements Bean {
 
@@ -40,9 +39,6 @@ public class SettingsBean implements Bean {
     @Nullable
     @JsonProperty("message_channel_id")
     private String messageChannelId;
-    @Nullable
-    @JsonProperty("saved_playlists")
-    private Map<String, List<String>> savedPlaylists;
     @Nullable
     @JsonProperty("prefix")
     private String prefix;
@@ -102,11 +98,6 @@ public class SettingsBean implements Bean {
     }
 
     @Nullable
-    public Map<String, List<String>> getSavedPlaylists() {
-        return this.savedPlaylists;
-    }
-
-    @Nullable
     public String getPrefix() {
         return this.prefix;
     }
@@ -124,7 +115,6 @@ public class SettingsBean implements Bean {
                 ", joinMessage='" + this.joinMessage + '\'' +
                 ", leaveMessage='" + this.leaveMessage + '\'' +
                 ", messageChannelId='" + this.messageChannelId + '\'' +
-                ", savedPlaylists=" + this.savedPlaylists +
                 ", prefix='" + this.prefix + '\'' +
                 '}';
     }

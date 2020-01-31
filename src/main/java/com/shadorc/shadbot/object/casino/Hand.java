@@ -58,7 +58,9 @@ public class Hand {
 
     public String format() {
         return String.format("%s%nValue: %d",
-                FormatUtils.format(this.getCards(), card -> String.format("`%s` %s", card.getValue().getIdent(), card.getSuit().getEmoji()), " | "),
+                FormatUtils.format(this.getCards(),
+                        card -> String.format("`%s` %s", card.getValue().getIdent(), card.getSuit().getEmoji()),
+                        " | "),
                 this.getValue());
     }
 

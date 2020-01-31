@@ -72,7 +72,7 @@ public final class DiscordUtils {
     /**
      * @param spec     A {@link Consumer} that provides a "blank" {@link MessageCreateSpec} to be operated on.
      * @param channel  The {@link MessageChannel} in which to send the message.
-     * @param hasEmbed Wether or not the spec contains an embed.
+     * @param hasEmbed Whether or not the spec contains an embed.
      * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
      * it is emitted through the Mono.
      */
@@ -103,7 +103,8 @@ public final class DiscordUtils {
                 })
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
-                .retryWhen(Retry.onlyIf(err -> err.exception() instanceof PrematureCloseException || err.exception() instanceof Errors.NativeIoException)
+                .retryWhen(Retry.onlyIf(err ->
+                        err.exception() instanceof PrematureCloseException || err.exception() instanceof Errors.NativeIoException)
                         .exponentialBackoff(Duration.ofSeconds(1), Duration.ofSeconds(5))
                         .retryMax(3));
     }

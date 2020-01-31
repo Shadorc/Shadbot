@@ -64,7 +64,7 @@ public abstract class Game {
     }
 
     /**
-     * @param message the {@link Message} to check
+     * @param message The {@link Message} to check.
      * @return A {@link Mono} that returns {@code true} if the {@link Message} is a valid
      * cancel command, {@code false} otherwise.
      */

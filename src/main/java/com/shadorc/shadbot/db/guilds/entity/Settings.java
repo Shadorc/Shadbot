@@ -9,7 +9,9 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -95,12 +97,6 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getMessageChannelId)
                 .map(Snowflake::of);
-    }
-
-    public Map<String, List<String>> getSavedPlaylists() {
-        return Optional.ofNullable(this.getBean())
-                .map(SettingsBean::getSavedPlaylists)
-                .orElse(new HashMap<>());
     }
 
     public String getPrefix() {
