@@ -31,7 +31,8 @@ public class JokeCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getUsername()))
                 .send()
-                .then(NetUtils.get(header -> header.add(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON), HOME_URL, JokeResponse.class))
+                .then(NetUtils.get(header -> header.add(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON),
+                        HOME_URL, JokeResponse.class))
                 .map(response -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Joke", HOME_URL, context.getAvatarUrl())
                                 .setDescription(response.getJoke()))))

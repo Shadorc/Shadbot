@@ -90,6 +90,9 @@ public class OverwatchCmd extends BaseCmd {
                 .then();
     }
 
+    /**
+     * Automatically detects the platform by iterating over all of them.
+     */
     private static Mono<Tuple3<Platform, ProfileResponse, StatsResponse>> getResponse(String battletag) {
         return Flux.fromArray(Platform.values())
                 .flatMap(platform -> OverwatchCmd.getResponse(platform.toString(), battletag))

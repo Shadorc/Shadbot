@@ -26,8 +26,10 @@ import java.util.function.Consumer;
 
 public class DiabloCmd extends BaseCmd {
 
-    private static final String ACCESS_TOKEN_URL = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-            CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_ID), CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_SECRET));
+    private static final String ACCESS_TOKEN_URL = String.format(
+            "https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
+            CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_ID),
+            CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_SECRET));
 
     private enum Region {
         EU, US, TW, KR;
@@ -105,7 +107,7 @@ public class DiabloCmd extends BaseCmd {
     }
 
     /**
-     *  Requests to update the Blizzard token, if expired.
+     * Requests to update the Blizzard token, if expired.
      *
      * @return A {@link Mono} that completes once the token has been successfully updated, if expired.
      */
