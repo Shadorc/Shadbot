@@ -25,6 +25,9 @@ import java.util.function.Consumer;
 
 public class ImageCmd extends BaseCmd {
 
+    private static final String OAUTH_URL = "https://www.deviantart.com/oauth2/token";
+    private static final String BROWSE_POPULAR_URL = "https://www.deviantart.com/api/v1/oauth2/browse/popular";
+
     private final AtomicLong lastTokenGeneration;
     private TokenResponse token;
 
@@ -53,7 +56,8 @@ public class ImageCmd extends BaseCmd {
                     }
                     final Image image = Utils.randValue(images);
                     return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor(String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
+                            .andThen(embed -> embed.setAuthor(
+                                    String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/gT4hHUB.png")
                                     .addField("Title", image.getTitle(), false)
                                     .addField("Author", image.getAuthor().getUsername(), false)
@@ -66,23 +70,24 @@ public class ImageCmd extends BaseCmd {
     }
 
     private Flux<Image> getPopularImages(String encodedSearch) {
-        return this.generateAccessToken()
-                .then(Mono.defer(() -> Mono.just(String.format("https://www.deviantart.com/api/v1/oauth2/browse/popular?"
+        return this.requestAccessToken()
+                .then(Mono.defer(() -> Mono.just(String.format("%s?"
                                 + "q=%s"
                                 + "&timerange=alltime"
                                 + "&limit=25" // The pagination limit (min: 1 max: 50)
                                 + "&offset=%d" // The pagination offset (min: 0 max: 50000)
                                 + "&access_token=%s",
-                        encodedSearch, ThreadLocalRandom.current().nextInt(150), this.token.getAccessToken()))))
+                        BROWSE_POPULAR_URL, encodedSearch, ThreadLocalRandom.current().nextInt(150),
+                        this.token.getAccessToken()))))
                 .flatMap(url -> NetUtils.get(url, DeviantArtResponse.class))
                 .map(DeviantArtResponse::getResults)
                 .flatMapMany(Flux::fromIterable)
                 .filter(image -> image.getContent().isPresent());
     }
 
-    private Mono<TokenResponse> generateAccessToken() {
-        return Mono.just(String.format("https://www.deviantart.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials",
-                CredentialManager.getInstance().get(Credential.DEVIANTART_CLIENT_ID),
+    private Mono<Void> requestAccessToken() {
+        return Mono.just(String.format("%s?client_id=%s&client_secret=%s&grant_type=client_credentials",
+                OAUTH_URL, CredentialManager.getInstance().get(Credential.DEVIANTART_CLIENT_ID),
                 CredentialManager.getInstance().get(Credential.DEVIANTART_API_SECRET)))
                 .filter(url -> this.isTokenExpired())
                 .flatMap(url -> NetUtils.get(url, TokenResponse.class))
@@ -90,7 +95,8 @@ public class ImageCmd extends BaseCmd {
                     this.token = token;
                     this.lastTokenGeneration.set(System.currentTimeMillis());
                     LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
-                });
+                })
+                .then();
     }
 
     private boolean isTokenExpired() {

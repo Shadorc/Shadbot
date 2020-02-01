@@ -54,7 +54,8 @@ public class RolelistCmd extends BaseCmd {
                 })
                 .map(tuple -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
-                            embed.setAuthor(String.format("Rolelist: %s", FormatUtils.format(tuple.getT1(), Role::getName, ", ")),
+                            embed.setAuthor(
+                                    String.format("Rolelist: %s", FormatUtils.format(tuple.getT1(), Role::getName, ", ")),
                                     null, context.getAvatarUrl());
 
                             if (tuple.getT2().isEmpty()) {
