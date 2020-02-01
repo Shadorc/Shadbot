@@ -32,7 +32,9 @@ public class UserInfoCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final Mono<Member> getMember = context.getMessage()
                 .getUserMentions()
-                .switchIfEmpty(Mono.just(context.getAuthor()))
+                .switchIfEmpty(context.getGuild()
+                        .flatMapMany(guild -> DiscordUtils.extractMembers(guild, context.getContent())))
+                .defaultIfEmpty(context.getAuthor())
                 .next()
                 .flatMap(user -> user.asMember(context.getGuildId()));
 
@@ -78,8 +80,8 @@ public class UserInfoCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
-                .setDescription("Show info about an user.")
-                .addArg("@user", true)
+                .setDescription("Show info about a user.")
+                .addArg("@user", "if not specified, it will show your info", true)
                 .build();
     }
 
