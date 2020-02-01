@@ -38,7 +38,7 @@ public class MemberListener {
                     .flatMap(tuple -> MemberListener.sendAutoMessage(event.getClient(), event.getMember(),
                             tuple.getT1(), tuple.getT2()));
 
-            // Add auto-roles when an user joins if they are configured
+            // Add auto-roles when a user joins if they are configured
             final Flux<Void> addAutoRoles = Mono.zip(event.getGuild(), event.getClient().getSelfId())
                     .flatMap(tuple -> tuple.getT1().getMemberById(tuple.getT2()))
                     .flatMapMany(self -> self.getBasePermissions()

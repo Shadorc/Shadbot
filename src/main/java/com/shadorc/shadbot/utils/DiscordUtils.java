@@ -172,7 +172,7 @@ public final class DiscordUtils {
      * @return {@code true} if the user has the permission in the provided channel, {@code false} otherwise.
      */
     public static Mono<Boolean> hasPermission(Channel channel, Snowflake userId, Permission permission) {
-        // An user has all the permissions in a private channel
+        // A user has all the permissions in a private channel
         if (channel instanceof PrivateChannel) {
             return Mono.just(true);
         }

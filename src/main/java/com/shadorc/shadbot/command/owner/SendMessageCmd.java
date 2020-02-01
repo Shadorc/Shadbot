@@ -62,7 +62,7 @@ public class SendMessageCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
-                .setDescription("Send a private message to an user.")
+                .setDescription("Send a private message to a user.")
                 .addArg("userID", false)
                 .addArg("message", false)
                 .build();
