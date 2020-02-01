@@ -81,24 +81,34 @@ public class DiabloCmd extends BaseCmd {
                             .collectList()
                             .map(heroResponses -> {
                                 Collections.reverse(heroResponses);
-                                return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                                        .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
-                                                .setThumbnail("https://i.imgur.com/QUS9QkX.png")
-                                                .setDescription(String.format("Stats for **%s** (Guild: **%s**)"
-                                                                + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
-                                                                + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
-                                                        profile.getBattleTag(), profile.getGuildName(),
-                                                        profile.getParagonLevel(), profile.getParagonLevelHardcore(),
-                                                        profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
-                                                .addField("Heroes", FormatUtils.format(heroResponses,
-                                                        hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
-                                                .addField("Damage", FormatUtils.format(heroResponses,
-                                                        hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true)));
+                                return updatableMsg.setEmbed(this.getEmbed(context.getAvatarUrl(), profile, heroResponses));
                             });
                 })
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
+    }
+
+    private Consumer<EmbedCreateSpec> getEmbed(String avatarUrl, ProfileResponse profile, List<HeroResponse> heroResponses) {
+        final String description = String.format("Stats for **%s** (Guild: **%s**)"
+                        + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
+                        + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
+                profile.getBattleTag(), profile.getGuildName(),
+                profile.getParagonLevel(), profile.getParagonLevelHardcore(),
+                profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore());
+
+        final String heroes = FormatUtils.format(heroResponses,
+                hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n");
+
+        final String damages = FormatUtils.format(heroResponses,
+                hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n");
+
+        return DiscordUtils.getDefaultEmbed()
+                .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, avatarUrl)
+                        .setThumbnail("https://i.imgur.com/QUS9QkX.png")
+                        .setDescription(description)
+                        .addField("Heroes", heroes, true)
+                        .addField("Damage", damages, true));
     }
 
     private boolean isTokenExpired() {
