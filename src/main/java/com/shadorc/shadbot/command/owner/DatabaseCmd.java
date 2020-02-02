@@ -36,7 +36,8 @@ public class DatabaseCmd extends BaseCmd {
             final StringBuilder strBuilder = new StringBuilder();
             try {
                 final Process process = Runtime.getRuntime().exec(new String[]{"mongo", Config.DATABASE_NAME, "--eval", arg});
-                try (final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+                try (final BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
 
                     String line;
                     while ((line = reader.readLine()) != null) {
@@ -46,6 +47,7 @@ public class DatabaseCmd extends BaseCmd {
             } catch (final IOException err) {
                 strBuilder.append(String.format(Emoji.RED_CROSS + " Error: %s", err.getMessage()));
             }
+
             return strBuilder.toString();
         })
                 .flatMap(text -> context.getChannel()
