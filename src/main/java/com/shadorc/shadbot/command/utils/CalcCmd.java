@@ -34,8 +34,8 @@ public class CalcCmd extends BaseCmd {
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
-                        context.getUsername(), arg.replace("*", "\\*"), this.formatter.format(this.evaluator.evaluate(arg))),
-                        channel))
+                        context.getUsername(), arg.replace("*", "\\*"),
+                        this.formatter.format(this.evaluator.evaluate(arg))), channel))
                 .onErrorMap(IllegalArgumentException.class, err -> new CommandException(err.getMessage()))
                 .then();
     }

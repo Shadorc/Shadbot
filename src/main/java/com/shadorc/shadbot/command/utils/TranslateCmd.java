@@ -93,7 +93,7 @@ public class TranslateCmd extends BaseCmd {
                             || !body.startsWith("[")
                             || !(new JSONArray(body).get(0) instanceof JSONArray)) {
                         throw new CommandException(String.format("One of the specified language isn't supported. "
-                                + "Use `%shelp %s` to see a complete list of supported languages.",
+                                        + "Use `%shelp %s` to see a complete list of supported languages.",
                                 context.getPrefix(), this.getName()));
                     }
 
