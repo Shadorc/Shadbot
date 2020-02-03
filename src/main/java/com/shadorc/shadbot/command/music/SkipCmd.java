@@ -53,7 +53,8 @@ public class SkipCmd extends BaseCmd {
                         // If the music has been started correctly
                         if (guildMusic.getTrackScheduler().nextTrack()) {
                             // we resume it in case the previous music was paused.
-                            return Mono.fromRunnable(() -> guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false));
+                            guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
+                            return Mono.empty();
                         }
                         // else
                         else {
