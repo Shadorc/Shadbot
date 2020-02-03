@@ -16,7 +16,6 @@ import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpMethod;
 import org.apache.http.HttpStatus;
@@ -52,10 +51,11 @@ public class LyricsCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         final String search = this.getSearch(context);
 
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading lyrics...", context.getUsername()))
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading lyrics...",
+                context.getUsername()))
                 .send()
                 .then(this.getCorrectedUrl(search))
-                .flatMap(url -> Mono.zip(this.getLyricsDocument(context.getClient(), url)
+                .flatMap(url -> Mono.zip(this.getLyricsDocument(url)
                         .map(doc -> doc.outputSettings(PRESERVE_FORMAT)), Mono.just(url)))
                 .flatMap(tuple -> {
                     final Document doc = tuple.getT1();
@@ -74,13 +74,17 @@ public class LyricsCmd extends BaseCmd {
                                     .setFooter("Click on the title to see the full version",
                                             "https://i.imgur.com/G7q6Hmq.png"))));
                 })
-                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
-                        context.getUsername(), search)))))
+                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
+                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+                                context.getUsername(), search)))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 
+    /**
+     * @return The search term, either the current playing music title or the context argument.
+     */
     private String getSearch(Context context) {
         return context.getArg()
                 .orElseGet(() -> {
@@ -99,7 +103,7 @@ public class LyricsCmd extends BaseCmd {
                 });
     }
 
-    private Mono<Document> getLyricsDocument(GatewayDiscordClient client, String url) {
+    private Mono<Document> getLyricsDocument(String url) {
         // Sometimes Musixmatch redirects to a wrong page
         // If the response URL and the requested URL are different, retry
         return NetUtils.request(HttpMethod.GET, url)
@@ -115,7 +119,8 @@ public class LyricsCmd extends BaseCmd {
                 .retry(MAX_RETRY, err -> "Musixmatch redirected to wrong page.".equals(err.getMessage()))
                 .onErrorMap(IOException.class, err -> {
                     LogUtils.warn("[%s] Too many retries, abort attempt to reload page.", this.getClass().getSimpleName());
-                    return new HttpStatusException("Musixmatch does not redirect to the correct page.", HttpStatus.SC_SERVICE_UNAVAILABLE, url);
+                    return new HttpStatusException("Musixmatch does not redirect to the correct page.",
+                            HttpStatus.SC_SERVICE_UNAVAILABLE, url);
                 });
     }
 
