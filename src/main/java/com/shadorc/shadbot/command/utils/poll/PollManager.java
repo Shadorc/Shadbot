@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.command.utils.poll;
 
-import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.message.ReactionMessage;
@@ -91,19 +90,21 @@ public class PollManager {
 
     private Mono<Message> sendResults(Set<Reaction> reactions) {
         // Reactions are not in the same order as they were when added to the message, they need to be ordered
-        final BiMap<ReactionEmoji, String> reactionsChoices = HashBiMap.create(this.spec.getChoices()).inverse();
-        final Map<String, Integer> choicesVotes = new HashMap<>();
+        final Map<ReactionEmoji, String> reactionsChoices = HashBiMap.create(this.spec.getChoices()).inverse();
+        Map<String, Integer> choicesVotes = new HashMap<>(reactions.size());
         for (final Reaction reaction : reactions) {
             // -1 is here to ignore the reaction of the bot itself
             choicesVotes.put(reactionsChoices.get(reaction.getEmoji()), reaction.getCount() - 1);
         }
 
         // Sort votes map by value in the ascending order
+        choicesVotes = Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue()));
+
         final StringBuilder representation = new StringBuilder();
         int count = 1;
-        for (final String key : Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue())).keySet()) {
-            representation.append(String.format("%n\t**%d.** %s (%s)", count, key,
-                    StringUtils.pluralOf(count, "vote")));
+        for (final Entry<String, Integer> entry : choicesVotes.entrySet()) {
+            representation.append(String.format("%n\t**%d.** %s (%s)", count,
+                    entry.getKey(), StringUtils.pluralOf(entry.getValue(), "vote")));
             count++;
         }
 
