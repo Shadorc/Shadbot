@@ -23,10 +23,16 @@ public class NameCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final AudioTrackInfo trackInfo = context.requireGuildMusic().getTrackScheduler().getAudioPlayer().getPlayingTrack().getInfo();
+        final AudioTrackInfo trackInfo = context.requireGuildMusic()
+                .getTrackScheduler()
+                .getAudioPlayer()
+                .getPlayingTrack()
+                .getInfo();
+
         return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MUSICAL_NOTE + " (**%s**) Currently playing: **%s**",
-                        context.getUsername(), FormatUtils.trackName(trackInfo)), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.MUSICAL_NOTE + " (**%s**) Currently playing: **%s**",
+                                context.getUsername(), FormatUtils.trackName(trackInfo)), channel))
                 .then();
     }
 

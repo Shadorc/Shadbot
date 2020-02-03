@@ -49,10 +49,10 @@ public class RepeatCmd extends BaseCmd {
                         strBuilder.append(" Song repetition disabled. ");
                     }
 
-                    strBuilder.append(String.format(" %s repetition enabled by **%s**.",
+                    return strBuilder.append(String.format(" %s repetition enabled by **%s**.",
                             newMode == TrackScheduler.RepeatMode.PLAYLIST ? "Playlist" : "Song",
-                            context.getUsername()));
-                    return strBuilder.toString();
+                            context.getUsername()))
+                            .toString();
                 })
                 .flatMap(message -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(message, channel)))

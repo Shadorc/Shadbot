@@ -115,8 +115,9 @@ public class PollCmd extends BaseCmd {
                 .distinct()
                 .collect(Collectors.toList());
         if (!NumberUtils.isBetween(choices.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
-            throw new CommandException(String.format("You must specify between %d and %d different non-empty choices and one question.",
-                    MIN_CHOICES_NUM, MAX_CHOICES_NUM));
+            throw new CommandException(
+                    String.format("You must specify between %d and %d different non-empty choices and one question.",
+                            MIN_CHOICES_NUM, MAX_CHOICES_NUM));
         }
 
         final Map<String, ReactionEmoji> choicesReactions = new LinkedHashMap<>();
@@ -124,7 +125,8 @@ public class PollCmd extends BaseCmd {
             choicesReactions.put(choices.get(i), ReactionEmoji.unicode(NUMBER_UNICODE.get(i)));
         }
 
-        return new PollManager(this, context, new PollCreateSpec(Duration.ofSeconds(seconds), substrings.get(0), choicesReactions));
+        return new PollManager(this, context,
+                new PollCreateSpec(Duration.ofSeconds(seconds), substrings.get(0), choicesReactions));
     }
 
     @Override

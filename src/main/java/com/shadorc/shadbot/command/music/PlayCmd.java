@@ -45,7 +45,8 @@ public class PlayCmd extends BaseCmd {
                             final Snowflake voiceChannelId = tuple.getT1();
                             final String identifier = tuple.getT2();
 
-                            return MusicManager.getInstance().getOrCreate(context.getClient(), context.getGuildId(), voiceChannelId)
+                            return MusicManager.getInstance()
+                                    .getOrCreate(context.getClient(), context.getGuildId(), voiceChannelId)
                                     .flatMap(guildMusic -> PlayCmd.play(context, channel, guildMusic, identifier));
                         }));
     }
