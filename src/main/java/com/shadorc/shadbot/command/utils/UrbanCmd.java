@@ -21,6 +21,8 @@ import java.util.function.Consumer;
 
 public class UrbanCmd extends BaseCmd {
 
+    private final static String HOME_URL = "http://api.urbandictionary.com/v0/define";
+
     public UrbanCmd() {
         super(CommandCategory.UTILS, List.of("urban"), "ud");
         this.setDefaultRateLimiter();
@@ -32,14 +34,16 @@ public class UrbanCmd extends BaseCmd {
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final String url = String.format("https://api.urbandictionary.com/v0/define?term=%s", NetUtils.encode(arg));
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Urban Dictionary definition...", context.getUsername()))
+        final String url = String.format("%s?term=%s", HOME_URL, NetUtils.encode(arg));
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Urban Dictionary definition...",
+                context.getUsername()))
                 .send()
                 .then(NetUtils.get(url, UrbanDictionaryResponse.class))
                 .map(urbanDictionary -> {
                     if (urbanDictionary.getDefinitions().isEmpty()) {
-                        return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No urban definitions found for `%s`",
-                                context.getUsername(), arg));
+                        return updatableMsg.setContent(
+                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Urban Dictionary definition found for `%s`",
+                                        context.getUsername(), arg));
                     }
 
                     final UrbanDefinition urbanDefinition = urbanDictionary.getDefinitions().get(0);
@@ -49,9 +53,11 @@ public class UrbanCmd extends BaseCmd {
 
                     return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> {
-                                embed.setAuthor(String.format("Urban Dictionary: %s", urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())
+                                embed.setAuthor(String.format("Urban Dictionary: %s",
+                                        urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())
                                         .setThumbnail("https://i.imgur.com/7KJtwWp.png")
                                         .setDescription(definition);
+
                                 if (!example.isBlank()) {
                                     embed.addField("Example", example, false);
                                 }
@@ -65,7 +71,7 @@ public class UrbanCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
-                .setDescription("Show Urban Dictionary definition for a search.")
+                .setDescription("Show the first Urban Dictionary definition for a search.")
                 .addArg("search", false)
                 .build();
     }
