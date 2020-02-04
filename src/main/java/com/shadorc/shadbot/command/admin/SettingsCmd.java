@@ -168,7 +168,8 @@ public class SettingsCmd extends BaseCmd {
 
     private static Consumer<EmbedCreateSpec> getHelp(Context context, BaseSetting setting) {
         return setting.getHelp(context)
-                .andThen(embed -> embed.setAuthor(String.format("Help for setting: %s", setting.getName()), null, context.getAvatarUrl())
+                .andThen(embed -> embed.setAuthor(
+                        String.format("Help for setting: %s", setting.getName()), null, context.getAvatarUrl())
                         .setDescription(String.format("**%s**", setting.getDescription())));
     }
 

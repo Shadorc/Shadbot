@@ -30,8 +30,9 @@ public class VolumeSetting extends BaseSetting {
 
         final Integer volume = NumberUtils.toIntBetweenOrNull(args.get(1), MIN_VOLUME, MAX_VOLUME);
         if (volume == null) {
-            return Mono.error(new CommandException(String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
-                    args.get(1), MIN_VOLUME, MAX_VOLUME)));
+            return Mono.error(new CommandException(
+                    String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
+                            args.get(1), MIN_VOLUME, MAX_VOLUME)));
         }
 
         return DatabaseManager.getGuilds()

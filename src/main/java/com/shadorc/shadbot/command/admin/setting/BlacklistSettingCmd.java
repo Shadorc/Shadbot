@@ -72,7 +72,8 @@ public class BlacklistSettingCmd extends BaseSetting {
                             .then(context.getChannel())
                             .flatMap(channel -> DiscordUtils.sendMessage(
                                     String.format(Emoji.CHECK_MARK + " Command(s) %s %s to the blacklist.",
-                                            FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "), actionVerbose),
+                                            FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "),
+                                            actionVerbose),
                                     channel));
                 })
                 .then();
@@ -81,10 +82,12 @@ public class BlacklistSettingCmd extends BaseSetting {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <command(s)>`", context.getPrefix(), this.getCommandName()), false)
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <command(s)>`",
+                        context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s",
                                 FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s add rule34 russian_roulette`", context.getPrefix(), this.getCommandName()), false));
+                        .addField("Example", String.format("`%s%s add rule34 russian_roulette`",
+                                context.getPrefix(), this.getCommandName()), false));
     }
 
 }

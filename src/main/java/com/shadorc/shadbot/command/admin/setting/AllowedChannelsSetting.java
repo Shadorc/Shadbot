@@ -93,10 +93,12 @@ public class AllowedChannelsSetting extends BaseSetting {
                                 FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
 
                         if (!mentionedTextChannelIds.isEmpty() && allowedTextChannelIds.isEmpty()) {
-                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed text channels set, I can now speak in all the text channels.");
+                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed text channels set, "
+                                    + "I can now speak in all the text channels.");
                         }
                         if (!mentionedVoiceChannelIds.isEmpty() && allowedVoiceChannelIds.isEmpty()) {
-                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed voice channels set, I can now connect to all voice channels.");
+                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed voice channels set, "
+                                    + "I can now connect to all voice channels.");
                         }
                     }
 

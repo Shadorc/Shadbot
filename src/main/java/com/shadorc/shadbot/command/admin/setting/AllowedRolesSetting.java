@@ -68,7 +68,8 @@ public class AllowedRolesSetting extends BaseSetting {
                                 FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
 
                         if (allowedRoles.isEmpty()) {
-                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed roles set, everyone can now interact with me.");
+                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed roles set, everyone "
+                                    + "can now interact with me.");
                         }
                     }
 
@@ -84,11 +85,14 @@ public class AllowedRolesSetting extends BaseSetting {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <role(s)>`", context.getPrefix(), this.getCommandName()), false)
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <role(s)>`",
+                        context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s",
                                 FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s add @role`", context.getPrefix(), this.getCommandName()), false)
-                        .addField("Info", "By default, **server owner** and **administrators** will always be able to interact with Shadbot.", false));
+                        .addField("Example", String.format("`%s%s add @role`",
+                                context.getPrefix(), this.getCommandName()), false)
+                        .addField("Info", "By default, **server owner** and **administrators** "
+                                + "will always be able to interact with Shadbot.", false));
     }
 
 }

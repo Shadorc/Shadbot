@@ -81,7 +81,7 @@ public abstract class RemoveMemberCmd extends BaseCmd {
                                 context.getUsername(), this.conjugatedVerb,
                                 String.format("**%s**", tuple.getT4().getUsername())),
                                 tuple.getT2())))
-                .onErrorMap(err -> err instanceof ClientException && ((ClientException) err).getStatus().equals(HttpResponseStatus.FORBIDDEN),
+                .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> new MissingPermissionException(this.permission))
                 .then();
     }

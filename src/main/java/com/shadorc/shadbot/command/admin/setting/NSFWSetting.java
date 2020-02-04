@@ -56,10 +56,12 @@ public class NSFWSetting extends BaseSetting {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action>`", context.getPrefix(), this.getCommandName()), false)
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action>`",
+                        context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s",
                                 FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s toggle`", context.getPrefix(), this.getCommandName()), false));
+                        .addField("Example", String.format("`%s%s toggle`",
+                                context.getPrefix(), this.getCommandName()), false));
     }
 
 }
