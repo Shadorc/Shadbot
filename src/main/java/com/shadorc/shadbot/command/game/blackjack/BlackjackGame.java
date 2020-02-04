@@ -112,17 +112,21 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                 .collectList()
                 .map(hands -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
-                            final Hand visibleDealerHand = this.isScheduled() ? new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
+                            final Hand visibleDealerHand = this.isScheduled() ?
+                                    new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
                             embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/oESeVrU.png")
                                     .setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
-                                                    + "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
+                                                    + "%n%nType `hit` to take another card, `stand` to pass or "
+                                                    + "`double down` to double down.",
                                             this.getContext().getPrefix(), this.getContext().getCommandName()))
                                     .addField("Dealer's hand", visibleDealerHand.format(), true);
 
                             if (this.isScheduled()) {
-                                final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-                                embed.setFooter(String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
+                                final Duration remainingDuration = this.getDuration()
+                                        .minusMillis(TimeUtils.getMillisUntil(this.startTime));
+                                embed.setFooter(
+                                        String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
                                         remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
                             } else {
                                 embed.setFooter("Finished", null);

@@ -62,10 +62,12 @@ public class HangmanInputs extends Inputs {
                     }
 
                     if (content.length() == 1
-                            && !this.game.getRateLimiter().isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
+                            && !this.game.getRateLimiter()
+                            .isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
                         return this.game.checkLetter(content);
                     } else if (content.length() == this.game.getWord().length()
-                            && !this.game.getRateLimiter().isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
+                            && !this.game.getRateLimiter()
+                            .isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
                         return this.game.checkWord(content);
                     }
 

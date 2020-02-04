@@ -39,13 +39,15 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
 
         return this.loadWords(difficulty)
                 .then(Mono.defer(() -> {
-                    final HangmanGame hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
+                    final HangmanGame hangmanManager = this.getManagers()
+                            .putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
                     if (hangmanManager == null) {
                         final HangmanGame newHangmanManager = this.getManagers().get(context.getChannelId());
                         return newHangmanManager.start().then(newHangmanManager.show());
                     } else {
                         return context.getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
+                                .flatMap(channel -> DiscordUtils.sendMessage(
+                                        String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
                                                 + " Please, wait for him to finish.",
                                         context.getUsername(), hangmanManager.getContext().getUsername()), channel))
                                 .then();

@@ -58,7 +58,8 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                 .collectList()
                 .doOnNext(list -> this.results = String.join("\n", list))
                 .then(this.getContext().getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
                 .then(this.show())
                 .then(Mono.fromRunnable(this::stop));
     }
@@ -73,7 +74,8 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                             embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/XgOilIW.png")
                                     .setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
-                                            this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
+                                            this.getContext().getPrefix(), this.getContext().getCommandName(),
+                                            FormatUtils.coins(this.bet)))
                                     .addField("Player", String.join("\n", usernames), true)
                                     .addField("Number", this.getPlayers().values().stream()
                                             .map(DicePlayer::getNumber)
@@ -85,8 +87,10 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                             }
 
                             if (this.isScheduled()) {
-                                final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-                                embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
+                                final Duration remainingDuration = this.getDuration()
+                                        .minusMillis(TimeUtils.getMillisUntil(this.startTime));
+                                embed.setFooter(
+                                        String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
                                         remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
                             } else {
                                 embed.setFooter("Finished.", null);

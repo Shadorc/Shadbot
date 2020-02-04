@@ -38,8 +38,10 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                 .flatMap(bet -> {
                     // Match [1-36], red, black, odd, even, high or low
                     if (!NUMBER_PATTERN.matcher(place).matches() && Utils.parseEnum(Place.class, place) == null) {
-                        return Mono.error(new CommandException(String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
-                                place, FormatUtils.format(Place.values(), value -> String.format("**%s**", value.toString().toLowerCase()), ", "))));
+                        return Mono.error(new CommandException(
+                                String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
+                                place, FormatUtils.format(Place.values(),
+                                                value -> String.format("**%s**", value.toString().toLowerCase()), ", "))));
                     }
 
                     if (this.getManagers().containsKey(context.getChannelId())) {
@@ -73,7 +75,8 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
         return HelpBuilder.create(this, context)
                 .setDescription("Play a roulette game in which everyone can participate.")
                 .addArg("bet", false)
-                .addArg("place", String.format("number between 1 and 36, %s", FormatUtils.format(Place.class, ", ")), false)
+                .addArg("place", String.format("number between 1 and 36, %s",
+                        FormatUtils.format(Place.class, ", ")), false)
                 .addField("Info", "**low** - numbers between 1 and 18"
                         + "\n**high** - numbers between 19 and 36", false)
                 .addField("Gains", "The game follows the same rules and winnings as real Roulette.", false)

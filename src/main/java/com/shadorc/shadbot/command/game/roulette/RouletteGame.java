@@ -70,8 +70,9 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                 .collectSortedList()
                 .doOnNext(list -> this.results = String.join(", ", list))
                 .then(this.getContext().getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
-                        winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
+                                winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"), channel))
                 .then(this.show())
                 .then(Mono.fromRunnable(this::stop));
     }
@@ -93,22 +94,31 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                 .collectList()
                 .map(list -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
+                            final String description = String.format("**Use `%s%s <bet> <place>` to join the game.**"
+                                            + "%n%n**place** is a `number between 1 and 36`, %s",
+                                    this.getContext().getPrefix(), this.getContext().getCommandName(),
+                                    FormatUtils.format(Place.values(),
+                                            value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
+                            final String player = FormatUtils.format(list,
+                                    tuple -> String.format("**%s** (%s)",
+                                            tuple.getT2(), FormatUtils.coins(tuple.getT1().getBet())), "\n");
+                            final String place = this.getPlayers().values().stream()
+                                    .map(RoulettePlayer::getPlace)
+                                    .collect(Collectors.joining("\n"));
+
                             embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/D7xZd6C.png")
-                                    .setDescription(String.format("**Use `%s%s <bet> <place>` to join the game.**"
-                                                    + "%n%n**place** is a `number between 1 and 36`, %s",
-                                            this.getContext().getPrefix(), this.getContext().getCommandName(),
-                                            FormatUtils.format(Place.values(), value -> String.format("`%s`", value.toString().toLowerCase()), ", ")))
-                                    .addField("Player (Bet)", FormatUtils.format(list,
-                                            tuple -> String.format("**%s** (%s)", tuple.getT2(), FormatUtils.coins(tuple.getT1().getBet())), "\n"), true)
-                                    .addField("Place", this.getPlayers().values().stream().map(RoulettePlayer::getPlace).collect(Collectors.joining("\n")), true);
+                                    .setDescription(description)
+                                    .addField("Player (Bet)", player, true)
+                                    .addField("Place", place, true);
 
                             if (this.results != null) {
                                 embed.addField("Results", this.results, false);
                             }
 
                             if (this.isScheduled()) {
-                                final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+                                final Duration remainingDuration = this.getDuration()
+                                        .minusMillis(TimeUtils.getMillisUntil(this.startTime));
                                 embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
                                         remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
                             } else {

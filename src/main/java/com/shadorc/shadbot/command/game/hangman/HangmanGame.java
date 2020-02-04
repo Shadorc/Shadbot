@@ -97,7 +97,7 @@ public class HangmanGame extends Game {
         final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     embed.setAuthor("Hangman Game", null, this.getContext().getAvatarUrl())
-                            .setThumbnail("https://lh5.ggpht.com/nIoJylIWCj1gKv9dxtd4CFE2aeXvG7MbvP0BNFTtTFusYlxozJRQmHizsIDxydaa7DHT=w300")
+                            .setThumbnail("https://i.imgur.com/Vh9WyaU.png")
                             .setDescription("Type letters or enter a word if you think you've guessed it.")
                             .addField("Word", this.getRepresentation(this.word), false);
 

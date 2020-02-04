@@ -65,8 +65,8 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
         return HelpBuilder.create(this, context)
                 .setDescription("Start or join a blackjack game.")
                 .addArg("bet", false)
-                .addField("Info", "**double down** - increase the initial bet by 100% in exchange for committing to stand"
-                        + " after receiving exactly one more card", false)
+                .addField("Info", "**double down** - increase the initial bet by 100% in exchange for "
+                        + "committing to stand after receiving exactly one more card", false)
                 .addField("Gains", "This game follows the same rules and winnings as real Blackjack.", false)
                 .build();
     }
