@@ -62,7 +62,7 @@ public class VolumeCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
                 .setDescription("Show or change current volume level.")
-                .addArg("volume", String.format("must be between 0%% and %d%%", Config.VOLUME_MAX), true)
+                .addArg("volume", String.format("must be between 1%% and %d%%", Config.VOLUME_MAX), true)
                 .build();
     }
 }
