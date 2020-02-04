@@ -27,7 +27,7 @@ public class StopCmd extends BaseCmd {
                 .getConnection(context.getGuildId())
                 .leaveVoiceChannel()
                 .then(context.getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.",
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.STOP_BUTTON + " Music stopped by **%s**.",
                         context.getUsername()), channel))
                 .then();
     }

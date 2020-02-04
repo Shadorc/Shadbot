@@ -37,7 +37,7 @@ public class RepeatCmd extends BaseCmd {
                             .orElse(oldMode == TrackScheduler.RepeatMode.NONE ?
                                     TrackScheduler.RepeatMode.SONG : TrackScheduler.RepeatMode.NONE);
 
-                    if(oldMode == newMode) {
+                    if (oldMode == newMode) {
                         return String.format(Emoji.INFO + " Repeat mode already set to %s.",
                                 oldMode.toString().toLowerCase());
                     }
@@ -57,7 +57,7 @@ public class RepeatCmd extends BaseCmd {
 
                     if (newMode == TrackScheduler.RepeatMode.PLAYLIST) {
                         strBuilder.append("Playlist ");
-                    } else if(newMode == TrackScheduler.RepeatMode.SONG){
+                    } else if (newMode == TrackScheduler.RepeatMode.SONG) {
                         strBuilder.append("Song ");
                     }
 

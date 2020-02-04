@@ -44,6 +44,7 @@ public enum Emoji {
     REPEAT("repeat"),
     SOUND("sound"),
     MUTE("mute"),
+    STOP_BUTTON("stop_button"),
 
     THUMBSDOWN("thumbsdown"),
     SPEECH("speech_balloon"),
