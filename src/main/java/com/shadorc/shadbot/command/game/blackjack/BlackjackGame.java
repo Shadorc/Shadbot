@@ -127,7 +127,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                                         .minusMillis(TimeUtils.getMillisUntil(this.startTime));
                                 embed.setFooter(
                                         String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
-                                        remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
+                                                remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
                             } else {
                                 embed.setFooter("Finished", null);
                             }

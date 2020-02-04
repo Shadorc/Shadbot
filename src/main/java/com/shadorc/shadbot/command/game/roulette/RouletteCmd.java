@@ -40,7 +40,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                     if (!NUMBER_PATTERN.matcher(place).matches() && Utils.parseEnum(Place.class, place) == null) {
                         return Mono.error(new CommandException(
                                 String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
-                                place, FormatUtils.format(Place.values(),
+                                        place, FormatUtils.format(Place.values(),
                                                 value -> String.format("**%s**", value.toString().toLowerCase()), ", "))));
                     }
 

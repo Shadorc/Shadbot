@@ -91,7 +91,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                                         .minusMillis(TimeUtils.getMillisUntil(this.startTime));
                                 embed.setFooter(
                                         String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
-                                        remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
+                                                remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
                             } else {
                                 embed.setFooter("Finished.", null);
                             }

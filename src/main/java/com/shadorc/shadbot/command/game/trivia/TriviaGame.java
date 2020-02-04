@@ -73,7 +73,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
         return this.getContext().getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
-                        this.trivia.getCorrectAnswer()), channel))
+                                this.trivia.getCorrectAnswer()), channel))
                 .then(Mono.fromRunnable(this::stop));
     }
 

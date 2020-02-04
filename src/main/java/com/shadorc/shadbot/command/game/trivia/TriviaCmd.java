@@ -51,7 +51,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                             return Mono.error(new CommandException(
                                     String.format("`%s` is not a valid ID. Use `%s%s categories` to see the "
                                                     + "complete list of available categories.",
-                                    context.getArg().get(), context.getPrefix(), this.getName())));
+                                            context.getArg().get(), context.getPrefix(), this.getName())));
                         }
                     }
 

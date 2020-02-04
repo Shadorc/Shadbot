@@ -48,8 +48,8 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                         return context.getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
                                         String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
-                                                + " Please, wait for him to finish.",
-                                        context.getUsername(), hangmanManager.getContext().getUsername()), channel))
+                                                        + " Please, wait for him to finish.",
+                                                context.getUsername(), hangmanManager.getContext().getUsername()), channel))
                                 .then();
                     }
                 }));
