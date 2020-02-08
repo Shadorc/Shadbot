@@ -108,7 +108,7 @@
         <dependency>
             <groupId>com.github.Discord4J.Discord4J</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>prototype~voice-for-3.1-3.0.12-g2fa52bc-151</version>
+            <version>prototype~voice-for-3.1-3.0.12-g1a8ecd5-160</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
@@ -139,7 +139,7 @@
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
-            <version>0.9.11</version>
+            <version>0.9.12</version>
         </dependency>
         <!-- DurationFormatUtils, StringUtils -->
         <dependency>
@@ -150,7 +150,7 @@
         <dependency>
             <groupId>com.github.vladimir-bukhtoyarov</groupId>
             <artifactId>bucket4j-core</artifactId>
-            <version>4.7.0</version>
+            <version>4.8.0</version>
         </dependency>
         <dependency>
             <groupId>com.fathzer</groupId>
@@ -160,7 +160,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.6.0-M1</version>
+            <version>5.6.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -171,12 +171,12 @@
         <dependency>
             <groupId>io.projectreactor.tools</groupId>
             <artifactId>blockhound</artifactId>
-            <version>1.0.1.RELEASE</version>
+            <version>1.0.2.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry</artifactId>
-            <version>1.7.27</version>
+            <version>1.7.30</version>
         </dependency>
     </dependencies>
 </project>
