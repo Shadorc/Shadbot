@@ -116,46 +116,14 @@
             <version>1.3.34</version>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20190722</version>
-        </dependency>
-        <dependency>
-            <groupId>net.aksingh</groupId>
-            <artifactId>owm-japis</artifactId>
-            <version>2.5.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <!-- BiMap, Lists -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>28.2-jre</version>
-        </dependency>
-        <!-- DurationFormatUtils, StringUtils -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.vladimir-bukhtoyarov</groupId>
             <artifactId>bucket4j-core</artifactId>
             <version>4.8.0</version>
         </dependency>
         <dependency>
-            <groupId>com.fathzer</groupId>
-            <artifactId>javaluator</artifactId>
-            <version>3.0.3</version>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20190722</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -174,9 +142,42 @@
             <version>1.0.2.RELEASE</version>
         </dependency>
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+        <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry</artifactId>
             <version>1.7.30</version>
+        </dependency>
+        <dependency>
+            <groupId>net.aksingh</groupId>
+            <artifactId>owm-japis</artifactId>
+            <version>2.5.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fathzer</groupId>
+            <artifactId>javaluator</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+        <!-- Parse command line options (used by WallhavenCmd) -->
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <!-- BiMap, Lists -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>28.2-jre</version>
+        </dependency>
+        <!-- DurationFormatUtils, StringUtils -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
         </dependency>
     </dependencies>
 </project>
