@@ -135,11 +135,11 @@
             <artifactId>commons-cli</artifactId>
             <version>1.4</version>
         </dependency>
-        <!-- HashBasedTable -->
+        <!-- BiMap, Lists -->
         <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>0.9.12</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>28.2-jre</version>
         </dependency>
         <!-- DurationFormatUtils, StringUtils -->
         <dependency>
